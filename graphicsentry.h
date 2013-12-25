@@ -40,6 +40,7 @@ class LaneGraphicsView : public QGraphicsView {
   LaneGraphicsView(QGraphicsScene *,QWidget * parent = 0);
  protected:
   void scrollContentsBy(int,int);
+  void keyPressEvent(QKeyEvent *);
 };
 class GraphicsEntry : public QWidget {
   Q_OBJECT
@@ -58,10 +59,13 @@ class GraphicsEntry : public QWidget {
     void linkActivated(const QString &);
     void linkHovered(const QString &);
     void anchorTest();
+    void onZoomIn();
+    void onZoomOut();
  private:
     const XalanCompiledStylesheet * m_compXsl;
     bool showNode(const QString &);
-
+    qreal m_scale;
+    QTransform m_transform;
     QString transform(const QString & xsl,const QString & xml);
     void addEntry(const QString &);
     void setCSS(const QString &);
@@ -75,6 +79,8 @@ class GraphicsEntry : public QWidget {
     QPushButton * m_findNodeBtn;
     QPushButton * m_loadCssBtn;
     QPushButton * m_anchorBtn;
+    QPushButton * m_zoomIn;
+    QPushButton * m_zoomOut;
     QLabel * m_root;
     QLabel * m_word;
     LaneGraphicsView * m_view;

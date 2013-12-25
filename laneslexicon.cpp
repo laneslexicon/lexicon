@@ -84,4 +84,5 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * ol
     statusBar()->showMessage(item->getNode());
 
   }
+
 }

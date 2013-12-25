@@ -19,13 +19,17 @@ void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
   }
 
 }
+void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
+  qDebug() << "got key";
+  QGraphicsView::keyPressEvent(event);
+}
 GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   m_textOption.setTextDirection(Qt::LeftToRight);
   m_compXsl = 0;
   m_dbname = new QLineEdit;
   m_dbname->setText("lexicon.sqlite");
-
+  m_scale = 1.0;
   m_currentDb = m_dbname->text();
 
   m_xsl = new QLineEdit;
@@ -68,6 +72,16 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   hlayout->addWidget(m_word);
   hlayout->addStretch();
   layout->addLayout(hlayout);
+
+  QHBoxLayout * btnslayout = new QHBoxLayout;
+  m_zoomIn = new QPushButton(tr("+"));
+  m_zoomOut = new QPushButton(tr("-"));
+  btnslayout->addWidget(m_zoomIn);
+  btnslayout->addWidget(m_zoomOut);
+  layout->addLayout(btnslayout);
+
+  connect(m_zoomIn,SIGNAL(clicked()),this,SLOT(onZoomIn()));
+  connect(m_zoomOut,SIGNAL(clicked()),this,SLOT(onZoomOut()));
 
   QSplitter * splitter = new QSplitter;
   m_scene = new QGraphicsScene;
@@ -333,6 +347,8 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   //  }
   m_nodeHtml->setPlainText(allHtml);
   //  qDebug() << xml;
+  m_view->setFocus();
+  m_transform = m_view->transform();
 }
 void GraphicsEntry::getXmlForNode(const QString  & node) {
   qDebug() << "Search for node" << node;
@@ -390,5 +406,18 @@ void GraphicsEntry::addEntry(const QString & html) {
 
   //  m_nodeHtml->setHtml(html);
   //  m_nodeText->setPlainText(html);
+
+}
+void GraphicsEntry::onZoomIn() {
+  m_view->setTransform(m_transform);
+  m_scale += .1;
+  m_view->scale(m_scale,m_scale);
+  qDebug() << "scale" << m_scale;
+}
+void GraphicsEntry::onZoomOut() {
+  m_view->setTransform(m_transform);
+  m_scale -= .1;
+  m_view->scale(m_scale,m_scale);
+  qDebug() << "scale" << m_scale;
 
 }
