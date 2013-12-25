@@ -2,14 +2,17 @@
 <xsl:stylesheet
     version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" >
-
+  <xsl:param name="ddebug" />
   <xsl:preserve-space elements="*"/>
   <xsl:output method="html" indent="yes" encoding="utf-8" omit-xml-declaration="yes"/>
   <xsl:template match="/">
+      <xsl:message><xsl:value-of select="$ddebug"/></xsl:message>
 
     <xsl:apply-templates select="//word" />
     <xsl:apply-templates select="//root" />
-
+    <xsl:if test="$ddebug = 'entryfree'">
+      <xsl:apply-templates select="//entryFree" />
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="root">
