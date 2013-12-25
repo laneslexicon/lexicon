@@ -6,9 +6,11 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   QSplitter * w = new QSplitter;
   m_tree = new ContentsWidget(this);
+  m_tabs = new QTabWidget(this);
   m_entry = new GraphicsEntry;
   w->addWidget(m_tree);
-  w->addWidget(m_entry);
+  w->addWidget(m_tabs);
+  m_tabs->addTab(m_entry,tr(""));
   setCentralWidget(w);
   createActions();
   createToolBar();
@@ -69,7 +71,7 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
   ok = m_db.open();
   return ok;
 }
-void LanesLexicon::rootClicked(QTreeWidgetItem * item,int column) {
+void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
   qDebug() << "requested root" << root;
   m_entry->getXmlForRoot(root);
