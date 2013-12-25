@@ -1,0 +1,9 @@
+.hi { font-family : Droid Serif;font-size : 12px;font-style : italic}
+.arabic { font-family : Amiri;font-size : 14px}
+.arabichead { font-family : Amiri;font-size : 30px}
+body { font-family : Sans Droid;font-size : 12px}
+.bseparator { font-size : 12px}
+.aseparator { font-size : 12px}
+.rootword { margin-left : 50px}
+.entry { margin-left : 30px}
+.infl {font-family : Sans Droid Bold; font-style : bold}
