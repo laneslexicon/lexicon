@@ -23,10 +23,10 @@
 #include <QTextOption>
 #include <QScrollBar>
 #include "xsltsupport.h"
-class LaneGraphicsTextItem : public QGraphicsTextItem {
+class EntryItem : public QGraphicsTextItem {
  public:
-  LaneGraphicsTextItem(const QString &, QGraphicsItem * parent = 0);
-  LaneGraphicsTextItem(QGraphicsItem * parent = 0);
+  EntryItem(const QString &, QGraphicsItem * parent = 0);
+  EntryItem(QGraphicsItem * parent = 0);
   void setNode(const QString & id) { m_nodeId = id;}
   bool isNode(const QString & id) { return m_nodeId ==  id;}
   QString getNode() { return m_nodeId;}
@@ -90,5 +90,7 @@ class GraphicsEntry : public QWidget {
     QString m_currentCSS;
     QString m_currentHtml;
     XalanTransformer * m_xalan;
+ signals:
+    void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
 };
 #endif

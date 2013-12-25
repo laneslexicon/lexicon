@@ -42,6 +42,7 @@ public:
 private slots:
     void on_actionExit();
     void rootClicked(QTreeWidgetItem * , int);
+    void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
 private:
     void createActions();
     void createToolBar();

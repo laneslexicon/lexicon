@@ -7,7 +7,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   QSplitter * w = new QSplitter;
   m_tree = new ContentsWidget(this);
   m_tabs = new QTabWidget(this);
-  m_entry = new GraphicsEntry;
+  m_entry = new GraphicsEntry(this);
   w->addWidget(m_tree);
   w->addWidget(m_tabs);
   m_tabs->addTab(m_entry,tr(""));
@@ -26,6 +26,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     statusBar()->showMessage(tr("Failed to open database"));
   }
   connect(m_tree,SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
+  connect(m_entry,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
+          this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 }
 
 LanesLexicon::~LanesLexicon()
@@ -75,4 +77,11 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
   qDebug() << "requested root" << root;
   m_entry->getXmlForRoot(root);
+}
+void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
+  EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
+  if (item) {
+    statusBar()->showMessage(item->getNode());
+
+  }
 }

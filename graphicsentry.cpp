@@ -1,7 +1,7 @@
 #include "graphicsentry.h"
-LaneGraphicsTextItem::LaneGraphicsTextItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
+EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
 }
-LaneGraphicsTextItem::LaneGraphicsTextItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
+EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
 
 }
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,QWidget * parent) :
@@ -108,6 +108,9 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   connect(m_item,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
   connect(m_item,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
 
+  connect(m_scene,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
+          this,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
+
  m_standardCSS = QString(".arabic { font-family : Sans Droid;font-size : 28px};div { font-family : Sans Droid;font-size : 20px}");
   m_currentCSS = m_standardCSS;
   cssChanged();
@@ -147,7 +150,7 @@ void GraphicsEntry::anchorTest() {
 
   QList<QGraphicsItem *> items = m_scene->items();
   for(int i=0;i < items.size();i++) {
-    LaneGraphicsTextItem * item = dynamic_cast<LaneGraphicsTextItem *>(items[i]);
+    EntryItem * item = dynamic_cast<EntryItem *>(items[i]);
     if (item) {
       if (item->isNode(node)) {
         qDebug() << "Found node" << node;
@@ -161,7 +164,7 @@ void GraphicsEntry::anchorTest() {
 bool GraphicsEntry::showNode(const QString & node) {
   QList<QGraphicsItem *> items = m_scene->items();
   for(int i=0;i < items.size();i++) {
-    LaneGraphicsTextItem * item = dynamic_cast<LaneGraphicsTextItem *>(items[i]);
+    EntryItem * item = dynamic_cast<EntryItem *>(items[i]);
     if (item) {
       if (item->isNode(node)) {
         qDebug() << "Found node" << node;
@@ -308,7 +311,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   QString allHtml;
   for(int i=0;i < xmlitems.size();i++) {
     QString html =transform(m_xsl->text(),xmlitems[i]);
-    LaneGraphicsTextItem * gi = new LaneGraphicsTextItem("");
+    EntryItem * gi = new EntryItem("");
     gi->document()->setDefaultStyleSheet(m_currentCSS);
     gi->setHtml(html);
     gi->setPos(xpos,ypos);
