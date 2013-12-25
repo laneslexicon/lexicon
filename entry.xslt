@@ -6,8 +6,6 @@
   <xsl:preserve-space elements="*"/>
   <xsl:output method="html" indent="yes" encoding="utf-8" omit-xml-declaration="yes"/>
   <xsl:template match="/">
-      <xsl:message><xsl:value-of select="$ddebug"/></xsl:message>
-
     <xsl:apply-templates select="//word" />
     <xsl:apply-templates select="//root" />
     <xsl:if test="$ddebug = 'entryfree'">
@@ -121,7 +119,7 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
             <xsl:when test="name() = 'sense'">
               <xsl:apply-templates select="." />
             </xsl:when>
-            <xsl:when test="name() = 'foreign'">
+            <xsl:when test="name() = 'foreign' or 'orth'">
               <span class="arabic">
               <xsl:choose>
                 <xsl:when test="@goto">
