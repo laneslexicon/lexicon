@@ -15,7 +15,14 @@ Qt::ItemFlags EditableSqlModel::flags(
         flags |= Qt::ItemIsEditable;
     return flags;
 }
-
+void EditableSqlModel::setNote(int row,const QString & note) {
+  QModelIndex ix = createIndex(row,Notes_Note);
+  setData(ix,note,Qt::EditRole);
+}
+void EditableSqlModel::setTag(int row,const QString & note) {
+  QModelIndex ix = createIndex(row,Notes_Tag);
+  setData(ix,note,Qt::EditRole);
+}
 bool EditableSqlModel::setData(const QModelIndex &index, const QVariant &value, int /* role */)
 {
   if (index.column() == 3 || index.column() == 4) {
@@ -31,10 +38,10 @@ bool EditableSqlModel::setData(const QModelIndex &index, const QVariant &value, 
   qDebug() << "setData" << index.row() << index.column() << value;
   bool ok;
   if (index.column() == 3) {
-    ok = setNote(id, value.toString());
+    ok = updateNote(id, value.toString());
   }
   else if (index.column() == 4 ){
-    ok = setTag(id, value.toString());
+    ok = updateTag(id, value.toString());
   }
   refresh();
   return ok;
@@ -63,7 +70,7 @@ void EditableSqlModel::refresh()
   setHeaderData(Notes_Tag,Qt::Horizontal,tr("Tag"));
 }
 
-bool EditableSqlModel::setNote(int id, const QString & note)
+bool EditableSqlModel::updateNote(int id, const QString & note)
 {
   QSqlQuery query(m_db);
   query.prepare("update notes set note = ? where id = ?");
@@ -72,7 +79,7 @@ bool EditableSqlModel::setNote(int id, const QString & note)
     return query.exec();
 }
 
-bool EditableSqlModel::setTag(int id, const QString & tag)
+bool EditableSqlModel::updateTag(int id, const QString & tag)
 {
   QSqlQuery query(m_db);
     query.prepare("update notes set tag = ? where id = ?");
@@ -173,15 +180,24 @@ QWidget * NotesWidget::createEditWidget() {
   m_tag = new QLineEdit;
   layout->addWidget(m_note);
   layout->addWidget(m_tag);
+
+
+  QHBoxLayout * btnlayout = new QHBoxLayout;
+  m_saveBtn = new QPushButton(tr("Save"));
+  btnlayout->addWidget(m_saveBtn);
+  layout->addLayout(btnlayout);
+  connect(m_saveBtn,SIGNAL(clicked()),this,SLOT(onSaveClicked()));
   editWidget->setLayout(layout);
   return editWidget;
-
-
 }
 NotesWidget::~NotesWidget() {
   if (m_db.isOpen()) {
     m_db.close();
   }
+}
+void NotesWidget::onSaveClicked() {
+  m_model->setNote(m_currentRow,m_note->toPlainText());
+  m_model->setTag(m_currentRow,m_tag->text());
 }
 void NotesWidget::onShowClicked() {
   m_model->setSearch(m_show->text());
@@ -219,8 +235,8 @@ bool NotesWidget::createConnection() {
 }
 void NotesWidget::showSelectedNote() {
   if (m_view->selectionModel()->hasSelection()) {
-    int row = m_view->selectionModel()->currentIndex().row();
-    m_note->setText(m_model->data(m_model->index(row, Notes_Note)).toString());
-    m_tag->setText(m_model->data(m_model->index(row, Notes_Tag)).toString());
+    m_currentRow = m_view->selectionModel()->currentIndex().row();
+    m_note->setText(m_model->data(m_model->index(m_currentRow, Notes_Note)).toString());
+    m_tag->setText(m_model->data(m_model->index(m_currentRow, Notes_Tag)).toString());
   }
 }

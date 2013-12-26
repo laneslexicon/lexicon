@@ -39,10 +39,13 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
     void setSearch(const QString & t ) { m_searchItem = t;};
+    void setNote(int row, const QString &);
+    void setTag(int row, const QString &);
+
     void refresh();
  private:
-    bool setNote(int id, const QString &);
-    bool setTag(int id, const QString &);
+    bool updateNote(int id, const QString &);
+    bool updateTag(int id, const QString &);
 
     bool createConnection();
     QString m_searchItem;
@@ -58,8 +61,10 @@ class NotesWidget : public QWidget {
   ~NotesWidget();
  public slots:
   void onShowClicked();
+  void onSaveClicked();
   void showSelectedNote();
  private:
+  int m_currentRow;
   QString m_baseQuery;
   QSqlDatabase m_db;
   //QSqlQueryModel * m_model;
@@ -70,6 +75,8 @@ class NotesWidget : public QWidget {
   QLineEdit * m_show;
   QLineEdit * m_tag;
   QPushButton * m_showBtn;
+  QPushButton * m_saveBtn;
+  QPushButton * m_deleteBtn;
   QWidget * createQueryWidget();
   QWidget * createEditWidget();
 };
