@@ -17,14 +17,15 @@
 #include <QPushButton>
 #include <QSplitter>
 #include <QDebug>
+#include <QModelIndex>
 //CREATE TABLE notes (id integer primary key, nodeId text,word text,tag text,note text,created text,amended text);
-
+/// these are the columns in the table
 enum {
   Notes_Id = 0,
   Notes_NodeId = 1,
   Notes_Word = 2,
-  Notes_Tag = 3,
-  Notes_Note = 4,
+  Notes_Note = 3,
+  Notes_Tag = 4,
   Notes_CreationDate = 5,
   Notes_AmendDate = 6
 };
@@ -36,13 +37,18 @@ class NotesWidget : public QWidget {
   ~NotesWidget();
  public slots:
   void onShowClicked();
+  void showSelectedNote();
  private:
+  QString m_baseQuery;
   QSqlDatabase m_db;
   QSqlQueryModel * m_model;
   QTableView * m_view;
   bool createConnection();
   QTextEdit * m_note;
   QLineEdit * m_show;
+  QLineEdit * m_tag;
   QPushButton * m_showBtn;
+  QWidget * createQueryWidget();
+  QWidget * createEditWidget();
 };
 #endif
