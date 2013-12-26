@@ -293,13 +293,19 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   QString arRoot;
-  QString contents;
+  //  QString contents;
 
   //  if ( ! m_rootQuery->isValid()) {
   //    qDebug() << "Root not found";
   //  }
   QStringList xmlitems;
   QStringList nodes;
+  QString rootxml = QString("<word type=\"root\" ar=\"%1\">\n").arg(root);
+  //  rootxml += contents;
+  rootxml += "</word>";
+  qDebug() << rootxml;
+  xmlitems << rootxml;
+  int itemCount = m_items.size();
   while(m_rootQuery->next()) {
     arRoot = m_rootQuery->value(0).toString();
     qDebug() << m_rootQuery->value(3).toString();
@@ -310,17 +316,30 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
       .arg(m_rootQuery->value(6).toString());
     t += m_rootQuery->value(4).toString();
     t += "</word>\n";
+    EntryItem * item  = createEntry(t);
+    item->setNode(m_rootQuery->value(7).toString());
+    item->setRoot(arRoot);
+    m_items << item;
     xmlitems << t;
     nodes << m_rootQuery->value(7).toString();
   }
 
-  QString rootxml = QString("<root btext=\"%1\" text=\"%2\">\n").arg(root).arg(arRoot);
-  rootxml += contents;
-  rootxml += "</root>";
-  xmlitems.prepend(rootxml);
   m_nodeXml->setPlainText(xmlitems.join("\n"));
   showItems(xmlitems,nodes);
   showNode(node);
+}
+EntryItem * GraphicsEntry::createEntry(const QString & xml) {
+    QString html =transform(m_xsl->text(),xml);
+    EntryItem * gi = new EntryItem("");
+    gi->document()->setDefaultStyleSheet(m_currentCSS);
+    gi->setHtml(html);
+    //    gi->setPos(xpos,ypos);
+    gi->setTextWidth(300);
+    gi->document()->setDefaultTextOption(m_textOption);
+    gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
+    connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
+    return gi;
 }
 void GraphicsEntry::showItems(const QStringList & xmlitems,const QStringList & nodes) {
   m_scene->clear();

@@ -6,8 +6,8 @@
   <xsl:preserve-space elements="*"/>
   <xsl:output method="html" indent="yes" encoding="utf-8" omit-xml-declaration="yes"/>
   <xsl:template match="/">
-    <xsl:apply-templates select="//word" />
     <xsl:apply-templates select="//root" />
+    <xsl:apply-templates select="//word" />
     <xsl:if test="$ddebug = 'entryfree'">
       <xsl:apply-templates select="//entryFree" />
     </xsl:if>
@@ -23,6 +23,14 @@
   </xsl:template>
 
   <xsl:template match="word">
+    <xsl:choose>
+      <xsl:when test="@type = 'root'">
+    <p class="rootword"><span class="arabichead rootword"><xsl:value-of  select="@ar"/></span>
+    </p>
+
+
+      </xsl:when>
+      <xsl:otherwise>
     <span class="wordheading">
       <xsl:if test="not(@itype = '')">
         <span class="infl"><xsl:value-of select="@itype" /></span><xsl:text> </xsl:text>
@@ -30,6 +38,8 @@
     <span class="arabic"><xsl:value-of select="@ar"/></span>
     </span>
     <xsl:apply-templates select="entryFree" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="form">

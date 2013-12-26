@@ -28,8 +28,10 @@ class EntryItem : public QGraphicsTextItem {
   EntryItem(const QString &, QGraphicsItem * parent = 0);
   EntryItem(QGraphicsItem * parent = 0);
   void setNode(const QString & id) { m_nodeId = id;}
+  void setRoot(const QString & root) { m_root = root; }
   bool isNode(const QString & id) { return m_nodeId ==  id;}
   QString getNode() { return m_nodeId;}
+  QString getRoot() { return m_root;}
  private:
   QString m_nodeId;
   int m_page;
@@ -62,7 +64,9 @@ class GraphicsEntry : public QWidget {
     void onZoomIn();
     void onZoomOut();
  private:
+    QList<EntryItem *> m_items;
     void showItems(const QStringList & xmlitems,const QStringList & nodes);
+    EntryItem * createEntry(const QString & xml);
     const XalanCompiledStylesheet * m_compXsl;
     bool showNode(const QString &);
     qreal m_scale;
