@@ -31,6 +31,7 @@
 #include <QLabel>
 #include "contentswidget.h"
 #include "graphicsentry.h"
+#include "noteswidget.h"
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
@@ -58,5 +59,6 @@ private:
     QMenu * m_fileMenu;
     // actions
     QAction * m_exitAction;
+
 };
 #endif // MAINWINDOW_H

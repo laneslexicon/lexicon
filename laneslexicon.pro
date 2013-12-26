@@ -28,11 +28,13 @@ SOURCES += main.cpp\
         contentswidget.cpp \
         graphicsentry.cpp \
         xsltsupport.cpp \
-        searchwidget.cpp
+        searchwidget.cpp \
+        noteswidget.cpp
 
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
             graphicsentry.h \
             xsltsupport.h \
-            searchwidget.h
+            searchwidget.h \
+            noteswidget.h

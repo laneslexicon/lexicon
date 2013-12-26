@@ -11,6 +11,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   w->addWidget(m_tree);
   w->addWidget(m_tabs);
   m_tabs->addTab(m_entry,tr(""));
+
+  m_tabs->addTab(new NotesWidget,"Notes");
   setCentralWidget(w);
   createActions();
   createToolBar();
