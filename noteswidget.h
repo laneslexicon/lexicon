@@ -10,10 +10,13 @@
 #include <QMessageBox>
 #include <QSqlError>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QTextEdit>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSplitter>
+#include <QDebug>
 //CREATE TABLE notes (id integer primary key, nodeId text,word text,tag text,note text,created text,amended text);
 
 enum {
@@ -31,11 +34,15 @@ class NotesWidget : public QWidget {
 
   NotesWidget(QWidget * parent = 0);
   ~NotesWidget();
+ public slots:
+  void onShowClicked();
  private:
   QSqlDatabase m_db;
   QSqlQueryModel * m_model;
   QTableView * m_view;
   bool createConnection();
   QTextEdit * m_note;
+  QLineEdit * m_show;
+  QPushButton * m_showBtn;
 };
 #endif
