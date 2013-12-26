@@ -29,6 +29,27 @@ enum {
   Notes_CreationDate = 5,
   Notes_AmendDate = 6
 };
+class EditableSqlModel : public QSqlQueryModel
+{
+    Q_OBJECT
+
+public:
+    EditableSqlModel(QObject *parent = 0);
+
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+    void setSearch(const QString & t ) { m_searchItem = t;};
+    void refresh();
+ private:
+    bool setNote(int id, const QString &);
+    bool setTag(int id, const QString &);
+
+    bool createConnection();
+    QString m_searchItem;
+    QString m_baseQuery;
+    QSqlDatabase m_db;
+};
+
 class NotesWidget : public QWidget {
   Q_OBJECT
  public:
@@ -41,7 +62,8 @@ class NotesWidget : public QWidget {
  private:
   QString m_baseQuery;
   QSqlDatabase m_db;
-  QSqlQueryModel * m_model;
+  //QSqlQueryModel * m_model;
+  EditableSqlModel * m_model;
   QTableView * m_view;
   bool createConnection();
   QTextEdit * m_note;
