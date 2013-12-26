@@ -64,8 +64,8 @@ class GraphicsEntry : public QWidget {
     void onZoomIn();
     void onZoomOut();
  private:
+    void addEntries(int);
     QList<EntryItem *> m_items;
-    void showItems(const QStringList & xmlitems,const QStringList & nodes);
     EntryItem * createEntry(const QString & xml);
     const XalanCompiledStylesheet * m_compXsl;
     bool showNode(const QString &);

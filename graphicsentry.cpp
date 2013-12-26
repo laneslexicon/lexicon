@@ -293,19 +293,15 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   QString arRoot;
-  //  QString contents;
-
-  //  if ( ! m_rootQuery->isValid()) {
-  //    qDebug() << "Root not found";
-  //  }
-  QStringList xmlitems;
-  QStringList nodes;
-  QString rootxml = QString("<word type=\"root\" ar=\"%1\">\n").arg(root);
-  //  rootxml += contents;
-  rootxml += "</word>";
-  qDebug() << rootxml;
-  xmlitems << rootxml;
+  QString startNode = node;
+  /// get the position of the last item
   int itemCount = m_items.size();
+  /// add the root item
+  QString rootxml = QString("<word type=\"root\" ar=\"%1\" />\n").arg(root);
+  EntryItem * item  = createEntry(rootxml);
+  item->setRoot(root);
+  m_items << item;
+  /// now add all the entries for the root
   while(m_rootQuery->next()) {
     arRoot = m_rootQuery->value(0).toString();
     qDebug() << m_rootQuery->value(3).toString();
@@ -316,62 +312,65 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
       .arg(m_rootQuery->value(6).toString());
     t += m_rootQuery->value(4).toString();
     t += "</word>\n";
-    EntryItem * item  = createEntry(t);
+    item  = createEntry(t);
     item->setNode(m_rootQuery->value(7).toString());
+    /// get the nodeid of the first item at added, so we jump to it later
+    if (startNode.isEmpty()) {
+      startNode = m_rootQuery->value(7).toString();
+    }
     item->setRoot(arRoot);
     m_items << item;
-    xmlitems << t;
-    nodes << m_rootQuery->value(7).toString();
   }
-
-  m_nodeXml->setPlainText(xmlitems.join("\n"));
-  showItems(xmlitems,nodes);
-  showNode(node);
+  addEntries(itemCount);
+  m_view->setFocus();
+  m_transform = m_view->transform();
+  qDebug() << "showing start node:" << startNode;
+  showNode(startNode);
 }
+/**
+ * create the QTextGraphicsItem by transforming the passed xml
+ *
+ * @param xml
+ *
+ * @return
+ */
 EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     QString html =transform(m_xsl->text(),xml);
     EntryItem * gi = new EntryItem("");
     gi->document()->setDefaultStyleSheet(m_currentCSS);
     gi->setHtml(html);
-    //    gi->setPos(xpos,ypos);
     gi->setTextWidth(300);
+    /// need this otherwise arabic text will be right justified
     gi->document()->setDefaultTextOption(m_textOption);
     gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
     connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
     connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
     return gi;
 }
-void GraphicsEntry::showItems(const QStringList & xmlitems,const QStringList & nodes) {
-  m_scene->clear();
+/**
+ * add the graphics items in m_items to the scene starting with the item
+ * at startPos
+ *
+ * @param startPos
+ */
+void GraphicsEntry::addEntries(int startPos) {
   int ypos = 0;
   int xpos = 0;
-  QString allHtml;
-  for(int i=0;i < xmlitems.size();i++) {
-    QString html =transform(m_xsl->text(),xmlitems[i]);
-    EntryItem * gi = new EntryItem("");
-    gi->document()->setDefaultStyleSheet(m_currentCSS);
-    gi->setHtml(html);
-    gi->setPos(xpos,ypos);
-    gi->setTextWidth(300);
-    gi->document()->setDefaultTextOption(m_textOption);
-    gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    if (i > 0) {
-      gi->setNode(nodes[i-1]);
-    }
-    connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
-    connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
-    m_scene->addItem(gi);
-    QRectF r = gi->boundingRect();
-    ypos += r.toRect().height() + 10;
-    allHtml += html;
+  QRectF r;
+  qDebug() << "addEntries" << startPos;
+  /// calculate the y-position of the last item currently in the scene
+  if (startPos > 0) {
+    QPointF p = m_items[startPos - 1]->pos();
+    r = m_items[startPos - 1]->boundingRect();
+    ypos =  p.toPoint().y() + r.toRect().height() + 10;
   }
-  //  if (! node.isEmpty()) {
-  //    m_nodeHtml->scrollToAnchor(node);
-  //  }
-  m_nodeHtml->setPlainText(allHtml);
-  //  qDebug() << xml;
-  m_view->setFocus();
-  m_transform = m_view->transform();
+  /// add items updating the ypos as we go
+  for(int i=startPos;i < m_items.size();i++) {
+    m_items[i]->setPos(xpos,ypos);
+    m_scene->addItem(m_items[i]);
+    r = m_items[i]->boundingRect();
+    ypos += r.toRect().height() + 10;
+  }
 }
 void GraphicsEntry::getXmlForNode(const QString  & node) {
   qDebug() << "Search for node" << node;
