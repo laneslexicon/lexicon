@@ -22,6 +22,9 @@
 #include <QApplication>
 #include <QTextOption>
 #include <QScrollBar>
+#include <QMenu>
+#include <QAction>
+#include <QGraphicsSceneContextMenuEvent>
 #include "xsltsupport.h"
 class EntryItem : public QGraphicsTextItem {
  public:
@@ -32,7 +35,9 @@ class EntryItem : public QGraphicsTextItem {
   bool isNode(const QString & id) { return m_nodeId ==  id;}
   QString getNode() { return m_nodeId;}
   QString getRoot() { return m_root;}
- private:
+ protected:
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
+  private:
   QString m_nodeId;
   int m_page;
   QString m_root;

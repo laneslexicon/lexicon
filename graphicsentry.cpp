@@ -4,6 +4,14 @@ EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTe
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
 
 }
+void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event) {
+  //  QGraphicsTextItem::contextMenuEvent(event);
+  qDebug() << "got context menuevent";
+  QMenu menu;
+  QAction *removeAction = menu.addAction("Remove");
+  QAction *markAction = menu.addAction("Mark");
+  QAction *selectedAction = menu.exec(event->screenPos());
+}
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,QWidget * parent) :
   QGraphicsView(scene,parent) {
 }
