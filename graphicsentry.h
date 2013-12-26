@@ -62,6 +62,7 @@ class GraphicsEntry : public QWidget {
     void onZoomIn();
     void onZoomOut();
  private:
+    void showItems(const QStringList & xmlitems,const QStringList & nodes);
     const XalanCompiledStylesheet * m_compXsl;
     bool showNode(const QString &);
     qreal m_scale;

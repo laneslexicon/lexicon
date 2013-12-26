@@ -11,16 +11,16 @@ void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
   QScrollBar * b = this->verticalScrollBar();
   QGraphicsView::scrollContentsBy(dx,dy);
   //  qDebug() << "scrolling" << dx << dy << b->maximum() << b->value();
-  if (b->value() == b->maximum()) {
-    qDebug() << "At bottom";
-  }
-  if (b->value() == b->minimum()) {
-    qDebug() << "At top";
-  }
+  // if (b->value() == b->maximum()) {
+  //   qDebug() << "At bottom";
+  // }
+  // if (b->value() == b->minimum()) {
+  //   qDebug() << "At top";
+  // }
 
 }
 void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
-  qDebug() << "got key";
+  //  qDebug() << "got key";
   QGraphicsView::keyPressEvent(event);
 }
 GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
@@ -182,7 +182,7 @@ bool GraphicsEntry::showNode(const QString & node) {
     if (item) {
       if (item->isNode(node)) {
         qDebug() << "Found node" << node;
-        m_scene->setFocusItem(item);
+        //        m_scene->setFocusItem(item);
         m_view->ensureVisible(item);
         return true;
       }
@@ -319,6 +319,10 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   rootxml += "</root>";
   xmlitems.prepend(rootxml);
   m_nodeXml->setPlainText(xmlitems.join("\n"));
+  showItems(xmlitems,nodes);
+  showNode(node);
+}
+void GraphicsEntry::showItems(const QStringList & xmlitems,const QStringList & nodes) {
   m_scene->clear();
   int ypos = 0;
   int xpos = 0;
@@ -412,12 +416,9 @@ void GraphicsEntry::onZoomIn() {
   m_view->setTransform(m_transform);
   m_scale += .1;
   m_view->scale(m_scale,m_scale);
-  qDebug() << "scale" << m_scale;
 }
 void GraphicsEntry::onZoomOut() {
   m_view->setTransform(m_transform);
   m_scale -= .1;
   m_view->scale(m_scale,m_scale);
-  qDebug() << "scale" << m_scale;
-
 }
