@@ -126,6 +126,8 @@ NotesWidget::NotesWidget(QWidget * parent) : QWidget(parent) {
   QSplitter * splitter = new QSplitter(Qt::Vertical);
   splitter->addWidget(createQueryWidget());
   splitter->addWidget(createEditWidget());
+  splitter->setStretchFactor(0,0);
+  splitter->setStretchFactor(1,1);
   layout->addWidget(splitter);
   setLayout(layout);
 
@@ -241,4 +243,11 @@ void NotesWidget::showSelectedNote() {
     m_node->setText(m_model->data(m_model->index(m_currentRow, Notes_NodeId)).toString());
     m_word->setText(m_model->data(m_model->index(m_currentRow, Notes_Word)).toString());
   }
+}
+void NotesWidget::setActiveNode(const QString & node,const QString & word) {
+  qDebug() << "word activated" << node << word;
+  m_node->setText(node);
+  m_word->setText(word);
+  m_show->setText(word);
+  onShowClicked();
 }

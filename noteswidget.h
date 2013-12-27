@@ -18,6 +18,7 @@
 #include <QSplitter>
 #include <QDebug>
 #include <QModelIndex>
+
 //CREATE TABLE notes (id integer primary key, nodeId text,word text,tag text,note text,created text,amended text);
 /// these are the columns in the table
 enum {
@@ -64,6 +65,7 @@ class NotesWidget : public QWidget {
   void onSaveClicked();
   void onNewClicked();
   void showSelectedNote();
+  void setActiveNode(const QString & node,const QString & word);
  private:
   int m_currentRow;
   QString m_baseQuery;

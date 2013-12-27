@@ -8,11 +8,12 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_tree = new ContentsWidget(this);
   m_tabs = new QTabWidget(this);
   m_entry = new GraphicsEntry(this);
+  m_notes = new NotesWidget(this);
   w->addWidget(m_tree);
   w->addWidget(m_tabs);
   m_tabs->addTab(m_entry,tr(""));
 
-  m_tabs->addTab(new NotesWidget,"Notes");
+  m_tabs->addTab(m_notes,"Notes");
   setCentralWidget(w);
   createActions();
   createToolBar();
@@ -30,7 +31,11 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   connect(m_tree,SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
   connect(m_entry,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
-}
+
+  connect(this,SIGNAL(nodeActivated(const QString & ,const QString & )),
+          m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
+
+ }
 
 LanesLexicon::~LanesLexicon()
 {
@@ -49,6 +54,9 @@ void LanesLexicon::createMenus() {
   m_fileMenu->addAction(m_exitAction);
 }
 void LanesLexicon::createStatusBar() {
+  m_notesBtn = new QPushButton(tr("Notes"));
+  m_notesBtn->setEnabled(false);
+  statusBar()->insertPermanentWidget(0,m_notesBtn,0);
   statusBar()->showMessage(tr("Ready"));
 }
 QSize LanesLexicon::sizeHint() const {
@@ -60,6 +68,9 @@ void LanesLexicon::on_actionExit()
     m_db.close();
   }
   close();
+}
+void LanesLexicon::onNotesClicked() {
+  qDebug() << "clicked notes";
 }
 bool LanesLexicon::openDatabase(const QString & dbname) {
   QFile dbfile(dbname);
@@ -84,7 +95,8 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * ol
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
   if (item) {
     statusBar()->showMessage(item->getNode());
-
+    m_notesBtn->setEnabled(true);
+    emit(nodeActivated(item->getNode(),item->getWord()));
   }
 
 }

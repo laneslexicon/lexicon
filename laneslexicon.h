@@ -44,14 +44,17 @@ private slots:
     void on_actionExit();
     void rootClicked(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
+    void onNotesClicked();
 private:
     void createActions();
     void createToolBar();
     void createMenus();
     void createStatusBar();
     bool openDatabase(const QString &);
+    QPushButton * m_notesBtn;
     ContentsWidget * m_tree;
     GraphicsEntry * m_entry;
+    NotesWidget * m_notes;
     QSqlDatabase m_db;
     QTabWidget * m_tabs;
     QToolBar  * m_tools;
@@ -59,6 +62,7 @@ private:
     QMenu * m_fileMenu;
     // actions
     QAction * m_exitAction;
-
+ signals:
+   void nodeActivated(const QString & node,const QString & word);
 };
 #endif // MAINWINDOW_H

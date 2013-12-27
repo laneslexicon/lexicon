@@ -327,6 +327,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
       startNode = m_rootQuery->value(7).toString();
     }
     item->setRoot(arRoot);
+    item->setWord(m_rootQuery->value(2).toString());
     m_items << item;
   }
   addEntries(itemCount);

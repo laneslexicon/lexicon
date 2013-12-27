@@ -32,15 +32,18 @@ class EntryItem : public QGraphicsTextItem {
   EntryItem(QGraphicsItem * parent = 0);
   void setNode(const QString & id) { m_nodeId = id;}
   void setRoot(const QString & root) { m_root = root; }
+  void setWord(const QString & word) { m_word = word; }
   bool isNode(const QString & id) { return m_nodeId ==  id;}
   QString getNode() { return m_nodeId;}
   QString getRoot() { return m_root;}
+  QString getWord() { return m_word;}
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   private:
   QString m_nodeId;
   int m_page;
   QString m_root;
+  QString m_word;
 };
 class LaneGraphicsView : public QGraphicsView {
  public:
