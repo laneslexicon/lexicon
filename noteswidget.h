@@ -41,7 +41,7 @@ public:
     void setSearch(const QString & t ) { m_searchItem = t;};
     void setNote(int row, const QString &);
     void setTag(int row, const QString &);
-
+    void addNote(const QString & node,const QString & word,const QString & note,const QString & tag);
     void refresh();
  private:
     bool updateNote(int id, const QString &);
@@ -62,6 +62,7 @@ class NotesWidget : public QWidget {
  public slots:
   void onShowClicked();
   void onSaveClicked();
+  void onNewClicked();
   void showSelectedNote();
  private:
   int m_currentRow;
@@ -71,9 +72,12 @@ class NotesWidget : public QWidget {
   EditableSqlModel * m_model;
   QTableView * m_view;
   bool createConnection();
+  QLineEdit * m_node;
+  QLineEdit * m_word;
   QTextEdit * m_note;
   QLineEdit * m_show;
   QLineEdit * m_tag;
+  QPushButton * m_newBtn;
   QPushButton * m_showBtn;
   QPushButton * m_saveBtn;
   QPushButton * m_deleteBtn;

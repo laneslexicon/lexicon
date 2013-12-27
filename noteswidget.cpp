@@ -69,6 +69,16 @@ void EditableSqlModel::refresh()
   setHeaderData(Notes_Note,Qt::Horizontal,tr("Note"));
   setHeaderData(Notes_Tag,Qt::Horizontal,tr("Tag"));
 }
+void EditableSqlModel::addNote(const QString & node,const QString & word,const QString & note,const QString & tag) {
+  QSqlQuery query(m_db);
+  query.prepare("insert into notes (nodeId,word,note,tag) values (?,?,?,?)");
+  query.addBindValue(node);
+  query.addBindValue(word);
+  query.addBindValue(note);
+  query.addBindValue(tag);
+  query.exec();
+  refresh();
+}
 
 bool EditableSqlModel::updateNote(int id, const QString & note)
 {
@@ -176,17 +186,24 @@ QWidget * NotesWidget::createEditWidget() {
   QWidget * editWidget = new QWidget;
 
   QVBoxLayout * layout = new QVBoxLayout;
+  m_node = new QLineEdit;
+  m_word = new QLineEdit;
   m_note = new QTextEdit;
   m_tag = new QLineEdit;
+  layout->addWidget(m_node);
+  layout->addWidget(m_word);
   layout->addWidget(m_note);
   layout->addWidget(m_tag);
 
 
   QHBoxLayout * btnlayout = new QHBoxLayout;
   m_saveBtn = new QPushButton(tr("Save"));
+  m_newBtn = new QPushButton(tr("Add"));
   btnlayout->addWidget(m_saveBtn);
+  btnlayout->addWidget(m_newBtn);
   layout->addLayout(btnlayout);
   connect(m_saveBtn,SIGNAL(clicked()),this,SLOT(onSaveClicked()));
+  connect(m_newBtn,SIGNAL(clicked()),this,SLOT(onNewClicked()));
   editWidget->setLayout(layout);
   return editWidget;
 }
@@ -198,6 +215,12 @@ NotesWidget::~NotesWidget() {
 void NotesWidget::onSaveClicked() {
   m_model->setNote(m_currentRow,m_note->toPlainText());
   m_model->setTag(m_currentRow,m_tag->text());
+}
+void NotesWidget::onNewClicked() {
+  m_model->addNote(m_node->text(),
+                   m_word->text(),
+                   m_note->toPlainText(),
+                   m_tag->text());
 }
 void NotesWidget::onShowClicked() {
   m_model->setSearch(m_show->text());
@@ -238,5 +261,7 @@ void NotesWidget::showSelectedNote() {
     m_currentRow = m_view->selectionModel()->currentIndex().row();
     m_note->setText(m_model->data(m_model->index(m_currentRow, Notes_Note)).toString());
     m_tag->setText(m_model->data(m_model->index(m_currentRow, Notes_Tag)).toString());
+    m_node->setText(m_model->data(m_model->index(m_currentRow, Notes_NodeId)).toString());
+    m_word->setText(m_model->data(m_model->index(m_currentRow, Notes_Word)).toString());
   }
 }
