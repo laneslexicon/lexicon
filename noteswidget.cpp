@@ -4,7 +4,6 @@ EditableSqlModel::EditableSqlModel(QObject *parent)
 {
   m_baseQuery  = "select id,nodeid,word,note,tag from notes";
   createConnection();
-
 }
 
 Qt::ItemFlags EditableSqlModel::flags(
@@ -35,7 +34,7 @@ bool EditableSqlModel::setData(const QModelIndex &index, const QVariant &value, 
   int id = data(primaryKeyIndex).toInt();
 
   clear();
-  qDebug() << "setData" << index.row() << index.column() << value;
+
   bool ok;
   if (index.column() == 3) {
     ok = updateNote(id, value.toString());
@@ -51,7 +50,7 @@ void EditableSqlModel::refresh()
 {
   QString query;
   if (m_searchItem.isEmpty()) {
-      query = m_baseQuery +  " order by nodeId";
+      query = m_baseQuery +  " order by nodeId,word";
   }
   else if (m_searchItem.startsWith("n")) {
     query = QString("%1 where nodeId = '%2'").arg(m_baseQuery).arg(m_searchItem);
@@ -63,7 +62,7 @@ void EditableSqlModel::refresh()
   if (lastError().isValid()) {
     qDebug() << "Last error" << lastError().text();
   }
-  setHeaderData(Notes_Id,Qt::Horizontal,tr("Id"));
+  setHeaderData(Notes_Id,Qt::Horizontal,QObject::tr("Id"));
   setHeaderData(Notes_NodeId,Qt::Horizontal,tr("Node"));
   setHeaderData(Notes_Word,Qt::Horizontal,tr("Word"));
   setHeaderData(Notes_Note,Qt::Horizontal,tr("Note"));
@@ -123,11 +122,8 @@ bool EditableSqlModel::createConnection() {
  */
 
 NotesWidget::NotesWidget(QWidget * parent) : QWidget(parent) {
-  // if (! createConnection()) {
-  //   return;
-  // }
   QVBoxLayout * layout = new QVBoxLayout;
-  QSplitter * splitter = new QSplitter;
+  QSplitter * splitter = new QSplitter(Qt::Vertical);
   splitter->addWidget(createQueryWidget());
   splitter->addWidget(createEditWidget());
   layout->addWidget(splitter);
@@ -138,20 +134,13 @@ QWidget * NotesWidget::createQueryWidget() {
   m_baseQuery  = "select id,nodeid,word,note,tag from notes";
   //  m_model = new QSqlQueryModel;
   m_model = new EditableSqlModel;
-  // m_model->setQuery(m_baseQuery + " order by nodeId",m_db);
-  // m_model->setHeaderData(Notes_Id,Qt::Horizontal,tr("Id"));
-  // m_model->setHeaderData(Notes_NodeId,Qt::Horizontal,tr("Node"));
-  // m_model->setHeaderData(Notes_Word,Qt::Horizontal,tr("Word"));
-  // m_model->setHeaderData(Notes_Note,Qt::Horizontal,tr("Note"));
-  // m_model->setHeaderData(Notes_Tag,Qt::Horizontal,tr("Tag"));
-  //  m_model->select();
-
   m_view = new QTableView;
   m_view->setModel(m_model);
   m_view->setSelectionMode(QAbstractItemView::SingleSelection);
   m_view->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_view->setColumnHidden(Notes_Id,true);
-  m_view->setColumnHidden(Notes_Tag,true);
+  m_view->horizontalHeader()->setSectionHidden(0,true);
+  //  m_view->setColumnHidden(0,true);
+  //  m_view->setColumnHidden(Notes_Tag,true);
   m_view->resizeColumnsToContents();
   m_view->horizontalHeader()->setStretchLastSection(true);
   m_view->show();
@@ -172,14 +161,12 @@ QWidget * NotesWidget::createQueryWidget() {
   layout->addWidget(m_showBtn);
   layout->addWidget(m_view);
   queryWidget->setLayout(layout);
-
-  //  connect(m_view->selectionModel(),SIGNAL(currentRowChanged(const QModelIndex &,const QModelIndex &)),
-  //          this,SLOT(showSelectedNote()));
   connect(m_view->selectionModel(),SIGNAL(selectionChanged(const QItemSelection &,const QItemSelection &)),
             this,SLOT(showSelectedNote()));
-  //  void 	selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
+
 
   m_model->refresh();
+  m_view->horizontalHeader()->setSectionHidden(Notes_Id,true);
   return queryWidget;
 }
 QWidget * NotesWidget::createEditWidget() {
@@ -215,29 +202,19 @@ NotesWidget::~NotesWidget() {
 void NotesWidget::onSaveClicked() {
   m_model->setNote(m_currentRow,m_note->toPlainText());
   m_model->setTag(m_currentRow,m_tag->text());
+  m_view->horizontalHeader()->setSectionHidden(Notes_Id,true);
 }
 void NotesWidget::onNewClicked() {
   m_model->addNote(m_node->text(),
                    m_word->text(),
                    m_note->toPlainText(),
                    m_tag->text());
+  m_view->horizontalHeader()->setSectionHidden(Notes_Id,true);
 }
 void NotesWidget::onShowClicked() {
   m_model->setSearch(m_show->text());
   m_model->refresh();
-  // QString t = m_show->text();
-  // if (t.isEmpty()) {
-  //    m_model->setQuery(m_baseQuery +  " order by nodeId",m_db);
-  // }
-  // else if (t.startsWith("n")) {
-  //   m_model->setQuery(QString("%1 where nodeId = '%2'").arg(m_baseQuery).arg(t),m_db);
-  // }
-  // else {
-  //   m_model->setQuery(QString("%1 where word = '%2'").arg(m_baseQuery).arg(t),m_db);
-  // }
-  // if (m_model->lastError().isValid()) {
-  //   qDebug() << "Last error" << m_model->lastError().text();
-  // }
+  m_view->horizontalHeader()->setSectionHidden(Notes_Id,true);
 }
 bool NotesWidget::createConnection() {
   bool dbInitRequired = false;
