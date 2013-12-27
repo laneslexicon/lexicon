@@ -393,7 +393,7 @@ void GraphicsEntry::getXmlForNode(const QString  & node) {
     QString word = QString("%1/%2").arg(m_nodeQuery->value("bword").toString()).arg(m_nodeQuery->value("word").toString());
     m_root->setText(root);
     m_word->setText(word);
-    getXmlForRoot(m_nodeQuery->value("broot").toString(),node);
+    getXmlForRoot(m_nodeQuery->value("root").toString(),node);
     //   transform(m_xsl->text(),xml);
   }
   else {
