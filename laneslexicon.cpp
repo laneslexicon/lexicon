@@ -35,6 +35,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   connect(this,SIGNAL(nodeActivated(const QString & ,const QString & )),
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
 
+  connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
  }
 
 LanesLexicon::~LanesLexicon()
@@ -70,7 +71,7 @@ void LanesLexicon::on_actionExit()
   close();
 }
 void LanesLexicon::onNotesClicked() {
-  qDebug() << "clicked notes";
+  m_tabs->setCurrentWidget(m_notes);
 }
 bool LanesLexicon::openDatabase(const QString & dbname) {
   QFile dbfile(dbname);
@@ -88,7 +89,6 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
-  qDebug() << "requested root" << root;
   m_entry->getXmlForRoot(root);
 }
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
