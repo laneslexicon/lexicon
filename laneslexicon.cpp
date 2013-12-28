@@ -29,6 +29,10 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     statusBar()->showMessage(tr("Failed to open database"));
   }
   connect(m_tree,SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
+
+  connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
+
+
   connect(entry,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 

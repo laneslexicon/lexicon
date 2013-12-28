@@ -33,3 +33,28 @@ void ContentsWidget::loadContents() {
     addTopLevelItem(item);
   }
 }
+void ContentsWidget::keyPressEvent(QKeyEvent * event) {
+  switch (event->key()) {
+  case Qt::Key_Space: {
+    qDebug() << "spacebar";
+    QTreeWidgetItem * item = this->currentItem();
+    if (item) {
+      /// it is a top level item so expand it
+      if (item->childCount() > 0) {
+        if (item->isExpanded()) {
+          collapseItem(item);
+        }
+        else {
+          expandItem(item);
+        }
+      }
+      else {
+        emit(itemActivated(item,0));
+      }
+    }
+    break;
+  }
+  default:
+    QTreeWidget::keyPressEvent(event);
+  }
+}

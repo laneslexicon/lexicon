@@ -8,10 +8,15 @@
 #include <QHeaderView>
 #include <QDebug>
 #include <QFont>
+#include <QKeyEvent>
 class ContentsWidget : public QTreeWidget {
   Q_OBJECT;
  public:
   ContentsWidget(QWidget * parent = 0);
   void loadContents();
+ protected:
+  virtual void 	keyPressEvent(QKeyEvent * event);
+ signals:
+  void itemActivated(QTreeWidgetItem *,int /* not used */);
 };
 #endif
