@@ -31,7 +31,7 @@ class EntryItem : public QGraphicsTextItem {
   EntryItem(const QString &, QGraphicsItem * parent = 0);
   EntryItem(QGraphicsItem * parent = 0);
   void setNode(const QString & id) { m_nodeId = id;}
-  void setRoot(const QString & root) { m_root = root; }
+  void setRoot(const QString & root,bool isRootEntry = false);
   void setWord(const QString & word) { m_word = word; }
   bool isNode(const QString & id) { return m_nodeId ==  id;}
   QString getNode() { return m_nodeId;}
@@ -41,6 +41,7 @@ class EntryItem : public QGraphicsTextItem {
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   private:
   QString m_nodeId;
+  bool m_isRoot;
   int m_page;
   QString m_root;
   QString m_word;
@@ -71,6 +72,7 @@ class GraphicsEntry : public QWidget {
     void anchorTest();
     void onZoomIn();
     void onZoomOut();
+    void onClearScene();
  private:
     void addEntries(int);
     QList<EntryItem *> m_items;
@@ -92,6 +94,7 @@ class GraphicsEntry : public QWidget {
     QPushButton * m_findNodeBtn;
     QPushButton * m_loadCssBtn;
     QPushButton * m_anchorBtn;
+    QPushButton * m_clearSceneBtn;
     QPushButton * m_zoomIn;
     QPushButton * m_zoomOut;
     QLabel * m_root;

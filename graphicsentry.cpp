@@ -12,6 +12,10 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event) {
   QAction *markAction = menu.addAction("Mark");
   QAction *selectedAction = menu.exec(event->screenPos());
 }
+void EntryItem::setRoot(const QString & root,bool isRootEntry) {
+  m_root = root;
+  m_isRoot = isRootEntry;
+}
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,QWidget * parent) :
   QGraphicsView(scene,parent) {
 }
@@ -84,12 +88,15 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   QHBoxLayout * btnslayout = new QHBoxLayout;
   m_zoomIn = new QPushButton(tr("+"));
   m_zoomOut = new QPushButton(tr("-"));
+  m_clearSceneBtn = new QPushButton(tr("Clear"));
   btnslayout->addWidget(m_zoomIn);
   btnslayout->addWidget(m_zoomOut);
+  btnslayout->addWidget(m_clearSceneBtn);
   layout->addLayout(btnslayout);
 
   connect(m_zoomIn,SIGNAL(clicked()),this,SLOT(onZoomIn()));
   connect(m_zoomOut,SIGNAL(clicked()),this,SLOT(onZoomOut()));
+  connect(m_clearSceneBtn,SIGNAL(clicked()),this,SLOT(onClearScene()));
 
   QSplitter * splitter = new QSplitter;
   m_scene = new QGraphicsScene;
@@ -143,6 +150,15 @@ GraphicsEntry::~GraphicsEntry() {
   //    m_db.close();
   //  }
 }
+void GraphicsEntry::onClearScene() {
+  for(int i=0;i < m_items.size();i++) {
+    m_scene->removeItem(m_items[i]);
+  }
+  while(m_items.size() > 0) {
+    delete m_items.takeFirst();
+  }
+  qDebug() << "Items clear" << m_items.size();
+}
 void GraphicsEntry::anchorClicked(const QUrl & link) {
   qDebug() << link.toDisplayString();
   qDebug() << QApplication::keyboardModifiers();
@@ -170,9 +186,9 @@ void GraphicsEntry::linkHovered(const QString & link) {
 void GraphicsEntry::anchorTest() {
   QString node = m_node->text();
 
-  QList<QGraphicsItem *> items = m_scene->items();
-  for(int i=0;i < items.size();i++) {
-    EntryItem * item = dynamic_cast<EntryItem *>(items[i]);
+  //  QList<QGraphicsItem *> items = m_scene->items();
+  for(int i=0;i < m_items.size();i++) {
+    EntryItem * item = m_items[i];
     if (item) {
       if (item->isNode(node)) {
         qDebug() << "Found node" << node;
@@ -184,13 +200,14 @@ void GraphicsEntry::anchorTest() {
   }
 }
 bool GraphicsEntry::showNode(const QString & node) {
-  QList<QGraphicsItem *> items = m_scene->items();
-  for(int i=0;i < items.size();i++) {
-    EntryItem * item = dynamic_cast<EntryItem *>(items[i]);
+  //  QList<QGraphicsItem *> items = m_scene->items();
+  for(int i=0;i < m_items.size();i++) {
+    EntryItem * item = m_items[i];
     if (item) {
       if (item->isNode(node)) {
         qDebug() << "Found node" << node;
         //        m_scene->setFocusItem(item);
+        m_scene->clearFocus();
         m_view->ensureVisible(item);
         return true;
       }
@@ -296,6 +313,12 @@ bool GraphicsEntry::prepareQueries() {
 
   return ok;
 }
+/**
+ *
+ *
+ * @param root
+ * @param node the id of the entry we want to focus on
+ */
 void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   qDebug() << "Search for root" << root;
   m_rootQuery->bindValue(0,root);
@@ -305,21 +328,21 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   /// get the position of the last item
   int itemCount = m_items.size();
   /// add the root item
-  QString rootxml = QString("<word type=\"root\" ar=\"%1\" />\n").arg(root);
+  QString rootxml = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
   EntryItem * item  = createEntry(rootxml);
-  item->setRoot(root);
+  item->setRoot(root,true);
   m_items << item;
   /// now add all the entries for the root
   while(m_rootQuery->next()) {
     arRoot = m_rootQuery->value(0).toString();
     qDebug() << m_rootQuery->value(3).toString();
-    QString t  = QString("<word buckwalter=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\">\n")
+    QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\">")
       .arg(m_rootQuery->value(3).toString())
       .arg(m_rootQuery->value(2).toString())
       .arg(m_rootQuery->value(5).toString())
       .arg(m_rootQuery->value(6).toString());
     t += m_rootQuery->value(4).toString();
-    t += "</word>\n";
+    t += "</word>";
     item  = createEntry(t);
     item->setNode(m_rootQuery->value(7).toString());
     /// get the nodeid of the first item at added, so we jump to it later
@@ -329,11 +352,11 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
     item->setRoot(arRoot);
     item->setWord(m_rootQuery->value(2).toString());
     m_items << item;
+
   }
   addEntries(itemCount);
   m_view->setFocus();
   m_transform = m_view->transform();
-  qDebug() << "showing start node:" << startNode;
   showNode(startNode);
 }
 /**
@@ -363,22 +386,29 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
  * @param startPos
  */
 void GraphicsEntry::addEntries(int startPos) {
-  int ypos = 0;
-  int xpos = 0;
+  qreal ypos = 0;
+  qreal xpos = 0;
   QRectF r;
   qDebug() << "addEntries" << startPos;
   /// calculate the y-position of the last item currently in the scene
   if (startPos > 0) {
     QPointF p = m_items[startPos - 1]->pos();
     r = m_items[startPos - 1]->boundingRect();
-    ypos =  p.toPoint().y() + r.toRect().height() + 10;
+    ypos =  p.y() + r.height() + 10;
   }
   /// add items updating the ypos as we go
   for(int i=startPos;i < m_items.size();i++) {
     m_items[i]->setPos(xpos,ypos);
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
-    ypos += r.toRect().height() + 10;
+    qDebug() << "Pos" << m_items[i]->getNode()  << ypos << r.height();
+    QFile f(QString("/tmp/%1.html").arg(m_items[i]->getNode()));
+    if (f.open(QIODevice::WriteOnly)) {
+      QTextStream out(&f);
+      out << m_items[i]->toHtml();
+    }
+    ypos += r.height() + 10;
+
   }
 }
 void GraphicsEntry::getXmlForNode(const QString  & node) {

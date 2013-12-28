@@ -27,8 +27,6 @@
       <xsl:when test="@type = 'root'">
     <p class="rootword"><span class="arabichead rootword"><xsl:value-of  select="@ar"/></span>
     </p>
-
-
       </xsl:when>
       <xsl:otherwise>
     <span class="wordheading">
