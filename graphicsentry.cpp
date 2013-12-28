@@ -12,6 +12,9 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event) {
   QAction *markAction = menu.addAction("Mark");
   QAction *selectedAction = menu.exec(event->screenPos());
 }
+void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
+  qDebug() << "hover" << this->getNode() << this->isRoot();
+}
 void EntryItem::setRoot(const QString & root,bool isRootEntry) {
   m_root = root;
   m_isRoot = isRootEntry;
@@ -375,6 +378,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     /// need this otherwise arabic text will be right justified
     gi->document()->setDefaultTextOption(m_textOption);
     gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    gi->setAcceptHoverEvents(true);
     connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
     connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
     return gi;

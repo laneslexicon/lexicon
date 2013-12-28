@@ -34,11 +34,13 @@ class EntryItem : public QGraphicsTextItem {
   void setRoot(const QString & root,bool isRootEntry = false);
   void setWord(const QString & word) { m_word = word; }
   bool isNode(const QString & id) { return m_nodeId ==  id;}
+  bool isRoot() { return m_isRoot;}
   QString getNode() { return m_nodeId;}
   QString getRoot() { return m_root;}
   QString getWord() { return m_word;}
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
+  void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
   private:
   QString m_nodeId;
   bool m_isRoot;
