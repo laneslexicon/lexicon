@@ -50,6 +50,7 @@ private:
     void createToolBar();
     void createMenus();
     void createStatusBar();
+    bool eventFilter(QObject * target, QEvent *);
     bool openDatabase(const QString &);
     QPushButton * m_notesBtn;
     ContentsWidget * m_tree;

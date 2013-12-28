@@ -4,16 +4,16 @@ EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTe
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
 
 }
-void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event) {
+void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
-  qDebug() << "got context menuevent";
+
   QMenu menu;
   QAction *removeAction = menu.addAction("Remove");
   QAction *markAction = menu.addAction("Mark");
   QAction *selectedAction = menu.exec(event->screenPos());
 }
 void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
-  qDebug() << "hover" << this->getNode() << this->isRoot();
+  //  qDebug() << "hover" << this->getNode() << this->isRoot();
 }
 void EntryItem::setRoot(const QString & root,bool isRootEntry) {
   m_root = root;
@@ -152,6 +152,27 @@ GraphicsEntry::~GraphicsEntry() {
   //  if (m_db.isOpen()) {
   //    m_db.close();
   //  }
+}
+void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
+  switch(event->key()) {
+  case Qt::Key_Plus: {
+    onZoomIn();
+    break;
+  }
+  case Qt::Key_Minus: {
+    onZoomOut();
+    break;
+  }
+  default:
+    QWidget::keyPressEvent(event);
+  }
+
+}
+void GraphicsEntry::focusInEvent(QFocusEvent * event) {
+  qDebug() << "Got input focus";
+  m_view->setFocus();
+  QWidget::focusInEvent(event);
+
 }
 void GraphicsEntry::onClearScene() {
   for(int i=0;i < m_items.size();i++) {

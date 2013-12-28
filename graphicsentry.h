@@ -25,6 +25,8 @@
 #include <QMenu>
 #include <QAction>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QKeyEvent>
+#include <QFocusEvent>
 #include "xsltsupport.h"
 class EntryItem : public QGraphicsTextItem {
  public:
@@ -76,6 +78,7 @@ class GraphicsEntry : public QWidget {
     void onZoomOut();
     void onClearScene();
  private:
+
     void addEntries(int);
     QList<EntryItem *> m_items;
     EntryItem * createEntry(const QString & xml);
@@ -114,6 +117,9 @@ class GraphicsEntry : public QWidget {
     QString m_currentCSS;
     QString m_currentHtml;
     XalanTransformer * m_xalan;
+ protected:
+    void keyPressEvent(QKeyEvent *);
+    void focusInEvent(QFocusEvent *);
  signals:
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
 };

@@ -8,6 +8,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_tree = new ContentsWidget(this);
   m_tabs = new QTabWidget(this);
   GraphicsEntry * entry = new GraphicsEntry(this);
+  entry->installEventFilter(this);
   m_notes = new NotesWidget(this);
   w->addWidget(m_tree);
   w->addWidget(m_tabs);
@@ -100,12 +101,13 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     w->getXmlForRoot(root);
     connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
-
+    w->installEventFilter(this);
   }
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     w->getXmlForRoot(root);
     m_tabs->setTabText(0,root);
+    w->setFocus();
   }
   qDebug() << "Get root" << QApplication::keyboardModifiers() << root;
 }
@@ -117,4 +119,21 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * ol
     emit(nodeActivated(item->getNode(),item->getWord()));
   }
 
+}
+bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
+  if (event->type() == QEvent::KeyPress) {
+    QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
+    switch(keyEvent->key()) {
+      case Qt::Key_T: {
+        if (keyEvent->modifiers() && Qt::ControlModifier) {
+          qDebug() << Q_FUNC_INFO << "laneslexicon switch focus to tree";
+          return true;
+        }
+        break;
+      }
+    default:
+      break;
+    }
+  }
+  return QMainWindow::eventFilter(target,event);
 }

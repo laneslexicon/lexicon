@@ -36,7 +36,6 @@ void ContentsWidget::loadContents() {
 void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   switch (event->key()) {
   case Qt::Key_Space: {
-    qDebug() << "spacebar";
     QTreeWidgetItem * item = this->currentItem();
     if (item) {
       /// it is a top level item so expand it
