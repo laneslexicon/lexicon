@@ -53,7 +53,7 @@ private:
     bool openDatabase(const QString &);
     QPushButton * m_notesBtn;
     ContentsWidget * m_tree;
-    GraphicsEntry * m_entry;
+    //    GraphicsEntry * m_entry;
     NotesWidget * m_notes;
     QSqlDatabase m_db;
     QTabWidget * m_tabs;

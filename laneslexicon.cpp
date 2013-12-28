@@ -7,11 +7,11 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   QSplitter * w = new QSplitter;
   m_tree = new ContentsWidget(this);
   m_tabs = new QTabWidget(this);
-  m_entry = new GraphicsEntry(this);
+  GraphicsEntry * entry = new GraphicsEntry(this);
   m_notes = new NotesWidget(this);
   w->addWidget(m_tree);
   w->addWidget(m_tabs);
-  m_tabs->addTab(m_entry,tr(""));
+  m_tabs->addTab(entry,tr(""));
 
   m_tabs->addTab(m_notes,"Notes");
   setCentralWidget(w);
@@ -23,13 +23,13 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   if (openDatabase("lexicon.sqlite")) {
     statusBar()->showMessage(tr("Ready"));
     m_tree->loadContents();
-    m_entry->prepareQueries();
+    entry->prepareQueries();
   }
   else {
     statusBar()->showMessage(tr("Failed to open database"));
   }
   connect(m_tree,SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
-  connect(m_entry,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
+  connect(entry,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
   connect(this,SIGNAL(nodeActivated(const QString & ,const QString & )),
@@ -89,7 +89,21 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
-  m_entry->getXmlForRoot(root);
+  if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+    GraphicsEntry * w = new GraphicsEntry(this);
+    w->prepareQueries();
+    m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
+    w->getXmlForRoot(root);
+    connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
+          this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
+
+  }
+  else {
+    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
+    w->getXmlForRoot(root);
+    m_tabs->setTabText(0,root);
+  }
+  qDebug() << "Get root" << QApplication::keyboardModifiers() << root;
 }
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
