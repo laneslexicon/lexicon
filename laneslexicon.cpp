@@ -29,7 +29,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   else {
     statusBar()->showMessage(tr("Failed to open database"));
   }
-  connect(m_tree,SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
+  connect(m_tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 
   connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 

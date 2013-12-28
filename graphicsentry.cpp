@@ -143,7 +143,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   connect(m_scene,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
- m_standardCSS = QString(".arabic { font-family : Sans Droid;font-size : 28px};div { font-family : Sans Droid;font-size : 20px}");
+ m_standardCSS = QString(".arabic { font-family : Droid Sans;font-size : 28px};div { font-family : Droid Sans;font-size : 20px}");
   m_currentCSS = m_standardCSS;
   cssChanged();
   m_xalan = getXalan();
