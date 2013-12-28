@@ -427,7 +427,8 @@ void GraphicsEntry::addEntries(int startPos) {
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
     qDebug() << "Pos" << m_items[i]->getNode()  << ypos << r.height();
-    QFile f(QString("/tmp/%1.html").arg(m_items[i]->getNode()));
+    QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
+    QFile f(fi.filePath());
     if (f.open(QIODevice::WriteOnly)) {
       QTextStream out(&f);
       out << m_items[i]->toHtml();

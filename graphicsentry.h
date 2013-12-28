@@ -13,6 +13,8 @@
 #include <QGraphicsTextItem>
 #include <QLabel>
 #include <QFile>
+#include <QFileInfo>
+#include <QDir>
 #include <QDebug>
 #include <QSplitter>
 #include <QSqlDatabase>
