@@ -47,7 +47,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 LanesLexicon::~LanesLexicon()
 {
-  qDebug() << "main window destructor";
+  QLOG_DEBUG() << "main window destructor";
 }
 void LanesLexicon::createActions() {
   m_exitAction = new QAction(tr("Exit"),this);
@@ -92,6 +92,8 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
   m_db = QSqlDatabase::addDatabase("QSQLITE");
   m_db.setDatabaseName(dbname);
   ok = m_db.open();
+
+  QLOG_INFO() << "Opened database" << dbname;
   return ok;
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
@@ -111,7 +113,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     m_tabs->setTabText(0,root);
     w->setFocus();
   }
-  qDebug() << "Get root" << QApplication::keyboardModifiers() << root;
+  QLOG_DEBUG() << "Get root" << QApplication::keyboardModifiers() << root;
 }
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);

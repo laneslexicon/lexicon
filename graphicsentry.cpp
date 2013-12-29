@@ -13,7 +13,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   QAction *selectedAction = menu.exec(event->screenPos());
 }
 void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
-  //  qDebug() << "hover" << this->getNode() << this->isRoot();
+  //  QLOG_DEBUG() << "hover" << this->getNode() << this->isRoot();
 }
 void EntryItem::setRoot(const QString & root,bool isRootEntry) {
   m_root = root;
@@ -25,17 +25,17 @@ LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,QWidget * parent) :
 void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
   QScrollBar * b = this->verticalScrollBar();
   QGraphicsView::scrollContentsBy(dx,dy);
-  //  qDebug() << "scrolling" << dx << dy << b->maximum() << b->value();
+  //  QLOG_DEBUG() << "scrolling" << dx << dy << b->maximum() << b->value();
   // if (b->value() == b->maximum()) {
-  //   qDebug() << "At bottom";
+  //   QLOG_DEBUG() << "At bottom";
   // }
   // if (b->value() == b->minimum()) {
-  //   qDebug() << "At top";
+  //   QLOG_DEBUG() << "At top";
   // }
 
 }
 void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
-  //  qDebug() << "got key";
+  //  QLOG_DEBUG() << "got key";
   QGraphicsView::keyPressEvent(event);
 }
 GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
@@ -169,7 +169,7 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
 
 }
 void GraphicsEntry::focusInEvent(QFocusEvent * event) {
-  qDebug() << "Got input focus";
+  QLOG_DEBUG() << "Got input focus";
   m_view->setFocus();
   QWidget::focusInEvent(event);
 
@@ -181,18 +181,14 @@ void GraphicsEntry::onClearScene() {
   while(m_items.size() > 0) {
     delete m_items.takeFirst();
   }
-  qDebug() << "Items clear" << m_items.size();
 }
 void GraphicsEntry::anchorClicked(const QUrl & link) {
-  qDebug() << link.toDisplayString();
-  qDebug() << QApplication::keyboardModifiers();
+  QLOG_DEBUG() << link.toDisplayString();
+  QLOG_DEBUG() << QApplication::keyboardModifiers();
 }
 void GraphicsEntry::linkActivated(const QString & link) {
-  qDebug() << "Link activated" << link;
-  qDebug() << QApplication::keyboardModifiers();
   QString node(link);
   node.remove(0,1);
-  qDebug() << "Node" << node;
   showNode(node);
 }
 void GraphicsEntry::linkHovered(const QString & link) {
@@ -203,8 +199,8 @@ void GraphicsEntry::linkHovered(const QString & link) {
   }
   else {
     gi->setCursor(QCursor(Qt::PointingHandCursor));
-    qDebug() << "Link hovered" << link;
-    qDebug() << QApplication::keyboardModifiers();
+    QLOG_DEBUG() << "Link hovered" << link;
+    QLOG_DEBUG() << QApplication::keyboardModifiers();
   }
 }
 void GraphicsEntry::anchorTest() {
@@ -215,7 +211,6 @@ void GraphicsEntry::anchorTest() {
     EntryItem * item = m_items[i];
     if (item) {
       if (item->isNode(node)) {
-        qDebug() << "Found node" << node;
         m_scene->setFocusItem(item);
         m_view->ensureVisible(item);
         return;
@@ -229,7 +224,7 @@ bool GraphicsEntry::showNode(const QString & node) {
     EntryItem * item = m_items[i];
     if (item) {
       if (item->isNode(node)) {
-        qDebug() << "Found node" << node;
+        QLOG_DEBUG() << "Found node" << node;
         //        m_scene->setFocusItem(item);
         m_scene->clearFocus();
         m_view->ensureVisible(item);
@@ -241,7 +236,7 @@ bool GraphicsEntry::showNode(const QString & node) {
 }
 void GraphicsEntry::dbnameChanged() { //const QString & text) {
   /*
-  qDebug() << "db name changed" << m_dbname->text();
+  QLOG_DEBUG() << "db name changed" << m_dbname->text();
   QFile f(m_dbname->text());
   if (f.exists()) {
     if (openDb(m_dbname->text())) {
@@ -249,19 +244,19 @@ void GraphicsEntry::dbnameChanged() { //const QString & text) {
       return;
     }
   }
-  qDebug() << "No such file" << m_dbname->text();
+  QLOG_DEBUG() << "No such file" << m_dbname->text();
   m_dbname->setText(m_currentDb);
   openDb(m_currentDb);
   */
 }
 void GraphicsEntry::setCSS(const QString & css) {
-  qDebug() << "Setting CSS";
-  qDebug() << css;
+  QLOG_DEBUG() << "Setting CSS";
+  QLOG_DEBUG() << css;
   m_currentCSS = css;
   /*
   QString html = m_nodeHtml->toHtml();
   if (html != m_currentHtml) {
-    qDebug() << "Not current html";
+    QLOG_DEBUG() << "Not current html";
   }
   m_nodeHtml->document()->setDefaultStyleSheet(m_currentCSS);
   m_nodeHtml->setHtml(m_currentHtml);
@@ -314,7 +309,7 @@ bool GraphicsEntry::prepareQueries() {
   ok = m_db.open();
   if (ok) {
     m_db = QSqlDatabase::database();
-    qDebug() << "success,  opened DB " << dbname;
+    QLOG_DEBUG() << "success,  opened DB " << dbname;
   }
   else {
     qWarning() << Q_FUNC_INFO << "db open failed" << ok;
@@ -327,12 +322,12 @@ bool GraphicsEntry::prepareQueries() {
   m_nodeQuery = new QSqlQuery;
   bool ok = m_nodeQuery->prepare("select * from entry where nodeId = ?");
   if (! ok ) {
-    qDebug() << "node SQL prepare failed";
+    QLOG_DEBUG() << "node SQL prepare failed";
   }
   m_rootQuery = new QSqlQuery;
   ok = m_rootQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeId from entry where root = ? order by nodenum");
   if (! ok ) {
-    qDebug() << "root SQL prepare failed";
+    QLOG_DEBUG() << "root SQL prepare failed";
   }
 
   return ok;
@@ -344,7 +339,7 @@ bool GraphicsEntry::prepareQueries() {
  * @param node the id of the entry we want to focus on
  */
 void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
-  qDebug() << "Search for root" << root;
+  QLOG_DEBUG() << "Search for root" << root;
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   QString arRoot;
@@ -359,7 +354,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   /// now add all the entries for the root
   while(m_rootQuery->next()) {
     arRoot = m_rootQuery->value(0).toString();
-    qDebug() << m_rootQuery->value(3).toString();
+    QLOG_DEBUG() << m_rootQuery->value(3).toString();
     QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\">")
       .arg(m_rootQuery->value(3).toString())
       .arg(m_rootQuery->value(2).toString())
@@ -414,7 +409,7 @@ void GraphicsEntry::addEntries(int startPos) {
   qreal ypos = 0;
   qreal xpos = 0;
   QRectF r;
-  qDebug() << "addEntries" << startPos;
+  QLOG_DEBUG() << "addEntries" << startPos;
   /// calculate the y-position of the last item currently in the scene
   if (startPos > 0) {
     QPointF p = m_items[startPos - 1]->pos();
@@ -426,7 +421,7 @@ void GraphicsEntry::addEntries(int startPos) {
     m_items[i]->setPos(xpos,ypos);
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
-    qDebug() << "Pos" << m_items[i]->getNode()  << ypos << r.height();
+    QLOG_DEBUG() << "Pos" << m_items[i]->getNode()  << ypos << r.height();
     QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
     QFile f(fi.filePath());
     if (f.open(QIODevice::WriteOnly)) {
@@ -438,12 +433,12 @@ void GraphicsEntry::addEntries(int startPos) {
   }
 }
 void GraphicsEntry::getXmlForNode(const QString  & node) {
-  qDebug() << "Search for node" << node;
+  QLOG_DEBUG() << "Search for node" << node;
   m_nodeQuery->bindValue(0,node);
   m_nodeQuery->exec();
   if (m_nodeQuery->first()) {
     QString xml = m_nodeQuery->value("xml").toString();
-    qDebug() << "got " << xml;
+    QLOG_DEBUG() << "got " << xml;
     m_nodeXml->setText(xml);
     QString root = QString("%1/%2").arg(m_nodeQuery->value("broot").toString()).arg(m_nodeQuery->value("root").toString());
     QString word = QString("%1/%2").arg(m_nodeQuery->value("bword").toString()).arg(m_nodeQuery->value("word").toString());
@@ -453,7 +448,7 @@ void GraphicsEntry::getXmlForNode(const QString  & node) {
     //   transform(m_xsl->text(),xml);
   }
   else {
-    qDebug() << "Error" << m_nodeQuery->lastError().text();
+    QLOG_DEBUG() << "Error" << m_nodeQuery->lastError().text();
   }
 }
 void GraphicsEntry::on_findNode()  {
@@ -475,7 +470,7 @@ QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
     std::istringstream iss(xsl.toStdString());
     int r = m_xalan->compileStylesheet("entry.xslt",m_compXsl);
     if (r != 0) {
-      qDebug() << "Error compiling stylesheet" << m_xalan->getLastError();
+      QLOG_DEBUG() << "Error compiling stylesheet" << m_xalan->getLastError();
       return QString();
     }
   }

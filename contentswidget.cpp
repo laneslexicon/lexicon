@@ -23,7 +23,7 @@ void ContentsWidget::loadContents() {
     rootQuery.bindValue(0,letter);
     rootQuery.exec();
     if (! rootQuery.first()) {
-      qDebug() << rootQuery.lastError().text();
+      QLOG_DEBUG() << rootQuery.lastError().text();
     }
     while(rootQuery.next()) {
       QString root = rootQuery.value(0).toString();

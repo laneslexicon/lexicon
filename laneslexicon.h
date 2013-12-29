@@ -32,6 +32,7 @@
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"
+#include "QsLog.h"
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT

@@ -60,7 +60,7 @@ void EditableSqlModel::refresh()
   }
   setQuery(query,m_db);
   if (lastError().isValid()) {
-    qDebug() << "Last error" << lastError().text();
+    QLOG_DEBUG() << "Last error" << lastError().text();
   }
   setHeaderData(Notes_Id,Qt::Horizontal,QObject::tr("Id"));
   setHeaderData(Notes_NodeId,Qt::Horizontal,tr("Node"));
@@ -245,7 +245,7 @@ void NotesWidget::showSelectedNote() {
   }
 }
 void NotesWidget::setActiveNode(const QString & node,const QString & word) {
-  qDebug() << "word activated" << node << word;
+  QLOG_DEBUG() << "word activated" << node << word;
   m_node->setText(node);
   m_word->setText(word);
   m_show->setText(word);

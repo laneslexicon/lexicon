@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QFont>
 #include <QKeyEvent>
+#include "QsLog.h"
 class ContentsWidget : public QTreeWidget {
   Q_OBJECT;
  public:

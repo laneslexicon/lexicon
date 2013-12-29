@@ -29,6 +29,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QKeyEvent>
 #include <QFocusEvent>
+#include "QsLog.h"
 #include "xsltsupport.h"
 class EntryItem : public QGraphicsTextItem {
  public:

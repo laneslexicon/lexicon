@@ -18,6 +18,8 @@
 #include <QSplitter>
 #include <QDebug>
 #include <QModelIndex>
+#include "QsLog.h"
+
 
 //CREATE TABLE notes (id integer primary key, nodeId text,word text,tag text,note text,created text,amended text);
 /// these are the columns in the table
