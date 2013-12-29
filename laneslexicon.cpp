@@ -52,10 +52,14 @@ LanesLexicon::~LanesLexicon()
 void LanesLexicon::createActions() {
   m_exitAction = new QAction(tr("Exit"),this);
   connect(m_exitAction,SIGNAL(triggered()),this,SLOT(on_actionExit()));
+
+  m_testAction = new QAction(tr("Test"),this);
+  connect(m_testAction,SIGNAL(triggered()),this,SLOT(on_actionTest()));
 }
 void LanesLexicon::createToolBar() {
   m_fileToolBar = addToolBar(tr("&File"));
   m_fileToolBar->addAction(m_exitAction);
+  m_fileToolBar->addAction(m_testAction);
 }
 void LanesLexicon::createMenus() {
   m_fileMenu = menuBar()->addMenu(tr("&File"));
@@ -157,4 +161,8 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
     }
   }
   return QMainWindow::eventFilter(target,event);
+}
+void LanesLexicon::on_actionTest() {
+  //  QKeySequenceEdit * w = new QKeySequenceEdit;
+  //  w->show();
 }

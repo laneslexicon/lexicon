@@ -29,10 +29,13 @@
 #include <QSqlDatabase>
 #include <QFile>
 #include <QLabel>
+#include <QDialog>
+#include <QKeySequenceEdit>
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"
 #include "QsLog.h"
+
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
@@ -43,6 +46,7 @@ public:
     QSize sizeHint() const;
 private slots:
     void on_actionExit();
+    void on_actionTest();
     void rootClicked(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void onNotesClicked();
@@ -64,6 +68,7 @@ private:
     QMenu * m_fileMenu;
     // actions
     QAction * m_exitAction;
+    QAction * m_testAction;
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };
