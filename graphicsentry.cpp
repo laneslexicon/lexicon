@@ -226,8 +226,8 @@ bool GraphicsEntry::showNode(const QString & node,bool thisPageOnly) {
     if (item->isNode(node)) {
       QLOG_DEBUG() << "Found local node" << node;
       m_scene->setFocusItem(item);
-      m_view->ensureVisible(item);
-      // m_view->centerOn(item);
+      //m_view->ensureVisible(item);
+       m_view->centerOn(item);
       //     m_scene->clearFocus();
       return true;
     }
@@ -382,15 +382,18 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   addEntries(itemCount);
   m_view->setFocus();
   m_transform = m_view->transform();
+
+  //QLOG_DEBUG() << "Scene rect" << m_scene->sceneRect();
+  /// without thus centerOn() does not work properly for
+  /// items added to the scene
+  m_view->setSceneRect(m_scene->sceneRect());
+
   if ( node.isEmpty()) {
       m_scene->setFocusItem(rootItem);
       m_view->centerOn(rootItem);
       //      m_scene->clearFocus();
   }
-  //QLOG_DEBUG() << "Scene rect" << m_scene->sceneRect();
-  /// without thus centerOn() does not work properly for
-  /// items added to the scene
-  m_view->setSceneRect(m_scene->sceneRect());
+
 }
 /**
  * create the QTextGraphicsItem by transforming the passed xml
