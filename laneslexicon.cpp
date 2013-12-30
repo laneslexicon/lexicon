@@ -122,9 +122,15 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
   if (item) {
-    statusBar()->showMessage(item->getNode());
-    m_notesBtn->setEnabled(true);
-    emit(nodeActivated(item->getNode(),item->getWord()));
+    QString node = item->getNode();
+    QString word = item->getWord();
+    QPointF p = item->pos();
+    if (! node.isEmpty()) {
+      QString txt = QString("%1  %2  At:%3,%4").arg(node).arg(word).arg(p.x()).arg(p.y());
+      statusBar()->showMessage(txt);
+      m_notesBtn->setEnabled(true);
+      emit(nodeActivated(item->getNode(),item->getWord()));
+    }
   }
 
 }
