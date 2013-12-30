@@ -673,4 +673,12 @@ z0.xml , rEf  (also in xml/r0.xml)
   sqlite3 lexicon.sqlite 'select xml from entry where nodeId = "n26320"' | java -jar /workvol/saxonhe/saxon9he.jar -t -xsl:entry.xslt -s:- ddebug=yes
 
 
-  sqlite3 lexicon.sqlite 'select xml from entry where nodeId = "n26320"' | Xalan -p ddebug "'yes'" - entry.xslt
+   sqlite3 lexicon.sqlite 'select xml from entry where nodeId = "n26320"' | Xalan -p ddebug "'yes'" - entry.xslt
+* open root in a free floating independent window that can be printed etc
+* Options
+
+  + click/double click in tree
+  + new root opens in new tab, appends to existing or replaces existing
+  + arabic font in tab title
+  + history serialize for how long
+  + text width for graphicsitem
