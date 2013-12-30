@@ -409,6 +409,7 @@ void GraphicsEntry::addEntries(int startPos) {
   qreal ypos = 0;
   qreal xpos = 0;
   QRectF r;
+  QSizeF sz;
   QLOG_DEBUG() << "addEntries" << startPos;
   /// calculate the y-position of the last item currently in the scene
   if (startPos > 0) {
@@ -428,7 +429,9 @@ void GraphicsEntry::addEntries(int startPos) {
       QTextStream out(&f);
       out << m_items[i]->toHtml();
     }
-    ypos += r.height() + 10;
+    sz = m_items[i]->document()->size();
+    ypos += sz.height() + 10;
+    //    ypos += r.height() + 10;
 
   }
 }
