@@ -1,0 +1,676 @@
+*  n5080 1a2u3a
+
+   j0.xml n5080 line 2093 (PDF v2, p16) has
+   #+BEGIN_SRC xml
+   <form n="infl">
+      <orth orig="Bu" lang="ar">1a2u3a</orth>
+      </form>
+   #+END_SRC
+
+    also entry has root specified as: <word> and <word>
+
+* etc
+
+  m0.xml line 233 has
+
+   <div2 n"mA^r, &amp;c">
+
+   with entry as See supplement
+
+* j0.xml floating Quasi
+
+  n6824 has this:
+
+      <orth type="arrow" lang="ar">AljaA$u</orth>, without
+          <foreign lang="ar" TEIform="foreign">'
+          </foreign>;] mentioned by some in art. <foreign lang="ar" TEIform="foreign">jA^$
+          </foreign>. (TA.) Quasi   </entryFree>
+          </orth>
+    where "Quasi" belongs to n6825 (V2.pdf, p 131/494)
+
+    Checked with:
+
+    grep -H "Quasi[[:blank:]]\+</entry" *.xml
+
+    and looks to be the only one.
+
+* _Y0.xml and _Y1.xml
+
+  both have <entryFree key="Y">
+
+  Y1 looks like a dummy, but check this (same applies to H)
+
+
+* 0x2015 (horizontal bar)
+
+  Used a sense separator (doubled as extreme break)
+
+* -An-  used for Lane's double horizontal bar with -A1-, -A2- marking the sequence in the entry
+* -bn-  used for Lane's single horizontal bar with -A1-, -b2- marking the sequence in the entry
+
+
+* Letter/Vol/Pages
+
+  | Letter | Buck | Vol | PDF | Lane |
+  |--------+------+-----+-----+------|
+  | alef   | A    |   1 |  38 |    1 |
+  | beh    | b    |   1 | 177 |  141 |
+  | teh    | t    |   1 | 328 |  291 |
+  | theh   | v    |   1 | 364 |  327 |
+  | jeem   | j    |     |     |      |
+  | hah    | H    |   2 | 131 |  495 |
+  | khah   | x    |     |     |      |
+  | dal    | d    |   3 |   5 |  106 |
+  | thal   | *    |     |     |      |
+  | reh    | r    |     |     |      |
+  | zain   | z    |     |     |      |
+  | seen   | s    |   4 |   4 |  162 |
+  | sheen  | $    |     |     |      |
+  | sad    | S    |     |     |      |
+  | dad    | D    |   5 |  44 |  222 |
+  | tah    | T    |     |     |      |
+  | zah    | Z    |     |     |      |
+  | ain    | E    |     |     |      |
+  | ghain  | g    |   6 |   5 |  280 |
+  | feh    | f    |   6 | 105 | 2321 |
+  | qaaf   | q    |   7 |   5 |  312 |
+  | kaaf   | k    |     |     |      |
+  | laam   | l    |     |     |      |
+  | miim   | m    |     |     |      |
+  | nuun   | n    |   8 |   5 |  347 |
+  | haa    | h    |     | 127 |  363 |
+  | waw    | w    |     | 167 |  368 |
+  | yeh    | y    |     | 227 |  376 |
+  | qaaf   | q    |   8 | 237 |      |
+  | kaaf   | k    |     | 252 | 2998 |
+  | laam   | l    |     | 260 | 3006 |
+  | meem   | m    |     | 270 | 3016 |
+
+
+  Vol 5 contains a memoir
+
+  supplement to qaaf to yeh begins on p237 of Vol 8.
+
+  | Volume | First Page | Last Page |
+  |--------+------------+-----------|
+  |      1 |          1 |       367 |
+  |      2 |        369 |       837 |
+  |      3 |        839 |      1280 |
+  |      4 |       1281 |      1757 |
+  |      5 |       1759 |      2219 |
+  |      6 |       2221 |      2475 |
+  |      7 |       2478 |      2749 |
+  |      8 |       2751 |      3064 |
+  |        |            |           |
+
+* Lanes quotes
+
+  Are written like this:
+
+ <quote TEIform="quote">
+    <L>
+       <foreign lang="ar" TEIform="foreign">AlomuToEimaAni Al~aHoma biA@loEa$ij~i</foreign>
+       <foreign lang="ar" TEIform="foreign">xaAliY EuwayofN waA^abuw Ealij~i</foreign>
+    </L>
+ </quote>
+
+* italics
+
+  Lanes italics are:
+
+    rend="ital"
+
+    eg n4890
+
+    <hi rend="ital" TEIform="hi">female hyena</hi>
+* Tags in use by original files
+
+  Does not include <teiHeader> or any of its children.
+
+  | Tag       |  Count | Attributes |                     |     |    |
+  |-----------+--------+------------+---------------------+-----+----|
+  | G         |     48 |            |                     |     |    |
+  | H         |     32 |            |                     |     |    |
+  | L         |   3613 |            |                     |     |    |
+  | Table     |      3 |            |                     |     |    |
+  | body      |     36 |            |                     |     |    |
+  | cell      |    167 |            |                     |     |    |
+  |           |        | TEIform    | cell                |     |    |
+  |           |        | cols       | 1                   |     |    |
+  |           |        | role       | data                |     |    |
+  |           |        | rows       | 1                   |     |    |
+  | div1      |     36 |            |                     |     |    |
+  |           |        | TEIform    | div1                |     |    |
+  |           |        | n          | 28 items            |     |    |
+  |           |        | org        | uniform             |     |    |
+  |           |        | part       | N                   |     |    |
+  |           |        | sample     | complete            |     |    |
+  |           |        | type       | alphabetical letter |     |    |
+  | div2      |   5315 |            |                     |     |    |
+  |           |        | TEIform    | div2                |     |    |
+  |           |        | n          | 5204 items          |     |    |
+  |           |        | org        | uniform             |     |    |
+  |           |        | part       | N                   |     |    |
+  |           |        | sample     | complete            |     |    |
+  |           |        | type       | root                |     |    |
+  | entryFree |  48100 |            |                     |     |    |
+  |           |        | id         | 44829 items         |     |    |
+  |           |        | key        | 43841 items         |     |    |
+  |           |        | type       | main                |     |    |
+  | foreign   | 283403 |            |                     |     |    |
+  |           |        | TEIform    | foreign             |     |    |
+  |           |        | lang       | ar                  |     |    |
+  | form      |  54559 |            |                     |     |    |
+  |           |        | n          | 1 items             |     |    |
+  |           |        | type       | Q Q                 | R Q | Q  |
+  | head      |   5315 |            |                     |     |    |
+  |           |        | TEIform    | head                |     |    |
+  |           |        | lang       | ar                  |     |    |
+  | hi        | 357828 |            |                     |     |    |
+  |           |        | TEIform    | hi                  |     |    |
+  |           |        | rend       | ital                |     |    |
+  | itype     |  14233 |            |                     |     |    |
+  | orth      | 147210 |            |                     |     |    |
+  |           |        | orig=""    |                     |     |    |
+  |           |        | extent     | full                |     |    |
+  |           |        | lang       | ar                  | gr  | he |
+  |           |        | orig       | Bi                  | Ba  | Bu |
+  |           |        | type       | arrow               |     |    |
+  | pb        |   3063 |            |                     |     |    |
+  |           |        | TEIform    | pb                  |     |    |
+  |           |        | n          | 3063 items          |     |    |
+  | quote     |   2161 |            |                     |     |    |
+  |           |        | TEIform    | quote               |     |    |
+  | row       |     51 |            |                     |     |    |
+  |           |        | TEIform    | row                 |     |    |
+  |           |        | role       | data                |     |    |
+  | text      |     36 |            |                     |     |    |
+* Links and cross references styles
+** see (also) \d, in \w+ places
+** see what next follows
+   eg in j0.xml line 2149 entry n5085
+** see also <foreign lang="ar" TEIform="foreign">...</foreign>
+
+   these should have been processed by the --set-links in lane.pl. Check them?
+** Also syn., in two senses, with <foreign lang="ar">
+
+   in n5255, j0.xml
+** orth type="arrow"
+
+   some of these are
+      as also ↓  <orth type="arrow" lang="ar">Astj*</orth>
+
+      where the the indicated word is derived form of the current word (Note that's a bad example
+      because there is an error: it should be Astj*l, as on V2  33/397)
+** see the preceding paragraph (V6 15/2231)
+* Duplicates roots and the supplements
+
+  These are duplicated roots report by scanning the XML.
+
+  A root can be in both the __0.xml and __1.xml files. The "1" files are
+  entries in the supplement.
+
+  It looks like the only duplicates are the entries for the letters themselves.
+
+  run check.pl with duplicateRoots() uncommented
+
+** SQL to check
+   select root.bletter,entry.nodeId,entry.bword from root
+        join entry where entry.bword = root.bword and entry.itype="alphabetical letter"
+        order by root.bletter;
+
+
+
+** duplicates reported by check.pl
+
+$0.xml , $A^b  (also in xml/$0.xml)
+_Y1.xml , Y  (also in xml/_Y0.xml)
+h1.xml , h  (also in xml/h0.xml)
+h1.xml , h*  (also in xml/h0.xml)
+h1.xml , hr  (also in xml/h0.xml)
+   h1 = V8 296/3042
+   h0 = V8 142/2888
+h1.xml , hrs  (also in xml/h0.xml)
+h1.xml , hzr  (also in xml/h0.xml)
+h1.xml , hzm  (also in xml/h0.xml)
+h1.xml , hmd  (also in xml/h0.xml)
+j0.xml , Hd  (also in xml/_H0.xml)
+   should be jHd
+k1.xml , k  (also in xml/k0.xml)
+k1.xml , kt  (also in xml/k0.xml)
+k1.xml , ktb  (also in xml/k0.xml)
+k1.xml , krz  (also in xml/k0.xml)
+k1.xml , krs  (also in xml/k0.xml)
+k1.xml , kr$  (also in xml/k0.xml)
+k1.xml , krm  (also in xml/k0.xml)
+k1.xml , kZm  (also in xml/k0.xml)
+k1.xml , kEbr  (also in xml/k0.xml)
+k1.xml , kEl  (also in xml/k0.xml)
+k1.xml , kEm  (also in xml/k0.xml)
+k1.xml , kl  (also in xml/k0.xml)
+k1.xml , kmr  (also in xml/k0.xml)
+k1.xml , kns  (also in xml/k0.xml)
+k1.xml , knf  (also in xml/k0.xml)
+k1.xml , khb  (also in xml/k0.xml)
+k1.xml , kwr  (also in xml/k0.xml)
+k1.xml , kys  (also in xml/k0.xml)
+l1.xml , l  (also in xml/l0.xml)
+l1.xml , lbs  (also in xml/l0.xml)
+l1.xml , lv  (also in xml/l0.xml)
+l1.xml , lj  (also in xml/l0.xml)
+l1.xml , lHZ  (also in xml/l0.xml)
+l1.xml , lz  (also in xml/l0.xml)
+l1.xml , lkz  (also in xml/l0.xml)
+l1.xml , lm  (also in xml/l0.xml)
+l1.xml , lwS  (also in xml/l0.xml)
+l1.xml , lys  (also in xml/l0.xml)
+m0.xml , mtH  (also in xml/m0.xml)
+m0.xml , mgnTs  (also in xml/m0.xml)
+m1.xml , m  (also in xml/m0.xml)
+m1.xml , mjr  (also in xml/m0.xml)
+m1.xml , mHt  (also in xml/m0.xml)
+m1.xml , mr  (also in xml/m0.xml)
+m1.xml , mrz  (also in xml/m0.xml)
+m1.xml , mrs  (also in xml/m0.xml)
+m1.xml , mzr  (also in xml/m0.xml)
+m1.xml , m$  (also in xml/m0.xml)
+m1.xml , mE  (also in xml/m0.xml)
+m1.xml , mqT  (also in xml/m0.xml)
+m1.xml , mkr  (also in xml/m0.xml)
+m1.xml , mhd  (also in xml/m0.xml)
+m1.xml , mwA^  (also in xml/m0.xml)
+m1.xml , mys  (also in xml/m0.xml)
+m1.xml , my$  (also in xml/m0.xml)
+n0.xml , nxt  (also in xml/n0.xml)
+n0.xml , nsH  (also in xml/n0.xml)
+n0.xml , nSb  (also in xml/n0.xml)
+n0.xml , nDH  (also in xml/n0.xml)
+n1.xml , n  (also in xml/n0.xml)
+n1.xml , nbD  (also in xml/n0.xml)
+n1.xml , nbT  (also in xml/n0.xml)
+n1.xml , nHz  (also in xml/n0.xml)
+n1.xml , nHs  (also in xml/n0.xml)
+n1.xml , nrjs  (also in xml/n0.xml)
+n1.xml , ns  (also in xml/n0.xml)
+n1.xml , nsj  (also in xml/n0.xml)
+n1.xml , nDr  (also in xml/n0.xml)
+n1.xml , nkz  (also in xml/n0.xml)
+n1.xml , nwH  (also in xml/n0.xml)
+n1.xml , nwT  (also in xml/n0.xml)
+q1.xml , q  (also in xml/q0.xml)
+q1.xml , qbs  (also in xml/q0.xml)
+q1.xml , qbE  (also in xml/q0.xml)
+q1.xml , qbl  (also in xml/q0.xml)
+q1.xml , qbn  (also in xml/q0.xml)
+q1.xml , qbw  (also in xml/q0.xml)
+q1.xml , qtr  (also in xml/q0.xml)
+q1.xml , qHf  (also in xml/q0.xml)
+q1.xml , qds  (also in xml/q0.xml)
+q1.xml , qdE  (also in xml/q0.xml)
+q1.xml , q*E  (also in xml/q0.xml)
+q1.xml , qrS  (also in xml/q0.xml)
+q1.xml , qrT  (also in xml/q0.xml)
+q1.xml , qrn  (also in xml/q0.xml)
+q1.xml , qD  (also in xml/q0.xml)
+q1.xml , qTn  (also in xml/q0.xml)
+q1.xml , qfr  (also in xml/q0.xml)
+q1.xml , ql  (also in xml/q0.xml)
+q1.xml , qlS  (also in xml/q0.xml)
+q1.xml , qn  (also in xml/q0.xml)
+q1.xml , qnbr  (also in xml/q0.xml)
+q1.xml , qwr  (also in xml/q0.xml)
+q1.xml , qys  (also in xml/q0.xml)
+q1.xml , qyS  (also in xml/q0.xml)
+q1.xml , qyD  (also in xml/q0.xml)
+q1.xml , qyZ  (also in xml/q0.xml)
+r0.xml , rfw  (also in xml/r0.xml)
+s0.xml , sHf  (also in xml/s0.xml)
+t0.xml , tfH  (also in xml/n0.xml)
+w1.xml , w  (also in xml/w0.xml)
+w1.xml , wA^r  (also in xml/w0.xml)
+w1.xml , wbr  (also in xml/w0.xml)
+w1.xml , wb$  (also in xml/w0.xml)
+w1.xml , wtr  (also in xml/w0.xml)
+w1.xml , wvr  (also in xml/w0.xml)
+w1.xml , wsT  (also in xml/w0.xml)
+w1.xml , wEs  (also in xml/w0.xml)
+w1.xml , wfD  (also in xml/w0.xml)
+x0.xml , xbv  (also in xml/x0.xml)
+z0.xml , rEf  (also in xml/r0.xml)
+
+
+* Look at x0.xml n11908 and n11909 and check against V2 473
+
+  the xml has multiple <orth> entrie
+* V7 53/2523
+
+* Running lane.pl
+
+  perl lane.pl --db <dbname> --initdb --verbose --no-context --dir ./xml
+
+
+* "According to some" roots
+
+  There are only two of these:
+
+  xml/q0.xml 12372             <div2 n="qnf*, or, accord. to some, qf*" type="root" org="uniform" sample="complete"
+  xml/t0.xml 3384             <div2 n="Quasi tqY: or, accord. to some, tqw" type="root" org="uniform"
+
+
+* Multiword roots
+
+  There are 151 of them
+
+** Table
+
+  | _D0.xml |   990 | <div2 n="Quasi Dbrm" type="root" org="uniform" sample="complete" part="N"              |
+  | _D0.xml |  1336 | <div2 n="Dbw or DbY" type="root" org="uniform" sample="complete" part="N"              |
+  | _D0.xml |  2024 | <div2 n="DHw and DHY" type="root" org="uniform" sample="complete" part="N"             |
+  | _D0.xml |  3310 | <div2 n="Quasi Drd" type="root" org="uniform" sample="complete" part="N"               |
+  | _D0.xml |  3913 | <div2 n="Drw and DrY" type="root" org="uniform" sample="complete" part="N"             |
+  | _E0.xml |  2614 | <div2 n="Etw and EtY" type="root" org="uniform" sample="complete" part="N"             |
+  | _E0.xml |  3173 | <div2 n="Evw and EvY" type="root" org="uniform" sample="complete" part="N"             |
+  | _E0.xml |  5046 | <div2 n="Ejw and EjY" type="root" org="uniform" sample="complete" part="N"             |
+  | _E0.xml | 14688 | <div2 n="Quasi E$rn" type="root" org="uniform" sample="complete" part="N"              |
+  | _E0.xml | 15049 | <div2 n="Quasi E$Y" type="root" org="uniform" sample="complete" part="N"               |
+  | _E0.xml | 19169 | <div2 n="EZw or EZY" type="root" org="uniform" sample="complete" part="N"              |
+  | _E0.xml | 24368 | <div2 n="Quasi Eljn" type="root" org="uniform" sample="complete" part="N"              |
+  | _E0.xml | 29533 | <div2 n="Quasi EnSr" type="root" org="uniform" sample="complete" part="N"              |
+  | _E0.xml | 29543 | <div2 n="Quasi EnSl" type="root" org="uniform" sample="complete" part="N"              |
+  | _E0.xml | 29994 | <div2 n="Quasi Enqd" type="root" org="uniform" sample="complete" part="N"              |
+  | _E0.xml | 33466 | <div2 n="Quasi Eyd" type="root" org="uniform" sample="complete" part="N"               |
+  | _H0.xml |  2701 | <div2 n="Hvw and HvY" type="root" org="uniform" sample="complete" part="N"             |
+  | _H0.xml | 10908 | <div2 n="Hzw and HzY" type="root" org="uniform" sample="complete" part="N"             |
+  | _H0.xml | 14555 | <div2 n="HSw and HSY" type="root" org="uniform" sample="complete" part="N"             |
+  | _H0.xml | 17195 | <div2 n="Hfw and HfY" type="root" org="uniform" sample="complete" part="N"             |
+  | _H0.xml | 20389 | <div2 n="Hlz or Hlzn" type="root" org="uniform" sample="complete" part="N"             |
+  | _H0.xml | 25620 | <div2 n="Hnw and HnY" type="root" org="uniform" sample="complete" part="N"             |
+  | _S0.xml |  7171 | <div2 n="Sgw and SgY" type="root" org="uniform" sample="complete" part="N"             |
+  | _S0.xml | 13500 | <div2 n="Shw and ShY" type="root" org="uniform" sample="complete" part="N"             |
+  | _S0.xml | 15149 | <div2 n="Quasi Syt" type="root" org="uniform" sample="complete" part="N"               |
+  | _S0.xml | 15936 | <div2 n="Quasi Sym" type="root" org="uniform" sample="complete" part="N"               |
+  | _T0.xml |  1796 | <div2 n="THw and THY" type="root" org="uniform" sample="complete" part="N"             |
+  | _T0.xml |  1886 | <div2 n="Txw and TxY" type="root" org="uniform" sample="complete" part="N"             |
+  | _T0.xml |  4683 | <div2 n="Tgw and TgY" type="root" org="uniform" sample="complete" part="N"             |
+  | _T0.xml |  5325 | <div2 n="Tfw and TfY" type="root" org="uniform" sample="complete" part="N"             |
+  | _T0.xml |  6822 | <div2 n="Tlw and TlY" type="root" org="uniform" sample="complete" part="N"             |
+  | _T0.xml |  7897 | <div2 n="Tyw and TyY" type="root" org="uniform" sample="complete" part="N"             |
+  | _T0.xml |  8690 | <div2 n="Thw and ThY" type="root" org="uniform" sample="complete" part="N"             |
+  | _T0.xml | 10965 | <div2 n="Quasi Tyl" type="root" org="uniform" sample="complete" part="N"               |
+  | _Z0.xml |  1799 | <div2 n="Quasi ZlY" type="root" org="uniform" sample="complete" part="N"               |
+  | _Z0.xml |  2165 | <div2 n="Quasi ZnY" type="root" org="uniform" sample="complete" part="N"               |
+  | _Z0.xml |  2549 | <div2 n="Quasi Zwr" type="root" org="uniform" sample="complete" part="N"               |
+  | _Z0.xml |  2605 | <div2 n="Quasi Zyr" type="root" org="uniform" sample="complete" part="N"               |
+  | b0.xml  | 12231 | <div2 n="bTw or bTY" type="root" org="uniform" sample="complete" part="N"              |
+  | b0.xml  | 19801 | <div2 n="Quasi bwj" type="root" org="uniform" sample="complete" part="N"               |
+  | b0.xml  | 20929 | <div2 n="Quasi byH" type="root" org="uniform" sample="complete" part="N"               |
+  | b0.xml  | 21001 | <div2 n="Quasi byr" type="root" org="uniform" sample="complete" part="N"               |
+  | d0.xml  |  1610 | <div2 n="dbw and dbY" type="root" org="uniform" sample="complete" part="N"             |
+  | d0.xml  |  9220 | <div2 n="Quasi dkr" type="root" org="uniform" sample="complete" part="N"               |
+  | d0.xml  | 13665 | <div2 n="dhw and dhY" type="root" org="uniform" sample="complete" part="N"             |
+  | f0.xml  |   598 | <div2 n="fAnyd and fAny*" type="root" org="uniform" sample="complete" part="N"         |
+  | f0.xml  |  1939 | <div2 n="ftw or ftY" type="root" org="uniform" sample="complete" part="N"              |
+  | f0.xml  |  9357 | <div2 n="Quasi frwz" type="root" org="uniform" sample="complete" part="N"              |
+  | f0.xml  |  9873 | <div2 n="fst and fstT" type="root" org="uniform" sample="complete" part="N"            |
+  | f0.xml  | 12518 | <div2 n="fDw and fDY" type="root" org="uniform" sample="complete" part="N"             |
+  | f0.xml  | 13632 | <div2 n="fEw or fEY" type="root" org="uniform" sample="complete" part="N"              |
+  | f0.xml  | 13894 | <div2 n="fgw and fgY" type="root" org="uniform" sample="complete" part="N"             |
+  | g0.xml  |  1512 | <div2 n="gvw and gvY" type="root" org="uniform" sample="complete" part="N"             |
+  | g0.xml  |  5233 | <div2 n="gsw and gsY" type="root" org="uniform" sample="complete" part="N"             |
+  | g0.xml  |  6469 | <div2 n="gDw and gDY" type="root" org="uniform" sample="complete" part="N"             |
+  | g0.xml  |  7067 | <div2 n="gTw and gTY" type="root" org="uniform" sample="complete" part="N"             |
+  | g0.xml  |  7721 | <div2 n="gfw and gfY" type="root" org="uniform" sample="complete" part="N"             |
+  | g0.xml  | 11743 | <div2 n="gw or gwY" type="root" org="uniform" sample="complete" part="N"               |
+  | j0.xml  |   334 | <div2 n="Quasi jA^y" type="root" org="uniform" sample="complete" part="N"              |
+  | j0.xml  |  1583 | <div2 n="jbw and jbY" type="root" org="uniform" sample="complete" part="N"             |
+  | j0.xml  |  2087 | <div2 n="jvw and jvY" type="root" org="uniform" sample="complete" part="N"             |
+  | j0.xml  |  4594 | <div2 n="Quasi j*Em" type="root" org="uniform" sample="complete" part="N"              |
+  | j0.xml  |  6182 | <div2 n="jrdq and jr*q" type="root" org="uniform" sample="complete" part="N"           |
+  | j0.xml  | 12822 | <div2 n="Quasi jlhm" type="root" org="uniform" sample="complete" part="N"              |
+  | k0.xml  |  1629 | <div2 n="ktE ktf ktl ktm ktn" type="root" org="uniform" sample="complete" part="N"     |
+  | k0.xml  |  2175 | <div2 n="kvf kvl kvm" type="root" org="uniform" sample="complete" part="N"             |
+  | k0.xml  |  2280 | <div2 n="kHS kHl kx" type="root" org="uniform" sample="complete" part="N"              |
+  | k0.xml  |  2798 | <div2 n="kdm kdn kdh kdY" type="root" org="uniform" sample="complete" part="N"         |
+  | k0.xml  |  4167 | <div2 n="krS krD krT krE krf" type="root" org="uniform" sample="complete" part="N"     |
+  | k0.xml  |  4283 | <div2 n="krh krw" type="root" org="uniform" sample="complete" part="N" TEIform="div2"> |
+  | k0.xml  |  4413 | <div2 n="kzm kzm" type="root" org="uniform" sample="complete" part="N" TEIform="div2"> |
+  | k0.xml  |  5017 | <div2 n="ksE ksf ksl ksm ksw" type="root" org="uniform" sample="complete" part="N"     |
+  | k0.xml  |  5688 | <div2 n="kEr kEs" type="root" org="uniform" sample="complete" part="N" TEIform="div2"> |
+  | k0.xml  |  6454 | <div2 n="kfl kfn kfY" type="root" org="uniform" sample="complete" part="N"             |
+  | k0.xml  |  7291 | <div2 n="klE klf klm klY km" type="root" org="uniform" sample="complete" part="N"      |
+  | k0.xml  |  7768 | <div2 n="kmE kml kmn kmh kmY kn" type="root" org="uniform" sample="complete" part="N"  |
+  | k0.xml  |  8346 | <div2 n="knh knY kh" type="root" org="uniform" sample="complete" part="N"              |
+  | k0.xml  |  8536 | <div2 n="khl khm khn khY" type="root" org="uniform" sample="complete" part="N"         |
+  | k0.xml  |  8997 | <div2 n="kwE kwf" type="root" org="uniform" sample="complete" part="N" TEIform="div2"> |
+  | k0.xml  |  9013 | <div2 n="kwm kwn kwY" type="root" org="uniform" sample="complete" part="N"             |
+  | k0.xml  |  9288 | <div2 n="kyS kyf kyl kyn" type="root" org="uniform" sample="complete" part="N"         |
+  | l0.xml  |  1280 | <div2 n="ltd ltz ltm ltn" type="root" org="uniform" sample="complete" part="N"         |
+  | l0.xml  |  1378 | <div2 n="lvd lvT lvg lvq lvm lvY" type="root" org="uniform" sample="complete"          |
+  | l0.xml  |  1773 | <div2 n="ljf ljm ljn" type="root" org="uniform" sample="complete" part="N"             |
+  | l0.xml  |  2347 | <div2 n="lHf lHq lHk lHm lHn lHY" type="root" org="uniform" sample="complete"          |
+  | l0.xml  |  2475 | <div2 n="lxf lxm lxn lxY" type="root" org="uniform" sample="complete" part="N"         |
+  | l0.xml  |  2615 | <div2 n="lds ldg ldm ldn" type="root" org="uniform" sample="complete" part="N"         |
+  | l0.xml  |  3038 | <div2 n="lzq lzm lzn" type="root" org="uniform" sample="complete" part="N"             |
+  | l0.xml  |  3129 | <div2 n="lsE lsm lsn" type="root" org="uniform" sample="complete" part="N"             |
+  | l0.xml  |  3301 | <div2 n="lSf lSq lT" type="root" org="uniform" sample="complete" part="N"              |
+  | l0.xml  |  3492 | <div2 n="lTE lTf lTm lTY" type="root" org="uniform" sample="complete" part="N"         |
+  | l0.xml  |  3894 | <div2 n="lET lEf lEq lEm lEn" type="root" org="uniform" sample="complete" part="N"     |
+  | l0.xml  |  4630 | <div2 n="lfE lfq lfm lq" type="root" org="uniform" sample="complete" part="N"          |
+  | l0.xml  |  5040 | <div2 n="lqE lqf lqm lqn lqY lk" type="root" org="uniform" sample="complete" part="N"  |
+  | l0.xml  |  5235 | <div2 n="lkE lkm lkn lkY" type="root" org="uniform" sample="complete" part="N"         |
+  | l0.xml  |  5746 | <div2 n="lmE lmq lmk lmY" type="root" org="uniform" sample="complete" part="N"         |
+  | l0.xml  |  6135 | <div2 n="lhz lhs lhT lhE lhf lhq" type="root" org="uniform" sample="complete"          |
+  | l0.xml  |  6155 | <div2 n="lhm lhn lhw lw" type="root" org="uniform" sample="complete" part="N"          |
+  | l0.xml  |  6950 | <div2 n="lwE lwf lwq lwk lwm lwn lwh lwY lY" type="root" org="uniform"                 |
+  | l0.xml  |  7263 | <div2 n="lyE lyf lyq lyl lyn" type="root" org="uniform" sample="complete" part="N"     |
+  | m1.xml  |   986 | <div2 n="mzw and mzY" type="root" org="uniform" sample="complete" part="N"             |
+  | m1.xml  |  2216 | <div2 n="mnjn and mnjnq" type="root" org="uniform" sample="complete" part="N"          |
+  | n0.xml  |  9989 | <div2 n="nugoruwqN See art. grnq" type="root" org="uniform" sample="complete"          |
+  | n1.xml  |  1623 | <div2 n="nsw and nsY" type="root" org="uniform" sample="complete" part="N"             |
+  | q0.xml  |  5171 | <div2 n="qrE qrf" type="root" org="uniform" sample="complete" part="N" TEIform="div2"> |
+  | q0.xml  |  5207 | <div2 n="qrq qrm" type="root" org="uniform" sample="complete" part="N" TEIform="div2"> |
+  | q0.xml  |  5379 | <div2 n="qrw and qrY" type="root" org="uniform" sample="complete" part="N"             |
+  | q0.xml  |  5578 | <div2 n="qzE qzl qzm" type="root" org="uniform" sample="complete" part="N"             |
+  | q0.xml  |  6044 | <div2 n="qsm qsn qsw q$" type="root" org="uniform" sample="complete" part="N"          |
+  | q0.xml  |  7658 | <div2 n="qSE qSf qSl qSm qSw" type="root" org="uniform" sample="complete" part="N"     |
+  | q0.xml  |  8044 | <div2 n="qDE qDf qSm qSY" type="root" org="uniform" sample="complete" part="N"         |
+  | q0.xml  |  8687 | <div2 n="qTE qTf qTl qTm" type="root" org="uniform" sample="complete" part="N"         |
+  | q0.xml  |  9562 | <div2 n="qET qEf qEqE qEl qEm qEn qEw qf" type="root" org="uniform" sample="complete"  |
+  | q0.xml  |  9957 | <div2 n="qfT qfE qfl qfn qfw" type="root" org="uniform" sample="complete" part="N"     |
+  | q0.xml  | 10913 | <div2 n="qlE qlf qlq" type="root" org="uniform" sample="complete" part="N"             |
+  | q0.xml  | 10930 | <div2 n="qlm qlw qlY qm~" type="root" org="uniform" sample="complete" part="N"         |
+  | q0.xml  | 11724 | <div2 n="qmE qml qmn" type="root" org="uniform" sample="complete" part="N"             |
+  | q0.xml  | 12354 | <div2 n="qnE qnf" type="root" org="uniform" sample="complete" part="N" TEIform="div2"> |
+  | q0.xml  | 12579 | <div2 n="qhl qhw" type="root" org="uniform" sample="complete" part="N" TEIform="div2"> |
+  | q0.xml  | 13397 | <div2 n="qwE qwf qwl qwm qwY" type="root" org="uniform" sample="complete" part="N"     |
+  | q0.xml  | 14026 | <div2 n="qyl qyn" type="root" org="uniform" sample="complete" part="N" TEIform="div2"> |
+  | q1.xml  |  2653 | <div2 n="qlw and qlY" type="root" org="uniform" sample="complete" part="N"             |
+  | q1.xml  |  2956 | <div2 n="qnw and qnY" type="root" org="uniform" sample="complete" part="N"             |
+  | r0.xml  |  8010 | <div2 n="rHw and rHY" type="root" org="uniform" sample="complete" part="N"             |
+  | r0.xml  | 14303 | <div2 n="Quasi rDY" type="root" org="uniform" sample="complete" part="N"               |
+  | r0.xml  | 15418 | <div2 n="Quasi rE$n" type="root" org="uniform" sample="complete" part="N"              |
+  | r0.xml  | 16468 | <div2 n="Quasi rgld" type="root" org="uniform" sample="complete" part="N"              |
+  | r0.xml  | 27432 | <div2 n="Quasi rys" type="root" org="uniform" sample="complete" part="N"               |
+  | s0.xml  |  5465 | <div2 n="sHw and sHY" type="root" org="uniform" sample="complete" part="N"             |
+  | s0.xml  |  6333 | <div2 n="sxw and sxY" type="root" org="uniform" sample="complete" part="N"             |
+  | s0.xml  |  7423 | <div2 n="sdw and sdY" type="root" org="uniform" sample="complete" part="N"             |
+  | s0.xml  |  8016 | <div2 n="Quasi srA^l and srA^n" type="root" org="uniform" sample="complete" part="N"   |
+  | s0.xml  |  9502 | <div2 n="srfl and srfn" type="root" org="uniform" sample="complete" part="N"           |
+  | s0.xml  | 11521 | <div2 n="sEw and sEY" type="root" org="uniform" sample="complete" part="N"             |
+  | s0.xml  | 12369 | <div2 n="safaro jalN" type="root" org="uniform" sample="complete" part="N"             |
+  | s0.xml  | 12976 | <div2 n="sfnd and sfnT" type="root" org="uniform" sample="complete" part="N"           |
+  | s0.xml  | 13124 | <div2 n="sfw and sfY" type="root" org="uniform" sample="complete" part="N"             |
+  | s0.xml  | 22031 | <div2 n="snw and snY" type="root" org="uniform" sample="complete" part="N"             |
+  | s0.xml  | 26437 | <div2 n="Quasi sym" type="root" org="uniform" sample="complete" part="N"               |
+  | t0.xml  |  1203 | <div2 n="Quasi tjh" type="root" org="uniform" sample="complete" part="N"               |
+  | t0.xml  |  1397 | <div2 n="txm and quasi txm" type="root" org="uniform" sample="complete" part="N"       |
+  | t0.xml  |  1963 | <div2 n="Quasi trv" type="root" org="uniform" sample="complete" part="N"               |
+  | t0.xml  |  3384 | <div2 n="Quasi tqY: or, accord. to some, tqw" type="root" org="uniform"                |
+  | t0.xml  |  3519 | <div2 n="Quasi tkA^" type="root" org="uniform" sample="complete" part="N"              |
+  | t0.xml  |  3529 | <div2 n="Quasi tkl" type="root" org="uniform" sample="complete" part="N"               |
+  | t0.xml  |  3785 | <div2 n="Quasi tlj" type="root" org="uniform" sample="complete" part="N"               |
+  | v0.xml  |   735 | <div2 n="vbw or vbY" type="root" org="uniform" sample="complete" part="N"              |
+  | v0.xml  |  4686 | <div2 n="vnd and vndA^" type="root" org="uniform" sample="complete" part="N"           |
+  | v0.xml  |  4698 | <div2 n="Quasi vnw" type="root" org="uniform" sample="complete" part="N"               |
+  | x0.xml  | 17666 | <div2 n="Quasi xmY" type="root" org="uniform" sample="complete" part="N"               |
+  | z0.xml  |  3405 | <div2 n="Quasi zrqm" type="root" org="uniform" sample="complete" part="N"              |
+
+* Buckwalter conversion errors
+
+  Written to files *_conv.log
+
+  This will list the ones that haven't been fixed:
+
+  awk '/^0/ { print FILENAME , $1;}' /tmp/*conv.log | sed 's|/tmp/131210_||' | sed 's/_conv.log//'
+
+
+  As 10th Dec, there are 930 errors, 177 of which are due to "Quasi"
+
+  Fixed, the quasi and the alternates forms, now down to 772
+* Duplicate nodeId in entry
+
+  select id,nodeId,count(nodeId) from entry group by nodeId having (count(nodeId) > 1)
+
+
+  Unpatched there are 194 of them.
+* Conversion errors
+
+  _E0, n29982,V5 400/2115 c1 p2
+
+  "the sign.." then a small circle above two horizontal bars above a small circle
+
+
+  _E0, n31299, pos 1146, V5 503/2218, c2 p3
+
+  >> of the (??) (S:) and women are likened to these wild animals
+
+  should be "wild cow";
+
+
+   >> epithet. (TA.) ―         -b4-  (??) <hi rend="ital" TEIform="hi">A good
+
+   has  "And" with poss. a dot underneath followed by double-cross.
+
+
+   >> opposed to EaworA='u. (??) ―         -b5-  And. applied to
+* Fixups
+** alef wasla
+
+   In xml directory:
+
+   $ grep '@' *.xml | wc -l
+   3285
+   $ grep 'A@' *.xml | wc -l
+   3285
+
+
+   Random checked:
+   _H0 , line 145, V2 131/495 c2 p2, ok
+              185, V2 131/495 c3 p1, ok
+              1433   , V2 141/505 c1 p1, ok
+                     , V2 141/505 c3 p1, ok
+* Ba,Bi,Bu
+
+  Entries like this:
+
+
+               <entryFree id="n38353" key="ma*iHa" type="main">
+                  <form>
+                     <itype>1</itype>
+                     <orth orig="" extent="full" lang="ar">ma*iHa</orth>
+                     <orth extent="full" lang="ar">*</orth>
+                  </form>, (S,) aor.
+    <form n="infl">
+                     <orth orig="Ba" lang="ar">ma*aHa</orth>
+                  </form>, (L,) inf. n.
+
+
+  The original has (always ?) just "aor. ﹷ" . The form given cannot be the imperfect as it has
+  no prefix.
+* SQL
+** count of nodes for each root
+
+   select broot,id,nodeId,count(nodeId) from entry group by broot having (count(nodeId) > 1);
+
+** words having more than one entry
+
+   select broot,bword,nodeId from entry group by bword having (count(bword) > 1);
+
+   it seems to be ok, eg V3 390/1224 has two entries for zarobN (nodes n17624 and n17627)
+** getting the entries for a root in the correct order
+
+   select bword,nodeId,itype from entry where broot="ktb" order by nodeId;
+
+   you get the itypes in the correct sequence followed by the itype=""
+   #+begin_src  sqlite :results output raw
+   sqlite3 /home/andrewsg/qt5projects/laneparser/lexicon.sqlite 'select bword,nodeId,itype from entry where broot="ktb" order by nodeId;'
+   #+end_src
+
+   #+RESULTS:
+   | katabahu     | n36626      |      1 |    |
+   | kat~aba      | n36626-1    |      2 |    |
+   | mukaAtabapN  | n36627      |      3 |    |
+   | Aktb         | n36628      |      4 |    |
+   | tkt~b        | n36629      |      5 |    |
+   | takaAotaba   | n36629-5    |      6 |    |
+   | A_ikotataba  | n36629-5-6  |      8 |    |
+   | Astktbhu     | $ayoy^FA    | n36630 | 10 |
+   | kutobapN     | n36631      |        |    |
+   | kitobapN     | n36632      |        |    |
+   | kutubiY~N    | n36633      |        |    |
+   | kitaAbN      | n36634      |        |    |
+   | qirobapN     | katiybN     | n36635 |    |
+   | kitaAbapN    | n36636      |        |    |
+   | katiybapN    | n36637      |        |    |
+   | kut~aAbN     | n36638      |        |    |
+   | kaAtibN      | n36639      |        |    |
+   | makotabN     | n36640      |        |    |
+   | mukotabN     | n36641      |        |    |
+   | mukotibN     | n36642      |        |    |
+   | bglp         | makotuwbapN | n36643 |    |
+   | mukat~abN    | n36644      |        |    |
+   | mukotatabN   | n36645      |        |    |
+   | mukotawotibN | n36646      |        |    |
+   | kitaAbN      | n42947      |        |    |
+
+** getting previous entries of a given node
+
+   get the nodeId,nodenum for the required entry then:
+
+   select nodeId,nodenum from entry where nodenum < 6621 order by nodenum desc limit 10;
+** get letter start pages
+
+   select bletter,page,supplement from root where (bword = bletter) and (supplement = 0) order by letter;
+
+** get previous entries to a given root
+
+  select bword from root where bword < "$Eb*" order by bword desc limit 5;
+
+  (normally using word, not bword)
+
+* Perseus XML fixups
+** 2 17/381 has out of sequence roots
+
+   it has jH followed by Hd in both the XML and the original text
+
+   is this a typo ?
+** $0.xml
+
+   has <div2 n="$E." type="root ...
+
+   should be n="$Ew"
+* QFontEngine
+
+  load glyph failed err=6 face=0x9e41580, glyph=1374
+  QFontEngine: Glyph neither outline nor bitmap format=0
+  main window destructor
+  QMutex: destroying locked mutex
+* Running with saxon or Xalan
+
+  java -jar /workvol/saxonhe/saxon9he.jar -t -xsl:entry.xslt -s:../laneparser/jwb.xml
+
+
+  sqlite3 lexicon.sqlite 'select xml from entry where nodeId = "n26320"' | java -jar /workvol/saxonhe/saxon9he.jar -t -xsl:entry.xslt -s:- ddebug=yes
+
+
+  sqlite3 lexicon.sqlite 'select xml from entry where nodeId = "n26320"' | Xalan -p ddebug "'yes'" - entry.xslt
