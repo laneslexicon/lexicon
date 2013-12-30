@@ -86,7 +86,7 @@ class GraphicsEntry : public QWidget {
     QList<EntryItem *> m_items;
     EntryItem * createEntry(const QString & xml);
     const XalanCompiledStylesheet * m_compXsl;
-    bool showNode(const QString &);
+    bool showNode(const QString &,bool thisPageOnly = false);
     qreal m_scale;
     QTransform m_transform;
     QString transform(const QString & xsl,const QString & xml);

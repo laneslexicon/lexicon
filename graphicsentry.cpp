@@ -104,6 +104,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   QSplitter * splitter = new QSplitter;
   m_scene = new QGraphicsScene;
   m_view = new LaneGraphicsView(m_scene);
+  //  m_scene->setSceneRect(0,0,300,20000);
   m_view->setInteractive(true);
   m_item = new QGraphicsTextItem("");
   m_item->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -218,19 +219,24 @@ void GraphicsEntry::anchorTest() {
     }
   }
 }
-bool GraphicsEntry::showNode(const QString & node) {
-  //  QList<QGraphicsItem *> items = m_scene->items();
+bool GraphicsEntry::showNode(const QString & node,bool thisPageOnly) {
+  /// check if the node is on this page
   for(int i=0;i < m_items.size();i++) {
     EntryItem * item = m_items[i];
-    if (item) {
-      if (item->isNode(node)) {
-        QLOG_DEBUG() << "Found node" << node;
-        //        m_scene->setFocusItem(item);
-        m_scene->clearFocus();
-        m_view->ensureVisible(item);
-        return true;
-      }
+    if (item->isNode(node)) {
+      QLOG_DEBUG() << "Found local node" << node;
+      m_scene->setFocusItem(item);
+      m_view->ensureVisible(item);
+      // m_view->centerOn(item);
+      //     m_scene->clearFocus();
+      return true;
     }
+  }
+  QLOG_DEBUG() << "Not found on page" << node;
+  /// trying out of page jump
+  if (! thisPageOnly ) {
+    QLOG_DEBUG() << "Out of page jump" << node;
+    getXmlForNode(node);
   }
   return false;
 }
@@ -348,9 +354,9 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   int itemCount = m_items.size();
   /// add the root item
   QString rootxml = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
-  EntryItem * item  = createEntry(rootxml);
-  item->setRoot(root,true);
-  m_items << item;
+  EntryItem * rootItem  = createEntry(rootxml);
+  rootItem->setRoot(root,true);
+  m_items << rootItem;
   /// now add all the entries for the root
   while(m_rootQuery->next()) {
     arRoot = m_rootQuery->value(0).toString();
@@ -362,7 +368,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
       .arg(m_rootQuery->value(6).toString());
     t += m_rootQuery->value(4).toString();
     t += "</word>";
-    item  = createEntry(t);
+    EntryItem * item  = createEntry(t);
     item->setNode(m_rootQuery->value(7).toString());
     /// get the nodeid of the first item at added, so we jump to it later
     if (startNode.isEmpty()) {
@@ -376,7 +382,15 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   addEntries(itemCount);
   m_view->setFocus();
   m_transform = m_view->transform();
-  showNode(startNode);
+  if ( node.isEmpty()) {
+      m_scene->setFocusItem(rootItem);
+      m_view->centerOn(rootItem);
+      //      m_scene->clearFocus();
+  }
+  //QLOG_DEBUG() << "Scene rect" << m_scene->sceneRect();
+  /// without thus centerOn() does not work properly for
+  /// items added to the scene
+  m_view->setSceneRect(m_scene->sceneRect());
 }
 /**
  * create the QTextGraphicsItem by transforming the passed xml
@@ -389,8 +403,8 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     QString html =transform(m_xsl->text(),xml);
     EntryItem * gi = new EntryItem("");
     gi->document()->setDefaultStyleSheet(m_currentCSS);
-    gi->setHtml(html);
     gi->setTextWidth(300);
+    gi->setHtml(html);
     /// need this otherwise arabic text will be right justified
     gi->document()->setDefaultTextOption(m_textOption);
     gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -441,18 +455,21 @@ void GraphicsEntry::getXmlForNode(const QString  & node) {
   m_nodeQuery->exec();
   if (m_nodeQuery->first()) {
     QString xml = m_nodeQuery->value("xml").toString();
-    QLOG_DEBUG() << "got " << xml;
+    //    QLOG_DEBUG() << "got " << xml;
     m_nodeXml->setText(xml);
     QString root = QString("%1/%2").arg(m_nodeQuery->value("broot").toString()).arg(m_nodeQuery->value("root").toString());
     QString word = QString("%1/%2").arg(m_nodeQuery->value("bword").toString()).arg(m_nodeQuery->value("word").toString());
     m_root->setText(root);
     m_word->setText(word);
     getXmlForRoot(m_nodeQuery->value("root").toString(),node);
-    //   transform(m_xsl->text(),xml);
+    /// focus on the node, set thisPageOnly to true just in case something has gone horribly wrong
+    /// otherwise we'll be looping forever
+    showNode(node,true);
   }
   else {
     QLOG_DEBUG() << "Error" << m_nodeQuery->lastError().text();
   }
+
 }
 void GraphicsEntry::on_findNode()  {
   QRegExp rx("n\\d+");
@@ -462,6 +479,7 @@ void GraphicsEntry::on_findNode()  {
   }
   else {
     getXmlForRoot(node);
+    showNode(node);
   }
 }
 QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
