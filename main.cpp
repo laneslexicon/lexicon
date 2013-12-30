@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
       QsLogging::DestinationFactory::MakeFileDestination(sLogPath, true, 512 * 64, 5) );
    QsLogging::DestinationPtr debugDestination(
       QsLogging::DestinationFactory::MakeDebugOutputDestination() );
-   //   logger.addDestination(debugDestination);
+   logger.addDestination(debugDestination);
    logger.addDestination(fileDestination);
 
    QLOG_INFO() << "Program started";
