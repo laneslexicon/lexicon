@@ -1,5 +1,6 @@
 #ifndef __GRAPHICSENTRY_H__
 #define __GRAPHICSENTRY_H__
+
 #include <QWidget>
 #include <QPushButton>
 #include <QLineEdit>
@@ -31,6 +32,9 @@
 #include <QFocusEvent>
 #include "QsLog.h"
 #include "xsltsupport.h"
+#include "history.h"
+
+extern HistoryMaster * getHistory();
 class EntryItem : public QGraphicsTextItem {
  public:
   EntryItem(const QString &, QGraphicsItem * parent = 0);

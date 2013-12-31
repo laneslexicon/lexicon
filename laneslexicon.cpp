@@ -27,6 +27,12 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     statusBar()->showMessage(tr("Ready"));
     m_tree->loadContents();
     entry->prepareQueries();
+    m_history = new HistoryMaster("notes.sqlite");
+    HistoryEvent * event = new HistoryEvent;
+    event->setNode("testnode");
+    event->setWord("testword");
+    event->setRoot("testroot");
+    m_history->add(event);
   }
   else {
     statusBar()->showMessage(tr("Failed to open database"));
@@ -171,4 +177,7 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
 void LanesLexicon::on_actionTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
+}
+HistoryMaster * LanesLexicon::history() {
+  return m_history;
 }

@@ -34,6 +34,7 @@
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"
+#include "history.h"
 #include "QsLog.h"
 
 class LanesLexicon : public QMainWindow
@@ -44,12 +45,14 @@ public:
     explicit LanesLexicon(QWidget *parent = 0);
     ~LanesLexicon();
     QSize sizeHint() const;
-private slots:
+    HistoryMaster * history();
+    private slots:
     void on_actionExit();
     void on_actionTest();
     void rootClicked(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void onNotesClicked();
+
 private:
     void createActions();
     void createToolBar();
@@ -69,7 +72,10 @@ private:
     // actions
     QAction * m_exitAction;
     QAction * m_testAction;
+    HistoryMaster * m_history;
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };
+
+
 #endif // MAINWINDOW_H
