@@ -28,11 +28,16 @@ class HistoryMaster {
   HistoryMaster(const QString & dbname);
   //  bool add(const QString & root,const QString & word, const QString & node);
   bool add(HistoryEvent *);
+  void on() { m_historyOn = true;}
+  void off() { m_historyOn = false;}
+  bool isOn() { return m_historyOn;}
   QList<HistoryEvent *> getHistory(int howMany);
  private:
   bool openDatabase(const QString & dbname);
+  bool m_historyOn;
   QSqlDatabase m_db;
   bool m_historyOk;
   QSqlQuery * m_addQuery;
 };
+extern HistoryMaster * getHistory();
 #endif

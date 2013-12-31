@@ -188,6 +188,8 @@ void GraphicsEntry::anchorClicked(const QUrl & link) {
   QLOG_DEBUG() << QApplication::keyboardModifiers();
 }
 void GraphicsEntry::linkActivated(const QString & link) {
+  /// turn history on as the user has clicked on something
+  getHistory()->on();
   QString node(link);
   node.remove(0,1);
   showNode(node);
@@ -392,12 +394,18 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   /// without thus centerOn() does not work properly for
   /// items added to the scene
   m_view->setSceneRect(m_scene->sceneRect());
-
-  HistoryEvent * event = new HistoryEvent;
-  event->setRoot(arRoot);
-  event->setNode(node);
-  event->setWord(showWord);
-  getHistory()->add(event);
+  /**
+   * we need to know whether we got here by accessing the history button
+   * or not
+   *
+   */
+  if (getHistory()->isOn()) {
+    HistoryEvent * event = new HistoryEvent;
+    event->setRoot(arRoot);
+    event->setNode(node);
+    event->setWord(showWord);
+    getHistory()->add(event);
+  }
   if ( node.isEmpty()) {
       m_scene->setFocusItem(rootItem);
       m_view->centerOn(rootItem);

@@ -4,11 +4,11 @@ HistoryEvent::HistoryEvent() {
 }
 
 HistoryMaster::HistoryMaster(const QString & dbname) {
-
   m_historyOk = openDatabase(dbname);
   if (m_historyOk) {
     m_addQuery = new QSqlQuery(m_db);
     if (m_addQuery->prepare("insert into history (nodeId,word,root,timewhen) values (?,?,?,?)")) {
+      m_historyOn = true;
     }
     else {
       qDebug() << "whoops";
