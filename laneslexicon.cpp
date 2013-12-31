@@ -28,11 +28,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     m_tree->loadContents();
     entry->prepareQueries();
     m_history = new HistoryMaster("notes.sqlite");
-    HistoryEvent * event = new HistoryEvent;
-    event->setNode("testnode");
-    event->setWord("testword");
-    event->setRoot("testroot");
-    m_history->add(event);
   }
   else {
     statusBar()->showMessage(tr("Failed to open database"));
