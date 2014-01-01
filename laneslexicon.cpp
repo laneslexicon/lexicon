@@ -56,11 +56,33 @@ void LanesLexicon::createActions() {
 
   m_testAction = new QAction(tr("Test"),this);
   connect(m_testAction,SIGNAL(triggered()),this,SLOT(on_actionTest()));
+  /// probably need icons
+  m_hForward = new QAction(tr("Forward"),this);
+  m_hBackward = new QAction(tr("Backard"),this);
+
+  connect(m_hForward,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
+  connect(m_hBackward,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
 }
 void LanesLexicon::createToolBar() {
   m_fileToolBar = addToolBar(tr("&File"));
   m_fileToolBar->addAction(m_exitAction);
   m_fileToolBar->addAction(m_testAction);
+
+  QToolBar * history = addToolBar(tr("History"));
+
+  m_hForwardBtn = new QToolButton;
+  m_hForwardBtn->setText("Forward");
+  m_hForwardBtn->setDefaultAction(m_hForward);
+  m_hForwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
+  m_hBackwardBtn = new QToolButton;
+  m_hBackwardBtn->setText("Back");
+  m_hBackwardBtn->setDefaultAction(m_hBackward);
+  m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
+
+
+  history->addWidget(m_hBackwardBtn);
+  history->addWidget(m_hForwardBtn);
+
 }
 void LanesLexicon::createMenus() {
   m_fileMenu = menuBar()->addMenu(tr("&File"));
@@ -74,6 +96,12 @@ void LanesLexicon::createStatusBar() {
 }
 QSize LanesLexicon::sizeHint() const {
   return QSize(800,600);
+}
+void LanesLexicon::onHistoryForward() {
+  qDebug() << "Vorwarts";
+}
+void LanesLexicon::onHistoryBackward() {
+  qDebug() << "Ruckwarts";
 }
 void LanesLexicon::on_actionExit()
 {
@@ -103,6 +131,8 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
+  /// turn history on as the user has clicked on something
+  m_history->on();
   if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
     GraphicsEntry * w = new GraphicsEntry(this);
     w->prepareQueries();

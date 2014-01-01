@@ -34,7 +34,7 @@
 #include "xsltsupport.h"
 #include "history.h"
 
-extern HistoryMaster * getHistory();
+
 class EntryItem : public QGraphicsTextItem {
  public:
   EntryItem(const QString &, QGraphicsItem * parent = 0);

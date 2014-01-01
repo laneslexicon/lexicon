@@ -4,14 +4,17 @@
 #include <QFile>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QDebug>
 #include "QsLog.h"
+
 class HistoryEvent {
  public:
   HistoryEvent();
   void setWord(const QString & word) { m_word = word;}
   void setRoot(const QString & word) { m_root = word;}
   void setNode(const QString & word) { m_node = word;}
+  void setWhen(const QDateTime & word) { m_when = word;}
   QString getWord() { return m_word;}
   QString getRoot() { return m_root;}
   QString getNode() { return m_node;}
@@ -38,6 +41,7 @@ class HistoryMaster {
   QSqlDatabase m_db;
   bool m_historyOk;
   QSqlQuery * m_addQuery;
+  QSqlQuery * m_getQuery;
 };
 extern HistoryMaster * getHistory();
 #endif

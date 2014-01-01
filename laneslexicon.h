@@ -49,9 +49,12 @@ public:
     private slots:
     void on_actionExit();
     void on_actionTest();
+    void onHistoryForward();
+    void onHistoryBackward();
     void rootClicked(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void onNotesClicked();
+    //    void historyItemActivated();
 
 private:
     void createActions();
@@ -72,6 +75,10 @@ private:
     // actions
     QAction * m_exitAction;
     QAction * m_testAction;
+    QAction * m_hForward;
+    QAction * m_hBackward;
+    QToolButton * m_hForwardBtn;
+    QToolButton * m_hBackwardBtn;
     HistoryMaster * m_history;
  signals:
    void nodeActivated(const QString & node,const QString & word);
