@@ -57,6 +57,7 @@ public:
     //    void historyItemActivated();
 
 private:
+    int m_historyPos;
     void createActions();
     void createToolBar();
     void setupHistory();

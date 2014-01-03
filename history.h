@@ -37,14 +37,16 @@ class HistoryMaster {
   void on() { m_historyOn = true;}
   void off() { m_historyOn = false;}
   bool isOn() { return m_historyOn;}
-  QList<HistoryEvent *> getHistory(int howMany);
+  QList<HistoryEvent *> getHistory(int howMany,int direction,int startPos = -1);
  private:
+  int m_lastId;
   bool openDatabase(const QString & dbname);
   bool m_historyOn;
   QSqlDatabase m_db;
   bool m_historyOk;
   QSqlQuery * m_addQuery;
-  QSqlQuery * m_getQuery;
+  QSqlQuery * m_backQuery;
+  QSqlQuery * m_forQuery;
 };
 extern HistoryMaster * getHistory();
 #endif

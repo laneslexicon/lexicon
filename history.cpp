@@ -7,9 +7,17 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
   m_historyOk = openDatabase(dbname);
   if (m_historyOk) {
     m_addQuery = new QSqlQuery(m_db);
-    m_getQuery = new QSqlQuery(m_db);
+    m_forQuery = new QSqlQuery(m_db);
+    m_backQuery = new QSqlQuery(m_db);
     if (m_addQuery->prepare("insert into history (nodeId,word,root,timewhen) values (?,?,?,?)")) {
-      if (m_getQuery->prepare("select * from history order by timewhen desc")) {
+      if ((m_backQuery->prepare("select * from history where id <= ? order by id desc")) &&
+        (m_forQuery->prepare("select * from history where id > ? order by id asc")))
+        {
+        QSqlQuery mq(m_db);
+        mq.exec("select max(id) from history");
+        if (mq.first()) {
+          m_lastId = mq.value(0).toInt();
+        }
         m_historyOn = true;
       }
     }
@@ -46,21 +54,42 @@ bool HistoryMaster::add(HistoryEvent * event) {
  * The calling function should delete the events
  *
  * @param count
- *
+ * @param direciton 0 - back, 1 forward
  * @return
  */
-QList<HistoryEvent *> HistoryMaster::getHistory(int count) {
+QList<HistoryEvent *> HistoryMaster::getHistory(int count,int direction,int startPos) {
   int i = 0;
-  QList<HistoryEvent *> events;
-  m_getQuery->exec();
-  while(m_getQuery->next() && (i < count)) {
-    HistoryEvent * event = new HistoryEvent();
-    event->setId(m_getQuery->value(0).toInt());
-    event->setNode(m_getQuery->value(1).toString());
-    event->setWord(m_getQuery->value(2).toString());
-    event->setRoot(m_getQuery->value(3).toString());
-    event->setWhen(m_getQuery->value(4).toDateTime());
-    events << event;
+  if (startPos == -1) {
+    startPos = m_lastId;
   }
-  return events;
+  if (direction == 0) {
+    QList<HistoryEvent *> events;
+    m_backQuery->bindValue(0,startPos);
+    m_backQuery->exec();
+    while(m_backQuery->next() && (i < count)) {
+      HistoryEvent * event = new HistoryEvent();
+      event->setId(m_backQuery->value(0).toInt());
+      event->setNode(m_backQuery->value(1).toString());
+      event->setWord(m_backQuery->value(2).toString());
+      event->setRoot(m_backQuery->value(3).toString());
+      event->setWhen(m_backQuery->value(4).toDateTime());
+      events << event;
+    }
+    return events;
+  }
+  if (direction == 1) {
+    QList<HistoryEvent *> events;
+    m_forQuery->bindValue(0,startPos);
+    m_forQuery->exec();
+    while(m_forQuery->next() && (i < count)) {
+      HistoryEvent * event = new HistoryEvent();
+      event->setId(m_forQuery->value(0).toInt());
+      event->setNode(m_forQuery->value(1).toString());
+      event->setWord(m_forQuery->value(2).toString());
+      event->setRoot(m_forQuery->value(3).toString());
+      event->setWhen(m_forQuery->value(4).toDateTime());
+      events << event;
+    }
+    return events;
+  }
 }

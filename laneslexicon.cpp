@@ -27,6 +27,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     statusBar()->showMessage(tr("Ready"));
     m_tree->loadContents();
     entry->prepareQueries();
+    /// at the end of the history, but we should be able to restore from settings
+    m_historyPos = 9;
     m_history = new HistoryMaster("notes.sqlite");
     setupHistory();
   }
@@ -88,31 +90,52 @@ void LanesLexicon::createToolBar() {
 
 }
 void LanesLexicon::setupHistory() {
-  QList<HistoryEvent *> events = m_history->getHistory(10);
+  // get backward history
+  QList<HistoryEvent *> events = m_history->getHistory(10,0,m_historyPos);
   if (events.size() == 0) {
     m_hBackwardBtn->setEnabled(true);
-    return;
   }
-  QMenu * m = new QMenu;
-  for(int i=events.size() - 1;i >= 0;i--) {
-    HistoryEvent * event = events[i];
-    QString root = event->getRoot();
-    QString word = event->getWord();
-    QAction * action;
-    if (! word.isEmpty()) {
-      action = m->addAction(word);
+  else {
+    QMenu * m = new QMenu;
+    while(events.size() > 0) {
+      HistoryEvent * event = events.takeFirst();
+      QString root = event->getRoot();
+      QString word = event->getWord();
+      QAction * action;
+      if (! word.isEmpty()) {
+        action = m->addAction(word);
+      }
+      else {
+        action = m->addAction(root);
+      }
+      action->setData(event->getId());
+      connect(action,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
     }
-    else {
-      action = m->addAction(root);
-    }
-    action->setData(event->getId());
-    connect(action,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
+    m_hBackwardBtn->setEnabled(true);
+    m_hBackwardBtn->setMenu(m);
   }
-  m_hBackwardBtn->setEnabled(true);
-  m_hBackwardBtn->setMenu(m);
-  while(events.size() > 0) {
-    HistoryEvent * event = events.takeFirst();
-    delete  event;
+  events = m_history->getHistory(10,1,m_historyPos);
+  if (events.size() == 0) {
+    m_hForwardBtn->setEnabled(true);
+  }
+  else {
+    QMenu * m = new QMenu;
+    while(events.size() > 0) {
+      HistoryEvent * event = events.takeFirst();
+      QString root = event->getRoot();
+      QString word = event->getWord();
+      QAction * action;
+      if (! word.isEmpty()) {
+        action = m->addAction(word);
+      }
+      else {
+        action = m->addAction(root);
+      }
+      action->setData(event->getId());
+      connect(action,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
+    }
+    m_hForwardBtn->setEnabled(true);
+    m_hForwardBtn->setMenu(m);
   }
 }
 void LanesLexicon::createMenus() {
@@ -129,12 +152,16 @@ QSize LanesLexicon::sizeHint() const {
   return QSize(800,600);
 }
 void LanesLexicon::onHistoryForward() {
+  QAction * action = static_cast<QAction *>(QObject::sender());
   qDebug() << "Vorwarts";
+  m_historyPos = action->data().toInt();
+  setupHistory();
 }
 void LanesLexicon::onHistoryBackward() {
   QAction * action = static_cast<QAction *>(QObject::sender());
   qDebug() << "Ruckwarts" << action->data();
-
+  m_historyPos = action->data().toInt();
+  setupHistory();
 }
 void LanesLexicon::on_actionExit()
 {
