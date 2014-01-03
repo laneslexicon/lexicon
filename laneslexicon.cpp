@@ -155,13 +155,27 @@ void LanesLexicon::onHistoryForward() {
   QAction * action = static_cast<QAction *>(QObject::sender());
   qDebug() << "Vorwarts";
   m_historyPos = action->data().toInt();
+  HistoryEvent * event = m_history->getEvent(m_historyPos);
   setupHistory();
+  QString node = event->getNode();
+  QString root = event->getRoot();
+  GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
+  w->getXmlForRoot(root,node);
+  m_tabs->setTabText(0,root);
+  w->setFocus();
 }
 void LanesLexicon::onHistoryBackward() {
   QAction * action = static_cast<QAction *>(QObject::sender());
   qDebug() << "Ruckwarts" << action->data();
   m_historyPos = action->data().toInt();
+  HistoryEvent * event = m_history->getEvent(m_historyPos);
   setupHistory();
+  QString node = event->getNode();
+  QString root = event->getRoot();
+  GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
+  w->getXmlForRoot(root,node);
+  m_tabs->setTabText(0,root);
+  w->setFocus();
 }
 void LanesLexicon::on_actionExit()
 {
