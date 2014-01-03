@@ -31,6 +31,7 @@
 #include <QLabel>
 #include <QDialog>
 #include <QKeySequenceEdit>
+#include <QSettings>
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"
@@ -44,6 +45,8 @@ public:
     explicit LanesLexicon(QWidget *parent = 0);
     ~LanesLexicon();
     QSize sizeHint() const;
+    void readSettings();
+    void writeSettings();
 private slots:
     void on_actionExit();
     void on_actionTest();

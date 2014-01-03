@@ -3,7 +3,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
 {
-
   QSplitter * w = new QSplitter;
   m_tree = new ContentsWidget(this);
   m_tree->installEventFilter(this);
@@ -23,6 +22,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createMenus();
   createStatusBar();
 
+  writeSettings();
   if (openDatabase("lexicon.sqlite")) {
     statusBar()->showMessage(tr("Ready"));
     m_tree->loadContents();
@@ -171,4 +171,11 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
 void LanesLexicon::on_actionTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
+}
+void LanesLexicon::readSettings() {
+}
+void LanesLexicon::writeSettings() {
+  QSettings settings;
+
+  settings.setValue("Run date","This is the value");
 }

@@ -81,7 +81,7 @@ class GraphicsEntry : public QWidget {
     void onZoomOut();
     void onClearScene();
  private:
-
+    bool m_debug;
     void addEntries(int);
     QList<EntryItem *> m_items;
     EntryItem * createEntry(const QString & xml);

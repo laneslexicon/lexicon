@@ -40,6 +40,7 @@ void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
 }
 GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
+  m_debug = true;
   m_textOption.setTextDirection(Qt::LeftToRight);
   m_compXsl = 0;
   m_dbname = new QLineEdit;
@@ -368,6 +369,14 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
       .arg(m_rootQuery->value(6).toString());
     t += m_rootQuery->value(4).toString();
     t += "</word>";
+    if (m_debug) {
+      QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.xml").arg(m_rootQuery->value(7).toString()));
+      QFile f(fi.filePath());
+      if (f.open(QIODevice::WriteOnly)) {
+        QTextStream out(&f);
+        out << t;
+      }
+    }
     EntryItem * item  = createEntry(t);
     item->setNode(m_rootQuery->value(7).toString());
     /// get the nodeid of the first item at added, so we jump to it later
@@ -440,11 +449,13 @@ void GraphicsEntry::addEntries(int startPos) {
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
     QLOG_DEBUG() << "Pos" << m_items[i]->getNode()  << ypos << r.height();
-    QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
-    QFile f(fi.filePath());
-    if (f.open(QIODevice::WriteOnly)) {
-      QTextStream out(&f);
-      out << m_items[i]->toHtml();
+    if (m_debug) {
+      QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
+      QFile f(fi.filePath());
+      if (f.open(QIODevice::WriteOnly)) {
+        QTextStream out(&f);
+        out << m_items[i]->toHtml();
+      }
     }
     sz = m_items[i]->document()->size();
     ypos += sz.height() + 10;

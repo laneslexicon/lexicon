@@ -5,6 +5,11 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    QCoreApplication::setOrganizationName("Gabanjo");
+    QCoreApplication::setOrganizationDomain("nowhere.com");
+    QCoreApplication::setApplicationName("Lanes Lexicon");
+
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);
     const QString sLogPath(QDir(a.applicationDirPath()).filePath("log.txt"));
