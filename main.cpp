@@ -2,6 +2,17 @@
 #include <QApplication>
 #include "QsLog.h"
 #include "QsLogDest.h"
+LanesLexicon * getApp() {
+  foreach(QWidget *widget, qApp->topLevelWidgets()) {
+    if(widget->inherits("QMainWindow"))
+      return dynamic_cast<LanesLexicon *>(widget);
+  }
+  return NULL;
+}
+HistoryMaster * getHistory() {
+  LanesLexicon * app = getApp();
+  return app->history();
+}
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);

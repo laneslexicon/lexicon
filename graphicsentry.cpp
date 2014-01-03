@@ -189,6 +189,8 @@ void GraphicsEntry::anchorClicked(const QUrl & link) {
   QLOG_DEBUG() << QApplication::keyboardModifiers();
 }
 void GraphicsEntry::linkActivated(const QString & link) {
+  /// turn history on as the user has clicked on something
+  getHistory()->on();
   QString node(link);
   node.remove(0,1);
   showNode(node);
@@ -356,6 +358,8 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   /// add the root item
   QString rootxml = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
   EntryItem * rootItem  = createEntry(rootxml);
+  /// this will be set to the right word if a node has been supplied
+  QString showWord;
   rootItem->setRoot(root,true);
   m_items << rootItem;
   /// now add all the entries for the root
@@ -380,11 +384,14 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
     EntryItem * item  = createEntry(t);
     item->setNode(m_rootQuery->value(7).toString());
     /// get the nodeid of the first item at added, so we jump to it later
+    item->setRoot(arRoot);
+    item->setWord(m_rootQuery->value(2).toString());
     if (startNode.isEmpty()) {
       startNode = m_rootQuery->value(7).toString();
     }
-    item->setRoot(arRoot);
-    item->setWord(m_rootQuery->value(2).toString());
+    else if ( startNode == item->getNode()) {
+      showWord = item->getWord();
+    }
     m_items << item;
 
   }
@@ -396,13 +403,23 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   /// without thus centerOn() does not work properly for
   /// items added to the scene
   m_view->setSceneRect(m_scene->sceneRect());
-
+  /**
+   * we need to know whether we got here by accessing the history button
+   * or not
+   *
+   */
+  if (getHistory()->isOn()) {
+    HistoryEvent * event = new HistoryEvent;
+    event->setRoot(arRoot);
+    event->setNode(node);
+    event->setWord(showWord);
+    getHistory()->add(event);
+  }
   if ( node.isEmpty()) {
       m_scene->setFocusItem(rootItem);
       m_view->centerOn(rootItem);
       //      m_scene->clearFocus();
   }
-
 }
 /**
  * create the QTextGraphicsItem by transforming the passed xml

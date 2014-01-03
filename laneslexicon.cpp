@@ -27,6 +27,10 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     statusBar()->showMessage(tr("Ready"));
     m_tree->loadContents();
     entry->prepareQueries();
+    /// at the end of the history, but we should be able to restore from settings
+    m_historyPos = 9;
+    m_history = new HistoryMaster("notes.sqlite");
+    setupHistory();
   }
   else {
     statusBar()->showMessage(tr("Failed to open database"));
@@ -55,11 +59,84 @@ void LanesLexicon::createActions() {
 
   m_testAction = new QAction(tr("Test"),this);
   connect(m_testAction,SIGNAL(triggered()),this,SLOT(on_actionTest()));
+  /// probably need icons
+  m_hForward = new QAction(tr("Forward"),this);
+  m_hBackward = new QAction(tr("Backard"),this);
+
+  connect(m_hForward,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
+  connect(m_hBackward,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
 }
 void LanesLexicon::createToolBar() {
   m_fileToolBar = addToolBar(tr("&File"));
   m_fileToolBar->addAction(m_exitAction);
   m_fileToolBar->addAction(m_testAction);
+
+  QToolBar * history = addToolBar(tr("History"));
+
+  m_hForwardBtn = new QToolButton;
+  m_hForwardBtn->setText("Forward");
+  m_hForwardBtn->setDefaultAction(m_hForward);
+  m_hForwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
+  m_hForwardBtn->setEnabled(false);
+  m_hBackwardBtn = new QToolButton;
+  m_hBackwardBtn->setText("Back");
+  m_hBackwardBtn->setDefaultAction(m_hBackward);
+  m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
+  m_hBackwardBtn->setEnabled(false);
+
+
+  history->addWidget(m_hBackwardBtn);
+  history->addWidget(m_hForwardBtn);
+
+}
+void LanesLexicon::setupHistory() {
+  // get backward history
+  QList<HistoryEvent *> events = m_history->getHistory(10,0,m_historyPos);
+  if (events.size() == 0) {
+    m_hBackwardBtn->setEnabled(true);
+  }
+  else {
+    QMenu * m = new QMenu;
+    while(events.size() > 0) {
+      HistoryEvent * event = events.takeFirst();
+      QString root = event->getRoot();
+      QString word = event->getWord();
+      QAction * action;
+      if (! word.isEmpty()) {
+        action = m->addAction(word);
+      }
+      else {
+        action = m->addAction(root);
+      }
+      action->setData(event->getId());
+      connect(action,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
+    }
+    m_hBackwardBtn->setEnabled(true);
+    m_hBackwardBtn->setMenu(m);
+  }
+  events = m_history->getHistory(10,1,m_historyPos);
+  if (events.size() == 0) {
+    m_hForwardBtn->setEnabled(true);
+  }
+  else {
+    QMenu * m = new QMenu;
+    while(events.size() > 0) {
+      HistoryEvent * event = events.takeFirst();
+      QString root = event->getRoot();
+      QString word = event->getWord();
+      QAction * action;
+      if (! word.isEmpty()) {
+        action = m->addAction(word);
+      }
+      else {
+        action = m->addAction(root);
+      }
+      action->setData(event->getId());
+      connect(action,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
+    }
+    m_hForwardBtn->setEnabled(true);
+    m_hForwardBtn->setMenu(m);
+  }
 }
 void LanesLexicon::createMenus() {
   m_fileMenu = menuBar()->addMenu(tr("&File"));
@@ -73,6 +150,32 @@ void LanesLexicon::createStatusBar() {
 }
 QSize LanesLexicon::sizeHint() const {
   return QSize(800,600);
+}
+void LanesLexicon::onHistoryForward() {
+  QAction * action = static_cast<QAction *>(QObject::sender());
+  qDebug() << "Vorwarts";
+  m_historyPos = action->data().toInt();
+  HistoryEvent * event = m_history->getEvent(m_historyPos);
+  setupHistory();
+  QString node = event->getNode();
+  QString root = event->getRoot();
+  GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
+  w->getXmlForRoot(root,node);
+  m_tabs->setTabText(0,root);
+  w->setFocus();
+}
+void LanesLexicon::onHistoryBackward() {
+  QAction * action = static_cast<QAction *>(QObject::sender());
+  qDebug() << "Ruckwarts" << action->data();
+  m_historyPos = action->data().toInt();
+  HistoryEvent * event = m_history->getEvent(m_historyPos);
+  setupHistory();
+  QString node = event->getNode();
+  QString root = event->getRoot();
+  GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
+  w->getXmlForRoot(root,node);
+  m_tabs->setTabText(0,root);
+  w->setFocus();
 }
 void LanesLexicon::on_actionExit()
 {
@@ -102,6 +205,8 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
+  /// turn history on as the user has clicked on something
+  m_history->on();
   if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
     GraphicsEntry * w = new GraphicsEntry(this);
     w->prepareQueries();
@@ -173,6 +278,11 @@ void LanesLexicon::on_actionTest() {
   //  w->show();
 }
 void LanesLexicon::readSettings() {
+  QSettings settings;
+  QString ar = settings.value("Arabic font").toString();
+  if (! ar.isEmpty()) {
+    arFont.fromString(ar);
+  }
 }
 void LanesLexicon::writeSettings() {
   QSettings settings;
@@ -182,4 +292,7 @@ void LanesLexicon::writeSettings() {
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
   }
+}
+HistoryMaster * LanesLexicon::history() {
+  return m_history;
 }
