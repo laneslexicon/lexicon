@@ -32,6 +32,7 @@
 #include <QDialog>
 #include <QKeySequenceEdit>
 #include <QSettings>
+#include <QDateTime>
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"
@@ -54,6 +55,7 @@ private slots:
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void onNotesClicked();
 private:
+    QFont arFont;
     void createActions();
     void createToolBar();
     void createMenus();

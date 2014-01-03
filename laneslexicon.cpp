@@ -176,6 +176,10 @@ void LanesLexicon::readSettings() {
 }
 void LanesLexicon::writeSettings() {
   QSettings settings;
-
-  settings.setValue("Run date","This is the value");
+  QDateTime now = QDateTime::currentDateTime();
+  settings.setValue("Run date",now);
+  QString ar = settings.value("Arabic font").toString();
+  if (! ar.isEmpty()) {
+    arFont.fromString(ar);
+  }
 }
