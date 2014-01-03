@@ -55,6 +55,7 @@ QList<HistoryEvent *> HistoryMaster::getHistory(int count) {
   m_getQuery->exec();
   while(m_getQuery->next() && (i < count)) {
     HistoryEvent * event = new HistoryEvent();
+    event->setId(m_getQuery->value(0).toInt());
     event->setNode(m_getQuery->value(1).toString());
     event->setWord(m_getQuery->value(2).toString());
     event->setRoot(m_getQuery->value(3).toString());

@@ -28,6 +28,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     m_tree->loadContents();
     entry->prepareQueries();
     m_history = new HistoryMaster("notes.sqlite");
+    setupHistory();
   }
   else {
     statusBar()->showMessage(tr("Failed to open database"));
@@ -74,15 +75,45 @@ void LanesLexicon::createToolBar() {
   m_hForwardBtn->setText("Forward");
   m_hForwardBtn->setDefaultAction(m_hForward);
   m_hForwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
+  m_hForwardBtn->setEnabled(false);
   m_hBackwardBtn = new QToolButton;
   m_hBackwardBtn->setText("Back");
   m_hBackwardBtn->setDefaultAction(m_hBackward);
   m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
+  m_hBackwardBtn->setEnabled(false);
 
 
   history->addWidget(m_hBackwardBtn);
   history->addWidget(m_hForwardBtn);
 
+}
+void LanesLexicon::setupHistory() {
+  QList<HistoryEvent *> events = m_history->getHistory(10);
+  if (events.size() == 0) {
+    m_hBackwardBtn->setEnabled(true);
+    return;
+  }
+  QMenu * m = new QMenu;
+  for(int i=events.size() - 1;i >= 0;i--) {
+    HistoryEvent * event = events[i];
+    QString root = event->getRoot();
+    QString word = event->getWord();
+    QAction * action;
+    if (! word.isEmpty()) {
+      action = m->addAction(word);
+    }
+    else {
+      action = m->addAction(root);
+    }
+    action->setData(event->getId());
+    connect(action,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
+  }
+  m_hBackwardBtn->setEnabled(true);
+  m_hBackwardBtn->setMenu(m);
+  while(events.size() > 0) {
+    HistoryEvent * event = events.takeFirst();
+    delete  event;
+  }
 }
 void LanesLexicon::createMenus() {
   m_fileMenu = menuBar()->addMenu(tr("&File"));
@@ -101,7 +132,9 @@ void LanesLexicon::onHistoryForward() {
   qDebug() << "Vorwarts";
 }
 void LanesLexicon::onHistoryBackward() {
-  qDebug() << "Ruckwarts";
+  QAction * action = static_cast<QAction *>(QObject::sender());
+  qDebug() << "Ruckwarts" << action->data();
+
 }
 void LanesLexicon::on_actionExit()
 {

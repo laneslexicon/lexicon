@@ -59,6 +59,7 @@ public:
 private:
     void createActions();
     void createToolBar();
+    void setupHistory();
     void createMenus();
     void createStatusBar();
     bool eventFilter(QObject * target, QEvent *);
