@@ -3,9 +3,10 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
 {
-
+  loadStyleSheet();
   QSplitter * w = new QSplitter;
   m_tree = new ContentsWidget(this);
+  m_tree->setObjectName("treeRoots");
   m_tree->installEventFilter(this);
   m_tabs = new QTabWidget(this);
   GraphicsEntry * entry = new GraphicsEntry(this);
@@ -53,6 +54,27 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 LanesLexicon::~LanesLexicon()
 {
   QLOG_DEBUG() << "main window destructor";
+}
+void LanesLexicon::loadStyleSheet() {
+  QFile f("app.css");
+  if ( ! f.open(QIODevice::ReadOnly)) {
+    QLOG_WARN() << "Unable to open stylesheet";
+    return;
+  }
+  QString css;
+  QTextStream in(&f);
+  in.setCodec("UTF-8");
+  QString t;
+  while(! in.atEnd()) {
+    t = in.readLine();
+    if (! t.startsWith("#")) {
+      css += t;
+    }
+  }
+  if (! css.isEmpty()) {
+    qApp->setStyleSheet(css);
+    qDebug() << "Set style sheet" << css;
+  }
 }
 void LanesLexicon::createActions() {
   m_exitAction = new QAction(tr("Exit"),this);

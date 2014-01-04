@@ -3,7 +3,7 @@
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   setColumnCount(1);
   setHeaderLabels(
-                  QStringList() << tr("Letter/Root"));
+                  QStringList() << tr("Contents"));
   header()->setSectionResizeMode(0,QHeaderView::Stretch);
 }
 void ContentsWidget::loadContents() {
@@ -14,12 +14,9 @@ void ContentsWidget::loadContents() {
   QSqlQuery rootQuery;
   rootQuery.prepare("select word from root where letter = ? order by word ");
 
-  QFont f;
-  f.fromString("Amiri,12,-1,5,50,0,0,0,0,0");
   while(query.next()) {
     QString letter = query.value(0).toString();
     QTreeWidgetItem * item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(letter));
-    item->setFont(0,f);
     rootQuery.bindValue(0,letter);
     rootQuery.exec();
     if (! rootQuery.first()) {
@@ -28,7 +25,6 @@ void ContentsWidget::loadContents() {
     while(rootQuery.next()) {
       QString root = rootQuery.value(0).toString();
       QTreeWidgetItem * rootitem = new QTreeWidgetItem(item,QStringList(root));
-      rootitem->setFont(0,f);
     }
     addTopLevelItem(item);
   }
