@@ -3,6 +3,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
 {
+
   QSplitter * w = new QSplitter;
   m_tree = new ContentsWidget(this);
   m_tree->installEventFilter(this);
@@ -22,7 +23,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createMenus();
   createStatusBar();
 
-  writeSettings();
+  readSettings();
   if (openDatabase("lexicon.sqlite")) {
     statusBar()->showMessage(tr("Ready"));
     m_tree->loadContents();
@@ -219,7 +220,13 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     w->getXmlForRoot(root);
+    QString t = QString("<span class=\"ar\">%1</span>").arg(root);
     m_tabs->setTabText(0,root);
+    // this works but sets it for all tabs
+    //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
+    // this sets it for all the items in graphicsentry
+    // but not the tab title
+    //    w->setStyleSheet("font-family : Amiri;font-size : 16px");
     w->setFocus();
   }
   QLOG_DEBUG() << "Get root" << QApplication::keyboardModifiers() << root;
@@ -281,6 +288,7 @@ void LanesLexicon::readSettings() {
   QSettings settings;
   QString ar = settings.value("Arabic font").toString();
   if (! ar.isEmpty()) {
+    qDebug() << "set font" << ar;
     arFont.fromString(ar);
   }
 }
@@ -288,10 +296,6 @@ void LanesLexicon::writeSettings() {
   QSettings settings;
   QDateTime now = QDateTime::currentDateTime();
   settings.setValue("Run date",now);
-  QString ar = settings.value("Arabic font").toString();
-  if (! ar.isEmpty()) {
-    arFont.fromString(ar);
-  }
 }
 HistoryMaster * LanesLexicon::history() {
   return m_history;
