@@ -55,11 +55,17 @@ bool HistoryMaster::openDatabase(const QString & dbname) {
   return ok;
 }
 bool HistoryMaster::add(HistoryEvent * event) {
-  m_addQuery->bindValue(0,event->getNode());
-  m_addQuery->bindValue(1,event->getWord());
-  m_addQuery->bindValue(2,event->getRoot());
-  m_addQuery->bindValue(3,event->getWhen());
-  return m_addQuery->exec();
+  QString root = event->getRoot();
+  QString word = event->getWord();
+  if (! (root.isEmpty() && word.isEmpty()) ) {
+    m_addQuery->bindValue(0,event->getNode());
+    m_addQuery->bindValue(1,word);
+    m_addQuery->bindValue(2,root);
+    m_addQuery->bindValue(3,event->getWhen());
+    return m_addQuery->exec();
+  }
+  QLOG_DEBUG() << "Attempt to add empty history";
+  return false;
 }
 /**
  * The calling function should delete the events
