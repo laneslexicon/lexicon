@@ -21,6 +21,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("nowhere.com");
     QCoreApplication::setApplicationName("Lanes Lexicon");
 
+    a.setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
+
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);
     const QString sLogPath(QDir(a.applicationDirPath()).filePath("log.txt"));

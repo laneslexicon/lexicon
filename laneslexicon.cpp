@@ -3,8 +3,10 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
 {
+  loadStyleSheet();
   QSplitter * w = new QSplitter;
   m_tree = new ContentsWidget(this);
+  m_tree->setObjectName("treeRoots");
   m_tree->installEventFilter(this);
   m_tabs = new QTabWidget(this);
   GraphicsEntry * entry = new GraphicsEntry(this);
@@ -22,7 +24,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createMenus();
   createStatusBar();
 
-  writeSettings();
+  readSettings();
   if (openDatabase("lexicon.sqlite")) {
     statusBar()->showMessage(tr("Ready"));
     m_tree->loadContents();
@@ -52,6 +54,27 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 LanesLexicon::~LanesLexicon()
 {
   QLOG_DEBUG() << "main window destructor";
+}
+void LanesLexicon::loadStyleSheet() {
+  QFile f("app.css");
+  if ( ! f.open(QIODevice::ReadOnly)) {
+    QLOG_WARN() << "Unable to open stylesheet";
+    return;
+  }
+  QString css;
+  QTextStream in(&f);
+  in.setCodec("UTF-8");
+  QString t;
+  while(! in.atEnd()) {
+    t = in.readLine();
+    if (! t.startsWith("#")) {
+      css += t;
+    }
+  }
+  if (! css.isEmpty()) {
+    qApp->setStyleSheet(css);
+    qDebug() << "Set style sheet" << css;
+  }
 }
 void LanesLexicon::createActions() {
   m_exitAction = new QAction(tr("Exit"),this);
@@ -219,7 +242,13 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     w->getXmlForRoot(root);
+    QString t = QString("<span class=\"ar\">%1</span>").arg(root);
     m_tabs->setTabText(0,root);
+    // this works but sets it for all tabs
+    //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
+    // this sets it for all the items in graphicsentry
+    // but not the tab title
+    //    w->setStyleSheet("font-family : Amiri;font-size : 16px");
     w->setFocus();
   }
   QLOG_DEBUG() << "Get root" << QApplication::keyboardModifiers() << root;
@@ -281,6 +310,7 @@ void LanesLexicon::readSettings() {
   QSettings settings;
   QString ar = settings.value("Arabic font").toString();
   if (! ar.isEmpty()) {
+    qDebug() << "set font" << ar;
     arFont.fromString(ar);
   }
 }
@@ -288,10 +318,6 @@ void LanesLexicon::writeSettings() {
   QSettings settings;
   QDateTime now = QDateTime::currentDateTime();
   settings.setValue("Run date",now);
-  QString ar = settings.value("Arabic font").toString();
-  if (! ar.isEmpty()) {
-    arFont.fromString(ar);
-  }
 }
 HistoryMaster * LanesLexicon::history() {
   return m_history;
