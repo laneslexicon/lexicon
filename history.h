@@ -22,6 +22,7 @@ class HistoryEvent {
   QDateTime getWhen() { return m_when;}
   int getId() { return m_id;}
   bool isValid() { return m_id == -1;}
+  bool matches(HistoryEvent *);
  private:
   int m_id;
   QString m_word;

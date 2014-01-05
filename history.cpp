@@ -3,6 +3,12 @@ HistoryEvent::HistoryEvent() {
   m_when = QDateTime::currentDateTime();
   m_id = -1;
 }
+bool HistoryEvent::matches(HistoryEvent * event) {
+  return ((m_word == event->getWord()) &&
+          (m_root == event->getRoot()) &&
+          (m_node == event->getNode()));
+
+}
 //CREATE TABLE history(id integer primary key,nodeId text,word text,root text,timewhen text);
 HistoryMaster::HistoryMaster(const QString & dbname) {
   m_historyOk = openDatabase(dbname);
@@ -75,37 +81,50 @@ bool HistoryMaster::add(HistoryEvent * event) {
  * @return
  */
 QList<HistoryEvent *> HistoryMaster::getHistory(int count,int direction,int startPos) {
-  int i = 0;
   if (startPos == -1) {
     startPos = m_lastId;
   }
   if (direction == 0) {
     QList<HistoryEvent *> events;
+    int ix = 0;
     m_backQuery->bindValue(0,startPos);
     m_backQuery->exec();
-    while(m_backQuery->next() && (i < count)) {
+    while(m_backQuery->next() && (ix < count)) {
       HistoryEvent * event = new HistoryEvent();
       event->setId(m_backQuery->value(0).toInt());
       event->setNode(m_backQuery->value(1).toString());
       event->setWord(m_backQuery->value(2).toString());
       event->setRoot(m_backQuery->value(3).toString());
       event->setWhen(m_backQuery->value(4).toDateTime());
-      events << event;
+      if ((ix > 0) && ( events[ix-1]->matches(event))) {
+        delete event;
+      }
+      else {
+        events << event;
+        ix++;
+      }
     }
     return events;
   }
   if (direction == 1) {
+    int ix = 0;
     QList<HistoryEvent *> events;
     m_forQuery->bindValue(0,startPos);
     m_forQuery->exec();
-    while(m_forQuery->next() && (i < count)) {
+    while(m_forQuery->next() && (ix < count)) {
       HistoryEvent * event = new HistoryEvent();
       event->setId(m_forQuery->value(0).toInt());
       event->setNode(m_forQuery->value(1).toString());
       event->setWord(m_forQuery->value(2).toString());
       event->setRoot(m_forQuery->value(3).toString());
       event->setWhen(m_forQuery->value(4).toDateTime());
-      events << event;
+      if ((ix > 0) && ( events[ix-1]->matches(event))) {
+        delete event;
+      }
+      else {
+        events << event;
+        ix++;
+      }
     }
     return events;
   }
