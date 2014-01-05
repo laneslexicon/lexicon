@@ -39,7 +39,6 @@ void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
   QGraphicsView::keyPressEvent(event);
 }
 GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
-  setTitle("Fuck OFF");
   QVBoxLayout * layout = new QVBoxLayout;
   m_debug = true;
   m_textOption.setTextDirection(Qt::LeftToRight);
