@@ -71,6 +71,8 @@ private:
     void createStatusBar();
     bool eventFilter(QObject * target, QEvent *);
     bool openDatabase(const QString &);
+    /// this is in the status bar
+    QLabel * m_currentRoot;
     QPushButton * m_notesBtn;
     ContentsWidget * m_tree;
     //    GraphicsEntry * m_entry;

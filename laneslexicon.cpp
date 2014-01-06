@@ -170,6 +170,15 @@ void LanesLexicon::createMenus() {
   m_fileMenu->addAction(m_exitAction);
 }
 void LanesLexicon::createStatusBar() {
+  QWidget * w = new QWidget;
+  QHBoxLayout * layout = new QHBoxLayout;
+  layout->addWidget(new QLabel(tr("Current root:")));
+  m_currentRoot = new QLabel("None");
+  m_currentRoot->setObjectName("currentRoot");
+  layout->addWidget(m_currentRoot);
+  w->setLayout(layout);
+  statusBar()->insertPermanentWidget(0,w,0);
+
   m_notesBtn = new QPushButton(tr("Notes"));
   m_notesBtn->setEnabled(false);
   statusBar()->insertPermanentWidget(0,m_notesBtn,0);
@@ -237,6 +246,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     w->prepareQueries();
     m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
     w->getXmlForRoot(root);
+    m_currentRoot->setText(root);
     connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
     w->installEventFilter(this);
@@ -245,6 +255,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     w->getXmlForRoot(root);
     QString t = QString("<span class=\"ar\">%1</span>").arg(root);
+    m_currentRoot->setText(root);
     m_tabs->setTabText(0,root);
     // this works but sets it for all tabs
     //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
