@@ -9,12 +9,20 @@
 #include <QDebug>
 #include <QFont>
 #include <QKeyEvent>
+#include <QFile>
+#include <QTextStream>
+#include <QFileInfo>
+#include <QDir>
 #include "QsLog.h"
 class ContentsWidget : public QTreeWidget {
   Q_OBJECT;
  public:
   ContentsWidget(QWidget * parent = 0);
   void loadContents();
+  QString findNextRoot(const QString &);
+
+ private:
+  bool m_debug;
  protected:
   virtual void 	keyPressEvent(QKeyEvent * event);
  signals:

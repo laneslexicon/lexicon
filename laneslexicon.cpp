@@ -44,7 +44,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   connect(entry,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
-
+  connect(entry,SIGNAL(nextRoot(const QString &)),this,SLOT(findNextRoot(const QString &)));
   connect(this,SIGNAL(nodeActivated(const QString & ,const QString & )),
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
 
@@ -334,4 +334,12 @@ void LanesLexicon::writeSettings() {
 }
 HistoryMaster * LanesLexicon::history() {
   return m_history;
+}
+void LanesLexicon::findNextRoot(const QString & root) {
+  GraphicsEntry * entry = dynamic_cast<GraphicsEntry *>(QObject::sender());
+  qDebug() << Q_FUNC_INFO  << root;
+  QString nroot = m_tree->findNextRoot(root);
+  if (entry && ! nroot.isEmpty()) {
+     entry->getXmlForRoot(nroot);
+  }
 }

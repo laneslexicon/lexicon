@@ -51,6 +51,7 @@ public:
     void writeSettings();
     HistoryMaster * history();
     private slots:
+    void findNextRoot(const QString &);
     void on_actionExit();
     void on_actionTest();
     void onHistoryForward();

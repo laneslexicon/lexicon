@@ -33,7 +33,7 @@
 #include "QsLog.h"
 #include "xsltsupport.h"
 #include "history.h"
-
+#include "laneslexicon.h"
 
 class EntryItem : public QGraphicsTextItem {
  public:
@@ -57,12 +57,17 @@ class EntryItem : public QGraphicsTextItem {
   QString m_root;
   QString m_word;
 };
+class GraphicsEntry;
+
 class LaneGraphicsView : public QGraphicsView {
+  Q_OBJECT
  public:
-  LaneGraphicsView(QGraphicsScene *,QWidget * parent = 0);
+  LaneGraphicsView(QGraphicsScene *,GraphicsEntry * parent = 0);
  protected:
-  void scrollContentsBy(int,int);
+  virtual void scrollContentsBy(int,int);
   void keyPressEvent(QKeyEvent *);
+ signals:
+  void nextPage();
 };
 class GraphicsEntry : public QWidget {
   Q_OBJECT
@@ -73,6 +78,9 @@ class GraphicsEntry : public QWidget {
     bool prepareQueries();
     void getXmlForRoot(const QString &,const QString & anchor = QString());
     void getXmlForNode(const QString &);
+    /// return the first/last root in the scene
+    QString lastRoot();
+    QString firstRoot();
   public slots:
     void on_findNode();
     void dbnameChanged();//const QString &);
@@ -84,6 +92,7 @@ class GraphicsEntry : public QWidget {
     void onZoomIn();
     void onZoomOut();
     void onClearScene();
+    void nextPageRequested();
  private:
     bool m_debug;
     void addEntries(int);
@@ -120,6 +129,7 @@ class GraphicsEntry : public QWidget {
     QTextEdit * m_nodeText;
     QSqlQuery * m_nodeQuery;
     QSqlQuery * m_rootQuery;
+    QSqlQuery * m_nextRootQuery;
     QString m_standardCSS;
     QString m_currentCSS;
     QString m_currentHtml;
@@ -129,5 +139,7 @@ class GraphicsEntry : public QWidget {
     void focusInEvent(QFocusEvent *);
  signals:
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
+    void rootChanged(const QString & root,const QString & node);
+    void nextRoot(const QString &);
 };
 #endif

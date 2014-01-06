@@ -19,16 +19,28 @@ void EntryItem::setRoot(const QString & root,bool isRootEntry) {
   m_root = root;
   m_isRoot = isRootEntry;
 }
-LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,QWidget * parent) :
+LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
   QGraphicsView(scene,parent) {
 }
 void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
   QScrollBar * b = this->verticalScrollBar();
-  QGraphicsView::scrollContentsBy(dx,dy);
   //  QLOG_DEBUG() << "scrolling" << dx << dy << b->maximum() << b->value();
-  // if (b->value() == b->maximum()) {
-  //   QLOG_DEBUG() << "At bottom";
-  // }
+  /// lastRoot will emit nextRoot(root)
+  if (b->value() == b->maximum()) {
+    emit(nextPage());
+    //    qDebug() << "at rock bottom";
+    //    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(this->parent());
+    //     if (w) {
+    //        w->lastRoot();
+    //     }
+    //     else {
+    //       qDebug() << "not a fucking graphicsentry";
+    //     }
+
+  }
+  else {
+    QGraphicsView::scrollContentsBy(dx,dy);
+  }
   // if (b->value() == b->minimum()) {
   //   QLOG_DEBUG() << "At top";
   // }
@@ -102,9 +114,16 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   connect(m_zoomOut,SIGNAL(clicked()),this,SLOT(onZoomOut()));
   connect(m_clearSceneBtn,SIGNAL(clicked()),this,SLOT(onClearScene()));
 
+  ///
+  ///
+  ///
+
   QSplitter * splitter = new QSplitter;
-  m_scene = new QGraphicsScene;
-  m_view = new LaneGraphicsView(m_scene);
+  m_scene = new QGraphicsScene(this);
+  qDebug() << "graphicsentry contstruct" << this;
+  m_view = new LaneGraphicsView(m_scene,this);
+  connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
+  qDebug() << "view parent" << m_view->parent();
   //  m_scene->setSceneRect(0,0,300,20000);
   m_view->setInteractive(true);
   m_item = new QGraphicsTextItem("");
@@ -151,6 +170,9 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_xalan = getXalan();
 }
 GraphicsEntry::~GraphicsEntry() {
+  delete m_nodeQuery;
+  delete m_rootQuery;
+  delete m_nextRootQuery;
   //  if (m_db.isOpen()) {
   //    m_db.close();
   //  }
@@ -338,7 +360,8 @@ bool GraphicsEntry::prepareQueries() {
   if (! ok ) {
     QLOG_DEBUG() << "root SQL prepare failed";
   }
-
+  m_nextRootQuery = new QSqlQuery;
+  ok = m_nextRootQuery->prepare("select word from root ");
   return ok;
 }
 /**
@@ -362,6 +385,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   QString showWord;
   rootItem->setRoot(root,true);
   m_items << rootItem;
+  qDebug() << "Added root item at" << (m_items.size() - 1);
   /// now add all the entries for the root
   while(m_rootQuery->next()) {
     arRoot = m_rootQuery->value(0).toString();
@@ -403,6 +427,8 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   /// without thus centerOn() does not work properly for
   /// items added to the scene
   m_view->setSceneRect(m_scene->sceneRect());
+
+  emit rootChanged(arRoot,node);
   /**
    * we need to know whether we got here by accessing the history button
    * or not
@@ -551,4 +577,30 @@ void GraphicsEntry::onZoomOut() {
   m_view->setTransform(m_transform);
   m_scale -= .1;
   m_view->scale(m_scale,m_scale);
+}
+QString GraphicsEntry::lastRoot() {
+    /// find the last root item
+    int ix = m_items.size() - 1;
+    QString root;
+    while((ix >= 0) && root.isEmpty()) {
+      if (m_items[ix]->isRoot()) {
+        root = m_items[ix]->getRoot();
+      }
+      ix--;
+    }
+    if (root.isEmpty()) {
+      QLOG_DEBUG() << "Cannot find root on current page";
+    }
+    else {
+      qDebug() << "emit" << root;
+      emit nextRoot(root);
+    }
+    return root;
+}
+QString GraphicsEntry::firstRoot() {
+  QString root;
+  return root;
+}
+void GraphicsEntry::nextPageRequested() {
+  this->lastRoot();
 }
