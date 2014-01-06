@@ -13,10 +13,10 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   entry->installEventFilter(this);
 
   m_notes = new NotesWidget(this);
+  //  m_notes->setObjectName("notes");
   w->addWidget(m_tree);
   w->addWidget(m_tabs);
   m_tabs->addTab(entry,tr(""));
-
   m_tabs->addTab(m_notes,"Notes");
   setCentralWidget(w);
   createActions();
@@ -55,6 +55,11 @@ LanesLexicon::~LanesLexicon()
 {
   QLOG_DEBUG() << "main window destructor";
 }
+/**
+ * load the application level stylesheet, stripping out lines
+ * beginning with #
+ *
+ */
 void LanesLexicon::loadStyleSheet() {
   QFile f("app.css");
   if ( ! f.open(QIODevice::ReadOnly)) {
@@ -73,7 +78,6 @@ void LanesLexicon::loadStyleSheet() {
   }
   if (! css.isEmpty()) {
     qApp->setStyleSheet(css);
-    qDebug() << "Set style sheet" << css;
   }
 }
 void LanesLexicon::createActions() {
@@ -176,7 +180,6 @@ QSize LanesLexicon::sizeHint() const {
 }
 void LanesLexicon::onHistoryForward() {
   QAction * action = static_cast<QAction *>(QObject::sender());
-  qDebug() << "Vorwarts";
   m_historyPos = action->data().toInt();
   HistoryEvent * event = m_history->getEvent(m_historyPos);
   setupHistory();
@@ -189,7 +192,6 @@ void LanesLexicon::onHistoryForward() {
 }
 void LanesLexicon::onHistoryBackward() {
   QAction * action = static_cast<QAction *>(QObject::sender());
-  qDebug() << "Ruckwarts" << action->data();
   m_historyPos = action->data().toInt();
   HistoryEvent * event = m_history->getEvent(m_historyPos);
   setupHistory();
