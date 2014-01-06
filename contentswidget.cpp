@@ -48,9 +48,16 @@ void ContentsWidget::loadContents() {
     delete out;
   }
 }
+/**
+ * Called by LanesLexicon when it gets a next root signal
+ *
+ *
+ * @param root start root
+ *
+ * @return the next root in sequence
+ */
 QString ContentsWidget::findNextRoot(const QString & root) {
-  QString nr;
-  QTreeWidgetItem * nextItem;
+  QTreeWidgetItem * currentItem;
   int tc = topLevelItemCount();
   int topIndex = -1;
   int childIndex = -1;
@@ -62,6 +69,7 @@ QString ContentsWidget::findNextRoot(const QString & root) {
     for(int j=0;(j < kidCount) && ! found ;j++) {
       QTreeWidgetItem * child = topItem->child(j);
       if (child->text(0) == root) {
+        currentItem = child;
         topIndex = i;
         if (j == (kidCount - 1)) {
           topIndex++;
@@ -71,12 +79,11 @@ QString ContentsWidget::findNextRoot(const QString & root) {
           childIndex = j + 1;
         }
         found = true;
-        qDebug() << "found at" << i << j;
       }
     }
   }
   if (topIndex == tc) {
-    qDebug() << "At the end";
+    emit(atEnd());
     return QString();
   }
   /// overkill, but would only matter if there were letters without any roots
@@ -84,8 +91,10 @@ QString ContentsWidget::findNextRoot(const QString & root) {
       QTreeWidgetItem * item = topLevelItem(i);
       int kidCount = item->childCount();
       if (childIndex < kidCount) {
-        QTreeWidgetItem * nr = item->child(childIndex);
-        return nr->text(0);
+        QTreeWidgetItem * nextItem = item->child(childIndex);
+        currentItem->setSelected(false);
+        nextItem->setSelected(true);
+        return nextItem->text(0);
       }
     }
   return QString();

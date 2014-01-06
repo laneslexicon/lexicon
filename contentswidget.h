@@ -27,5 +27,6 @@ class ContentsWidget : public QTreeWidget {
   virtual void 	keyPressEvent(QKeyEvent * event);
  signals:
   void itemActivated(QTreeWidgetItem *,int /* not used */);
+  void atEnd();
 };
 #endif
