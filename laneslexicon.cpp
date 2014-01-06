@@ -239,9 +239,11 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
-  /// turn history on as the user has clicked on something
-  m_history->on();
+
+
   if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+    /// turn history on as the user has clicked on something
+    m_history->on();
     GraphicsEntry * w = new GraphicsEntry(this);
     w->prepareQueries();
     m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
@@ -253,16 +255,19 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   }
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
-    w->getXmlForRoot(root);
-    QString t = QString("<span class=\"ar\">%1</span>").arg(root);
-    m_currentRoot->setText(root);
-    m_tabs->setTabText(0,root);
-    // this works but sets it for all tabs
-    //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
-    // this sets it for all the items in graphicsentry
-    // but not the tab title
-    //    w->setStyleSheet("font-family : Amiri;font-size : 16px");
-    w->setFocus();
+    if (w->hasRoot(root,true) == -1) {
+      m_history->on();
+      w->getXmlForRoot(root);
+      QString t = QString("<span class=\"ar\">%1</span>").arg(root);
+      m_currentRoot->setText(root);
+      m_tabs->setTabText(0,root);
+      // this works but sets it for all tabs
+      //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
+      // this sets it for all the items in graphicsentry
+      // but not the tab title
+      //    w->setStyleSheet("font-family : Amiri;font-size : 16px");
+      w->setFocus();
+    }
   }
   QLOG_DEBUG() << "Get root" << QApplication::keyboardModifiers() << root;
 }

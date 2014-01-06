@@ -578,6 +578,31 @@ void GraphicsEntry::onZoomOut() {
   m_scale -= .1;
   m_view->scale(m_scale,m_scale);
 }
+/**
+ * search for the given root in the items list
+ *
+ * @param root         arabic root to search for
+ * @param setFocus     center on the root if found
+ * @return index in list of item or -1
+ */
+int GraphicsEntry::hasRoot(const QString & root,bool setFocus) {
+  int max = m_items.size();
+  int ix = -1;
+
+  for(int i=0;i < max;i++) {
+    if (m_items[i]->isRoot() &&
+        (m_items[i]->getRoot() == root)) {
+          ix = i;
+          i = max;
+    }
+  }
+  qDebug() << Q_FUNC_INFO << root << setFocus << ix;
+  if ((ix != -1) && setFocus) {
+    m_scene->setFocusItem(m_items[ix]);
+    m_view->ensureVisible(m_items[ix]);
+  }
+  return ix;
+}
 QString GraphicsEntry::lastRoot() {
     /// find the last root item
     int ix = m_items.size() - 1;
