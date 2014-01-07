@@ -25,10 +25,9 @@ LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
 void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
-  QScrollBar * b = this->verticalScrollBar();
-   //  QLOG_DEBUG() << "scrolling" << dx << dy << b->maximum() << b->value();
-  /// lastRoot will emit nextRoot(root)
-  //qDebug() << Q_FUNC_INFO << dx << dy << b->value() << b->minimum();
+    QGraphicsView::scrollContentsBy(dx,dy);
+  /*
+    QScrollBar * b = this->verticalScrollBar();
   if (b->value() == b->maximum()) {
     emit(nextPage());
   }
@@ -36,12 +35,9 @@ void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
     emit(backPage());
   }
   else {
-    QGraphicsView::scrollContentsBy(dx,dy);
-  }
-    // if (b->value() == b->minimum()) {
-  //   QLOG_DEBUG() << "At top";
-  // }
 
+  }
+  */
 }
 void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
   //  QLOG_DEBUG() << "got key";
