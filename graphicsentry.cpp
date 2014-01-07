@@ -28,7 +28,7 @@ void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
   QScrollBar * b = this->verticalScrollBar();
    //  QLOG_DEBUG() << "scrolling" << dx << dy << b->maximum() << b->value();
   /// lastRoot will emit nextRoot(root)
-  qDebug() << Q_FUNC_INFO << dx << dy << b->value() << b->minimum();
+  //qDebug() << Q_FUNC_INFO << dx << dy << b->value() << b->minimum();
   if (b->value() == b->maximum()) {
     emit(nextPage());
   }
@@ -386,7 +386,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   /// this will be set to the right word if a node has been supplied
   QString showWord;
   rootItem->setRoot(root,true);
-  m_items << rootItem;
+  items << rootItem;
   qDebug() << "Added root item at" << (m_items.size() - 1);
   /// now add all the entries for the root
   while(m_rootQuery->next()) {
@@ -418,9 +418,22 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
     else if ( startNode == item->getNode()) {
       showWord = item->getWord();
     }
-    m_items << item;
+    items << item;
   }
-  addEntries(itemCount);
+  if (m_pagingDir == 1) {
+    while(items.size() > 0) {
+      EntryItem * item = items.takeLast();
+      m_items.prepend(item);
+    }
+  }
+  else {
+    while(items.size() > 0) {
+      EntryItem * item = items.takeFirst();
+      m_items.append(item);
+    }
+    addEntries(itemCount);
+  }
+
   m_view->setFocus();
   m_transform = m_view->transform();
 
