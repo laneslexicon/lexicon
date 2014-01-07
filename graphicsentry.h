@@ -106,7 +106,8 @@ class GraphicsEntry : public QWidget {
  private:
     int m_pagingDir;
     bool m_debug;
-    void addEntries(int);
+    void addEntries(int,int);
+    void prependEntries(int);
     QList<EntryItem *> m_items;
     EntryItem * createEntry(const QString & xml);
     const XalanCompiledStylesheet * m_compXsl;

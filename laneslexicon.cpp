@@ -395,6 +395,18 @@ void LanesLexicon::on_actionNextRoot() {
 }
 void LanesLexicon::on_actionPrevRoot() {
   qDebug() << Q_FUNC_INFO;
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    QString root =  entry->currentRoot();
+    QString nroot = m_tree->findPrevRoot(root);
+    if (! nroot.isEmpty()) {
+      entry->setPagingBackward();
+      entry->getXmlForRoot(nroot);
+    }
+    else {
+      QLOG_DEBUG() << "No prev root for " << root;
+    }
+  }
 }
 void LanesLexicon::on_actionFirstRoot() {
   qDebug() << Q_FUNC_INFO;
