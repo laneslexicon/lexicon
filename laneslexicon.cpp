@@ -380,6 +380,18 @@ void LanesLexicon::findPrevRoot(const QString & root) {
 }
 void LanesLexicon::on_actionNextRoot() {
   qDebug() << Q_FUNC_INFO;
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    QString root =  entry->currentRoot();
+    QString nroot = m_tree->findNextRoot(root);
+    if (! nroot.isEmpty()) {
+      entry->setPagingForward();
+      entry->getXmlForRoot(nroot);
+    }
+    else {
+      QLOG_DEBUG() << "No next root for " << root;
+    }
+  }
 }
 void LanesLexicon::on_actionPrevRoot() {
   qDebug() << Q_FUNC_INFO;
