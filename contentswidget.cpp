@@ -5,6 +5,7 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   setColumnCount(1);
   setHeaderLabels(
                   QStringList() << tr("Contents"));
+  setSelectionMode(QAbstractItemView::SingleSelection);
   header()->setSectionResizeMode(0,QHeaderView::Stretch);
 }
 void ContentsWidget::loadContents() {
