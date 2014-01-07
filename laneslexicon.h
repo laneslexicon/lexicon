@@ -55,6 +55,10 @@ public:
     void findPrevRoot(const QString &);
     void on_actionExit();
     void on_actionTest();
+    void on_actionNextRoot();
+    void on_actionPrevRoot();
+    void on_actionFirstRoot();
+    void on_actionLastRoot();
     void onHistoryForward();
     void onHistoryBackward();
     void rootClicked(QTreeWidgetItem * , int);
@@ -89,6 +93,12 @@ private:
     QAction * m_testAction;
     QAction * m_hForward;
     QAction * m_hBackward;
+    // navigation
+    QAction * m_rootForwardAction;
+    QAction * m_rootBackwardAction;
+    QAction * m_rootFirstAction;
+    QAction * m_rootLastAction;
+    // history
     QToolButton * m_hForwardBtn;
     QToolButton * m_hBackwardBtn;
     HistoryMaster * m_history;

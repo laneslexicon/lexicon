@@ -93,6 +93,16 @@ void LanesLexicon::createActions() {
 
   connect(m_hForward,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
   connect(m_hBackward,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
+
+  m_rootForwardAction = new QAction(tr("Next Root"),this);
+  m_rootBackwardAction = new QAction(tr("Prev Root"),this);
+  m_rootFirstAction = new QAction(tr("First Root"),this);
+  m_rootLastAction = new QAction(tr("Last Root"),this);
+
+  connect(m_rootForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextRoot()));
+  connect(m_rootBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevRoot()));
+  connect(m_rootFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstRoot()));
+  connect(m_rootLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastRoot()));
 }
 void LanesLexicon::createToolBar() {
   m_fileToolBar = addToolBar(tr("&File"));
@@ -115,7 +125,13 @@ void LanesLexicon::createToolBar() {
 
   history->addWidget(m_hBackwardBtn);
   history->addWidget(m_hForwardBtn);
-
+  history->addSeparator();
+  QToolBar * navigation = addToolBar(tr("Navigation"));
+  navigation->addAction(m_rootFirstAction);
+  navigation->addAction(m_rootForwardAction);
+  navigation->addAction(m_rootBackwardAction);
+  navigation->addAction(m_rootLastAction);
+  navigation->addSeparator();
 }
 void LanesLexicon::setupHistory() {
   // get backward history
@@ -358,4 +374,16 @@ void LanesLexicon::findPrevRoot(const QString & root) {
     entry->setPagingBackward();
     entry->getXmlForRoot(nroot);
   }
+}
+void LanesLexicon::on_actionNextRoot() {
+  qDebug() << Q_FUNC_INFO;
+}
+void LanesLexicon::on_actionPrevRoot() {
+  qDebug() << Q_FUNC_INFO;
+}
+void LanesLexicon::on_actionFirstRoot() {
+  qDebug() << Q_FUNC_INFO;
+}
+void LanesLexicon::on_actionLastRoot() {
+  qDebug() << Q_FUNC_INFO;
 }
