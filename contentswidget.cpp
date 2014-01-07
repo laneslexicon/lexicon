@@ -100,6 +100,61 @@ QString ContentsWidget::findNextRoot(const QString & root) {
     }
   return QString();
 }
+/**
+ * Called by LanesLexicon when it gets a next root signal
+ *
+ *
+ * @param root start root
+ *
+ * @return the next root in sequence
+ */
+QString ContentsWidget::findPrevRoot(const QString & root) {
+  QTreeWidgetItem * currentItem;
+  int tc = topLevelItemCount();
+  int topIndex = -1;
+  int childIndex = -1;
+  bool found = false;
+
+  for(int i = 0;(i < tc) && ! found;i++) {
+    QTreeWidgetItem * topItem = topLevelItem(i);
+    int kidCount = topItem->childCount();
+    for(int j=0;(j < kidCount) && ! found ;j++) {
+      QTreeWidgetItem * child = topItem->child(j);
+      if (child->text(0) == root) {
+        currentItem = child;
+        /// if first child, we want the last root of the prev letter
+        topIndex = i;
+        if (j == 0) {
+          topIndex--;
+          childIndex = -1;
+        }
+        else {
+          childIndex = j - 1;
+        }
+        found = true;
+      }
+    }
+  }
+  if (topIndex == -1) {
+    emit(atStart());
+    return QString();
+  }
+  /// overkill, but would only matter if there were letters without any roots
+  for(int i = topIndex;i >= 0; i--) {
+      QTreeWidgetItem * item = topLevelItem(i);
+      int kidCount = item->childCount();
+      if (kidCount > childIndex) {
+        if (childIndex == -1) {
+          childIndex = kidCount - 1;
+        }
+        QTreeWidgetItem * nextItem = item->child(childIndex);
+        currentItem->setSelected(false);
+        nextItem->setSelected(true);
+        return nextItem->text(0);
+      }
+    }
+  return QString();
+}
 void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   switch (event->key()) {
   case Qt::Key_Space: {

@@ -68,6 +68,7 @@ class LaneGraphicsView : public QGraphicsView {
   void keyPressEvent(QKeyEvent *);
  signals:
   void nextPage();
+  void backPage();
 };
 class GraphicsEntry : public QWidget {
   Q_OBJECT
@@ -82,6 +83,12 @@ class GraphicsEntry : public QWidget {
     /// return the first/last root in the scene
     QString lastRoot();
     QString firstRoot();
+    void setPagingForward() {
+      m_pagingDir = 0;
+    }
+    void setPagingBackward() {
+      m_pagingDir = 1;
+    }
   public slots:
     void on_findNode();
     void dbnameChanged();//const QString &);
@@ -94,7 +101,9 @@ class GraphicsEntry : public QWidget {
     void onZoomOut();
     void onClearScene();
     void nextPageRequested();
+    void prevPageRequested();
  private:
+    int m_pagingDir;
     bool m_debug;
     void addEntries(int);
     QList<EntryItem *> m_items;
@@ -142,5 +151,6 @@ class GraphicsEntry : public QWidget {
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void rootChanged(const QString & root,const QString & node);
     void nextRoot(const QString &);
+    void prevRoot(const QString &);
 };
 #endif

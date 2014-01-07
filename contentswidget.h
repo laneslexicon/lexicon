@@ -20,6 +20,7 @@ class ContentsWidget : public QTreeWidget {
   ContentsWidget(QWidget * parent = 0);
   void loadContents();
   QString findNextRoot(const QString &);
+  QString findPrevRoot(const QString &);
 
  private:
   bool m_debug;
@@ -28,5 +29,6 @@ class ContentsWidget : public QTreeWidget {
  signals:
   void itemActivated(QTreeWidgetItem *,int /* not used */);
   void atEnd();
+  void atStart();
 };
 #endif

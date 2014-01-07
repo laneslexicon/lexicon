@@ -21,27 +21,24 @@ void EntryItem::setRoot(const QString & root,bool isRootEntry) {
 }
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
   QGraphicsView(scene,parent) {
+  //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
 void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
   QScrollBar * b = this->verticalScrollBar();
-  //  QLOG_DEBUG() << "scrolling" << dx << dy << b->maximum() << b->value();
+   //  QLOG_DEBUG() << "scrolling" << dx << dy << b->maximum() << b->value();
   /// lastRoot will emit nextRoot(root)
+  qDebug() << Q_FUNC_INFO << dx << dy << b->value() << b->minimum();
   if (b->value() == b->maximum()) {
     emit(nextPage());
-    //    qDebug() << "at rock bottom";
-    //    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(this->parent());
-    //     if (w) {
-    //        w->lastRoot();
-    //     }
-    //     else {
-    //       qDebug() << "not a fucking graphicsentry";
-    //     }
-
+  }
+  else if (b->value() == b->minimum()) {
+    emit(backPage());
   }
   else {
     QGraphicsView::scrollContentsBy(dx,dy);
   }
-  // if (b->value() == b->minimum()) {
+    // if (b->value() == b->minimum()) {
   //   QLOG_DEBUG() << "At top";
   // }
 
@@ -57,6 +54,9 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_compXsl = 0;
   m_dbname = new QLineEdit;
   m_dbname->setText("lexicon.sqlite");
+  /// 0 = paging forward, items are appended
+  /// 1 = paging backward, items are prepended
+  m_pagingDir = 0;
   m_scale = 1.0;
   m_currentDb = m_dbname->text();
 
@@ -123,6 +123,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   qDebug() << "graphicsentry contstruct" << this;
   m_view = new LaneGraphicsView(m_scene,this);
   connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
+  connect(m_view,SIGNAL(backPage()),this,SLOT(prevPageRequested()));
   qDebug() << "view parent" << m_view->parent();
   //  m_scene->setSceneRect(0,0,300,20000);
   m_view->setInteractive(true);
@@ -371,6 +372,7 @@ bool GraphicsEntry::prepareQueries() {
  * @param node the id of the entry we want to focus on
  */
 void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
+  QList<EntryItem *> items;
   QLOG_DEBUG() << "Search for root" << root;
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
@@ -417,7 +419,6 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
       showWord = item->getWord();
     }
     m_items << item;
-
   }
   addEntries(itemCount);
   m_view->setFocus();
@@ -617,15 +618,38 @@ QString GraphicsEntry::lastRoot() {
       QLOG_DEBUG() << "Cannot find root on current page";
     }
     else {
-      qDebug() << "emit" << root;
+      qDebug() << "emit nextRoo" << root;
       emit nextRoot(root);
     }
     return root;
 }
 QString GraphicsEntry::firstRoot() {
+  /// find the first root item (should always be the first
+  /// element in m_items
+  qDebug() << Q_FUNC_INFO;
+  int ix = 0;
+  int max = m_items.size();
   QString root;
-  return root;
+    while((ix < max) && root.isEmpty()) {
+      if (m_items[ix]->isRoot()) {
+        root = m_items[ix]->getRoot();
+      }
+      ix++;
+    }
+    if (root.isEmpty()) {
+      QLOG_DEBUG() << "Cannot find root on current page";
+    }
+    else {
+      qDebug() << "emit prevRoot" << root;
+      emit prevRoot(root);
+    }
+    return root;
 }
 void GraphicsEntry::nextPageRequested() {
   this->lastRoot();
+}
+
+void GraphicsEntry::prevPageRequested() {
+  qDebug() << Q_FUNC_INFO;
+  this->firstRoot();
 }
