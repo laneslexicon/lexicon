@@ -46,6 +46,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
   connect(entry,SIGNAL(nextRoot(const QString &)),this,SLOT(findNextRoot(const QString &)));
   connect(entry,SIGNAL(prevRoot(const QString &)),this,SLOT(findPrevRoot(const QString &)));
+
+  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
+
   connect(this,SIGNAL(nodeActivated(const QString & ,const QString & )),
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
 
@@ -265,7 +268,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     w->prepareQueries();
     m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
     w->getXmlForRoot(root);
-    m_currentRoot->setText(root);
+
     connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
     w->installEventFilter(this);
@@ -276,7 +279,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
       m_history->on();
       w->getXmlForRoot(root);
       QString t = QString("<span class=\"ar\">%1</span>").arg(root);
-      m_currentRoot->setText(root);
+
       m_tabs->setTabText(0,root);
       // this works but sets it for all tabs
       //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
@@ -386,4 +389,7 @@ void LanesLexicon::on_actionFirstRoot() {
 }
 void LanesLexicon::on_actionLastRoot() {
   qDebug() << Q_FUNC_INFO;
+}
+void LanesLexicon::rootChanged(const QString & root,const QString & node) {
+  m_currentRoot->setText(root);
 }

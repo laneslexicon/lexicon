@@ -80,6 +80,7 @@ class GraphicsEntry : public QWidget {
     void getXmlForRoot(const QString &,const QString & anchor = QString());
     void getXmlForNode(const QString &);
     int hasRoot(const QString & root,bool focus = true);
+    QString currentRoot() { return m_currentRoot;}
     /// return the first/last root in the scene
     QString lastRoot();
     QString firstRoot();
@@ -143,6 +144,7 @@ class GraphicsEntry : public QWidget {
     QString m_standardCSS;
     QString m_currentCSS;
     QString m_currentHtml;
+    QString m_currentRoot;
     XalanTransformer * m_xalan;
  protected:
     void keyPressEvent(QKeyEvent *);

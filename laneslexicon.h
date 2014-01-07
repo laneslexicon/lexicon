@@ -65,7 +65,7 @@ public:
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void onNotesClicked();
     //    void historyItemActivated();
-
+    void rootChanged(const QString & root,const QString & node);
 private:
     QFont arFont;
     int m_historyPos;

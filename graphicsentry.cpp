@@ -441,7 +441,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   /// without thus centerOn() does not work properly for
   /// items added to the scene
   m_view->setSceneRect(m_scene->sceneRect());
-
+  m_currentRoot = arRoot;
   emit rootChanged(arRoot,node);
   /**
    * we need to know whether we got here by accessing the history button
