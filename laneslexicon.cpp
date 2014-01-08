@@ -41,13 +41,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 
-
-  connect(entry,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
-          this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
-  connect(entry,SIGNAL(nextRoot(const QString &)),this,SLOT(findNextRoot(const QString &)));
-  connect(entry,SIGNAL(prevRoot(const QString &)),this,SLOT(findPrevRoot(const QString &)));
-
-  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
+  setSignals(entry);
 
   connect(this,SIGNAL(nodeActivated(const QString & ,const QString & )),
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
@@ -58,6 +52,19 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 LanesLexicon::~LanesLexicon()
 {
   QLOG_DEBUG() << "main window destructor";
+}
+/**
+ * convenience
+ *
+ * @param entry
+ */
+void LanesLexicon::setSignals(GraphicsEntry * entry) {
+  connect(entry,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
+          this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
+  connect(entry,SIGNAL(nextRoot(const QString &)),this,SLOT(findNextRoot(const QString &)));
+  connect(entry,SIGNAL(prevRoot(const QString &)),this,SLOT(findPrevRoot(const QString &)));
+
+  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
 }
 /**
  * load the application level stylesheet, stripping out lines
@@ -268,9 +275,9 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
       w->prepareQueries();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
       w->getXmlForRoot(root);
-
-      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
-              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
+      setSignals(w);
+      //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
+      //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
       w->installEventFilter(this);
     }
   }
@@ -378,8 +385,15 @@ void LanesLexicon::findPrevRoot(const QString & root) {
     entry->getXmlForRoot(nroot);
   }
 }
+/**
+ * user clicks on next root button
+ *  - fetch the current root from GraphicsEntry page
+ *  - query the ContentsWidget for the next root
+ *  - if found
+ *    tell the GraphicsEntry page to either show the root or fetch it and show it
+ *
+ */
 void LanesLexicon::on_actionNextRoot() {
-  qDebug() << Q_FUNC_INFO;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     QString root =  entry->currentRoot();
@@ -398,7 +412,6 @@ void LanesLexicon::on_actionNextRoot() {
   }
 }
 void LanesLexicon::on_actionPrevRoot() {
-  qDebug() << Q_FUNC_INFO;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     QString root =  entry->currentRoot();

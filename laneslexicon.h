@@ -69,6 +69,7 @@ public:
 private:
     QFont arFont;
     int m_historyPos;
+    void setSignals(GraphicsEntry *);
     void loadStyleSheet();
     void createActions();
     void createToolBar();
