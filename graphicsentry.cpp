@@ -509,7 +509,7 @@ void GraphicsEntry::addEntries(int offset,int startPos) {
     m_items[i]->setPos(xpos,ypos);
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
-    QLOG_DEBUG() << "Pos" << m_items[i]->getNode()  << ypos << r.height();
+    //    QLOG_DEBUG() << "Pos" << m_items[i]->getNode()  << ypos << r.height();
     if (m_debug) {
       QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
@@ -652,6 +652,8 @@ int GraphicsEntry::hasRoot(const QString & root,bool setFocus) {
   if ((ix != -1) && setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);
+    m_currentRoot = root;
+    emit(rootChanged(root,QString()));
   }
   return ix;
 }
