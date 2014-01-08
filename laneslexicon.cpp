@@ -259,19 +259,20 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
-
-
   if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
     /// turn history on as the user has clicked on something
-    m_history->on();
+    /// and the root is not already shown
     GraphicsEntry * w = new GraphicsEntry(this);
-    w->prepareQueries();
-    m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
-    w->getXmlForRoot(root);
+    if (w->hasRoot(root,true) == -1) {
+      m_history->on();
+      w->prepareQueries();
+      m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
+      w->getXmlForRoot(root);
 
-    connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
-          this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
-    w->installEventFilter(this);
+      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
+              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
+      w->installEventFilter(this);
+    }
   }
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
@@ -289,7 +290,6 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
       w->setFocus();
     }
   }
-  QLOG_DEBUG() << "Get root" << QApplication::keyboardModifiers() << root;
 }
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
@@ -385,8 +385,12 @@ void LanesLexicon::on_actionNextRoot() {
     QString root =  entry->currentRoot();
     QString nroot = m_tree->findNextRoot(root);
     if (! nroot.isEmpty()) {
-      entry->setPagingForward();
-      entry->getXmlForRoot(nroot);
+      /// hasRoot will checks if root already shown
+      /// if it is, it move focus to it (if true is 2nd param)
+      if (entry->hasRoot(nroot,true) == -1) {
+        entry->setPagingForward();
+        entry->getXmlForRoot(nroot);
+      }
     }
     else {
       QLOG_DEBUG() << "No next root for " << root;
@@ -400,8 +404,12 @@ void LanesLexicon::on_actionPrevRoot() {
     QString root =  entry->currentRoot();
     QString nroot = m_tree->findPrevRoot(root);
     if (! nroot.isEmpty()) {
-      entry->setPagingBackward();
-      entry->getXmlForRoot(nroot);
+      /// hasRoot will checks if root already shown
+      /// if it is, it move focus to it (if true is 2nd param)
+      if (entry->hasRoot(nroot,true) == -1) {
+        entry->setPagingBackward();
+        entry->getXmlForRoot(nroot);
+      }
     }
     else {
       QLOG_DEBUG() << "No prev root for " << root;
