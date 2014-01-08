@@ -33,7 +33,7 @@
 #include "QsLog.h"
 #include "xsltsupport.h"
 #include "history.h"
-#include "laneslexicon.h"
+//#include "laneslexicon.h"
 
 class EntryItem : public QGraphicsTextItem {
  public:
@@ -57,19 +57,7 @@ class EntryItem : public QGraphicsTextItem {
   QString m_root;
   QString m_word;
 };
-class GraphicsEntry;
-
-class LaneGraphicsView : public QGraphicsView {
-  Q_OBJECT
- public:
-  LaneGraphicsView(QGraphicsScene *,GraphicsEntry * parent = 0);
- protected:
-  virtual void scrollContentsBy(int,int);
-  void keyPressEvent(QKeyEvent *);
- signals:
-  void nextPage();
-  void backPage();
-};
+class LaneGraphicsView;
 class GraphicsEntry : public QWidget {
   Q_OBJECT
 
@@ -155,5 +143,17 @@ class GraphicsEntry : public QWidget {
     void rootChanged(const QString & root,const QString & node);
     void nextRoot(const QString &);
     void prevRoot(const QString &);
+};
+
+class LaneGraphicsView : public QGraphicsView {
+  Q_OBJECT
+ public:
+  LaneGraphicsView(QGraphicsScene *,GraphicsEntry * parent = 0);
+ protected:
+  virtual void scrollContentsBy(int,int);
+  void keyPressEvent(QKeyEvent *);
+ signals:
+  void nextPage();
+  void backPage();
 };
 #endif

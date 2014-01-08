@@ -8,6 +8,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
 
   QMenu menu;
+  menu.setObjectName("entry");
   QAction *removeAction = menu.addAction("Remove");
   QAction *markAction = menu.addAction("Mark");
   QAction *selectedAction = menu.exec(event->screenPos());
