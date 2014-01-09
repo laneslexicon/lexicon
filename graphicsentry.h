@@ -107,8 +107,6 @@ class GraphicsEntry : public QWidget {
     QString transform(const QString & xsl,const QString & xml);
 
     QTextOption m_textOption;
-    QString m_currentDb;
-    QSqlDatabase m_db;
     QPushButton * m_clearSceneBtn;
     QPushButton * m_zoomIn;
     QPushButton * m_zoomOut;
