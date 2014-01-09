@@ -47,9 +47,8 @@ void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
 GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
-  m_debug = true;
   m_textOption.setTextDirection(Qt::LeftToRight);
-  m_compXsl = 0;
+  m_compiledXsl = 0;
   /// 0 = paging forward, items are appended
   /// 1 = paging backward, items are prepended
   m_pagingDir = 0;
@@ -75,12 +74,11 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_view = new LaneGraphicsView(m_scene,this);
   connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
   connect(m_view,SIGNAL(backPage()),this,SLOT(prevPageRequested()));
-  qDebug() << "view parent" << m_view->parent();
-  //  m_scene->setSceneRect(0,0,300,20000);
+
   m_view->setInteractive(true);
   m_item = new QGraphicsTextItem("");
   m_item->setTextInteractionFlags(Qt::TextBrowserInteraction);
-  m_item->setTextWidth(300);
+  m_item->setTextWidth(m_textWidth);
   m_scene->addItem(m_item);
 
   // add the graphics viwe
@@ -110,7 +108,17 @@ void GraphicsEntry::readSettings() {
   settings.beginGroup("Entry");
   QString css = settings.value("css",QString("entry.css")).toString();
   readCssFromFile(css);
-  m_xsltSource = settings.value("xslt",QString("entry.xsl")).toString();
+  m_xsltSource = settings.value("xslt",QString("entry.xslt")).toString();
+  m_textWidth = settings.value("text width",300).toInt();
+  m_debug = settings.value("debug",false).toBool();
+}
+void GraphicsEntry::writeDefaultSettings() {
+  QSettings settings;
+  settings.beginGroup("Entry");
+  settings.setValue("css","entry.css");
+  settings.setValue("xslt","entry.xslt");
+  settings.setValue("debug",true);
+  settings.setValue("text width",300);
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   switch(event->key()) {
@@ -362,7 +370,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     QString html =transform(m_xsltSource,xml);
     EntryItem * gi = new EntryItem("");
     gi->document()->setDefaultStyleSheet(m_currentCSS);
-    gi->setTextWidth(300);
+    gi->setTextWidth(m_textWidth);
     gi->setHtml(html);
     /// need this otherwise arabic text will be right justified
     gi->document()->setDefaultTextOption(m_textOption);
@@ -479,9 +487,9 @@ QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
   //  QString footer = "</div1></body></text></TEI.2>";
 
   //  QString tei  = header + xml + footer;
-  if (m_compXsl == 0) {
+  if (m_compiledXsl == 0) {
     std::istringstream iss(xsl.toStdString());
-    int r = m_xalan->compileStylesheet("entry.xslt",m_compXsl);
+    int r = m_xalan->compileStylesheet(m_xsltSource.toLocal8Bit().data(),m_compiledXsl);
     if (r != 0) {
       QLOG_DEBUG() << "Error compiling stylesheet" << m_xalan->getLastError();
       return QString();
@@ -490,7 +498,7 @@ QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
   std::istringstream iss(xml.toStdString());
   std::stringstream ostream;
 
-  m_xalan->transform(iss,m_compXsl,ostream);
+  m_xalan->transform(iss,m_compiledXsl,ostream);
   return QString::fromStdString(ostream.str());
 }
 void GraphicsEntry::onZoomIn() {

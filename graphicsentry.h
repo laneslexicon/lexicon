@@ -91,6 +91,7 @@ class GraphicsEntry : public QWidget {
     void prevPageRequested();
  private:
     void readSettings();
+    void writeDefaultSettings();
     bool readCssFromFile(const QString &name);
     int m_pagingDir;
     bool m_debug;
@@ -98,7 +99,7 @@ class GraphicsEntry : public QWidget {
     void prependEntries(int);
     QList<EntryItem *> m_items;
     EntryItem * createEntry(const QString & xml);
-    const XalanCompiledStylesheet * m_compXsl;
+    const XalanCompiledStylesheet * m_compiledXsl;
     bool showNode(const QString &,bool thisPageOnly = false);
     qreal m_scale;
 
@@ -118,10 +119,15 @@ class GraphicsEntry : public QWidget {
     QSqlQuery * m_rootQuery;
     QSqlQuery * m_nextRootQuery;
     QString m_standardCSS;
-    QString m_currentCSS;
+
     QString m_currentHtml;
     QString m_currentRoot;
+
+    // read/set from readSettings
+
+    QString m_currentCSS;
     QString m_xsltSource;
+    int m_textWidth;
     XalanTransformer * m_xalan;
  protected:
     void keyPressEvent(QKeyEvent *);
