@@ -12,12 +12,12 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   GraphicsEntry * entry = new GraphicsEntry(this);
   entry->installEventFilter(this);
 
-  m_notes = new NotesWidget(this);
+  m_notes = new NotesWidget();
   //  m_notes->setObjectName("notes");
   w->addWidget(m_tree);
   w->addWidget(m_tabs);
   m_tabs->addTab(entry,tr(""));
-  m_tabs->addTab(m_notes,"Notes");
+  //  m_tabs->addTab(m_notes,"Notes");
   setCentralWidget(w);
   createActions();
   createToolBar();
@@ -207,7 +207,7 @@ void LanesLexicon::createStatusBar() {
   statusBar()->insertPermanentWidget(0,w,0);
 
   m_notesBtn = new QPushButton(tr("Notes"));
-  m_notesBtn->setEnabled(false);
+  m_notesBtn->setEnabled(true);
   statusBar()->insertPermanentWidget(0,m_notesBtn,0);
   statusBar()->showMessage(tr("Ready"));
 }
@@ -243,10 +243,13 @@ void LanesLexicon::on_actionExit()
   if (m_db.isOpen()) {
     m_db.close();
   }
+  m_notes->close();
+  delete m_notes;
   close();
 }
 void LanesLexicon::onNotesClicked() {
-  m_tabs->setCurrentWidget(m_notes);
+  //  m_tabs->setCurrentWidget(m_notes);
+  m_notes->show();
 }
 bool LanesLexicon::openDatabase(const QString & dbname) {
   QFile dbfile(dbname);
