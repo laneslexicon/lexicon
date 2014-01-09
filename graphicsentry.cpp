@@ -45,58 +45,16 @@ void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
   QGraphicsView::keyPressEvent(event);
 }
 GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
+  readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_debug = true;
   m_textOption.setTextDirection(Qt::LeftToRight);
   m_compXsl = 0;
-  m_dbname = new QLineEdit;
-  m_dbname->setText("lexicon.sqlite");
   /// 0 = paging forward, items are appended
   /// 1 = paging backward, items are prepended
   m_pagingDir = 0;
   m_scale = 1.0;
-  m_currentDb = m_dbname->text();
 
-  m_xsl = new QLineEdit;
-  m_xsl->setText("./entry.xslt");
-
-  m_cssFile = new QLineEdit("entry.css");
-
-  m_node = new QLineEdit;
-  // m_node->setText("n43789");
-  m_node->setText("jwb");
-  m_findNodeBtn = new QPushButton("Fetch");
-  m_nodeXml = new QTextEdit;
-
-  m_root = new QLabel;
-  m_word = new QLabel;
-
-  layout->addWidget(m_dbname);
-
-  m_loadCssBtn = new QPushButton("Load CSS");
-  m_anchorBtn = new QPushButton("Jump to anchor");
-  QHBoxLayout * xsllayout = new QHBoxLayout;
-  xsllayout->addWidget(new QLabel("XSL"));
-  xsllayout->addWidget(m_xsl);
-  xsllayout->addWidget(new QLabel("CSS"));
-  xsllayout->addWidget(m_cssFile);
-  xsllayout->addWidget(m_loadCssBtn);
-
-  layout->addLayout(xsllayout);
-  layout->addWidget(m_node);
-  QHBoxLayout * findlayout = new QHBoxLayout;
-  findlayout->addWidget(m_findNodeBtn);
-  findlayout->addWidget(m_anchorBtn);
-  layout->addLayout(findlayout);
-
-  QHBoxLayout * hlayout = new QHBoxLayout;
-
-  hlayout->addWidget(new QLabel("Root:"));
-  hlayout->addWidget(m_root);
-  hlayout->addWidget(new QLabel("Word:"));
-  hlayout->addWidget(m_word);
-  hlayout->addStretch();
-  layout->addLayout(hlayout);
 
   QHBoxLayout * btnslayout = new QHBoxLayout;
   m_zoomIn = new QPushButton(tr("+"));
@@ -111,11 +69,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   connect(m_zoomOut,SIGNAL(clicked()),this,SLOT(onZoomOut()));
   connect(m_clearSceneBtn,SIGNAL(clicked()),this,SLOT(onClearScene()));
 
-  ///
-  ///
-  ///
 
-  QSplitter * splitter = new QSplitter;
   m_scene = new QGraphicsScene(this);
   qDebug() << "graphicsentry contstruct" << this;
   m_view = new LaneGraphicsView(m_scene,this);
@@ -128,43 +82,19 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_item->setTextInteractionFlags(Qt::TextBrowserInteraction);
   m_item->setTextWidth(300);
   m_scene->addItem(m_item);
-  // html widget has the html and the text of the node
-  QWidget * htmlwidget = new QWidget;
-  m_nodeHtml = new QTextBrowser(htmlwidget);
-  //   m_nodeText = new QTextEdit(htmlwidget);
-  QVBoxLayout * htmllayout = new QVBoxLayout;
-  htmllayout->addWidget(m_nodeHtml);
+
   // add the graphics viwe
-  htmllayout->addWidget(m_view);
-
-  htmlwidget->setLayout(htmllayout);
-
-  splitter->addWidget(m_nodeXml);
-  splitter->addWidget(htmlwidget);
-  m_nodeXml->hide();
-  m_nodeHtml->hide();
-  layout->addWidget(splitter,1);
+  layout->addWidget(m_view,1);
 
   m_nodeQuery = 0;
   setLayout(layout);
-  // this doesn't open the db, it just sets up the queries
-  //  openDb(m_dbname->text());
-  connect(m_findNodeBtn,SIGNAL(clicked()),this,SLOT(on_findNode()));
-  connect(m_loadCssBtn,SIGNAL(clicked()),this,SLOT(cssChanged()));
-  connect(m_anchorBtn,SIGNAL(clicked()),this,SLOT(anchorTest()));
-  //  connect(m_dbname,SIGNAL(textChanged(const QString &)),this,SLOT(dbnameChanged(const QString &)));
-  connect(m_dbname,SIGNAL(editingFinished()),this,SLOT(dbnameChanged()));
-  connect(m_cssFile,SIGNAL(editingFinished()),this,SLOT(cssChanged()));
-  connect(m_nodeHtml,SIGNAL(anchorClicked(const QUrl &)),this,SLOT(anchorClicked(const QUrl &)));
+
   connect(m_item,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
   connect(m_item,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
 
   connect(m_scene,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
- m_standardCSS = QString(".arabic { font-family : Droid Sans;font-size : 28px};div { font-family : Droid Sans;font-size : 20px}");
-  m_currentCSS = m_standardCSS;
-  cssChanged();
   m_xalan = getXalan();
 }
 GraphicsEntry::~GraphicsEntry() {
@@ -174,6 +104,13 @@ GraphicsEntry::~GraphicsEntry() {
   //  if (m_db.isOpen()) {
   //    m_db.close();
   //  }
+}
+void GraphicsEntry::readSettings() {
+  QSettings settings;
+  settings.beginGroup("Entry");
+  QString css = settings.value("css",QString("entry.css")).toString();
+  readCssFromFile(css);
+  m_xsltSource = settings.value("xslt",QString("entry.xsl")).toString();
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   switch(event->key()) {
@@ -227,9 +164,12 @@ void GraphicsEntry::linkHovered(const QString & link) {
     QLOG_DEBUG() << QApplication::keyboardModifiers();
   }
 }
+/**
+ * redundant
+ *
+ */
 void GraphicsEntry::anchorTest() {
-  QString node = m_node->text();
-
+  QString node;
   //  QList<QGraphicsItem *> items = m_scene->items();
   for(int i=0;i < m_items.size();i++) {
     EntryItem * item = m_items[i];
@@ -263,91 +203,36 @@ bool GraphicsEntry::showNode(const QString & node,bool thisPageOnly) {
   }
   return false;
 }
-void GraphicsEntry::dbnameChanged() { //const QString & text) {
-  /*
-  QLOG_DEBUG() << "db name changed" << m_dbname->text();
-  QFile f(m_dbname->text());
-  if (f.exists()) {
-    if (openDb(m_dbname->text())) {
-      m_currentDb = m_dbname->text();
-      return;
-    }
-  }
-  QLOG_DEBUG() << "No such file" << m_dbname->text();
-  m_dbname->setText(m_currentDb);
-  openDb(m_currentDb);
-  */
-}
-void GraphicsEntry::setCSS(const QString & css) {
-  QLOG_DEBUG() << "Setting CSS";
-  QLOG_DEBUG() << css;
-  m_currentCSS = css;
-  /*
-  QString html = m_nodeHtml->toHtml();
-  if (html != m_currentHtml) {
-    QLOG_DEBUG() << "Not current html";
-  }
-  m_nodeHtml->document()->setDefaultStyleSheet(m_currentCSS);
-  m_nodeHtml->setHtml(m_currentHtml);
-  m_item->document()->setDefaultStyleSheet(m_currentCSS);
-  m_item->setHtml(m_currentHtml);
-  m_item->setTextInteractionFlags(Qt::TextBrowserInteraction);
-  */
-  //  m_nodeHtml->clear();
-  //  m_nodeHtml->setHtml(html);
-  //  on_findNode();
-
-  // this is what transform does
-  //
-  //  m_nodeHtml->document()->setDefaultStyleSheet(m_currentCSS);
-  //  m_nodeHtml->setHtml("<html><body>" + html + "</body></html>");
-
-}
-void GraphicsEntry::cssChanged() {
-  QString name = m_cssFile->text();
+/**
+ *
+ *
+ */
+bool GraphicsEntry::readCssFromFile(const QString & name) {
   QFile f(name);
   if (! f.open(QIODevice::ReadOnly)) {
-    std::cerr << "Cannot open file for reading: "
-              << qPrintable(f.errorString()) << std::endl;
-    return;
+    QLOG_WARN()  << "Cannot open file for reading: "
+                 << f.errorString();
+    return false;
 
   }
   QTextStream in(&f);
   QString css;
   while( ! in.atEnd()) {
-    css += in.readLine();
+    if (! css.startsWith("-")) {
+      css += in.readLine();
+    }
   }
   f.close();
   if (! css.isEmpty()) {
-    setCSS(css);
+    m_currentCSS= css;
+    emit(cssChanged());
   }
-
+  return true;
 }
 
 
 
 bool GraphicsEntry::prepareQueries() {
-  /*
-  QFile dbfile(dbname);
-  if (m_db.isOpen()) {
-    m_db.close();
-  }
-  bool ok;
-  m_db = QSqlDatabase::addDatabase("QSQLITE");
-  m_db.setDatabaseName(dbname);
-  ok = m_db.open();
-  if (ok) {
-    m_db = QSqlDatabase::database();
-    QLOG_DEBUG() << "success,  opened DB " << dbname;
-  }
-  else {
-    qWarning() << Q_FUNC_INFO << "db open failed" << ok;
-    return ok;
-  }
-  if (! m_nodeQuery ) {
-    delete m_nodeQuery;
-  }
-  */
   m_nodeQuery = new QSqlQuery;
   bool ok = m_nodeQuery->prepare("select * from entry where nodeId = ?");
   if (! ok ) {
@@ -434,9 +319,9 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
       EntryItem * item = items.takeFirst();
       m_items.append(item);
     }
-    /// where the old entries started and where they end
+    /// where the old when finish
     //
-    addEntries(itemStart,itemCount);
+    appendEntries(itemCount);
   }
 
   m_view->setFocus();
@@ -474,7 +359,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
  * @return
  */
 EntryItem * GraphicsEntry::createEntry(const QString & xml) {
-    QString html =transform(m_xsl->text(),xml);
+    QString html =transform(m_xsltSource,xml);
     EntryItem * gi = new EntryItem("");
     gi->document()->setDefaultStyleSheet(m_currentCSS);
     gi->setTextWidth(300);
@@ -493,12 +378,12 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
  *
  * @param startPos
  */
-void GraphicsEntry::addEntries(int offset,int startPos) {
+void GraphicsEntry::appendEntries(int startPos) {
   qreal ypos = 0;
   qreal xpos = 0;
   QRectF r;
   QSizeF sz;
-  QLOG_DEBUG() << "addEntries" << offset << startPos;
+  //  QLOG_DEBUG() << "addEntries" << offset << startPos;
   /// calculate the y-position of the last item currently in the scene
   if (startPos > 0) {
     QPointF p = m_items[startPos - 1]->pos();
@@ -566,11 +451,8 @@ void GraphicsEntry::getXmlForNode(const QString  & node) {
   if (m_nodeQuery->first()) {
     QString xml = m_nodeQuery->value("xml").toString();
     //    QLOG_DEBUG() << "got " << xml;
-    m_nodeXml->setText(xml);
     QString root = QString("%1/%2").arg(m_nodeQuery->value("broot").toString()).arg(m_nodeQuery->value("root").toString());
     QString word = QString("%1/%2").arg(m_nodeQuery->value("bword").toString()).arg(m_nodeQuery->value("word").toString());
-    m_root->setText(root);
-    m_word->setText(word);
     getXmlForRoot(m_nodeQuery->value("root").toString(),node);
     /// focus on the node, set thisPageOnly to true just in case something has gone horribly wrong
     /// otherwise we'll be looping forever
@@ -583,7 +465,7 @@ void GraphicsEntry::getXmlForNode(const QString  & node) {
 }
 void GraphicsEntry::on_findNode()  {
   QRegExp rx("n\\d+");
-  QString node = m_node->text();
+  QString node;
   if (rx.indexIn(node) != -1) {
     getXmlForNode(node);
   }
@@ -610,16 +492,6 @@ QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
 
   m_xalan->transform(iss,m_compXsl,ostream);
   return QString::fromStdString(ostream.str());
-}
-void GraphicsEntry::addEntry(const QString & html) {
-  m_nodeHtml->document()->setDefaultStyleSheet(m_currentCSS);
-  // if we do not include the wrappers, the word entries are right justified
-  m_currentHtml = QString("<html><body>%1</body></html>").arg(html);
-  m_nodeHtml->setHtml(m_currentHtml);
-
-  //  m_nodeHtml->setHtml(html);
-  //  m_nodeText->setPlainText(html);
-
 }
 void GraphicsEntry::onZoomIn() {
   m_view->setTransform(m_transform);

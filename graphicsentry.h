@@ -1,6 +1,5 @@
 #ifndef __GRAPHICSENTRY_H__
 #define __GRAPHICSENTRY_H__
-
 #include <QWidget>
 #include <QPushButton>
 #include <QLineEdit>
@@ -30,6 +29,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QKeyEvent>
 #include <QFocusEvent>
+#include <QSettings>
 #include "QsLog.h"
 #include "xsltsupport.h"
 #include "history.h"
@@ -80,8 +80,6 @@ class GraphicsEntry : public QWidget {
     }
   public slots:
     void on_findNode();
-    void dbnameChanged();//const QString &);
-    void cssChanged();
     void anchorClicked(const QUrl &);
     void linkActivated(const QString &);
     void linkHovered(const QString &);
@@ -92,41 +90,30 @@ class GraphicsEntry : public QWidget {
     void nextPageRequested();
     void prevPageRequested();
  private:
+    void readSettings();
+    bool readCssFromFile(const QString &name);
     int m_pagingDir;
     bool m_debug;
-    void addEntries(int,int);
+    void appendEntries(int);
     void prependEntries(int);
     QList<EntryItem *> m_items;
     EntryItem * createEntry(const QString & xml);
     const XalanCompiledStylesheet * m_compXsl;
     bool showNode(const QString &,bool thisPageOnly = false);
     qreal m_scale;
+
     QTransform m_transform;
     QString transform(const QString & xsl,const QString & xml);
-    void addEntry(const QString &);
-    void setCSS(const QString &);
+
     QTextOption m_textOption;
     QString m_currentDb;
     QSqlDatabase m_db;
-    QLineEdit * m_dbname;
-    QLineEdit * m_xsl;
-    QLineEdit * m_cssFile;
-    QLineEdit * m_node;
-    QPushButton * m_findNodeBtn;
-    QPushButton * m_loadCssBtn;
-    QPushButton * m_anchorBtn;
     QPushButton * m_clearSceneBtn;
     QPushButton * m_zoomIn;
     QPushButton * m_zoomOut;
-    QLabel * m_root;
-    QLabel * m_word;
     LaneGraphicsView * m_view;
     QGraphicsScene * m_scene;
     QGraphicsTextItem * m_item;
-    QTextEdit * m_cssText;
-    QTextEdit * m_nodeXml;
-    QTextBrowser * m_nodeHtml;
-    QTextEdit * m_nodeText;
     QSqlQuery * m_nodeQuery;
     QSqlQuery * m_rootQuery;
     QSqlQuery * m_nextRootQuery;
@@ -134,6 +121,7 @@ class GraphicsEntry : public QWidget {
     QString m_currentCSS;
     QString m_currentHtml;
     QString m_currentRoot;
+    QString m_xsltSource;
     XalanTransformer * m_xalan;
  protected:
     void keyPressEvent(QKeyEvent *);
@@ -143,6 +131,7 @@ class GraphicsEntry : public QWidget {
     void rootChanged(const QString & root,const QString & node);
     void nextRoot(const QString &);
     void prevRoot(const QString &);
+    void cssChanged();
 };
 
 class LaneGraphicsView : public QGraphicsView {
