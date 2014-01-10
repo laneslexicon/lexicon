@@ -204,5 +204,7 @@ void ContentsWidget::ensureVisible(const QString & root, bool select) {
   }
   topItem->setExpanded(true);
   qDebug() << "hidden" << item->isHidden() << "top" << topItem->isExpanded();
-  setCurrentItem(item);
+  if (select) {
+    setCurrentItem(item);
+  }
 }
