@@ -4,7 +4,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 {
   loadStyleSheet();
-  QSplitter * w = new QSplitter;
+  QSplitter * splitter = new QSplitter;
   m_tree = new ContentsWidget(this);
   m_tree->setObjectName("treeRoots");
   m_tree->installEventFilter(this);
@@ -14,11 +14,15 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   m_notes = new NotesWidget();
   //  m_notes->setObjectName("notes");
-  w->addWidget(m_tree);
-  w->addWidget(m_tabs);
+  splitter->addWidget(m_tree);
+  splitter->addWidget(m_tabs);
+  splitter->setStretchFactor(0,0);
+  splitter->setStretchFactor(1,1);
+
+
   m_tabs->addTab(entry,tr(""));
   //  m_tabs->addTab(m_notes,"Notes");
-  setCentralWidget(w);
+  setCentralWidget(splitter);
   createActions();
   createToolBar();
   createMenus();
@@ -28,6 +32,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   if (openDatabase("lexicon.sqlite")) {
     statusBar()->showMessage(tr("Ready"));
     m_tree->loadContents();
+
     entry->prepareQueries();
     getFirstAndLast();
     /// at the end of the history, but we should be able to restore from settings
@@ -51,7 +56,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   showRoot(m_firstRoot,false);
   m_tree->ensureVisible(m_firstRoot);
- }
+  m_tree->resizeColumnToContents(0);
+}
 
 LanesLexicon::~LanesLexicon()
 {
