@@ -463,6 +463,7 @@ void LanesLexicon::on_actionLastRoot() {
 }
 void LanesLexicon::rootChanged(const QString & root,const QString & node) {
   m_currentRoot->setText(root);
+  m_tree->ensureVisible(root,true);
 }
 void LanesLexicon::getFirstAndLast() {
   QSqlQuery query;
