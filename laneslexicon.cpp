@@ -103,11 +103,12 @@ void LanesLexicon::createActions() {
 
   connect(m_hForward,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
   connect(m_hBackward,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
-
-  m_rootForwardAction = new QAction(tr("Next Root"),this);
-  m_rootBackwardAction = new QAction(tr("Prev Root"),this);
-  m_rootFirstAction = new QAction(tr("First Root"),this);
-  m_rootLastAction = new QAction(tr("Last Root"),this);
+  QString imgdir = QString("./images/32");
+  //    openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
+  m_rootForwardAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next Root"),this);
+  m_rootBackwardAction = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Prev Root"),this);
+  m_rootFirstAction = new QAction(QIcon(imgdir + "/go-first.png"),tr("First Root"),this);
+  m_rootLastAction = new QAction(QIcon(imgdir + "/go-last.png"),tr("Last Root"),this);
 
   connect(m_rootForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextRoot()));
   connect(m_rootBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevRoot()));

@@ -108,6 +108,8 @@ class GraphicsEntry : public QWidget {
 
     QTextOption m_textOption;
     QPushButton * m_clearSceneBtn;
+
+
     QPushButton * m_zoomIn;
     QPushButton * m_zoomOut;
     LaneGraphicsView * m_view;

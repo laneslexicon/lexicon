@@ -54,10 +54,11 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_pagingDir = 0;
   m_scale = 1.0;
 
-
   QHBoxLayout * btnslayout = new QHBoxLayout;
-  m_zoomIn = new QPushButton(tr("+"));
-  m_zoomOut = new QPushButton(tr("-"));
+  m_zoomIn = new QPushButton(QIcon("./images/zoom-in-32.png"),tr(""));
+  m_zoomIn->setToolTip(tr("Zoom in"));
+  m_zoomOut = new QPushButton(QIcon("./images/zoom-out-32.png"),tr(""));
+  m_zoomOut->setToolTip(tr("Zoom out"));
   m_clearSceneBtn = new QPushButton(tr("Clear"));
   btnslayout->addWidget(m_zoomIn);
   btnslayout->addWidget(m_zoomOut);
@@ -70,7 +71,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 
 
   m_scene = new QGraphicsScene(this);
-  qDebug() << "graphicsentry contstruct" << this;
+
   m_view = new LaneGraphicsView(m_scene,this);
   connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
   connect(m_view,SIGNAL(backPage()),this,SLOT(prevPageRequested()));
@@ -99,9 +100,6 @@ GraphicsEntry::~GraphicsEntry() {
   delete m_nodeQuery;
   delete m_rootQuery;
   delete m_nextRootQuery;
-  //  if (m_db.isOpen()) {
-  //    m_db.close();
-  //  }
 }
 void GraphicsEntry::readSettings() {
   QSettings settings;
@@ -268,8 +266,6 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   m_rootQuery->exec();
   QString arRoot;
   QString startNode = node;
-  /// get the position of the first item
-  int itemStart = 0;
   /// get the position of the last item
   int itemCount = m_items.size();
   /// add the root item
