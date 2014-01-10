@@ -21,7 +21,7 @@ class ContentsWidget : public QTreeWidget {
   void loadContents();
   QString findNextRoot(const QString &);
   QString findPrevRoot(const QString &);
-
+  void ensureVisible(const QString & root, bool select = false);
  private:
   bool m_debug;
  protected:

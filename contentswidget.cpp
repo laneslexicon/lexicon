@@ -179,3 +179,30 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
     QTreeWidget::keyPressEvent(event);
   }
 }
+void ContentsWidget::ensureVisible(const QString & root, bool select) {
+  QTreeWidgetItem * item;
+  QTreeWidgetItem * topItem;
+  int tc = topLevelItemCount();
+  int topIndex = -1;
+  int childIndex = -1;
+  bool found = false;
+
+  for(int i = 0;(i < tc) && ! found;i++) {
+    topItem = topLevelItem(i);
+    int kidCount = topItem->childCount();
+    for(int j=0;(j < kidCount) && ! found ;j++) {
+      item = topItem->child(j);
+      if (item->text(0) == root) {
+        topIndex = i;
+        childIndex = j;
+        found = true;
+      }
+    }
+  }
+  if (!item) {
+    return;
+  }
+  topItem->setExpanded(true);
+  qDebug() << "hidden" << item->isHidden() << "top" << topItem->isExpanded();
+  setCurrentItem(item);
+}
