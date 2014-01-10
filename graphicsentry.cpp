@@ -156,6 +156,7 @@ void GraphicsEntry::linkActivated(const QString & link) {
   /// turn history on as the user has clicked on something
   getHistory()->on();
   QString node(link);
+  /// remove the leading #
   node.remove(0,1);
   showNode(node);
 }
@@ -262,21 +263,25 @@ bool GraphicsEntry::prepareQueries() {
  */
 void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   QList<EntryItem *> items;
-  QLOG_DEBUG() << "Search for root" << root;
+  QString arRoot;
+  int itemCount;
+  QString str;
+
+  QLOG_DEBUG() << Q_FUNC_INFO << root;
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
-  QString arRoot;
+
   QString startNode = node;
   /// get the position of the last item
-  int itemCount = m_items.size();
+  itemCount = m_items.size();
   /// add the root item
-  QString rootxml = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
-  EntryItem * rootItem  = createEntry(rootxml);
+  str = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
+  EntryItem * rootItem  = createEntry(str);
   /// this will be set to the right word if a node has been supplied
   QString showWord;
   rootItem->setRoot(root,true);
   items << rootItem;
-  qDebug() << "Added root item at" << (m_items.size() - 1);
+
   /// now add all the entries for the root
   while(m_rootQuery->next()) {
     arRoot = m_rootQuery->value(0).toString();
@@ -335,8 +340,10 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   /// without thus centerOn() does not work properly for
   /// items added to the scene
   m_view->setSceneRect(m_scene->sceneRect());
-  m_currentRoot = arRoot;
-  emit rootChanged(arRoot,node);
+  if (m_currentRoot != arRoot) {
+    emit rootChanged(arRoot,node);
+    m_currentRoot = arRoot;
+  }
   /**
    * we need to know whether we got here by accessing the history button
    * or not
