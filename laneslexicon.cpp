@@ -50,6 +50,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
 
   showRoot(m_firstRoot,false);
+  m_tree->ensureVisible(m_firstRoot);
  }
 
 LanesLexicon::~LanesLexicon()
@@ -418,6 +419,7 @@ void LanesLexicon::on_actionNextRoot() {
       if (entry->hasRoot(nroot,true) == -1) {
         entry->setPagingForward();
         entry->getXmlForRoot(nroot);
+        m_tree->ensureVisible(nroot,true);
       }
     }
     else {
@@ -436,6 +438,7 @@ void LanesLexicon::on_actionPrevRoot() {
       if (entry->hasRoot(nroot,true) == -1) {
         entry->setPagingBackward();
         entry->getXmlForRoot(nroot);
+        m_tree->ensureVisible(nroot,true);
       }
     }
     else {
@@ -445,9 +448,12 @@ void LanesLexicon::on_actionPrevRoot() {
 }
 void LanesLexicon::on_actionFirstRoot() {
   qDebug() << Q_FUNC_INFO;
+  showRoot(m_firstRoot,false);
+  m_tree->ensureVisible(m_firstRoot);
 }
 void LanesLexicon::on_actionLastRoot() {
-  qDebug() << Q_FUNC_INFO;
+  showRoot(m_lastRoot,false);
+  m_tree->ensureVisible(m_lastRoot);
 }
 void LanesLexicon::rootChanged(const QString & root,const QString & node) {
   m_currentRoot->setText(root);
