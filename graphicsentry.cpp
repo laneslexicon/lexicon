@@ -318,7 +318,6 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
     prependEntries(x);
   }
   else {
-    itemStart = 0;
     while(items.size() > 0) {
       EntryItem * item = items.takeFirst();
       m_items.append(item);
