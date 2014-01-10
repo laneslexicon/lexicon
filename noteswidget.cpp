@@ -188,15 +188,19 @@ QWidget * NotesWidget::createEditWidget() {
   QHBoxLayout * btnlayout = new QHBoxLayout;
   m_saveBtn = new QPushButton(tr("Save"));
   m_newBtn = new QPushButton(tr("Add"));
+  m_lexiconBtn = new QPushButton(tr("Lexicon"));
   btnlayout->addWidget(m_saveBtn);
   btnlayout->addWidget(m_newBtn);
+  btnlayout->addWidget(m_lexiconBtn);
   layout->addLayout(btnlayout);
   connect(m_saveBtn,SIGNAL(clicked()),this,SLOT(onSaveClicked()));
   connect(m_newBtn,SIGNAL(clicked()),this,SLOT(onNewClicked()));
+  connect(m_lexiconBtn,SIGNAL(clicked()),this,SLOT(onLexiconClicked()));
   editWidget->setLayout(layout);
   return editWidget;
 }
 NotesWidget::~NotesWidget() {
+  qDebug() << Q_FUNC_INFO;
   if (m_db.isOpen()) {
     m_db.close();
   }
@@ -217,6 +221,9 @@ void NotesWidget::onShowClicked() {
   m_model->setSearch(m_show->text());
   m_model->refresh();
   m_view->horizontalHeader()->setSectionHidden(Notes_Id,true);
+}
+void NotesWidget::onLexiconClicked() {
+  this->hide();
 }
 bool NotesWidget::createConnection() {
   bool dbInitRequired = false;

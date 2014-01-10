@@ -66,6 +66,7 @@ class NotesWidget : public QWidget {
   void onShowClicked();
   void onSaveClicked();
   void onNewClicked();
+  void onLexiconClicked();
   void showSelectedNote();
   void setActiveNode(const QString & node,const QString & word);
  private:
@@ -85,6 +86,7 @@ class NotesWidget : public QWidget {
   QPushButton * m_showBtn;
   QPushButton * m_saveBtn;
   QPushButton * m_deleteBtn;
+  QPushButton * m_lexiconBtn;
   QWidget * createQueryWidget();
   QWidget * createEditWidget();
 };
