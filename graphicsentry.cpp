@@ -59,7 +59,8 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_zoomIn->setToolTip(tr("Zoom in"));
   m_zoomOut = new QPushButton(QIcon("./images/zoom-out-32.png"),tr(""));
   m_zoomOut->setToolTip(tr("Zoom out"));
-  m_clearSceneBtn = new QPushButton(tr("Clear"));
+  m_clearSceneBtn = new QPushButton(QIcon("./images/32/cleaning-erase-eraser-icone-4970-32.png"),tr("Clear"));
+  m_clearSceneBtn->setToolTip("Clear contents");
   btnslayout->addWidget(m_zoomIn);
   btnslayout->addWidget(m_zoomOut);
   btnslayout->addWidget(m_clearSceneBtn);

@@ -107,11 +107,12 @@ class GraphicsEntry : public QWidget {
     QString transform(const QString & xsl,const QString & xml);
 
     QTextOption m_textOption;
+
     QPushButton * m_clearSceneBtn;
-
-
     QPushButton * m_zoomIn;
     QPushButton * m_zoomOut;
+
+
     LaneGraphicsView * m_view;
     QGraphicsScene * m_scene;
     QGraphicsTextItem * m_item;
