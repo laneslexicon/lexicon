@@ -207,4 +207,6 @@ void ContentsWidget::ensureVisible(const QString & root, bool select) {
   if (select) {
     setCurrentItem(item);
   }
+  QModelIndex index = indexFromItem(item);
+  scrollTo(index);
 }
