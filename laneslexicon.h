@@ -51,6 +51,7 @@ public:
     void writeSettings();
     HistoryMaster * history();
     private slots:
+    void showRoot(const QString &,bool newTab = false);
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
     void on_actionExit();
@@ -68,6 +69,9 @@ public:
     void rootChanged(const QString & root,const QString & node);
 private:
     QFont arFont;
+    QString m_firstRoot;
+    QString m_lastRoot;
+    void getFirstAndLast();
     int m_historyPos;
     void setSignals(GraphicsEntry *);
     void loadStyleSheet();

@@ -29,6 +29,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     statusBar()->showMessage(tr("Ready"));
     m_tree->loadContents();
     entry->prepareQueries();
+    getFirstAndLast();
     /// at the end of the history, but we should be able to restore from settings
     m_historyPos = 9;
     m_history = new HistoryMaster("notes.sqlite");
@@ -47,6 +48,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
 
   connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
+
+  showRoot(m_firstRoot,false);
  }
 
 LanesLexicon::~LanesLexicon()
@@ -269,8 +272,15 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
   return ok;
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
+  bool newTab = false;
   QString root = item->text(0);
   if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+    newTab = true;
+  }
+  showRoot(root,newTab);
+}
+void LanesLexicon::showRoot(const QString & root,bool createTab) {
+  if (createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
     GraphicsEntry * w = new GraphicsEntry(this);
@@ -441,4 +451,24 @@ void LanesLexicon::on_actionLastRoot() {
 }
 void LanesLexicon::rootChanged(const QString & root,const QString & node) {
   m_currentRoot->setText(root);
+}
+void LanesLexicon::getFirstAndLast() {
+  QSqlQuery query;
+  bool ok = query.prepare("select root from entry order by nodenum limit 5;");
+  if (! ok ) {
+    QLOG_DEBUG() << "first root SQL prepare failed";
+  }
+  query.exec();
+  if (query.first()) {
+    m_firstRoot = query.value(0).toString();
+  }
+  ok = query.prepare("select root from entry order by nodenum desc limit 5;");
+  if (! ok ) {
+    QLOG_DEBUG() << "last root SQL prepare failed";
+  }
+  query.exec();
+  if (query.first()) {
+    m_lastRoot = query.value(0).toString();
+  }
+  qDebug() << "First" << m_firstRoot << "last" << m_lastRoot;
 }
