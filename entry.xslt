@@ -25,7 +25,16 @@
   <xsl:template match="word">
     <xsl:choose>
       <xsl:when test="@type = 'root'">
-    <p class="rootword"><span class="arabichead rootword"><xsl:value-of  select="@ar"/></span>
+    <p>
+    <xsl:choose>
+      <xsl:when test="boolean(./@supp = 1)">
+        <xsl:attribute name="class">rootword supplement</xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="class">rootword</xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+      <span class="arabichead rootword"><xsl:value-of  select="@ar"/></span>
     </p>
       </xsl:when>
       <xsl:otherwise>
@@ -95,7 +104,15 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
 
   <xsl:template match="entryFree" priority="100">
 
-    <span class="entry">
+    <span>
+    <xsl:choose>
+      <xsl:when test="boolean(../@supp = 1)">
+        <xsl:attribute name="class">entry supplement</xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="class">entry</xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
       <a>
         <xsl:attribute name="name">
           <xsl:value-of select="@id" />
@@ -172,6 +189,8 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
       -->
 
     </xsl:for-each>
+
+
     </span>
       <br/>
       <br/>
