@@ -247,7 +247,7 @@ bool GraphicsEntry::prepareQueries() {
     QLOG_DEBUG() << "node SQL prepare failed";
   }
   m_rootQuery = new QSqlQuery;
-  ok = m_rootQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeId from entry where root = ? order by nodenum");
+  ok = m_rootQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeId,supplement from entry where root = ? order by nodenum");
   if (! ok ) {
     QLOG_DEBUG() << "root SQL prepare failed";
   }
@@ -286,11 +286,12 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   while(m_rootQuery->next()) {
     arRoot = m_rootQuery->value(0).toString();
     QLOG_DEBUG() << m_rootQuery->value(3).toString();
-    QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\">")
+    QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
       .arg(m_rootQuery->value(3).toString())
       .arg(m_rootQuery->value(2).toString())
       .arg(m_rootQuery->value(5).toString())
-      .arg(m_rootQuery->value(6).toString());
+      .arg(m_rootQuery->value(6).toString())
+      .arg(m_rootQuery->value(8).toInt());
     t += m_rootQuery->value(4).toString();
     t += "</word>";
     if (m_debug) {
