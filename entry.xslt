@@ -23,22 +23,29 @@
   </xsl:template>
 
   <xsl:template match="word">
+    <xsl:variable name="entrystyle">
+    <xsl:choose>
+      <xsl:when test="boolean(./@supp = 1)">
+        <xsl:text>supplement</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>main</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+    </xsl:variable>
     <xsl:choose>
       <xsl:when test="@type = 'root'">
     <p>
-    <xsl:choose>
-      <xsl:when test="boolean(./@supp = 1)">
-        <xsl:attribute name="class">rootword supplement</xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="class">rootword</xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
-      <span class="arabichead rootword"><xsl:value-of  select="@ar"/></span>
+      <xsl:attribute name="class">rootword <xsl:value-of select="$entrystyle" /></xsl:attribute>
+      <span>
+      <xsl:attribute name="class">arabichead rootword <xsl:value-of select="$entrystyle" /></xsl:attribute>
+      <xsl:value-of  select="@ar"/>
+      </span>
     </p>
       </xsl:when>
       <xsl:otherwise>
-    <span class="wordheading">
+    <span>
+      <xsl:attribute name="class">wordheading <xsl:value-of select="$entrystyle" /></xsl:attribute>
       <xsl:if test="not(@itype = '')">
         <span class="infl"><xsl:value-of select="@itype" /></span><xsl:text> </xsl:text>
       </xsl:if>
