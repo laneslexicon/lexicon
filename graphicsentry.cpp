@@ -20,6 +20,23 @@ void EntryItem::setRoot(const QString & root,bool isRootEntry) {
   m_root = root;
   m_isRoot = isRootEntry;
 }
+
+void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWidget *w) {
+  QPen pen = painter->pen();
+  QBrush brush = painter->brush();
+  painter->setPen(Qt::NoPen);
+  if ( ! m_supplement) {
+    painter->setBrush(Qt::white);
+  }
+  else {
+    painter->setBrush(Qt::lightGray);
+  }
+  painter->drawRect(boundingRect());
+  painter->setPen(pen);
+  QGraphicsTextItem::paint(painter, o, w);
+}
+
+
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
   QGraphicsView(scene,parent) {
   //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -110,6 +127,7 @@ void GraphicsEntry::readSettings() {
   m_xsltSource = settings.value("xslt",QString("entry.xslt")).toString();
   m_textWidth = settings.value("text width",300).toInt();
   m_debug = settings.value("debug",false).toBool();
+  m_entryMargin = settings.value("margin",10).toInt();
 }
 void GraphicsEntry::writeDefaultSettings() {
   QSettings settings;
@@ -265,6 +283,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   QList<EntryItem *> items;
   QString arRoot;
   int itemCount;
+  bool supplement;
   QString str;
 
   QLOG_DEBUG() << Q_FUNC_INFO << root;
@@ -284,6 +303,12 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
 
   /// now add all the entries for the root
   while(m_rootQuery->next()) {
+    if (m_rootQuery->value(8).toInt()) {
+      supplement = true;
+    }
+    else {
+      supplement = false;
+    }
     arRoot = m_rootQuery->value(0).toString();
     QLOG_DEBUG() << m_rootQuery->value(3).toString();
     QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
@@ -303,6 +328,10 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
       }
     }
     EntryItem * item  = createEntry(t);
+    if (supplement) {
+      //      item->setBrush(Qt::cyan);
+    }
+    item->setSupplement(supplement);
     item->setNode(m_rootQuery->value(7).toString());
     /// get the nodeid of the first item at added, so we jump to it later
     item->setRoot(arRoot);
@@ -400,7 +429,7 @@ void GraphicsEntry::appendEntries(int startPos) {
   if (startPos > 0) {
     QPointF p = m_items[startPos - 1]->pos();
     r = m_items[startPos - 1]->boundingRect();
-    ypos =  p.y() + r.height() + 10;
+    ypos =  p.y() + r.height() + m_entryMargin;
   }
   /// add items updating the ypos as we go
   for(int i=startPos;i < m_items.size();i++) {
@@ -417,8 +446,13 @@ void GraphicsEntry::appendEntries(int startPos) {
       }
     }
     sz = m_items[i]->document()->size();
-    ypos += sz.height() + 10;
-    //    ypos += r.height() + 10;
+    //    QGraphicsRectItem * ri = m_scene->addRect(r);
+    //    ri->setPos(xpos,ypos);
+    //    ri->setPen(QPen(Qt::NoPen));
+    //    ri->setBrush(Qt::cyan);
+
+    ypos += sz.height() + m_entryMargin;
+    //    ypos += r.height() + m_entryMargin;
 
   }
 }
@@ -451,8 +485,8 @@ void GraphicsEntry::prependEntries(int startPos) {
       }
     }
     sz = m_items[i]->document()->size();
-    ypos += sz.height() + 10;
-    //    ypos += r.height() + 10;
+    ypos += sz.height() + m_entryMargin;
+    //    ypos += r.height() + m_entryMargin;
 
   }
 }

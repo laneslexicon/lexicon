@@ -42,18 +42,23 @@ class EntryItem : public QGraphicsTextItem {
   void setNode(const QString & id) { m_nodeId = id;}
   void setRoot(const QString & root,bool isRootEntry = false);
   void setWord(const QString & word) { m_word = word; }
+  void setSupplement(bool v)  { m_supplement = v;}
   bool isNode(const QString & id) { return m_nodeId ==  id;}
   bool isRoot() { return m_isRoot;}
   QString getNode() { return m_nodeId;}
   QString getRoot() { return m_root;}
   QString getWord() { return m_word;}
+  bool isSupplement() { return m_supplement;}
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
+  void paint( QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+
   private:
   QString m_nodeId;
   bool m_isRoot;
   int m_page;
+  bool m_supplement;
   QString m_root;
   QString m_word;
 };
@@ -94,6 +99,7 @@ class GraphicsEntry : public QWidget {
     void writeDefaultSettings();
     bool readCssFromFile(const QString &name);
     int m_pagingDir;
+    int m_entryMargin;
     bool m_debug;
     void appendEntries(int);
     void prependEntries(int);
