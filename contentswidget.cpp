@@ -2,9 +2,9 @@
 
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   m_debug = true;
-  setColumnCount(1);
+  setColumnCount(2);
   setHeaderLabels(
-                  QStringList() << tr("Contents"));
+                  QStringList() << tr("Contents") << tr("Supplement"));
   setSelectionMode(QAbstractItemView::SingleSelection);
   header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
 }
@@ -20,11 +20,19 @@ void ContentsWidget::loadContents() {
       out->setCodec("UTF-8");
     }
   }
-  query.prepare("select distinct letter from root order by letter");
+  QString sql = "select distinct letter from root order by letter";
+  if ( ! query.prepare(sql)) {
+    QLOG_FATAL() << "Error preparing SQL:" << sql;
+    return;
+  }
   query.exec();
 
   QSqlQuery rootQuery;
-  rootQuery.prepare("select word from root where letter = ? order by word ");
+  sql = "select word,supplement from root where letter = ? order by word ";
+  if (! rootQuery.prepare(sql)) {
+    QLOG_FATAL() << "Error preparing SQL:" << sql;
+    return;
+  }
 
   while(query.next()) {
     QString letter = query.value(0).toString();
@@ -34,12 +42,35 @@ void ContentsWidget::loadContents() {
     //    if (! rootQuery.first()) {
     //      QLOG_DEBUG() << rootQuery.lastError().text();
     //    }
+    QString supp;
+    QString root;
     while(rootQuery.next()) {
-      QString root = rootQuery.value(0).toString();
-      if (m_debug && f.isOpen()) {
-        *out << root << '\n';
+      bool ok = true;
+      root = rootQuery.value(0).toString();
+      //      itype = rootQuery.value(2).toString();
+
+      if (rootQuery.value(1).toInt() == 1) {
+        supp = "*";
+        //        if (itype == "alphabetical letter") {
+          //          ok = false;
+        //        }
+
       }
-      QTreeWidgetItem * rootitem = new QTreeWidgetItem(item,QStringList(root));
+      else {
+        supp = " ";
+      }
+      /// skipping the letter entries from the supplement
+      if ((supp == "*") && (root.size() == 1)) {
+        ok = false;
+      }
+      if (ok) {
+        if (m_debug && f.isOpen()) {
+          *out << root << '\n';
+        }
+        QStringList cols;
+        cols << root << supp;
+        QTreeWidgetItem * rootitem = new QTreeWidgetItem(item,cols);
+      }
     }
     addTopLevelItem(item);
   }
