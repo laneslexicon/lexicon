@@ -28,7 +28,7 @@ void ContentsWidget::loadContents() {
   query.exec();
 
   QSqlQuery rootQuery;
-  sql = "select word,supplement from root where letter = ? order by word ";
+  sql = "select word,supplement from root where letter = ? order by word,supplement";
   if (! rootQuery.prepare(sql)) {
     QLOG_FATAL() << "Error preparing SQL:" << sql;
     return;
