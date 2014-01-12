@@ -233,7 +233,8 @@ void LanesLexicon::onHistoryForward() {
   QString node = event->getNode();
   QString root = event->getRoot();
   GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
-  w->getXmlForRoot(root,node);
+  /// TODO fix for supplement
+  w->getXmlForRoot(root,0,node);
   m_tabs->setTabText(0,root);
   w->setFocus();
 }
@@ -245,7 +246,8 @@ void LanesLexicon::onHistoryBackward() {
   QString node = event->getNode();
   QString root = event->getRoot();
   GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
-  w->getXmlForRoot(root,node);
+  /// TODO fix for supplement
+  w->getXmlForRoot(root,0,node);
   m_tabs->setTabText(0,root);
   w->setFocus();
 }
@@ -281,12 +283,17 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   bool newTab = false;
   QString root = item->text(0);
+  QString supp = item->text(1);
+  int p = 0;
+  if (supp == "*") {
+    p = 1;
+  }
   if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
     newTab = true;
   }
-  showRoot(root,newTab);
+  showRoot(root,p,newTab);
 }
-void LanesLexicon::showRoot(const QString & root,bool createTab) {
+void LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) {
   if (createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
@@ -295,7 +302,7 @@ void LanesLexicon::showRoot(const QString & root,bool createTab) {
       m_history->on();
       w->prepareQueries();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
-      w->getXmlForRoot(root);
+      w->getXmlForRoot(root,supplement);
       setSignals(w);
       //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
       //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
@@ -306,7 +313,7 @@ void LanesLexicon::showRoot(const QString & root,bool createTab) {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     if (w->hasRoot(root,true) == -1) {
       m_history->on();
-      w->getXmlForRoot(root);
+      w->getXmlForRoot(root,supplement);
       QString t = QString("<span class=\"ar\">%1</span>").arg(root);
 
       m_tabs->setTabText(0,root);
@@ -388,6 +395,11 @@ void LanesLexicon::writeSettings() {
 HistoryMaster * LanesLexicon::history() {
   return m_history;
 }
+/**
+ * this needs to be fixed to return supplement as well
+ *
+ * @param root
+ */
 void LanesLexicon::findNextRoot(const QString & root) {
   GraphicsEntry * entry = dynamic_cast<GraphicsEntry *>(QObject::sender());
   qDebug() << Q_FUNC_INFO  << root;

@@ -70,8 +70,8 @@ class GraphicsEntry : public QWidget {
   GraphicsEntry(QWidget * parent = 0);
   ~GraphicsEntry();
     bool prepareQueries();
-    void getXmlForRoot(const QString &,const QString & anchor = QString());
-    void getXmlForNode(const QString &);
+    void getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString());
+    void getXmlForNode(const QString &, int supplement = 0);
     int hasRoot(const QString & root,bool focus = true);
     QString currentRoot() { return m_currentRoot;}
     /// return the first/last root in the scene

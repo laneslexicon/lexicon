@@ -1,8 +1,9 @@
 #include "graphicsentry.h"
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
+  m_supplement = false;
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
-
+  m_supplement = false;
 }
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
@@ -279,7 +280,7 @@ bool GraphicsEntry::prepareQueries() {
  * @param root
  * @param node the id of the entry we want to focus on
  */
-void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
+void GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & node) {
   QList<EntryItem *> items;
   QString arRoot;
   int itemCount;
@@ -299,6 +300,9 @@ void GraphicsEntry::getXmlForRoot(const QString & root,const QString & node) {
   /// this will be set to the right word if a node has been supplied
   QString showWord;
   rootItem->setRoot(root,true);
+  if (supp == 1) {
+    rootItem->setSupplement(true);
+  }
   items << rootItem;
 
   /// now add all the entries for the root
@@ -490,7 +494,7 @@ void GraphicsEntry::prependEntries(int startPos) {
 
   }
 }
-void GraphicsEntry::getXmlForNode(const QString  & node) {
+void GraphicsEntry::getXmlForNode(const QString  & node,int supplement) {
   QLOG_DEBUG() << "Search for node" << node;
   m_nodeQuery->bindValue(0,node);
   m_nodeQuery->exec();
@@ -499,7 +503,7 @@ void GraphicsEntry::getXmlForNode(const QString  & node) {
     //    QLOG_DEBUG() << "got " << xml;
     QString root = QString("%1/%2").arg(m_nodeQuery->value("broot").toString()).arg(m_nodeQuery->value("root").toString());
     QString word = QString("%1/%2").arg(m_nodeQuery->value("bword").toString()).arg(m_nodeQuery->value("word").toString());
-    getXmlForRoot(m_nodeQuery->value("root").toString(),node);
+    getXmlForRoot(m_nodeQuery->value("root").toString(),supplement,node);
     /// focus on the node, set thisPageOnly to true just in case something has gone horribly wrong
     /// otherwise we'll be looping forever
     showNode(node,true);

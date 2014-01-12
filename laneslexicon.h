@@ -51,7 +51,7 @@ public:
     void writeSettings();
     HistoryMaster * history();
     private slots:
-    void showRoot(const QString &,bool newTab = false);
+      void showRoot(const QString &,int supp = 0,bool newTab = false);
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
     void on_actionExit();
