@@ -274,7 +274,7 @@ bool GraphicsEntry::prepareQueries() {
   ok = m_nextRootQuery->prepare("select word from root ");
   return ok;
 }
-Place GraphicsEntry::getXmlForRoot(const Place & p,const QString & node) {
+Place GraphicsEntry::getXmlForPlace(const Place & p,const QString & node) {
   getXmlForRoot(p.getRoot(),p.getSupplement(),node);
   m_place = p;
   qDebug() << "Place set" << p.getRoot() << p.getSupplement();

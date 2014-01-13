@@ -76,7 +76,7 @@ void ContentsWidget::loadContents() {
     delete out;
   }
 }
-Place ContentsWidget::findNextRoot(const Place & p) {
+Place ContentsWidget::findNextPlace(const Place & p) {
   QTreeWidgetItem * currentItem;
   int tc = topLevelItemCount();
   int topIndex = -1;
@@ -251,7 +251,7 @@ QString ContentsWidget::findPrevRoot(const QString & root) {
  *
  * @return the next root in sequence
  */
-Place ContentsWidget::findPrevRoot(const Place & p) {
+Place ContentsWidget::findPrevPlace(const Place & p) {
   QTreeWidgetItem * currentItem;
   int tc = topLevelItemCount();
   int topIndex = -1;
