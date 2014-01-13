@@ -290,7 +290,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & 
   QList<EntryItem *> items;
   QString arRoot;
   int itemCount;
-  bool supplement;
+  int supplement;
   QString str;
 
   QLOG_DEBUG() << Q_FUNC_INFO << root;
@@ -306,19 +306,12 @@ void GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & 
   /// this will be set to the right word if a node has been supplied
   QString showWord;
   rootItem->setRoot(root,true);
-  if (supp == 1) {
-    rootItem->setSupplement(true);
-  }
+  rootItem->setSupplement(supp);
   items << rootItem;
 
   /// now add all the entries for the root
   while(m_rootQuery->next()) {
-    if (m_rootQuery->value(8).toInt()) {
-      supplement = true;
-    }
-    else {
-      supplement = false;
-    }
+    supplement = m_rootQuery->value(8).toInt();
     arRoot = m_rootQuery->value(0).toString();
     QLOG_DEBUG() << m_rootQuery->value(3).toString();
     QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
@@ -581,6 +574,29 @@ int GraphicsEntry::hasRoot(const QString & root,bool setFocus) {
   if ((ix != -1) && setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);
+    m_currentRoot = root;
+    emit(rootChanged(root,QString()));
+  }
+  return ix;
+}
+int GraphicsEntry::hasPlace(const Place & p,bool setFocus) {
+  int max = m_items.size();
+  int ix = -1;
+  int supp = p.getSupplement();
+  QString root = p.getRoot();
+  for(int i=0;i < max;i++) {
+    if (m_items[i]->isRoot() &&
+        ((m_items[i]->getRoot() == root) &&
+         (m_items[i]->getSupplement() == supp))) {
+          ix = i;
+          i = max;
+    }
+  }
+  qDebug() << Q_FUNC_INFO << root << setFocus << ix;
+  if ((ix != -1) && setFocus) {
+    m_scene->setFocusItem(m_items[ix]);
+    m_view->ensureVisible(m_items[ix]);
+    m_place = p;
     m_currentRoot = root;
     emit(rootChanged(root,QString()));
   }

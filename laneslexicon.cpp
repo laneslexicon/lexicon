@@ -477,7 +477,7 @@ void LanesLexicon::on_actionNextRoot() {
     if (! np.isEmpty()) {
       /// hasRoot will checks if root already shown
       /// if it is, it move focus to it (if true is 2nd param)
-      if (entry->hasRoot(np.getRoot(),true) == -1) {
+      if (entry->hasPlace(np,true) == -1) {
         entry->setPagingForward();
         entry->getXmlForRoot(np);
         m_tree->ensureVisible(np,true);
@@ -498,7 +498,7 @@ void LanesLexicon::on_actionPrevRoot() {
     if (! np.isEmpty()) {
       /// hasRoot will checks if root already shown
       /// if it is, it move focus to it (if true is 2nd param)
-      if (entry->hasRoot(np.getRoot(),true) == -1) {
+      if (entry->hasPlace(np,true) == -1) {
         entry->setPagingBackward();
         entry->getXmlForRoot(np);
         m_tree->ensureVisible(np,true);
