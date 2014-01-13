@@ -304,7 +304,7 @@ void LanesLexicon::showPlace(const Place & p,bool createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
     GraphicsEntry * w = new GraphicsEntry(this);
-    if (w->hasRoot(root,true) == -1) {
+    if (w->hasPlace(p,true) == -1) {
       m_history->on();
       w->prepareQueries();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
@@ -317,7 +317,7 @@ void LanesLexicon::showPlace(const Place & p,bool createTab) {
   }
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
-    if (w->hasRoot(root,true) == -1) {
+    if (w->hasPlace(p,true) == -1) {
       m_history->on();
       w->getXmlForPlace(p);
       QString t = QString("<span class=\"ar\">%1</span>").arg(root);

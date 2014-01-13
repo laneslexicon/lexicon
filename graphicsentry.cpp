@@ -1,9 +1,9 @@
 #include "graphicsentry.h"
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
-  m_supplement = false;
+  m_supplement = 0;
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
-  m_supplement = false;
+  m_supplement = 0;
 }
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
@@ -331,9 +331,6 @@ void GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & 
       }
     }
     EntryItem * item  = createEntry(t);
-    if (supplement) {
-      //      item->setBrush(Qt::cyan);
-    }
     item->setSupplement(supplement);
     item->setNode(m_rootQuery->value(7).toString());
     /// get the nodeid of the first item at added, so we jump to it later
@@ -592,7 +589,7 @@ int GraphicsEntry::hasPlace(const Place & p,bool setFocus) {
           i = max;
     }
   }
-  qDebug() << Q_FUNC_INFO << root << setFocus << ix;
+  qDebug() << Q_FUNC_INFO << root << supp << setFocus << ix;
   if ((ix != -1) && setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);

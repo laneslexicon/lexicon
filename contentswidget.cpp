@@ -335,6 +335,7 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   }
 }
 void ContentsWidget::ensureVisible(const Place & p, bool select) {
+  qDebug() << Q_FUNC_INFO << p.getRoot() << p.getSupplement();
   ensureVisible(p.getRoot(),p.getSupplement());
 }
 void ContentsWidget::ensureVisible(const QString & root, int supplement,bool select) {
@@ -362,6 +363,9 @@ void ContentsWidget::ensureVisible(const QString & root, int supplement,bool sel
   }
   if (!item) {
     return;
+  }
+  if ((topIndex == -1) || (childIndex == -1)) {
+    QLOG_WARN() << "Ensure visible error";
   }
   topItem->setExpanded(true);
   qDebug() << "hidden" << item->isHidden() << "top" << topItem->isExpanded();
