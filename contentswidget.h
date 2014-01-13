@@ -14,6 +14,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include "QsLog.h"
+#include "place.h"
 class ContentsWidget : public QTreeWidget {
   Q_OBJECT;
  public:
@@ -21,7 +22,10 @@ class ContentsWidget : public QTreeWidget {
   void loadContents();
   QString findNextRoot(const QString &);
   QString findPrevRoot(const QString &);
-  void ensureVisible(const QString & root, bool select = false);
+  Place findNextRoot(const Place &);
+  Place findPrevRoot(const Place &);
+  void ensureVisible(const QString & root, int supp = 0,bool select = false);
+  void ensureVisible(const Place & p, bool select = false);
  private:
   bool m_debug;
  protected:

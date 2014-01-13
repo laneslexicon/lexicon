@@ -80,6 +80,61 @@ void ContentsWidget::loadContents() {
     delete out;
   }
 }
+Place ContentsWidget::findNextRoot(const Place & p) {
+  QTreeWidgetItem * currentItem;
+  int tc = topLevelItemCount();
+  int topIndex = -1;
+  int childIndex = -1;
+  bool found = false;
+
+  QString root = p.getRoot();
+  int supp = p.getSupplement();
+  QString suppTest;
+  if (supp == 1) {
+    suppTest = "*";
+  }
+  for(int i = 0;(i < tc) && ! found;i++) {
+    QTreeWidgetItem * topItem = topLevelItem(i);
+    int kidCount = topItem->childCount();
+    for(int j=0;(j < kidCount) && ! found ;j++) {
+      QTreeWidgetItem * child = topItem->child(j);
+      if ((child->text(0) == root) && (child->text(1) == suppTest)) {
+        currentItem = child;
+        topIndex = i;
+        if (j == (kidCount - 1)) {
+          topIndex++;
+          childIndex = 0;
+        }
+        else {
+          childIndex = j + 1;
+        }
+        found = true;
+      }
+    }
+  }
+  if (topIndex == tc) {
+    emit(atEnd());
+    return Place();
+  }
+  /// overkill, but would only matter if there were letters without any roots
+  for(int i = topIndex;i < tc; i++) {
+      QTreeWidgetItem * item = topLevelItem(i);
+      int kidCount = item->childCount();
+      if (childIndex < kidCount) {
+        QTreeWidgetItem * nextItem = item->child(childIndex);
+        currentItem->setSelected(false);
+        nextItem->setSelected(true);
+        if (nextItem->text(1) == "*") {
+          supp = 1;
+        }
+        else {
+          supp = 0;
+        }
+        return Place(nextItem->text(0),supp);
+      }
+    }
+  return Place();
+}
 /**
  * Called by LanesLexicon when it gets a next root signal
  *
@@ -186,6 +241,73 @@ QString ContentsWidget::findPrevRoot(const QString & root) {
     }
   return QString();
 }
+/**
+ * Called by LanesLexicon when it gets a next root signal
+ *
+ *
+ * @param root start root
+ *
+ * @return the next root in sequence
+ */
+Place ContentsWidget::findPrevRoot(const Place & p) {
+  QTreeWidgetItem * currentItem;
+  int tc = topLevelItemCount();
+  int topIndex = -1;
+  int childIndex = -1;
+  bool found = false;
+  QString root = p.getRoot();
+  int supp = p.getSupplement();
+  QString suppTest;
+  if (supp == 1) {
+    suppTest = "*";
+  }
+
+  for(int i = 0;(i < tc) && ! found;i++) {
+    QTreeWidgetItem * topItem = topLevelItem(i);
+    int kidCount = topItem->childCount();
+    for(int j=0;(j < kidCount) && ! found ;j++) {
+      QTreeWidgetItem * child = topItem->child(j);
+      if ((child->text(0) == root) && (child->text(1) == suppTest)) {
+        currentItem = child;
+        /// if first child, we want the last root of the prev letter
+        topIndex = i;
+        if (j == 0) {
+          topIndex--;
+          childIndex = -1;
+        }
+        else {
+          childIndex = j - 1;
+        }
+        found = true;
+      }
+    }
+  }
+  if (topIndex == -1) {
+    emit(atStart());
+    return Place();
+  }
+  /// overkill, but would only matter if there were letters without any roots
+  for(int i = topIndex;i >= 0; i--) {
+      QTreeWidgetItem * item = topLevelItem(i);
+      int kidCount = item->childCount();
+      if (kidCount > childIndex) {
+        if (childIndex == -1) {
+          childIndex = kidCount - 1;
+        }
+        QTreeWidgetItem * nextItem = item->child(childIndex);
+        currentItem->setSelected(false);
+        nextItem->setSelected(true);
+        if (nextItem->text(1) == "*") {
+          supp = 1;
+        }
+        else {
+          supp = 0;
+        }
+        return Place(nextItem->text(0),supp);
+      }
+    }
+  return Place();
+}
 void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   switch (event->key()) {
   case Qt::Key_Space: {
@@ -210,20 +332,26 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
     QTreeWidget::keyPressEvent(event);
   }
 }
-void ContentsWidget::ensureVisible(const QString & root, bool select) {
+void ContentsWidget::ensureVisible(const Place & p, bool select) {
+  ensureVisible(p.getRoot(),p.getSupplement());
+}
+void ContentsWidget::ensureVisible(const QString & root, int supplement,bool select) {
   QTreeWidgetItem * item;
   QTreeWidgetItem * topItem;
   int tc = topLevelItemCount();
   int topIndex = -1;
   int childIndex = -1;
   bool found = false;
-
+  QString suppTest;
+  if (supplement == 1) {
+    suppTest = "*";
+  }
   for(int i = 0;(i < tc) && ! found;i++) {
     topItem = topLevelItem(i);
     int kidCount = topItem->childCount();
     for(int j=0;(j < kidCount) && ! found ;j++) {
       item = topItem->child(j);
-      if (item->text(0) == root) {
+      if ((item->text(0) == root) && (item->text(1) == suppTest)) {
         topIndex = i;
         childIndex = j;
         found = true;
