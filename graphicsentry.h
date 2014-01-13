@@ -33,6 +33,7 @@
 #include "QsLog.h"
 #include "xsltsupport.h"
 #include "history.h"
+#include "place.h"
 //#include "laneslexicon.h"
 
 class EntryItem : public QGraphicsTextItem {

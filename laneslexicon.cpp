@@ -53,8 +53,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
 
   connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
-
-  showRoot(m_firstRoot,false);
+  Place p(m_firstRoot,0);
+  //  showRoot(m_firstRoot,false);
+  showRoot(p,false);
   m_tree->ensureVisible(m_firstRoot);
   m_tree->resizeColumnToContents(0);
 }
@@ -292,6 +293,9 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     newTab = true;
   }
   showRoot(root,p,newTab);
+}
+void LanesLexicon::showRoot(const Place & p,bool createTab) {
+  showRoot(p.getRoot(),p.getSupplement());
 }
 void LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) {
   if (createTab) {

@@ -38,7 +38,7 @@
 #include "noteswidget.h"
 #include "history.h"
 #include "QsLog.h"
-
+#include "place.h"
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
@@ -52,6 +52,7 @@ public:
     HistoryMaster * history();
     private slots:
       void showRoot(const QString &,int supp = 0,bool newTab = false);
+      void showRoot(const Place &,bool newTab = false);
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
     void on_actionExit();

@@ -32,7 +32,8 @@ SOURCES += main.cpp\
         xsltsupport.cpp \
         searchwidget.cpp \
         noteswidget.cpp \
-        history.cpp
+        history.cpp \
+        place.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -41,4 +42,5 @@ HEADERS  += laneslexicon.h \
             xsltsupport.h \
             searchwidget.h \
             noteswidget.h \
-            history.h
+            history.h \
+            place.h
