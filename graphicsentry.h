@@ -72,7 +72,7 @@ class GraphicsEntry : public QWidget {
   ~GraphicsEntry();
     bool prepareQueries();
     void getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString());
-    void getXmlForRoot(const Place & ,const QString & anchor = QString());
+    Place getXmlForRoot(const Place & ,const QString & anchor = QString());
     void getXmlForNode(const QString &, int supplement = 0);
     Place getPlace() { return m_place;}
     int hasRoot(const QString & root,bool focus = true);

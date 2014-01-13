@@ -53,9 +53,12 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
 
   connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
-  Place p(m_firstRoot,0);
-  //  showRoot(m_firstRoot,false);
-  showRoot(p,false);
+  // the following line shows an entry but nothing in the tree is highlighted;
+  //m_place = Place("يى",1);
+
+  // this one works
+  //  m_place = Place("يمر",1);
+  showRoot(Place(m_firstRoot,0),false);
   m_tree->ensureVisible(m_firstRoot);
   m_tree->resizeColumnToContents(0);
 }
@@ -292,10 +295,43 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
     newTab = true;
   }
-  showRoot(root,p,newTab);
+  Place m(root,p);
+  showRoot(m,newTab);
 }
 void LanesLexicon::showRoot(const Place & p,bool createTab) {
-  showRoot(p.getRoot(),p.getSupplement());
+  QString root = p.getRoot();
+ if (createTab) {
+    /// turn history on as the user has clicked on something
+    /// and the root is not already shown
+    GraphicsEntry * w = new GraphicsEntry(this);
+    if (w->hasRoot(root,true) == -1) {
+      m_history->on();
+      w->prepareQueries();
+      m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
+      w->getXmlForRoot(p);
+      setSignals(w);
+      //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
+      //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
+      w->installEventFilter(this);
+    }
+  }
+  else {
+    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
+    if (w->hasRoot(root,true) == -1) {
+      m_history->on();
+      w->getXmlForRoot(p);
+      QString t = QString("<span class=\"ar\">%1</span>").arg(root);
+
+      m_tabs->setTabText(0,root);
+      // this works but sets it for all tabs
+      //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
+      // this sets it for all the items in graphicsentry
+      // but not the tab title
+      //    w->setStyleSheet("font-family : Amiri;font-size : 16px");
+      w->setFocus();
+    }
+  }
+
 }
 void LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) {
   if (createTab) {
@@ -431,47 +467,53 @@ void LanesLexicon::findPrevRoot(const QString & root) {
  *
  */
 void LanesLexicon::on_actionNextRoot() {
+  qDebug() << Q_FUNC_INFO;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    QString root =  entry->currentRoot();
-    QString nroot = m_tree->findNextRoot(root);
-    if (! nroot.isEmpty()) {
+    //    QString root =  entry->currentRoot();
+    //    QString nroot = m_tree->findNextRoot(root);
+    Place p  =  entry->getPlace();
+    Place np = m_tree->findNextRoot(p);
+    if (! np.isEmpty()) {
       /// hasRoot will checks if root already shown
       /// if it is, it move focus to it (if true is 2nd param)
-      if (entry->hasRoot(nroot,true) == -1) {
+      if (entry->hasRoot(np.getRoot(),true) == -1) {
         entry->setPagingForward();
-        entry->getXmlForRoot(nroot);
-        m_tree->ensureVisible(nroot,true);
+        entry->getXmlForRoot(np);
+        m_tree->ensureVisible(np,true);
       }
     }
     else {
-      QLOG_DEBUG() << "No next root for " << root;
+      QLOG_DEBUG() << "No next root for " << p.getRoot();
     }
   }
 }
 void LanesLexicon::on_actionPrevRoot() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    QString root =  entry->currentRoot();
-    QString nroot = m_tree->findPrevRoot(root);
-    if (! nroot.isEmpty()) {
+    //    QString root =  entry->currentRoot();
+    //    QString nroot = m_tree->findPrevRoot(root);
+    Place p  =  entry->getPlace();
+    Place np = m_tree->findPrevRoot(p);
+    if (! np.isEmpty()) {
       /// hasRoot will checks if root already shown
       /// if it is, it move focus to it (if true is 2nd param)
-      if (entry->hasRoot(nroot,true) == -1) {
+      if (entry->hasRoot(np.getRoot(),true) == -1) {
         entry->setPagingBackward();
-        entry->getXmlForRoot(nroot);
-        m_tree->ensureVisible(nroot,true);
+        entry->getXmlForRoot(np);
+        m_tree->ensureVisible(np,true);
       }
     }
     else {
-      QLOG_DEBUG() << "No prev root for " << root;
+      QLOG_DEBUG() << "No prev root for " << p.getRoot();
     }
   }
 }
 void LanesLexicon::on_actionFirstRoot() {
   qDebug() << Q_FUNC_INFO;
-  showRoot(m_firstRoot,false);
-  m_tree->ensureVisible(m_firstRoot);
+  Place p(m_firstRoot,0);
+  showRoot(p,false);
+  m_tree->ensureVisible(p);
 }
 void LanesLexicon::on_actionLastRoot() {
   showRoot(m_lastRoot,false);

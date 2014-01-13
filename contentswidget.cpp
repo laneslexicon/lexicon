@@ -51,13 +51,9 @@ void ContentsWidget::loadContents() {
 
       if (rootQuery.value(1).toInt() == 1) {
         supp = "*";
-        //        if (itype == "alphabetical letter") {
-          //          ok = false;
-        //        }
-
       }
       else {
-        supp = " ";
+        supp = "";
       }
       /// skipping the letter entries from the supplement
       if ((supp == "*") && (root.size() == 1)) {
@@ -93,11 +89,13 @@ Place ContentsWidget::findNextRoot(const Place & p) {
   if (supp == 1) {
     suppTest = "*";
   }
+  qDebug() << Q_FUNC_INFO << root << supp;
   for(int i = 0;(i < tc) && ! found;i++) {
     QTreeWidgetItem * topItem = topLevelItem(i);
     int kidCount = topItem->childCount();
     for(int j=0;(j < kidCount) && ! found ;j++) {
       QTreeWidgetItem * child = topItem->child(j);
+      //      qDebug() << child->text(0) << child->text(1);
       if ((child->text(0) == root) && (child->text(1) == suppTest)) {
         currentItem = child;
         topIndex = i;
@@ -111,6 +109,10 @@ Place ContentsWidget::findNextRoot(const Place & p) {
         found = true;
       }
     }
+  }
+  if ((topIndex == -1) || (childIndex == -1 )) {
+    QLOG_WARN() << "Root not found" << root;
+    return Place();
   }
   if (topIndex == tc) {
     emit(atEnd());

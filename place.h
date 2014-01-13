@@ -4,14 +4,20 @@
 #include "QsLog.h"
 class Place {
  public:
-  Place() {}
+  Place() {
+    m_supplement = 0;
+  }
   Place(const QString & root,int supp) {
     m_root = root;
     m_supplement = supp;
     m_isRoot = true;
   }
+  bool isEmpty() {
+    return m_root.isEmpty();
+  }
+  void setRoot(const QString & root) { m_root = root;}
   void setIsRoot(bool v) {
-    m_isRoot = true;
+    m_isRoot = v;
   }
   void setWord(const QString & word) {
     m_word = word;
