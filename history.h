@@ -37,17 +37,21 @@ class HistoryMaster {
   ~HistoryMaster();
   //  bool add(const QString & root,const QString & word, const QString & node);
   HistoryEvent * getEvent(int id);
+  void setEnabled(bool v) { m_historyEnabled = v;}
   bool add(HistoryEvent *);
   void on() { m_historyOn = true;}
   void off() { m_historyOn = false;}
   bool isOn() { return m_historyOn;}
   QList<HistoryEvent *> getHistory(int howMany,int direction,int startPos = -1);
  private:
+  QSqlDatabase m_db;
+
   int m_lastId;
   bool openDatabase(const QString & dbname);
+  /// this is turned on/off depending on user actions
   bool m_historyOn;
-  QSqlDatabase m_db;
-  bool m_historyOk;
+    /// this disables history altogether
+  bool m_historyEnabled;
   QSqlQuery * m_getQuery;
   QSqlQuery * m_addQuery;
   QSqlQuery * m_backQuery;

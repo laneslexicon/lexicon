@@ -11,8 +11,8 @@ bool HistoryEvent::matches(HistoryEvent * event) {
 }
 //CREATE TABLE history(id integer primary key,nodeId text,word text,root text,timewhen text);
 HistoryMaster::HistoryMaster(const QString & dbname) {
-  m_historyOk = openDatabase(dbname);
-  if (m_historyOk) {
+  bool ok = openDatabase(dbname);
+  if (ok) {
     m_getQuery = new QSqlQuery(m_db);
     m_addQuery = new QSqlQuery(m_db);
     m_forQuery = new QSqlQuery(m_db);
@@ -30,17 +30,26 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
           m_lastId = mq.value(0).toInt();
         }
         m_historyOn = true;
-    }
+        m_historyEnabled = true;
+        }
     else {
       QLOG_WARN() << "History not available" << m_db.lastError().text();
     }
   }
 }
 HistoryMaster::~HistoryMaster() {
-  delete m_addQuery;
-  delete m_backQuery;
-  delete m_forQuery;
-  delete m_getQuery;
+  if (m_addQuery) {
+    delete m_addQuery;
+  }
+  if (m_backQuery) {
+    delete m_backQuery;
+  }
+  if (m_forQuery) {
+    delete m_forQuery;
+  }
+  if (m_getQuery) {
+    delete m_getQuery;
+  }
   m_db.close();
 }
 //create table history(id integer primary key,nodeId text,word text,root text,timewhen text);
@@ -57,10 +66,13 @@ bool HistoryMaster::openDatabase(const QString & dbname) {
   m_db.setDatabaseName(dbname);
   ok = m_db.open();
 
-  QLOG_INFO() << "Opened database" << dbname;
+  QLOG_INFO() << "Opened database for history" << dbname;
   return ok;
 }
 bool HistoryMaster::add(HistoryEvent * event) {
+  if (! m_historyEnabled ) {
+    return false;
+  }
   QString root = event->getRoot();
   QString word = event->getWord();
   if (! (root.isEmpty() && word.isEmpty()) ) {
@@ -81,12 +93,15 @@ bool HistoryMaster::add(HistoryEvent * event) {
  * @return
  */
 QList<HistoryEvent *> HistoryMaster::getHistory(int count,int direction,int startPos) {
+  QList<HistoryEvent *> events;
+  if (! m_historyEnabled ) {
+    return events;
+  }
   if (startPos == -1) {
     startPos = m_lastId;
   }
   if (direction == 0) {
-    QList<HistoryEvent *> events;
-    int ix = 0;
+      int ix = 0;
     m_backQuery->bindValue(0,startPos);
     m_backQuery->exec();
     while(m_backQuery->next() && (ix < count)) {
@@ -108,7 +123,6 @@ QList<HistoryEvent *> HistoryMaster::getHistory(int count,int direction,int star
   }
   if (direction == 1) {
     int ix = 0;
-    QList<HistoryEvent *> events;
     m_forQuery->bindValue(0,startPos);
     m_forQuery->exec();
     while(m_forQuery->next() && (ix < count)) {
@@ -128,9 +142,13 @@ QList<HistoryEvent *> HistoryMaster::getHistory(int count,int direction,int star
     }
     return events;
   }
+  return events;
 }
 HistoryEvent * HistoryMaster::getEvent(int id) {
    HistoryEvent * event = new HistoryEvent();
+   if ( ! m_historyEnabled ) {
+     return event;
+   }
    m_getQuery->bindValue(0,id);
    m_getQuery->exec();
    if (m_getQuery->first()) {

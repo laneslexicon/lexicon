@@ -281,7 +281,6 @@ bool GraphicsEntry::prepareQueries() {
 Place GraphicsEntry::getXmlForPlace(const Place & p) {
   getXmlForRoot(p.getRoot(),p.getSupplement(),p.getNode());
   m_place = p;
-  qDebug() << "Place set" << p.getRoot() << p.getSupplement()  << p.getNode();
   emit(placeChanged(p));
   return p;
 }

@@ -36,7 +36,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     getFirstAndLast();
     /// at the end of the history, but we should be able to restore from settings
     m_historyPos = 9;
-    m_history = new HistoryMaster("notes.sqlite");
+    m_history = new HistoryMaster(m_notesDbName);
+    m_history->setEnabled(m_historyEnabled);
     setupHistory();
   }
     else {
@@ -206,6 +207,10 @@ void LanesLexicon::setupHistory() {
     }
     m_hForwardBtn->setEnabled(true);
     m_hForwardBtn->setMenu(m);
+  }
+  if (! m_historyEnabled) {
+    m_hForwardBtn->setEnabled(false);
+    m_hBackwardBtn->setEnabled(false);
   }
 }
 void LanesLexicon::createMenus() {
@@ -427,6 +432,7 @@ void LanesLexicon::readSettings() {
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
   }
+  m_historyEnabled = settings.value("History",true).toBool();
   settings.endGroup();
   settings.beginGroup("Notes");
   m_notesDbName = settings.value("Database","notes.sqlite").toString();

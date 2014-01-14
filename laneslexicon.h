@@ -73,8 +73,12 @@ private:
     QFont arFont;
     QString m_firstRoot;
     QString m_lastRoot;
+    /// set by readSettings
+
     QString m_dbName;
     QString m_notesDbName;
+    bool m_historyEnabled;
+
     void getFirstAndLast();
     int m_historyPos;
     void setSignals(GraphicsEntry *);
