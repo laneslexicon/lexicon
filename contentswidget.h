@@ -25,7 +25,7 @@ class ContentsWidget : public QTreeWidget {
   Place findNextPlace(const Place &);
   Place findPrevPlace(const Place &);
   void ensureVisible(const QString & root, int supp = 0,bool select = false);
-  void ensureVisible(const Place & p, bool select = false);
+  void ensurePlaceVisible(const Place & p, bool select = false);
  private:
   bool m_debug;
  protected:

@@ -68,6 +68,7 @@ public:
     void onNotesClicked();
     //    void historyItemActivated();
     void rootChanged(const QString & root,const QString & node);
+    void placeChanged(const Place &);
 private:
     QFont arFont;
     QString m_firstRoot;

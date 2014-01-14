@@ -78,7 +78,9 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(nextRoot(const QString &)),this,SLOT(findNextRoot(const QString &)));
   connect(entry,SIGNAL(prevRoot(const QString &)),this,SLOT(findPrevRoot(const QString &)));
 
-  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
+  //  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
+
+  connect(entry,SIGNAL(placeChanged(const Place &)),this,SLOT(placeChanged &));
 }
 /**
  * load the application level stylesheet, stripping out lines
@@ -480,7 +482,7 @@ void LanesLexicon::on_actionNextRoot() {
       if (entry->hasPlace(np,true) == -1) {
         entry->setPagingForward();
         entry->getXmlForPlace(np);
-        m_tree->ensureVisible(np,true);
+        m_tree->ensurePlaceVisible(np,true);
       }
     }
     else {
@@ -501,7 +503,7 @@ void LanesLexicon::on_actionPrevRoot() {
       if (entry->hasPlace(np,true) == -1) {
         entry->setPagingBackward();
         entry->getXmlForPlace(np);
-        m_tree->ensureVisible(np,true);
+        m_tree->ensurePlaceVisible(np,true);
       }
     }
     else {
@@ -513,7 +515,7 @@ void LanesLexicon::on_actionFirstRoot() {
   qDebug() << Q_FUNC_INFO;
   Place p(m_firstRoot,0);
   showPlace(p,false);
-  m_tree->ensureVisible(p);
+  m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::on_actionLastRoot() {
   showRoot(m_lastRoot,false);
@@ -522,6 +524,10 @@ void LanesLexicon::on_actionLastRoot() {
 void LanesLexicon::rootChanged(const QString & root,const QString & node) {
   m_currentRoot->setText(root);
   m_tree->ensureVisible(root,true);
+}
+void LanesLexicon::placeChanged(const Place & p) {
+  m_currentRoot->setText(p.getRoot());
+  m_tree->ensurePlaceVisible(p,true);
 }
 void LanesLexicon::getFirstAndLast() {
   QSqlQuery query;

@@ -334,7 +334,7 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
     QTreeWidget::keyPressEvent(event);
   }
 }
-void ContentsWidget::ensureVisible(const Place & p, bool select) {
+void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
   qDebug() << Q_FUNC_INFO << p.getRoot() << p.getSupplement();
   ensureVisible(p.getRoot(),p.getSupplement());
 }

@@ -177,7 +177,9 @@ void GraphicsEntry::linkActivated(const QString & link) {
   QString node(link);
   /// remove the leading #
   node.remove(0,1);
-  showNode(node);
+  Place p;
+  p.setNode(node);
+  showPlace(p);
 }
 void GraphicsEntry::linkHovered(const QString & link) {
   QGraphicsTextItem * gi = static_cast<QGraphicsTextItem *>(QObject::sender());
@@ -209,8 +211,9 @@ void GraphicsEntry::anchorTest() {
     }
   }
 }
-bool GraphicsEntry::showNode(const QString & node,bool thisPageOnly) {
+bool GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
   /// check if the node is on this page
+  QString node = p.getNode();
   for(int i=0;i < m_items.size();i++) {
     EntryItem * item = m_items[i];
     if (item->isNode(node)) {
@@ -274,10 +277,11 @@ bool GraphicsEntry::prepareQueries() {
   ok = m_nextRootQuery->prepare("select word from root ");
   return ok;
 }
-Place GraphicsEntry::getXmlForPlace(const Place & p,const QString & node) {
-  getXmlForRoot(p.getRoot(),p.getSupplement(),node);
+Place GraphicsEntry::getXmlForPlace(const Place & p) {
+  getXmlForRoot(p.getRoot(),p.getSupplement(),p.getNode());
   m_place = p;
-  qDebug() << "Place set" << p.getRoot() << p.getSupplement();
+  qDebug() << "Place set" << p.getRoot() << p.getSupplement()  << p.getNode();
+  emit(placeChanged(p));
   return p;
 }
 /**
@@ -490,26 +494,39 @@ void GraphicsEntry::prependEntries(int startPos) {
 
   }
 }
-void GraphicsEntry::getXmlForNode(const QString  & node,int supplement) {
+/**
+ * get the root,supplement for the given node and show it
+ * nodeId are unique
+ *
+ * @param node
+ *
+ */
+Place GraphicsEntry::getXmlForNode(const QString  & node) {
+  Place p;
   QLOG_DEBUG() << "Search for node" << node;
   m_nodeQuery->bindValue(0,node);
   m_nodeQuery->exec();
+
   if (m_nodeQuery->first()) {
-    QString xml = m_nodeQuery->value("xml").toString();
+    //QString xml = m_nodeQuery->value("xml").toString();
     //    QLOG_DEBUG() << "got " << xml;
-    QString root = QString("%1/%2").arg(m_nodeQuery->value("broot").toString()).arg(m_nodeQuery->value("root").toString());
-    QString word = QString("%1/%2").arg(m_nodeQuery->value("bword").toString()).arg(m_nodeQuery->value("word").toString());
-    getXmlForRoot(m_nodeQuery->value("root").toString(),supplement,node);
+    QString root = m_nodeQuery->value("root").toString();
+    int supplement = m_nodeQuery->value("supplement").toInt();
+    p = Place(root,supplement);
+    p.setNode(node);
+    p = getXmlForPlace(p);
     /// focus on the node, set thisPageOnly to true just in case something has gone horribly wrong
     /// otherwise we'll be looping forever
-    showNode(node,true);
+    showPlace(p,true);
   }
   else {
     QLOG_DEBUG() << "Error" << m_nodeQuery->lastError().text();
   }
-
+  return p;
 }
 void GraphicsEntry::on_findNode()  {
+  qDebug() << "REDUNDANT CODE";
+  /*
   QRegExp rx("n\\d+");
   QString node;
   if (rx.indexIn(node) != -1) {
@@ -519,6 +536,7 @@ void GraphicsEntry::on_findNode()  {
     getXmlForRoot(node);
     showNode(node);
   }
+  */
 }
 QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
   //  QString header = "<TEI.2><text><body><div1>";

@@ -72,8 +72,8 @@ class GraphicsEntry : public QWidget {
   ~GraphicsEntry();
     bool prepareQueries();
     void getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString());
-    Place getXmlForPlace(const Place & ,const QString & anchor = QString());
-    void getXmlForNode(const QString &, int supplement = 0);
+    Place getXmlForPlace(const Place &);
+    Place getXmlForNode(const QString &);
     Place getPlace() { return m_place;}
     int hasRoot(const QString & root,bool focus = true);
     int hasPlace(const Place & ,bool focus = true);
@@ -110,7 +110,8 @@ class GraphicsEntry : public QWidget {
     QList<EntryItem *> m_items;
     EntryItem * createEntry(const QString & xml);
     const XalanCompiledStylesheet * m_compiledXsl;
-    bool showNode(const QString &,bool thisPageOnly = false);
+    //    bool showNode(const QString &,bool thisPageOnly = false);
+    bool showPlace(const Place &,bool thisPageOnly = false);
     qreal m_scale;
 
     QTransform m_transform;
@@ -149,6 +150,7 @@ class GraphicsEntry : public QWidget {
     void nextRoot(const QString &);
     void prevRoot(const QString &);
     void cssChanged();
+    void placeChanged(const Place &);
 };
 
 class LaneGraphicsView : public QGraphicsView {
