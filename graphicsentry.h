@@ -70,7 +70,7 @@ class GraphicsEntry : public QWidget {
  public:
   GraphicsEntry(QWidget * parent = 0);
   ~GraphicsEntry();
-    bool prepareQueries();
+
     void getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString());
     Place getXmlForPlace(const Place &);
     Place getXmlForNode(const QString &);
@@ -79,8 +79,6 @@ class GraphicsEntry : public QWidget {
     int hasPlace(const Place & ,bool focus = true);
     QString currentRoot() { return m_currentRoot;}
     /// return the first/last root in the scene
-    QString lastRoot();
-    QString firstRoot();
     void setPagingForward() {
       m_pagingDir = 0;
     }
@@ -99,6 +97,9 @@ class GraphicsEntry : public QWidget {
     void nextPageRequested();
     void prevPageRequested();
  private:
+    bool prepareQueries();
+    QString lastRoot();
+    QString firstRoot();
     void readSettings();
     void writeDefaultSettings();
     bool readCssFromFile(const QString &name);

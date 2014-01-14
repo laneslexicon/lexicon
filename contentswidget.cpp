@@ -368,10 +368,11 @@ void ContentsWidget::ensureVisible(const QString & root, int supplement,bool sel
     QLOG_WARN() << "Ensure visible error";
   }
   topItem->setExpanded(true);
-  qDebug() << "hidden" << item->isHidden() << "top" << topItem->isExpanded();
   if (select) {
     setCurrentItem(item);
   }
   QModelIndex index = indexFromItem(item);
-  scrollTo(index);
+  if (index.isValid()) {
+    scrollTo(index);
+  }
 }

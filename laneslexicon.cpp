@@ -3,6 +3,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
 {
+  readSettings();
+  openDatabase("lexicon.sqlite");
   loadStyleSheet();
   QSplitter * splitter = new QSplitter;
   m_tree = new ContentsWidget(this);
@@ -28,21 +30,18 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createMenus();
   createStatusBar();
 
-  readSettings();
-  if (openDatabase("lexicon.sqlite")) {
+  if (m_db.isOpen()) {
     statusBar()->showMessage(tr("Ready"));
     m_tree->loadContents();
-
-    entry->prepareQueries();
     getFirstAndLast();
     /// at the end of the history, but we should be able to restore from settings
     m_historyPos = 9;
     m_history = new HistoryMaster("notes.sqlite");
     setupHistory();
   }
-  else {
-    statusBar()->showMessage(tr("Failed to open database"));
-  }
+    else {
+      statusBar()->showMessage(tr("Failed to open database"));
+    }
   connect(m_tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 
   connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
@@ -306,15 +305,16 @@ void LanesLexicon::showPlace(const Place & p,bool createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
     GraphicsEntry * w = new GraphicsEntry(this);
+    setSignals(w);
+    w->installEventFilter(this);
     if (w->hasPlace(p,true) == -1) {
       m_history->on();
-      w->prepareQueries();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
       w->getXmlForPlace(p);
-      setSignals(w);
+
       //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
       //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
-      w->installEventFilter(this);
+
     }
   }
   else {
@@ -340,15 +340,12 @@ void LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) 
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
     GraphicsEntry * w = new GraphicsEntry(this);
+    setSignals(w);
+    w->installEventFilter(this);
     if (w->hasRoot(root,true) == -1) {
       m_history->on();
-      w->prepareQueries();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
       w->getXmlForRoot(root,supplement);
-      setSignals(w);
-      //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
-      //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
-      w->installEventFilter(this);
     }
   }
   else {
@@ -423,14 +420,22 @@ void LanesLexicon::on_actionTest() {
 }
 void LanesLexicon::readSettings() {
   QSettings settings;
+  qDebug() << "keys" << settings.allKeys();
+  settings.beginGroup("General");
+  m_dbName = settings.value("Database","lexicon.sqlite").toString();
   QString ar = settings.value("Arabic font").toString();
   if (! ar.isEmpty()) {
-    qDebug() << "set font" << ar;
     arFont.fromString(ar);
   }
+  settings.endGroup();
+  settings.beginGroup("Notes");
+  m_notesDbName = settings.value("Database","notes.sqlite").toString();
+  qDebug() << "Lexicon" << m_dbName;
+  qDebug() << "Notesdb" << m_notesDbName;
 }
 void LanesLexicon::writeSettings() {
   QSettings settings;
+  settings.beginGroup("General");
   QDateTime now = QDateTime::currentDateTime();
   settings.setValue("Run date",now);
 }

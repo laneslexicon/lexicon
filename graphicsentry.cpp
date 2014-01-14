@@ -114,6 +114,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
           this,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
   m_xalan = getXalan();
+  prepareQueries();
 }
 GraphicsEntry::~GraphicsEntry() {
   delete m_nodeQuery;
