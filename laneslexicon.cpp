@@ -80,7 +80,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
 
   //  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
 
-  connect(entry,SIGNAL(placeChanged(const Place &)),this,SLOT(placeChanged &));
+  connect(entry,SIGNAL(placeChanged(const Place &)),this,SLOT(placeChanged (const Place &)));
 }
 /**
  * load the application level stylesheet, stripping out lines
