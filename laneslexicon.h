@@ -33,12 +33,15 @@
 #include <QKeySequenceEdit>
 #include <QSettings>
 #include <QDateTime>
+#include <QShortcut>
+#include <QSignalMapper>
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"
 #include "history.h"
 #include "QsLog.h"
 #include "place.h"
+
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
@@ -53,6 +56,7 @@ public:
     private slots:
       void showRoot(const QString &,int supp = 0,bool newTab = false);
       void showPlace(const Place &,bool newTab = false);
+      void shortcut(const QString &);
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
     void on_actionExit();
@@ -69,6 +73,9 @@ public:
     //    void historyItemActivated();
     void rootChanged(const QString & root,const QString & node);
     void placeChanged(const Place &);
+    // shortcuts
+    void shortcutActivated();
+    void ambiguousShortcut();
 private:
     QFont arFont;
     QString m_firstRoot;
@@ -80,6 +87,8 @@ private:
     bool m_historyEnabled;
 
     void getFirstAndLast();
+    QSignalMapper * m_signalMapper;
+    void setupShortcuts();
     int m_historyPos;
     void setSignals(GraphicsEntry *);
     void loadStyleSheet();

@@ -43,6 +43,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     else {
       statusBar()->showMessage(tr("Failed to open database"));
     }
+
+  setupShortcuts();
   connect(m_tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 
   connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
@@ -81,6 +83,32 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   //  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
 
   connect(entry,SIGNAL(placeChanged(const Place &)),this,SLOT(placeChanged (const Place &)));
+}
+void LanesLexicon::shortcut(const QString & k) {
+  qDebug() << "shortcut" << k;
+  if (k == "Root Search") {
+
+  }
+  //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
+}
+/**
+ * setup the shortcuts from the conf
+ *
+ */
+void LanesLexicon::setupShortcuts() {
+  QSettings settings;
+  settings.beginGroup("Shortcut");
+  m_signalMapper = new QSignalMapper(this);
+  QStringList keys = settings.childKeys();
+  for(int i=0;i < keys.size();i++) {
+    QString k = settings.value(keys[i]).toString();
+    QShortcut * sc = new QShortcut(k,this);
+    connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
+    /// doesn't seem to be emitted
+    connect(sc,SIGNAL(activatedAmbiguously()),this,SLOT(ambiguousShortcut()));
+    m_signalMapper->setMapping(sc,keys[i]);
+  }
+  connect(m_signalMapper,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
 }
 /**
  * load the application level stylesheet, stripping out lines
@@ -559,4 +587,12 @@ void LanesLexicon::getFirstAndLast() {
     m_lastRoot = query.value(0).toString();
   }
   qDebug() << "First" << m_firstRoot << "last" << m_lastRoot;
+}
+void LanesLexicon::shortcutActivated() {
+  QShortcut * sc = qobject_cast<QShortcut *>(QObject::sender());
+  qDebug() << "got the fucking shortcut" << sc->key().toString();
+}
+void LanesLexicon::ambiguousShortcut() {
+  QShortcut * sc = qobject_cast<QShortcut *>(QObject::sender());
+  qDebug() << "got the ambiguous shortcut" << sc->key().toString();
 }
