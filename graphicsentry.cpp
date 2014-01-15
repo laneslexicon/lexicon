@@ -296,8 +296,9 @@ void GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & 
   int itemCount;
   int supplement;
   QString str;
+  EntryItem * centerItem;
 
-  QLOG_DEBUG() << Q_FUNC_INFO << root;
+  QLOG_DEBUG() << Q_FUNC_INFO << root << supp << node;
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
 
@@ -312,7 +313,8 @@ void GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & 
   rootItem->setRoot(root,true);
   rootItem->setSupplement(supp);
   items << rootItem;
-
+  /// by default we will center on the root item
+  centerItem = rootItem;
   /// now add all the entries for the root
   while(m_rootQuery->next()) {
     supplement = m_rootQuery->value(8).toInt();
@@ -345,6 +347,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & 
     }
     else if ( startNode == item->getNode()) {
       showWord = item->getWord();
+      centerItem = item;
     }
     items << item;
   }
@@ -390,10 +393,14 @@ void GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & 
     event->setWord(showWord);
     getHistory()->add(event);
   }
+  /// TODO there has to be a better way than this
+  /// TODO if node specified we need to center on it
   if ( node.isEmpty()) {
-      m_scene->setFocusItem(rootItem);
-      m_view->centerOn(rootItem);
-      //      m_scene->clearFocus();
+      m_scene->setFocusItem(centerItem);
+      int h =  m_view->height();
+      QPointF p = centerItem->pos();
+      p.setY(p.y() + h/2 - 10);
+      m_view->centerOn(p);
   }
 }
 /**
