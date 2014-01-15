@@ -89,11 +89,8 @@ void LanesLexicon::shortcut(const QString & k) {
     RootSearchDialog * d = new RootSearchDialog(this);
     if (d->exec()) {
       QString t = d->getText();
-      if (UcdScripts::isScript(t,"Arabic")) {
-        qDebug() << "got arabic" << t;
-      }
-      else {
-        qDebug() << "got buck" << t;
+      if (! t.isEmpty()) {
+        showRoot(t,0,false);
       }
     }
   }
