@@ -721,7 +721,7 @@ bool im_match_diacritics(KeyEntry * k,QStringList & d) {
 }
 QString im_convert_string(InputMapper * im,const QString & mapping,const QString & source, bool * ok) {
   QString retval;
-//  qDebug() <<  mapping << source;
+  qDebug() <<  Q_FUNC_INFO << mapping << source;
   QString mname(mapping);
   KeyMap * map = im_get_map(im,mname);
   if (map == NULL) {

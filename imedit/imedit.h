@@ -39,6 +39,7 @@ public:
     }
     void getScriptNames(QStringList &);
     QString currentScript();
+    QString convertString(const QString & source);
  private:
     InputMapper * mapper;
     QString mapname;
@@ -79,12 +80,14 @@ class WrappedEdit : public QWidget {
     return m_edit;
   }
   ~WrappedEdit();
+  QString getText();
   public slots:
     void shortcutActivated();
     void setScriptFont(const QString &);
     void showContextMenu(const QPoint &);
     void actionChangeMap();
     void actionChangeFont();
+
  protected:
   void toggleMap(const QString &);
   virtual void buildContextMenu(QMenu * menu);
@@ -92,6 +95,7 @@ class WrappedEdit : public QWidget {
   QString m_currentMap;
   QString  m_docFontString;
   ImEdit * m_edit;
+
  signals:
   void dataChanged();
   void fontChanged();

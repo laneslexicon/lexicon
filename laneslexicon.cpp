@@ -85,9 +85,17 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(placeChanged(const Place &)),this,SLOT(placeChanged (const Place &)));
 }
 void LanesLexicon::shortcut(const QString & k) {
-  qDebug() << "shortcut" << k;
   if (k == "Root Search") {
-
+    RootSearchDialog * d = new RootSearchDialog(this);
+    if (d->exec()) {
+      QString t = d->getText();
+      if (UcdScripts::isScript(t,"Arabic")) {
+        qDebug() << "got arabic" << t;
+      }
+      else {
+        qDebug() << "got buck" << t;
+      }
+    }
   }
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
 }

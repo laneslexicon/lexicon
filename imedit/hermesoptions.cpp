@@ -4,7 +4,6 @@ ScriptMap::ScriptMap(const QString & fileName) {
   m_enabled = true;
 }
 HermesOptions::~HermesOptions() {
-  qDebug() << "hermesoptions cleanup";
   QStringList keys = m_maps.keys();
   for(int i=0;i < keys.size();i++) {
     ScriptMap * map = m_maps.take(keys[i]);
@@ -20,7 +19,6 @@ HermesOptions::~HermesOptions() {
     UnicodeEntry * f = m_unicode.take(keys[i]);
     delete f;
   }
-  qDebug() << Q_FUNC_INFO << __LINE__;
 }
 void HermesOptions::addMap(const QString & name,ScriptMap * map) {
   m_maps.insert(name,map);
@@ -42,47 +40,8 @@ void HermesOptions::readSettings() {
   bool ok;
   QStringList keys;
   QStringList groupkeys;
-  QString org = "Gabanjo";
-  QString app = "My Editor";
-  QSettings settings(org,app);
-  //  qDebug() << "allkeys" << settings.allKeys();
-  settings.beginGroup("Unicode Items");
-  groupkeys = settings.childGroups();
-  for(int j=0;j < groupkeys.size();j++) {
-    settings.beginGroup(groupkeys[j]);
-    keys = settings.childKeys();
-    if (keys.contains("value")) {
-      QString v = settings.value("value").toString();
-      int x = v.toInt(&ok,16);
-      if (ok) {
-        UnicodeEntry * ue = new UnicodeEntry;
-        ue->m_value = x;
-        ue->m_key = groupkeys[j];
-        if (keys.contains("name")) {
-          ue->m_name = settings.value("name").toString();
-        }
-        if (keys.contains("uname")) {
-          ue->m_uname = settings.value("uname").toString();
-        }
-        if (keys.contains("icon")) {
-          ue->m_iconFilename  = settings.value("icon").toString();
-        }
-        m_unicode.insert(groupkeys[j],ue);
-        //        qDebug() << "insert unicode" << ue->m_key << ue->m_uname << ue->m_value;
-      }
+  QSettings settings;
 
-    }
-    settings.endGroup();
-  }
-  settings.endGroup();
-  qDebug() << "Read Editor settings";
-  settings.beginGroup("Editor");
-  QStringList ed = settings.childKeys();
-  for(int i=0;i < ed.size();i++) {
-    m_options.insert(ed[i],settings.value(ed[i]).toString());
-  }
-  settings.endGroup();
-  qDebug() << "reading Maps settings";
   settings.beginGroup("Maps");
   QStringList maps = settings.childGroups();
   for(int i=0;i < maps.size();i++) {
@@ -104,7 +63,7 @@ void HermesOptions::readSettings() {
         map->setShortCut(settings.value("shortcut").toString());
       }
       addMap(mapname,map);
-      //      qDebug() << "add map" << mapname << map->getFileName() << map->getShortCut();
+      qDebug() << "add map" << mapname << map->getFileName() << map->getShortCut();
       settings.endGroup();
     }
     else {
@@ -113,6 +72,7 @@ void HermesOptions::readSettings() {
   }
   settings.endGroup();
   setupKeys();
+  /*
   qDebug() << "Reading Scripts settings";
   settings.beginGroup("Scripts");
   QStringList scripts =  settings.childGroups();
@@ -133,52 +93,7 @@ void HermesOptions::readSettings() {
     settings.endGroup();
   }
   settings.endGroup();
-
-  settings.beginGroup("FlashCards");
-  settings.beginGroup("Script");
-  scripts =  settings.childGroups();
-  for (int i=0;i < scripts.size();i++) {
-    QString script = scripts[i];
-    settings.beginGroup(script);
-    //    qDebug() << script << "group childkeys" << settings.childKeys();
-    QStringList keys = settings.childKeys();
-    if (keys.contains("font")) {
-      ScriptFont * f = new ScriptFont;
-      f->setFontString(settings.value("font").toString());
-      if (keys.contains("enabled")) {
-        f->setEnabled(settings.value("enabled").toBool());
-      }
-      addFlashFont(script,f);
-      //      qDebug() << "added font" << script << settings.value("font").toString();
-    }
-    settings.endGroup();
-  }
-  settings.endGroup();
-  settings.endGroup();
-
-  qDebug() << "reading decktree settings";
-  settings.beginGroup("DeckTree");
-  settings.beginGroup("Script");
-  scripts =  settings.childGroups();
-  qDebug() << scripts;
-  for (int i=0;i < scripts.size();i++) {
-    QString script = scripts[i];
-    settings.beginGroup(script);
-    //    qDebug() << script << "group childkeys" << settings.childKeys();
-    QStringList keys = settings.childKeys();
-    if (keys.contains("font")) {
-      ScriptFont * f = new ScriptFont;
-      f->setFontString(settings.value("font").toString());
-      if (keys.contains("enabled")) {
-        f->setEnabled(settings.value("enabled").toBool());
-      }
-      addTreeFont(script,f);
-      //  qDebug() << "added font" << script << settings.value("font").toString();
-    }
-    settings.endGroup();
-  }
-  settings.endGroup();
-  settings.endGroup();
+  */
 }
 void HermesOptions::writeSettings() {
   QString org = "Gabanjo";

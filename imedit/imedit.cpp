@@ -21,6 +21,18 @@ QString ImEdit::currentScript() {
   }
   return mapper->getScript(mapname);
 }
+QString ImEdit::convertString(const QString & str) {
+  bool ok;
+  // QString t = im_convert_string(this->mapper,this->mapname,str,&ok);
+  QString t = im_convert_string(this->mapper,"Buckwalter",str,&ok);
+  if (ok) {
+    return t;
+  }
+  else {
+    qDebug() << "error converting string";
+    return QString();
+  }
+}
 /**
  *
  *
@@ -257,12 +269,9 @@ WrappedEdit::WrappedEdit(QWidget * parent) : QWidget(parent) {
       QShortcut * sc = new QShortcut(k,m_edit);
       sc->setContext(Qt::WidgetShortcut);
       connect(sc,SIGNAL(activated()),this,SLOT(shortcutActivated()));
-      //      connect(sc,SIGNAL(activatedAmbiguously()),this,SLOT(shortcutActivated()));
-      qDebug() << "setup slots for" << k.toString();
     }
   }
   connect(m_edit,SIGNAL(textChanged()),this,SIGNAL(dataChanged()));
-  qDebug() << "Finished initialisation";
 }
 WrappedEdit::~WrappedEdit() {
   qDebug() << Q_FUNC_INFO;
@@ -447,6 +456,13 @@ void HudEdit::buildContextMenu(QMenu * menu) {
       qDebug() << "no unicode entry for" << m_hudChar;
     }
   }
+}
+QString WrappedEdit::getText() {
+  QString t = this->editor()->toPlainText();
+  if (! UcdScripts::isScript(t,"Arabic")) {
+    t = m_edit->convertString(t);
+  }
+  return t;
 }
 HudEdit::~HudEdit() {
   qDebug() << Q_FUNC_INFO;

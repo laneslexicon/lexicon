@@ -12,6 +12,7 @@
  */
 class UcdScripts : public QObject {
  public:
+  UcdScripts() {}
   UcdScripts(const QString & );
   int size() { return m_scripts.size();}
   QString getScriptAt(int i);
