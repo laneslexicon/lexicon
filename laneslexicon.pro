@@ -24,6 +24,7 @@ MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 QMAKE_CXXFLAGS += -Wunused-parameter
 include(qslog/QsLog.pri)
+include(imedit/imedit.pri)
 SOURCES += main.cpp\
         eventtype.cpp \
         laneslexicon.cpp \
