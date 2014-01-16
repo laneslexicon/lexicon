@@ -35,6 +35,7 @@
 #include <QDateTime>
 #include <QShortcut>
 #include <QSignalMapper>
+#include <QMessageBox>
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"
@@ -77,8 +78,8 @@ public:
     void ambiguousShortcut();
 private:
     Place showPlace(const Place &,bool newTab = false);
-    void showRoot(const QString &,int supp = 0,bool newTab = false);
-    void showNode(const QString &,bool newTab = false);
+    Place showRoot(const QString &,int supp = 0,bool newTab = false);
+    Place showNode(const QString &,bool newTab = false);
     QFont arFont;
     QString m_firstRoot;
     QString m_lastRoot;

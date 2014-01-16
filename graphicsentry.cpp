@@ -280,9 +280,44 @@ bool GraphicsEntry::prepareQueries() {
   return ok;
 }
 Place GraphicsEntry::getXmlForPlace(const Place & p) {
-  getXmlForRoot(p.getRoot(),p.getSupplement(),p.getNode());
-  m_place = p;
-  emit(placeChanged(p));
+  Place np = getXmlForRoot(p.getRoot(),p.getSupplement(),p.getNode());
+  if (np.isValid()) {
+    if (np.getRoot() != m_place.getRoot()) {
+      emit(placeChanged(np));
+    }
+    m_place = np;
+  }
+  return np;
+}
+/**
+ * get the root,supplement for the given node and show it
+ * nodeId are unique
+ *
+ * @param node
+ *
+ */
+Place GraphicsEntry::getXmlForNode(const QString  & node) {
+  Place p;
+  QLOG_DEBUG() << "Search for node" << node;
+  m_nodeQuery->bindValue(0,node);
+  m_nodeQuery->exec();
+
+  if (m_nodeQuery->first()) {
+    //QString xml = m_nodeQuery->value("xml").toString();
+    //    QLOG_DEBUG() << "got " << xml;
+    QString root = m_nodeQuery->value("root").toString();
+    int supplement = m_nodeQuery->value("supplement").toInt();
+    p = Place(root,supplement);
+    p.setNode(node);
+    p.setWord(m_nodeQuery->value("word").toString());
+    Place np = getXmlForPlace(p);
+    /// focus on the node, set thisPageOnly to true just in case something has gone horribly wrong
+    /// otherwise we'll be looping forever
+    showPlace(np,true);
+  }
+  else {
+    QLOG_DEBUG() << "Error" << m_nodeQuery->lastError().text();
+  }
   return p;
 }
 /**
@@ -302,7 +337,10 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
   QLOG_DEBUG() << Q_FUNC_INFO << root << supp << node;
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
-
+  if (! m_rootQuery->first()) {
+    qDebug() << "root not found";
+    return p;
+  }
   QString startNode = node;
   /// get the position of the last item
   itemCount = m_items.size();
@@ -317,7 +355,7 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
   /// by default we will center on the root item
   centerItem = rootItem;
   /// now add all the entries for the root
-  while(m_rootQuery->next()) {
+  do  {
     supplement = m_rootQuery->value(8).toInt();
     arRoot = m_rootQuery->value(0).toString();
     QLOG_DEBUG() << m_rootQuery->value(3).toString();
@@ -351,7 +389,7 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
       centerItem = item;
     }
     items << item;
-  }
+  } while(m_rootQuery->next());
   if (m_pagingDir == 1) {
     /// where the old items begin
     int x = items.size();
@@ -502,37 +540,6 @@ void GraphicsEntry::prependEntries(int startPos) {
     //    ypos += r.height() + m_entryMargin;
 
   }
-}
-/**
- * get the root,supplement for the given node and show it
- * nodeId are unique
- *
- * @param node
- *
- */
-Place GraphicsEntry::getXmlForNode(const QString  & node) {
-  Place p;
-  QLOG_DEBUG() << "Search for node" << node;
-  m_nodeQuery->bindValue(0,node);
-  m_nodeQuery->exec();
-
-  if (m_nodeQuery->first()) {
-    //QString xml = m_nodeQuery->value("xml").toString();
-    //    QLOG_DEBUG() << "got " << xml;
-    QString root = m_nodeQuery->value("root").toString();
-    int supplement = m_nodeQuery->value("supplement").toInt();
-    p = Place(root,supplement);
-    p.setNode(node);
-    p.setWord(m_nodeQuery->value("word").toString());
-    Place np = getXmlForPlace(p);
-    /// focus on the node, set thisPageOnly to true just in case something has gone horribly wrong
-    /// otherwise we'll be looping forever
-    showPlace(p,true);
-  }
-  else {
-    QLOG_DEBUG() << "Error" << m_nodeQuery->lastError().text();
-  }
-  return p;
 }
 void GraphicsEntry::on_findNode()  {
   qDebug() << "REDUNDANT CODE";

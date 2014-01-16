@@ -90,7 +90,13 @@ void LanesLexicon::shortcut(const QString & k) {
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
-        showRoot(t,0,false);
+        Place p = showRoot(t,0,false);
+        qDebug() << "showRoot returned" << p.getRoot() << p.getWord() << p.getNode();
+        if (! p.isValid()) {
+          QMessageBox msgBox;
+          msgBox.setText(QString("%1 not found").arg(t));
+          msgBox.exec();
+        }
       }
     }
   }
@@ -99,7 +105,12 @@ void LanesLexicon::shortcut(const QString & k) {
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
-        showNode(t,false);
+        Place p = showNode(t,false);
+        if (! p.isValid()) {
+          QMessageBox msgBox;
+          msgBox.setText(QString("%1 not found").arg(t));
+          msgBox.exec();
+        }
       }
     }
   }
@@ -350,7 +361,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   Place m(root,p);
   showPlace(m,newTab);
 }
-void LanesLexicon::showNode(const QString & node,bool createTab) {
+Place LanesLexicon::showNode(const QString & node,bool createTab) {
   qDebug() << Q_FUNC_INFO << node << createTab;
   Place p;
   p.setNode(node);
@@ -385,10 +396,13 @@ void LanesLexicon::showNode(const QString & node,bool createTab) {
     }
   }
  qDebug() << Q_FUNC_INFO << p.getRoot() << p.getWord() << p.getNode();
- if (m_place.getRoot() != p.getRoot()) {
-   placeChanged(p);
+ if (p.isValid()) {
+   if (m_place.getRoot() != p.getRoot()) {
+     placeChanged(p);
+   }
+   m_place = p;
  }
- m_place = p;
+ return p;
 }
 Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   Place np;
@@ -427,7 +441,8 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   }
  return np;
 }
-void LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) {
+Place LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) {
+  Place p;
   if (createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
@@ -437,14 +452,14 @@ void LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) 
     if (w->hasRoot(root,true) == -1) {
       m_history->on();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
-      w->getXmlForRoot(root,supplement);
+      p = w->getXmlForRoot(root,supplement);
     }
   }
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     if (w->hasRoot(root,true) == -1) {
       m_history->on();
-      w->getXmlForRoot(root,supplement);
+      p = w->getXmlForRoot(root,supplement);
       QString t = QString("<span class=\"ar\">%1</span>").arg(root);
 
       m_tabs->setTabText(0,root);
@@ -456,6 +471,7 @@ void LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) 
       w->setFocus();
     }
   }
+  return p;
 }
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);

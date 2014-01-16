@@ -15,6 +15,9 @@ class Place {
   bool isEmpty() {
     return m_root.isEmpty();
   }
+  bool isValid() {
+    return ! m_root.isEmpty();
+  }
   void setRoot(const QString & root) { m_root = root;}
   void setIsRoot(bool v) {
     m_isRoot = v;
@@ -28,6 +31,7 @@ class Place {
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
  private:
+  QString m_msg;
   QString m_root;
   QString m_node;
   int m_supplement;
