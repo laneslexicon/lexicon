@@ -640,6 +640,7 @@ void LanesLexicon::rootChanged(const QString & root,const QString & node) {
   m_tree->ensureVisible(root,true);
 }
 void LanesLexicon::placeChanged(const Place & p) {
+  qDebug() << Q_FUNC_INFO << p.getRoot();
   m_currentRoot->setText(p.getRoot());
   m_tree->ensurePlaceVisible(p,true);
 }

@@ -335,8 +335,8 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   }
 }
 void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
-  qDebug() << Q_FUNC_INFO << p.getRoot() << p.getSupplement();
-  ensureVisible(p.getRoot(),p.getSupplement());
+  qDebug() << Q_FUNC_INFO << p.getRoot() << p.getSupplement() << select;
+  ensureVisible(p.getRoot(),p.getSupplement(),select);
 }
 void ContentsWidget::ensureVisible(const QString & root, int supplement,bool select) {
   QTreeWidgetItem * item;
@@ -369,6 +369,7 @@ void ContentsWidget::ensureVisible(const QString & root, int supplement,bool sel
   }
   topItem->setExpanded(true);
   if (select) {
+    qDebug() << Q_FUNC_INFO << "setCurrentItem";
     setCurrentItem(item);
   }
   QModelIndex index = indexFromItem(item);

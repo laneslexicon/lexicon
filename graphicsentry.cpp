@@ -229,6 +229,7 @@ bool GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
   }
   QLOG_DEBUG() << "Not found on page" << node;
   /// trying out of page jump
+  /// TODO this does not return Place needs fixing
   if (! thisPageOnly ) {
     QLOG_DEBUG() << "Out of page jump" << node;
     getXmlForNode(node);
