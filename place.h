@@ -28,6 +28,7 @@ class Place {
   void setNode(const QString & node) { m_node = node;}
   QString getRoot() const { return m_root;}
   int getSupplement() const { return m_supplement;}
+  void setSupplement(int i) { m_supplement = i;}
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
  private:

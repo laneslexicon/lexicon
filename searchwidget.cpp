@@ -16,6 +16,7 @@ void SearchWidget::onCancel() {
 
 RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
+  setWindowTitle(tr("Search for root"));
 
   QVBoxLayout * layout = new QVBoxLayout;
   m_edit = new WrappedEdit;
@@ -42,7 +43,7 @@ QString RootSearchDialog::getText() {
 }
 NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
-
+  setWindowTitle(tr("Search for node"));
   QVBoxLayout * layout = new QVBoxLayout;
   m_edit = new WrappedEdit;
   m_edit->setSz(QSize(300,30));

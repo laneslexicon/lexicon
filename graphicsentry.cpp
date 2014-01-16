@@ -341,6 +341,7 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
     qDebug() << "root not found";
     return p;
   }
+
   QString startNode = node;
   /// get the position of the last item
   itemCount = m_items.size();
@@ -351,6 +352,8 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
   QString showWord;
   rootItem->setRoot(root,true);
   rootItem->setSupplement(supp);
+  p.setRoot(root);
+  p.setSupplement(supp);
   items << rootItem;
   /// by default we will center on the root item
   centerItem = rootItem;
@@ -387,6 +390,7 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
     else if ( startNode == item->getNode()) {
       showWord = item->getWord();
       centerItem = item;
+      p.setNode(startNode);
     }
     items << item;
   } while(m_rootQuery->next());
