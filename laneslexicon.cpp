@@ -94,6 +94,18 @@ void LanesLexicon::shortcut(const QString & k) {
       }
     }
   }
+  if (k == "Node Search") {
+    NodeSearchDialog * d = new NodeSearchDialog(this);
+    if (d->exec()) {
+      QString t = d->getText();
+      if (! t.isEmpty()) {
+        showNode(t,false);
+      }
+    }
+  }
+  else if (k == "Quit") {
+    on_actionExit();
+  }
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
 }
 /**
@@ -121,6 +133,7 @@ void LanesLexicon::setupShortcuts() {
  *
  */
 void LanesLexicon::loadStyleSheet() {
+  /// TODO from variable setting by QSettings
   QFile f("app.css");
   if ( ! f.open(QIODevice::ReadOnly)) {
     QLOG_WARN() << "Unable to open stylesheet";
@@ -337,8 +350,10 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   Place m(root,p);
   showPlace(m,newTab);
 }
-void LanesLexicon::showPlace(const Place & p,bool createTab) {
-  QString root = p.getRoot();
+void LanesLexicon::showNode(const QString & node,bool createTab) {
+  qDebug() << Q_FUNC_INFO << node << createTab;
+  Place p;
+  p.setNode(node);
  if (createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
@@ -347,8 +362,8 @@ void LanesLexicon::showPlace(const Place & p,bool createTab) {
     w->installEventFilter(this);
     if (w->hasPlace(p,true) == -1) {
       m_history->on();
-      m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
-      w->getXmlForPlace(p);
+      m_tabs->insertTab(m_tabs->currentIndex()+1,w,node);
+      p = w->getXmlForNode(node);
 
       //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
       //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
@@ -359,7 +374,46 @@ void LanesLexicon::showPlace(const Place & p,bool createTab) {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     if (w->hasPlace(p,true) == -1) {
       m_history->on();
-      w->getXmlForPlace(p);
+      p = w->getXmlForNode(node);
+      m_tabs->setTabText(0,p.getNode());
+      // this works but sets it for all tabs
+      //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
+      // this sets it for all the items in graphicsentry
+      // but not the tab title
+      //    w->setStyleSheet("font-family : Amiri;font-size : 16px");
+      w->setFocus();
+    }
+  }
+ qDebug() << Q_FUNC_INFO << p.getRoot() << p.getWord() << p.getNode();
+ if (m_place.getRoot() != p.getRoot()) {
+   placeChanged(p);
+ }
+ m_place = p;
+}
+Place LanesLexicon::showPlace(const Place & p,bool createTab) {
+  Place np;
+  QString root = p.getRoot();
+ if (createTab) {
+    /// turn history on as the user has clicked on something
+    /// and the root is not already shown
+    GraphicsEntry * w = new GraphicsEntry(this);
+    setSignals(w);
+    w->installEventFilter(this);
+    if (w->hasPlace(p,true) == -1) {
+      m_history->on();
+      m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
+      np = w->getXmlForPlace(p);
+
+      //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
+      //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
+
+    }
+  }
+  else {
+    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
+    if (w->hasPlace(p,true) == -1) {
+      m_history->on();
+      np = w->getXmlForPlace(p);
       QString t = QString("<span class=\"ar\">%1</span>").arg(root);
 
       m_tabs->setTabText(0,root);
@@ -371,7 +425,7 @@ void LanesLexicon::showPlace(const Place & p,bool createTab) {
       w->setFocus();
     }
   }
-
+ return np;
 }
 void LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) {
   if (createTab) {

@@ -80,6 +80,9 @@ class WrappedEdit : public QWidget {
     return m_edit;
   }
   ~WrappedEdit();
+  void setSz(QSize sz) {
+    m_sz = sz;
+  }
   QString getText();
   public slots:
     void shortcutActivated();
@@ -87,14 +90,15 @@ class WrappedEdit : public QWidget {
     void showContextMenu(const QPoint &);
     void actionChangeMap();
     void actionChangeFont();
-
  protected:
   void toggleMap(const QString &);
   virtual void buildContextMenu(QMenu * menu);
+  virtual QSize sizeHint() const { return QSize(300,30);};
   HermesOptions m_options;
   QString m_currentMap;
   QString  m_docFontString;
   ImEdit * m_edit;
+  QSize m_sz;
 
  signals:
   void dataChanged();

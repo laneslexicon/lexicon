@@ -26,6 +26,7 @@ class Place {
   QString getRoot() const { return m_root;}
   int getSupplement() const { return m_supplement;}
   QString getNode() const { return m_node;}
+  QString getWord() const { return m_word;}
  private:
   QString m_root;
   QString m_node;

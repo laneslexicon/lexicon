@@ -19,6 +19,7 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
 
   QVBoxLayout * layout = new QVBoxLayout;
   m_edit = new WrappedEdit;
+  m_edit->setSz(QSize(300,30));
   m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                      | QDialogButtonBox::Cancel);
 
@@ -26,7 +27,8 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
 
-  layout->addWidget(m_edit);
+  layout->addWidget(m_edit,0);
+  layout->addStretch(1);
   layout->addWidget(m_buttonBox);
 
   setModal(true);
@@ -37,4 +39,27 @@ void RootSearchDialog::onCancel() {
 }
 QString RootSearchDialog::getText() {
   return m_edit->getText();
+}
+NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
+  QDialog(parent,f) {
+
+  QVBoxLayout * layout = new QVBoxLayout;
+  m_edit = new WrappedEdit;
+  m_edit->setSz(QSize(300,30));
+  m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+                                     | QDialogButtonBox::Cancel);
+
+  connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+
+  layout->addWidget(m_edit,0);
+  layout->addStretch(1);
+  layout->addWidget(m_buttonBox);
+
+  setModal(true);
+  setLayout(layout);
+}
+QString NodeSearchDialog::getText() {
+  return m_edit->editor()->toPlainText();
 }

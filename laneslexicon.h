@@ -55,8 +55,6 @@ public:
     void writeSettings();
     HistoryMaster * history();
     private slots:
-      void showRoot(const QString &,int supp = 0,bool newTab = false);
-      void showPlace(const Place &,bool newTab = false);
       void shortcut(const QString &);
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
@@ -78,6 +76,9 @@ public:
     void shortcutActivated();
     void ambiguousShortcut();
 private:
+    Place showPlace(const Place &,bool newTab = false);
+    void showRoot(const QString &,int supp = 0,bool newTab = false);
+    void showNode(const QString &,bool newTab = false);
     QFont arFont;
     QString m_firstRoot;
     QString m_lastRoot;

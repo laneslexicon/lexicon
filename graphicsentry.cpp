@@ -90,8 +90,9 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 
 
   m_scene = new QGraphicsScene(this);
-
   m_view = new LaneGraphicsView(m_scene,this);
+
+  //  m_view->setBackgroundBrush(QBrush(Qt::red, Qt::SolidPattern));
   connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
   connect(m_view,SIGNAL(backPage()),this,SLOT(prevPageRequested()));
 
@@ -290,14 +291,14 @@ Place GraphicsEntry::getXmlForPlace(const Place & p) {
  * @param root
  * @param node the id of the entry we want to focus on
  */
-void GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & node) {
+Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & node) {
   QList<EntryItem *> items;
   QString arRoot;
   int itemCount;
   int supplement;
   QString str;
   EntryItem * centerItem;
-
+  Place p;
   QLOG_DEBUG() << Q_FUNC_INFO << root << supp << node;
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
@@ -402,6 +403,7 @@ void GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & 
       p.setY(p.y() + h/2 - 10);
       m_view->centerOn(p);
   }
+  return p;
 }
 /**
  * create the QTextGraphicsItem by transforming the passed xml
@@ -521,7 +523,8 @@ Place GraphicsEntry::getXmlForNode(const QString  & node) {
     int supplement = m_nodeQuery->value("supplement").toInt();
     p = Place(root,supplement);
     p.setNode(node);
-    p = getXmlForPlace(p);
+    p.setWord(m_nodeQuery->value("word").toString());
+    Place np = getXmlForPlace(p);
     /// focus on the node, set thisPageOnly to true just in case something has gone horribly wrong
     /// otherwise we'll be looping forever
     showPlace(p,true);
