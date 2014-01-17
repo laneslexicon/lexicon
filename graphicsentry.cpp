@@ -359,8 +359,18 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
   /// by default we will center on the root item
   centerItem = rootItem;
   /// now add all the entries for the root
+  bool ok;
   do  {
+    ok = true;
     supplement = m_rootQuery->value(8).toInt();
+    /**
+     * if we've asked to see the entry for the supplement then just show that
+     *
+     */
+    if ((supp == 1) && (supplement == 0)) {
+      ok = false;
+    }
+    if (ok) {
     arRoot = m_rootQuery->value(0).toString();
     QLOG_DEBUG() << m_rootQuery->value(3).toString();
     QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
@@ -390,11 +400,16 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
     }
     else if ( startNode == item->getNode()) {
       showWord = item->getWord();
+      /// if a node has been passed, then center on the node
       centerItem = item;
       p.setNode(startNode);
     }
     items << item;
+    }
   } while(m_rootQuery->next());
+  /// TODO we've only got a root item
+  if (items.size() == 1) {
+  }
   if (m_pagingDir == 1) {
     /// where the old items begin
     int x = items.size();
@@ -446,6 +461,7 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
       p.setY(p.y() + h/2 - 10);
       m_view->centerOn(p);
   }
+  p.setPage(centerItem->getPage());
   return p;
 }
 /**
