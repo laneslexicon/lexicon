@@ -29,9 +29,13 @@ class Place {
   QString getRoot() const { return m_root;}
   int getSupplement() const { return m_supplement;}
   void setSupplement(int i) { m_supplement = i;}
+  int getPage() { return m_page;}
+  void setPage(int i) { m_page = i;}
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
  private:
+  int m_vol;
+  int m_page;
   QString m_msg;
   QString m_root;
   QString m_node;

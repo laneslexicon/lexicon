@@ -50,6 +50,7 @@ class EntryItem : public QGraphicsTextItem {
   QString getRoot() { return m_root;}
   QString getWord() { return m_word;}
   int getSupplement() { return m_supplement;}
+  int get Page() { return m_page;}
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);

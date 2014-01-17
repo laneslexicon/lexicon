@@ -426,8 +426,6 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     if (w->hasPlace(p,true) == -1) {
       np = w->getXmlForPlace(p);
-      QString t = QString("<span class=\"ar\">%1</span>").arg(root);
-
       m_tabs->setTabText(0,root);
       // this works but sets it for all tabs
       //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
@@ -456,8 +454,6 @@ Place LanesLexicon::showRoot(const QString & root,int supplement,bool createTab)
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     if (w->hasRoot(root,true) == -1) {
       p = w->getXmlForRoot(root,supplement);
-      QString t = QString("<span class=\"ar\">%1</span>").arg(root);
-
       m_tabs->setTabText(0,root);
       // this works but sets it for all tabs
       //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
