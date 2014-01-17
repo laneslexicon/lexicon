@@ -91,7 +91,6 @@ void LanesLexicon::shortcut(const QString & k) {
       QString t = d->getText();
       if (! t.isEmpty()) {
         Place p = showRoot(t,0,false);
-        qDebug() << "showRoot returned" << p.getRoot() << p.getWord() << p.getNode();
         if (! p.isValid()) {
           QMessageBox msgBox;
           msgBox.setText(QString("%1 not found").arg(t));
@@ -176,6 +175,7 @@ void LanesLexicon::createActions() {
 
   connect(m_hForward,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
   connect(m_hBackward,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
+  /// TODO get this from QSettings
   QString imgdir = QString("./images/32");
   //    openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
   m_rootForwardAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next Root"),this);
@@ -414,7 +414,6 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     setSignals(w);
     w->installEventFilter(this);
     if (w->hasPlace(p,true) == -1) {
-      m_history->on();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
       np = w->getXmlForPlace(p);
 
@@ -426,7 +425,6 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     if (w->hasPlace(p,true) == -1) {
-      m_history->on();
       np = w->getXmlForPlace(p);
       QString t = QString("<span class=\"ar\">%1</span>").arg(root);
 
@@ -450,7 +448,6 @@ Place LanesLexicon::showRoot(const QString & root,int supplement,bool createTab)
     setSignals(w);
     w->installEventFilter(this);
     if (w->hasRoot(root,true) == -1) {
-      m_history->on();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
       p = w->getXmlForRoot(root,supplement);
     }
@@ -458,7 +455,6 @@ Place LanesLexicon::showRoot(const QString & root,int supplement,bool createTab)
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
     if (w->hasRoot(root,true) == -1) {
-      m_history->on();
       p = w->getXmlForRoot(root,supplement);
       QString t = QString("<span class=\"ar\">%1</span>").arg(root);
 
@@ -471,6 +467,12 @@ Place LanesLexicon::showRoot(const QString & root,int supplement,bool createTab)
       w->setFocus();
     }
   }
+ if (p.isValid()) {
+   if (m_place.getRoot() != p.getRoot()) {
+     placeChanged(p);
+   }
+   m_place = p;
+ }
   return p;
 }
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
