@@ -113,6 +113,9 @@ void LanesLexicon::shortcut(const QString & k) {
       }
     }
   }
+  else if (k == "Contents Collapse All") {
+    m_tree->collapseAll();
+  }
   else if (k == "Quit") {
     on_actionExit();
   }
