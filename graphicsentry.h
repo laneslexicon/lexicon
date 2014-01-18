@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QTextStream>
+#include <QColor>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsTextItem>
@@ -44,6 +45,7 @@ class EntryItem : public QGraphicsTextItem {
   void setRoot(const QString & root,bool isRootEntry = false);
   void setWord(const QString & word) { m_word = word; }
   void setSupplement(int v)  { m_supplement = v;}
+  void setBackground(QColor & c) { m_backgroundColor = c;}
   bool isNode(const QString & id) { return m_nodeId ==  id;}
   bool isRoot() { return m_isRoot;}
   QString getNode() { return m_nodeId;}
@@ -55,7 +57,7 @@ class EntryItem : public QGraphicsTextItem {
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
   void paint( QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-
+  QColor m_backgroundColor;
   private:
   QString m_nodeId;
   bool m_isRoot;
@@ -98,6 +100,7 @@ class GraphicsEntry : public QWidget {
     void nextPageRequested();
     void prevPageRequested();
  private:
+    QColor m_supplementBg;
     bool prepareQueries();
     QString lastRoot();
     QString firstRoot();

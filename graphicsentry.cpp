@@ -30,7 +30,7 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
     painter->setBrush(Qt::white);
   }
   else {
-    painter->setBrush(Qt::lightGray);
+    painter->setBrush(m_backgroundColor);
   }
   painter->drawRect(boundingRect());
   painter->setPen(pen);
@@ -121,6 +121,7 @@ GraphicsEntry::~GraphicsEntry() {
   delete m_nodeQuery;
   delete m_rootQuery;
   delete m_nextRootQuery;
+  /// TODO xalan cleanup ?
 }
 void GraphicsEntry::readSettings() {
   QSettings settings;
@@ -131,6 +132,20 @@ void GraphicsEntry::readSettings() {
   m_textWidth = settings.value("text width",300).toInt();
   m_debug = settings.value("debug",false).toBool();
   m_entryMargin = settings.value("margin",10).toInt();
+
+  QString bg = settings.value("Supplement Background Color",QString("rgb(255,254,253)")).toString();
+  QRegExp rx("^rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\s*\\)");
+  if (rx.indexIn(bg) != -1) {
+    //    qDebug() << bg << "color" << rx.cap(1) << rx.cap(2) << rx.cap(3);
+    m_supplementBg = QColor::fromRgb(rx.cap(1).toInt(),rx.cap(2).toInt(),rx.cap(3).toInt());
+    if (! m_supplementBg.isValid())  {
+      m_supplementBg = QColor::fromRgb(255,255,255);
+    }
+  }
+  else {
+    m_supplementBg = QColor::fromRgb(255,255,255);
+  }
+
 }
 void GraphicsEntry::writeDefaultSettings() {
   QSettings settings;
@@ -481,6 +496,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     gi->document()->setDefaultTextOption(m_textOption);
     gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
     gi->setAcceptHoverEvents(true);
+    gi->setBackground(m_supplementBg);
     connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
     connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
     return gi;

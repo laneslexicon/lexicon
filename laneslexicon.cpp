@@ -4,6 +4,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 {
   readSettings();
+
   openDatabase("lexicon.sqlite");
   loadStyleSheet();
   QSplitter * splitter = new QSplitter;
@@ -68,6 +69,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 LanesLexicon::~LanesLexicon()
 {
   QLOG_DEBUG() << "main window destructor";
+  /// TODO make this check something has changed ?
+  writeSettings();
 }
 /**
  * convenience
