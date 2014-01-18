@@ -85,6 +85,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(placeChanged(const Place &)),this,SLOT(placeChanged (const Place &)));
 }
 void LanesLexicon::shortcut(const QString & k) {
+  qDebug() << Q_FUNC_INFO << k;
   if (k == "Root Search") {
     RootSearchDialog * d = new RootSearchDialog(this);
     if (d->exec()) {
@@ -115,6 +116,27 @@ void LanesLexicon::shortcut(const QString & k) {
   }
   else if (k == "Contents Collapse All") {
     m_tree->collapseAll();
+  }
+  else if (k == "Contents Collapse Letter") {
+    QTreeWidgetItem * item = m_tree->currentItem();
+    if (item) {
+      /// if item is a root, get the parent (letter)
+      if (item->childCount() == 0) {
+        item = item->parent();
+        if (! item ) {
+          return;
+        }
+      }
+      if (item->isExpanded()) {
+        m_tree->collapseItem(item);
+      }
+      else {
+        m_tree->expandItem(item);
+      }
+    }
+    else {
+      qDebug() << Q_FUNC_INFO << "No current item";
+    }
   }
   else if (k == "Quit") {
     on_actionExit();
