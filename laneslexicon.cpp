@@ -12,6 +12,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_tree->setObjectName("treeRoots");
   m_tree->installEventFilter(this);
   m_tabs = new QTabWidget(this);
+  m_tabs->setTabsClosable(true);
   GraphicsEntry * entry = new GraphicsEntry(this);
   entry->installEventFilter(this);
 
@@ -100,7 +101,7 @@ void LanesLexicon::shortcut(const QString & k) {
       }
     }
   }
-  if (k == "Node Search") {
+  else if (k == "Node Search") {
     NodeSearchDialog * d = new NodeSearchDialog(this);
     if (d->exec()) {
       QString t = d->getText();
@@ -111,6 +112,16 @@ void LanesLexicon::shortcut(const QString & k) {
           msgBox.setText(QString(tr("%1 not found")).arg(t));
           msgBox.exec();
         }
+      }
+    }
+  }
+  else if (k == "Word Search") {
+    WordSearchDialog * d = new WordSearchDialog(this);
+    if (d->exec()) {
+      QString t = d->getText();
+      if (! t.isEmpty()) {
+        SearchResultsWidget * s = new SearchResultsWidget(t,this);
+        m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
       }
     }
   }

@@ -64,3 +64,32 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
 QString NodeSearchDialog::getText() {
   return m_edit->editor()->toPlainText();
 }
+/**
+ *
+ *
+ * @param parent
+ * @param f
+ */
+WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
+  QDialog(parent,f) {
+  setWindowTitle(tr("Search for word"));
+  QVBoxLayout * layout = new QVBoxLayout;
+  m_edit = new WrappedEdit;
+  m_edit->setSz(QSize(300,30));
+  m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+                                     | QDialogButtonBox::Cancel);
+
+  connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+
+  layout->addWidget(m_edit,0);
+  layout->addStretch(1);
+  layout->addWidget(m_buttonBox);
+
+  setModal(true);
+  setLayout(layout);
+}
+QString WordSearchDialog::getText() {
+  return m_edit->getText();
+}

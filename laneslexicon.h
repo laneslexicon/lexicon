@@ -44,7 +44,7 @@
 #include "place.h"
 #include "searchwidget.h"
 #include "scripts.h"
-
+#include "searchresults.h"
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT

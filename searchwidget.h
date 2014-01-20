@@ -38,4 +38,14 @@ class NodeSearchDialog : public QDialog {
   WrappedEdit * m_edit;
   QDialogButtonBox * m_buttonBox;
 };
+class WordSearchDialog : public QDialog {
+  Q_OBJECT
+
+ public:
+  WordSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
+  QString getText();
+ private:
+  WrappedEdit * m_edit;
+  QDialogButtonBox * m_buttonBox;
+};
 #endif
