@@ -30,6 +30,7 @@ class SearchResultsWidget : public QWidget {
 
  public:
   SearchResultsWidget(const QString & str, QWidget * parent = 0);
+GraphicsEntry * getEntry() { return m_text;};
  public slots:
  void itemChanged(QListWidgetItem *,QListWidgetItem *);
 

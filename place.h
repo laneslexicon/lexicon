@@ -33,6 +33,9 @@ class Place {
   void setPage(int i) { m_page = i;}
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
+
+  void setNodeOnly(bool v) { m_nodeOnly = v;}
+  bool getNodeOnly() { return m_nodeOnly; }
  private:
   int m_vol;
   int m_page;
@@ -43,5 +46,6 @@ class Place {
   QString m_word;
   QString m_anchor;
   bool m_isRoot;
+  bool m_nodeOnly;
 };
 #endif

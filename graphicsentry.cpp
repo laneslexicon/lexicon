@@ -36,21 +36,25 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
   painter->setPen(pen);
   QGraphicsTextItem::paint(painter, o, w);
 }
-void EntryItem::highlight(const QString & target) {
+QTextCursor EntryItem::highlight(const QString & target) {
   int pos;
   QTextCursor cursor;
+  QTextCursor firstPos;
   QTextDocument * doc = this->document();
   QTextCharFormat fmt;
+  /// TODO get from QSettings
   fmt.setBackground(Qt::yellow);
-  cursor = doc->find(target);
+  cursor = doc->find(target,QTextDocument::FindWholeWords);
+  firstPos = cursor;
   while(! cursor.isNull()) {
     pos =  cursor.position();
     qDebug() << "found at" << pos;
     cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
     cursor.setPosition(pos, QTextCursor::KeepAnchor);
     cursor.setCharFormat(fmt);
-    cursor = doc->find(target,pos);
+    cursor = doc->find(target,pos,QTextDocument::FindWholeWords);
   }
+  return firstPos;
 }
 
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
@@ -327,7 +331,7 @@ Place GraphicsEntry::getXmlForPlace(const Place & p) {
  * @param node
  *
  */
-Place GraphicsEntry::getXmlForNode(const QString  & node) {
+Place GraphicsEntry::getXmlForNode(const QString  & node,bool nodeOnly) {
   Place p;
   QLOG_DEBUG() << "Search for node" << node;
   m_nodeQuery->bindValue(0,node);
@@ -341,6 +345,7 @@ Place GraphicsEntry::getXmlForNode(const QString  & node) {
     p = Place(root,supplement);
     p.setNode(node);
     p.setWord(m_nodeQuery->value("word").toString());
+    p.setNodeOnly(nodeOnly);
     Place np = getXmlForPlace(p);
     /// focus on the node, set thisPageOnly to true just in case something has gone horribly wrong
     /// otherwise we'll be looping forever
@@ -736,8 +741,22 @@ void GraphicsEntry::prevPageRequested() {
   this->firstRoot();
 }
 void GraphicsEntry::highlight(const QString & target) {
+  int ix = -1;
+  QTextCursor cursor;
   for(int i=0;i < m_items.size();i++ ) {
     EntryItem * item = m_items[i];
-    item->highlight(target);
+    QTextCursor c = item->highlight(target);
+    /// get the cursor for the first match
+    if (! c.isNull() && (ix == -1)) {
+      cursor = c;
+      ix = i;
+    }
+  }
+  qDebug() << Q_FUNC_INFO << "item" << ix << "pos" << cursor.position() << cursor.hasSelection();
+  /// unselect the text and set the cursor so the item is visible
+  /// TODO can it be moved up a bit?
+  if (ix != -1) {
+    cursor.clearSelection();
+    m_items[ix]->setTextCursor(cursor);
   }
 }

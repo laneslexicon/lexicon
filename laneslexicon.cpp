@@ -123,6 +123,7 @@ void LanesLexicon::shortcut(const QString & k) {
         SearchResultsWidget * s = new SearchResultsWidget(t,this);
         int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
         m_tabs->setCurrentIndex(i);
+        setSignals(s->getEntry());
       }
     }
   }
@@ -513,6 +514,8 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * ol
   if (item) {
     QString node = item->getNode();
     QString word = item->getWord();
+    QString root = item->getRoot();
+    qDebug() << Q_FUNC_INFO << root << word << node;
     QPointF p = item->pos();
     if (! node.isEmpty()) {
       QString txt = QString("%1  %2  At:%3,%4").arg(node).arg(word).arg(p.x()).arg(p.y());
@@ -526,7 +529,7 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * ol
 /**
  * Ctrl-T moves focus to the tree
  * Ctrl-E moves focus to the current display widget
- *
+ * TODO move these to shortcuts
  * @param target
  * @param event
  *

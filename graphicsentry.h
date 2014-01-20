@@ -53,7 +53,7 @@ class EntryItem : public QGraphicsTextItem {
   QString getWord() { return m_word;}
   int getSupplement() { return m_supplement;}
   int getPage() { return m_page;}
-  void highlight(const QString &);
+  QTextCursor highlight(const QString &);
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
@@ -77,7 +77,7 @@ class GraphicsEntry : public QWidget {
 
     Place getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString());
     Place getXmlForPlace(const Place &);
-    Place getXmlForNode(const QString &);
+    Place getXmlForNode(const QString &,bool nodeOnly = false);
     Place getPlace() { return m_place;}
     int hasRoot(const QString & root,bool focus = true);
     int hasPlace(const Place & ,bool focus = true);
