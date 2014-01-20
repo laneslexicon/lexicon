@@ -31,6 +31,7 @@
 #include <QKeyEvent>
 #include <QFocusEvent>
 #include <QSettings>
+#include <QRegExp>
 #include "QsLog.h"
 #include "xsltsupport.h"
 #include "history.h"
@@ -54,6 +55,7 @@ class EntryItem : public QGraphicsTextItem {
   int getSupplement() { return m_supplement;}
   int getPage() { return m_page;}
   QTextCursor highlight(const QString &);
+  QTextCursor highlightRx(const QString &);
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);

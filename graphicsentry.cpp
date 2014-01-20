@@ -56,7 +56,28 @@ QTextCursor EntryItem::highlight(const QString & target) {
   }
   return firstPos;
 }
-
+QTextCursor EntryItem::highlightRx(const QString & target) {
+  int pos;
+  QTextCursor cursor;
+  QTextCursor firstPos;
+  QTextDocument * doc = this->document();
+  QTextCharFormat fmt;
+  QRegExp rx;
+  rx.setPattern("\\b" + target + "\\b");
+  /// TODO get from QSettings
+  fmt.setBackground(Qt::yellow);
+  cursor = doc->find(rx,QTextDocument::FindWholeWords);
+  firstPos = cursor;
+  while(! cursor.isNull()) {
+    pos =  cursor.position();
+    qDebug() << "found at" << pos;
+    cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
+    cursor.setPosition(pos, QTextCursor::KeepAnchor);
+    cursor.setCharFormat(fmt);
+    cursor = doc->find(target,pos,QTextDocument::FindWholeWords);
+  }
+  return firstPos;
+}
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
   QGraphicsView(scene,parent) {
   //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -748,7 +769,7 @@ void GraphicsEntry::highlight(const QString & target) {
   QTextCursor cursor;
   for(int i=0;i < m_items.size();i++ ) {
     EntryItem * item = m_items[i];
-    QTextCursor c = item->highlight(target);
+    QTextCursor c = item->highlightRx(target);
     /// get the cursor for the first match
     if (! c.isNull() && (ix == -1)) {
       cursor = c;
