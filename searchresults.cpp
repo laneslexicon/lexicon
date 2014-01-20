@@ -27,8 +27,13 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   }
   m_query.bindValue(0,m_target);
   m_query.exec();
+  QStringList nodes;
   while(m_query.next()) {
-    QListWidgetItem * item = new QListWidgetItem(m_query.value("node").toString(),m_list);
+    QString t = m_query.value("node").toString();
+    if (! nodes.contains(t)) {
+      QListWidgetItem * item = new QListWidgetItem(t,m_list);
+      nodes << t;
+    }
   }
   setLayout(layout);
   connect(m_list,SIGNAL(currentItemChanged(QListWidgetItem * ,QListWidgetItem * )),
