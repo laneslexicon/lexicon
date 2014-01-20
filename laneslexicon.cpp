@@ -56,11 +56,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
 
   connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
-  // the following line shows an entry but nothing in the tree is highlighted;
-  //m_place = Place("يى",1);
-
-  // this one works
-  //  m_place = Place("يمر",1);
+  /// TOTDO replace this last visited item
   showPlace(Place(m_firstRoot,0),false);
   m_tree->ensureVisible(m_firstRoot);
   m_tree->resizeColumnToContents(0);
@@ -69,7 +65,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 LanesLexicon::~LanesLexicon()
 {
   QLOG_DEBUG() << "main window destructor";
-  /// TODO make this check something has changed ?
+  /// TODO make this check something has changed or give
+  /// option to save settings ?
   writeSettings();
 }
 /**
@@ -97,7 +94,7 @@ void LanesLexicon::shortcut(const QString & k) {
         Place p = showRoot(t,0,false);
         if (! p.isValid()) {
           QMessageBox msgBox;
-          msgBox.setText(QString("%1 not found").arg(t));
+          msgBox.setText(QString(tr("%1 not found")).arg(t));
           msgBox.exec();
         }
       }
@@ -111,7 +108,7 @@ void LanesLexicon::shortcut(const QString & k) {
         Place p = showNode(t,false);
         if (! p.isValid()) {
           QMessageBox msgBox;
-          msgBox.setText(QString("%1 not found").arg(t));
+          msgBox.setText(QString(tr("%1 not found")).arg(t));
           msgBox.exec();
         }
       }
