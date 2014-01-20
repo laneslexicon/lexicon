@@ -12,7 +12,13 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   menu.setObjectName("entry");
   QAction *removeAction = menu.addAction("Remove");
   QAction *markAction = menu.addAction("Mark");
+  QAction *searchAction = menu.addAction("Search");
+  connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
   QAction *selectedAction = menu.exec(event->screenPos());
+
+}
+void EntryItem::searchItem() {
+  qDebug() << Q_FUNC_INFO;
 }
 void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
   //  QLOG_DEBUG() << "hover" << this->getNode() << this->isRoot();
@@ -63,6 +69,8 @@ QTextCursor EntryItem::highlightRx(const QString & target) {
   QTextDocument * doc = this->document();
   QTextCharFormat fmt;
   QRegExp rx;
+  /// TODO this needs to be fixed to allow for e.g. full stop
+  /// and then made the default
   rx.setPattern("\\b" + target + "\\b");
   /// TODO get from QSettings
   fmt.setBackground(Qt::yellow);

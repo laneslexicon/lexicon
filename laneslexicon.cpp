@@ -509,13 +509,22 @@ Place LanesLexicon::showRoot(const QString & root,int supplement,bool createTab)
  }
   return p;
 }
+/**
+ * when user clicks on item reason Qt::MouseFocusReason
+ * when setFocus called it is Qt::OtherFocusReason
+ *
+ * @param newFocus
+ * @param oldFocus
+ * @param reason
+ */
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
+
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
   if (item) {
     QString node = item->getNode();
     QString word = item->getWord();
     QString root = item->getRoot();
-    qDebug() << Q_FUNC_INFO << root << word << node;
+    qDebug() << Q_FUNC_INFO << root << word << node << reason;
     QPointF p = item->pos();
     if (! node.isEmpty()) {
       QString txt = QString("%1  %2  At:%3,%4").arg(node).arg(word).arg(p.x()).arg(p.y());

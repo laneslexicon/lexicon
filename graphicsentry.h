@@ -39,6 +39,8 @@
 //#include "laneslexicon.h"
 
 class EntryItem : public QGraphicsTextItem {
+  Q_OBJECT
+
  public:
   EntryItem(const QString &, QGraphicsItem * parent = 0);
   EntryItem(QGraphicsItem * parent = 0);
@@ -56,6 +58,8 @@ class EntryItem : public QGraphicsTextItem {
   int getPage() { return m_page;}
   QTextCursor highlight(const QString &);
   QTextCursor highlightRx(const QString &);
+  public slots:
+    void searchItem();
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
