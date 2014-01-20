@@ -36,7 +36,22 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
   painter->setPen(pen);
   QGraphicsTextItem::paint(painter, o, w);
 }
-
+void EntryItem::highlight(const QString & target) {
+  int pos;
+  QTextCursor cursor;
+  QTextDocument * doc = this->document();
+  QTextCharFormat fmt;
+  fmt.setBackground(Qt::yellow);
+  cursor = doc->find(target);
+  while(! cursor.isNull()) {
+    pos =  cursor.position();
+    qDebug() << "found at" << pos;
+    cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
+    cursor.setPosition(pos, QTextCursor::KeepAnchor);
+    cursor.setCharFormat(fmt);
+    cursor = doc->find(target,pos);
+  }
+}
 
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
   QGraphicsView(scene,parent) {
@@ -719,4 +734,10 @@ void GraphicsEntry::nextPageRequested() {
 void GraphicsEntry::prevPageRequested() {
   qDebug() << Q_FUNC_INFO;
   this->firstRoot();
+}
+void GraphicsEntry::highlight(const QString & target) {
+  for(int i=0;i < m_items.size();i++ ) {
+    EntryItem * item = m_items[i];
+    item->highlight(target);
+  }
 }

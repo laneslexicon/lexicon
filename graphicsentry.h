@@ -53,6 +53,7 @@ class EntryItem : public QGraphicsTextItem {
   QString getWord() { return m_word;}
   int getSupplement() { return m_supplement;}
   int getPage() { return m_page;}
+  void highlight(const QString &);
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
@@ -88,6 +89,7 @@ class GraphicsEntry : public QWidget {
     void setPagingBackward() {
       m_pagingDir = 1;
     }
+    void highlight(const QString & t);
   public slots:
     void on_findNode();
     void anchorClicked(const QUrl &);

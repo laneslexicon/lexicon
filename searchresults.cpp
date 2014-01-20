@@ -44,4 +44,5 @@ void SearchResultsWidget::itemChanged(QListWidgetItem * item,QListWidgetItem * p
     return;
   }
   m_text->getXmlForNode(node);
+  m_text->highlight(m_target);
 }
