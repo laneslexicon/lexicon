@@ -315,7 +315,7 @@ bool GraphicsEntry::prepareQueries() {
   return ok;
 }
 Place GraphicsEntry::getXmlForPlace(const Place & p) {
-  Place np = getXmlForRoot(p.getRoot(),p.getSupplement(),p.getNode());
+  Place np = getXmlForRoot(p.getRoot(),p.getSupplement(),p.getNode(),p.getNodeOnly());
   if (np.isValid()) {
     if (np.getRoot() != m_place.getRoot()) {
       emit(placeChanged(np));
@@ -362,7 +362,7 @@ Place GraphicsEntry::getXmlForNode(const QString  & node,bool nodeOnly) {
  * @param root
  * @param node the id of the entry we want to focus on
  */
-Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & node) {
+Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & node,bool nodeOnly) {
   QList<EntryItem *> items;
   QString arRoot;
   int itemCount;
@@ -421,6 +421,7 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {
         QTextStream out(&f);
+        out.setCodec("UTF-8");
         out << t;
       }
     }
@@ -550,6 +551,7 @@ void GraphicsEntry::appendEntries(int startPos) {
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {
         QTextStream out(&f);
+        out.setCodec("UTF-8");
         out << m_items[i]->toHtml();
       }
     }
@@ -589,6 +591,7 @@ void GraphicsEntry::prependEntries(int startPos) {
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {
         QTextStream out(&f);
+        out.setCodec("UTF-8");
         out << m_items[i]->toHtml();
       }
     }

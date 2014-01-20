@@ -75,7 +75,7 @@ class GraphicsEntry : public QWidget {
   GraphicsEntry(QWidget * parent = 0);
   ~GraphicsEntry();
 
-    Place getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString());
+  Place getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString(),bool nodeOnly = false);
     Place getXmlForPlace(const Place &);
     Place getXmlForNode(const QString &,bool nodeOnly = false);
     Place getPlace() { return m_place;}

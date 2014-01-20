@@ -35,7 +35,7 @@ class Place {
   QString getWord() const { return m_word;}
 
   void setNodeOnly(bool v) { m_nodeOnly = v;}
-  bool getNodeOnly() { return m_nodeOnly; }
+  bool getNodeOnly() const { return m_nodeOnly; }
  private:
   int m_vol;
   int m_page;
