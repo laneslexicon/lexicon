@@ -24,15 +24,20 @@
 #include <QMessageBox>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include "graphicsentry.h"
 class SearchResultsWidget : public QWidget {
   Q_OBJECT
 
  public:
   SearchResultsWidget(const QString & str, QWidget * parent = 0);
+ public slots:
+ void itemChanged(QListWidgetItem *,QListWidgetItem *);
+
  private:
   QSqlQuery m_query;
+QSqlQuery m_nodeQuery;
   QString m_target;
   QListWidget * m_list;
-  QTextEdit * m_text;
+  GraphicsEntry * m_text;
 };
 #endif

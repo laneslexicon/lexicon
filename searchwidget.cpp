@@ -91,5 +91,6 @@ WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setLayout(layout);
 }
 QString WordSearchDialog::getText() {
+  /// getText() converts buckwalter to arabic
   return m_edit->getText();
 }

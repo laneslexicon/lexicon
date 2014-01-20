@@ -121,7 +121,8 @@ void LanesLexicon::shortcut(const QString & k) {
       QString t = d->getText();
       if (! t.isEmpty()) {
         SearchResultsWidget * s = new SearchResultsWidget(t,this);
-        m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
+        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
+        m_tabs->setCurrentIndex(i);
       }
     }
   }
@@ -573,8 +574,6 @@ void LanesLexicon::readSettings() {
   settings.endGroup();
   settings.beginGroup("Notes");
   m_notesDbName = settings.value("Database","notes.sqlite").toString();
-  qDebug() << "Lexicon" << m_dbName;
-  qDebug() << "Notesdb" << m_notesDbName;
 }
 void LanesLexicon::writeSettings() {
   QSettings settings;
