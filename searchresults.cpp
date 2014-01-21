@@ -48,6 +48,12 @@ void SearchResultsWidget::itemChanged(QListWidgetItem * item,QListWidgetItem * p
     QLOG_WARN() << "No record for node" << node;
     return;
   }
-  m_text->getXmlForNode(node);
-  m_text->highlight(m_target);
+  /// TODO make this a QSettings option or dialog option
+  Place p = m_text->getXmlForNode(node,true);
+  if (p.isValid()) {
+    m_text->highlight(m_target);
+  }
+  else {
+    QLOG_DEBUG() << "Invalid place returned for node" << node;
+  }
 }

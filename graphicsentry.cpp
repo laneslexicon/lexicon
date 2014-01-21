@@ -362,7 +362,7 @@ Place GraphicsEntry::getXmlForPlace(const Place & p) {
  */
 Place GraphicsEntry::getXmlForNode(const QString  & node,bool nodeOnly) {
   Place p;
-  QLOG_DEBUG() << "Search for node" << node;
+  QLOG_DEBUG() << "Search for node" << node << nodeOnly;
   m_nodeQuery->bindValue(0,node);
   m_nodeQuery->exec();
 
@@ -419,7 +419,9 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
   rootItem->setSupplement(supp);
   p.setRoot(root);
   p.setSupplement(supp);
-  items << rootItem;
+  if (! nodeOnly ) {
+    items << rootItem;
+  }
   /// by default we will center on the root item
   centerItem = rootItem;
   /// now add all the entries for the root
@@ -435,41 +437,46 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
       ok = false;
     }
     if (ok) {
-    arRoot = m_rootQuery->value(0).toString();
-    QLOG_DEBUG() << m_rootQuery->value(3).toString();
-    QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
-      .arg(m_rootQuery->value(3).toString())
-      .arg(m_rootQuery->value(2).toString())
-      .arg(m_rootQuery->value(5).toString())
-      .arg(m_rootQuery->value(6).toString())
-      .arg(m_rootQuery->value(8).toInt());
-    t += m_rootQuery->value(4).toString();
-    t += "</word>";
-    if (m_debug) {
-      QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.xml").arg(m_rootQuery->value(7).toString()));
-      QFile f(fi.filePath());
-      if (f.open(QIODevice::WriteOnly)) {
-        QTextStream out(&f);
-        out.setCodec("UTF-8");
-        out << t;
+      arRoot = m_rootQuery->value(0).toString();
+      QLOG_DEBUG() << m_rootQuery->value(3).toString();
+      QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
+        .arg(m_rootQuery->value(3).toString())
+        .arg(m_rootQuery->value(2).toString())
+        .arg(m_rootQuery->value(5).toString())
+        .arg(m_rootQuery->value(6).toString())
+        .arg(m_rootQuery->value(8).toInt());
+      t += m_rootQuery->value(4).toString();
+      t += "</word>";
+      if (m_debug) {
+        QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.xml").arg(m_rootQuery->value(7).toString()));
+        QFile f(fi.filePath());
+        if (f.open(QIODevice::WriteOnly)) {
+          QTextStream out(&f);
+          out.setCodec("UTF-8");
+          out << t;
+        }
       }
-    }
-    EntryItem * item  = createEntry(t);
-    item->setSupplement(supplement);
-    item->setNode(m_rootQuery->value(7).toString());
-    /// get the nodeid of the first item at added, so we jump to it later
-    item->setRoot(arRoot);
-    item->setWord(m_rootQuery->value(2).toString());
-    if (startNode.isEmpty()) {
-      startNode = m_rootQuery->value(7).toString();
-    }
-    else if ( startNode == item->getNode()) {
-      showWord = item->getWord();
-      /// if a node has been passed, then center on the node
-      centerItem = item;
-      p.setNode(startNode);
-    }
-    items << item;
+      EntryItem * item  = createEntry(t);
+      item->setSupplement(supplement);
+      item->setNode(m_rootQuery->value(7).toString());
+      /// get the nodeid of the first item at added, so we jump to it later
+      item->setRoot(arRoot);
+      item->setWord(m_rootQuery->value(2).toString());
+      if (startNode.isEmpty()) {
+        startNode = m_rootQuery->value(7).toString();
+      }
+      else if ( startNode == item->getNode()) {
+        showWord = item->getWord();
+        /// if a node has been passed, then center on the node
+        centerItem = item;
+        p.setNode(startNode);
+        if ( nodeOnly ) {
+          items << item;
+        }
+      }
+      if (! nodeOnly ) {
+        items << item;
+      }
     }
   } while(m_rootQuery->next());
   /// TODO we've only got a root item
