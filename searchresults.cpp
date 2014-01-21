@@ -2,9 +2,19 @@
 SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) : QWidget(parent) {
   m_target = str;
 
-
+  QSettings settings;
+  settings.beginGroup("Search");
+  QString f = settings.value("Results Font",QString()).toString();
+  if (! f.isEmpty()) {
+    m_resultsFont.fromString(f);
+  }
   QVBoxLayout * layout = new QVBoxLayout;
-  m_list = new QListWidget;
+  m_list = new QTableWidget;
+  m_list->setColumnCount(3);
+  QStringList headers;
+  headers << tr("Root") << tr("Entry") << tr("Node");
+  m_list->setHorizontalHeaderLabels(headers);
+  m_list->horizontalHeader()->setStretchLastSection(true);
   m_text = new GraphicsEntry;
   QSplitter * splitter = new QSplitter(Qt::Vertical);
   splitter->addWidget(m_list);
@@ -13,9 +23,8 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   splitter->setStretchFactor(1,1);
   layout->addWidget(splitter);
 
-  qDebug() << Q_FUNC_INFO << str;
   bool ok = false;
-  QString sql = QString("select * from xref where word = ?");
+  QString sql = QString("select * from xref where word = ? order by root,entry asc");
   if (m_query.prepare(sql)) {
     if (m_nodeQuery.prepare("select * from entry where nodeId = ?")) {
       ok = true;
@@ -28,18 +37,40 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   m_query.bindValue(0,m_target);
   m_query.exec();
   QStringList nodes;
+
+  QTableWidgetItem * item;
+  /// TODO include count in table ?
   while(m_query.next()) {
     QString t = m_query.value("node").toString();
     if (! nodes.contains(t)) {
-      QListWidgetItem * item = new QListWidgetItem(t,m_list);
+      int row = m_list->rowCount();
+      m_list->insertRow(row);
+      QString word = m_query.value("entry").toString();
+      item = new QTableWidgetItem(m_query.value("root").toString());
+      item->setFont(m_resultsFont);
+      m_list->setItem(row,0,item);
+
+      item = new QTableWidgetItem(m_query.value("entry").toString());
+      item->setFont(m_resultsFont);
+      m_list->setItem(row,1,item);
+
+      item = new QTableWidgetItem(t);
+      m_list->setItem(row,2,item);
       nodes << t;
     }
   }
+  //  m_list->resizeColumnsToContents();
+
   setLayout(layout);
-  connect(m_list,SIGNAL(currentItemChanged(QListWidgetItem * ,QListWidgetItem * )),
-          this,SLOT(itemChanged(QListWidgetItem * ,QListWidgetItem * )));
+  connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
+          this,SLOT(itemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
 }
-void SearchResultsWidget::itemChanged(QListWidgetItem * item,QListWidgetItem * prev ) {
+int SearchResultsWidget::count() {
+  return m_list->rowCount();
+}
+void SearchResultsWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * prev ) {
+  /// get the node
+  item = item->tableWidget()->item(item->row(),2);
   QString node = item->text();
   m_nodeQuery.bindValue(0,node);
   m_nodeQuery.exec();
