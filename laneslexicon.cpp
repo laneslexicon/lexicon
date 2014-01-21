@@ -100,6 +100,7 @@ void LanesLexicon::shortcut(const QString & k) {
         }
       }
     }
+    delete d;
   }
   else if (k == "Node Search") {
     NodeSearchDialog * d = new NodeSearchDialog(this);
@@ -114,6 +115,7 @@ void LanesLexicon::shortcut(const QString & k) {
         }
       }
     }
+    delete d;
   }
   else if (k == "Word Search") {
     WordSearchDialog * d = new WordSearchDialog(this);
@@ -121,11 +123,20 @@ void LanesLexicon::shortcut(const QString & k) {
       QString t = d->getText();
       if (! t.isEmpty()) {
         SearchResultsWidget * s = new SearchResultsWidget(t,this);
-        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
-        m_tabs->setCurrentIndex(i);
-        setSignals(s->getEntry());
+        if (s->count() == 0) {
+          QMessageBox msgBox;
+          msgBox.setText(QString(tr("%1 not found")).arg(t));
+          msgBox.exec();
+          delete s;
+        }
+        else {
+          int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
+          m_tabs->setCurrentIndex(i);
+          setSignals(s->getEntry());
+        }
       }
     }
+    delete d;
   }
   else if (k == "Contents Collapse All") {
     m_tree->collapseAll();
