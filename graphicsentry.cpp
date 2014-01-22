@@ -57,7 +57,7 @@ QTextCursor EntryItem::highlight(const QString & target) {
   firstPos = cursor;
   while(! cursor.isNull()) {
     pos =  cursor.position();
-    qDebug() << "found at" << pos;
+    //    qDebug() << Q_FUNC_INFO << "found at" << pos;
     cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
     cursor.setPosition(pos, QTextCursor::KeepAnchor);
     cursor.setCharFormat(fmt);
@@ -81,7 +81,7 @@ QTextCursor EntryItem::highlightRx(const QString & target) {
   firstPos = cursor;
   while(! cursor.isNull()) {
     pos =  cursor.position();
-    qDebug() << "found at" << pos;
+    qDebug() << Q_FUNC_INFO << "found at" << pos;
     cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
     cursor.setPosition(pos, QTextCursor::KeepAnchor);
     cursor.setCharFormat(fmt);
@@ -536,6 +536,17 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// TODO there has to be a better way than this
   /// TODO if node specified we need to center on it
   if ( node.isEmpty()) {
+    /*
+    QTextCursor cursor(centerItem->document());
+    QTextBlock b = cursor.block();
+    QTextLayout * layout = b.layout();
+    QTextLine line = layout->lineForTextPosition(cursor.position());
+    if (line.isValid()) {
+      qDebug() << Q_FUNC_INFO << "text line pos" << line.position() << line.textLength();
+        m_view->centerOn(line.position());
+    }
+    */
+
       m_scene->setFocusItem(centerItem);
       int h =  m_view->height();
       QPointF p = centerItem->pos();
@@ -801,10 +812,19 @@ void GraphicsEntry::highlight(const QString & target) {
     }
   }
   qDebug() << Q_FUNC_INFO << "item" << ix << "pos" << cursor.position() << cursor.hasSelection();
-  /// unselect the text and set the cursor so the item is visible
-  /// TODO can it be moved up a bit?
+  /// unselect the text otherwise it will be in the select color
+  /// center the view on the word
   if (ix != -1) {
-    cursor.clearSelection();
+    if ( ! cursor.isNull()) {
+      cursor.clearSelection();
+      QTextBlock b = cursor.block();
+      QTextLayout * layout = b.layout();
+      QTextLine line = layout->lineForTextPosition(cursor.position());
+      if (line.isValid()) {
+        //        qDebug() << "text line pos" << line.position() << line.textLength();
+        m_view->centerOn(line.position());
+      }
+    }
     m_items[ix]->setTextCursor(cursor);
   }
 }

@@ -14,6 +14,9 @@
 #include <QSettings>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QTextLine>
+#include <QTextLayout>
+#include <QTextBlock>
 #include <QFont>
 #include <QWidget>
 #include "graphicsentry.h"
