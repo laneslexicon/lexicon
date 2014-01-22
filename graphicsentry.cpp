@@ -344,7 +344,7 @@ bool GraphicsEntry::prepareQueries() {
   return ok;
 }
 Place GraphicsEntry::getXmlForPlace(const Place & p) {
-  Place np = getXmlForRoot(p.getRoot(),p.getSupplement(),p.getNode(),p.getNodeOnly());
+  Place np = getXmlForRoot(p);
   if (np.isValid()) {
     if (np.getRoot() != m_place.getRoot()) {
       emit(placeChanged(np));
@@ -391,7 +391,7 @@ Place GraphicsEntry::getXmlForNode(const QString  & node,bool nodeOnly) {
  * @param root
  * @param node the id of the entry we want to focus on
  */
-Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString & node,bool nodeOnly) {
+Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QList<EntryItem *> items;
   QString arRoot;
   int itemCount;
@@ -399,6 +399,12 @@ Place GraphicsEntry::getXmlForRoot(const QString & root,int supp,const QString &
   QString str;
   EntryItem * centerItem;
   Place p;
+
+  QString root = dp.getRoot();
+  int supp = dp.getSupplement();
+  QString node = dp.getNode();
+  bool nodeOnly = dp.getNodeOnly();
+
   QLOG_DEBUG() << Q_FUNC_INFO << root << supp << node;
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();

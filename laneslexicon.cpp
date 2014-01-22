@@ -92,7 +92,7 @@ void LanesLexicon::shortcut(const QString & k) {
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
-        Place p = showRoot(t,0,false);
+        Place p = showPlace(Place(t),false);
         if (! p.isValid()) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));
@@ -346,12 +346,13 @@ void LanesLexicon::onHistoryForward() {
   m_historyPos = action->data().toInt();
   HistoryEvent * event = m_history->getEvent(m_historyPos);
   setupHistory();
-  QString node = event->getNode();
-  QString root = event->getRoot();
+  Place p;
+  p.setNode(event->getNode());
+  p.setRoot(event->getRoot());
   GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
   /// TODO fix for supplement
-  w->getXmlForRoot(root,0,node);
-  m_tabs->setTabText(0,root);
+  w->getXmlForRoot(p);
+  m_tabs->setTabText(0,p.getRoot());
   w->setFocus();
 }
 void LanesLexicon::onHistoryBackward() {
@@ -359,12 +360,13 @@ void LanesLexicon::onHistoryBackward() {
   m_historyPos = action->data().toInt();
   HistoryEvent * event = m_history->getEvent(m_historyPos);
   setupHistory();
-  QString node = event->getNode();
-  QString root = event->getRoot();
+  Place p;
+  p.setNode(event->getNode());
+  p.setRoot(event->getRoot());
   GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
   /// TODO fix for supplement
-  w->getXmlForRoot(root,0,node);
-  m_tabs->setTabText(0,root);
+  w->getXmlForRoot(p);
+  m_tabs->setTabText(0,p.getRoot());
   w->setFocus();
 }
 void LanesLexicon::on_actionExit()
@@ -488,6 +490,8 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
 }
 Place LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) {
   Place p;
+  QLOG_DEBUG() << Q_FUNC_INFO << "REDUNDANT CODE";
+  /*
   if (createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
@@ -518,6 +522,7 @@ Place LanesLexicon::showRoot(const QString & root,int supplement,bool createTab)
    }
    m_place = p;
  }
+  */
   return p;
 }
 /**
@@ -618,7 +623,7 @@ void LanesLexicon::findNextRoot(const QString & root) {
   QString nroot = m_tree->findNextRoot(root);
   if (entry && ! nroot.isEmpty()) {
     entry->setPagingForward();
-    entry->getXmlForRoot(nroot);
+    entry->getXmlForRoot(Place(nroot));
   }
 }
 void LanesLexicon::findPrevRoot(const QString & root) {
@@ -627,7 +632,7 @@ void LanesLexicon::findPrevRoot(const QString & root) {
   QString nroot = m_tree->findPrevRoot(root);
   if (entry && ! nroot.isEmpty()) {
     entry->setPagingBackward();
-    entry->getXmlForRoot(nroot);
+    entry->getXmlForRoot(Place(nroot));
   }
 }
 /**
@@ -688,7 +693,7 @@ void LanesLexicon::on_actionFirstRoot() {
   m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::on_actionLastRoot() {
-  showRoot(m_lastRoot,false);
+  showPlace(Place(m_lastRoot),false);
   m_tree->ensureVisible(m_lastRoot);
 }
 void LanesLexicon::rootChanged(const QString & root,const QString & node) {

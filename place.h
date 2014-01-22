@@ -6,6 +6,11 @@ class Place {
  public:
   Place() {
     m_supplement = 0;
+    m_nodeOnly = false;
+  }
+  Place(const QString & root) {
+    m_root = root;
+    m_isRoot = true;
   }
   Place(const QString & root,int supp) {
     m_root = root;
