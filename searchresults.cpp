@@ -15,6 +15,7 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   headers << tr("Root") << tr("Entry") << tr("Node");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
+  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_text = new GraphicsEntry;
   QSplitter * splitter = new QSplitter(Qt::Vertical);
   splitter->addWidget(m_list);
