@@ -14,8 +14,11 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   QAction *markAction = menu.addAction("Mark");
   QAction *searchAction = menu.addAction("Search");
   connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
-  QAction *selectedAction = menu.exec(event->screenPos());
 
+  if (this->textCursor().hasSelection()) {
+    QAction *copyAction = menu.addAction("Copy");
+  }
+  QAction *selectedAction = menu.exec(event->screenPos());
 }
 void EntryItem::searchItem() {
   qDebug() << Q_FUNC_INFO;
