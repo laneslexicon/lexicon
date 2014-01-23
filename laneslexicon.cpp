@@ -439,6 +439,11 @@ Place LanesLexicon::showNode(const QString & node,bool createTab) {
   qDebug() << Q_FUNC_INFO << node << createTab;
   Place p;
   p.setNode(node);
+  int currentTab = m_tabs->currentIndex();
+  if (currentTab == -1) {
+    createTab = true;
+  }
+  qDebug() << Q_FUNC_INFO << currentTab << createTab;
  if (createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
@@ -456,7 +461,7 @@ Place LanesLexicon::showNode(const QString & node,bool createTab) {
     }
   }
   else {
-    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
+    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (w->hasPlace(p,true) == -1) {
       m_history->on();
       p = w->getXmlForNode(node);
@@ -481,6 +486,11 @@ Place LanesLexicon::showNode(const QString & node,bool createTab) {
 Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   Place np;
   QString root = p.getRoot();
+  int currentTab = m_tabs->currentIndex();
+  if (currentTab == -1) {
+    createTab = true;
+  }
+  qDebug() << Q_FUNC_INFO << currentTab << createTab;
  if (createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
@@ -497,7 +507,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     }
   }
   else {
-    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
+    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (w->hasPlace(p,true) == -1) {
       np = w->getXmlForPlace(p);
       m_tabs->setTabText(0,root);
