@@ -89,6 +89,7 @@ private:
     QString m_dbName;
     QString m_notesDbName;
     bool m_historyEnabled;
+    bool m_saveTabs;
 
     void getFirstAndLast();
     QSignalMapper * m_signalMapper;

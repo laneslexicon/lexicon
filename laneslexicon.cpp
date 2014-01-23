@@ -599,6 +599,7 @@ void LanesLexicon::readSettings() {
     arFont.fromString(ar);
   }
   m_historyEnabled = settings.value("History",true).toBool();
+  m_saveTabs = settings.value("Save Tabs",true).toBool();
   settings.endGroup();
   settings.beginGroup("Notes");
   m_notesDbName = settings.value("Database","notes.sqlite").toString();
@@ -608,6 +609,25 @@ void LanesLexicon::writeSettings() {
   settings.beginGroup("General");
   QDateTime now = QDateTime::currentDateTime();
   settings.setValue("Run date",now);
+  settings.setValue("Save Tabs",m_saveTabs);
+  settings.setValue("Database",m_dbName);
+  settings.setValue("History",m_historyEnabled);
+  settings.setValue("Aarabic font",arFont.toString());
+  settings.endGroup();
+  if (m_saveTabs) {
+    settings.beginGroup("Tabs");
+    for(int i=0;i < m_tabs->count();i++) {
+      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+      Place p = entry->getPlace();
+      settings.beginGroup(QString("Tab-%1").arg(i));
+      settings.setValue("root",p.getRoot());
+      settings.setValue("word",p.getWord());
+      settings.setValue("node",p.getNode());
+      settings.setValue("supplement",p.getSupplement());
+      settings.setValue("nodeOnly",p.getNodeOnly());
+      settings.endGroup();
+    }
+  }
 }
 HistoryMaster * LanesLexicon::history() {
   return m_history;
