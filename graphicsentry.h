@@ -111,6 +111,7 @@ class GraphicsEntry : public QWidget {
  private:
     QColor m_supplementBg;
     bool prepareQueries();
+    bool m_clearScene;
     QString lastRoot();
     QString firstRoot();
     void readSettings();

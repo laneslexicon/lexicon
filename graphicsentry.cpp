@@ -196,7 +196,7 @@ void GraphicsEntry::readSettings() {
   else {
     m_supplementBg = QColor::fromRgb(255,255,255);
   }
-
+  m_clearScene = settings.value("clear",true).toBool();
 }
 void GraphicsEntry::writeDefaultSettings() {
   QSettings settings;
@@ -205,6 +205,7 @@ void GraphicsEntry::writeDefaultSettings() {
   settings.setValue("xslt","entry.xslt");
   settings.setValue("debug",true);
   settings.setValue("text width",300);
+  settings.setValue("clear",true);
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   switch(event->key()) {
@@ -415,7 +416,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     qDebug() << "root not found";
     return p;
   }
-
+  if (m_clearScene) {
+    onClearScene();
+  }
   QString startNode = node;
   /// get the position of the last item
   itemCount = m_items.size();
