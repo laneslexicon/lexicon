@@ -60,6 +60,7 @@ public:
       void shortcut(const QString &);
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
+    void onCloseTab(int) ;
     void on_actionExit();
     void on_actionTest();
     void on_actionNextRoot();

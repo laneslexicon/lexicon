@@ -53,6 +53,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
 
   connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
+
+  connect(m_tabs,SIGNAL(tabCloseRequested(int)),this,SLOT(onCloseTab(int)));
   /// TOTDO replace this last visited item
   if (m_restoreTabs) {
     restoreTabs();
@@ -89,6 +91,22 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   //  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
 
   connect(entry,SIGNAL(placeChanged(const Place &)),this,SLOT(placeChanged (const Place &)));
+}
+void LanesLexicon::onCloseTab(int ix) {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
+  if (entry) {
+    m_tabs->removeTab(ix);
+    delete entry;
+    return;
+  }
+  SearchResultsWidget * results = qobject_cast<SearchResultsWidget *>(m_tabs->widget(ix));
+  if (results) {
+      m_tabs->removeTab(ix);
+      delete results;
+      return;
+  }
+  QLOG_WARN() << "Removed unknown tab";
+  m_tabs->removeTab(ix);
 }
 void LanesLexicon::shortcut(const QString & k) {
   qDebug() << Q_FUNC_INFO << k;
