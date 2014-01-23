@@ -13,8 +13,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_tree->installEventFilter(this);
   m_tabs = new QTabWidget(this);
   m_tabs->setTabsClosable(true);
-  GraphicsEntry * entry = new GraphicsEntry(this);
-  entry->installEventFilter(this);
 
   m_notes = new NotesWidget();
   //  m_notes->setObjectName("notes");
@@ -23,8 +21,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   splitter->setStretchFactor(0,0);
   splitter->setStretchFactor(1,1);
 
-
-  m_tabs->addTab(entry,tr(""));
   //  m_tabs->addTab(m_notes,"Notes");
   setCentralWidget(splitter);
   createActions();
@@ -51,14 +47,23 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 
-  setSignals(entry);
+
 
   connect(this,SIGNAL(nodeActivated(const QString & ,const QString & )),
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
 
   connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
   /// TOTDO replace this last visited item
-  showPlace(Place(m_firstRoot,0),false);
+  if (m_restoreTabs) {
+    restoreTabs();
+  }
+  else {
+    GraphicsEntry * entry = new GraphicsEntry(this);
+    entry->installEventFilter(this);
+    setSignals(entry);
+    m_tabs->addTab(entry,tr(""));
+    showPlace(Place(m_firstRoot,0),false);
+  }
   m_tree->ensureVisible(m_firstRoot);
   m_tree->resizeColumnToContents(0);
 }
@@ -591,7 +596,7 @@ void LanesLexicon::on_actionTest() {
 }
 void LanesLexicon::readSettings() {
   QSettings settings;
-  qDebug() << "keys" << settings.allKeys();
+  //  qDebug() << "keys" << settings.allKeys();
   settings.beginGroup("General");
   m_dbName = settings.value("Database","lexicon.sqlite").toString();
   QString ar = settings.value("Arabic font").toString();
@@ -600,9 +605,13 @@ void LanesLexicon::readSettings() {
   }
   m_historyEnabled = settings.value("History",true).toBool();
   m_saveTabs = settings.value("Save Tabs",true).toBool();
+  m_restoreTabs = settings.value("Restore Tabs",true).toBool();
+
   settings.endGroup();
   settings.beginGroup("Notes");
   m_notesDbName = settings.value("Database","notes.sqlite").toString();
+  settings.endGroup();
+
 }
 void LanesLexicon::writeSettings() {
   QSettings settings;
@@ -613,9 +622,45 @@ void LanesLexicon::writeSettings() {
   settings.setValue("Database",m_dbName);
   settings.setValue("History",m_historyEnabled);
   settings.setValue("Aarabic font",arFont.toString());
+  settings.setValue("Restore Tabs",m_restoreTabs);
   settings.endGroup();
   if (m_saveTabs) {
     settings.beginGroup("Tabs");
+    for(int i=0;i < m_tabs->count();i++) {
+      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+      if (entry) {
+        Place p = entry->getPlace();
+        settings.beginGroup(QString("Tab-%1").arg(i));
+        settings.setValue("root",p.getRoot());
+        settings.setValue("word",p.getWord());
+        settings.setValue("node",p.getNode());
+        settings.setValue("supplement",p.getSupplement());
+        settings.setValue("nodeOnly",p.getNodeOnly());
+        settings.endGroup();
+      }
+    }
+  }
+}
+void LanesLexicon::restoreTabs() {
+  QSettings settings;
+  settings.beginGroup("Tabs");
+  QStringList tabs = settings.childGroups();
+  qDebug() << tabs;
+  for(int i=0;i < tabs.size();i++) {
+    settings.beginGroup(tabs[i]);
+    Place p;
+    p.setNode(settings.value("node").toString());
+    p.setRoot(settings.value("root").toString());
+    p.setSupplement(settings.value("supplement").toInt());
+    p.setWord(settings.value("word").toString());
+    p.setNodeOnly(settings.value("nodeOnly").toBool());
+    GraphicsEntry * entry = new GraphicsEntry(this);
+    setSignals(entry);
+    entry->getXmlForPlace(p);
+    m_tabs->addTab(entry,p.getRoot());
+    settings.endGroup();
+  }
+  /*
     for(int i=0;i < m_tabs->count();i++) {
       GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
       Place p = entry->getPlace();
@@ -628,7 +673,9 @@ void LanesLexicon::writeSettings() {
       settings.endGroup();
     }
   }
+  */
 }
+
 HistoryMaster * LanesLexicon::history() {
   return m_history;
 }

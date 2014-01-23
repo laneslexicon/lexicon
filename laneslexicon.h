@@ -90,8 +90,10 @@ private:
     QString m_notesDbName;
     bool m_historyEnabled;
     bool m_saveTabs;
+    bool m_restoreTabs;
 
     void getFirstAndLast();
+    void restoreTabs();
     QSignalMapper * m_signalMapper;
     void setupShortcuts();
     int m_historyPos;
