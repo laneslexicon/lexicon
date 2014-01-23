@@ -624,6 +624,7 @@ void LanesLexicon::on_actionTest() {
 }
 void LanesLexicon::readSettings() {
   QSettings settings;
+  settings.setIniCodec("UTF-8");
   //  qDebug() << "keys" << settings.allKeys();
   settings.beginGroup("General");
   m_dbName = settings.value("Database","lexicon.sqlite").toString();
@@ -643,6 +644,7 @@ void LanesLexicon::readSettings() {
 }
 void LanesLexicon::writeSettings() {
   QSettings settings;
+  settings.setIniCodec("UTF-8");
   settings.beginGroup("General");
   QDateTime now = QDateTime::currentDateTime();
   settings.setValue("Run date",now);
@@ -671,6 +673,7 @@ void LanesLexicon::writeSettings() {
 }
 void LanesLexicon::restoreTabs() {
   QSettings settings;
+  settings.setIniCodec("UTF-8");
   settings.beginGroup("Tabs");
   QStringList tabs = settings.childGroups();
   qDebug() << tabs;
