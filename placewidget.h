@@ -24,6 +24,7 @@ class PlaceWidget : public QWidget {
   void paintEvent(QPaintEvent *);
  private:
   void readSettings();
+  bool m_show;
   Place m_place;
   QFont m_rootFont;
   QFont m_wordFont;

@@ -21,6 +21,9 @@ PlaceWidget::PlaceWidget(QWidget * parent) : QWidget(parent) {
   layout->addWidget(m_page);
 
   setLayout(layout);
+  if (! m_show) {
+    this->hide();
+  }
 }
 void PlaceWidget::setPlace(const Place & p) {
   m_place = p;
@@ -63,6 +66,7 @@ void PlaceWidget::readSettings() {
   QSettings settings;
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Place");
+  m_show = settings.value("Show",false).toBool();
   QString f = settings.value("Root font",QString()).toString();
   if (! f.isEmpty()) {
     m_rootFont.fromString(f);
