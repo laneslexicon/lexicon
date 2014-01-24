@@ -7,6 +7,8 @@ class Place {
   Place() {
     m_supplement = 0;
     m_nodeOnly = false;
+    m_page = -1;
+    m_vol = -1;
   }
   Place(const QString & root) {
     m_root = root;
