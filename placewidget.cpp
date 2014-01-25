@@ -67,6 +67,7 @@ void PlaceWidget::readSettings() {
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Place");
   m_show = settings.value("Show",false).toBool();
+
   QString f = settings.value("Root font",QString()).toString();
   if (! f.isEmpty()) {
     m_rootFont.fromString(f);
