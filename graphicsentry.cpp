@@ -17,6 +17,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
 
   if (this->textCursor().hasSelection()) {
     QAction *copyAction = menu.addAction("Copy");
+    connect(copyAction,SIGNAL(triggered()),this,SLOT(copy()));
   }
   QAction *selectedAction = menu.exec(event->screenPos());
 }
@@ -30,7 +31,11 @@ void EntryItem::setRoot(const QString & root,bool isRootEntry) {
   m_root = root;
   m_isRoot = isRootEntry;
 }
-
+void EntryItem::copy() {
+  QString txt = this->textCursor().selectedText();
+  QClipboard *clipboard = QApplication::clipboard();
+  clipboard->setText(txt);
+}
 void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWidget *w) {
   QPen pen = painter->pen();
   QBrush brush = painter->brush();

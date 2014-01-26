@@ -32,6 +32,7 @@
 #include <QFocusEvent>
 #include <QSettings>
 #include <QRegExp>
+#include <QClipboard>
 #include "QsLog.h"
 #include "xsltsupport.h"
 #include "history.h"
@@ -60,6 +61,7 @@ class EntryItem : public QGraphicsTextItem {
   QTextCursor highlightRx(const QString &);
   public slots:
     void searchItem();
+    void copy();
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
