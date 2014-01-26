@@ -16,13 +16,22 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   m_notes = new NotesWidget();
   //  m_notes->setObjectName("notes");
-  splitter->addWidget(m_tree);
-  splitter->addWidget(m_tabs);
-  splitter->setStretchFactor(0,0);
-  splitter->setStretchFactor(1,1);
-
-  //  m_tabs->addTab(m_notes,"Notes");
-  setCentralWidget(splitter);
+  if (m_docked) {
+    QDockWidget * dock = new QDockWidget("Contents",this);
+    dock->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                Qt::RightDockWidgetArea);
+    dock->setWidget(m_tree);
+    addDockWidget(Qt::LeftDockWidgetArea, dock);
+    setCentralWidget(m_tabs);
+  }
+  else {
+    splitter->addWidget(m_tree);
+    splitter->addWidget(m_tabs);
+    splitter->setStretchFactor(0,0);
+    splitter->setStretchFactor(1,1);
+    //  m_tabs->addTab(m_notes,"Notes");
+    setCentralWidget(splitter);
+  }
   createActions();
   createToolBar();
   createMenus();
@@ -643,6 +652,7 @@ void LanesLexicon::readSettings() {
   m_historyEnabled = settings.value("History",true).toBool();
   m_saveTabs = settings.value("Save Tabs",true).toBool();
   m_restoreTabs = settings.value("Restore Tabs",true).toBool();
+  m_docked = settings.value("Docked",false).toBool();
   m_interface = settings.value("Interface","default").toString();
   settings.endGroup();
   settings.beginGroup("Notes");

@@ -36,6 +36,7 @@
 #include <QShortcut>
 #include <QSignalMapper>
 #include <QMessageBox>
+#include <QDockWidget>
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"
@@ -83,6 +84,7 @@ private:
     Place showRoot(const QString &,int supp = 0,bool newTab = false);
     Place showNode(const QString &,bool newTab = false);
     QString m_interface;    // "default","minimal"
+    bool m_docked;          // whether to use docked widget
     QFont arFont;
     QString m_firstRoot;
     QString m_lastRoot;
