@@ -17,11 +17,11 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_notes = new NotesWidget();
   //  m_notes->setObjectName("notes");
   if (m_docked) {
-    QDockWidget * dock = new QDockWidget("Contents",this);
-    dock->setAllowedAreas(Qt::LeftDockWidgetArea |
+    m_treeDock = new QDockWidget("Contents",this);
+    m_treeDock->setAllowedAreas(Qt::LeftDockWidgetArea |
                                 Qt::RightDockWidgetArea);
-    dock->setWidget(m_tree);
-    addDockWidget(Qt::LeftDockWidgetArea, dock);
+    m_treeDock->setWidget(m_tree);
+    addDockWidget(Qt::LeftDockWidgetArea, m_treeDock);
     setCentralWidget(m_tabs);
   }
   else {
@@ -85,6 +85,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     statusBar()->hide();
     menuBar()->hide();
   }
+  setupInterface();
 }
 
 LanesLexicon::~LanesLexicon()
@@ -93,6 +94,24 @@ LanesLexicon::~LanesLexicon()
   /// TODO make this check something has changed or give
   /// option to save settings ?
   writeSettings();
+}
+void LanesLexicon::setupInterface() {
+  if (m_interface == "minimal") {
+    QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
+    for(int i=0;i < toolbars.size();i++) {
+      toolbars[i]->hide();
+    }
+    statusBar()->hide();
+    menuBar()->hide();
+  }
+  else  {
+    QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
+    for(int i=0;i < toolbars.size();i++) {
+      toolbars[i]->show();
+    }
+    statusBar()->show();
+    menuBar()->show();
+  }
 }
 /**
  * convenience
@@ -204,6 +223,35 @@ void LanesLexicon::shortcut(const QString & k) {
   }
   else if (k == "Quit") {
     on_actionExit();
+  }
+  else if (k == "Toggle Interface") {
+    if (m_interface == "minimal") {
+      m_interface = "default";
+    }
+    else {
+      m_interface = "minimal";
+    }
+    setupInterface();
+  }
+  else if (k == "Contents Show") {
+    if (m_treeDock->isVisible()) {
+      m_treeDock->hide();
+    }
+    else {
+      m_treeDock->show();
+    }
+  }
+  else if (k == "Root Next") {
+    this->on_actionNextRoot();
+  }
+  else if (k == "Root Prev") {
+    this->on_actionPrevRoot();
+  }
+  else if (k == "Root First") {
+    this->on_actionFirstRoot();
+  }
+  else if (k == "Root Last") {
+    this->on_actionLastRoot();
   }
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
 }
