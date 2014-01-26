@@ -10,9 +10,8 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
 
   QMenu menu;
   menu.setObjectName("entry");
-  QAction *removeAction = menu.addAction("Remove");
-  QAction *markAction = menu.addAction("Mark");
-  QAction *searchAction = menu.addAction("Search");
+  QAction *markAction = menu.addAction("Bookmark");
+  QAction *searchAction = menu.addAction("Find");
   connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
 
   if (this->textCursor().hasSelection()) {
@@ -70,6 +69,13 @@ QTextCursor EntryItem::highlight(const QString & target) {
   }
   return firstPos;
 }
+/**
+ * this is the one that is used by default
+ *
+ * @param target
+ *
+ * @return
+ */
 QTextCursor EntryItem::highlightRx(const QString & target) {
   int pos;
   QTextCursor cursor;
@@ -86,7 +92,6 @@ QTextCursor EntryItem::highlightRx(const QString & target) {
   firstPos = cursor;
   while(! cursor.isNull()) {
     pos =  cursor.position();
-    qDebug() << Q_FUNC_INFO << "found at" << pos;
     cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
     cursor.setPosition(pos, QTextCursor::KeepAnchor);
     cursor.setCharFormat(fmt);
