@@ -82,6 +82,7 @@ private:
     Place showPlace(const Place &,bool newTab = false);
     Place showRoot(const QString &,int supp = 0,bool newTab = false);
     Place showNode(const QString &,bool newTab = false);
+    QString m_interface;    // "default","minimal"
     QFont arFont;
     QString m_firstRoot;
     QString m_lastRoot;

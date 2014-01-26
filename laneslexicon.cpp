@@ -68,6 +68,14 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   m_tree->ensureVisible(m_firstRoot);
   m_tree->resizeColumnToContents(0);
+  if (m_interface == "minimal") {
+    QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
+    for(int i=0;i < toolbars.size();i++) {
+      toolbars[i]->hide();
+    }
+    statusBar()->hide();
+    menuBar()->hide();
+  }
 }
 
 LanesLexicon::~LanesLexicon()
@@ -635,7 +643,7 @@ void LanesLexicon::readSettings() {
   m_historyEnabled = settings.value("History",true).toBool();
   m_saveTabs = settings.value("Save Tabs",true).toBool();
   m_restoreTabs = settings.value("Restore Tabs",true).toBool();
-
+  m_interface = settings.value("Interface","default").toString();
   settings.endGroup();
   settings.beginGroup("Notes");
   m_notesDbName = settings.value("Database","notes.sqlite").toString();
