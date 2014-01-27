@@ -197,6 +197,15 @@ void LanesLexicon::shortcut(const QString & k) {
     }
     delete d;
   }
+  else if (k == "Page Search") {
+    bool ok;
+    /// not sure about putting max/mins
+    int page = QInputDialog::getInt(this, tr("Page Search"),
+                                    tr("Page:"), -1,1,3016, 1,&ok);
+    if (ok && (page != -1)) {
+      //
+    }
+  }
   else if (k == "Contents Collapse All") {
     m_tree->collapseAll();
   }

@@ -105,13 +105,16 @@ LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
 void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
-    QGraphicsView::scrollContentsBy(dx,dy);
+  QGraphicsView::scrollContentsBy(dx,dy);
   /*
-    QScrollBar * b = this->verticalScrollBar();
+  qDebug() << Q_FUNC_INFO << dx << dy;
+  QScrollBar * b = this->verticalScrollBar();
   if (b->value() == b->maximum()) {
+    qDebug() << "nextPage emit";
     emit(nextPage());
   }
   else if (b->value() == b->minimum()) {
+    qDebug() << "backPage emit";
     emit(backPage());
   }
   else {
@@ -782,6 +785,12 @@ QString GraphicsEntry::lastRoot() {
     }
     return root;
 }
+/**
+ * find the first root in the current scene
+ *
+ *
+ * @return the text of the root
+ */
 QString GraphicsEntry::firstRoot() {
   /// find the first root item (should always be the first
   /// element in m_items
@@ -804,12 +813,15 @@ QString GraphicsEntry::firstRoot() {
     }
     return root;
 }
+/**
+ * find the last root on the page
+ * which will emit(nextRoot(<root>))
+ */
 void GraphicsEntry::nextPageRequested() {
   this->lastRoot();
 }
 
 void GraphicsEntry::prevPageRequested() {
-  qDebug() << Q_FUNC_INFO;
   this->firstRoot();
 }
 void GraphicsEntry::highlight(const QString & target) {

@@ -37,6 +37,7 @@
 #include <QSignalMapper>
 #include <QMessageBox>
 #include <QDockWidget>
+#include <QInputDialog>
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"
