@@ -166,7 +166,8 @@ void LanesLexicon::shortcut(const QString & k) {
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
-        Place p = showNode(t,false);
+        /// show only node
+        Place p = showNode(t,true);
         if (! p.isValid()) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));
@@ -509,15 +510,13 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   Place m(root,p);
   showPlace(m,newTab);
 }
-Place LanesLexicon::showNode(const QString & node,bool createTab) {
-  qDebug() << Q_FUNC_INFO << node << createTab;
+Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) {
   Place p;
   p.setNode(node);
   int currentTab = m_tabs->currentIndex();
   if (currentTab == -1) {
     createTab = true;
   }
-  qDebug() << Q_FUNC_INFO << currentTab << createTab;
  if (createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
@@ -527,7 +526,7 @@ Place LanesLexicon::showNode(const QString & node,bool createTab) {
     if (w->hasPlace(p,true) == -1) {
       m_history->on();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,node);
-      p = w->getXmlForNode(node);
+      p = w->getXmlForNode(node,nodeOnly);
 
       //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
       //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
@@ -538,7 +537,7 @@ Place LanesLexicon::showNode(const QString & node,bool createTab) {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (w->hasPlace(p,true) == -1) {
       m_history->on();
-      p = w->getXmlForNode(node);
+      p = w->getXmlForNode(node,nodeOnly);
       m_tabs->setTabText(0,p.getNode());
       // this works but sets it for all tabs
       //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
@@ -548,7 +547,6 @@ Place LanesLexicon::showNode(const QString & node,bool createTab) {
       w->setFocus();
     }
   }
- qDebug() << Q_FUNC_INFO << p.getRoot() << p.getWord() << p.getNode();
  if (p.isValid()) {
    if (m_place.getRoot() != p.getRoot()) {
      placeChanged(p);
@@ -711,6 +709,7 @@ void LanesLexicon::readSettings() {
   m_restoreTabs = settings.value("Restore Tabs",true).toBool();
   m_docked = settings.value("Docked",false).toBool();
   m_interface = settings.value("Interface","default").toString();
+  m_rootMode = settings.value("Root Mode",true).toBool();
   settings.endGroup();
   settings.beginGroup("Notes");
   m_notesDbName = settings.value("Database","notes.sqlite").toString();

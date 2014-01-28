@@ -83,7 +83,7 @@ public:
 private:
     Place showPlace(const Place &,bool newTab = false);
     Place showRoot(const QString &,int supp = 0,bool newTab = false);
-    Place showNode(const QString &,bool newTab = false);
+    Place showNode(const QString &,bool nodeOnly = false,bool newTab = false);
     QString m_interface;    // "default","minimal"
     void setupInterface();
     bool m_docked;          // whether to use docked widget
@@ -98,7 +98,7 @@ private:
     bool m_historyEnabled;
     bool m_saveTabs;
     bool m_restoreTabs;
-
+    bool m_rootMode;
     void getFirstAndLast();
     void restoreTabs();
     QSignalMapper * m_signalMapper;

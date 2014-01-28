@@ -570,6 +570,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       m_view->centerOn(p);
   }
   p.setPage(centerItem->getPage());
+  if (nodeOnly) {
+    delete rootItem;
+  }
   return p;
 }
 /**
