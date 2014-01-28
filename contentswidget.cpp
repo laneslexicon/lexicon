@@ -86,6 +86,7 @@ Place ContentsWidget::findNextPlace(const Place & p) {
   QString root = p.getRoot();
   int supp = p.getSupplement();
   QString suppTest;
+  Place np;
   if (supp == 1) {
     suppTest = "*";
   }
@@ -112,11 +113,11 @@ Place ContentsWidget::findNextPlace(const Place & p) {
   }
   if ((topIndex == -1) || (childIndex == -1 )) {
     QLOG_WARN() << "Root not found" << root;
-    return Place();
+    return np;
   }
   if (topIndex == tc) {
     emit(atEnd());
-    return Place();
+    return np;
   }
   /// overkill, but would only matter if there were letters without any roots
   for(int i = topIndex;i < tc; i++) {
@@ -132,10 +133,12 @@ Place ContentsWidget::findNextPlace(const Place & p) {
         else {
           supp = 0;
         }
-        return Place(nextItem->text(0),supp);
+        np.setRoot(nextItem->text(0));
+        np.setSupplement(supp);
+        return np;
       }
     }
-  return Place();
+  return np;
 }
 /**
  * Called by LanesLexicon when it gets a next root signal
@@ -260,6 +263,7 @@ Place ContentsWidget::findPrevPlace(const Place & p) {
   QString root = p.getRoot();
   int supp = p.getSupplement();
   QString suppTest;
+  Place np;
   if (supp == 1) {
     suppTest = "*";
   }
@@ -286,7 +290,7 @@ Place ContentsWidget::findPrevPlace(const Place & p) {
   }
   if (topIndex == -1) {
     emit(atStart());
-    return Place();
+    return np;
   }
   /// overkill, but would only matter if there were letters without any roots
   for(int i = topIndex;i >= 0; i--) {
@@ -305,10 +309,12 @@ Place ContentsWidget::findPrevPlace(const Place & p) {
         else {
           supp = 0;
         }
-        return Place(nextItem->text(0),supp);
+        np.setRoot(nextItem->text(0));
+        np.setSupplement(supp);
+        return np;
       }
     }
-  return Place();
+  return np;
 }
 void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   switch (event->key()) {
