@@ -432,14 +432,15 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (m_clearScene) {
     onClearScene();
   }
+  /// this will be set to the right word if a node has been supplied
+  QString showWord;
   QString startNode = node;
   /// get the position of the last item
   itemCount = m_items.size();
-  /// add the root item
+
+  /// add the root item unless nodeOnly is set
   str = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
   EntryItem * rootItem  = createEntry(str);
-  /// this will be set to the right word if a node has been supplied
-  QString showWord;
   rootItem->setRoot(root,true);
   rootItem->setSupplement(supp);
   p.setRoot(root);
@@ -507,6 +508,13 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// TODO we've only got a root item
   if (items.size() == 1) {
   }
+  /**
+   * we have all the new items to show.
+   * If we are going forward, add them to the end
+   *                 backwards, prepend them in reverse order
+   *
+   */
+
   if (m_pagingDir == 1) {
     /// where the old items begin
     int x = items.size();
@@ -599,7 +607,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
 }
 /**
  * add the graphics items in m_items to the scene starting with the item
- * at startPos
+ * at startPos calculating the position as it goes
  *
  * @param startPos
  */
@@ -608,7 +616,6 @@ void GraphicsEntry::appendEntries(int startPos) {
   qreal xpos = 0;
   QRectF r;
   QSizeF sz;
-  //  QLOG_DEBUG() << "addEntries" << offset << startPos;
   /// calculate the y-position of the last item currently in the scene
   if (startPos > 0) {
     QPointF p = m_items[startPos - 1]->pos();
@@ -620,7 +627,6 @@ void GraphicsEntry::appendEntries(int startPos) {
     m_items[i]->setPos(xpos,ypos);
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
-    //    QLOG_DEBUG() << "Pos" << m_items[i]->getNode()  << ypos << r.height();
     if (m_debug) {
       QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
@@ -635,15 +641,14 @@ void GraphicsEntry::appendEntries(int startPos) {
     //    ri->setPos(xpos,ypos);
     //    ri->setPen(QPen(Qt::NoPen));
     //    ri->setBrush(Qt::cyan);
-
     ypos += sz.height() + m_entryMargin;
-    //    ypos += r.height() + m_entryMargin;
-
   }
 }
 /**
  * add the graphics items in m_items to the scene starting with the item
  * at startPos
+ *
+ * recalculates the position of all the items
  *
  * @param startPos
  */
@@ -652,15 +657,14 @@ void GraphicsEntry::prependEntries(int startPos) {
   qreal xpos = 0;
   QRectF r;
   QSizeF sz;
-  QLOG_DEBUG() << "prependEntries" <<  startPos;
+
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->setPos(xpos,ypos);
-    /// check if this is a new item
-    if (i < startPos) {
+    /// check if this is a new item and add it the scene
+    if (i < startPosw) {
       m_scene->addItem(m_items[i]);
     }
     r = m_items[i]->boundingRect();
-    //    QLOG_DEBUG() << "Pos" << m_items[i]->getNode()  << ypos << r.height();
     if (m_debug) {
       QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
@@ -672,8 +676,6 @@ void GraphicsEntry::prependEntries(int startPos) {
     }
     sz = m_items[i]->document()->size();
     ypos += sz.height() + m_entryMargin;
-    //    ypos += r.height() + m_entryMargin;
-
   }
 }
 void GraphicsEntry::on_findNode()  {
