@@ -144,9 +144,11 @@ class GraphicsEntry : public QWidget {
     LaneGraphicsView * m_view;
     QGraphicsScene * m_scene;
     QGraphicsTextItem * m_item;
+
     QSqlQuery * m_nodeQuery;
     QSqlQuery * m_rootQuery;
     QSqlQuery * m_nextRootQuery;
+    QSqlQuery * m_pageQuery;
     QString m_standardCSS;
 
     QString m_currentHtml;

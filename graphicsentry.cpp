@@ -185,6 +185,7 @@ GraphicsEntry::~GraphicsEntry() {
   delete m_nodeQuery;
   delete m_rootQuery;
   delete m_nextRootQuery;
+  delete m_pageQuery;
   /// TODO xalan cleanup ?
 }
 void GraphicsEntry::readSettings() {
@@ -346,18 +347,27 @@ bool GraphicsEntry::readCssFromFile(const QString & name) {
 
 
 bool GraphicsEntry::prepareQueries() {
-  m_nodeQuery = new QSqlQuery;
-  bool ok = m_nodeQuery->prepare("select * from entry where nodeId = ?");
+  bool ok;
+  m_pageQuery = new QSqlQuery;
+  ok = m_pageQuery->prepare("select * from entry where page = ? order by word asc");
   if (! ok ) {
-    QLOG_DEBUG() << "node SQL prepare failed";
+    QLOG_WARN() << "page SQL prepare failed" << m_pageQuery->lastError();
+  }
+  m_nodeQuery = new QSqlQuery;
+  ok = m_nodeQuery->prepare("select * from entry where nodeId = ?");
+  if (! ok ) {
+    QLOG_WARN() << "node SQL prepare failed" << m_nodeQuery->lastError();
   }
   m_rootQuery = new QSqlQuery;
   ok = m_rootQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeId,supplement from entry where root = ? order by nodenum");
   if (! ok ) {
-    QLOG_DEBUG() << "root SQL prepare failed";
+    QLOG_WARN() << "root SQL prepare failed" << m_rootQuery->lastError();
   }
   m_nextRootQuery = new QSqlQuery;
   ok = m_nextRootQuery->prepare("select word from root ");
+  if (! ok ) {
+    QLOG_WARN() << "next root SQL prepare failed" << m_nextRootQuery->lastError();
+  }
   return ok;
 }
 Place GraphicsEntry::getXmlForPlace(const Place & p) {
