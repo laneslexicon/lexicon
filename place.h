@@ -17,11 +17,15 @@ class Place {
     m_supplement = supp;
     m_isRoot = true;
   }
-  bool isEmpty() {
+  bool isEmpty() const {
     return m_root.isEmpty();
   }
-  bool isValid() {
-    return ! m_root.isEmpty();
+  /// we are either looking for a root or a node
+  bool isValid() const {
+    if (m_root.isEmpty() && ! m_nodeOnly) {
+      return false;
+    }
+    return true;
   }
   void setRoot(const QString & root) { m_root = root;}
   void setIsRoot(bool v) {

@@ -8,6 +8,9 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   setSelectionMode(QAbstractItemView::SingleSelection);
   header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
 }
+ContentsWidget::~ContentsWidget() {
+  qDebug() << Q_FUNC_INFO;
+}
 void ContentsWidget::loadContents() {
   QSqlQuery query;
   QFile f;
@@ -372,6 +375,7 @@ void ContentsWidget::ensureVisible(const QString & root, int supplement,bool sel
   }
   if ((topIndex == -1) || (childIndex == -1)) {
     QLOG_WARN() << "Ensure visible error";
+    return;
   }
   topItem->setExpanded(true);
   if (select) {

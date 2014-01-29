@@ -87,6 +87,8 @@ private:
     QString m_interface;    // "default","minimal"
     void setupInterface();
     bool m_docked;          // whether to use docked widget
+    bool m_valgrind;
+    bool m_useNotes;
     QDockWidget * m_treeDock;
     QFont arFont;
     QString m_firstRoot;

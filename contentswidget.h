@@ -19,6 +19,7 @@ class ContentsWidget : public QTreeWidget {
   Q_OBJECT;
  public:
   ContentsWidget(QWidget * parent = 0);
+  ~ContentsWidget();
   void loadContents();
   QString findNextRoot(const QString &);
   QString findPrevRoot(const QString &);

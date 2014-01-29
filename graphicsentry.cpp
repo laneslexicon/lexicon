@@ -182,6 +182,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   prepareQueries();
 }
 GraphicsEntry::~GraphicsEntry() {
+  qDebug() << Q_FUNC_INFO;
   delete m_nodeQuery;
   delete m_rootQuery;
   delete m_nextRootQuery;
@@ -349,7 +350,7 @@ bool GraphicsEntry::readCssFromFile(const QString & name) {
 bool GraphicsEntry::prepareQueries() {
   bool ok;
   m_pageQuery = new QSqlQuery;
-  ok = m_pageQuery->prepare("select * from entry where page = ? order by word asc");
+  ok = m_pageQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeId,supplement from entry where page = ? order by nodenum asc");
   if (! ok ) {
     QLOG_WARN() << "page SQL prepare failed" << m_pageQuery->lastError();
   }
@@ -432,11 +433,11 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QString node = dp.getNode();
   bool nodeOnly = dp.getNodeOnly();
 
-  QLOG_DEBUG() << Q_FUNC_INFO << root << supp << node;
+  QLOG_DEBUG() << Q_FUNC_INFO << root << supp << node << "nodeOnly = " << nodeOnly;
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   if (! m_rootQuery->first()) {
-    qDebug() << "root not found";
+    QLOG_INFO() << "root not found" << root;
     return p;
   }
   if (m_clearScene) {
@@ -445,7 +446,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// this will be set to the right word if a node has been supplied
   QString showWord;
   QString startNode = node;
-  /// get the position of the last item
+  /// get the position of the last item in the scene
   itemCount = m_items.size();
 
   /// add the root item unless nodeOnly is set
@@ -515,6 +516,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       }
     }
   } while(m_rootQuery->next());
+
   /// TODO we've only got a root item
   if (items.size() == 1) {
   }
@@ -671,7 +673,7 @@ void GraphicsEntry::prependEntries(int startPos) {
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->setPos(xpos,ypos);
     /// check if this is a new item and add it the scene
-    if (i < startPosw) {
+    if (i < startPos) {
       m_scene->addItem(m_items[i]);
     }
     r = m_items[i]->boundingRect();

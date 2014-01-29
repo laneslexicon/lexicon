@@ -7,14 +7,16 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   openDatabase("lexicon.sqlite");
   loadStyleSheet();
-  QSplitter * splitter = new QSplitter;
+
   m_tree = new ContentsWidget(this);
   m_tree->setObjectName("treeRoots");
   m_tree->installEventFilter(this);
   m_tabs = new QTabWidget(this);
   m_tabs->setTabsClosable(true);
-
-  m_notes = new NotesWidget();
+  if ( m_useNotes) {
+    m_notes = new NotesWidget(this);
+    m_notes->hide();
+  }
   //  m_notes->setObjectName("notes");
   if (m_docked) {
     m_treeDock = new QDockWidget("Contents",this);
@@ -25,6 +27,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     setCentralWidget(m_tabs);
   }
   else {
+    QSplitter * splitter = new QSplitter;
     splitter->addWidget(m_tree);
     splitter->addWidget(m_tabs);
     splitter->setStretchFactor(0,0);
@@ -39,8 +42,10 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   if (m_db.isOpen()) {
     statusBar()->showMessage(tr("Ready"));
-    m_tree->loadContents();
-    getFirstAndLast();
+    if (! m_valgrind ) {
+      m_tree->loadContents();
+      getFirstAndLast();
+    }
     /// at the end of the history, but we should be able to restore from settings
     m_historyPos = 9;
     m_history = new HistoryMaster(m_notesDbName);
@@ -57,12 +62,11 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 
 
-
+  if ( m_useNotes ) {
   connect(this,SIGNAL(nodeActivated(const QString & ,const QString & )),
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
-
   connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
-
+  }
   connect(m_tabs,SIGNAL(tabCloseRequested(int)),this,SLOT(onCloseTab(int)));
   /// TOTDO replace this last visited item
   if (m_restoreTabs) {
@@ -72,19 +76,13 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     GraphicsEntry * entry = new GraphicsEntry(this);
     entry->installEventFilter(this);
     setSignals(entry);
-    m_tabs->addTab(entry,tr(""));
-    showPlace(Place(m_firstRoot,0),false);
-  }
-  m_tree->ensureVisible(m_firstRoot);
-  m_tree->resizeColumnToContents(0);
-  if (m_interface == "minimal") {
-    QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
-    for(int i=0;i < toolbars.size();i++) {
-      toolbars[i]->hide();
+    if (! m_firstRoot.isEmpty()) {
+      m_tabs->addTab(entry,tr(""));
+      showPlace(Place(m_firstRoot,0),false);
+      m_tree->ensureVisible(m_firstRoot);
     }
-    statusBar()->hide();
-    menuBar()->hide();
   }
+  m_tree->resizeColumnToContents(0);
   setupInterface();
 }
 
@@ -94,6 +92,12 @@ LanesLexicon::~LanesLexicon()
   /// TODO make this check something has changed or give
   /// option to save settings ?
   writeSettings();
+  if (m_history) {
+    delete m_history;
+  }
+  if (m_db.isOpen()) {
+    m_db.close();
+  }
 }
 void LanesLexicon::setupInterface() {
   if (m_interface == "minimal") {
@@ -141,7 +145,6 @@ void LanesLexicon::onCloseTab(int ix) {
       delete results;
       return;
   }
-  QLOG_WARN() << "Removed unknown tab";
   m_tabs->removeTab(ix);
 }
 void LanesLexicon::shortcut(const QString & k) {
@@ -342,12 +345,12 @@ void LanesLexicon::createToolBar() {
 
   QToolBar * history = addToolBar(tr("History"));
 
-  m_hForwardBtn = new QToolButton;
+  m_hForwardBtn = new QToolButton(history);
   m_hForwardBtn->setText("Forward");
   m_hForwardBtn->setDefaultAction(m_hForward);
   m_hForwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_hForwardBtn->setEnabled(false);
-  m_hBackwardBtn = new QToolButton;
+  m_hBackwardBtn = new QToolButton(history);
   m_hBackwardBtn->setText("Back");
   m_hBackwardBtn->setDefaultAction(m_hBackward);
   m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
@@ -430,10 +433,11 @@ void LanesLexicon::createStatusBar() {
   layout->addWidget(m_currentRoot);
   w->setLayout(layout);
   statusBar()->insertPermanentWidget(0,w,0);
-
-  m_notesBtn = new QPushButton(tr("Notes"));
-  m_notesBtn->setEnabled(true);
-  statusBar()->insertPermanentWidget(0,m_notesBtn,0);
+  if (m_useNotes) {
+    m_notesBtn = new QPushButton(tr("Notes"));
+    m_notesBtn->setEnabled(true);
+    statusBar()->insertPermanentWidget(0,m_notesBtn,0);
+  }
   statusBar()->showMessage(tr("Ready"));
 }
 QSize LanesLexicon::sizeHint() const {
@@ -472,8 +476,10 @@ void LanesLexicon::on_actionExit()
   if (m_db.isOpen()) {
     m_db.close();
   }
-  m_notes->close();
-  delete m_notes;
+  if (m_useNotes) {
+    m_notes->close();
+    delete m_notes;
+  }
   close();
 }
 void LanesLexicon::onNotesClicked() {
@@ -558,6 +564,10 @@ Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) 
 Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   Place np;
   QString root = p.getRoot();
+
+  if (! p.isValid()) {
+    return np;
+  }
   int currentTab = m_tabs->currentIndex();
   if (currentTab == -1) {
     createTab = true;
@@ -650,8 +660,10 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * ol
     if (! node.isEmpty()) {
       QString txt = QString("%1  %2  At:%3,%4").arg(node).arg(word).arg(p.x()).arg(p.y());
       statusBar()->showMessage(txt);
-      m_notesBtn->setEnabled(true);
-      emit(nodeActivated(item->getNode(),item->getWord()));
+      if (m_useNotes) {
+        m_notesBtn->setEnabled(true);
+        emit(nodeActivated(item->getNode(),item->getWord()));
+      }
     }
   }
 
@@ -710,6 +722,10 @@ void LanesLexicon::readSettings() {
   m_docked = settings.value("Docked",false).toBool();
   m_interface = settings.value("Interface","default").toString();
   m_rootMode = settings.value("Root Mode",true).toBool();
+
+  m_valgrind = settings.value("Valgrind",false).toBool();
+  m_useNotes = settings.value("Use Notes",false).toBool();
+
   settings.endGroup();
   settings.beginGroup("Notes");
   m_notesDbName = settings.value("Database","notes.sqlite").toString();
@@ -754,11 +770,15 @@ void LanesLexicon::restoreTabs() {
   for(int i=0;i < tabs.size();i++) {
     settings.beginGroup(tabs[i]);
     Place p;
-    p.setNode(settings.value("node").toString());
-    p.setRoot(settings.value("root").toString());
+    p.setNode(settings.value("node",QString()).toString());
+    p.setRoot(settings.value("root",QString()).toString());
     p.setSupplement(settings.value("supplement").toInt());
-    p.setWord(settings.value("word").toString());
-    p.setNodeOnly(settings.value("nodeOnly").toBool());
+    p.setWord(settings.value("word",QString()).toString());
+    p.setNodeOnly(settings.value("nodeOnly",false).toBool());
+    if (p.getNode().isEmpty()) {
+      p.setNodeOnly(false);
+    }
+    qDebug() << "restore tab" << p.getNodeOnly() << p.getRoot() << p.getNode();
     GraphicsEntry * entry = new GraphicsEntry(this);
     setSignals(entry);
     entry->getXmlForPlace(p);

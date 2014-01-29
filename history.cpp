@@ -50,7 +50,9 @@ HistoryMaster::~HistoryMaster() {
   if (m_getQuery) {
     delete m_getQuery;
   }
-  m_db.close();
+  if (m_db.isOpen()) {
+    m_db.close();
+  }
 }
 //create table history(id integer primary key,nodeId text,word text,root text,timewhen text);
 bool HistoryMaster::openDatabase(const QString & dbname) {
