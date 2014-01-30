@@ -223,7 +223,6 @@ void GraphicsEntry::writeDefaultSettings() {
   settings.beginGroup("Entry");
   settings.setValue("css","entry.css");
   settings.setValue("xslt","entry.xslt");
-  settings.setValue("debug",true);
   settings.setValue("text width",300);
   settings.setValue("clear",true);
 }
@@ -427,7 +426,7 @@ Place GraphicsEntry::getXmlForNode(const QString  & node,bool nodeOnly) {
 Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QList<EntryItem *> items;
   QString arRoot;
-  int itemCount;
+
   int supplement;
   QString str;
   EntryItem * centerItem;
@@ -451,8 +450,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// this will be set to the right word if a node has been supplied
   QString showWord;
   QString startNode = node;
-  /// get the position of the last item in the scene
-  itemCount = m_items.size();
 
   /// add the root item unless nodeOnly is set
   str = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
@@ -480,7 +477,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
     if (ok) {
       arRoot = m_rootQuery->value(0).toString();
-      QLOG_DEBUG() << m_rootQuery->value(3).toString();
       QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
         .arg(m_rootQuery->value(3).toString())
         .arg(m_rootQuery->value(2).toString())
@@ -501,7 +497,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       EntryItem * item  = createEntry(t);
       item->setSupplement(supplement);
       item->setNode(m_rootQuery->value(7).toString());
-      /// get the nodeid of the first item at added, so we jump to it later
       item->setRoot(arRoot);
       item->setWord(m_rootQuery->value(2).toString());
       if (startNode.isEmpty()) {
@@ -528,29 +523,33 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /**
    * we have all the new items to show.
    * If we are going forward, add them to the end
-   *                 backwards, prepend them in reverse order
+   *  "  "  "   "    backwards, prepend them in reverse order
    *
    */
 
   if (m_pagingDir == 1) {
-    /// where the old items begin
+    /// where the old items begin will be the number of items we're adding
     int x = items.size();
     while(items.size() > 0) {
       EntryItem * item = items.takeLast();
       m_items.prepend(item);
     }
+    /// added the entries to the scene and recalculate positions
+    /// parameter tells it where the new entries stop
     prependEntries(x);
   }
   else {
+   /// get the position of the last item in the scene
+    int itemCount = m_items.size();
     while(items.size() > 0) {
       EntryItem * item = items.takeFirst();
       m_items.append(item);
     }
-    /// where the old when finish
-    //
     appendEntries(itemCount);
   }
-
+  ///
+  /// all items have been added and positions calculated
+  ///
   m_view->setFocus();
   m_transform = m_view->transform();
 
@@ -663,11 +662,11 @@ void GraphicsEntry::appendEntries(int startPos) {
 }
 /**
  * add the graphics items in m_items to the scene starting with the item
- * at startPos
+ * at the beginning and stopping at startPos
  *
  * recalculates the position of all the items
  *
- * @param startPos
+ * @param startPos the starting position of items that have already been added
  */
 void GraphicsEntry::prependEntries(int startPos) {
   qreal ypos = 0;
