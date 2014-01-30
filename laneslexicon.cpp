@@ -78,7 +78,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     setSignals(entry);
     if (! m_firstRoot.isEmpty()) {
       m_tabs->addTab(entry,tr(""));
-      showPlace(Place(m_firstRoot,0),false);
+      Place p;
+      p.setRoot(m_firstRoot);
+      showPlace(p,false);
       m_tree->ensureVisible(m_firstRoot);
     }
   }
