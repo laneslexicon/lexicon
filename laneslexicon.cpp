@@ -209,7 +209,7 @@ void LanesLexicon::shortcut(const QString & k) {
     int page = QInputDialog::getInt(this, tr("Page Search"),
                                     tr("Page:"), -1,1,3016, 1,&ok);
     if (ok && (page != -1)) {
-      //
+      this->onGoToPage(page);
     }
   }
   else if (k == "Contents Collapse All") {
@@ -915,4 +915,13 @@ void LanesLexicon::shortcutActivated() {
 void LanesLexicon::ambiguousShortcut() {
   QShortcut * sc = qobject_cast<QShortcut *>(QObject::sender());
   qDebug() << "got the ambiguous shortcut" << sc->key().toString();
+}
+void LanesLexicon::onGoToPage(int page) {
+  qDebug() << Q_FUNC_INFO;
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->setPagingForward();
+    entry->getPage(page);
+    //        m_tree->ensurePlaceVisible(np,true);
+  }
 }
