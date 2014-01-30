@@ -99,6 +99,21 @@ QTextCursor EntryItem::highlightRx(const QString & target) {
   }
   return firstPos;
 }
+Place EntryItem::getPlace() {
+  Place p;
+  p.setRoot(m_root);
+  p.setWord(m_word);
+  p.setPage(m_page);
+  p.setSupplement(m_supplement);
+  p.setIsRoot(m_isRoot);
+  return p;
+}
+/**
+ *
+ *
+ * @param scene
+ * @param parent
+ */
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
   QGraphicsView(scene,parent) {
   //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -426,11 +441,10 @@ Place GraphicsEntry::getXmlForNode(const QString  & node,bool nodeOnly) {
 Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QList<EntryItem *> items;
   QString arRoot;
-
+  Place p;
   int supplement;
   QString str;
   EntryItem * centerItem;
-  Place p;
 
   QString root = dp.getRoot();
   int supp = dp.getSupplement();
@@ -455,9 +469,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   str = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
   EntryItem * rootItem  = createEntry(str);
   rootItem->setRoot(root,true);
-  rootItem->setSupplement(supp);
-  p.setRoot(root);
-  p.setSupplement(supp);
+  rootItem->setSupplement(m_rootQuery->value(8).toInt());
+  rootItem->setPage(m_rootQuery->value(5).toInt());
+
   if (! nodeOnly ) {
     items << rootItem;
   }
@@ -594,11 +608,11 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       p.setY(p.y() + h/2 - 10);
       m_view->centerOn(p);
   }
-  p.setPage(centerItem->getPage());
   if (nodeOnly) {
     delete rootItem;
   }
-  return p;
+  m_place = centerItem->getPlace();
+  return m_place;
 }
 Place GraphicsEntry::getPage(const int page) {
   QList<EntryItem *> items;
@@ -655,7 +669,7 @@ Place GraphicsEntry::getPage(const int page) {
     QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
       .arg(m_pageQuery->value(3).toString())
       .arg(m_pageQuery->value(2).toString())
-      .arg(m_pageQuery->value(5).toString())
+      .arg(m_pageQuery->value(5).toInt())
       .arg(m_pageQuery->value(6).toString())
       .arg(m_pageQuery->value(8).toInt());
     t += m_pageQuery->value(4).toString();
@@ -674,6 +688,7 @@ Place GraphicsEntry::getPage(const int page) {
     item->setNode(m_pageQuery->value(7).toString());
     item->setRoot(root);
     item->setWord(m_pageQuery->value(2).toString());
+    item->setPage(m_pageQuery->value(5).toInt());
     items << item;
 
     entryCount++;
@@ -777,6 +792,7 @@ Place GraphicsEntry::getPage(const int page) {
   m_view->centerOn(pt);
 
   p.setPage(focusItem->getPage());
+  m_place = p;
   return p;
 }
 /**

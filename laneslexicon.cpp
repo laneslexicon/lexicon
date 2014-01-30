@@ -268,6 +268,19 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (k == "Root Last") {
     this->on_actionLastRoot();
   }
+  else if (k == "Page Next") {
+    this->on_actionNextPage();
+  }
+  else if (k == "Page Prev") {
+    this->on_actionPrevPage();
+  }
+  else if (k == "Page First") {
+    this->on_actionFirstPage();
+  }
+  else if (k == "Page Last") {
+    this->on_actionLastPage();
+  }
+
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
 }
 /**
@@ -760,6 +773,7 @@ void LanesLexicon::writeSettings() {
         settings.setValue("node",p.getNode());
         settings.setValue("supplement",p.getSupplement());
         settings.setValue("nodeOnly",p.getNodeOnly());
+        settings.setValue("page",p.getPage());
         settings.endGroup();
       }
     }
@@ -784,8 +798,9 @@ void LanesLexicon::restoreTabs() {
     QLOG_DEBUG() << "restore tab" << p.getNodeOnly() << p.getRoot() << p.getNode();
     GraphicsEntry * entry = new GraphicsEntry(this);
     setSignals(entry);
-    entry->getXmlForPlace(p);
+    p = entry->getXmlForPlace(p);
     m_tabs->addTab(entry,p.getRoot());
+    m_tree->ensurePlaceVisible(p,true);
     settings.endGroup();
   }
 }
@@ -890,23 +905,26 @@ void LanesLexicon::placeChanged(const Place & p) {
 }
 void LanesLexicon::getFirstAndLast() {
   QSqlQuery query;
-  bool ok = query.prepare("select root from entry order by nodenum limit 5;");
+  bool ok = query.prepare("select root,page from entry order by nodenum limit 5;");
   if (! ok ) {
     QLOG_DEBUG() << "first root SQL prepare failed";
   }
   query.exec();
   if (query.first()) {
     m_firstRoot = query.value(0).toString();
+    m_firstPage = query.value(1).toInt();
   }
-  ok = query.prepare("select root from entry order by nodenum desc limit 5;");
+  ok = query.prepare("select root,page from entry order by nodenum desc limit 5;");
   if (! ok ) {
     QLOG_DEBUG() << "last root SQL prepare failed";
   }
   query.exec();
   if (query.first()) {
     m_lastRoot = query.value(0).toString();
+    m_lastPage = query.value(1).toInt();
   }
   qDebug() << "First" << m_firstRoot << "last" << m_lastRoot;
+  qDebug() << "First page" << m_firstPage << "last page" << m_lastPage;
 }
 void LanesLexicon::shortcutActivated() {
   QShortcut * sc = qobject_cast<QShortcut *>(QObject::sender());
@@ -922,6 +940,52 @@ void LanesLexicon::onGoToPage(int page) {
   if (entry) {
     entry->setPagingForward();
     entry->getPage(page);
+    //        m_tree->ensurePlaceVisible(np,true);
+  }
+}
+void LanesLexicon::on_actionNextPage() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    int page = entry->getPlace().getPage();
+    if (page == -1) {
+      page = 0;
+    }
+    page++;
+    entry->setPagingForward();
+    entry->getPage(page);
+    //        m_tree->ensurePlaceVisible(np,true);
+  }
+}
+void LanesLexicon::on_actionPrevPage() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    int page = entry->getPlace().getPage();
+    if (page < 0) {
+      page = 1;
+    }
+    if (page == 1) {
+      QLOG_INFO() << "At first page";
+      return;
+    }
+    page--;
+    entry->setPagingForward();
+    entry->getPage(page);
+    //        m_tree->ensurePlaceVisible(np,true);
+  }
+}
+void LanesLexicon::on_actionFirstPage() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->setPagingForward();
+    entry->getPage(m_firstPage);
+    //        m_tree->ensurePlaceVisible(np,true);
+  }
+}
+void LanesLexicon::on_actionLastPage() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->setPagingForward();
+    entry->getPage(m_lastPage);
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }

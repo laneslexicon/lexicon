@@ -66,10 +66,17 @@ public:
     void onGoToPage(int);
     void on_actionExit();
     void on_actionTest();
+
     void on_actionNextRoot();
     void on_actionPrevRoot();
     void on_actionFirstRoot();
     void on_actionLastRoot();
+
+    void on_actionNextPage();
+    void on_actionPrevPage();
+    void on_actionFirstPage();
+    void on_actionLastPage();
+
     void onHistoryForward();
     void onHistoryBackward();
     void rootClicked(QTreeWidgetItem * , int);
@@ -92,8 +99,12 @@ private:
     bool m_useNotes;
     QDockWidget * m_treeDock;
     QFont arFont;
+
     QString m_firstRoot;
     QString m_lastRoot;
+    int m_firstPage;
+    int m_lastPage;
+
     /// set by readSettings
 
     QString m_dbName;

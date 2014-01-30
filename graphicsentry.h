@@ -49,9 +49,11 @@ class EntryItem : public QGraphicsTextItem {
   void setRoot(const QString & root,bool isRootEntry = false);
   void setWord(const QString & word) { m_word = word; }
   void setSupplement(int v)  { m_supplement = v;}
+  void setPage(int x)  { m_page = x;}
   void setBackground(QColor & c) { m_backgroundColor = c;}
   bool isNode(const QString & id) { return m_nodeId ==  id;}
   bool isRoot() { return m_isRoot;}
+  Place getPlace();
   QString getNode() { return m_nodeId;}
   QString getRoot() { return m_root;}
   QString getWord() { return m_word;}
