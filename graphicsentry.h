@@ -84,7 +84,8 @@ class GraphicsEntry : public QWidget {
   ~GraphicsEntry();
 
   //  Place getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString(),bool nodeOnly = false);
-  Place getXmlForRoot(const Place &);
+    Place getXmlForRoot(const Place &);
+    Place getPage(const int );
     Place getXmlForPlace(const Place &);
     Place getXmlForNode(const QString &,bool nodeOnly = false);
     Place getPlace() { return m_place;}

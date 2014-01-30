@@ -556,6 +556,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   //QLOG_DEBUG() << "Scene rect" << m_scene->sceneRect();
   /// without thus centerOn() does not work properly for
   /// items added to the scene
+  /// TODO check this
   m_view->setSceneRect(m_scene->sceneRect());
   if (m_currentRoot != arRoot) {
     emit rootChanged(arRoot,node);
@@ -597,6 +598,185 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (nodeOnly) {
     delete rootItem;
   }
+  return p;
+}
+Place GraphicsEntry::getPage(const int page) {
+  QList<EntryItem *> items;
+  EntryItem * item;
+  QString arRoot;
+  QString str;
+  EntryItem * focusItem;
+  Place p;
+  bool nodeOnly = false;
+  p.setPage(page);
+
+
+  m_pageQuery->bindValue(0,page);
+  m_pageQuery->exec();
+  if (! m_pageQuery->first()) {
+    QLOG_INFO() << "Page not found" << page;
+    return p;
+  }
+  if (m_clearScene) {
+    onClearScene();
+  }
+  QString lastRoot;
+  /*
+  int supplement = m_pageQuery->value(8).toInt();
+  /// add the root item unless nodeOnly is set
+  str = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
+  item  = createEntry(str);
+  rootItem->setRoot(root,true);
+  rootItem->setSupplement(supplement);
+  p.setRoot(root);
+  p.setSupplement(supplement);
+  if (! nodeOnly ) {
+    items << rootItem;
+  }
+  /// by default we will center on the root item
+  centerItem = rootItem;
+  /// now add all the entries for the root
+  */
+  int rootCount = 0;
+  int entryCount = 0;
+  do   {
+    int supplement = m_pageQuery->value(8).toInt();
+    QString root = m_pageQuery->value(0).toString();
+    /// if root has changed add root XML
+    if (root != lastRoot) {
+      if (! lastRoot.isEmpty()) {
+        QString  str = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
+        item = createEntry(str);
+        items  << item;
+        rootCount++;
+      }
+      lastRoot = root;
+    }
+    QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
+      .arg(m_pageQuery->value(3).toString())
+      .arg(m_pageQuery->value(2).toString())
+      .arg(m_pageQuery->value(5).toString())
+      .arg(m_pageQuery->value(6).toString())
+      .arg(m_pageQuery->value(8).toInt());
+    t += m_pageQuery->value(4).toString();
+    t += "</word>";
+    if (m_dumpXML) {
+      QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.xml").arg(m_pageQuery->value(7).toString()));
+      QFile f(fi.filePath());
+      if (f.open(QIODevice::WriteOnly)) {
+        QTextStream out(&f);
+        out.setCodec("UTF-8");
+        out << t;
+      }
+    }
+    item  = createEntry(t);
+    item->setSupplement(supplement);
+    item->setNode(m_pageQuery->value(7).toString());
+    item->setRoot(root);
+    item->setWord(m_pageQuery->value(2).toString());
+    items << item;
+
+    entryCount++;
+    /*
+    if (startNode.isEmpty()) {
+      startNode = m_pageQuery->value(7).toString();
+    }
+    else if ( startNode == item->getNode()) {
+      showWord = item->getWord();
+      /// if a node has been passed, then center on the node
+      centerItem = item;
+      p.setNode(startNode);
+      if ( nodeOnly ) {
+        items << item;
+      }
+    }
+    */
+
+  } while(m_pageQuery->next());
+  if (items.size() == 0) {
+    QLOG_INFO() << "No entries found for page" << page;
+    return p;
+  }
+  QLOG_DEBUG() << "Page" << page << "Roots" << rootCount << "Entries" << entryCount;
+  /**
+   * we have all the new items to show.
+   * If we are going forward, add them to the end
+   *  "  "  "   "    backwards, prepend them in reverse order
+   *
+   */
+
+  if (m_pagingDir == 1) {
+    /// where the old items begin will be the number of items we're adding
+    int x = items.size();
+    while(items.size() > 0) {
+      EntryItem * item = items.takeLast();
+      m_items.prepend(item);
+    }
+    /// added the entries to the scene and recalculate positions
+    /// parameter tells it where the new entries stop
+    prependEntries(x);
+    focusItem = m_items[x];
+  }
+  else {
+   /// get the position of the last item in the scene
+    int itemCount = m_items.size();
+    while(items.size() > 0) {
+      EntryItem * item = items.takeFirst();
+      m_items.append(item);
+    }
+    appendEntries(itemCount);
+    focusItem = m_items[itemCount];
+  }
+  ///
+  /// all items have been added and positions calculated
+  ///
+  m_view->setFocus();
+  m_transform = m_view->transform();
+
+  //QLOG_DEBUG() << "Scene rect" << m_scene->sceneRect();
+  /// without thus centerOn() does not work properly for
+  /// items added to the scene
+  /// TODO check this
+  m_view->setSceneRect(m_scene->sceneRect());
+
+  if (m_currentRoot != lastRoot) {
+    emit rootChanged(lastRoot,QString());
+    m_currentRoot = lastRoot;
+  }
+  /**
+   * we need to know whether we got here by accessing the history button
+   * or not
+   *
+   */
+  /// TODO fix this
+  if (getHistory()->isOn()) {
+    HistoryEvent * event = new HistoryEvent;
+    event->setRoot(lastRoot);
+    //    event->setNode(node);
+    //    event->setWord(showWord);
+    getHistory()->add(event);
+  }
+  /// TODO there has to be a better way than this
+  /// TODO if node specified we need to center on it
+
+    /*
+    QTextCursor cursor(centerItem->document());
+    QTextBlock b = cursor.block();
+    QTextLayout * layout = b.layout();
+    QTextLine line = layout->lineForTextPosition(cursor.position());
+    if (line.isValid()) {
+      qDebug() << Q_FUNC_INFO << "text line pos" << line.position() << line.textLength();
+        m_view->centerOn(line.position());
+    }
+    */
+
+  m_scene->setFocusItem(focusItem);
+  int h =  m_view->height();
+  QPointF pt = focusItem->pos();
+  pt.setY(pt.y() + h/2 - 10);
+  m_view->centerOn(pt);
+
+  p.setPage(focusItem->getPage());
   return p;
 }
 /**
