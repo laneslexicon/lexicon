@@ -112,7 +112,7 @@ private:
     bool m_historyEnabled;
     bool m_saveTabs;
     bool m_restoreTabs;
-    bool m_rootMode;
+    QString m_navigationMode;
     void getFirstAndLast();
     void restoreTabs();
     QSignalMapper * m_signalMapper;
@@ -144,11 +144,16 @@ private:
     QAction * m_testAction;
     QAction * m_hForward;
     QAction * m_hBackward;
-    // navigation
+    // root navigation
     QAction * m_rootForwardAction;
     QAction * m_rootBackwardAction;
     QAction * m_rootFirstAction;
     QAction * m_rootLastAction;
+    // page navigation
+    QAction * m_pageForwardAction;
+    QAction * m_pageBackwardAction;
+    QAction * m_pageFirstAction;
+    QAction * m_pageLastAction;
     // history
     QToolButton * m_hForwardBtn;
     QToolButton * m_hBackwardBtn;

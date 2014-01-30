@@ -352,6 +352,16 @@ void LanesLexicon::createActions() {
   connect(m_rootBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevRoot()));
   connect(m_rootFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstRoot()));
   connect(m_rootLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastRoot()));
+
+  m_pageForwardAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next Page"),this);
+  m_pageBackwardAction = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Prev Page"),this);
+  m_pageFirstAction = new QAction(QIcon(imgdir + "/go-first.png"),tr("First Page"),this);
+  m_pageLastAction = new QAction(QIcon(imgdir + "/go-last.png"),tr("Last Page"),this);
+
+  connect(m_pageForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextPage()));
+  connect(m_pageBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevPage()));
+  connect(m_pageFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstPage()));
+  connect(m_pageLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastPage()));
 }
 void LanesLexicon::createToolBar() {
   m_fileToolBar = addToolBar(tr("&File"));
@@ -375,11 +385,18 @@ void LanesLexicon::createToolBar() {
   history->addWidget(m_hBackwardBtn);
   history->addWidget(m_hForwardBtn);
   history->addSeparator();
-  QToolBar * navigation = addToolBar(tr("Navigation"));
+  QToolBar * navigation = addToolBar(tr("Root Navigation"));
   navigation->addAction(m_rootFirstAction);
   navigation->addAction(m_rootForwardAction);
   navigation->addAction(m_rootBackwardAction);
   navigation->addAction(m_rootLastAction);
+  navigation->addSeparator();
+
+  navigation = addToolBar(tr("Page Navigation"));
+  navigation->addAction(m_pageFirstAction);
+  navigation->addAction(m_pageForwardAction);
+  navigation->addAction(m_pageBackwardAction);
+  navigation->addAction(m_pageLastAction);
   navigation->addSeparator();
 }
 void LanesLexicon::setupHistory() {
@@ -736,7 +753,7 @@ void LanesLexicon::readSettings() {
   m_restoreTabs = settings.value("Restore Tabs",true).toBool();
   m_docked = settings.value("Docked",false).toBool();
   m_interface = settings.value("Interface","default").toString();
-  m_rootMode = settings.value("Root Mode",true).toBool();
+  m_navigationMode = settings.value("Navigation","root").toString();
   m_useNotes = settings.value("Use Notes",false).toBool();
   settings.endGroup();
 
@@ -760,6 +777,9 @@ void LanesLexicon::writeSettings() {
   settings.setValue("History",m_historyEnabled);
   settings.setValue("Aarabic font",arFont.toString());
   settings.setValue("Restore Tabs",m_restoreTabs);
+  settings.setValue("Interface",m_interface);
+  settings.setValue("Use Notes",m_useNotes);
+  settings.setValue("Navigation",m_navigationMode);
   settings.endGroup();
   if (m_saveTabs) {
     settings.beginGroup("Tabs");

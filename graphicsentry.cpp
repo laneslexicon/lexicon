@@ -791,9 +791,9 @@ Place GraphicsEntry::getPage(const int page) {
   pt.setY(pt.y() + h/2 - 10);
   m_view->centerOn(pt);
 
-  p.setPage(focusItem->getPage());
-  m_place = p;
-  return p;
+
+  m_place = focusItem->getPlace();
+  return m_place;
 }
 /**
  * create the QTextGraphicsItem by transforming the passed xml
