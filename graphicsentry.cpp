@@ -196,7 +196,6 @@ void GraphicsEntry::readSettings() {
   readCssFromFile(css);
   m_xsltSource = settings.value("xslt",QString("entry.xslt")).toString();
   m_textWidth = settings.value("text width",300).toInt();
-  m_debug = settings.value("debug",false).toBool();
   m_entryMargin = settings.value("margin",10).toInt();
 
   QString bg = settings.value("Supplement Background Color",QString("rgb(255,254,253)")).toString();
@@ -212,6 +211,12 @@ void GraphicsEntry::readSettings() {
     m_supplementBg = QColor::fromRgb(255,255,255);
   }
   m_clearScene = settings.value("clear",true).toBool();
+  settings.endGroup();
+
+  settings.beginGroup("Debug");
+  m_dumpXML = settings.value("Dump XML",false).toBool();
+  m_dumpHTML = settings.value("Dump HTML",false).toBool();
+  settings.endGroup();
 }
 void GraphicsEntry::writeDefaultSettings() {
   QSettings settings;
@@ -484,7 +489,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         .arg(m_rootQuery->value(8).toInt());
       t += m_rootQuery->value(4).toString();
       t += "</word>";
-      if (m_debug) {
+      if (m_dumpXML) {
         QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.xml").arg(m_rootQuery->value(7).toString()));
         QFile f(fi.filePath());
         if (f.open(QIODevice::WriteOnly)) {
@@ -639,7 +644,7 @@ void GraphicsEntry::appendEntries(int startPos) {
     m_items[i]->setPos(xpos,ypos);
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
-    if (m_debug) {
+    if (m_dumpHTML) {
       QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {
@@ -677,7 +682,7 @@ void GraphicsEntry::prependEntries(int startPos) {
       m_scene->addItem(m_items[i]);
     }
     r = m_items[i]->boundingRect();
-    if (m_debug) {
+    if (m_dumpHTML) {
       QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {

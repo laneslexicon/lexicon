@@ -121,7 +121,8 @@ class GraphicsEntry : public QWidget {
     bool readCssFromFile(const QString &name);
     int m_pagingDir;
     int m_entryMargin;
-    bool m_debug;
+    bool m_dumpXML;
+    bool m_dumpHTML;
     void appendEntries(int);
     void prependEntries(int);
     QList<EntryItem *> m_items;

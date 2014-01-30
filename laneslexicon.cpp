@@ -724,11 +724,13 @@ void LanesLexicon::readSettings() {
   m_docked = settings.value("Docked",false).toBool();
   m_interface = settings.value("Interface","default").toString();
   m_rootMode = settings.value("Root Mode",true).toBool();
-
-  m_valgrind = settings.value("Valgrind",false).toBool();
   m_useNotes = settings.value("Use Notes",false).toBool();
-
   settings.endGroup();
+
+  settings.beginGroup("Debug");
+  m_valgrind = settings.value("Valgrind",false).toBool();
+  settings.endGroup();
+
   settings.beginGroup("Notes");
   m_notesDbName = settings.value("Database","notes.sqlite").toString();
   settings.endGroup();
