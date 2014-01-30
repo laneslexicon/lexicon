@@ -768,7 +768,6 @@ void LanesLexicon::restoreTabs() {
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Tabs");
   QStringList tabs = settings.childGroups();
-  qDebug() << tabs;
   for(int i=0;i < tabs.size();i++) {
     settings.beginGroup(tabs[i]);
     Place p;
@@ -780,27 +779,13 @@ void LanesLexicon::restoreTabs() {
     if (p.getNode().isEmpty()) {
       p.setNodeOnly(false);
     }
-    qDebug() << "restore tab" << p.getNodeOnly() << p.getRoot() << p.getNode();
+    QLOG_DEBUG() << "restore tab" << p.getNodeOnly() << p.getRoot() << p.getNode();
     GraphicsEntry * entry = new GraphicsEntry(this);
     setSignals(entry);
     entry->getXmlForPlace(p);
     m_tabs->addTab(entry,p.getRoot());
     settings.endGroup();
   }
-  /*
-    for(int i=0;i < m_tabs->count();i++) {
-      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
-      Place p = entry->getPlace();
-      settings.beginGroup(QString("Tab-%1").arg(i));
-      settings.setValue("root",p.getRoot());
-      settings.setValue("word",p.getWord());
-      settings.setValue("node",p.getNode());
-      settings.setValue("supplement",p.getSupplement());
-      settings.setValue("nodeOnly",p.getNodeOnly());
-      settings.endGroup();
-    }
-  }
-  */
 }
 
 HistoryMaster * LanesLexicon::history() {
@@ -881,13 +866,15 @@ void LanesLexicon::on_actionPrevRoot() {
   }
 }
 void LanesLexicon::on_actionFirstRoot() {
-  qDebug() << Q_FUNC_INFO;
-  Place p(m_firstRoot,0);
+  Place p;
+  p.setRoot(m_firstRoot);
   showPlace(p,false);
   m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::on_actionLastRoot() {
-  showPlace(Place(m_lastRoot),false);
+  Place p;
+  p.setRoot(m_lastRoot);
+  showPlace(p,false);
   m_tree->ensureVisible(m_lastRoot);
 }
 void LanesLexicon::rootChanged(const QString & root,const QString & node) {
