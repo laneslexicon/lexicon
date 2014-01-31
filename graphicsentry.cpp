@@ -8,7 +8,7 @@ EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
 
-  QMenu menu;
+  QMenu menu("Fucking off you bastards");
   menu.setObjectName("entry");
   QAction *markAction = menu.addAction("Bookmark");
   QAction *searchAction = menu.addAction("Find");
