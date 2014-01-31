@@ -5,7 +5,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 {
   readSettings();
 
-  openDatabase("lexicon.sqlite");
+  openDatabase(m_dbName);
   loadStyleSheet();
 
   m_tree = new ContentsWidget(this);
@@ -741,8 +741,7 @@ void LanesLexicon::on_actionTest() {
 void LanesLexicon::readSettings() {
   QSettings settings;
   settings.setIniCodec("UTF-8");
-  //  qDebug() << "keys" << settings.allKeys();
-  settings.beginGroup("General");
+  settings.beginGroup("System");
   m_dbName = settings.value("Database","lexicon.sqlite").toString();
   QString ar = settings.value("Arabic font").toString();
   if (! ar.isEmpty()) {
@@ -769,18 +768,20 @@ void LanesLexicon::readSettings() {
 void LanesLexicon::writeSettings() {
   QSettings settings;
   settings.setIniCodec("UTF-8");
-  settings.beginGroup("General");
+  /*
+  settings.beginGroup("System");
   QDateTime now = QDateTime::currentDateTime();
   settings.setValue("Run date",now);
   settings.setValue("Save Tabs",m_saveTabs);
   settings.setValue("Database",m_dbName);
   settings.setValue("History",m_historyEnabled);
-  settings.setValue("Aarabic font",arFont.toString());
+  settings.setValue("Arabic font",arFont.toString());
   settings.setValue("Restore Tabs",m_restoreTabs);
   settings.setValue("Interface",m_interface);
   settings.setValue("Use Notes",m_useNotes);
   settings.setValue("Navigation",m_navigationMode);
   settings.endGroup();
+  */
   if (m_saveTabs) {
     settings.beginGroup("Tabs");
     for(int i=0;i < m_tabs->count();i++) {
