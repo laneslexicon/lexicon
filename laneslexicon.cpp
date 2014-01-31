@@ -71,6 +71,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   /// TOTDO replace this last visited item
   if (m_restoreTabs) {
     restoreTabs();
+    m_tabs->currentWidget()->setFocus();
   }
   else {
     GraphicsEntry * entry = new GraphicsEntry(this);
@@ -279,6 +280,15 @@ void LanesLexicon::shortcut(const QString & k) {
   }
   else if (k == "Page Last") {
     this->on_actionLastPage();
+  }
+  else if (k == "Focus Content") {
+    m_tabs->currentWidget()->setFocus();
+  }
+  else if (k == "Focus Tree") {
+    m_tree->setFocus();
+  }
+  else {
+    QLOG_WARN() << "Unhandled shortcut" << k;
   }
 
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
@@ -798,6 +808,10 @@ void LanesLexicon::writeSettings() {
         settings.endGroup();
       }
     }
+    settings.endGroup();
+    settings.beginGroup("System");
+    settings.setValue("Focus tab",m_tabs->currentIndex());
+    settings.endGroup();
   }
 }
 void LanesLexicon::restoreTabs() {
@@ -823,6 +837,12 @@ void LanesLexicon::restoreTabs() {
     m_tabs->addTab(entry,p.getRoot());
     m_tree->ensurePlaceVisible(p,true);
     settings.endGroup();
+  }
+  settings.endGroup();
+  settings.beginGroup("System");
+  int i =  settings.value("Focus tab",0).toInt();
+  if ((i >=0) && (i << m_tabs->count())) {
+    m_tabs->setCurrentIndex(i);
   }
 }
 
