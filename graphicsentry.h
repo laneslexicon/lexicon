@@ -45,20 +45,20 @@ class EntryItem : public QGraphicsTextItem {
  public:
   EntryItem(const QString &, QGraphicsItem * parent = 0);
   EntryItem(QGraphicsItem * parent = 0);
-  void setNode(const QString & id) { m_nodeId = id;}
+  void setNode(const QString & id);
   void setRoot(const QString & root,bool isRootEntry = false);
-  void setWord(const QString & word) { m_word = word; }
-  void setSupplement(int v)  { m_supplement = v;}
-  void setPage(int x)  { m_page = x;}
+  void setWord(const QString & word);
+  void setSupplement(int v);
+  void setPage(int x);
   void setBackground(QColor & c) { m_backgroundColor = c;}
   bool isNode(const QString & id) { return m_nodeId ==  id;}
   bool isRoot() { return m_isRoot;}
   Place getPlace();
-  QString getNode() { return m_nodeId;}
-  QString getRoot() { return m_root;}
-  QString getWord() { return m_word;}
-  int getSupplement() { return m_supplement;}
-  int getPage() { return m_page;}
+  QString getNode() { return m_place.getNode();}
+  QString getRoot() { return m_place.getRoot();}
+  QString getWord() { return m_place.getWord();}
+  int getSupplement() { return m_place.getSupplement();}
+  int getPage() { return m_place.getPage();}
   QTextCursor highlight(const QString &);
   QTextCursor highlightRx(const QString &);
   public slots:
@@ -72,10 +72,7 @@ class EntryItem : public QGraphicsTextItem {
   private:
   QString m_nodeId;
   bool m_isRoot;
-  int m_page;
-  int m_supplement;
-  QString m_root;
-  QString m_word;
+  Place m_place;
 };
 class LaneGraphicsView;
 class GraphicsEntry : public QWidget {

@@ -1,9 +1,9 @@
 #include "graphicsentry.h"
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
-  m_supplement = 0;
+
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
-  m_supplement = 0;
+
 }
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
@@ -19,16 +19,13 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     connect(copyAction,SIGNAL(triggered()),this,SLOT(copy()));
   }
   QAction *selectedAction = menu.exec(event->screenPos());
+
 }
 void EntryItem::searchItem() {
   qDebug() << Q_FUNC_INFO;
 }
 void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
   //  QLOG_DEBUG() << "hover" << this->getNode() << this->isRoot();
-}
-void EntryItem::setRoot(const QString & root,bool isRootEntry) {
-  m_root = root;
-  m_isRoot = isRootEntry;
 }
 void EntryItem::copy() {
   QString txt = this->textCursor().selectedText();
@@ -39,7 +36,7 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
   QPen pen = painter->pen();
   QBrush brush = painter->brush();
   painter->setPen(Qt::NoPen);
-  if ( ! m_supplement) {
+  if ( ! m_place.isSupplement()) {
     painter->setBrush(Qt::white);
   }
   else {
@@ -99,14 +96,24 @@ QTextCursor EntryItem::highlightRx(const QString & target) {
   }
   return firstPos;
 }
+void EntryItem::setWord(const QString & word) {
+  m_place.setWord(word);
+}
+void EntryItem::setRoot(const QString & root,bool isroot) {
+  m_place.setRoot(root);
+  m_place.setIsRoot(isroot);
+}
+void EntryItem::setNode(const QString & node) {
+  m_place.setNode(node);
+}
+void EntryItem::setSupplement(int supplement) {
+  m_place.setSupplement(supplement);
+}
+void EntryItem::setPage(const int page) {
+  m_place.setPage(page);
+}
 Place EntryItem::getPlace() {
-  Place p;
-  p.setRoot(m_root);
-  p.setWord(m_word);
-  p.setPage(m_page);
-  p.setSupplement(m_supplement);
-  p.setIsRoot(m_isRoot);
-  return p;
+  return m_place;
 }
 /**
  *
@@ -621,7 +628,7 @@ Place GraphicsEntry::getPage(const int page) {
   QString str;
   EntryItem * focusItem;
   Place p;
-  bool nodeOnly = false;
+
   p.setPage(page);
 
 

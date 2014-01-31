@@ -28,7 +28,7 @@ class Place {
     }
     return true;
   }
-  void setRoot(const QString & root) { m_root = root;}
+  void setRoot(const QString & root) { m_root = root;};
   void setIsRoot(bool v) {
     m_isRoot = v;
   }
@@ -39,6 +39,7 @@ class Place {
   QString getRoot() const { return m_root;}
   int getSupplement() const { return m_supplement;}
   void setSupplement(int i) { m_supplement = i;}
+  bool isSupplement() { return (m_supplement == 1);}
   int getPage() { return m_page;}
   void setPage(int i) { m_page = i;}
   QString getNode() const { return m_node;}
