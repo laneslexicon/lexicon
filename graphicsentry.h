@@ -37,6 +37,7 @@
 #include "xsltsupport.h"
 #include "history.h"
 #include "place.h"
+#include "placewidget.h"
 //#include "laneslexicon.h"
 
 class EntryItem : public QGraphicsTextItem {
@@ -110,6 +111,7 @@ class GraphicsEntry : public QWidget {
     void onClearScene();
     void nextPageRequested();
     void prevPageRequested();
+    void nodeChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
  private:
     QColor m_supplementBg;
     bool prepareQueries();
@@ -155,6 +157,7 @@ class GraphicsEntry : public QWidget {
     QString m_currentHtml;
     QString m_currentRoot;
     Place m_place;
+    PlaceWidget * m_showPlace;
     // read/set from readSettings
 
     QString m_currentCSS;

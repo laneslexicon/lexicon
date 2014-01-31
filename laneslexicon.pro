@@ -35,7 +35,8 @@ SOURCES += main.cpp\
         noteswidget.cpp \
         history.cpp \
         place.cpp \
-        searchresults.cpp
+        searchresults.cpp \
+        placewidget.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -46,4 +47,5 @@ HEADERS  += laneslexicon.h \
             noteswidget.h \
             history.h \
             place.h \
-            searchresults.h
+            searchresults.h \
+            placewidget.h

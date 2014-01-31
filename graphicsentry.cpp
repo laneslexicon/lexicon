@@ -1,6 +1,5 @@
 #include "graphicsentry.h"
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
-
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
 
@@ -182,6 +181,10 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
   connect(m_view,SIGNAL(backPage()),this,SLOT(prevPageRequested()));
 
+
+  connect(this,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
+          this,SLOT(nodeChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
+
   m_view->setInteractive(true);
   m_item = new QGraphicsTextItem("");
   m_item->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -191,6 +194,8 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   // add the graphics viwe
   layout->addWidget(m_view,1);
 
+  //  m_showPlace = new PlaceWidget(this);
+  //  layout->addWidget(m_showPlace,0);
   m_nodeQuery = 0;
   setLayout(layout);
 
@@ -404,6 +409,7 @@ Place GraphicsEntry::getXmlForPlace(const Place & p) {
       emit(placeChanged(np));
     }
     m_place = np;
+    m_showPlace->setPlace(m_place);
   }
   return np;
 }
@@ -985,6 +991,8 @@ int GraphicsEntry::hasPlace(const Place & p,bool setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);
     m_place = p;
+    m_showPlace->setPlace(m_place);
+
     m_currentRoot = root;
     emit(rootChanged(root,QString()));
   }
@@ -1075,5 +1083,18 @@ void GraphicsEntry::highlight(const QString & target) {
       }
     }
     m_items[ix]->setTextCursor(cursor);
+  }
+}
+void GraphicsEntry::nodeChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason /* reason */) {
+
+  EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
+  if (item) {
+    QString node = item->getNode();
+    QString word = item->getWord();
+    QString root = item->getRoot();
+
+    m_showPlace->setNode(node);
+    m_showPlace->setWord(word);
+    m_showPlace->setRoot(root);
   }
 }

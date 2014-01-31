@@ -724,7 +724,6 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * ol
     QString node = item->getNode();
     QString word = item->getWord();
     QString root = item->getRoot();
-    qDebug() << Q_FUNC_INFO << root << word << node << reason;
     QPointF p = item->pos();
     if (! node.isEmpty()) {
       QString txt = QString("%1  %2  At:%3,%4").arg(node).arg(word).arg(p.x()).arg(p.y());
