@@ -287,6 +287,17 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (k == "Focus Tree") {
     m_tree->setFocus();
   }
+  else if (k.startsWith("Go Tab")) {
+    QString nstr = k.right(1);
+    bool ok;
+    int ix = nstr.toInt(&ok);
+    if (ok) {
+      ix--;
+      if ((ix >= 0) && (ix < m_tabs->count())) {
+        m_tabs->setCurrentIndex(ix);
+      }
+    }
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << k;
   }
@@ -303,12 +314,25 @@ void LanesLexicon::setupShortcuts() {
   m_signalMapper = new QSignalMapper(this);
   QStringList keys = settings.childKeys();
   for(int i=0;i < keys.size();i++) {
-    QString k = settings.value(keys[i]).toString();
-    QShortcut * sc = new QShortcut(k,this);
-    connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
-    /// doesn't seem to be emitted
-    connect(sc,SIGNAL(activatedAmbiguously()),this,SLOT(ambiguousShortcut()));
-    m_signalMapper->setMapping(sc,keys[i]);
+    if (keys[i] == "Go Tab") {
+      for(int j=1;j < 10;j++) {
+        QString ks = QString("%1,%2").arg(settings.value(keys[i]).toString()).arg(j);
+        QShortcut * sc = new QShortcut(ks,this);
+        connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
+        /// doesn't seem to be emitted
+        connect(sc,SIGNAL(activatedAmbiguously()),this,SLOT(ambiguousShortcut()));
+        m_signalMapper->setMapping(sc,QString("%1-%2").arg(keys[i]).arg(j));
+      }
+    }
+    else {
+      QString k = settings.value(keys[i]).toString();
+      QShortcut * sc = new QShortcut(k,this);
+      connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
+      /// doesn't seem to be emitted
+      connect(sc,SIGNAL(activatedAmbiguously()),this,SLOT(ambiguousShortcut()));
+      /// use the setting name as the shortcut 'name'
+      m_signalMapper->setMapping(sc,keys[i]);
+    }
   }
   connect(m_signalMapper,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
 }
