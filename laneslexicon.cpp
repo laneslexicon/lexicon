@@ -17,6 +17,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     m_notes = new NotesWidget(this);
     m_notes->hide();
   }
+
+  m_pwidget = new PlaceWidget(this);
   //  m_notes->setObjectName("notes");
   if (m_docked) {
     m_treeDock = new QDockWidget("Contents",this);
@@ -435,6 +437,9 @@ void LanesLexicon::createToolBar() {
   navigation->addAction(m_pageLastAction);
   navigation->addSeparator();
   navigation->setFloatable(true);
+
+  QToolBar * place = addToolBar("Place");
+  place->addWidget(m_pwidget);
 }
 void LanesLexicon::setupHistory() {
   // get backward history
@@ -721,6 +726,7 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * ol
 
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
   if (item) {
+    m_pwidget->setPlace(item->getPlace());
     QString node = item->getNode();
     QString word = item->getWord();
     QString root = item->getRoot();
@@ -843,6 +849,10 @@ void LanesLexicon::writeSettings() {
 void LanesLexicon::restoreTabs() {
   QSettings settings;
   settings.setIniCodec("UTF-8");
+  settings.beginGroup("System");
+  int tab =  settings.value("Focus tab",0).toInt();
+  settings.endGroup();
+  Place wp;
   settings.beginGroup("Tabs");
   QStringList tabs = settings.childGroups();
   for(int i=0;i < tabs.size();i++) {
@@ -856,6 +866,9 @@ void LanesLexicon::restoreTabs() {
     if (p.getNode().isEmpty()) {
       p.setNodeOnly(false);
     }
+    if (tab == i) {
+      wp = p;
+    }
     QLOG_DEBUG() << "restore tab" << p.getNodeOnly() << p.getRoot() << p.getNode();
     GraphicsEntry * entry = new GraphicsEntry(this);
     setSignals(entry);
@@ -865,11 +878,12 @@ void LanesLexicon::restoreTabs() {
     settings.endGroup();
   }
   settings.endGroup();
-  settings.beginGroup("System");
-  int i =  settings.value("Focus tab",0).toInt();
-  if ((i >=0) && (i << m_tabs->count())) {
-    m_tabs->setCurrentIndex(i);
+
+  if ((tab >=0) && (tab << m_tabs->count())) {
+    m_tabs->setCurrentIndex(tab);
+    m_pwidget->setPlace(wp);
   }
+
 }
 
 HistoryMaster * LanesLexicon::history() {

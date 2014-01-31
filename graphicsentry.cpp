@@ -409,7 +409,7 @@ Place GraphicsEntry::getXmlForPlace(const Place & p) {
       emit(placeChanged(np));
     }
     m_place = np;
-    m_showPlace->setPlace(m_place);
+    //    m_showPlace->setPlace(m_place);
   }
   return np;
 }
@@ -526,6 +526,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       item->setNode(m_rootQuery->value(7).toString());
       item->setRoot(arRoot);
       item->setWord(m_rootQuery->value(2).toString());
+      item->setPage(m_rootQuery->value(5).toInt());
       if (startNode.isEmpty()) {
         startNode = m_rootQuery->value(7).toString();
       }
@@ -533,7 +534,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         showWord = item->getWord();
         /// if a node has been passed, then center on the node
         centerItem = item;
-        p.setNode(startNode);
         if ( nodeOnly ) {
           items << item;
         }
@@ -991,7 +991,7 @@ int GraphicsEntry::hasPlace(const Place & p,bool setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);
     m_place = p;
-    m_showPlace->setPlace(m_place);
+    //    m_showPlace->setPlace(m_place);
 
     m_currentRoot = root;
     emit(rootChanged(root,QString()));
@@ -1093,8 +1093,8 @@ void GraphicsEntry::nodeChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFoc
     QString word = item->getWord();
     QString root = item->getRoot();
 
-    m_showPlace->setNode(node);
-    m_showPlace->setWord(word);
-    m_showPlace->setRoot(root);
+    //    m_showPlace->setNode(node);
+    //    m_showPlace->setWord(word);
+    //    m_showPlace->setRoot(root);
   }
 }
