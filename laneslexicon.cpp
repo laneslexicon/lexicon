@@ -420,18 +420,21 @@ void LanesLexicon::createToolBar() {
   history->addWidget(m_hForwardBtn);
   history->addSeparator();
   QToolBar * navigation = addToolBar(tr("Root Navigation"));
+  navigation->addWidget(new QLabel("Navigate<br/>by root"));
   navigation->addAction(m_rootFirstAction);
   navigation->addAction(m_rootForwardAction);
   navigation->addAction(m_rootBackwardAction);
   navigation->addAction(m_rootLastAction);
   navigation->addSeparator();
-
+  navigation->setFloatable(true);
   navigation = addToolBar(tr("Page Navigation"));
+  navigation->addWidget(new QLabel("Navigate<br/>by page"));
   navigation->addAction(m_pageFirstAction);
   navigation->addAction(m_pageForwardAction);
   navigation->addAction(m_pageBackwardAction);
   navigation->addAction(m_pageLastAction);
   navigation->addSeparator();
+  navigation->setFloatable(true);
 }
 void LanesLexicon::setupHistory() {
   // get backward history
