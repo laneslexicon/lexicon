@@ -37,4 +37,5 @@ int compileStylesheet(const QString & xsl);
 QString xsltTransform(const QString & xml);
 const char * getCompileError();
 void freeXslt();
+void parseErrorHandler(void *,const char *, ...);
 #endif

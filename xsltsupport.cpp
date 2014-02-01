@@ -31,20 +31,24 @@ QString xsltTransform(const QString & xml) {
 }
 
 void freeXslt() {
-  /// TODO
+  /// TODO free xalan code
 }
 #endif
 #ifdef USE_LIBXSLT
 static xsltStylesheetPtr cur;
+QStringList xmlParseErrors;
 void initXslt() {
    static bool m_init = false;
    if (! m_init) {
       xmlSubstituteEntitiesDefault(1);
       xmlLoadExtDtdDefaultValue = 1;
+      xmlGenericErrorFunc handler = (xmlGenericErrorFunc)parseErrorHandler;
+      initGenericErrorDefaultFunc(&handler);
    }
 }
 int compileStylesheet(const QString & xsl) {
    if (cur == 0) {
+      /// if errors in xslt they will be xmlParseErrors
       cur = xsltParseStylesheetFile((const xmlChar *)xsl.toLocal8Bit().data());
    }
    return 0;
@@ -56,6 +60,10 @@ QString xsltTransform(const QString & xml) {
   memset(params,0x00,sizeof(params));
   QByteArray ba = xml.toLocal8Bit();
   doc = xmlParseMemory(ba.data(),ba.size());
+  /// if errors in xml they will be xmlParseErrors
+  if (doc == 0) {
+     return QString();
+  }
   res = xsltApplyStylesheet(cur, doc, params);
   xmlChar * buf;
   int sz;
@@ -71,6 +79,21 @@ void freeXslt() {
   xsltCleanupGlobals();
   xmlCleanupParser();
 }
+#define TMP_BUF_SIZE 512
+void parseErrorHandler(void * /* ctx*/, const char *msg, ...) {
+  static QStringList errors;
+  char string[TMP_BUF_SIZE];
+   va_list arg_ptr;
+
+   va_start(arg_ptr, msg);
+   vsnprintf(string, TMP_BUF_SIZE, msg, arg_ptr);
+   va_end(arg_ptr);
+   QString s = string;
+   qDebug() << s.trimmed();
+   xmlParseErrors << s.trimmed();
+  return;
+}
+
 #endif
 /**
    xsl - name of xslt file
