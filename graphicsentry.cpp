@@ -205,7 +205,8 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   connect(m_scene,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
-  m_xalan = getXalan();
+  //  m_xalan = getXalan();
+  initXslt();
   prepareQueries();
 }
 GraphicsEntry::~GraphicsEntry() {
@@ -922,6 +923,8 @@ QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
   //  QString footer = "</div1></body></text></TEI.2>";
 
   //  QString tei  = header + xml + footer;
+
+  /*
   if (m_compiledXsl == 0) {
     std::istringstream iss(xsl.toStdString());
     int r = m_xalan->compileStylesheet(m_xsltSource.toLocal8Bit().data(),m_compiledXsl);
@@ -930,11 +933,18 @@ QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
       return QString();
     }
   }
+  */
+  int ok = compileStylesheet(xsl);
+  if (ok == 0) {
+    return xsltTransform(xml);
+  }
+  /*
   std::istringstream iss(xml.toStdString());
   std::stringstream ostream;
 
   m_xalan->transform(iss,m_compiledXsl,ostream);
   return QString::fromStdString(ostream.str());
+  */
 }
 void GraphicsEntry::onZoomIn() {
   m_view->setTransform(m_transform);

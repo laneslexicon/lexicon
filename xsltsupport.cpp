@@ -1,6 +1,18 @@
 #include "xsltsupport.h"
-XalanTransformer * getXalan() {
-  static XalanTransformer * m_xalan;
+static XalanTransformer * m_xalan;
+const XalanCompiledStylesheet * m_compiledXsl;
+int compileStylesheet(const QString & xsl) {
+  if (m_compiledXsl == 0) {
+  std::istringstream iss(xsl.toStdString());
+  int r = m_xalan->compileStylesheet(xsl.toLocal8Bit().data(),m_compiledXsl);
+  return r;
+  }
+  return 0;
+}
+const char * getCompileError() {
+  return m_xalan->getLastError();
+}
+void initXslt() {
   static bool m_init = false;
   if (! m_init){
     XMLPlatformUtils::Initialize();
@@ -9,11 +21,18 @@ XalanTransformer * getXalan() {
     m_xalan = new XalanTransformer;
 
   }
-  return m_xalan;
 }
+QString xsltTransform(const QString & xml) {
+  std::istringstream iss(xml.toStdString());
+  std::stringstream ostream;
+  m_xalan->transform(iss,m_compiledXsl,ostream);
+  return QString::fromStdString(ostream.str());
+}
+
 /**
    xsl - name of xslt file
  */
+/*
 QString xalanTransform(const QString & xsl,const QString & xml,QMap<QString,QString> & params) {
   std::istringstream iss(xml.toStdString());
   //  std::cout << xml.toStdString();
@@ -42,6 +61,7 @@ QString xalanTransform(const QString & xsl,const QString & xml,QMap<QString,QStr
   t = QString::fromStdString(ostream.str());
   return t;
 }
+*/
 /*
 const XalanDOMString key("param1");
 const XalanDOMString expression("'Hello World'");

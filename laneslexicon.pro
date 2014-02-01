@@ -17,7 +17,7 @@ TEMPLATE = app
 INCLUDEPATH += /usr/include/xalanc/PlatformSupport
 INCLUDEPATH += /usr/include/xalanc/XalanTransformer
 INCLUDEPATH += ./qslog
-
+DEFINES += USE_XALAN
 #LIBS +=   -lboost_thread-mt -lboost_system -lboost_filesystem
 LIBS += -lxalan-c -lxalanMsg -lxerces-c -lxerces-depdom
 MOC_DIR = ./moc

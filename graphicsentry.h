@@ -163,7 +163,7 @@ class GraphicsEntry : public QWidget {
     QString m_currentCSS;
     QString m_xsltSource;
     int m_textWidth;
-    XalanTransformer * m_xalan;
+    //    XalanTransformer * m_xalan;
  protected:
     void keyPressEvent(QKeyEvent *);
     void focusInEvent(QFocusEvent *);

@@ -4,12 +4,14 @@
 #include <QByteArray>
 #include <QMap>
 #include <QMapIterator>
+#ifdef USE_XALAN
 #include <xalanc/Include/PlatformDefinitions.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 #include <xalanc/XalanDOM/XalanDOMString.hpp>
 #include <xalanc/XalanTransformer/XalanCompiledStylesheetDefault.hpp>
 #include <xalanc/XalanTransformer/XalanCompiledStylesheet.hpp>
+#endif
 #include <iostream>
 #include <sstream>
 
@@ -19,6 +21,10 @@ XALAN_USING_XALAN(XalanTransformer)
 using XALAN_CPP_NAMESPACE::XalanCompiledStylesheet;
 
 //int m_xml_initialized = 0;
-XalanTransformer * getXalan();
-QString xalanTransform(const QString &,const QString &,QMap<QString,QString> &);
+//XalanTransformer * getXalan();
+//QString xalanTransform(const QString &,const QString &,QMap<QString,QString> &);
+void initXslt();
+int compileStylesheet(const QString & xsl);
+QString xsltTransform(const QString & xml);
+const char * getCompileError();
 #endif
