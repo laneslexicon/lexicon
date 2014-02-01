@@ -13,11 +13,17 @@ class Place {
   Place(const QString & root) {
     m_root = root;
     m_isRoot = true;
+    m_nodeOnly = false;
+    m_page = -1;
+    m_vol = -1;
   }
   Place(const QString & root,int supp) {
     m_root = root;
     m_supplement = supp;
     m_isRoot = true;
+    m_nodeOnly = false;
+    m_page = -1;
+    m_vol = -1;
   }
   bool isEmpty() const {
     return m_root.isEmpty();
