@@ -7,21 +7,28 @@ QT       += webkitwidgets network
 QT       += xml sql
 
 CONFIG   += debug
+CONFIG   += LIBXSLT
 QMAKE_CXXFLAGS += -g
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = laneslexicon
 TEMPLATE = app
+LIBXSLT {
 INCLUDEPATH += /opt/include/libxml2
 LIBS += -L /opt/lib -lxml2 -lxslt
-
+DEFINES += USE_LIBXSLT
+}
+XALAN {
 INCLUDEPATH += /usr/include/xalanc/PlatformSupport
 INCLUDEPATH += /usr/include/xalanc/XalanTransformer
-INCLUDEPATH += ./qslog
-DEFINES += USE_LIBXSLT
-#LIBS +=   -lboost_thread-mt -lboost_system -lboost_filesystem
 LIBS += -lxalan-c -lxalanMsg -lxerces-c -lxerces-depdom
+DEFINES += USE_XALAN
+}
+INCLUDEPATH += ./qslog
+
+#LIBS +=   -lboost_thread-mt -lboost_system -lboost_filesystem
+
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 QMAKE_CXXFLAGS += -Wunused-parameter
