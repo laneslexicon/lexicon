@@ -657,7 +657,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     if (w->hasPlace(p,true) == -1) {
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
       np = w->getXmlForPlace(p);
-
+      /// TODO decide whether to make new tab the current tab
       //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
       //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
@@ -667,7 +667,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (w->hasPlace(p,true) == -1) {
       np = w->getXmlForPlace(p);
-      m_tabs->setTabText(0,root);
+      m_tabs->setTabText(currentTab,root);
       // this works but sets it for all tabs
       //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
       // this sets it for all the items in graphicsentry
@@ -870,7 +870,6 @@ void LanesLexicon::restoreTabs() {
     if (tab == i) {
       wp = p;
     }
-    QLOG_DEBUG() << "restore tab" << p.getNodeOnly() << p.getRoot() << p.getNode();
     GraphicsEntry * entry = new GraphicsEntry(this);
     setSignals(entry);
     p = entry->getXmlForPlace(p);

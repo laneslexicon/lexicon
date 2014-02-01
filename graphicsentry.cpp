@@ -176,6 +176,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 
   m_scene = new QGraphicsScene(this);
   m_view = new LaneGraphicsView(m_scene,this);
+  m_view->setSceneRect(m_scene->sceneRect());
 
   //  m_view->setBackgroundBrush(QBrush(Qt::red, Qt::SolidPattern));
   connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));

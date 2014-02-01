@@ -63,7 +63,6 @@ void PlaceWidget::setPlace(const Place & p) {
     m_page->setText("");
   }
   */
-  qDebug() << m_text->toHtml();
 }
 /*
 void PlaceWidget::setRoot(const QString & root) {
