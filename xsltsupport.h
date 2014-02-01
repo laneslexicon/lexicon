@@ -4,6 +4,9 @@
 #include <QByteArray>
 #include <QMap>
 #include <QMapIterator>
+#include <QDebug>
+#include <iostream>
+#include <sstream>
 #ifdef USE_XALAN
 #include <xalanc/Include/PlatformDefinitions.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
@@ -11,20 +14,27 @@
 #include <xalanc/XalanDOM/XalanDOMString.hpp>
 #include <xalanc/XalanTransformer/XalanCompiledStylesheetDefault.hpp>
 #include <xalanc/XalanTransformer/XalanCompiledStylesheet.hpp>
-#endif
-#include <iostream>
-#include <sstream>
-
 XALAN_USING_XERCES(XMLPlatformUtils)
 XALAN_USING_XALAN(XalanTransformer)
-
 using XALAN_CPP_NAMESPACE::XalanCompiledStylesheet;
+#endif
+#ifdef USE_LIBXSLT
+#include <libxml/xmlmemory.h>
+#include <libxml/debugXML.h>
+#include <libxml/HTMLtree.h>
+#include <libxml/xmlIO.h>
+#include <libxml/DOCBparser.h>
+#include <libxml/xinclude.h>
+#include <libxml/catalog.h>
+#include <libxslt/xslt.h>
+#include <libxslt/xsltInternals.h>
+#include <libxslt/transform.h>
+#include <libxslt/xsltutils.h>
+#endif
 
-//int m_xml_initialized = 0;
-//XalanTransformer * getXalan();
-//QString xalanTransform(const QString &,const QString &,QMap<QString,QString> &);
 void initXslt();
 int compileStylesheet(const QString & xsl);
 QString xsltTransform(const QString & xml);
 const char * getCompileError();
+void freeXslt();
 #endif

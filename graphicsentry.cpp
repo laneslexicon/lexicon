@@ -7,7 +7,7 @@ EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
 
-  QMenu menu("Fucking off you bastards");
+  QMenu menu("Fuck off you bastards");
   menu.setObjectName("entry");
   QAction *markAction = menu.addAction("Bookmark");
   QAction *searchAction = menu.addAction("Find");
@@ -151,7 +151,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_textOption.setTextDirection(Qt::LeftToRight);
-  m_compiledXsl = 0;
+  //  m_compiledXsl = 0;
   /// 0 = paging forward, items are appended
   /// 1 = paging backward, items are prepended
   m_pagingDir = 0;
@@ -480,7 +480,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QString startNode = node;
 
   /// add the root item unless nodeOnly is set
-  str = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
+  str = QString("<word type=\"root\" ar=\"%1\"></word>").arg(root);
   EntryItem * rootItem  = createEntry(str);
   rootItem->setRoot(root,true);
   rootItem->setSupplement(m_rootQuery->value(8).toInt());
@@ -673,7 +673,7 @@ Place GraphicsEntry::getPage(const int page) {
     /// if root has changed add root XML
     if (root != lastRoot) {
       if (! lastRoot.isEmpty()) {
-        QString  str = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
+        QString  str = QString("<word type=\"root\" ar=\"%1\" ></word>").arg(root);
         item = createEntry(str);
         items  << item;
         rootCount++;
@@ -945,6 +945,7 @@ QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
   m_xalan->transform(iss,m_compiledXsl,ostream);
   return QString::fromStdString(ostream.str());
   */
+  return QString();
 }
 void GraphicsEntry::onZoomIn() {
   m_view->setTransform(m_transform);

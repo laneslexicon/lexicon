@@ -13,11 +13,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = laneslexicon
 TEMPLATE = app
+INCLUDEPATH += /opt/include/libxml2
+LIBS += -L /opt/lib -lxml2 -lxslt
 
 INCLUDEPATH += /usr/include/xalanc/PlatformSupport
 INCLUDEPATH += /usr/include/xalanc/XalanTransformer
 INCLUDEPATH += ./qslog
-DEFINES += USE_XALAN
+DEFINES += USE_LIBXSLT
 #LIBS +=   -lboost_thread-mt -lboost_system -lboost_filesystem
 LIBS += -lxalan-c -lxalanMsg -lxerces-c -lxerces-depdom
 MOC_DIR = ./moc

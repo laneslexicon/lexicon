@@ -1,11 +1,13 @@
 #include "xsltsupport.h"
+#ifdef USE_XALAN
 static XalanTransformer * m_xalan;
 const XalanCompiledStylesheet * m_compiledXsl;
+
 int compileStylesheet(const QString & xsl) {
   if (m_compiledXsl == 0) {
-  std::istringstream iss(xsl.toStdString());
-  int r = m_xalan->compileStylesheet(xsl.toLocal8Bit().data(),m_compiledXsl);
-  return r;
+    std::istringstream iss(xsl.toStdString());
+    int r = m_xalan->compileStylesheet(xsl.toLocal8Bit().data(),m_compiledXsl);
+    return r;
   }
   return 0;
 }
@@ -19,7 +21,6 @@ void initXslt() {
     XalanTransformer::initialize();
     m_init = true;
     m_xalan = new XalanTransformer;
-
   }
 }
 QString xsltTransform(const QString & xml) {
@@ -29,11 +30,53 @@ QString xsltTransform(const QString & xml) {
   return QString::fromStdString(ostream.str());
 }
 
+void freeXslt() {
+  /// TODO
+}
+#endif
+#ifdef USE_LIBXSLT
+static xsltStylesheetPtr cur;
+void initXslt() {
+   static bool m_init = false;
+   if (! m_init) {
+      xmlSubstituteEntitiesDefault(1);
+      xmlLoadExtDtdDefaultValue = 1;
+   }
+}
+int compileStylesheet(const QString & xsl) {
+   if (cur == 0) {
+      cur = xsltParseStylesheetFile((const xmlChar *)xsl.toLocal8Bit().data());
+   }
+   return 0;
+}
+QString xsltTransform(const QString & xml) {
+  QString result;
+  xmlDocPtr doc, res;
+  const char *params[16 + 1];
+  memset(params,0x00,sizeof(params));
+  QByteArray ba = xml.toLocal8Bit();
+  doc = xmlParseMemory(ba.data(),ba.size());
+  res = xsltApplyStylesheet(cur, doc, params);
+  xmlChar * buf;
+  int sz;
+  xsltSaveResultToString(&buf,&sz, res,cur);
+//  xsltSaveResultToFile(stdout, res, cur);
+
+  xmlFreeDoc(res);
+  xmlFreeDoc(doc);
+  return QString((char *) buf);
+}
+void freeXslt() {
+  xsltFreeStylesheet(cur);
+  xsltCleanupGlobals();
+  xmlCleanupParser();
+}
+#endif
 /**
    xsl - name of xslt file
- */
+*/
 /*
-QString xalanTransform(const QString & xsl,const QString & xml,QMap<QString,QString> & params) {
+  QString xalanTransform(const QString & xsl,const QString & xml,QMap<QString,QString> & params) {
   std::istringstream iss(xml.toStdString());
   //  std::cout << xml.toStdString();
   std::string ss;
@@ -46,24 +89,24 @@ QString xalanTransform(const QString & xsl,const QString & xml,QMap<QString,QStr
   QMapIterator<QString,QString> i(params);
 
   while(i.hasNext()) {
-    i.next();
-    QByteArray ka = i.key().toLocal8Bit();
-    QByteArray va = i.value().toLocal8Bit();
-    xalan->setStylesheetParam(ka.data(), va.data());
+  i.next();
+  QByteArray ka = i.key().toLocal8Bit();
+  QByteArray va = i.value().toLocal8Bit();
+  xalan->setStylesheetParam(ka.data(), va.data());
   }
   int theResult =
-    //    x.transform("../tmp/test.xml","../xslt/tei.xsl",xmlOut)
-    // x.transform("../tmp/test.xml","../xslt/tei.xsl",ostream);
-    xalan->transform(iss,ba.data(),ostream);
+  //    x.transform("../tmp/test.xml","../xslt/tei.xsl",xmlOut)
+  // x.transform("../tmp/test.xml","../xslt/tei.xsl",ostream);
+  xalan->transform(iss,ba.data(),ostream);
   // x.transform(xml.toStdString(),"../xslt/tei.xsl",ostream);
   //  std::cout << ostream.str();
   QString t;
   t = QString::fromStdString(ostream.str());
   return t;
-}
+  }
 */
 /*
-const XalanDOMString key("param1");
-const XalanDOMString expression("'Hello World'");
-theXalanTransformer.setStylesheetParam(key, expression);
+  const XalanDOMString key("param1");
+  const XalanDOMString expression("'Hello World'");
+  theXalanTransformer.setStylesheetParam(key, expression);
 */
