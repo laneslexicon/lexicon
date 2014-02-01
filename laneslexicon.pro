@@ -7,19 +7,19 @@ QT       += webkitwidgets network
 QT       += xml sql
 
 CONFIG   += debug
-CONFIG   += LIBXSLT
+CONFIG   += libxslt
 QMAKE_CXXFLAGS += -g
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = laneslexicon
 TEMPLATE = app
-LIBXSLT {
+libxslt {
 INCLUDEPATH += /opt/include/libxml2
 LIBS += -L /opt/lib -lxml2 -lxslt
 DEFINES += USE_LIBXSLT
 }
-XALAN {
+xalan {
 INCLUDEPATH += /usr/include/xalanc/PlatformSupport
 INCLUDEPATH += /usr/include/xalanc/XalanTransformer
 LIBS += -lxalan-c -lxalanMsg -lxerces-c -lxerces-depdom

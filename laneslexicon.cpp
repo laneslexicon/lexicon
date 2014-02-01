@@ -103,6 +103,7 @@ LanesLexicon::~LanesLexicon()
   if (m_db.isOpen()) {
     m_db.close();
   }
+  freeXslt();
 }
 void LanesLexicon::setupInterface() {
   if (m_interface == "minimal") {

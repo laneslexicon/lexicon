@@ -48,6 +48,7 @@
 #include "searchwidget.h"
 #include "scripts.h"
 #include "searchresults.h"
+#include "xsltsupport.h"
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
