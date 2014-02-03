@@ -3,23 +3,6 @@
 PlaceWidget::PlaceWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
   QHBoxLayout * layout = new QHBoxLayout;
-  /*
-  m_root = new QLabel("Root");
-  m_root->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-  layout->addWidget(m_root);
-
-  m_word = new QLabel("Word");
-  m_word->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-  layout->addWidget(m_word);
-
-  m_node = new QLabel("Node");
-  m_node->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-  layout->addWidget(m_node);
-
-  m_page = new QLabel("Page");
-  m_page->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-  layout->addWidget(m_page);
-  */
   m_text = new QTextBrowser(this);
   m_text->setMaximumHeight(40);
   //  m_text->setMaximumWidth(100);
@@ -48,33 +31,8 @@ void PlaceWidget::setPlace(const Place & p) {
   }
   m_text->setHtml(html);
   m_text->setToolTip(html);
-  /*
-   m_root->setText(m_place.getRoot());
-  m_root->setFont(m_rootFont);
+}
 
-  m_node->setText(m_place.getNode());
-  m_word->setText(m_place.getWord());
-  m_word->setFont(m_wordFont);
-  int page = m_place.getPage();
-  if (page != -1) {
-    m_page->setText(QString("Page: %1").arg(page));
-  }
-  else {
-    m_page->setText("");
-  }
-  */
-}
-/*
-void PlaceWidget::setRoot(const QString & root) {
-  m_root->setText(root);
-}
-void PlaceWidget::setNode(const QString & node) {
-  m_node->setText(node);
-}
-void PlaceWidget::setWord(const QString & word) {
-  m_word->setText(word);
-}
-*/
 /**
  * need this otherwise setStyleSheet will not work
  *
@@ -94,16 +52,6 @@ void PlaceWidget::readSettings() {
   m_show = settings.value("Show",false).toBool();
   QString f  = settings.value("CSS","place.css").toString();
   readCssFromFile(f);
-  /*
-  QString f = settings.value("Root font",QString()).toString();
-  if (! f.isEmpty()) {
-    m_rootFont.fromString(f);
-  }
-  f = settings.value("Word font",QString()).toString();
-  if (! f.isEmpty()) {
-    m_wordFont.fromString(f);
-  }
-  */
 }
 /**
  *
