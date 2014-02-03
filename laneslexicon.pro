@@ -3,8 +3,8 @@
 #
 #-------------------------------------------------
 QT       += core gui printsupport
-QT       += webkitwidgets network
-QT       += xml sql
+#QT       += webkitwidgets network
+QT       += sql
 
 CONFIG   += debug
 CONFIG   += libxslt
