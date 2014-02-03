@@ -50,6 +50,9 @@ int compileStylesheet(const QString & xsl) {
    if (cur == 0) {
       /// if errors in xslt they will be xmlParseErrors
       cur = xsltParseStylesheetFile((const xmlChar *)xsl.toLocal8Bit().data());
+      if (xmlParseErrors.size() > 0) {
+        return 1;
+      }
    }
    return 0;
 }
@@ -93,7 +96,12 @@ void parseErrorHandler(void * /* ctx*/, const char *msg, ...) {
    xmlParseErrors << s.trimmed();
   return;
 }
-
+QStringList getParseErrors() {
+  return xmlParseErrors;
+}
+void clearParseErrors() {
+  xmlParseErrors.clear();
+}
 #endif
 /**
    xsl - name of xslt file

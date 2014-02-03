@@ -60,6 +60,8 @@ class EntryItem : public QGraphicsTextItem {
   QString getWord() { return m_place.getWord();}
   int getSupplement() { return m_place.getSupplement();}
   int getPage() { return m_place.getPage();}
+  QString getOutputHTML() { return m_html; }
+  void setOutputHTML(const QString & html) { m_html = html;}
   QTextCursor highlight(const QString &);
   QTextCursor highlightRx(const QString &);
   public slots:
@@ -74,6 +76,7 @@ class EntryItem : public QGraphicsTextItem {
   QString m_nodeId;
   bool m_isRoot;
   Place m_place;
+  QString m_html;    /// saves the generated HTML for debug, only set when dumpOutputHTM is true
 };
 class LaneGraphicsView;
 class GraphicsEntry : public QWidget {
@@ -125,6 +128,7 @@ class GraphicsEntry : public QWidget {
     int m_entryMargin;
     bool m_dumpXML;
     bool m_dumpHTML;
+    bool m_dumpOutputHTML;
     void appendEntries(int);
     void prependEntries(int);
     QList<EntryItem *> m_items;

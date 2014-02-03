@@ -38,4 +38,6 @@ QString xsltTransform(const QString & xml);
 const char * getCompileError();
 void freeXslt();
 void parseErrorHandler(void *,const char *, ...);
+QStringList getParseErrors();
+void clearParseErrors();
 #endif

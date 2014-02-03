@@ -245,6 +245,7 @@ void GraphicsEntry::readSettings() {
   settings.beginGroup("Debug");
   m_dumpXML = settings.value("Dump XML",false).toBool();
   m_dumpHTML = settings.value("Dump HTML",false).toBool();
+  m_dumpOutputHTML = settings.value("Dump Output HTML",false).toBool();
   settings.endGroup();
 }
 void GraphicsEntry::writeDefaultSettings() {
@@ -485,6 +486,10 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// add the root item unless nodeOnly is set
   str = QString("<word type=\"root\" ar=\"%1\"></word>").arg(root);
   EntryItem * rootItem  = createEntry(str);
+  /// will be null if the XSLT/XML has not parsed correctly
+  if (rootItem == NULL) {
+    return p;
+  }
   rootItem->setRoot(root,true);
   rootItem->setSupplement(m_rootQuery->value(8).toInt());
   rootItem->setPage(m_rootQuery->value(5).toInt());
@@ -526,24 +531,35 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         }
       }
       EntryItem * item  = createEntry(t);
-      item->setSupplement(supplement);
-      item->setNode(m_rootQuery->value(7).toString());
-      item->setRoot(arRoot);
-      item->setWord(m_rootQuery->value(2).toString());
-      item->setPage(m_rootQuery->value(5).toInt());
-      if (startNode.isEmpty()) {
-        startNode = m_rootQuery->value(7).toString();
-      }
-      else if ( startNode == item->getNode()) {
-        showWord = item->getWord();
-        /// if a node has been passed, then center on the node
-        centerItem = item;
-        if ( nodeOnly ) {
+      if (item != NULL) {
+        if (m_dumpOutputHTML) {
+          QFileInfo fi(QDir::tempPath(),QString("/tmp/%1-out.html").arg(m_rootQuery->value(7).toString()));
+          QFile f(fi.filePath());
+          if (f.open(QIODevice::WriteOnly)) {
+            QTextStream out(&f);
+            out.setCodec("UTF-8");
+            out << item->getOutputHTML();
+          }
+        }
+        item->setSupplement(supplement);
+        item->setNode(m_rootQuery->value(7).toString());
+        item->setRoot(arRoot);
+        item->setWord(m_rootQuery->value(2).toString());
+        item->setPage(m_rootQuery->value(5).toInt());
+        if (startNode.isEmpty()) {
+          startNode = m_rootQuery->value(7).toString();
+        }
+        else if ( startNode == item->getNode()) {
+          showWord = item->getWord();
+          /// if a node has been passed, then center on the node
+          centerItem = item;
+          if ( nodeOnly ) {
+            items << item;
+          }
+        }
+        if (! nodeOnly ) {
           items << item;
         }
-      }
-      if (! nodeOnly ) {
-        items << item;
       }
     }
   } while(m_rootQuery->next());
@@ -678,8 +694,10 @@ Place GraphicsEntry::getPage(const int page) {
       if (! lastRoot.isEmpty()) {
         QString  str = QString("<word type=\"root\" ar=\"%1\" ></word>").arg(root);
         item = createEntry(str);
-        items  << item;
-        rootCount++;
+        if (item != NULL) {
+          items  << item;
+          rootCount++;
+        }
       }
       lastRoot = root;
     }
@@ -701,14 +719,25 @@ Place GraphicsEntry::getPage(const int page) {
       }
     }
     item  = createEntry(t);
-    item->setSupplement(supplement);
-    item->setNode(m_pageQuery->value(7).toString());
-    item->setRoot(root);
-    item->setWord(m_pageQuery->value(2).toString());
-    item->setPage(m_pageQuery->value(5).toInt());
-    items << item;
+    if (item != NULL) {
+      if (m_dumpOutputHTML) {
+        QFileInfo fi(QDir::tempPath(),QString("/tmp/%1-out.html").arg(m_pageQuery->value(7).toString()));
+        QFile f(fi.filePath());
+        if (f.open(QIODevice::WriteOnly)) {
+          QTextStream out(&f);
+          out.setCodec("UTF-8");
+          out << item->getOutputHTML();
+        }
+      }
+      item->setSupplement(supplement);
+      item->setNode(m_pageQuery->value(7).toString());
+      item->setRoot(root);
+      item->setWord(m_pageQuery->value(2).toString());
+      item->setPage(m_pageQuery->value(5).toInt());
+      items << item;
 
-    entryCount++;
+      entryCount++;
+    }
     /*
     if (startNode.isEmpty()) {
       startNode = m_pageQuery->value(7).toString();
@@ -821,6 +850,9 @@ Place GraphicsEntry::getPage(const int page) {
  */
 EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     QString html =transform(m_xsltSource,xml);
+    if (html.isEmpty()) {
+      return NULL;
+    }
     EntryItem * gi = new EntryItem("");
     gi->document()->setDefaultStyleSheet(m_currentCSS);
     gi->setTextWidth(m_textWidth);
@@ -830,6 +862,9 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
     gi->setAcceptHoverEvents(true);
     gi->setBackground(m_supplementBg);
+    if (m_dumpOutputHTML) {
+      gi->setOutputHTML(html);
+    }
     connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
     connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
     return gi;
@@ -940,6 +975,14 @@ QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
   int ok = compileStylesheet(xsl);
   if (ok == 0) {
     return xsltTransform(xml);
+  }
+  else {
+    QStringList errors = getParseErrors();
+    errors.prepend("Errors when processing:");
+    QMessageBox msgBox;
+    msgBox.setText(errors.join("\n"));
+    msgBox.exec();
+    clearParseErrors();
   }
   /*
   std::istringstream iss(xml.toStdString());
