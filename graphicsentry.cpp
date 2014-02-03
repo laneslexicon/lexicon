@@ -221,11 +221,11 @@ GraphicsEntry::~GraphicsEntry() {
 void GraphicsEntry::readSettings() {
   QSettings settings;
   settings.beginGroup("Entry");
-  QString css = settings.value("css",QString("entry.css")).toString();
+  QString css = settings.value("CSS",QString("entry.css")).toString();
   readCssFromFile(css);
-  m_xsltSource = settings.value("xslt",QString("entry.xslt")).toString();
-  m_textWidth = settings.value("text width",300).toInt();
-  m_entryMargin = settings.value("margin",10).toInt();
+  m_xsltSource = settings.value("XSLT",QString("entry.xslt")).toString();
+  m_textWidth = settings.value("Text Width",300).toInt();
+  m_entryMargin = settings.value("Margin",10).toInt();
 
   QString bg = settings.value("Supplement Background Color",QString("rgb(255,254,253)")).toString();
   QRegExp rx("^rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\s*\\)");
@@ -239,7 +239,7 @@ void GraphicsEntry::readSettings() {
   else {
     m_supplementBg = QColor::fromRgb(255,255,255);
   }
-  m_clearScene = settings.value("clear",true).toBool();
+  m_clearScene = settings.value("Clear",true).toBool();
   settings.endGroup();
 
   settings.beginGroup("Debug");
@@ -250,10 +250,12 @@ void GraphicsEntry::readSettings() {
 void GraphicsEntry::writeDefaultSettings() {
   QSettings settings;
   settings.beginGroup("Entry");
-  settings.setValue("css","entry.css");
-  settings.setValue("xslt","entry.xslt");
-  settings.setValue("text width",300);
-  settings.setValue("clear",true);
+  settings.setValue("CSS","entry.css");
+  settings.setValue("XSLT","entry.xslt");
+  settings.setValue("Text Width",300);
+  settings.setValue("Clear",true);
+  settings.setValue("Margin",0);
+  settings.setValue("Supplement Background Color","rgb(255,254,253)");
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   switch(event->key()) {
