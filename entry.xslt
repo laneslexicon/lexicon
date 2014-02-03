@@ -5,12 +5,17 @@
   <xsl:param name="ddebug" />
   <xsl:preserve-space elements="*"/>
   <xsl:output method="html" indent="yes" encoding="utf-8" omit-xml-declaration="yes"/>
+
   <xsl:template match="/">
+  <html>
     <xsl:apply-templates select="//root" />
+    <body>
     <xsl:apply-templates select="//word" />
+    </body>
     <xsl:if test="$ddebug = 'entryfree'">
       <xsl:apply-templates select="//entryFree" />
     </xsl:if>
+  </html>
   </xsl:template>
 
   <xsl:template match="root">
