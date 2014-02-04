@@ -1,10 +1,10 @@
 .hi { font-family : Droid Serif;font-size : 12px;font-style : italic}
-.arabic { font-family : Amiri;font-size : 14px}
+.arabic { font-family : Amiri;font-size : 18px}
 .arabichead { font-family : Amiri;font-size : 30px}
-body { font-family : Sans Droid;font-size : 12px}
+body { font-family : Droid Sans;font-size : 12px}
 .bseparator { font-size : 12px}
 .aseparator { font-size : 12px}
 .rootword { margin-left : 50px}
-.entry { margin-left : 30px}
+.entry { margin-left : 30px, font-family : Droid Sans;font-size : 12px}
 #.supplement { background-color : wheat }
-.infl {font-family : Sans Droid Bold; font-style : bold}
+.infl {font-family : Droid Sans Bold; font-style : bold}
