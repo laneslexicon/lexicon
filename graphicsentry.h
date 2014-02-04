@@ -154,7 +154,7 @@ class GraphicsEntry : public QWidget {
 
     QSqlQuery * m_nodeQuery;
     QSqlQuery * m_rootQuery;
-    QSqlQuery * m_nextRootQuery;
+
     QSqlQuery * m_pageQuery;
     QString m_standardCSS;
 

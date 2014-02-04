@@ -214,7 +214,7 @@ GraphicsEntry::~GraphicsEntry() {
   qDebug() << Q_FUNC_INFO;
   delete m_nodeQuery;
   delete m_rootQuery;
-  delete m_nextRootQuery;
+
   delete m_pageQuery;
   /// TODO xalan cleanup ?
 }
@@ -399,11 +399,6 @@ bool GraphicsEntry::prepareQueries() {
   ok = m_rootQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeId,supplement from entry where root = ? order by nodenum");
   if (! ok ) {
     QLOG_WARN() << "root SQL prepare failed" << m_rootQuery->lastError();
-  }
-  m_nextRootQuery = new QSqlQuery;
-  ok = m_nextRootQuery->prepare("select word from root ");
-  if (! ok ) {
-    QLOG_WARN() << "next root SQL prepare failed" << m_nextRootQuery->lastError();
   }
   return ok;
 }
