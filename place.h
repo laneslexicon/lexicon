@@ -1,6 +1,7 @@
 #ifndef __PLACE_H__
 #define __PLACE_H__
 #include <QString>
+#include <QDebug>
 #include "QsLog.h"
 class Place {
  public:
@@ -9,6 +10,7 @@ class Place {
     m_nodeOnly = false;
     m_page = -1;
     m_vol = -1;
+    m_id = -1;
   }
   Place(const QString & root) {
     m_root = root;
@@ -16,6 +18,7 @@ class Place {
     m_nodeOnly = false;
     m_page = -1;
     m_vol = -1;
+    m_id = -1;
   }
   Place(const QString & root,int supp) {
     m_root = root;
@@ -24,7 +27,26 @@ class Place {
     m_nodeOnly = false;
     m_page = -1;
     m_vol = -1;
+    m_id = -1;
   }
+  ~Place() {
+  }
+  inline friend QDebug operator<<(QDebug debug, const Place& p)
+{
+	debug.nospace() << "Place("
+                        << p.getRoot() << ","
+                        << p.getWord() << ","
+                        << p.getNode() << ","
+                        << p.getIsRoot() << ","
+                        << p.getSupplement() << ","
+                        << p.getPage() << ","
+                        << p.getId() << ")";
+	return debug.space();
+}
+  operator QVariant() const
+    {
+        return QVariant::fromValue(*this);
+    }
   bool isEmpty() const {
     return m_root.isEmpty();
   }
@@ -35,10 +57,13 @@ class Place {
     }
     return true;
   }
+  void setId(int id) { m_id = id;}
+  int getId() const { return m_id;}
   void setRoot(const QString & root) { m_root = root;};
   void setIsRoot(bool v) {
     m_isRoot = v;
   }
+  int getIsRoot() const { return m_isRoot;}
   void setWord(const QString & word) {
     m_word = word;
   }
@@ -47,7 +72,7 @@ class Place {
   int getSupplement() const { return m_supplement;}
   void setSupplement(int i) { m_supplement = i;}
   bool isSupplement() { return (m_supplement == 1);}
-  int getPage() { return m_page;}
+  int getPage() const { return m_page;}
   void setPage(int i) { m_page = i;}
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
@@ -57,6 +82,7 @@ class Place {
  private:
   int m_vol;
   int m_page;
+  int m_id;
   QString m_msg;
   QString m_root;
   QString m_node;
@@ -66,4 +92,5 @@ class Place {
   bool m_isRoot;
   bool m_nodeOnly;
 };
+Q_DECLARE_METATYPE(Place);
 #endif
