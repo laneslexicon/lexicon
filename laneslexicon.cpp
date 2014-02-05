@@ -10,7 +10,10 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   if (! openDatabase(m_dbName)) {
     QMessageBox msgBox;
-    msgBox.setText(QString(tr("No database, nothing to show - missing file: %1")).arg(m_dbName));
+    msgBox.setText(QString(tr("No database, nothing to show")));
+    QDir d;
+    QString currentDir = d.absoluteFilePath(m_dbName);
+    msgBox.setInformativeText(QString("Missing file %1").arg(QDir::cleanPath(currentDir)));
     msgBox.exec();
     return;
   }
