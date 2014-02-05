@@ -64,6 +64,7 @@ public:
     QSize sizeHint() const;
     void readSettings();
     void writeSettings();
+    bool isOk() { return m_ok;}
     HistoryMaster * history();
     private slots:
       void shortcut(const QString &);
@@ -95,12 +96,14 @@ public:
     // shortcuts
     void shortcutActivated();
     void ambiguousShortcut();
+
 private:
     Place showPlace(const Place &,bool newTab = false);
     Place showRoot(const QString &,int supp = 0,bool newTab = false);
     Place showNode(const QString &,bool nodeOnly = false,bool newTab = false);
     QString m_interface;    // "default","minimal"
     void setupInterface();
+    bool m_ok;
     bool m_docked;          // whether to use docked widget
     bool m_valgrind;
     bool m_useNotes;

@@ -4,9 +4,16 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
 {
+  m_ok = false;
+  m_history = 0;
   readSettings();
 
-  openDatabase(m_dbName);
+  if (! openDatabase(m_dbName)) {
+    QMessageBox msgBox;
+    msgBox.setText(QString(tr("No database, nothing to show - missing file: %1")).arg(m_dbName));
+    msgBox.exec();
+    return;
+  }
   loadStyleSheet();
 
   m_tree = new ContentsWidget(this);
@@ -90,6 +97,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   m_tree->resizeColumnToContents(0);
   setupInterface();
+  m_ok = true;
 }
 
 LanesLexicon::~LanesLexicon()
@@ -97,7 +105,9 @@ LanesLexicon::~LanesLexicon()
   QLOG_DEBUG() << "main window destructor";
   /// TODO make this check something has changed or give
   /// option to save settings ?
-  writeSettings();
+  if (m_ok) {
+    writeSettings();
+  }
   if (m_history) {
     delete m_history;
   }
@@ -105,6 +115,7 @@ LanesLexicon::~LanesLexicon()
     m_db.close();
   }
   freeXslt();
+  QLOG_DEBUG() << "finished main window destructor";
 }
 void LanesLexicon::setupInterface() {
   if (m_interface == "minimal") {
@@ -565,6 +576,7 @@ void LanesLexicon::onNotesClicked() {
 bool LanesLexicon::openDatabase(const QString & dbname) {
   QFile dbfile(dbname);
   if (! dbfile.exists()) {
+    QLOG_WARN() << QString(tr("Cannot find database : %1")).arg(dbname);
     return false;
   }
   if (m_db.isOpen()) {

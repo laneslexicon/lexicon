@@ -62,7 +62,17 @@ int main(int argc, char *argv[])
     progOptions.node = parser.value(nodeOption);
     //    qDebug() << "node = " << node << dump;
     //    qDebug() << "args = " << args;
-    LanesLexicon w;
-    w.show();
-    return a.exec();
+    int ret;
+    LanesLexicon * w = new LanesLexicon;
+    if (w->isOk()) {
+      w->show();
+      ret = a.exec();
+      delete w;
+    }
+    else {
+      delete w;
+      a.quit();
+      return 0;
+    }
+    return ret;
 }
