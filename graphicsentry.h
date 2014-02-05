@@ -51,6 +51,7 @@ class EntryItem : public QGraphicsTextItem {
   void setWord(const QString & word);
   void setSupplement(int v);
   void setPage(int x);
+  void setPlace(Place p) { m_place = p;}
   void setBackground(QColor & c) { m_backgroundColor = c;}
   bool isNode(const QString & id) { return m_nodeId ==  id;}
   bool isRoot() { return m_isRoot;}
@@ -67,6 +68,8 @@ class EntryItem : public QGraphicsTextItem {
   public slots:
     void searchItem();
     void copy();
+ signals:
+    void showPerseus(const Place &);
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
@@ -115,6 +118,7 @@ class GraphicsEntry : public QWidget {
     void nextPageRequested();
     void prevPageRequested();
     void nodeChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
+    void showPerseus(const Place &);
  private:
     QColor m_supplementBg;
     bool prepareQueries();

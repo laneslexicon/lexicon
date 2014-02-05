@@ -17,8 +17,12 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     QAction *copyAction = menu.addAction("Copy");
     connect(copyAction,SIGNAL(triggered()),this,SLOT(copy()));
   }
+  QAction * perseusAction = menu.addAction("Show Perseus XML");
+  Place p = this->getPlace();
   QAction *selectedAction = menu.exec(event->screenPos());
-
+  if (selectedAction == perseusAction) {
+    emit(showPerseus(p));
+  }
 }
 void EntryItem::searchItem() {
   qDebug() << Q_FUNC_INFO;
@@ -862,6 +866,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     }
     connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
     connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
+    connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
     return gi;
 }
 /**
@@ -1148,5 +1153,20 @@ void GraphicsEntry::nodeChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFoc
     //    m_showPlace->setNode(node);
     //    m_showPlace->setWord(word);
     //    m_showPlace->setRoot(root);
+  }
+}
+void GraphicsEntry::showPerseus(const Place & p) {
+  QString node = p.getNode();
+  if ( node.isEmpty()) {
+    /// TODO
+    return;
+  }
+  QLOG_DEBUG() << "show perseus fro node" << node;
+  m_nodeQuery->bindValue(0,node);
+  m_nodeQuery->exec();
+
+  if (m_nodeQuery->first()) {
+    QString xml = m_nodeQuery->value("xml").toString();
+    qDebug() << xml;
   }
 }

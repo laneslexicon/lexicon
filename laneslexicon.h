@@ -49,6 +49,11 @@
 #include "scripts.h"
 #include "searchresults.h"
 #include "xsltsupport.h"
+struct cmdOptions {
+  bool dump;
+  QString node;
+};
+
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
