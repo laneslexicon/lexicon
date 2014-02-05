@@ -1164,9 +1164,15 @@ void GraphicsEntry::showPerseus(const Place & p) {
   QLOG_DEBUG() << "show perseus fro node" << node;
   m_nodeQuery->bindValue(0,node);
   m_nodeQuery->exec();
-
+  QString xml;
   if (m_nodeQuery->first()) {
-    QString xml = m_nodeQuery->value("xml").toString();
+    xml = m_nodeQuery->value("xml").toString();
     qDebug() << xml;
   }
+  else {
+    xml = "No XML for " + node;
+  }
+  QMessageBox msgBox;
+  msgBox.setText(xml);
+  msgBox.exec();
 }
