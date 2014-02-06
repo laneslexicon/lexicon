@@ -1086,3 +1086,6 @@ void LanesLexicon::on_actionLastPage() {
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }
+bool LanesLexicon::sanityCheck() {
+  /// TODO check database exists and entry stylesheet
+}

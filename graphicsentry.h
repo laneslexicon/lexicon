@@ -107,7 +107,6 @@ class GraphicsEntry : public QWidget {
     }
     void highlight(const QString & t);
   public slots:
-    void on_findNode();
     void anchorClicked(const QUrl &);
     void linkActivated(const QString &);
     void linkHovered(const QString &);

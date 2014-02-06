@@ -942,55 +942,21 @@ void GraphicsEntry::prependEntries(int startPos) {
     ypos += sz.height() + m_entryMargin;
   }
 }
-void GraphicsEntry::on_findNode()  {
-  qDebug() << "REDUNDANT CODE";
-  /*
-  QRegExp rx("n\\d+");
-  QString node;
-  if (rx.indexIn(node) != -1) {
-    getXmlForNode(node);
-  }
-  else {
-    getXmlForRoot(node);
-    showNode(node);
-  }
-  */
-}
 QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
-  //  QString header = "<TEI.2><text><body><div1>";
-  //  QString footer = "</div1></body></text></TEI.2>";
-
-  //  QString tei  = header + xml + footer;
-
-  /*
-  if (m_compiledXsl == 0) {
-    std::istringstream iss(xsl.toStdString());
-    int r = m_xalan->compileStylesheet(m_xsltSource.toLocal8Bit().data(),m_compiledXsl);
-    if (r != 0) {
-      QLOG_DEBUG() << "Error compiling stylesheet" << m_xalan->getLastError();
-      return QString();
-    }
-  }
-  */
   int ok = compileStylesheet(xsl);
   if (ok == 0) {
-    return xsltTransform(xml);
+    QString html = xsltTransform(xml);
+    if (! html.isEmpty()) {
+      return html;
+    }
   }
-  else {
-    QStringList errors = getParseErrors();
-    errors.prepend("Errors when processing:");
-    QMessageBox msgBox;
-    msgBox.setText(errors.join("\n"));
-    msgBox.exec();
-    clearParseErrors();
-  }
-  /*
-  std::istringstream iss(xml.toStdString());
-  std::stringstream ostream;
-
-  m_xalan->transform(iss,m_compiledXsl,ostream);
-  return QString::fromStdString(ostream.str());
-  */
+  /// could be errors in stylesheet or in the xml
+  QStringList errors = getParseErrors();
+  errors.prepend("Errors when processing:");
+  QMessageBox msgBox;
+  msgBox.setText(errors.join("\n"));
+  msgBox.exec();
+  clearParseErrors();
   return QString();
 }
 void GraphicsEntry::onZoomIn() {
@@ -1161,7 +1127,6 @@ void GraphicsEntry::showPerseus(const Place & p) {
     /// TODO
     return;
   }
-  QLOG_DEBUG() << "show perseus fro node" << node;
   m_nodeQuery->bindValue(0,node);
   m_nodeQuery->exec();
   QString xml;
