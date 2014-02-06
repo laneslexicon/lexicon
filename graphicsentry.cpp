@@ -327,7 +327,7 @@ void GraphicsEntry::anchorTest() {
   for(int i=0;i < m_items.size();i++) {
     EntryItem * item = m_items[i];
     if (item) {
-      if (item->isNode(node)) {
+      if (item->getNode() == node) {
         m_scene->setFocusItem(item);
         m_view->ensureVisible(item);
         return;
@@ -340,7 +340,7 @@ bool GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
   QString node = p.getNode();
   for(int i=0;i < m_items.size();i++) {
     EntryItem * item = m_items[i];
-    if (item->isNode(node)) {
+    if (item->getNode() == node) {
       QLOG_DEBUG() << "Found local node" << node;
       m_scene->setFocusItem(item);
       //m_view->ensureVisible(item);
@@ -952,7 +952,12 @@ QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
   }
   /// could be errors in stylesheet or in the xml
   QStringList errors = getParseErrors();
-  errors.prepend("Errors when processing:");
+  if (ok != 0) {
+    errors.prepend("Errors when processing stylesheet:");
+  }
+  else {
+    errors.prepend("Errors when processing entry:");
+  }
   QMessageBox msgBox;
   msgBox.setText(errors.join("\n"));
   msgBox.exec();
