@@ -11,6 +11,7 @@ class Place {
     m_page = -1;
     m_vol = -1;
     m_id = -1;
+    m_isRoot = false;
   }
   Place(const QString & root) {
     m_root = root;
@@ -64,6 +65,7 @@ class Place {
     m_isRoot = v;
   }
   int getIsRoot() const { return m_isRoot;}
+  bool isRoot() const { return m_isRoot;}
   void setWord(const QString & word) {
     m_word = word;
   }

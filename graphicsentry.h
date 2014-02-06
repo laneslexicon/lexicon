@@ -53,12 +53,11 @@ class EntryItem : public QGraphicsTextItem {
   void setPage(int x);
   void setPlace(Place p) { m_place = p;}
   void setBackground(QColor & c) { m_backgroundColor = c;}
-  bool isNode(const QString & id) { return m_nodeId ==  id;}
-  bool isRoot() { return m_isRoot;}
   Place getPlace();
   QString getNode() { return m_place.getNode();}
   QString getRoot() { return m_place.getRoot();}
   QString getWord() { return m_place.getWord();}
+  bool isRoot() { return m_place.isRoot();}
   int getSupplement() { return m_place.getSupplement();}
   int getPage() { return m_place.getPage();}
   QString getOutputHTML() { return m_html; }
@@ -76,8 +75,6 @@ class EntryItem : public QGraphicsTextItem {
   void paint( QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
   QColor m_backgroundColor;
   private:
-  QString m_nodeId;
-  bool m_isRoot;
   Place m_place;
   QString m_html;    /// saves the generated HTML for debug, only set when dumpOutputHTM is true
 };
