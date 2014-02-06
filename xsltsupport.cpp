@@ -46,16 +46,22 @@ void initXslt() {
       initGenericErrorDefaultFunc(&handler);
    }
 }
+/**
+ * this is called every time, but only actually compiled once
+ *
+ * @param xsl the name of the stylesheet file
+ *
+ * @return 0 if ok, otherwise the number of errors
+ */
 int compileStylesheet(const QString & xsl) {
    if (cur == 0) {
       /// if errors in xslt they will be xmlParseErrors
       cur = xsltParseStylesheetFile((const xmlChar *)xsl.toLocal8Bit().data());
-      if (xmlParseErrors.size() > 0) {
-        return 1;
-      }
+      return xmlParseErrors.size();
    }
    return 0;
 }
+
 QString xsltTransform(const QString & xml) {
   QString result;
   xmlDocPtr doc, res;
@@ -75,7 +81,9 @@ QString xsltTransform(const QString & xml) {
 
   xmlFreeDoc(res);
   xmlFreeDoc(doc);
-  return QString((char *) buf);
+  QString html = QString((char *) buf);
+  xmlFree(buf);
+  return html;
 }
 void freeXslt() {
   xsltFreeStylesheet(cur);
