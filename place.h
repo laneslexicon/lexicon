@@ -7,28 +7,25 @@ class Place {
  public:
   Place() {
     m_supplement = 0;
-    m_nodeOnly = false;
     m_page = -1;
     m_vol = -1;
     m_id = -1;
-    m_isRoot = false;
+    m_showOnlyNodes = false;
   }
   Place(const QString & root) {
     m_root = root;
-    m_isRoot = true;
-    m_nodeOnly = false;
     m_page = -1;
     m_vol = -1;
     m_id = -1;
+    m_showOnlyNodes = false;
   }
   Place(const QString & root,int supp) {
     m_root = root;
     m_supplement = supp;
-    m_isRoot = true;
-    m_nodeOnly = false;
     m_page = -1;
     m_vol = -1;
     m_id = -1;
+    m_showOnlyNodes = false;
   }
   ~Place() {
   }
@@ -38,7 +35,6 @@ class Place {
                         << p.getRoot() << ","
                         << p.getWord() << ","
                         << p.getNode() << ","
-                        << p.getIsRoot() << ","
                         << p.getSupplement() << ","
                         << p.getPage() << ","
                         << p.getId() << ")";
@@ -53,7 +49,7 @@ class Place {
   }
   /// we are either looking for a root or a node
   bool isValid() const {
-    if (m_root.isEmpty() && ! m_nodeOnly) {
+    if (m_root.isEmpty() &&  m_node.isEmpty()) {
       return false;
     }
     return true;
@@ -61,11 +57,7 @@ class Place {
   void setId(int id) { m_id = id;}
   int getId() const { return m_id;}
   void setRoot(const QString & root) { m_root = root;};
-  void setIsRoot(bool v) {
-    m_isRoot = v;
-  }
-  int getIsRoot() const { return m_isRoot;}
-  bool isRoot() const { return m_isRoot;}
+  bool isRoot() const;
   void setWord(const QString & word) {
     m_word = word;
   }
@@ -78,21 +70,17 @@ class Place {
   void setPage(int i) { m_page = i;}
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
-
-  void setNodeOnly(bool v) { m_nodeOnly = v;}
-  bool getNodeOnly() const { return m_nodeOnly; }
+  bool getNodeOnly() const { return m_showOnlyNodes;}
+  void setNodeOnly(bool v) { m_showOnlyNodes = v;}
  private:
   int m_vol;
   int m_page;
   int m_id;
-  QString m_msg;
   QString m_root;
   QString m_node;
   int m_supplement;
   QString m_word;
-  QString m_anchor;
-  bool m_isRoot;
-  bool m_nodeOnly;
+  bool m_showOnlyNodes;
 };
 Q_DECLARE_METATYPE(Place);
 #endif

@@ -10,3 +10,9 @@
 
    qDebug() << v.userType() << x.getNode() << x.getId();
 */
+bool Place::isRoot() const {
+  if (! m_root.isEmpty() && m_node.isEmpty()) {
+    return true;
+  }
+  return false;
+}

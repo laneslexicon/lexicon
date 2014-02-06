@@ -4,9 +4,11 @@ HistoryEvent::HistoryEvent() {
   m_id = -1;
 }
 bool HistoryEvent::matches(HistoryEvent * event) {
-  return ((m_word == event->getWord()) &&
-          (m_root == event->getRoot()) &&
-          (m_node == event->getNode()));
+  /// TODO replace with place == place
+  Place p = event->getPlace();
+  return ((m_place.getWord() == p.getWord()) &&
+          (m_place.getRoot() == p.getRoot()) &&
+          (m_place.getNode() == p.getNode()));
 
 }
 //CREATE TABLE history(id integer primary key,nodeId text,word text,root text,timewhen text);
@@ -71,21 +73,21 @@ bool HistoryMaster::openDatabase(const QString & dbname) {
   QLOG_INFO() << "Opened database for history" << dbname;
   return ok;
 }
-bool HistoryMaster::add(HistoryEvent * event) {
-  if (! m_historyEnabled ) {
+bool HistoryMaster::add(const Place & p) {
+  if (! p.isValid()) {
     return false;
   }
-  QString root = event->getRoot();
-  QString word = event->getWord();
-  if (! (root.isEmpty() && word.isEmpty()) ) {
-    m_addQuery->bindValue(0,event->getNode());
-    m_addQuery->bindValue(1,word);
-    m_addQuery->bindValue(2,root);
+  /// TODO add other fields
+  HistoryEvent * event = new HistoryEvent;
+  event->setPlace(p);
+
+    m_addQuery->bindValue(0,p.getNode());
+    m_addQuery->bindValue(1,p.getWord());
+    m_addQuery->bindValue(2,p.getRoot());
     m_addQuery->bindValue(3,event->getWhen());
     return m_addQuery->exec();
-  }
-  QLOG_DEBUG() << "Attempt to add empty history";
-  return false;
+
+
 }
 /**
  * The calling function should delete the events
@@ -109,9 +111,12 @@ QList<HistoryEvent *> HistoryMaster::getHistory(int count,int direction,int star
     while(m_backQuery->next() && (ix < count)) {
       HistoryEvent * event = new HistoryEvent();
       event->setId(m_backQuery->value(0).toInt());
-      event->setNode(m_backQuery->value(1).toString());
-      event->setWord(m_backQuery->value(2).toString());
-      event->setRoot(m_backQuery->value(3).toString());
+      Place p;
+      p.setNode(m_backQuery->value(1).toString());
+      p.setWord(m_backQuery->value(2).toString());
+      p.setRoot(m_backQuery->value(3).toString());
+      /// TODO add other place fields
+      event->setPlace(p);
       event->setWhen(m_backQuery->value(4).toDateTime());
       if ((ix > 0) && ( events[ix-1]->matches(event))) {
         delete event;
@@ -130,9 +135,11 @@ QList<HistoryEvent *> HistoryMaster::getHistory(int count,int direction,int star
     while(m_forQuery->next() && (ix < count)) {
       HistoryEvent * event = new HistoryEvent();
       event->setId(m_forQuery->value(0).toInt());
-      event->setNode(m_forQuery->value(1).toString());
-      event->setWord(m_forQuery->value(2).toString());
-      event->setRoot(m_forQuery->value(3).toString());
+      Place p;
+      p.setNode(m_forQuery->value(1).toString());
+      p.setWord(m_forQuery->value(2).toString());
+      p.setRoot(m_forQuery->value(3).toString());
+      event->setPlace(p);
       event->setWhen(m_forQuery->value(4).toDateTime());
       if ((ix > 0) && ( events[ix-1]->matches(event))) {
         delete event;
@@ -155,9 +162,11 @@ HistoryEvent * HistoryMaster::getEvent(int id) {
    m_getQuery->exec();
    if (m_getQuery->first()) {
        event->setId(m_getQuery->value(0).toInt());
-       event->setNode(m_getQuery->value(1).toString());
-       event->setWord(m_getQuery->value(2).toString());
-       event->setRoot(m_getQuery->value(3).toString());
+       Place p;
+       p.setNode(m_getQuery->value(1).toString());
+       p.setWord(m_getQuery->value(2).toString());
+       p.setRoot(m_getQuery->value(3).toString());
+       event->setPlace(p);
        event->setWhen(m_getQuery->value(4).toDateTime());
    }
    return event;

@@ -6,28 +6,26 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
+#include "place.h"
 #include "QsLog.h"
 
 class HistoryEvent {
  public:
   HistoryEvent();
-  void setWord(const QString & word) { m_word = word;}
-  void setRoot(const QString & word) { m_root = word;}
-  void setNode(const QString & word) { m_node = word;}
+  void setPlace(const Place & p) { m_place = p;}
   void setWhen(const QDateTime & word) { m_when = word;}
   void setId(const int i) { m_id = i;}
-  QString getWord() { return m_word;}
-  QString getRoot() { return m_root;}
-  QString getNode() { return m_node;}
+  QString getWord() { return m_place.getWord();}
+  QString getRoot() { return m_place.getRoot();}
+  QString getNode() { return m_place.getNode();}
+  Place getPlace() { return m_place;}
   QDateTime getWhen() { return m_when;}
   int getId() { return m_id;}
   bool isValid() { return m_id == -1;}
   bool matches(HistoryEvent *);
  private:
   int m_id;
-  QString m_word;
-  QString m_root;
-  QString m_node;
+  Place m_place;
   QDateTime m_when;
 };
 
@@ -38,7 +36,7 @@ class HistoryMaster {
   //  bool add(const QString & root,const QString & word, const QString & node);
   HistoryEvent * getEvent(int id);
   void setEnabled(bool v) { m_historyEnabled = v;}
-  bool add(HistoryEvent *);
+  bool add(const Place &);
   void on() { m_historyOn = true;}
   void off() { m_historyOn = false;}
   bool isOn() { return m_historyOn;}

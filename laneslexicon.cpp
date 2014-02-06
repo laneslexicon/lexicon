@@ -190,6 +190,7 @@ void LanesLexicon::shortcut(const QString & k) {
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
+        /// TODO fix (broken since Place simplified
         /// show only node
         Place p = showNode(t,true);
         if (! p.isValid()) {
@@ -610,6 +611,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
 Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) {
   Place p;
   p.setNode(node);
+  p.setNodeOnly(nodeOnly);
   int currentTab = m_tabs->currentIndex();
   if (currentTab == -1) {
     createTab = true;
@@ -852,7 +854,7 @@ void LanesLexicon::writeSettings() {
         settings.setValue("word",p.getWord());
         settings.setValue("node",p.getNode());
         settings.setValue("supplement",p.getSupplement());
-        settings.setValue("nodeOnly",p.getNodeOnly());
+        //        settings.setValue("nodeOnly",p.getNodeOnly());
         settings.setValue("page",p.getPage());
         settings.endGroup();
       }
@@ -879,9 +881,9 @@ void LanesLexicon::restoreTabs() {
     p.setRoot(settings.value("root",QString()).toString());
     p.setSupplement(settings.value("supplement").toInt());
     p.setWord(settings.value("word",QString()).toString());
-    p.setNodeOnly(settings.value("nodeOnly",false).toBool());
+    //    p.setNodeOnly(settings.value("nodeOnly",false).toBool());
     if (p.getNode().isEmpty()) {
-      p.setNodeOnly(false);
+      //      p.setNodeOnly(false);
     }
     if (tab == i) {
       wp = p;

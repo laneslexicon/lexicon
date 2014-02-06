@@ -104,7 +104,7 @@ void EntryItem::setWord(const QString & word) {
 }
 void EntryItem::setRoot(const QString & root,bool isroot) {
   m_place.setRoot(root);
-  m_place.setIsRoot(isroot);
+  //  m_place.setIsRoot(isroot);
 }
 void EntryItem::setNode(const QString & node) {
   m_place.setNode(node);
@@ -608,18 +608,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     emit rootChanged(arRoot,node);
     m_currentRoot = arRoot;
   }
-  /**
-   * we need to know whether we got here by accessing the history button
-   * or not
-   *
-   */
-  if (getHistory()->isOn()) {
-    HistoryEvent * event = new HistoryEvent;
-    event->setRoot(arRoot);
-    event->setNode(node);
-    event->setWord(showWord);
-    getHistory()->add(event);
-  }
   /// TODO there has to be a better way than this
   /// TODO if node specified we need to center on it
   if ( node.isEmpty()) {
@@ -644,6 +632,14 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     delete rootItem;
   }
   m_place = centerItem->getPlace();
+  /**
+   * we need to know whether we got here by accessing the history button
+   * or not
+   *
+   */
+  if (getHistory()->isOn()) {
+    getHistory()->add(m_place);
+  }
   return m_place;
 }
 Place GraphicsEntry::getPage(const int page) {
@@ -803,19 +799,6 @@ Place GraphicsEntry::getPage(const int page) {
     emit rootChanged(lastRoot,QString());
     m_currentRoot = lastRoot;
   }
-  /**
-   * we need to know whether we got here by accessing the history button
-   * or not
-   *
-   */
-  /// TODO fix this
-  if (getHistory()->isOn()) {
-    HistoryEvent * event = new HistoryEvent;
-    event->setRoot(lastRoot);
-    //    event->setNode(node);
-    //    event->setWord(showWord);
-    getHistory()->add(event);
-  }
   /// TODO there has to be a better way than this
   /// TODO if node specified we need to center on it
 
@@ -838,6 +821,15 @@ Place GraphicsEntry::getPage(const int page) {
 
 
   m_place = focusItem->getPlace();
+  /**
+   * we need to know whether we got here by accessing the history button
+   * or not
+   *
+   */
+  /// TODO fix this
+  if (getHistory()->isOn()) {
+    getHistory()->add(m_place);
+  }
   return m_place;
 }
 /**
