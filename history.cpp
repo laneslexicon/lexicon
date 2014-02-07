@@ -13,6 +13,14 @@ bool HistoryEvent::matches(HistoryEvent * event) {
 }
 //CREATE TABLE history(id integer primary key,nodeId text,word text,root text,timewhen text);
 HistoryMaster::HistoryMaster(const QString & dbname) {
+  m_historyOn = false;
+  m_historyEnabled = false;
+  m_getQuery = 0;
+  m_addQuery = 0;
+  m_forQuery = 0;
+  m_backQuery = 0;
+  m_lastQuery = 0;
+
   bool ok = openDatabase(dbname);
   if (ok) {
     m_getQuery = new QSqlQuery(m_db);

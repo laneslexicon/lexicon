@@ -24,9 +24,18 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_tree->installEventFilter(this);
   m_tabs = new QTabWidget(this);
   m_tabs->setTabsClosable(true);
+
   if ( m_useNotes) {
     m_notes = new NotesWidget(this);
     m_notes->hide();
+  }
+
+  /// at the end of the history, but we should be able to restore from settings
+  /// TODO would we want restore our current position in history?
+  m_history = new HistoryMaster(m_notesDbName);
+  m_history->setEnabled(m_historyEnabled);
+  if (m_historyEnabled) {
+    setupHistory();
   }
 
   m_pwidget = new PlaceWidget(this);
@@ -58,21 +67,18 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     if (! m_valgrind ) {
       m_tree->loadContents();
       getFirstAndLast();
+      m_ok = true;
     }
-    /// at the end of the history, but we should be able to restore from settings
-    m_historyPos = 9;
-    m_history = new HistoryMaster(m_notesDbName);
-    m_history->setEnabled(m_historyEnabled);
-    setupHistory();
   }
-    else {
-      statusBar()->showMessage(tr("Failed to open database"));
-    }
+  else {
+    statusBar()->showMessage(tr("Failed to open database"));
+  }
 
   setupShortcuts();
   connect(m_tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 
   connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
+  connect(m_tabs,SIGNAL(tabCloseRequested(int)),this,SLOT(onCloseTab(int)));
 
 
   if ( m_useNotes ) {
@@ -80,7 +86,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
           m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
   connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
   }
-  connect(m_tabs,SIGNAL(tabCloseRequested(int)),this,SLOT(onCloseTab(int)));
+
+
   /// TOTDO replace this last visited item
   if (m_restoreTabs) {
     restoreTabs();
@@ -99,8 +106,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     }
   }
   m_tree->resizeColumnToContents(0);
+
+
   setupInterface();
-  m_ok = true;
 }
 
 LanesLexicon::~LanesLexicon()
@@ -458,9 +466,15 @@ void LanesLexicon::createToolBar() {
   QToolBar * place = addToolBar("Place");
   place->addWidget(m_pwidget);
 }
-void LanesLexicon::setupHistory() {
+/**
+ *
+ *
+ * @param currPos  our current position in the history, -1 = at the end (default)
+ */
+void LanesLexicon::setupHistory(int currPos) {
   // get backward history
-  QList<HistoryEvent *> events = m_history->getHistory(10,0,m_historyPos);
+  /// TODO set 10 to something from the QSettings
+  QList<HistoryEvent *> events = m_history->getHistory(10,0,currPos);
   if (events.size() == 0) {
     m_hBackwardBtn->setEnabled(true);
   }
@@ -478,11 +492,15 @@ void LanesLexicon::setupHistory() {
         action = m->addAction(root);
       }
       Place p = event->getPlace();
+      m_historyPos = p.getId();
       action->setData(QVariant(p));//event->getId());
       connect(action,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
     }
     m_hBackwardBtn->setEnabled(true);
     m_hBackwardBtn->setMenu(m);
+  }
+  if (currPos  == -1) {
+    return;
   }
   events = m_history->getHistory(10,1,m_historyPos);
   if (events.size() == 0) {

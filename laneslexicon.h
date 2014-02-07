@@ -132,7 +132,7 @@ private:
     void loadStyleSheet();
     void createActions();
     void createToolBar();
-    void setupHistory();
+    void setupHistory(int startPos = -1);
     void createMenus();
     void createStatusBar();
     bool eventFilter(QObject * target, QEvent *);
