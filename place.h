@@ -3,6 +3,16 @@
 #include <QString>
 #include <QDebug>
 #include "QsLog.h"
+/*
+  Using the QVariant;
+    Place p;
+    p.setNode("nxxxx");
+    QVariant v(p);
+
+    Place np = v.value<Place>();
+
+*/
+
 class Place {
  public:
   Place() {
@@ -11,6 +21,7 @@ class Place {
     m_vol = -1;
     m_id = -1;
     m_showOnlyNodes = false;
+    m_type = Place::User;
   }
   Place(const QString & root) {
     m_root = root;
@@ -18,6 +29,7 @@ class Place {
     m_vol = -1;
     m_id = -1;
     m_showOnlyNodes = false;
+    m_type = Place::User;
   }
   Place(const QString & root,int supp) {
     m_root = root;
@@ -26,10 +38,14 @@ class Place {
     m_vol = -1;
     m_id = -1;
     m_showOnlyNodes = false;
+    m_type = Place::User;
   }
   ~Place() {
   }
-  inline friend QDebug operator<<(QDebug debug, const Place& p)
+  enum Type { User, History, Bookmark, RestoreTab };
+  void setType(int t) { m_type = t;}
+  int getType() const { return m_type;}
+ inline friend QDebug operator<<(QDebug debug, const Place& p)
 {
 	debug.nospace() << "Place("
                         << p.getRoot() << ","
@@ -44,6 +60,11 @@ class Place {
     {
         return QVariant::fromValue(*this);
     }
+  void setData(const QVariant & v) {
+    m_data = v;
+  }
+  QVariant getData() { return m_data;}
+
   bool isEmpty() const {
     return m_root.isEmpty();
   }
@@ -68,6 +89,7 @@ class Place {
   bool isSupplement() { return (m_supplement == 1);}
   int getPage() const { return m_page;}
   void setPage(int i) { m_page = i;}
+  int getVol() const { return m_vol;}
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
   bool getNodeOnly() const { return m_showOnlyNodes;}
@@ -76,11 +98,13 @@ class Place {
   int m_vol;
   int m_page;
   int m_id;
+  int m_type;
   QString m_root;
   QString m_node;
   int m_supplement;
   QString m_word;
   bool m_showOnlyNodes;
+  QVariant m_data;
 };
 Q_DECLARE_METATYPE(Place);
 #endif

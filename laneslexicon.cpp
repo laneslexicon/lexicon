@@ -477,7 +477,8 @@ void LanesLexicon::setupHistory() {
       else {
         action = m->addAction(root);
       }
-      action->setData(event->getId());
+      Place p = event->getPlace();
+      action->setData(QVariant(p));//event->getId());
       connect(action,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
     }
     m_hBackwardBtn->setEnabled(true);
@@ -550,6 +551,12 @@ void LanesLexicon::onHistoryForward() {
 }
 void LanesLexicon::onHistoryBackward() {
   QAction * action = static_cast<QAction *>(QObject::sender());
+  QVariant v = action->data();
+  Place p = v.value<Place>();
+  qDebug() << "history place" << p;
+  p.setType(Place::History);
+  showPlace(p,false);
+  /*
   m_historyPos = action->data().toInt();
   HistoryEvent * event = m_history->getEvent(m_historyPos);
   setupHistory();
@@ -561,6 +568,7 @@ void LanesLexicon::onHistoryBackward() {
   w->getXmlForRoot(p);
   m_tabs->setTabText(0,p.getRoot());
   w->setFocus();
+  */
 }
 void LanesLexicon::on_actionExit()
 {
@@ -890,13 +898,14 @@ void LanesLexicon::restoreTabs() {
     }
     GraphicsEntry * entry = new GraphicsEntry(this);
     setSignals(entry);
+    p.setType(Place::RestoreTab);
     p = entry->getXmlForPlace(p);
     m_tabs->addTab(entry,p.getRoot());
     m_tree->ensurePlaceVisible(p,true);
     settings.endGroup();
   }
   settings.endGroup();
-
+  wp.setType(Place::RestoreTab);
   if ((tab >=0) && (tab << m_tabs->count())) {
     m_tabs->setCurrentIndex(tab);
     m_pwidget->setPlace(wp);

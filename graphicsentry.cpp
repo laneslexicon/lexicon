@@ -638,6 +638,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
    *
    */
   if (getHistory()->isOn()) {
+    m_place.setType(dp.getType());
     getHistory()->add(m_place);
   }
   return m_place;

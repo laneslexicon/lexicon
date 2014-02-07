@@ -35,6 +35,7 @@ class HistoryMaster {
   ~HistoryMaster();
   //  bool add(const QString & root,const QString & word, const QString & node);
   HistoryEvent * getEvent(int id);
+  Place getLastPlace();
   void setEnabled(bool v) { m_historyEnabled = v;}
   bool add(const Place &);
   void on() { m_historyOn = true;}
@@ -54,6 +55,7 @@ class HistoryMaster {
   QSqlQuery * m_addQuery;
   QSqlQuery * m_backQuery;
   QSqlQuery * m_forQuery;
+  QSqlQuery * m_lastQuery;
 };
 extern HistoryMaster * getHistory();
 #endif

@@ -19,10 +19,12 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
     m_addQuery = new QSqlQuery(m_db);
     m_forQuery = new QSqlQuery(m_db);
     m_backQuery = new QSqlQuery(m_db);
+    m_lastQuery = new QSqlQuery(m_db);
     if (
-        (m_addQuery->prepare("insert into history (nodeId,word,root,timewhen) values (?,?,?,?)")) &&
+        (m_addQuery->prepare("insert into history (node,word,root,supplement,page,vol,timewhen,nodeOnly) values (?,?,?,?,?,?,?,?)")) &&
         (m_backQuery->prepare("select * from history where id <= ? order by id desc")) &&
         (m_forQuery->prepare("select * from history where id > ? order by id asc")) &&
+        (m_lastQuery->prepare("select * from history where id = (select max(id) from history)")) &&
         (m_getQuery->prepare("select * from history where id = ?"))
           )
         {
@@ -52,9 +54,24 @@ HistoryMaster::~HistoryMaster() {
   if (m_getQuery) {
     delete m_getQuery;
   }
+  if (m_lastQuery) {
+    delete m_lastQuery;
+  }
   if (m_db.isOpen()) {
     m_db.close();
   }
+}
+Place HistoryMaster::getLastPlace() {
+  Place p;
+
+  m_lastQuery->exec();
+  if (m_lastQuery->first()) {
+    p.setId(m_lastQuery->value(0).toInt());
+    p.setNode(m_lastQuery->value(1).toString());
+    p.setWord(m_lastQuery->value(2).toString());
+    p.setRoot(m_lastQuery->value(3).toString());
+  }
+  return p;
 }
 //create table history(id integer primary key,nodeId text,word text,root text,timewhen text);
 bool HistoryMaster::openDatabase(const QString & dbname) {
@@ -74,18 +91,37 @@ bool HistoryMaster::openDatabase(const QString & dbname) {
   return ok;
 }
 bool HistoryMaster::add(const Place & p) {
+  if (! m_historyEnabled ) {
+    return false;
+  }
   if (! p.isValid()) {
     return false;
   }
+  /// don't add history event
+  if (p.getType() == Place::History) {
+    return false;
+  }
+  /// don't add two adjecent identical places
+  Place o = getLastPlace();
+  if ((o.getNode() == p.getNode()) &&
+      (o.getRoot() == p.getRoot()) &&
+      (o.getWord() == p.getWord())) {
+    return false;
+  }
+  /// TODO get last record and exit if sample place
   /// TODO add other fields
   HistoryEvent * event = new HistoryEvent;
   event->setPlace(p);
 
-    m_addQuery->bindValue(0,p.getNode());
-    m_addQuery->bindValue(1,p.getWord());
-    m_addQuery->bindValue(2,p.getRoot());
-    m_addQuery->bindValue(3,event->getWhen());
-    return m_addQuery->exec();
+  m_addQuery->bindValue(0,p.getNode());
+  m_addQuery->bindValue(1,p.getWord());
+  m_addQuery->bindValue(2,p.getRoot());
+  m_addQuery->bindValue(3,p.getSupplement());
+  m_addQuery->bindValue(4,p.getPage());
+  m_addQuery->bindValue(5,p.getVol());
+  m_addQuery->bindValue(6,event->getWhen());
+  m_addQuery->bindValue(7,p.getNodeOnly());
+  return m_addQuery->exec();
 
 
 }
@@ -115,6 +151,7 @@ QList<HistoryEvent *> HistoryMaster::getHistory(int count,int direction,int star
       p.setNode(m_backQuery->value(1).toString());
       p.setWord(m_backQuery->value(2).toString());
       p.setRoot(m_backQuery->value(3).toString());
+      p.setId(m_backQuery->value(0).toInt());
       /// TODO add other place fields
       event->setPlace(p);
       event->setWhen(m_backQuery->value(4).toDateTime());
@@ -139,6 +176,7 @@ QList<HistoryEvent *> HistoryMaster::getHistory(int count,int direction,int star
       p.setNode(m_forQuery->value(1).toString());
       p.setWord(m_forQuery->value(2).toString());
       p.setRoot(m_forQuery->value(3).toString());
+      p.setId(m_backQuery->value(0).toInt());
       event->setPlace(p);
       event->setWhen(m_forQuery->value(4).toDateTime());
       if ((ix > 0) && ( events[ix-1]->matches(event))) {
@@ -166,6 +204,7 @@ HistoryEvent * HistoryMaster::getEvent(int id) {
        p.setNode(m_getQuery->value(1).toString());
        p.setWord(m_getQuery->value(2).toString());
        p.setRoot(m_getQuery->value(3).toString());
+       p.setId(m_backQuery->value(0).toInt());
        event->setPlace(p);
        event->setWhen(m_getQuery->value(4).toDateTime());
    }
