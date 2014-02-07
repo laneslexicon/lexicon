@@ -34,10 +34,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   /// TODO would we want restore our current position in history?
   m_history = new HistoryMaster(m_notesDbName);
   m_history->setEnabled(m_historyEnabled);
-  if (m_historyEnabled) {
-    setupHistory();
-  }
-
   m_pwidget = new PlaceWidget(this);
   //  m_notes->setObjectName("notes");
   if (m_docked) {
@@ -106,6 +102,10 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     }
   }
   m_tree->resizeColumnToContents(0);
+
+  if (m_historyEnabled) {
+    setupHistory();
+  }
 
 
   setupInterface();
