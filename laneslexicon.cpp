@@ -651,7 +651,8 @@ Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) 
     if (w->hasPlace(p,true) == -1) {
       m_history->on();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,node);
-      p = w->getXmlForNode(node,nodeOnly);
+      //      p = w->getXmlForNode(node,nodeOnly);
+      p = w->getXmlForRoot(p);
 
       //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
       //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
@@ -662,7 +663,8 @@ Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) 
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (w->hasPlace(p,true) == -1) {
       m_history->on();
-      p = w->getXmlForNode(node,nodeOnly);
+      //      p = w->getXmlForNode(node,nodeOnly);
+      p = w->getXmlForRoot(p);
       m_tabs->setTabText(0,p.getNode());
       // this works but sets it for all tabs
       //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");

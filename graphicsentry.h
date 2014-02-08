@@ -90,7 +90,7 @@ class GraphicsEntry : public QWidget {
     Place getXmlForRoot(const Place &);
     Place getPage(const int );
     Place getXmlForPlace(const Place &);
-    Place getXmlForNode(const QString &,bool nodeOnly = false);
+
     Place getPlace() { return m_place;}
     int hasRoot(const QString & root,bool focus = true);
     int hasPlace(const Place & ,bool focus = true);

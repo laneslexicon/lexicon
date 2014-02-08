@@ -354,7 +354,11 @@ bool GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
   /// TODO this does not return Place needs fixing
   if (! thisPageOnly ) {
     QLOG_DEBUG() << "Out of page jump" << node;
-    getXmlForNode(node);
+    Place p;
+    p.setNode(node);
+    p.setNodeOnly(true);
+    //    getXmlForNode(node);
+    getXmlForRoot(p);
   }
   return false;
 }
@@ -418,39 +422,6 @@ Place GraphicsEntry::getXmlForPlace(const Place & p) {
   return np;
 }
 /**
- * get the root,supplement for the given node and show it
- * nodeId are unique
- *
- * @param node
- *
- */
-Place GraphicsEntry::getXmlForNode(const QString  & node,bool nodeOnly) {
-  Place p;
-  QLOG_DEBUG() << "Search for node" << node << nodeOnly;
-
-  m_nodeQuery->bindValue(0,node);
-  m_nodeQuery->exec();
-
-  if (m_nodeQuery->first()) {
-    //QString xml = m_nodeQuery->value("xml").toString();
-    //    QLOG_DEBUG() << "got " << xml;
-    QString root = m_nodeQuery->value("root").toString();
-    int supplement = m_nodeQuery->value("supplement").toInt();
-    p = Place(root,supplement);
-    p.setNode(node);
-    p.setWord(m_nodeQuery->value("word").toString());
-    p.setNodeOnly(nodeOnly);
-    Place np = getXmlForPlace(p);
-    /// focus on the node, set thisPageOnly to true just in case something has gone horribly wrong
-    /// otherwise we'll be looping forever
-    showPlace(np,true);
-  }
-  else {
-    QLOG_DEBUG() << "Error" << m_nodeQuery->lastError().text();
-  }
-  return p;
-}
-/**
  *
  *
  * @param root
@@ -459,7 +430,7 @@ Place GraphicsEntry::getXmlForNode(const QString  & node,bool nodeOnly) {
 Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QList<EntryItem *> items;
   QString arRoot;
-  Place p;
+  Place retval;
   int supplement;
   QString str;
   EntryItem * centerItem;
@@ -469,12 +440,43 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QString node = dp.getNode();
   bool nodeOnly = dp.getNodeOnly();
 
-  QLOG_DEBUG() << Q_FUNC_INFO << dp;
+  Place p = dp;
+  /**
+   * if we asked for the node, look up the root
+   *
+   */
+
+  if (nodeOnly) {
+    m_nodeQuery->bindValue(0,node);
+    m_nodeQuery->exec();
+
+    if (m_nodeQuery->first()) {
+      //QString xml = m_nodeQuery->value("xml").toString();
+      //    QLOG_DEBUG() << "got " << xml;
+      root = m_nodeQuery->value("root").toString();
+      supplement = m_nodeQuery->value("supplement").toInt();
+      p.setNode(node);
+      p.setRoot(root);
+      p.setWord(m_nodeQuery->value("word").toString());
+      p.setSupplement(supplement);
+    }
+    else {
+      QLOG_WARN() << "Node not found" << node;
+      return retval;
+    }
+  }
+
+  QLOG_DEBUG() << Q_FUNC_INFO << p;
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   if (! m_rootQuery->first()) {
-    QLOG_INFO() << "root not found" << root;
-    return p;
+    if (nodeOnly) {
+      QLOG_WARN() << QString(tr("Root not found for word %1 (node %2)")).arg(p.getWord()).arg(p.getNode());
+    }
+    else {
+      QLOG_WARN() << QString(tr("Root not found %1")).arg(root);
+    }
+    return retval;
   }
   /// this will be set to the right word if a node has been supplied
   QString showWord;
