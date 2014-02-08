@@ -356,7 +356,7 @@ bool GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
     QLOG_DEBUG() << "Out of page jump" << node;
     Place p;
     p.setNode(node);
-    p.setNodeOnly(true);
+    p.setNodeOnly(false);
     //    getXmlForNode(node);
     getXmlForRoot(p);
   }
@@ -429,10 +429,9 @@ Place GraphicsEntry::getXmlForPlace(const Place & p) {
  */
 Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QList<EntryItem *> items;
-  QString arRoot;
   Place retval;
   int supplement;
-  QString str;
+
   EntryItem * centerItem;
 
   QString root = dp.getRoot();
@@ -446,10 +445,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
    *
    */
 
-  if (nodeOnly) {
+  if (root.isEmpty() && ! node.isEmpty() ) {
     m_nodeQuery->bindValue(0,node);
     m_nodeQuery->exec();
-
     if (m_nodeQuery->first()) {
       //QString xml = m_nodeQuery->value("xml").toString();
       //    QLOG_DEBUG() << "got " << xml;
@@ -479,11 +477,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     return retval;
   }
   /// this will be set to the right word if a node has been supplied
-  QString showWord;
-  QString startNode = node;
 
   /// add the root item unless nodeOnly is set
-  str = QString("<word type=\"root\" ar=\"%1\"></word>").arg(root);
+  QString str = QString("<word type=\"root\" ar=\"%1\"></word>").arg(root);
   EntryItem * rootItem  = createEntry(str);
   /// will be null if the XSLT/XML has not parsed correctly
   if (rootItem == NULL) {
@@ -498,8 +494,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   rootItem->setSupplement(m_rootQuery->value(8).toInt());
   rootItem->setPage(m_rootQuery->value(5).toInt());
 
-  if (! nodeOnly ) {
-    items << rootItem;
+  items << rootItem;
+  if ( nodeOnly ) {
+    rootItem->hide();
   }
 
 
@@ -515,10 +512,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
      *
      */
     if ((supp == 1) && (supplement == 0)) {
-      ok = false;
+      //      ok = false;
     }
     if (ok) {
-      arRoot = m_rootQuery->value(0).toString();
       QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
         .arg(m_rootQuery->value(3).toString())
         .arg(m_rootQuery->value(2).toString())
@@ -549,22 +545,16 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         }
         item->setSupplement(supplement);
         item->setNode(m_rootQuery->value(7).toString());
-        item->setRoot(arRoot);
+        item->setRoot(root);
         item->setWord(m_rootQuery->value(2).toString());
         item->setPage(m_rootQuery->value(5).toInt());
-        if (startNode.isEmpty()) {
-          startNode = m_rootQuery->value(7).toString();
+        items << item;
+        /// if we asked for a specific word/node, focus on it
+        if (! node.isEmpty() && (item->getNode() == node)) {
+            centerItem = item;
         }
-        else if ( startNode == item->getNode()) {
-          showWord = item->getWord();
-          /// if a node has been passed, then center on the node
-          centerItem = item;
-          if ( nodeOnly ) {
-            items << item;
-          }
-        }
-        if (! nodeOnly ) {
-          items << item;
+        if ( nodeOnly ) {
+            item->hide();
         }
       }
     }
@@ -611,13 +601,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// items added to the scene
   /// TODO check this
   m_view->setSceneRect(m_scene->sceneRect());
-  if (m_currentRoot != arRoot) {
-    emit rootChanged(arRoot,node);
-    m_currentRoot = arRoot;
-  }
   /// TODO there has to be a better way than this
   /// TODO if node specified we need to center on it
-  if ( node.isEmpty()) {
+  //  if ( node.isEmpty()) {
     /*
     QTextCursor cursor(centerItem->document());
     QTextBlock b = cursor.block();
@@ -628,16 +614,17 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         m_view->centerOn(line.position());
     }
     */
-
-      m_scene->setFocusItem(centerItem);
-      int h =  m_view->height();
-      QPointF p = centerItem->pos();
-      p.setY(p.y() + h/2 - 10);
-      m_view->centerOn(p);
-  }
-  if (nodeOnly) {
-    delete rootItem;
-  }
+  qDebug() << "focus set" << centerItem->getPlace();
+  m_scene->setFocusItem(centerItem);
+  centerItem->ensureVisible();
+      //      int h =  m_view->height();
+      //      QPointF pt = centerItem->pos();
+      //      pt.setY(pt.y() + h/2 - 10);
+      //      m_view->centerOn(pt);
+      //  }
+  //  if (nodeOnly) {
+  //    delete rootItem;
+  //  }
   ///
   if (m_place.isValid() && (m_place != centerItem->getPlace())) {
 
@@ -1005,20 +992,41 @@ int GraphicsEntry::hasRoot(const QString & root,bool setFocus) {
   }
   return ix;
 }
-int GraphicsEntry::hasPlace(const Place & p,bool setFocus) {
+/**
+ *
+ *
+ * @param p
+ * @param type search type
+ * @param setFocus
+ *
+ * @return
+ */
+int GraphicsEntry::hasPlace(const Place & p,int type,bool setFocus) {
   int max = m_items.size();
   int ix = -1;
   int supp = p.getSupplement();
   QString root = p.getRoot();
   for(int i=0;i < max;i++) {
-    if (m_items[i]->isRoot() &&
-        ((m_items[i]->getRoot() == root) &&
-         (m_items[i]->getSupplement() == supp))) {
+    if (type == GraphicsEntry::NodeSearch) {
+      if (m_items[i]->getNode() == p.getNode()) {
           ix = i;
           i = max;
+      }
     }
+    else if (type == GraphicsEntry::RootSearch) {
+      if (m_items[i]->isRoot() &&
+          ((m_items[i]->getRoot() == root) &&
+           (m_items[i]->getSupplement() == supp))) {
+        ix = i;
+        i = max;
+      }
+    }
+    else {
+      QLOG_WARN() << "Unknown search type for place" << p;
+    }
+
   }
-  qDebug() << Q_FUNC_INFO << root << supp << setFocus << ix;
+  qDebug() << Q_FUNC_INFO << p << ix;
   if ((ix != -1) && setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);

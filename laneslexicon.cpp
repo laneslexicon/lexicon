@@ -634,6 +634,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   Place m(root,p);
   showPlace(m,newTab);
 }
+
 Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) {
   Place p;
   p.setNode(node);
@@ -648,7 +649,7 @@ Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) 
     GraphicsEntry * w = new GraphicsEntry(this);
     setSignals(w);
     w->installEventFilter(this);
-    if (w->hasPlace(p,true) == -1) {
+    if (w->hasPlace(p,GraphicsEntry::NodeSearch,true) == -1) {
       m_history->on();
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,node);
       //      p = w->getXmlForNode(node,nodeOnly);
@@ -661,7 +662,7 @@ Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) 
   }
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
-    if (w->hasPlace(p,true) == -1) {
+    if (w->hasPlace(p,GraphicsEntry::NodeSearch,true) == -1) {
       m_history->on();
       //      p = w->getXmlForNode(node,nodeOnly);
       p = w->getXmlForRoot(p);
@@ -700,7 +701,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     GraphicsEntry * w = new GraphicsEntry(this);
     setSignals(w);
     w->installEventFilter(this);
-    if (w->hasPlace(p,true) == -1) {
+    if (w->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
       np = w->getXmlForPlace(p);
       /// TODO decide whether to make new tab the current tab
@@ -711,7 +712,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   }
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
-    if (w->hasPlace(p,true) == -1) {
+    if (w->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
       np = w->getXmlForPlace(p);
       m_tabs->setTabText(currentTab,root);
       // this works but sets it for all tabs
@@ -978,7 +979,7 @@ void LanesLexicon::on_actionNextRoot() {
     if (! np.isEmpty()) {
       /// hasRoot will checks if root already shown
       /// if it is, it move focus to it (if true is 2nd param)
-      if (entry->hasPlace(np,true) == -1) {
+      if (entry->hasPlace(np,GraphicsEntry::RootSearch,true) == -1) {
         entry->setPagingForward();
         entry->getXmlForPlace(np);
         m_tree->ensurePlaceVisible(np,true);
@@ -999,7 +1000,7 @@ void LanesLexicon::on_actionPrevRoot() {
     if (! np.isEmpty()) {
       /// hasRoot will checks if root already shown
       /// if it is, it move focus to it (if true is 2nd param)
-      if (entry->hasPlace(np,true) == -1) {
+      if (entry->hasPlace(np,GraphicsEntry::RootSearch,true) == -1) {
         entry->setPagingBackward();
         entry->getXmlForPlace(np);
         m_tree->ensurePlaceVisible(np,true);

@@ -85,7 +85,7 @@ class GraphicsEntry : public QWidget {
  public:
   GraphicsEntry(QWidget * parent = 0);
   ~GraphicsEntry();
-
+  enum SearchType { RootSearch, WordSearch, NodeSearch };
   //  Place getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString(),bool nodeOnly = false);
     Place getXmlForRoot(const Place &);
     Place getPage(const int );
@@ -93,7 +93,7 @@ class GraphicsEntry : public QWidget {
 
     Place getPlace() { return m_place;}
     int hasRoot(const QString & root,bool focus = true);
-    int hasPlace(const Place & ,bool focus = true);
+    int hasPlace(const Place & ,int searchtype,bool focus = true);
     QString currentRoot() { return m_currentRoot;}
     /// return the first/last root in the scene
     void setPagingForward() {
