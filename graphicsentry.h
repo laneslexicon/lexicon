@@ -92,7 +92,7 @@ class GraphicsEntry : public QWidget {
     Place getXmlForPlace(const Place &);
 
     Place getPlace() { return m_place;}
-    int hasRoot(const QString & root,bool focus = true);
+    //    int hasRoot(const QString & root,bool focus = true);
     int hasPlace(const Place & ,int searchtype,bool focus = true);
     QString currentRoot() { return m_currentRoot;}
     /// return the first/last root in the scene

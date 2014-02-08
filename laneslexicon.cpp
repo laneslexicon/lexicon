@@ -634,7 +634,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   Place m(root,p);
   showPlace(m,newTab);
 }
-
+/// TODO is this redundant ?
 Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) {
   Place p;
   p.setNode(node);
@@ -724,43 +724,6 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     }
   }
  return np;
-}
-Place LanesLexicon::showRoot(const QString & root,int supplement,bool createTab) {
-  Place p;
-  QLOG_DEBUG() << Q_FUNC_INFO << "REDUNDANT CODE";
-  /*
-  if (createTab) {
-    /// turn history on as the user has clicked on something
-    /// and the root is not already shown
-    GraphicsEntry * w = new GraphicsEntry(this);
-    setSignals(w);
-    w->installEventFilter(this);
-    if (w->hasRoot(root,true) == -1) {
-      m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
-      p = w->getXmlForRoot(root,supplement);
-    }
-  }
-  else {
-    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
-    if (w->hasRoot(root,true) == -1) {
-      p = w->getXmlForRoot(root,supplement);
-      m_tabs->setTabText(0,root);
-      // this works but sets it for all tabs
-      //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
-      // this sets it for all the items in graphicsentry
-      // but not the tab title
-      //    w->setStyleSheet("font-family : Amiri;font-size : 16px");
-      w->setFocus();
-    }
-  }
- if (p.isValid()) {
-   if (m_place.getRoot() != p.getRoot()) {
-     placeChanged(p);
-   }
-   m_place = p;
- }
-  */
-  return p;
 }
 /**
  * when user clicks on item reason Qt::MouseFocusReason
@@ -977,7 +940,6 @@ void LanesLexicon::on_actionNextRoot() {
     Place p  =  entry->getPlace();
     Place np = m_tree->findNextPlace(p);
     if (! np.isEmpty()) {
-      /// hasRoot will checks if root already shown
       /// if it is, it move focus to it (if true is 2nd param)
       if (entry->hasPlace(np,GraphicsEntry::RootSearch,true) == -1) {
         entry->setPagingForward();
@@ -998,7 +960,6 @@ void LanesLexicon::on_actionPrevRoot() {
     Place p  =  entry->getPlace();
     Place np = m_tree->findPrevPlace(p);
     if (! np.isEmpty()) {
-      /// hasRoot will checks if root already shown
       /// if it is, it move focus to it (if true is 2nd param)
       if (entry->hasPlace(np,GraphicsEntry::RootSearch,true) == -1) {
         entry->setPagingBackward();
