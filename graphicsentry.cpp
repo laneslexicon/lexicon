@@ -427,6 +427,7 @@ Place GraphicsEntry::getXmlForPlace(const Place & p) {
 Place GraphicsEntry::getXmlForNode(const QString  & node,bool nodeOnly) {
   Place p;
   QLOG_DEBUG() << "Search for node" << node << nodeOnly;
+
   m_nodeQuery->bindValue(0,node);
   m_nodeQuery->exec();
 
@@ -468,15 +469,12 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QString node = dp.getNode();
   bool nodeOnly = dp.getNodeOnly();
 
-  QLOG_DEBUG() << Q_FUNC_INFO << root << supp << node << "nodeOnly = " << nodeOnly;
+  QLOG_DEBUG() << Q_FUNC_INFO << dp;
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   if (! m_rootQuery->first()) {
     QLOG_INFO() << "root not found" << root;
     return p;
-  }
-  if (m_clearScene) {
-    onClearScene();
   }
   /// this will be set to the right word if a node has been supplied
   QString showWord;
@@ -489,6 +487,11 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (rootItem == NULL) {
     return p;
   }
+
+
+  if (m_clearScene) {
+    onClearScene();
+  }
   rootItem->setRoot(root,true);
   rootItem->setSupplement(m_rootQuery->value(8).toInt());
   rootItem->setPage(m_rootQuery->value(5).toInt());
@@ -496,6 +499,8 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (! nodeOnly ) {
     items << rootItem;
   }
+
+
   /// by default we will center on the root item
   centerItem = rootItem;
   /// now add all the entries for the root
@@ -630,6 +635,10 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   }
   if (nodeOnly) {
     delete rootItem;
+  }
+  ///
+  if (m_place.isValid() && (m_place != centerItem->getPlace())) {
+
   }
   m_place = centerItem->getPlace();
   /**
