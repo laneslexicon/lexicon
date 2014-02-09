@@ -847,6 +847,7 @@ void LanesLexicon::writeSettings() {
   */
   if (m_saveTabs) {
     settings.beginGroup("Tabs");
+    settings.remove("");
     for(int i=0;i < m_tabs->count();i++) {
       GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
       if (entry) {
