@@ -291,6 +291,11 @@ void GraphicsEntry::onClearScene() {
     delete m_items.takeFirst();
   }
 }
+/**
+ * redundant
+ *
+ */
+
 void GraphicsEntry::anchorClicked(const QUrl & link) {
   QLOG_DEBUG() << link.toDisplayString();
   QLOG_DEBUG() << QApplication::keyboardModifiers();
@@ -410,6 +415,7 @@ bool GraphicsEntry::prepareQueries() {
   }
   return ok;
 }
+/*
 Place GraphicsEntry::getXmlForPlace(const Place & p) {
   Place np = getXmlForRoot(p);
   if (np.isValid()) {
@@ -421,9 +427,10 @@ Place GraphicsEntry::getXmlForPlace(const Place & p) {
   }
   return np;
 }
+*/
 /**
- *
- *
+ * TODO if this is called as part of search for node it does not return
+ *      the Place that matches the node, but the root
  * @param root
  * @param node the id of the entry we want to focus on
  */
@@ -550,11 +557,13 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         item->setPage(m_rootQuery->value(5).toInt());
         items << item;
         /// if we asked for a specific word/node, focus on it
-        if (! node.isEmpty() && (item->getNode() == node)) {
+        if (nodeOnly) {
+          if (! node.isEmpty() && (item->getNode() == node)) {
             centerItem = item;
-        }
-        if ( nodeOnly ) {
+          }
+          else {
             item->hide();
+          }
         }
       }
     }
@@ -994,6 +1003,9 @@ int GraphicsEntry::hasPlace(const Place & p,int type,bool setFocus) {
         i = max;
       }
     }
+    else if (type == GraphicsEntry::WordSearch) {
+      /// TODO word search
+    }
     else {
       QLOG_WARN() << "Unknown search type for place" << p;
     }
@@ -1003,11 +1015,11 @@ int GraphicsEntry::hasPlace(const Place & p,int type,bool setFocus) {
   if ((ix != -1) && setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);
-    m_place = p;
+    //    m_place = p;
     //    m_showPlace->setPlace(m_place);
 
-    m_currentRoot = root;
-    emit(rootChanged(root,QString()));
+    //    m_currentRoot = root;
+    //    emit(rootChanged(root,QString()));
   }
   return ix;
 }

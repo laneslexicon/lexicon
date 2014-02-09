@@ -99,7 +99,6 @@ public:
 
 private:
     Place showPlace(const Place &,bool newTab = false);
-    Place showRoot(const QString &,int supp = 0,bool newTab = false);
     Place showNode(const QString &,bool nodeOnly = false,bool newTab = false);
     QString m_interface;    // "default","minimal"
     void setupInterface();

@@ -198,7 +198,7 @@ void LanesLexicon::shortcut(const QString & k) {
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
-        /// TODO fix (broken since Place simplified
+        /// TODO make this an option to always show root
         /// show only node
         Place p = showNode(t,true);
         if (! p.isValid()) {
@@ -638,7 +638,8 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
 Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) {
   Place p;
   p.setNode(node);
-  p.setNodeOnly(nodeOnly);
+  /// TODO make this come from QSettings
+  p.setNodeOnly(false);
   int currentTab = m_tabs->currentIndex();
   if (currentTab == -1) {
     createTab = true;
@@ -654,7 +655,11 @@ Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) 
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,node);
       //      p = w->getXmlForNode(node,nodeOnly);
       p = w->getXmlForRoot(p);
-
+      if (p.isValid()) {
+        /// set focus
+        p.setNode(node);
+        w->hasPlace(p,GraphicsEntry::NodeSearch,true);
+      }
       //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
       //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
@@ -667,6 +672,11 @@ Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) 
       //      p = w->getXmlForNode(node,nodeOnly);
       p = w->getXmlForRoot(p);
       m_tabs->setTabText(0,p.getNode());
+      if (p.isValid()) {
+        /// set focus
+        p.setNode(node);
+        w->hasPlace(p,GraphicsEntry::NodeSearch,true);
+      }
       // this works but sets it for all tabs
       //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
       // this sets it for all the items in graphicsentry
@@ -703,7 +713,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     w->installEventFilter(this);
     if (w->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
-      np = w->getXmlForPlace(p);
+      np = w->getXmlForRoot(p);
       /// TODO decide whether to make new tab the current tab
       //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
       //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
@@ -713,7 +723,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (w->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
-      np = w->getXmlForPlace(p);
+      np = w->getXmlForRoot(p);
       m_tabs->setTabText(currentTab,root);
       // this works but sets it for all tabs
       //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
@@ -883,7 +893,7 @@ void LanesLexicon::restoreTabs() {
     GraphicsEntry * entry = new GraphicsEntry(this);
     setSignals(entry);
     p.setType(Place::RestoreTab);
-    p = entry->getXmlForPlace(p);
+    p = entry->getXmlForRoot(p);
     m_tabs->addTab(entry,p.getRoot());
     m_tree->ensurePlaceVisible(p,true);
     settings.endGroup();
@@ -943,7 +953,7 @@ void LanesLexicon::on_actionNextRoot() {
       /// if it is, it move focus to it (if true is 2nd param)
       if (entry->hasPlace(np,GraphicsEntry::RootSearch,true) == -1) {
         entry->setPagingForward();
-        entry->getXmlForPlace(np);
+        entry->getXmlForRoot(np);
         m_tree->ensurePlaceVisible(np,true);
       }
     }
@@ -963,7 +973,7 @@ void LanesLexicon::on_actionPrevRoot() {
       /// if it is, it move focus to it (if true is 2nd param)
       if (entry->hasPlace(np,GraphicsEntry::RootSearch,true) == -1) {
         entry->setPagingBackward();
-        entry->getXmlForPlace(np);
+        entry->getXmlForRoot(np);
         m_tree->ensurePlaceVisible(np,true);
       }
     }
