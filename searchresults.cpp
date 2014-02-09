@@ -49,13 +49,16 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
       QString word = m_query.value("entry").toString();
       item = new QTableWidgetItem(m_query.value("root").toString());
       item->setFont(m_resultsFont);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,0,item);
 
       item = new QTableWidgetItem(m_query.value("entry").toString());
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       item->setFont(m_resultsFont);
       m_list->setItem(row,1,item);
 
       item = new QTableWidgetItem(t);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,2,item);
       nodes << t;
     }
