@@ -623,7 +623,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         m_view->centerOn(line.position());
     }
     */
-  qDebug() << "focus set" << centerItem->getPlace();
   m_scene->setFocusItem(centerItem);
   centerItem->ensureVisible();
       //      int h =  m_view->height();
@@ -634,20 +633,16 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   //  if (nodeOnly) {
   //    delete rootItem;
   //  }
-  ///
+  /// we have changed places, so add to the history
   if (m_place.isValid() && (m_place != centerItem->getPlace())) {
-
+    if (getHistory()->isOn()) {
+      qDebug() << "history add place" << m_place;
+      m_place.setType(dp.getType());
+      getHistory()->add(m_place);
+    }
   }
   m_place = centerItem->getPlace();
-  /**
-   * we need to know whether we got here by accessing the history button
-   * or not
-   *
-   */
-  if (getHistory()->isOn()) {
-    m_place.setType(dp.getType());
-    getHistory()->add(m_place);
-  }
+  qDebug() << "Place set to:" << m_place;
   return m_place;
 }
 Place GraphicsEntry::getPage(const int page) {
