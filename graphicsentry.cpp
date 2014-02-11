@@ -350,6 +350,8 @@ bool GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
       m_scene->setFocusItem(item);
       //m_view->ensureVisible(item);
        m_view->centerOn(item);
+       /// update the place
+       m_place = item->getPlace();
       //     m_scene->clearFocus();
       return true;
     }
@@ -557,14 +559,13 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         item->setPage(m_rootQuery->value(5).toInt());
         items << item;
         /// if we asked for a specific word/node, focus on it
-        if (nodeOnly) {
-          if (! node.isEmpty() && (item->getNode() == node)) {
-            centerItem = item;
-          }
-          else {
-            item->hide();
-          }
+        if (! node.isEmpty() && (item->getNode() == node)) {
+          centerItem = item;
         }
+        if (nodeOnly) {
+            item->hide();
+        }
+
       }
     }
   } while(m_rootQuery->next());
