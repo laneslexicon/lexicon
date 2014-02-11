@@ -2,6 +2,7 @@
 #define __PLACE_H__
 #include <QString>
 #include <QDebug>
+#include <QList>
 #include "QsLog.h"
 /*
   Using the QVariant;
@@ -60,6 +61,7 @@ class Place {
                         << p.getNode() << ","
                         << p.getSupplement() << ","
                         << p.getPage() << ","
+                        << p.getVol() << ","
                         << p.getNodeOnly() << ")";
 	return debug.space();
 }
@@ -95,11 +97,12 @@ class Place {
   void setSupplement(int i) { m_supplement = i;}
   bool isSupplement() { return (m_supplement == 1);}
   int getPage() const { return m_page;}
-  void setPage(int i) { m_page = i;}
+  void setPage(int i);
   int getVol() const { return m_vol;}
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
   bool getNodeOnly() const { return m_showOnlyNodes;}
+
   void setNodeOnly(bool v) { m_showOnlyNodes = v;}
  private:
   int m_vol;
@@ -113,5 +116,8 @@ class Place {
   bool m_showOnlyNodes;
   QVariant m_data;
 };
+
 Q_DECLARE_METATYPE(Place);
+
+
 #endif
