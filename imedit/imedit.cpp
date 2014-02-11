@@ -6,13 +6,8 @@ ImEdit::ImEdit(QWidget * parent)
   mapper = im_new();
   mapEnabled = true;
   prev_char = 0;
-  //  setContextMenuPolicy(Qt::CustomContextMenu);
-  //  connect(this,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(showContextMenu(const QPoint&)));
-  //  setfont = new QAction("Set Font",this);
-  //  connect(setfont,SIGNAL(triggered()),this,SLOT(actionSetFont()));
 }
 ImEdit::~ImEdit() {
-  qDebug() << Q_FUNC_INFO;
   im_free(mapper);
 }
 QString ImEdit::currentScript() {
@@ -59,53 +54,51 @@ void ImEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
   //  qDebug() << "keypress" << mapEnabled << mapname;;
   if (event->modifiers() & Qt::ControlModifier) {
-     return QTextEdit::keyPressEvent(event);
+    return QTextEdit::keyPressEvent(event);
   }
   if (m_debug) {
-       QString t;
-       QTextStream out(&t);
-       out << "ImEdit in: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << event->key() << " " << UcdScripts::getScript(event->key());
-       out.reset();
-       out << " " << event->text();
-       emit(logMessage(t)); //QString("ImEdit got: %1 %2").arg(event->key()).arg(qPrintable(event->text()))));
+    QString t;
+    QTextStream out(&t);
+    out << "ImEdit in: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << event->key() << " " << UcdScripts::getScript(event->key());
+    out.reset();
+    out << " " << event->text();
+    emit(logMessage(t)); //QString("ImEdit got: %1 %2").arg(event->key()).arg(qPrintable(event->text()))));
   }
   if ((! mapEnabled) ||   mapname.isEmpty() ||  mapname.isNull())   {
-     return QTextEdit::keyPressEvent(event);
+    return QTextEdit::keyPressEvent(event);
   }
 
-         //event->text().toUtf8().data());
-   const QChar * uc = event->text().unicode();
-   pc = uc->unicode();
-   if (pc == 0) {
-     if (m_debug) {
-       emit(logMessage("ImEdit unicode value 0 exit"));
-     }
-     return QTextEdit::keyPressEvent(event);
-   }
-   //   qDebug("curr char %04x, prev %04x",pc,prev_char);
-   im_char * cc = im_convert(this->mapper,this->mapname.toUtf8().constData(),uc->unicode(),prev_char);
-   if (cc->processed) {
-     event->ignore();
-     QKeyEvent * nevent = new QKeyEvent(QEvent::KeyPress, cc->uc, Qt::NoModifier,cc->c);
-     prev_char = cc->uc;
-     QTextEdit::keyPressEvent(nevent);
-     //     qDebug("sending %s %04x %s","sending",cc->uc, qPrintable(cc->c));
-     if (m_debug) {
-       QString t;
-       QTextStream out(&t);
-       out << "ImEdit out: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << nevent->key();
-       out.reset();
-       out << nevent->text();
-       emit(logMessage(t)); //QString("ImEdit out: %1 %2").arg(nevent->key()).arg(qPrintable(nevent->text()))));
-     }
-     //     QApplication::postEvent(event->target, nevent);
-     return;
-   }
-   else {
-     prev_char = pc;
-     emit(logMessage("character not processed"));
-     QTextEdit::keyPressEvent(event);
-   }
+  //event->text().toUtf8().data());
+  const QChar * uc = event->text().unicode();
+  pc = uc->unicode();
+  if (pc == 0) {
+    if (m_debug) {
+      emit(logMessage("ImEdit unicode value 0 exit"));
+    }
+    return QTextEdit::keyPressEvent(event);
+  }
+  im_char * cc = im_convert(this->mapper,this->mapname.toUtf8().constData(),uc->unicode(),prev_char);
+  if (cc->processed) {
+    event->ignore();
+    QKeyEvent * nevent = new QKeyEvent(QEvent::KeyPress, cc->uc, Qt::NoModifier,cc->c);
+    prev_char = cc->uc;
+    QTextEdit::keyPressEvent(nevent);
+    if (m_debug) {
+      QString t;
+      QTextStream out(&t);
+      out << "ImEdit out: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << nevent->key();
+      out.reset();
+      out << nevent->text();
+      emit(logMessage(t)); //QString("ImEdit out: %1 %2").arg(nevent->key()).arg(qPrintable(nevent->text()))));
+    }
+    //     QApplication::postEvent(event->target, nevent);
+    return;
+  }
+  else {
+    prev_char = pc;
+    emit(logMessage("character not processed"));
+    QTextEdit::keyPressEvent(event);
+  }
 }
 void ImEdit::setMapname(const QString & name) {
   //  qDebug() << "setting map to:" << name;
@@ -148,17 +141,17 @@ void ImEdit::actionChangeMap() {
  */
 void ImEdit::actionSetFont() {
 
-   bool ok;
-   QFont font = QFontDialog::getFont(
-                &ok, QFont("", 10), this);
-   if (ok) {
-     m_docFont = font;
-     setFont(m_docFont);
-     emit(fontChanged());
-   } else {
-     // the user canceled the dialog; font is set to the initial
-     // value, in this case Helvetica [Cronyx], 10
-   }
+  bool ok;
+  QFont font = QFontDialog::getFont(
+                                    &ok, QFont("", 10), this);
+  if (ok) {
+    m_docFont = font;
+    setFont(m_docFont);
+    emit(fontChanged());
+  } else {
+    // the user canceled the dialog; font is set to the initial
+    // value, in this case Helvetica [Cronyx], 10
+  }
 
 
 }
@@ -169,29 +162,29 @@ void ImEdit::setDocFont(const QFont & f) {
 }
 void ImEdit::actionInsertUnicode() {
   /*
-  QAction * action = (QAction *)QObject::sender();
-  QString m = action->data().toString();
-  if (! m_unicode.contains(m)) {
+    QAction * action = (QAction *)QObject::sender();
+    QString m = action->data().toString();
+    if (! m_unicode.contains(m)) {
     qDebug() << "ERROR: insert undefined unicode entry" << m;
     return;
-  }
-  UnicodeEntry * u = m_unicode.value(m);
-  // get the hex value and insert it
-  qDebug() << "insert unicode" << u->m_name << u->m_value;
-  //  QKeyEvent * nevent = new QKeyEvent(QEvent::KeyPress, cc->uc, Qt::NoModifier,cc->c);
-  //  QTextEdit::keyPressEvent(nevent);
-  QTextCursor cursor = textCursor();
-  cursor.insertText(QString(QChar(u->m_value)));
-  setTextCursor(cursor);
+    }
+    UnicodeEntry * u = m_unicode.value(m);
+    // get the hex value and insert it
+    qDebug() << "insert unicode" << u->m_name << u->m_value;
+    //  QKeyEvent * nevent = new QKeyEvent(QEvent::KeyPress, cc->uc, Qt::NoModifier,cc->c);
+    //  QTextEdit::keyPressEvent(nevent);
+    QTextCursor cursor = textCursor();
+    cursor.insertText(QString(QChar(u->m_value)));
+    setTextCursor(cursor);
   */
 }
 void ImEdit::actionDeleteUnicode() {
   /*
-  QAction * action = (QAction *)QObject::sender();
-  qDebug() << "delete at" << m_hudPos << m_hudChar;
-  QTextCursor cstart = cursorForPosition(QPoint(0,0));
-  cstart.setPosition(m_hudPos);
-  cstart.deleteChar();
+    QAction * action = (QAction *)QObject::sender();
+    qDebug() << "delete at" << m_hudPos << m_hudChar;
+    QTextCursor cstart = cursorForPosition(QPoint(0,0));
+    cstart.setPosition(m_hudPos);
+    cstart.deleteChar();
   */
 }
 void ImEdit::dragEnterEvent(QDragEnterEvent * event) {
@@ -384,23 +377,23 @@ void WrappedEdit::buildContextMenu(QMenu * menu) {
   qDebug() << "no unicode entry for" << m_hudChar;
   }
   }
-}
+  }
 */
 void WrappedEdit::actionChangeFont() {
 
-   bool ok;
-   QFont font = QFontDialog::getFont(
-                                     &ok, editor()->getDocFont(), this);
-   if (ok) {
-     //     m_docFont = font;
-     m_docFontString = font.toString();
-     m_edit->setDocFont(font);
-     qDebug() << Q_FUNC_INFO << m_docFontString;
-     emit(fontChanged());
-   } else {
-     // the user canceled the dialog; font is set to the initial
-     // value, in this case Helvetica [Cronyx], 10
-   }
+  bool ok;
+  QFont font = QFontDialog::getFont(
+                                    &ok, editor()->getDocFont(), this);
+  if (ok) {
+    //     m_docFont = font;
+    m_docFontString = font.toString();
+    m_edit->setDocFont(font);
+    qDebug() << Q_FUNC_INFO << m_docFontString;
+    emit(fontChanged());
+  } else {
+    // the user canceled the dialog; font is set to the initial
+    // value, in this case Helvetica [Cronyx], 10
+  }
 
 
 }
@@ -467,10 +460,10 @@ QString WrappedEdit::getText() {
 HudEdit::~HudEdit() {
   qDebug() << Q_FUNC_INFO;
   /*
-  QStringList k = m_unicode.keys();
-  for(int i=0;i < k.size();i++) {
+    QStringList k = m_unicode.keys();
+    for(int i=0;i < k.size();i++) {
     UnicodeEntry * e = m_unicode.take(k[i]);
     delete e;
-  }
+    }
   */
 }
