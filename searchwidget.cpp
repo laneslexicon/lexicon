@@ -39,7 +39,7 @@ void RootSearchDialog::onCancel() {
   //  reject();
 }
 QString RootSearchDialog::getText() {
-  return m_edit->getText();
+  return m_edit->getText().trimmed();
 }
 NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
@@ -62,7 +62,7 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setLayout(layout);
 }
 QString NodeSearchDialog::getText() {
-  return m_edit->editor()->toPlainText();
+  return m_edit->editor()->toPlainText().trimmed();
 }
 /**
  *
@@ -92,5 +92,5 @@ WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
 }
 QString WordSearchDialog::getText() {
   /// getText() converts buckwalter to arabic
-  return m_edit->getText();
+  return m_edit->getText().trimmed();
 }
