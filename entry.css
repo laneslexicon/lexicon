@@ -1,7 +1,7 @@
 .hi { font-family : Droid Serif;font-size : 12px;font-style : italic}
 .arabic { font-family : Amiri;font-size : 18px}
 .arabichead { font-family : Amiri;font-size : 30px}
-body { font-family : Droid Sans;font-size : 12px}
+body { font-family : Droid Sans;font-size : 12px;line-height : 30px}
 .bseparator { font-size : 12px}
 .aseparator { font-size : 12px}
 .rootword { margin-left : 50px}
