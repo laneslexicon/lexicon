@@ -481,7 +481,7 @@ void LanesLexicon::setupHistory(int currPos) {
   // get backward history
   /// TODO set 10 to something from the QSettings
   m_historyPos = currPos;
-  QList<HistoryEvent *> events = m_history->getHistory(10,0,currPos);
+  QList<HistoryEvent *> events = m_history->getHistory();//10,0,currPos);
   if (events.size() == 0) {
     m_hBackwardBtn->setEnabled(true);
   }
@@ -509,6 +509,7 @@ void LanesLexicon::setupHistory(int currPos) {
   if (currPos  == -1) {
     return;
   }
+  return;
   events = m_history->getHistory(10,1,currPos);
   if (events.size() == 0) {
     m_hForwardBtn->setEnabled(true);

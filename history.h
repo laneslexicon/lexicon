@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QSqlError>
 #include <QDebug>
 #include "place.h"
@@ -42,15 +43,17 @@ class HistoryMaster {
   void off() { m_historyOn = false;}
   bool isOn() { return m_historyOn;}
   QList<HistoryEvent *> getHistory(int howMany,int direction,int startPos = -1);
+  QList<HistoryEvent *> getHistory();
  private:
   QSqlDatabase m_db;
-
+  int m_size;
   int m_lastId;
   bool openDatabase(const QString & dbname);
   /// this is turned on/off depending on user actions
   bool m_historyOn;
     /// this disables history altogether
   bool m_historyEnabled;
+  QSqlQuery * m_listQuery;
   QSqlQuery * m_getQuery;
   QSqlQuery * m_addQuery;
   QSqlQuery * m_backQuery;

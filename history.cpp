@@ -13,9 +13,11 @@ bool HistoryEvent::matches(HistoryEvent * event) {
 }
 //CREATE TABLE history(id integer primary key,nodeId text,word text,root text,timewhen text);
 HistoryMaster::HistoryMaster(const QString & dbname) {
+  m_size = 10;
   m_historyOn = false;
   m_historyEnabled = false;
   m_getQuery = 0;
+  m_listQuery = 0;
   m_addQuery = 0;
   m_forQuery = 0;
   m_backQuery = 0;
@@ -24,6 +26,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
   bool ok = openDatabase(dbname);
   if (ok) {
     m_getQuery = new QSqlQuery(m_db);
+    m_listQuery = new QSqlQuery(m_db);
     m_addQuery = new QSqlQuery(m_db);
     m_forQuery = new QSqlQuery(m_db);
     m_backQuery = new QSqlQuery(m_db);
@@ -33,6 +36,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
         (m_backQuery->prepare("select * from history where id <= ? order by id desc")) &&
         (m_forQuery->prepare("select * from history where id > ? order by id asc")) &&
         (m_lastQuery->prepare("select * from history where id = (select max(id) from history)")) &&
+        (m_listQuery->prepare(QString("select * from history order by id desc limit %1").arg(m_size))) &&
         (m_getQuery->prepare("select * from history where id = ?"))
           )
         {
@@ -132,6 +136,30 @@ bool HistoryMaster::add(const Place & p) {
   return m_addQuery->exec();
 
 
+}
+ QList<HistoryEvent *> HistoryMaster::getHistory() {
+  QList<HistoryEvent *> events;
+  if (! m_historyEnabled ) {
+    return events;
+  }
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  m_listQuery->exec();
+  while(m_listQuery->next()) {
+    HistoryEvent * event = new HistoryEvent();
+    int fno = m_listQuery->record().indexOf("id");
+    event->setId(m_listQuery->value(fno).toInt());
+    QLOG_DEBUG() << "Added id" << m_listQuery->value(0).toInt();
+    Place p;
+    /// TODO add other place fields
+    p.setNode(m_listQuery->value(1).toString());
+    p.setWord(m_listQuery->value(2).toString());
+    p.setRoot(m_listQuery->value(3).toString());
+    p.setId(m_listQuery->value(0).toInt());
+    event->setPlace(p);
+    event->setWhen(m_listQuery->value(4).toDateTime());
+    events.prepend(event);
+  }
+  return events;
 }
 /**
  * The calling function should delete the events
