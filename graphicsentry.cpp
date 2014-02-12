@@ -644,6 +644,8 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         m_place.setType(dp.getType());
         qDebug() << "history add place" << m_place;
         getHistory()->add(m_place);
+        /// this allows mainwindow to update the history list
+        emit(historyAddition());
       }
       else if (dp.getType() == Place::History) {
         emit(historyPositionChanged(dp.getId()));

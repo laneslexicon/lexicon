@@ -157,6 +157,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(nextRoot(const QString &)),this,SLOT(findNextRoot(const QString &)));
   connect(entry,SIGNAL(prevRoot(const QString &)),this,SLOT(findPrevRoot(const QString &)));
   connect(entry,SIGNAL(historyPositionChanged(int)),this,SLOT(historyPositionChanged(int)));
+  connect(entry,SIGNAL(historyAddition()),this,SLOT(historyAddition()));
 
   //  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
 
@@ -468,6 +469,14 @@ void LanesLexicon::createToolBar() {
   QToolBar * place = addToolBar("Place");
   place->addWidget(m_pwidget);
 }
+/**
+ * when user has done something that adds to history
+ * rebuild the dropdown, unchecking everything
+ *
+ */
+void LanesLexicon::historyAddition() {
+  setupHistory(-1);
+}
 void LanesLexicon::historyPositionChanged(int pos) {
   qDebug() << Q_FUNC_INFO << pos;
   setupHistory(pos);
@@ -505,7 +514,6 @@ void LanesLexicon::setupHistory(int currPos) {
       QAction * action = group->addAction(txt);
       action->setCheckable(true);
       if (id == currPos) {
-        qDebug() << "Checked item" << id;
         action->setChecked(true);
       }
       else {
@@ -514,7 +522,7 @@ void LanesLexicon::setupHistory(int currPos) {
       Place p = event->getPlace();
       //      m_historyPos = p.getId();
       action->setData(QVariant(p));//event->getId());
-      connect(action,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
+      connect(action,SIGNAL(triggered()),this,SLOT(onHistorySelection()));
     }
     m->addActions(group->actions());
     //    m->addActions(group);
@@ -526,35 +534,6 @@ void LanesLexicon::setupHistory(int currPos) {
     return;
   }
   return;
-  events = m_history->getHistory(10,1,currPos);
-  if (events.size() == 0) {
-    m_hForwardBtn->setEnabled(true);
-  }
-  else {
-    QMenu * m = new QMenu;
-    while(events.size() > 0) {
-      HistoryEvent * event = events.takeFirst();
-      QString root = event->getRoot();
-      QString word = event->getWord();
-      QAction * action;
-      if (! word.isEmpty()) {
-        action = m->addAction(word);
-      }
-      else {
-        action = m->addAction(root);
-      }
-      //      action->setData(event->getId());
-      Place p = event->getPlace();
-      action->setData(QVariant(p));//event->getId());
-      connect(action,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
-    }
-    m_hForwardBtn->setEnabled(true);
-    m_hForwardBtn->setMenu(m);
-  }
-  if (! m_historyEnabled) {
-    m_hForwardBtn->setEnabled(false);
-    m_hBackwardBtn->setEnabled(false);
-  }
 }
 void LanesLexicon::createMenus() {
   m_fileMenu = menuBar()->addMenu(tr("&File"));
@@ -579,34 +558,12 @@ void LanesLexicon::createStatusBar() {
 QSize LanesLexicon::sizeHint() const {
   return QSize(800,600);
 }
-void LanesLexicon::onHistoryForward() {
+void LanesLexicon::onHistorySelection() {
   QAction * action = static_cast<QAction *>(QObject::sender());
   QVariant v = action->data();
   Place p = v.value<Place>();
   p.setType(Place::History);
-  qDebug() << "history forward place" << p;
-  showPlace(p,false);
-  /*
-  m_historyPos = action->data().toInt();
-  HistoryEvent * event = m_history->getEvent(m_historyPos);
-  setupHistory();
-  Place p;
-  p.setNode(event->getNode());
-  p.setRoot(event->getRoot());
-  p.setType(Place::History);
-  GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
-  /// TODO fix for supplement
-  w->getXmlForRoot(p);
-  m_tabs->setTabText(0,p.getRoot());
-  w->setFocus();
-  */
-}
-void LanesLexicon::onHistoryBackward() {
-  QAction * action = static_cast<QAction *>(QObject::sender());
-  QVariant v = action->data();
-  Place p = v.value<Place>();
-  p.setType(Place::History);
-  qDebug() << "history backward place" << p;
+  qDebug() << "history change place" << p;
   showPlace(p,false);
   /*
   m_historyPos = action->data().toInt();

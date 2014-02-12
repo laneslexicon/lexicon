@@ -86,8 +86,7 @@ public:
     void on_actionFirstPage();
     void on_actionLastPage();
 
-    void onHistoryForward();
-    void onHistoryBackward();
+    void onHistorySelection();
     void rootClicked(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void onNotesClicked();
@@ -95,6 +94,7 @@ public:
     void rootChanged(const QString & root,const QString & node);
     void placeChanged(const Place &);
     void historyPositionChanged(int);
+    void historyAddition();
     // shortcuts
     void shortcutActivated();
     void ambiguousShortcut();
