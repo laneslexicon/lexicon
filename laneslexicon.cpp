@@ -523,6 +523,7 @@ void LanesLexicon::setupHistory(int currPos) {
       //      m_historyPos = p.getId();
       action->setData(QVariant(p));//event->getId());
       connect(action,SIGNAL(triggered()),this,SLOT(onHistorySelection()));
+      delete event;
     }
     m->addActions(group->actions());
     //    m->addActions(group);
@@ -801,7 +802,7 @@ void LanesLexicon::readSettings() {
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
   }
-  m_historyEnabled = settings.value("History",true).toBool();
+
   m_saveTabs = settings.value("Save Tabs",true).toBool();
   m_restoreTabs = settings.value("Restore Tabs",true).toBool();
   m_docked = settings.value("Docked",false).toBool();
@@ -817,7 +818,9 @@ void LanesLexicon::readSettings() {
   settings.beginGroup("Notes");
   m_notesDbName = settings.value("Database","notes.sqlite").toString();
   settings.endGroup();
-
+  settings.beginGroup("History");
+  m_historyEnabled = settings.value("Enabled",true).toBool();
+  settings.endGroup();
 }
 void LanesLexicon::writeSettings() {
   QSettings settings;

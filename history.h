@@ -1,6 +1,7 @@
 #ifndef __HISTORY_H__
 #define __HISTORY_H__
 #include <QtWidgets>
+#include <QSettings>
 #include <QFile>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -34,7 +35,7 @@ class HistoryMaster {
  public:
   HistoryMaster(const QString & dbname);
   ~HistoryMaster();
-  //  bool add(const QString & root,const QString & word, const QString & node);
+  void readSettings();
   HistoryEvent * getEvent(int id);
   Place getLastPlace();
   void setEnabled(bool v) { m_historyEnabled = v;}
@@ -42,7 +43,6 @@ class HistoryMaster {
   void on() { m_historyOn = true;}
   void off() { m_historyOn = false;}
   bool isOn() { return m_historyOn;}
-  QList<HistoryEvent *> getHistory(int howMany,int direction,int startPos = -1);
   QList<HistoryEvent *> getHistory();
  private:
   QSqlDatabase m_db;

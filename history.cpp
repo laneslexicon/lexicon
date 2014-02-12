@@ -13,9 +13,8 @@ bool HistoryEvent::matches(HistoryEvent * event) {
 }
 //CREATE TABLE history(id integer primary key,nodeId text,word text,root text,timewhen text);
 HistoryMaster::HistoryMaster(const QString & dbname) {
-  m_size = 10;
   m_historyOn = false;
-  m_historyEnabled = false;
+  readSettings();
   m_getQuery = 0;
   m_listQuery = 0;
   m_addQuery = 0;
@@ -148,7 +147,6 @@ bool HistoryMaster::add(const Place & p) {
     HistoryEvent * event = new HistoryEvent();
     int fno = m_listQuery->record().indexOf("id");
     event->setId(m_listQuery->value(fno).toInt());
-    QLOG_DEBUG() << "Added id" << m_listQuery->value(0).toInt();
     Place p;
     /// TODO add other place fields
     p.setNode(m_listQuery->value(1).toString());
@@ -158,83 +156,6 @@ bool HistoryMaster::add(const Place & p) {
     event->setPlace(p);
     event->setWhen(m_listQuery->value(4).toDateTime());
     events << event;
-  }
-  return events;
-}
-/**
- * The calling function should delete the events
- *
- * @param count
- * @param direciton 0 - back, 1 forward
- * @return
- */
-QList<HistoryEvent *> HistoryMaster::getHistory(int count,int direction,int startPos) {
-  QList<HistoryEvent *> events;
-  if (! m_historyEnabled ) {
-    return events;
-  }
-  QLOG_DEBUG() << Q_FUNC_INFO << count << direction << startPos;
-  if (startPos == -1) {
-    QSqlQuery mq(m_db);
-    mq.exec("select max(id) from history");
-    if (mq.first()) {
-      m_lastId = mq.value(0).toInt();
-    }
-    startPos = m_lastId;
-  }
-  if (direction == 0) {
-      int ix = 0;
-    m_backQuery->bindValue(0,startPos);
-    m_backQuery->exec();
-    QLOG_DEBUG() << "Build back items";
-    while(m_backQuery->next() && (ix < count)) {
-      HistoryEvent * event = new HistoryEvent();
-      event->setId(m_backQuery->value(0).toInt());
-      QLOG_DEBUG() << "Added id" << m_backQuery->value(0).toInt();
-      Place p;
-      /// TODO add other place fields
-      p.setNode(m_backQuery->value(1).toString());
-      p.setWord(m_backQuery->value(2).toString());
-      p.setRoot(m_backQuery->value(3).toString());
-      p.setId(m_backQuery->value(0).toInt());
-      /// TODO add other place fields
-      event->setPlace(p);
-      event->setWhen(m_backQuery->value(4).toDateTime());
-      if ((ix > 0) && ( events[ix-1]->matches(event))) {
-        delete event;
-      }
-      else {
-        events << event;
-        ix++;
-      }
-    }
-    return events;
-  }
-  if (direction == 1) {
-    int ix = 0;
-    m_forQuery->bindValue(0,startPos);
-    m_forQuery->exec();
-    QLOG_DEBUG() << "Build forward items";
-    while(m_forQuery->next() && (ix < count)) {
-      HistoryEvent * event = new HistoryEvent();
-      event->setId(m_forQuery->value(0).toInt());
-      QLOG_DEBUG() << "Added id" << m_forQuery->value(0).toInt();
-      Place p;
-      p.setNode(m_forQuery->value(1).toString());
-      p.setWord(m_forQuery->value(2).toString());
-      p.setRoot(m_forQuery->value(3).toString());
-      p.setId(m_forQuery->value(0).toInt());
-      event->setPlace(p);
-      event->setWhen(m_forQuery->value(4).toDateTime());
-      if ((ix > 0) && ( events[ix-1]->matches(event))) {
-        delete event;
-      }
-      else {
-        events << event;
-        ix++;
-      }
-    }
-    return events;
   }
   return events;
 }
@@ -256,4 +177,12 @@ HistoryEvent * HistoryMaster::getEvent(int id) {
        event->setWhen(m_getQuery->value(4).toDateTime());
    }
    return event;
+}
+void HistoryMaster::readSettings() {
+  QSettings settings;
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("History");
+  m_historyEnabled = settings.value("Enabled",true).toBool();
+  m_size = settings.value("Size",10).toInt();
+
 }
