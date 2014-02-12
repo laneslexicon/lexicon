@@ -38,6 +38,7 @@
 #include <QMessageBox>
 #include <QDockWidget>
 #include <QInputDialog>
+#include <QActionGroup>
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"

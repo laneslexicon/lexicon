@@ -157,7 +157,7 @@ bool HistoryMaster::add(const Place & p) {
     p.setId(m_listQuery->value(0).toInt());
     event->setPlace(p);
     event->setWhen(m_listQuery->value(4).toDateTime());
-    events.prepend(event);
+    events << event;
   }
   return events;
 }

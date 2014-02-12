@@ -480,6 +480,7 @@ void LanesLexicon::historyPositionChanged(int pos) {
 void LanesLexicon::setupHistory(int currPos) {
   // get backward history
   /// TODO set 10 to something from the QSettings
+  qDebug() << Q_FUNC_INFO << currPos;
   m_historyPos = currPos;
   QList<HistoryEvent *> events = m_history->getHistory();//10,0,currPos);
   if (events.size() == 0) {
@@ -487,23 +488,38 @@ void LanesLexicon::setupHistory(int currPos) {
   }
   else {
     QMenu * m = new QMenu;
+    QActionGroup * group = new QActionGroup(this);
     while(events.size() > 0) {
       HistoryEvent * event = events.takeFirst();
       QString root = event->getRoot();
       QString word = event->getWord();
-      QAction * action;
+      int id = event->getId();
+
+      QString txt;
       if (! word.isEmpty()) {
-        action = m->addAction(word);
+        txt = QString("%1 %2").arg(id).arg(word);
       }
       else {
-        action = m->addAction(root);
+        txt = QString("%1 %2").arg(id).arg(root);
+      }
+      QAction * action = group->addAction(txt);
+      action->setCheckable(true);
+      if (id == currPos) {
+        qDebug() << "Checked item" << id;
+        action->setChecked(true);
+      }
+      else {
+        action->setChecked(false);
       }
       Place p = event->getPlace();
       //      m_historyPos = p.getId();
       action->setData(QVariant(p));//event->getId());
       connect(action,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
     }
+    m->addActions(group->actions());
+    //    m->addActions(group);
     m_hBackwardBtn->setEnabled(true);
+    //    m_hBackwardBtn->addActions(group->actions());//setMenu(m);
     m_hBackwardBtn->setMenu(m);
   }
   if (currPos  == -1) {
