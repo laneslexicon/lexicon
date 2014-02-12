@@ -519,7 +519,9 @@ void LanesLexicon::setupHistory(int currPos) {
       else {
         action = m->addAction(root);
       }
-      action->setData(event->getId());
+      //      action->setData(event->getId());
+      Place p = event->getPlace();
+      action->setData(QVariant(p));//event->getId());
       connect(action,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
     }
     m_hForwardBtn->setEnabled(true);
@@ -555,23 +557,31 @@ QSize LanesLexicon::sizeHint() const {
 }
 void LanesLexicon::onHistoryForward() {
   QAction * action = static_cast<QAction *>(QObject::sender());
+  QVariant v = action->data();
+  Place p = v.value<Place>();
+  qDebug() << "history forward place" << p;
+  p.setType(Place::History);
+  showPlace(p,false);
+  /*
   m_historyPos = action->data().toInt();
   HistoryEvent * event = m_history->getEvent(m_historyPos);
   setupHistory();
   Place p;
   p.setNode(event->getNode());
   p.setRoot(event->getRoot());
+  p.setType(Place::History);
   GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
   /// TODO fix for supplement
   w->getXmlForRoot(p);
   m_tabs->setTabText(0,p.getRoot());
   w->setFocus();
+  */
 }
 void LanesLexicon::onHistoryBackward() {
   QAction * action = static_cast<QAction *>(QObject::sender());
   QVariant v = action->data();
   Place p = v.value<Place>();
-  qDebug() << "history place" << p;
+  qDebug() << "history backward place" << p;
   p.setType(Place::History);
   showPlace(p,false);
   /*
