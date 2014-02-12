@@ -178,6 +178,7 @@ class GraphicsEntry : public QWidget {
     void prevRoot(const QString &);
     void cssChanged();
     void placeChanged(const Place &);
+    void historyPositionChanged(int);
 };
 
 class LaneGraphicsView : public QGraphicsView {

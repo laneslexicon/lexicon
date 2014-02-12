@@ -93,6 +93,7 @@ public:
     //    void historyItemActivated();
     void rootChanged(const QString & root,const QString & node);
     void placeChanged(const Place &);
+    void historyPositionChanged(int);
     // shortcuts
     void shortcutActivated();
     void ambiguousShortcut();

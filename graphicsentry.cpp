@@ -634,15 +634,22 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   //  if (nodeOnly) {
   //    delete rootItem;
   //  }
+
+  if (! m_place.isValid() || (! m_place.isSamePlace(centerItem->getPlace()))) {
+    m_place = centerItem->getPlace();
+    m_place.setType(dp.getType());
   /// we have changed places, so add to the history
-  if (m_place.isValid() && (m_place != centerItem->getPlace())) {
     if (getHistory()->isOn()) {
-      qDebug() << "history add place" << m_place;
-      m_place.setType(dp.getType());
-      getHistory()->add(m_place);
+      if (dp.getType() == Place::User) {
+        m_place.setType(dp.getType());
+        qDebug() << "history add place" << m_place;
+        getHistory()->add(m_place);
+      }
+      else if (dp.getType() == Place::History) {
+        emit(historyPositionChanged(dp.getId()));
+      }
     }
   }
-  m_place = centerItem->getPlace();
   qDebug() << "Place set to:" << m_place;
   return m_place;
 }

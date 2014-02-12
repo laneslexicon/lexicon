@@ -156,6 +156,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
   connect(entry,SIGNAL(nextRoot(const QString &)),this,SLOT(findNextRoot(const QString &)));
   connect(entry,SIGNAL(prevRoot(const QString &)),this,SLOT(findPrevRoot(const QString &)));
+  connect(entry,SIGNAL(historyPositionChanged(int)),this,SLOT(historyPositionChanged(int)));
 
   //  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
 
@@ -390,19 +391,20 @@ void LanesLexicon::loadStyleSheet() {
   }
 }
 void LanesLexicon::createActions() {
+  /// TODO get this from QSettings
+  QString imgdir = QString("./images/32");
+
   m_exitAction = new QAction(tr("Exit"),this);
   connect(m_exitAction,SIGNAL(triggered()),this,SLOT(on_actionExit()));
 
   m_testAction = new QAction(tr("Test"),this);
   connect(m_testAction,SIGNAL(triggered()),this,SLOT(on_actionTest()));
   /// probably need icons
-  m_hForward = new QAction(tr("Forward"),this);
-  m_hBackward = new QAction(tr("Backard"),this);
+  m_hForward = new QAction(QIcon(imgdir + "/go-next.png"),tr("Forward"),this);
+  m_hBackward = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Back"),this);
 
   connect(m_hForward,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
   connect(m_hBackward,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
-  /// TODO get this from QSettings
-  QString imgdir = QString("./images/32");
   //    openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
   m_rootForwardAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next Root"),this);
   m_rootBackwardAction = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Prev Root"),this);
@@ -466,6 +468,10 @@ void LanesLexicon::createToolBar() {
   QToolBar * place = addToolBar("Place");
   place->addWidget(m_pwidget);
 }
+void LanesLexicon::historyPositionChanged(int pos) {
+  qDebug() << Q_FUNC_INFO << pos;
+  setupHistory(pos);
+}
 /**
  *
  *
@@ -474,6 +480,7 @@ void LanesLexicon::createToolBar() {
 void LanesLexicon::setupHistory(int currPos) {
   // get backward history
   /// TODO set 10 to something from the QSettings
+  m_historyPos = currPos;
   QList<HistoryEvent *> events = m_history->getHistory(10,0,currPos);
   if (events.size() == 0) {
     m_hBackwardBtn->setEnabled(true);
@@ -492,7 +499,7 @@ void LanesLexicon::setupHistory(int currPos) {
         action = m->addAction(root);
       }
       Place p = event->getPlace();
-      m_historyPos = p.getId();
+      //      m_historyPos = p.getId();
       action->setData(QVariant(p));//event->getId());
       connect(action,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
     }
@@ -502,7 +509,7 @@ void LanesLexicon::setupHistory(int currPos) {
   if (currPos  == -1) {
     return;
   }
-  events = m_history->getHistory(10,1,m_historyPos);
+  events = m_history->getHistory(10,1,currPos);
   if (events.size() == 0) {
     m_hForwardBtn->setEnabled(true);
   }
@@ -559,8 +566,8 @@ void LanesLexicon::onHistoryForward() {
   QAction * action = static_cast<QAction *>(QObject::sender());
   QVariant v = action->data();
   Place p = v.value<Place>();
-  qDebug() << "history forward place" << p;
   p.setType(Place::History);
+  qDebug() << "history forward place" << p;
   showPlace(p,false);
   /*
   m_historyPos = action->data().toInt();
@@ -581,8 +588,8 @@ void LanesLexicon::onHistoryBackward() {
   QAction * action = static_cast<QAction *>(QObject::sender());
   QVariant v = action->data();
   Place p = v.value<Place>();
-  qDebug() << "history backward place" << p;
   p.setType(Place::History);
+  qDebug() << "history backward place" << p;
   showPlace(p,false);
   /*
   m_historyPos = action->data().toInt();

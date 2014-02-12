@@ -56,13 +56,16 @@ class Place {
  inline friend QDebug operator<<(QDebug debug, const Place& p)
 {
 	debug.nospace() << "Place("
-                        << p.getRoot() << ","
-                        << p.getWord() << ","
                         << p.getNode() << ","
                         << p.getSupplement() << ","
-                        << p.getPage() << ","
                         << p.getVol() << ","
-                        << p.getNodeOnly() << ")";
+                        << p.getPage() << ","
+                        << p.getNodeOnly() << ","
+                        << p.getType() << ","
+                        << p.getId() << "," << "\n"
+                        << p.getRoot() << ","
+                        << p.getWord()
+                        << ")";
 	return debug.space();
 }
   operator QVariant() const
@@ -83,6 +86,9 @@ class Place {
       return false;
     }
     return true;
+  }
+  bool isSamePlace  (const Place & p) const {
+    return ((m_root == p.m_root) && (m_node == p.m_node));
   }
   void setId(int id) { m_id = id;}
   int getId() const { return m_id;}
