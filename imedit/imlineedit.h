@@ -9,6 +9,7 @@
 #include <QAction>
 #include <QMenu>
 #include <QFont>
+#include <QSettings>
 #include <QFontDialog>
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -25,6 +26,7 @@ class ImLineEdit : public QLineEdit {
   public slots:
     bool loadMap(const QString & filename,const QString & mapname = QString());
     void activateMap(const QString &,bool enable = true);
+    void shortcutActivated();
   private:
     InputMapper * m_mapper;
     ushort m_prev_char;

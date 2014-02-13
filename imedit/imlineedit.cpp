@@ -32,7 +32,40 @@ void ImLineEdit::activateMap(const QString & name,bool activate) {
     m_activeMap = name;
   }
 }
+void ImLineEdit::shortcutActivated() {
+  if (m_activeMap.isEmpty()) {
+    QShortcut * s = (QShortcut *)QObject::sender();
+    m_activeMap = s->property("keymap").toString();
+  }
+  else {
+    m_activeMap.clear();
+  }
+  qDebug() << Q_FUNC_INFO << "map" << m_activeMap;
+}
 void ImLineEdit::readSettings() {
+  QSettings settings;
+  settings.beginGroup("Maps");
+  QStringList groups = settings.childGroups();
+  for(int i=0;i < groups.size();i++) {
+    settings.beginGroup(groups[i]);
+    QString file = settings.value("file",QString()).toString();
+    if (! file.isEmpty()) {
+      loadMap(file,groups[i]);
+    }
+    QString scut = settings.value("shortcut",QString()).toString();
+    if (! scut.isEmpty()) {
+      QKeySequence k = QKeySequence(scut);
+      QShortcut * sc = new QShortcut(k,this);
+      sc->setProperty("keymap", groups[i]);
+      sc->setContext(Qt::WidgetShortcut);
+      connect(sc,SIGNAL(activated()),this,SLOT(shortcutActivated()));
+    }
+    bool  enabled = settings.value("enable",false).toBool();
+    if (enabled) {
+      m_activeMap = groups[i];
+    }
+    settings.endGroup();
+  }
 }
 void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
