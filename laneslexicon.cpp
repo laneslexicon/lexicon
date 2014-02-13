@@ -401,10 +401,10 @@ void LanesLexicon::createActions() {
   m_testAction = new QAction(tr("Test"),this);
   connect(m_testAction,SIGNAL(triggered()),this,SLOT(on_actionTest()));
   /// probably need icons
-  m_hForward = new QAction(QIcon(imgdir + "/go-next.png"),tr("Forward"),this);
+
   m_hBackward = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Back"),this);
 
-  connect(m_hForward,SIGNAL(triggered()),this,SLOT(onHistoryForward()));
+
   connect(m_hBackward,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
   //    openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
   m_rootForwardAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next Root"),this);
@@ -434,11 +434,9 @@ void LanesLexicon::createToolBar() {
 
   QToolBar * history = addToolBar(tr("History"));
 
-  m_hForwardBtn = new QToolButton(history);
-  m_hForwardBtn->setText("Forward");
-  m_hForwardBtn->setDefaultAction(m_hForward);
-  m_hForwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
-  m_hForwardBtn->setEnabled(false);
+
+
+
   m_hBackwardBtn = new QToolButton(history);
   m_hBackwardBtn->setText("Back");
   m_hBackwardBtn->setDefaultAction(m_hBackward);
@@ -447,7 +445,7 @@ void LanesLexicon::createToolBar() {
 
 
   history->addWidget(m_hBackwardBtn);
-  history->addWidget(m_hForwardBtn);
+
   history->addSeparator();
   QToolBar * navigation = addToolBar(tr("Root Navigation"));
   navigation->addWidget(new QLabel("Navigate<br/>by root"));
@@ -497,6 +495,7 @@ void LanesLexicon::setupHistory(int currPos) {
   }
   else {
     QMenu * m = new QMenu;
+    m->setObjectName("history");
     QActionGroup * group = new QActionGroup(this);
     while(events.size() > 0) {
       HistoryEvent * event = events.takeFirst();

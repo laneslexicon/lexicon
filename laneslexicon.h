@@ -155,7 +155,7 @@ private:
     // actions
     QAction * m_exitAction;
     QAction * m_testAction;
-    QAction * m_hForward;
+
     QAction * m_hBackward;
     // root navigation
     QAction * m_rootForwardAction;
@@ -168,7 +168,7 @@ private:
     QAction * m_pageFirstAction;
     QAction * m_pageLastAction;
     // history
-    QToolButton * m_hForwardBtn;
+
     QToolButton * m_hBackwardBtn;
     HistoryMaster * m_history;
  signals:
