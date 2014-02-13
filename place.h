@@ -43,6 +43,7 @@ class Place {
   }
   ~Place() {
   }
+  static int m_vols[8];
   bool operator == (const Place & p) {
     return ((m_root == p.m_root) && (m_word == p.m_word) && (m_node == p.m_node));
   }
@@ -124,6 +125,5 @@ class Place {
 };
 
 Q_DECLARE_METATYPE(Place);
-
 
 #endif

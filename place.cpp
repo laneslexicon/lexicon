@@ -10,6 +10,8 @@
 
    qDebug() << v.userType() << x.getNode() << x.getId();
 */
+int Place::m_vols[8] = {367,837,1280,1757,2219,2475,2749,3064};
+
 bool Place::isRoot() const {
   if (! m_root.isEmpty() && m_node.isEmpty()) {
     return true;
@@ -30,15 +32,10 @@ bool Place::isRoot() const {
 */
 void Place::setPage(int p) {
   m_page = p;
-  /*
-  if (Place::m_vols.size() == 0) {
-    Place::m_vols << 368 << 838 << 1281 << 1758 << 2220 << 2476 << 2749 << 3065;
-  }
-  for(int i=0; i < Place::m_vols.size();i++) {
-    if (p < Place::m_vols[i]) {
+  for(int i=0; i < 8;i++) {
+    if (p <= Place::m_vols[i]) {
       m_vol = i + 1;
-      i = Place::m_vols.size();
+      return;
     }
   }
-  */
 }
