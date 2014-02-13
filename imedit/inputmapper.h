@@ -29,6 +29,7 @@ class InputMapper {
   int pv;      // previous char only set when the key has been processed
   bool hasMap(const QString &) const;
   void getMapNames(QStringList &);
+  QStringList getMaps();
   void getScripts(QStringList &);
   void setDebug(bool v) { m_debug = v;}
   QString getScript(const QString & map);

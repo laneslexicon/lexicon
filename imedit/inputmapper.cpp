@@ -771,6 +771,13 @@ void InputMapper::getMapNames(QStringList & m) {
     m.append(maps[i]->name);
   }
 }
+QStringList InputMapper::getMaps() {
+  QStringList mapnames;
+  for(int i=0;i < maps.size();i++)  {
+    mapnames << maps[i]->name;
+  }
+  return mapnames;
+}
 void InputMapper::getScripts(QStringList & s) {
   for(int i=0;i < maps.size();i++)  {
     s.append(maps[i]->script);
