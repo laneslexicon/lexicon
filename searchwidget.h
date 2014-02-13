@@ -2,9 +2,12 @@
 #define __SEARCHWIDGET_H__
 #include <QWidget>
 #include <QPushButton>
+#include <QGroupBox>
+#include <QRadioButton>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include "imedit.h"
+#include "imlineedit.h"
 class SearchWidget : public QWidget {
   Q_OBJECT
  public:
@@ -24,8 +27,10 @@ class RootSearchDialog : public QDialog {
   QString getText();
   public slots:
     void onCancel();
+    void keymapChanged();
  private:
-  WrappedEdit * m_edit;
+    //  WrappedEdit * m_edit;
+    ImLineEdit * m_edit;
   QDialogButtonBox * m_buttonBox;
 };
 class NodeSearchDialog : public QDialog {
