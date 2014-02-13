@@ -614,7 +614,7 @@ void load_unicode(KeyMap * map,QJsonObject node) {
 }
 KeyMap * im_get_map(InputMapper * im,const QString & mapname) {
   for(int i=0; i < im->maps.size();i++) {
-    if (im->maps[i]->name == mapname)  {
+    if (im->maps[i]->name.toCaseFolded() == mapname.toCaseFolded())  {
       return im->maps[i];
     }
   }
@@ -633,6 +633,7 @@ im_char * im_convert(InputMapper * im,const QString & mapname,int curr_char, int
   ret->iv = curr_char;
   ret->pv = prev_char;
   ret->processed = false;
+  /// this is case insensitive
   KeyMap * map = im_get_map(im,mapname);
   if (map == NULL) {
     qDebug() << "map is NULL";
@@ -756,6 +757,14 @@ QString im_convert_string(InputMapper * im,const QString & mapping,const QString
     retval.append(ustr[i]);
   }
   return retval;
+}
+bool InputMapper::hasMap(const QString & name) const {
+  for(int i=0;i < maps.size();i++)  {
+    if (name.toCaseFolded() == maps[i]->name.toCaseFolded()) {
+      return true;
+    }
+  }
+  return false;
 }
 void InputMapper::getMapNames(QStringList & m) {
   for(int i=0;i < maps.size();i++)  {
