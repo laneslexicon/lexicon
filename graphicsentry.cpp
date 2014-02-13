@@ -24,6 +24,10 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     emit(showPerseus(p));
   }
 }
+void EntryItem::setPlace(const Place & p) {
+ m_place = p;
+ setToolTip(m_place.getText());
+ }
 void EntryItem::searchItem() {
   qDebug() << Q_FUNC_INFO;
 }
@@ -523,11 +527,14 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     if ((supp == 1) && (supplement == 0)) {
       //      ok = false;
     }
+    //
+    // "select root,broot,word,bword,xml,page,itype,nodeId,supplement from entry where root = ? order by nodenum");
+    //
     if (ok) {
       QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
         .arg(m_rootQuery->value(3).toString())
         .arg(m_rootQuery->value(2).toString())
-        .arg(m_rootQuery->value(5).toString())
+        .arg(m_rootQuery->value(5).toInt())
         .arg(m_rootQuery->value(6).toString())
         .arg(m_rootQuery->value(8).toInt());
       t += m_rootQuery->value(4).toString();
@@ -552,11 +559,13 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
             out << item->getOutputHTML();
           }
         }
-        item->setSupplement(supplement);
-        item->setNode(m_rootQuery->value(7).toString());
-        item->setRoot(root);
-        item->setWord(m_rootQuery->value(2).toString());
-        item->setPage(m_rootQuery->value(5).toInt());
+        Place p;
+        p.setSupplement(supplement);
+        p.setNode(m_rootQuery->value(7).toString());
+        p.setRoot(root);
+        p.setWord(m_rootQuery->value(2).toString());
+        p.setPage(m_rootQuery->value(5).toInt());
+        item->setPlace(p);
         items << item;
         /// if we asked for a specific word/node, focus on it
         if (! node.isEmpty() && (item->getNode() == node)) {

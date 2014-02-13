@@ -14,7 +14,7 @@
 
 */
 
-class Place {
+class Place    {
  public:
   Place() {
     m_supplement = 0;
@@ -43,6 +43,7 @@ class Place {
   }
   ~Place() {
   }
+  QString getText() const;
   static int m_vols[8];
   bool operator == (const Place & p) {
     return ((m_root == p.m_root) && (m_word == p.m_word) && (m_node == p.m_node));

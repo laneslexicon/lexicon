@@ -39,3 +39,34 @@ void Place::setPage(int p) {
     }
   }
 }
+QString Place::getText() const {
+  QString txt;
+
+  if (! m_root.isEmpty()) {
+    txt += QString(QObject::tr("Root:%1")).arg(m_root);
+  }
+  if (! m_word.isEmpty()) {
+    if (! txt.isEmpty()) {
+      txt += ",";
+    }
+    txt += QString(QObject::tr("Entry:%1")).arg(m_word);
+  }
+  if ( m_page != -1) {
+    if (! txt.isEmpty()) {
+      txt += ",";
+    }
+    txt += QString(QObject::tr("Vol %1,Page %2")).arg(m_vol).arg(m_page);
+  }
+  if (! m_node.isEmpty()) {
+    bool b;
+    if (! txt.isEmpty()) {
+      txt += " (";
+      b = true;
+    }
+    txt += QString(QObject::tr("Node:%1")).arg(m_node);
+    if (b) {
+      txt += ")";
+    }
+  }
+  return txt;
+}
