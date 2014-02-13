@@ -5,6 +5,7 @@ ImLineEdit::ImLineEdit(QWidget * parent)
   m_mapper = im_new();
   m_prev_char = 0;
   m_debug = false;
+  readSettings();
 }
 ImLineEdit::~ImLineEdit() {
   im_free(m_mapper);
@@ -28,8 +29,13 @@ void ImLineEdit::activateMap(const QString & name,bool activate) {
     m_activeMap.clear();
     return;
   }
+
   if (m_mapper->hasMap(name) && activate) {
     m_activeMap = name;
+    return;
+  }
+  if (! m_mapper->hasMap(name)) {
+    m_activeMap.clear();
   }
 }
 void ImLineEdit::shortcutActivated() {
@@ -46,6 +52,7 @@ void ImLineEdit::readSettings() {
   QSettings settings;
   settings.beginGroup("Maps");
   QStringList groups = settings.childGroups();
+  qDebug() << Q_FUNC_INFO << groups;
   for(int i=0;i < groups.size();i++) {
     settings.beginGroup(groups[i]);
     QString file = settings.value("file",QString()).toString();
@@ -60,7 +67,7 @@ void ImLineEdit::readSettings() {
       sc->setContext(Qt::WidgetShortcut);
       connect(sc,SIGNAL(activated()),this,SLOT(shortcutActivated()));
     }
-    bool  enabled = settings.value("enable",false).toBool();
+    bool  enabled = settings.value("enabled",false).toBool();
     if (enabled) {
       m_activeMap = groups[i];
     }

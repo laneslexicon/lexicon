@@ -23,6 +23,8 @@ class ImLineEdit : public QLineEdit {
   public:
     ImLineEdit(QWidget *parent = 0);
     ~ImLineEdit();
+    QStringList getMaps() { return m_mapper->getMaps();};
+    QString getActiveMap() { return m_activeMap;};
   public slots:
     bool loadMap(const QString & filename,const QString & mapname = QString());
     void activateMap(const QString &,bool enable = true);
