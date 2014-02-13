@@ -539,19 +539,6 @@ void LanesLexicon::createMenus() {
   m_fileMenu->addAction(m_exitAction);
 }
 void LanesLexicon::createStatusBar() {
-  QWidget * w = new QWidget;
-  QHBoxLayout * layout = new QHBoxLayout;
-  layout->addWidget(new QLabel(tr("Current root:")));
-  m_currentRoot = new QLabel("None");
-  m_currentRoot->setObjectName("currentRoot");
-  layout->addWidget(m_currentRoot);
-  w->setLayout(layout);
-  statusBar()->insertPermanentWidget(0,w,0);
-  if (m_useNotes) {
-    m_notesBtn = new QPushButton(tr("Notes"));
-    m_notesBtn->setEnabled(true);
-    statusBar()->insertPermanentWidget(0,m_notesBtn,0);
-  }
   statusBar()->showMessage(tr("Ready"));
 }
 QSize LanesLexicon::sizeHint() const {
@@ -562,21 +549,7 @@ void LanesLexicon::onHistorySelection() {
   QVariant v = action->data();
   Place p = v.value<Place>();
   p.setType(Place::History);
-  qDebug() << "history change place" << p;
   showPlace(p,false);
-  /*
-  m_historyPos = action->data().toInt();
-  HistoryEvent * event = m_history->getEvent(m_historyPos);
-  setupHistory();
-  Place p;
-  p.setNode(event->getNode());
-  p.setRoot(event->getRoot());
-  GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(0));
-  /// TODO fix for supplement
-  w->getXmlForRoot(p);
-  m_tabs->setTabText(0,p.getRoot());
-  w->setFocus();
-  */
 }
 void LanesLexicon::on_actionExit()
 {
@@ -988,12 +961,10 @@ void LanesLexicon::on_actionLastRoot() {
   m_tree->ensureVisible(m_lastRoot);
 }
 void LanesLexicon::rootChanged(const QString & root,const QString & node) {
-  m_currentRoot->setText(root);
   m_tree->ensureVisible(root,true);
 }
 void LanesLexicon::placeChanged(const Place & p) {
   qDebug() << Q_FUNC_INFO << p.getRoot();
-  m_currentRoot->setText(p.getRoot());
   m_tree->ensurePlaceVisible(p,true);
 }
 void LanesLexicon::getFirstAndLast() {

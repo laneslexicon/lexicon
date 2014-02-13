@@ -139,8 +139,7 @@ private:
     bool eventFilter(QObject * target, QEvent *);
     bool openDatabase(const QString &);
     bool sanityCheck();
-    /// this is in the status bar
-    QLabel * m_currentRoot;
+
     Place m_place;
     QPushButton * m_notesBtn;
     ContentsWidget * m_tree;
