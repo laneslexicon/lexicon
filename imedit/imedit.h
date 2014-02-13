@@ -106,6 +106,7 @@ class WrappedEdit : public QWidget {
   void mapChanged();
   void editingFinished();
 };
+#ifdef WITH_HUD
 class HudEdit : public WrappedEdit {
   Q_OBJECT
  public:
@@ -133,5 +134,7 @@ class HudEdit : public WrappedEdit {
       return m_hudCharCount;
     }
   virtual void buildContextMenu(QMenu * menu);
+
 };
+#endif
 #endif

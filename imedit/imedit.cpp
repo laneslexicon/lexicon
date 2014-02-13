@@ -118,13 +118,6 @@ void ImEdit::setMapname(const QString & name) {
 void ImEdit::enableMapping(bool v) {
   mapEnabled = v;
 }
-void HudEdit::setUnicode(const UniSettings & opts) {
-  QStringList k = opts.keys();
-  for(int i=0;i < k.size();i++) {
-    UnicodeEntry * e = new UnicodeEntry(*opts.value(k[i]));
-    m_unicode.insert(k[i],e);
-  }
-}
 /**
  * changes map via context menu
  *
@@ -301,7 +294,7 @@ void WrappedEdit::actionChangeMap() {
   QAction * mapAction = (QAction *)QObject::sender();
   QString mapname = mapAction->data().toString();
   if (mapname == "None") {
-    mapname = "-none";
+    mapname = "-none-";
   }
   toggleMap(mapname);
 }
@@ -332,53 +325,6 @@ void WrappedEdit::buildContextMenu(QMenu * menu) {
     menu->addAction(actionMap);
   }
 }
-//    menu->addAction(setfont);
-//
-/*
-  QStringList k = m_unicode.keys();
-  for(int i=0;i < k.size();i++) {
-  UnicodeEntry * u = m_unicode.value(k[i]);
-  QString t;
-  if (! u->m_uname.isEmpty()) {
-  t = u->m_uname;
-  }
-  if (! u->m_name.isEmpty()) {
-  t = u->m_name;
-  }
-  QAction * action = new QAction(t,menu);
-  action->setData(QVariant(k[i]));
-  connect(action,SIGNAL(triggered()),m_edit,SLOT(actionInsertUnicode()));
-  menu->addAction(action);
-  }
-
-  if (m_hudCharCount > 0) {
-  qDebug() << "hudchar count" << m_hudCharCount;
-  QAction * delAll = new QAction("Remove all HUD chars",menu);
-  menu->addAction(delAll);
-  }
-  qDebug() << "hud char" << m_isHudChar << m_hudChar;
-  if (m_isHudChar) {
-  UnicodeEntry * u = m_unicode.value(QString(m_hudChar));
-  if (u) {
-  QString t;
-  if (! u->m_uname.isEmpty()) {
-  t = u->m_uname;
-  }
-  if (! u->m_name.isEmpty()) {
-  t = u->m_name;
-  }
-  menu->addSeparator();
-  QAction * delAction = new QAction("Delete " + t,menu);
-  connect(delAction,SIGNAL(triggered()),m_edit,SLOT(actionDeleteUnicode()));
-
-  menu->addAction(delAction);
-  }
-  else {
-  qDebug() << "no unicode entry for" << m_hudChar;
-  }
-  }
-  }
-*/
 void WrappedEdit::actionChangeFont() {
 
   bool ok;
@@ -397,6 +343,22 @@ void WrappedEdit::actionChangeFont() {
 
 
 }
+QString WrappedEdit::getText() {
+  QString t = this->editor()->toPlainText();
+  if (! UcdScripts::isScript(t,"Arabic")) {
+    t = m_edit->convertString(t);
+  }
+  return t;
+}
+#ifdef WITH_HUD
+/**
+ *
+ *
+ * HUD stuff, not used here
+ *
+ *
+ */
+
 HudEdit::HudEdit(QWidget * parent) : WrappedEdit(parent) {
   m_hudCharCount = 0;
   m_unicode = m_options.getUnicodeSettings();
@@ -450,13 +412,7 @@ void HudEdit::buildContextMenu(QMenu * menu) {
     }
   }
 }
-QString WrappedEdit::getText() {
-  QString t = this->editor()->toPlainText();
-  if (! UcdScripts::isScript(t,"Arabic")) {
-    t = m_edit->convertString(t);
-  }
-  return t;
-}
+
 HudEdit::~HudEdit() {
   qDebug() << Q_FUNC_INFO;
   /*
@@ -467,3 +423,11 @@ HudEdit::~HudEdit() {
     }
   */
 }
+void HudEdit::setUnicode(const UniSettings & opts) {
+  QStringList k = opts.keys();
+  for(int i=0;i < k.size();i++) {
+    UnicodeEntry * e = new UnicodeEntry(*opts.value(k[i]));
+    m_unicode.insert(k[i],e);
+  }
+}
+#endif
