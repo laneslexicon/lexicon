@@ -405,7 +405,6 @@ void LanesLexicon::createActions() {
   m_hBackward = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Back"),this);
 
 
-  connect(m_hBackward,SIGNAL(triggered()),this,SLOT(onHistoryBackward()));
   //    openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
   m_rootForwardAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next Root"),this);
   m_rootBackwardAction = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Prev Root"),this);
