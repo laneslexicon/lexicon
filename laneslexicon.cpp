@@ -687,6 +687,9 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
       //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
     }
+    else {
+      return p;
+    }
   }
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
@@ -699,6 +702,9 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
       // but not the tab title
       //    w->setStyleSheet("font-family : Amiri;font-size : 16px");
       w->setFocus();
+    }
+    else {
+      return p;
     }
   }
  return np;
