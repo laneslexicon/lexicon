@@ -232,10 +232,10 @@ void GraphicsEntry::readSettings() {
   QString css = settings.value("CSS",QString("entry.css")).toString();
   readCssFromFile(css);
   m_xsltSource = settings.value("XSLT",QString("entry.xslt")).toString();
-  m_textWidth = settings.value("Text Width",300).toInt();
+  m_textWidth = settings.value("Text width",300).toInt();
   m_entryMargin = settings.value("Margin",10).toInt();
 
-  QString bg = settings.value("Supplement Background Color",QString("rgb(255,254,253)")).toString();
+  QString bg = settings.value("Supplement background color",QString("rgb(255,254,253)")).toString();
   QRegExp rx("^rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\s*\\)");
   if (rx.indexIn(bg) != -1) {
     //    qDebug() << bg << "color" << rx.cap(1) << rx.cap(2) << rx.cap(3);
@@ -253,7 +253,7 @@ void GraphicsEntry::readSettings() {
   settings.beginGroup("Debug");
   m_dumpXML = settings.value("Dump XML",false).toBool();
   m_dumpHTML = settings.value("Dump HTML",false).toBool();
-  m_dumpOutputHTML = settings.value("Dump Output HTML",false).toBool();
+  m_dumpOutputHTML = settings.value("Dump output HTML",false).toBool();
   settings.endGroup();
 }
 void GraphicsEntry::writeDefaultSettings() {

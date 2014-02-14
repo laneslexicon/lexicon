@@ -25,6 +25,7 @@ class ImLineEdit : public QLineEdit {
     ~ImLineEdit();
     QStringList getMaps() { return m_mapper->getMaps();};
     QString getActiveMap() { return m_activeMap;};
+    QString getNullMap() { return m_nullMap;}
   public slots:
     bool loadMap(const QString & filename,const QString & mapname = QString());
     void activateMap(const QString &,bool enable = true);
@@ -34,6 +35,7 @@ class ImLineEdit : public QLineEdit {
     ushort m_prev_char;
     void readSettings();
     QString m_activeMap;
+    QString m_nullMap;
     bool m_debug;
   protected:
     virtual void keyPressEvent(QKeyEvent *e);

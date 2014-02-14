@@ -31,9 +31,9 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->getActiveMap();
   if (map.isEmpty()) {
-    map = "None";
+    map = m_edit->getNullMap();
   }
-  maps << "None";
+  maps << m_edit->getNullMap();
   if (maps.size() > 0) {
     QGroupBox * group = new QGroupBox(tr("Keymap"));
     /// TODO this should be Grid to use less space ?
@@ -60,10 +60,8 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
 }
 void RootSearchDialog::keymapChanged() {
   QRadioButton * btn = qobject_cast<QRadioButton *>(QObject::sender());
-  if (btn) {
-    qDebug() << "checked" << btn->text();
-  }
-  /// if passed "None", this will deactive the current map as there is no such map
+  /// if passed the name of non-existent map
+  /// this will deactive the current map as there is no such map
   m_edit->activateMap(btn->text(),true);
   m_edit->setFocus();
 }

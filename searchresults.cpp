@@ -4,7 +4,7 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
 
   QSettings settings;
   settings.beginGroup("Search");
-  QString f = settings.value("Results Font",QString()).toString();
+  QString f = settings.value("Results font",QString()).toString();
   if (! f.isEmpty()) {
     m_resultsFont.fromString(f);
   }

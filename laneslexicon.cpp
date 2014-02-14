@@ -114,7 +114,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 LanesLexicon::~LanesLexicon()
 {
-  QLOG_DEBUG() << "main window destructor";
   /// TODO make this check something has changed or give
   /// option to save settings ?
   if (m_ok) {
@@ -126,9 +125,9 @@ LanesLexicon::~LanesLexicon()
   if (m_db.isOpen()) {
     m_db.close();
   }
+  /// TODO close notes db
   freeXslt();
   im_free(m_mapper);
-  QLOG_DEBUG() << "finished main window destructor";
 }
 void LanesLexicon::setupInterface() {
   if (m_interface == "minimal") {
@@ -181,12 +180,16 @@ void LanesLexicon::onCloseTab(int ix) {
   m_tabs->removeTab(ix);
 }
 void LanesLexicon::shortcut(const QString & k) {
+  QString key = k.toCaseFolded();
   qDebug() << Q_FUNC_INFO << k;
-  if (k == "Root Search") {
+  if (key == QString("Root search").toCaseFolded()) {
     RootSearchDialog * d = new RootSearchDialog(this);
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
+        if (! UcdScripts::isScript(t,"Arabic")) {
+          t = convertString(t);
+        }
         Place p = showPlace(Place(t),false);
         if (! p.isValid()) {
           QMessageBox msgBox;
@@ -197,7 +200,7 @@ void LanesLexicon::shortcut(const QString & k) {
     }
     delete d;
   }
-  else if (k == "Node Search") {
+  else if (key == QString("Node search").toCaseFolded()) {
     NodeSearchDialog * d = new NodeSearchDialog(this);
     if (d->exec()) {
       QString t = d->getText();
@@ -214,7 +217,7 @@ void LanesLexicon::shortcut(const QString & k) {
     }
     delete d;
   }
-  else if (k == "Word Search") {
+  else if (key == QString("Word search").toCaseFolded()) {
     WordSearchDialog * d = new WordSearchDialog(this);
     if (d->exec()) {
       QString t = d->getText();
@@ -235,7 +238,7 @@ void LanesLexicon::shortcut(const QString & k) {
     }
     delete d;
   }
-  else if (k == "Page Search") {
+  else if (key == QString("Page search").toCaseFolded()) {
     bool ok;
     /// not sure about putting max/mins
     int page = QInputDialog::getInt(this, tr("Page Search"),
@@ -244,10 +247,10 @@ void LanesLexicon::shortcut(const QString & k) {
       this->onGoToPage(page);
     }
   }
-  else if (k == "Contents Collapse All") {
+  else if (key == QString("Contents collapse all").toCaseFolded()) {
     m_tree->collapseAll();
   }
-  else if (k == "Contents Collapse Letter") {
+  else if (key == QString("Contents collapse letter").toCaseFolded()) {
     QTreeWidgetItem * item = m_tree->currentItem();
     if (item) {
       /// if item is a root, get the parent (letter)
@@ -268,10 +271,10 @@ void LanesLexicon::shortcut(const QString & k) {
       qDebug() << Q_FUNC_INFO << "No current item";
     }
   }
-  else if (k == "Quit") {
+  else if (key == QString("Quit").toCaseFolded()) {
     on_actionExit();
   }
-  else if (k == "Toggle Interface") {
+  else if (key == QString("Toggle Interface").toCaseFolded()) {
     if (m_interface == "minimal") {
       m_interface = "default";
     }
@@ -280,7 +283,7 @@ void LanesLexicon::shortcut(const QString & k) {
     }
     setupInterface();
   }
-  else if (k == "Contents Show") {
+  else if (key == QString("Contents Show").toCaseFolded()) {
     if (m_treeDock->isVisible()) {
       m_treeDock->hide();
     }
@@ -288,38 +291,38 @@ void LanesLexicon::shortcut(const QString & k) {
       m_treeDock->show();
     }
   }
-  else if (k == "Root Next") {
+  else if (key == QString("Root Next").toCaseFolded()) {
     this->on_actionNextRoot();
   }
-  else if (k == "Root Prev") {
+  else if (key == QString("Root Prev").toCaseFolded()) {
     this->on_actionPrevRoot();
   }
-  else if (k == "Root First") {
+  else if (key == QString("Root First").toCaseFolded()) {
     this->on_actionFirstRoot();
   }
-  else if (k == "Root Last") {
+  else if (key == QString("Root Last").toCaseFolded()) {
     this->on_actionLastRoot();
   }
-  else if (k == "Page Next") {
+  else if (key == QString("Page Next").toCaseFolded()) {
     this->on_actionNextPage();
   }
-  else if (k == "Page Prev") {
+  else if (key == QString("Page Prev").toCaseFolded()) {
     this->on_actionPrevPage();
   }
-  else if (k == "Page First") {
+  else if (key == QString("Page First").toCaseFolded()) {
     this->on_actionFirstPage();
   }
-  else if (k == "Page Last") {
+  else if (key == QString("Page Last").toCaseFolded()) {
     this->on_actionLastPage();
   }
-  else if (k == "Focus Content") {
+  else if (key == QString("Focus Content").toCaseFolded()) {
     m_tabs->currentWidget()->setFocus();
   }
-  else if (k == "Focus Tree") {
+  else if (key == QString("Focus Tree").toCaseFolded()) {
     m_tree->setFocus();
   }
-  else if (k.startsWith("Go Tab")) {
-    QString nstr = k.right(1);
+  else if (key.startsWith(QString("Go Tab").toCaseFolded())) {
+    QString nstr = key.right(1);
     bool ok;
     int ix = nstr.toInt(&ok);
     if (ok) {
@@ -330,7 +333,7 @@ void LanesLexicon::shortcut(const QString & k) {
     }
   }
   else {
-    QLOG_WARN() << "Unhandled shortcut" << k;
+    QLOG_WARN() << "Unhandled shortcut" << key;
   }
 
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
@@ -776,13 +779,13 @@ void LanesLexicon::readSettings() {
     arFont.fromString(ar);
   }
 
-  m_saveTabs = settings.value("Save Tabs",true).toBool();
-  m_restoreTabs = settings.value("Restore Tabs",true).toBool();
+  m_saveTabs = settings.value("Save tabs",true).toBool();
+  m_restoreTabs = settings.value("Restore tabs",true).toBool();
   m_docked = settings.value("Docked",false).toBool();
   m_interface = settings.value("Interface","default").toString();
   m_navigationMode = settings.value("Navigation","root").toString();
-  m_useNotes = settings.value("Use Notes",false).toBool();
-  m_activeMap = settings.value("Default Map","Buckwalter").toString();
+  m_useNotes = settings.value("Use notes",false).toBool();
+  m_activeMap = settings.value("Default map","Buckwalter").toString();
   settings.endGroup();
 
   settings.beginGroup("Debug");
@@ -1079,4 +1082,25 @@ void LanesLexicon::on_actionLastPage() {
 }
 bool LanesLexicon::sanityCheck() {
   /// TODO check database exists and entry stylesheet
+}
+/**
+ * Converts supplied param to Arabic using the default map
+ *
+ * @param s
+ *
+ * @return the equivalent arabic string
+ */
+QString LanesLexicon::convertString(const QString & s) const {
+  if ( m_activeMap.isEmpty()) {
+    return s;
+  }
+  if (UcdScripts::isScript(s,"Arabic")) {
+    return s;
+  }
+  bool ok;
+  QString t = im_convert_string(m_mapper,m_activeMap,s,&ok);
+  if ( ! ok ) {
+    QLOG_INFO() << QString(tr("Error converting <%1> with map <%2>")).arg(s).arg(m_activeMap);
+  }
+  return t;
 }

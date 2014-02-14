@@ -46,10 +46,14 @@ void ImLineEdit::shortcutActivated() {
   else {
     m_activeMap.clear();
   }
-  qDebug() << Q_FUNC_INFO << "map" << m_activeMap;
 }
 void ImLineEdit::readSettings() {
   QSettings settings;
+
+  settings.beginGroup("System");
+  m_nullMap = settings.value("Null map","None").toString();
+  settings.endGroup();
+
   settings.beginGroup("Maps");
   QStringList groups = settings.childGroups();
   qDebug() << Q_FUNC_INFO << groups;

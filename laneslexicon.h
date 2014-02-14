@@ -67,6 +67,7 @@ public:
     void readSettings();
     void writeSettings();
     bool isOk() { return m_ok;}
+    QString convertString(const QString &) const;
     HistoryMaster * history();
     private slots:
       void shortcut(const QString &);
