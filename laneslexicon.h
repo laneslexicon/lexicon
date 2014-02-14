@@ -39,6 +39,7 @@
 #include <QDockWidget>
 #include <QInputDialog>
 #include <QActionGroup>
+#include "inputmapper.h"
 #include "contentswidget.h"
 #include "graphicsentry.h"
 #include "noteswidget.h"
@@ -117,7 +118,8 @@ private:
     int m_lastPage;
 
     /// set by readSettings
-
+    InputMapper * m_mapper;
+    QString m_activeMap;
     QString m_dbName;
     QString m_notesDbName;
     bool m_historyEnabled;

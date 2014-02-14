@@ -6,6 +6,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 {
   m_ok = false;
   m_history = 0;
+  m_mapper = im_new();
   readSettings();
 
   if (! openDatabase(m_dbName)) {
@@ -126,6 +127,7 @@ LanesLexicon::~LanesLexicon()
     m_db.close();
   }
   freeXslt();
+  im_free(m_mapper);
   QLOG_DEBUG() << "finished main window destructor";
 }
 void LanesLexicon::setupInterface() {
@@ -780,6 +782,7 @@ void LanesLexicon::readSettings() {
   m_interface = settings.value("Interface","default").toString();
   m_navigationMode = settings.value("Navigation","root").toString();
   m_useNotes = settings.value("Use Notes",false).toBool();
+  m_activeMap = settings.value("Default Map","Buckwalter").toString();
   settings.endGroup();
 
   settings.beginGroup("Debug");
@@ -792,6 +795,27 @@ void LanesLexicon::readSettings() {
   settings.beginGroup("History");
   m_historyEnabled = settings.value("Enabled",true).toBool();
   settings.endGroup();
+  /**
+   * we are have a default map set that is used to convert input to Arabic
+   *
+   */
+
+  settings.beginGroup("Maps");
+  QStringList groups = settings.childGroups();
+  if ( ! groups.contains(m_activeMap) ) {
+    QLOG_WARN() << QString(tr("Default map <%1> not found in settings")).arg(m_activeMap);
+    return;
+  }
+  settings.beginGroup(m_activeMap);
+  QString filename = settings.value("file",QString()).toString();
+  QFile file(filename);
+  if ( ! file.exists() ) {
+    QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(m_activeMap).arg(filename);
+    return;
+  }
+  if (! im_load_map_from_json(m_mapper,filename.toUtf8().constData(),m_activeMap.toUtf8().constData())) {
+      QLOG_WARN() << QString(tr("Could not load <%1> from file <%2>")).arg(m_activeMap).arg(filename);
+  }
 }
 void LanesLexicon::writeSettings() {
   QSettings settings;
