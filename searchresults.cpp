@@ -86,7 +86,7 @@ void SearchResultsWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem *
   /// TODO make this a QSettings option or dialog option
   Place np;
   np.setNode(node);
-  np.setNodeOnly(true);
+  //  np.setNodeOnly(true);
   Place p = m_text->getXmlForRoot(np);
   if (p.isValid()) {
     m_text->highlight(m_target);
