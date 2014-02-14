@@ -26,7 +26,7 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
 
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-  layout->addWidget(m_edit,0);
+
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->getActiveMap();
@@ -51,12 +51,13 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   }
 
 
-
+  layout->addWidget(m_edit,0);
   layout->addStretch(1);
   layout->addWidget(m_buttonBox);
 
   setModal(true);
   setLayout(layout);
+  m_edit->setFocus();
 }
 void RootSearchDialog::keymapChanged() {
   QRadioButton * btn = qobject_cast<QRadioButton *>(QObject::sender());
@@ -112,7 +113,7 @@ WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
 
-  layout->addWidget(m_edit,0);
+
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->getActiveMap();
   if (map.isEmpty()) {
@@ -134,12 +135,13 @@ WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
       group->setLayout(btnlayout);
       layout->addWidget(group);
   }
-
+  layout->addWidget(m_edit,0);
   layout->addStretch(1);
   layout->addWidget(m_buttonBox);
 
   setModal(true);
   setLayout(layout);
+  m_edit->setFocus();
 }
 QString WordSearchDialog::getText() {
   /// getText() converts buckwalter to arabic
