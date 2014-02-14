@@ -49,8 +49,11 @@ class WordSearchDialog : public QDialog {
  public:
   WordSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   QString getText();
+  public slots:
+    void keymapChanged();
  private:
-  WrappedEdit * m_edit;
+  //  WrappedEdit * m_edit;
+    ImLineEdit * m_edit;
   QDialogButtonBox * m_buttonBox;
 };
 #endif
