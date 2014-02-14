@@ -222,6 +222,9 @@ void LanesLexicon::shortcut(const QString & k) {
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
+        if (! UcdScripts::isScript(t,"Arabic")) {
+          t = convertString(t);
+        }
         SearchResultsWidget * s = new SearchResultsWidget(t,this);
         if (s->count() == 0) {
           QMessageBox msgBox;
