@@ -132,7 +132,7 @@ private:
     void restoreTabs();
     QSignalMapper * m_signalMapper;
     QSignalMapper * m_bookmarkMap;
-    //    QMap<QChar, Place> m_bookmarks;
+    QMap<QString, Place> m_bookmarks;
     void setupShortcuts();
     int m_historyPos;
     void setSignals(GraphicsEntry *);
@@ -147,6 +147,7 @@ private:
     bool sanityCheck();
 
     Place m_place;
+    Place getCurrentPlace();
     QPushButton * m_notesBtn;
     ContentsWidget * m_tree;
     //    GraphicsEntry * m_entry;

@@ -345,11 +345,40 @@ void LanesLexicon::shortcut(const QString & k) {
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
 }
 void LanesLexicon::bookmarkShortcut(const QString & key) {
-  qDebug() << key;
-  if (key == QString("Bookmark list").toCaseFolded()) {
+  qDebug() << "bookmark" << key;
+  if (key == "list") {
     qDebug() << "bookmark list";
+    return;
   }
+  QRegExp rx("([^-]+)-(.+)");
+  QString v;
+  QString id;
+  if (rx.indexIn(key, 0) != -1) {
+    v = rx.cap(1);
+    id = rx.cap(2);
+  }
+  else {
+    QLOG_WARN() << tr("Unknown bookmark shortcut activated") << key;
+    return;
+  }
+  if (v == "jump") {
+    if ( ! m_bookmarks.contains(id) ) {
+      QLOG_WARN() << QString(tr("Unknown bookmark jump activated: %1")).arg(id);
+      return;
+    }
+    Place p = m_bookmarks.value(id);
+    return;
+  }
+  /// add a bookmark
+  Place p = this->getCurrentPlace();
+  if (! p.isValid()) {
+    QLOG_WARN() << QString(tr("No place to bookmark"));
+    return;
+  }
+  m_bookmarks.insert(id,p);
+  qDebug() << "bookmarks" << m_bookmarks.keys();
 }
+
 /**
  * setup the shortcuts from the conf
  *
@@ -391,15 +420,19 @@ void LanesLexicon::setupShortcuts() {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
     QShortcut * sc = new QShortcut(ks,this);
     connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
-    m_bookmarkMap->setMapping(sc,QString("bookmark-add-%1").arg(ids.at(i)));
+    m_bookmarkMap->setMapping(sc,QString("add-%1").arg(ids.at(i)));
   }
   key = settings.value("Jump","Ctrl+J").toString();
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
     QShortcut * sc = new QShortcut(ks,this);
     connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
-    m_bookmarkMap->setMapping(sc,QString("bookmark-jump-%1").arg(ids.at(i)));
+    m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i)));
   }
+  key = settings.value("List","Ctrl+B,Ctrl+J").toString();
+  QShortcut * sc = new QShortcut(key,this);
+  connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+  m_bookmarkMap->setMapping(sc,QString("list"));
 
   connect(m_bookmarkMap,SIGNAL(mapped(QString)),this,SLOT(bookmarkShortcut(const QString &)));
 }
@@ -1142,4 +1175,12 @@ QString LanesLexicon::convertString(const QString & s) const {
     QLOG_INFO() << QString(tr("Error converting <%1> with map <%2>")).arg(s).arg(m_activeMap);
   }
   return t;
+}
+Place LanesLexicon::getCurrentPlace() {
+  Place p;
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    p = entry->getPlace();
+  }
+  return p;
 }
