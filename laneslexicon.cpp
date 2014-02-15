@@ -435,7 +435,7 @@ void LanesLexicon::setupShortcuts() {
    *
    *
    */
-  settings.beginGroup("Bookmarks");
+  settings.beginGroup("Bookmark");
   m_bookmarkMap = new QSignalMapper(this);
   QString key = settings.value("Add","Ctrl+B").toString();
   QString ids = settings.value("Id","abcdefghijklmnopqrstuvwxyz").toString();
@@ -882,6 +882,9 @@ void LanesLexicon::readSettings() {
 
   m_saveTabs = settings.value("Save tabs",true).toBool();
   m_restoreTabs = settings.value("Restore tabs",true).toBool();
+
+  m_saveBookmarks = settings.value("Save bookmarks",true).toBool();
+
   m_docked = settings.value("Docked",false).toBool();
   m_interface = settings.value("Interface","default").toString();
   m_navigationMode = settings.value("Navigation","root").toString();
@@ -958,6 +961,15 @@ void LanesLexicon::writeSettings() {
     settings.endGroup();
     settings.beginGroup("System");
     settings.setValue("Focus tab",m_tabs->currentIndex());
+    settings.endGroup();
+  }
+  if (m_saveBookmarks) {
+    settings.beginGroup("Bookmarks");
+    QStringList keys = m_bookmarks.keys();
+    for(int i=0;i < keys.size();i++) {
+      Place p = m_bookmarks.value(keys[i]);
+      settings.setValue(keys[i],p.toString());
+    }
     settings.endGroup();
   }
 }

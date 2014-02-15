@@ -131,8 +131,10 @@ private:
     void getFirstAndLast();
     void restoreTabs();
     QSignalMapper * m_signalMapper;
+
     QSignalMapper * m_bookmarkMap;
     QMap<QString, Place> m_bookmarks;
+    bool m_saveBookmarks;
     void setupShortcuts();
     int m_historyPos;
     void setSignals(GraphicsEntry *);
