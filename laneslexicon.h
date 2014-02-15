@@ -100,10 +100,11 @@ public:
     // shortcuts
     void shortcutActivated();
     void ambiguousShortcut();
-
+    void bookmarkShortcut(const QString &);
 private:
     Place showPlace(const Place &,bool newTab = false);
     Place showNode(const QString &,bool nodeOnly = false,bool newTab = false);
+
     QString m_interface;    // "default","minimal"
     void setupInterface();
     bool m_ok;
@@ -130,6 +131,8 @@ private:
     void getFirstAndLast();
     void restoreTabs();
     QSignalMapper * m_signalMapper;
+    QSignalMapper * m_bookmarkMap;
+    //    QMap<QChar, Place> m_bookmarks;
     void setupShortcuts();
     int m_historyPos;
     void setSignals(GraphicsEntry *);

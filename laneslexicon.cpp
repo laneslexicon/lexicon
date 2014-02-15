@@ -335,11 +335,20 @@ void LanesLexicon::shortcut(const QString & k) {
       }
     }
   }
+  else if (key.startsWith("bookmark")) {
+    bookmarkShortcut(key);
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
 
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
+}
+void LanesLexicon::bookmarkShortcut(const QString & key) {
+  qDebug() << key;
+  if (key == QString("Bookmark list").toCaseFolded()) {
+    qDebug() << "bookmark list";
+  }
 }
 /**
  * setup the shortcuts from the conf
@@ -372,6 +381,27 @@ void LanesLexicon::setupShortcuts() {
     }
   }
   connect(m_signalMapper,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
+  settings.endGroup();
+
+  settings.beginGroup("Bookmarks");
+  m_bookmarkMap = new QSignalMapper(this);
+  QString key = settings.value("Add","Ctrl+B").toString();
+  QString ids = settings.value("Id","abcdefghijklmnopqrstuvwxyz").toString();
+  for(int i=0;i < ids.size();i++) {
+    QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
+    QShortcut * sc = new QShortcut(ks,this);
+    connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+    m_bookmarkMap->setMapping(sc,QString("bookmark-add-%1").arg(ids.at(i)));
+  }
+  key = settings.value("Jump","Ctrl+J").toString();
+  for(int i=0;i < ids.size();i++) {
+    QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
+    QShortcut * sc = new QShortcut(ks,this);
+    connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+    m_bookmarkMap->setMapping(sc,QString("bookmark-jump-%1").arg(ids.at(i)));
+  }
+
+  connect(m_bookmarkMap,SIGNAL(mapped(QString)),this,SLOT(bookmarkShortcut(const QString &)));
 }
 /**
  * load the application level stylesheet, stripping out lines
