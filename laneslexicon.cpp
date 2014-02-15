@@ -102,6 +102,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
       m_tree->ensureVisible(m_firstRoot);
     }
   }
+  if (m_restoreBookmarks) {
+    restoreBookmarks();
+  }
   m_tree->resizeColumnToContents(0);
 
   if (m_historyEnabled) {
@@ -396,7 +399,24 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
   m_bookmarks.insert(id,p);
   qDebug() << "bookmarks" << m_bookmarks.keys();
 }
-
+void LanesLexicon::restoreBookmarks() {
+  QSettings settings;
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Bookmarks");
+  QStringList keys = settings.childKeys();
+  qDebug() << "restore bookmarks" << keys;
+  for(int i=0;i < keys.size();i++) {
+    QString t = settings.value(keys[i]).toString();
+    Place p = Place::fromString(t);
+    if (p.isValid()) {
+      m_bookmarks.insert(keys[i],p);
+      qDebug() << "restore" << keys[i] << t;
+    }
+    else {
+      qDebug() << "invalid place" << keys[i] << t;
+    }
+  }
+}
 /**
  * setup the shortcuts from the conf
  *
@@ -884,6 +904,7 @@ void LanesLexicon::readSettings() {
   m_restoreTabs = settings.value("Restore tabs",true).toBool();
 
   m_saveBookmarks = settings.value("Save bookmarks",true).toBool();
+  m_restoreBookmarks = settings.value("Restore bookmarks",true).toBool();
 
   m_docked = settings.value("Docked",false).toBool();
   m_interface = settings.value("Interface","default").toString();

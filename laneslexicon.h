@@ -135,6 +135,9 @@ private:
     QSignalMapper * m_bookmarkMap;
     QMap<QString, Place> m_bookmarks;
     bool m_saveBookmarks;
+    bool m_restoreBookmarks;
+    void restoreBookmarks();
+
     void setupShortcuts();
     int m_historyPos;
     void setSignals(GraphicsEntry *);
