@@ -48,6 +48,7 @@
 #include "place.h"
 #include "placewidget.h"
 #include "searchwidget.h"
+#include "bookmarkwidget.h"
 #include "scripts.h"
 #include "searchresults.h"
 #include "xsltsupport.h"
@@ -137,7 +138,8 @@ private:
     bool m_saveBookmarks;
     bool m_restoreBookmarks;
     void restoreBookmarks();
-
+    void setupBookmarkShortcuts();
+    void bookmarkJump(const QString & id);
     void setupShortcuts();
     int m_historyPos;
     void setSignals(GraphicsEntry *);

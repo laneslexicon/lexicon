@@ -38,6 +38,7 @@ SOURCES += main.cpp\
         eventtype.cpp \
         laneslexicon.cpp \
         contentswidget.cpp \
+        bookmarkwidget.cpp \
         graphicsentry.cpp \
         xsltsupport.cpp \
         searchwidget.cpp \
@@ -50,6 +51,7 @@ SOURCES += main.cpp\
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
+            bookmarkwidget.h \
             graphicsentry.h \
             xsltsupport.h \
             searchwidget.h \
