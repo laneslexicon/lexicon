@@ -7,7 +7,7 @@ EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
 
-  QMenu menu("Fuck off you bastards");
+  QMenu menu(tr("Entry Menu"));
   menu.setObjectName("entry");
   QAction *markAction = menu.addAction("Bookmark");
   QAction *searchAction = menu.addAction("Find");
@@ -32,7 +32,10 @@ void EntryItem::searchItem() {
   qDebug() << Q_FUNC_INFO;
 }
 void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
-  //  QLOG_DEBUG() << "hover" << this->getNode() << this->isRoot();
+  //  QLOG_DEBUG() << "hoverEnter" << this->getPlace().getText();
+}
+void EntryItem::focusInEvent(QFocusEvent * event) {
+  //  QLOG_DEBUG() << "focusIn" << this->getPlace().getText();
 }
 void EntryItem::copy() {
   QString txt = this->textCursor().selectedText();
