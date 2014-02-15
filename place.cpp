@@ -70,3 +70,16 @@ QString Place::getText() const {
   }
   return txt;
 }
+QString Place::toString() const {
+  QString t = QString("%1,%2,%3,%4,%5,%6,%7,%8,%9").arg(m_root)
+    .arg(m_node)
+    .arg(m_word)
+    .arg(m_type)
+    .arg(m_page)
+    .arg(m_vol)
+    .arg(m_id)
+    .arg(m_supplement)
+    .arg(m_showOnlyNodes);
+
+  return t;
+}

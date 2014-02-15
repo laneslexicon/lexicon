@@ -44,6 +44,7 @@ class Place    {
   ~Place() {
   }
   QString getText() const;
+  QString toString() const;
   static int m_vols[8];
   bool operator == (const Place & p) {
     return ((m_root == p.m_root) && (m_word == p.m_word) && (m_node == p.m_node));
@@ -113,14 +114,14 @@ class Place    {
 
   void setNodeOnly(bool v) { m_showOnlyNodes = v;}
  private:
-  int m_vol;
-  int m_page;
-  int m_id;
-  int m_type;
   QString m_root;
   QString m_node;
-  int m_supplement;
   QString m_word;
+  int m_type;
+  int m_page;
+  int m_vol;
+  int m_id;
+  int m_supplement;
   bool m_showOnlyNodes;
   QVariant m_data;
 };
