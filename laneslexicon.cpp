@@ -350,6 +350,14 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
     qDebug() << "bookmark list";
     return;
   }
+  if (key == "revert") {
+    if (! m_bookmarks.contains("-here-")) {
+      return;
+    }
+    Place p = m_bookmarks.value("-here-");
+    showPlace(p,false);
+    return;
+  }
   QRegExp rx("([^-]+)-(.+)");
   QString v;
   QString id;
@@ -367,6 +375,15 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
       return;
     }
     Place p = m_bookmarks.value(id);
+    if (! p.isValid()) {
+      QLOG_WARN() << QString(tr("Jumping to invalid place:")) << p;
+      return;
+    }
+    /// get the current place and save it so we can jump back
+    Place cp = this->getCurrentPlace();
+    cp.setType(Place::Bookmark);
+    m_bookmarks.insert("-here-",cp);
+    showPlace(p,false);
     return;
   }
   /// add a bookmark
@@ -375,6 +392,7 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
     QLOG_WARN() << QString(tr("No place to bookmark"));
     return;
   }
+  p.setType(Place::Bookmark);
   m_bookmarks.insert(id,p);
   qDebug() << "bookmarks" << m_bookmarks.keys();
 }
@@ -411,7 +429,12 @@ void LanesLexicon::setupShortcuts() {
   }
   connect(m_signalMapper,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
   settings.endGroup();
-
+  /**
+   * setup all the bookmark shortcuts
+   *   add,jump,save,revert,list
+   *
+   *
+   */
   settings.beginGroup("Bookmarks");
   m_bookmarkMap = new QSignalMapper(this);
   QString key = settings.value("Add","Ctrl+B").toString();
@@ -429,10 +452,16 @@ void LanesLexicon::setupShortcuts() {
     connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
     m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i)));
   }
+  QShortcut * sc;
   key = settings.value("List","Ctrl+B,Ctrl+J").toString();
-  QShortcut * sc = new QShortcut(key,this);
+  sc = new QShortcut(key,this);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
   m_bookmarkMap->setMapping(sc,QString("list"));
+
+  key = settings.value("Revert","Ctrl+B,Ctrl+R").toString();
+  sc = new QShortcut(key,this);
+  connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+  m_bookmarkMap->setMapping(sc,QString("revert"));
 
   connect(m_bookmarkMap,SIGNAL(mapped(QString)),this,SLOT(bookmarkShortcut(const QString &)));
 }
