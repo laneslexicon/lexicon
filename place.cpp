@@ -83,3 +83,24 @@ QString Place::toString() const {
 
   return t;
 }
+Place Place::fromString(const QString & str) {
+  bool ok;
+  QStringList x = str.split(",");
+  Place p;
+  p.setRoot(x[0]);
+  p.setNode(x[1]);
+  p.setWord(x[2]);
+  p.setType(x[3].toInt(&ok));
+  p.setPage(x[4].toInt(&ok));
+  p.setVol(x[5].toInt(&ok));
+  p.setId(x[6].toInt(&ok));
+  p.setSupplement(x[7].toInt(&ok));
+  if (x[8] == "1") {
+    p.setNodeOnly(true);
+  }
+  else {
+    p.setNodeOnly(false);
+  }
+
+  return p;
+}

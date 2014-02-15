@@ -45,6 +45,7 @@ class Place    {
   }
   QString getText() const;
   QString toString() const;
+  static Place fromString(const QString &);
   static int m_vols[8];
   bool operator == (const Place & p) {
     return ((m_root == p.m_root) && (m_word == p.m_word) && (m_node == p.m_node));
@@ -107,6 +108,7 @@ class Place    {
   bool isSupplement() { return (m_supplement == 1);}
   int getPage() const { return m_page;}
   void setPage(int i);
+  void setVol(int i) { m_vol = i; }
   int getVol() const { return m_vol;}
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
