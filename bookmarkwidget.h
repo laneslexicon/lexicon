@@ -7,6 +7,7 @@
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QRegExp>
+#include "QsLog.h"
 class BookmarkWidget : public QDialog {
    Q_OBJECT
  public:

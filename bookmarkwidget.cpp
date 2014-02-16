@@ -20,17 +20,16 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   setLayout(layout);
 }
 void BookmarkWidget::setPlace() {
-  qDebug() << "accept slot";
   QListWidgetItem * item = m_list->currentItem();
   if (item) {
     QString t = item->text();
     QRegExp rx("(\\w+)\\s+");
     if (rx.indexIn(t,0) != -1) {
       m_mark = rx.cap(1);
-      qDebug() << "got" << m_mark;
+      //      qDebug() << "got" << m_mark;
     }
     else {
-      qDebug() << "rx failed";
+      QLOG_DEBUG() << Q_FUNC_INFO <<  "regex failed" << t;
     }
   }
   this->accept();
