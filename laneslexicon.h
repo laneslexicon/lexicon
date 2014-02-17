@@ -101,7 +101,14 @@ public:
     // shortcuts
     void shortcutActivated();
     void ambiguousShortcut();
+
     void bookmarkShortcut(const QString &);
+    void bookmarkAdd();
+    void bookmarkJump();
+    void bookmarkClear();
+    void bookmarkList();
+    void bookmarkRevert();
+    void bookmarkRebuildMenu(QAction *);
 private:
     Place showPlace(const Place &,bool newTab = false);
     Place showNode(const QString &,bool nodeOnly = false,bool newTab = false);
@@ -133,6 +140,7 @@ private:
     void restoreTabs();
     QSignalMapper * m_signalMapper;
 
+    // bookmarks
     QSignalMapper * m_bookmarkMap;
     QMap<QString, Place> m_bookmarks;
     bool m_saveBookmarks;
@@ -140,6 +148,13 @@ private:
     void restoreBookmarks();
     void setupBookmarkShortcuts();
     void bookmarkJump(const QString & id);
+    QAction * m_bookmarkListAction;
+    QAction * m_bookmarkAddAction;
+    QAction * m_bookmarkJumpAction;
+    QAction * m_bookmarkClearAction;
+    QAction * m_bookmarkRevertAction;
+    QMenu * m_bookmarkMenu;
+
     void setupShortcuts();
     int m_historyPos;
     void setSignals(GraphicsEntry *);

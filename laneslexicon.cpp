@@ -54,6 +54,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     //  m_tabs->addTab(m_notes,"Notes");
     setCentralWidget(splitter);
   }
+  setupShortcuts();
+  setupBookmarkShortcuts();
+
   createActions();
   createToolBar();
   createMenus();
@@ -71,8 +74,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     statusBar()->showMessage(tr("Failed to open database"));
   }
 
-  setupShortcuts();
-  setupBookmarkShortcuts();
 
   connect(m_tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 
@@ -349,86 +350,6 @@ void LanesLexicon::shortcut(const QString & k) {
 
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
 }
-void LanesLexicon::bookmarkShortcut(const QString & key) {
-  qDebug() << "bookmark" << key;
-  if (key == "revert") {
-    if (! m_bookmarks.contains("-here-")) {
-      return;
-    }
-    Place p = m_bookmarks.value("-here-");
-    showPlace(p,false);
-    return;
-  }
-  if (key == "list") {
-    BookmarkWidget * dlg = new BookmarkWidget(m_bookmarks,this);
-    if (dlg->exec() == QDialog::Accepted) {
-      QString m = dlg->getSelected();
-      delete dlg;
-      if ( ! m.isEmpty()) {
-        bookmarkJump(m);
-      }
-    }
-    return;
-  }
-  QRegExp rx("([^-]+)-(.+)");
-  QString v;
-  QString id;
-  if (rx.indexIn(key, 0) != -1) {
-    v = rx.cap(1);
-    id = rx.cap(2);
-  }
-  else {
-    QLOG_WARN() << tr("Unknown bookmark shortcut activated") << key;
-    return;
-  }
-  if (v == "jump") {
-    bookmarkJump(id);
-    return;
-  }
-  /// add a bookmark
-  Place p = this->getCurrentPlace();
-  if (! p.isValid()) {
-    QLOG_WARN() << QString(tr("No place to bookmark"));
-    return;
-  }
-  p.setType(Place::Bookmark);
-  m_bookmarks.insert(id,p);
-  qDebug() << "bookmarks" << m_bookmarks.keys();
-}
-void LanesLexicon::bookmarkJump(const QString & id) {
-  if ( ! m_bookmarks.contains(id) ) {
-    QLOG_WARN() << QString(tr("Unknown bookmark jump activated: %1")).arg(id);
-    return;
-  }
-  Place p = m_bookmarks.value(id);
-  if (! p.isValid()) {
-    QLOG_WARN() << QString(tr("Jumping to invalid place:")) << p;
-    return;
-  }
-  /// get the current place and save it so we can jump back
-  Place cp = this->getCurrentPlace();
-  cp.setType(Place::Bookmark);
-  m_bookmarks.insert("-here-",cp);
-  showPlace(p,false);
-}
-void LanesLexicon::restoreBookmarks() {
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Bookmarks");
-  QStringList keys = settings.childKeys();
-  qDebug() << "restore bookmarks" << keys;
-  for(int i=0;i < keys.size();i++) {
-    QString t = settings.value(keys[i]).toString();
-    Place p = Place::fromString(t);
-    if (p.isValid()) {
-      m_bookmarks.insert(keys[i],p);
-      qDebug() << "restore" << keys[i] << t;
-    }
-    else {
-      qDebug() << "invalid place" << keys[i] << t;
-    }
-  }
-}
 /**
  * setup the shortcuts from the conf
  *
@@ -462,45 +383,10 @@ void LanesLexicon::setupShortcuts() {
   connect(m_signalMapper,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
   settings.endGroup();
 }
-void LanesLexicon::setupBookmarkShortcuts() {
-  /**
-   * setup all the bookmark shortcuts
-   *   add,jump,save,revert,list
-   *
-   *
-   */
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Bookmark");
-  m_bookmarkMap = new QSignalMapper(this);
-  QString key = settings.value("Add","Ctrl+B").toString();
-  QString ids = settings.value("Id","abcdefghijklmnopqrstuvwxyz").toString();
-  for(int i=0;i < ids.size();i++) {
-    QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
-    QShortcut * sc = new QShortcut(ks,this);
-    connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
-    m_bookmarkMap->setMapping(sc,QString("add-%1").arg(ids.at(i)));
-  }
-  key = settings.value("Jump","Ctrl+J").toString();
-  for(int i=0;i < ids.size();i++) {
-    QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
-    QShortcut * sc = new QShortcut(ks,this);
-    connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
-    m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i)));
-  }
-  QShortcut * sc;
-  key = settings.value("List","Ctrl+B,Ctrl+L").toString();
-  sc = new QShortcut(key,this);
-  connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
-  m_bookmarkMap->setMapping(sc,QString("list"));
 
-  key = settings.value("Revert","Ctrl+B,Ctrl+R").toString();
-  sc = new QShortcut(key,this);
-  connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
-  m_bookmarkMap->setMapping(sc,QString("revert"));
 
-  connect(m_bookmarkMap,SIGNAL(mapped(QString)),this,SLOT(bookmarkShortcut(const QString &)));
-}
+
+
 /**
  * load the application level stylesheet, stripping out lines
  * beginning with #
@@ -673,7 +559,18 @@ void LanesLexicon::setupHistory(int currPos) {
 void LanesLexicon::createMenus() {
   m_fileMenu = menuBar()->addMenu(tr("&File"));
   m_fileMenu->addAction(m_exitAction);
+
+  m_bookmarkMenu = menuBar()->addMenu(tr("Bookmark"));
+  m_bookmarkMenu->addAction(m_bookmarkListAction);
+  m_bookmarkMenu->addAction(m_bookmarkClearAction);
+  m_bookmarkMenu->addAction(m_bookmarkRevertAction);
+  m_bookmarkMenu->addAction(m_bookmarkAddAction);
+  m_bookmarkMenu->addAction(m_bookmarkJumpAction);
+
+  /// Connections
+  connect(m_bookmarkMenu,SIGNAL(triggered(QAction *)),this,SLOT(bookmarkRebuildMenu(QAction *)));
 }
+
 void LanesLexicon::createStatusBar() {
   statusBar()->showMessage(tr("Ready"));
 }
@@ -1261,4 +1158,194 @@ Place LanesLexicon::getCurrentPlace() {
     p = entry->getPlace();
   }
   return p;
+}
+/************************************************************************************
+*
+*
+*    BOOKMARKS
+*
+*
+************************************************************************************/
+
+/**
+ * Possible values: revert,list,jump,add,clear
+ *
+ * @param key
+ */
+void LanesLexicon::bookmarkShortcut(const QString & key) {
+  qDebug() << "bookmark" << key;
+  if (key == "revert") {
+    if (! m_bookmarks.contains("-here-")) {
+      return;
+    }
+    Place p = m_bookmarks.value("-here-");
+    showPlace(p,false);
+    return;
+  }
+  if (key == "list") {
+    BookmarkWidget * dlg = new BookmarkWidget(m_bookmarks,this);
+    if (dlg->exec() == QDialog::Accepted) {
+      QString m = dlg->getSelected();
+      delete dlg;
+      if ( ! m.isEmpty()) {
+        bookmarkJump(m);
+      }
+    }
+    return;
+  }
+  if (key == "clear") {
+    /// TODO warning dialog ?
+    m_bookmarks.clear();
+    return;
+  }
+  QRegExp rx("([^-]+)-(.+)");
+  QString v;
+  QString id;
+  if (rx.indexIn(key, 0) != -1) {
+    v = rx.cap(1);
+    id = rx.cap(2);
+  }
+  else {
+    QLOG_WARN() << tr("Unknown bookmark shortcut activated") << key;
+    return;
+  }
+  if (v == "jump") {
+    bookmarkJump(id);
+    return;
+  }
+  /// add a bookmark
+  Place p = this->getCurrentPlace();
+  if (! p.isValid()) {
+    QLOG_WARN() << QString(tr("No place to bookmark"));
+    return;
+  }
+  p.setType(Place::Bookmark);
+  m_bookmarks.insert(id,p);
+  qDebug() << "bookmarks" << m_bookmarks.keys();
+}
+void LanesLexicon::bookmarkJump(const QString & id) {
+  if ( ! m_bookmarks.contains(id) ) {
+    QLOG_WARN() << QString(tr("Unknown bookmark jump activated: %1")).arg(id);
+    return;
+  }
+  Place p = m_bookmarks.value(id);
+  if (! p.isValid()) {
+    QLOG_WARN() << QString(tr("Jumping to invalid place:")) << p;
+    return;
+  }
+  /// get the current place and save it so we can jump back
+  Place cp = this->getCurrentPlace();
+  cp.setType(Place::Bookmark);
+  m_bookmarks.insert("-here-",cp);
+  showPlace(p,false);
+}
+void LanesLexicon::restoreBookmarks() {
+  QSettings settings;
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Bookmarks");
+  QStringList keys = settings.childKeys();
+  qDebug() << "restore bookmarks" << keys;
+  for(int i=0;i < keys.size();i++) {
+    QString t = settings.value(keys[i]).toString();
+    Place p = Place::fromString(t);
+    if (p.isValid()) {
+      m_bookmarks.insert(keys[i],p);
+      qDebug() << "restore" << keys[i] << t;
+    }
+    else {
+      qDebug() << "invalid place" << keys[i] << t;
+    }
+  }
+}
+void LanesLexicon::setupBookmarkShortcuts() {
+  /**
+   * setup all the bookmark shortcuts and actions
+   *   add,jump,save,revert,list
+   *
+   *  TODO bookmark Icons ?
+   */
+  QSettings settings;
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Bookmark");
+  m_bookmarkMap = new QSignalMapper(this);
+  QString key = settings.value("Add","Ctrl+B").toString();
+  QString ids = settings.value("Id","abcdefghijklmnopqrstuvwxyz").toString();
+  for(int i=0;i < ids.size();i++) {
+    QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
+    QShortcut * sc = new QShortcut(ks,this);
+    connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+    m_bookmarkMap->setMapping(sc,QString("add-%1").arg(ids.at(i)));
+  }
+  m_bookmarkAddAction = new QAction(tr("Add"),this);
+
+  key = settings.value("Jump","Ctrl+J").toString();
+  for(int i=0;i < ids.size();i++) {
+    QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
+    QShortcut * sc = new QShortcut(ks,this);
+    connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+    m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i)));
+  }
+  m_bookmarkJumpAction = new QAction(tr("Jump"),this);
+
+  QShortcut * sc;
+  key = settings.value("List","Ctrl+B,Ctrl+L").toString();
+  sc = new QShortcut(key,this);
+  connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+  m_bookmarkMap->setMapping(sc,QString("list"));
+  m_bookmarkListAction = new QAction(tr("List"),this);
+  m_bookmarkListAction->setShortcut(sc->key());
+
+  key = settings.value("Revert","Ctrl+B,Ctrl+R").toString();
+  sc = new QShortcut(key,this);
+  connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+  m_bookmarkMap->setMapping(sc,QString("revert"));
+  m_bookmarkRevertAction = new QAction(tr("Revert"),this);
+  m_bookmarkRevertAction->setShortcut(sc->key());
+
+  key = settings.value("Clear","Ctrl+B,Ctrl+C").toString();
+  sc = new QShortcut(key,this);
+  connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+  m_bookmarkMap->setMapping(sc,QString("clear"));
+  m_bookmarkClearAction = new QAction(tr("Clear"),this);
+  m_bookmarkClearAction->setShortcut(sc->key());
+
+  connect(m_bookmarkMap,SIGNAL(mapped(QString)),this,SLOT(bookmarkShortcut(const QString &)));
+
+  connect(m_bookmarkAddAction,SIGNAL(triggered()),this,SLOT(bookmarkAdd()));
+  connect(m_bookmarkJumpAction,SIGNAL(triggered()),this,SLOT(bookmarkJump()));
+  connect(m_bookmarkClearAction,SIGNAL(triggered()),this,SLOT(bookmarkClear()));
+  connect(m_bookmarkListAction,SIGNAL(triggered()),this,SLOT(bookmarkList()));
+  connect(m_bookmarkRevertAction,SIGNAL(triggered()),this,SLOT(bookmarkRevert()));
+
+}
+
+void LanesLexicon::bookmarkAdd() {
+    bool ok;
+  QString text = QInputDialog::getText(this, tr("Bookmark Add)"),
+                                         tr("Bookmark ID:"), QLineEdit::Normal,
+                                         QString(), &ok);
+  if (ok && !text.isEmpty())
+    bookmarkShortcut("add-" + text);
+
+}
+void LanesLexicon::bookmarkJump() {
+  bool ok;
+  QString text = QInputDialog::getText(this, tr("Bookmark Jump"),
+                                         tr("Bookmark ID:"), QLineEdit::Normal,
+                                         QString(), &ok);
+  if (ok && !text.isEmpty())
+    bookmarkShortcut("jump-" + text);
+}
+
+void LanesLexicon::bookmarkClear() {
+  bookmarkShortcut("clear");
+}
+void LanesLexicon::bookmarkList() {
+  bookmarkShortcut("list");
+}
+void LanesLexicon::bookmarkRevert() {
+  bookmarkShortcut("revert");
+}
+void LanesLexicon::bookmarkRebuildMenu(QAction * action) {
+  qDebug() << Q_FUNC_INFO;
 }
