@@ -1314,6 +1314,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
     QShortcut * sc = new QShortcut(ks,this);
+    sc->setContext(Qt::ApplicationShortcut);
     connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
     m_bookmarkMap->setMapping(sc,QString("add-%1").arg(ids.at(i)));
   }
@@ -1332,6 +1333,8 @@ void LanesLexicon::setupBookmarkShortcuts() {
   key = settings.value("List","Ctrl+B,Ctrl+L").toString();
   sc = new QShortcut(key,this);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+  connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
+  sc->setContext(Qt::ApplicationShortcut);
   m_bookmarkMap->setMapping(sc,QString("list"));
   m_bookmarkListAction = new QAction(tr("List"),this);
   m_bookmarkListAction->setShortcut(sc->key());
@@ -1340,6 +1343,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
 
   key = settings.value("Revert","Ctrl+B,Ctrl+R").toString();
   sc = new QShortcut(key,this);
+    sc->setContext(Qt::ApplicationShortcut);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
   m_bookmarkMap->setMapping(sc,QString("revert"));
   m_bookmarkRevertAction = new QAction(tr("Revert"),this);
@@ -1349,6 +1353,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
 
   key = settings.value("Clear","Ctrl+B,Ctrl+C").toString();
   sc = new QShortcut(key,this);
+    sc->setContext(Qt::ApplicationShortcut);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
   m_bookmarkMap->setMapping(sc,QString("clear"));
   m_bookmarkClearAction = new QAction(tr("Clear"),this);
