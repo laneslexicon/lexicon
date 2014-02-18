@@ -52,6 +52,7 @@
 #include "scripts.h"
 #include "searchresults.h"
 #include "xsltsupport.h"
+#include "menubar.h"
 struct cmdOptions {
   bool dump;
   QString node;
@@ -108,7 +109,8 @@ public:
     void bookmarkClear();
     void bookmarkList();
     void bookmarkRevert();
-    void bookmarkRebuildMenu(QAction *);
+    void bookmarkRebuildMenu();
+
 private:
     Place showPlace(const Place &,bool newTab = false);
     Place showNode(const QString &,bool nodeOnly = false,bool newTab = false);
@@ -153,7 +155,9 @@ private:
     QAction * m_bookmarkJumpAction;
     QAction * m_bookmarkClearAction;
     QAction * m_bookmarkRevertAction;
-    QMenu * m_bookmarkMenu;
+    QMenu   * m_bookmarkMenu;
+    void addBookmarkMenuItem(const QString & action,const QString &);
+    AppMenu * m_mainmenu;
 
     void setupShortcuts();
     int m_historyPos;

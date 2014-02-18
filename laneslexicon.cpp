@@ -557,18 +557,22 @@ void LanesLexicon::setupHistory(int currPos) {
   return;
 }
 void LanesLexicon::createMenus() {
+  m_mainmenu = new AppMenu(this);
+  setMenuBar(m_mainmenu);
   m_fileMenu = menuBar()->addMenu(tr("&File"));
   m_fileMenu->addAction(m_exitAction);
+  m_fileMenu->setObjectName("filemenu");
 
-  m_bookmarkMenu = menuBar()->addMenu(tr("Bookmark"));
+  m_bookmarkMenu = m_mainmenu->addMenu(tr("Bookmark"));
+  m_bookmarkMenu->setObjectName("bookmarkmenu");
+
   m_bookmarkMenu->addAction(m_bookmarkListAction);
   m_bookmarkMenu->addAction(m_bookmarkClearAction);
   m_bookmarkMenu->addAction(m_bookmarkRevertAction);
   m_bookmarkMenu->addAction(m_bookmarkAddAction);
   m_bookmarkMenu->addAction(m_bookmarkJumpAction);
 
-  /// Connections
-  connect(m_bookmarkMenu,SIGNAL(triggered(QAction *)),this,SLOT(bookmarkRebuildMenu(QAction *)));
+  connect(m_mainmenu,SIGNAL(rebuildBookmarks()),this,SLOT(bookmarkRebuildMenu()));
 }
 
 void LanesLexicon::createStatusBar() {
@@ -899,6 +903,7 @@ void LanesLexicon::writeSettings() {
   }
   if (m_saveBookmarks) {
     settings.beginGroup("Bookmarks");
+    //    settings.remove("");
     QStringList keys = m_bookmarks.keys();
     for(int i=0;i < keys.size();i++) {
       Place p = m_bookmarks.value(keys[i]);
@@ -1196,6 +1201,7 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
   if (key == "clear") {
     /// TODO warning dialog ?
     m_bookmarks.clear();
+    /// TODO clear menu
     return;
   }
   QRegExp rx("([^-]+)-(.+)");
@@ -1221,7 +1227,38 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
   }
   p.setType(Place::Bookmark);
   m_bookmarks.insert(id,p);
+  addBookmarkMenuItem(key,id);
   qDebug() << "bookmarks" << m_bookmarks.keys();
+}
+/**
+ * we've added a bookmark so we need to add the jump-<id> shortcut to the
+ * menu
+ *
+ * @param action
+ * @param id
+ */
+void LanesLexicon::addBookmarkMenuItem(const QString & action,const QString & id) {
+  qDebug() << Q_FUNC_INFO << "enter" << action << id;
+  QSettings settings;
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Bookmark");
+  QString key = settings.value("Jump","Ctrl+J").toString();
+
+  QString ks = QString("jump-%1").arg(id);
+
+  QShortcut * sc = qobject_cast<QShortcut *>(m_bookmarkMap->mapping(ks));
+  if (sc) {
+    Place p = m_bookmarks.value(id);
+    QAction * action = new QAction(p.getText(),this);
+    action->setShortcut(sc->key());
+    m_bookmarkMenu->addAction(action);
+  }
+  else {
+    qDebug() << Q_FUNC_INFO << "fetch mapping failed " << m_bookmarkMap->mapping(id) << id;
+  }
+  //  connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+  //  m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i)));
+
 }
 void LanesLexicon::bookmarkJump(const QString & id) {
   if ( ! m_bookmarks.contains(id) ) {
@@ -1237,6 +1274,7 @@ void LanesLexicon::bookmarkJump(const QString & id) {
   Place cp = this->getCurrentPlace();
   cp.setType(Place::Bookmark);
   m_bookmarks.insert("-here-",cp);
+  /// TODO add to menu
   showPlace(p,false);
 }
 void LanesLexicon::restoreBookmarks() {
@@ -1250,7 +1288,7 @@ void LanesLexicon::restoreBookmarks() {
     Place p = Place::fromString(t);
     if (p.isValid()) {
       m_bookmarks.insert(keys[i],p);
-      qDebug() << "restore" << keys[i] << t;
+      /// TODO add to menu
     }
     else {
       qDebug() << "invalid place" << keys[i] << t;
@@ -1346,6 +1384,6 @@ void LanesLexicon::bookmarkList() {
 void LanesLexicon::bookmarkRevert() {
   bookmarkShortcut("revert");
 }
-void LanesLexicon::bookmarkRebuildMenu(QAction * action) {
+void LanesLexicon::bookmarkRebuildMenu() {
   qDebug() << Q_FUNC_INFO;
 }
