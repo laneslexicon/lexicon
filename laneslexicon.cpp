@@ -1239,24 +1239,20 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
  */
 void LanesLexicon::addBookmarkMenuItem(const QString & action,const QString & id) {
   qDebug() << Q_FUNC_INFO << "enter" << action << id;
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Bookmark");
-  QString key = settings.value("Jump","Ctrl+J").toString();
 
   QString ks = QString("jump-%1").arg(id);
-
   QShortcut * sc = qobject_cast<QShortcut *>(m_bookmarkMap->mapping(ks));
   if (sc) {
     Place p = m_bookmarks.value(id);
-    QAction * action = new QAction(p.getText(),this);
+    QAction * action = m_bookmarkMenu->addAction(p.getText());
     action->setShortcut(sc->key());
-    m_bookmarkMenu->addAction(action);
+    action->setShortcutContext(Qt::ApplicationShortcut);
+    connect(action,SIGNAL(triggered()),sc,SIGNAL(activated()));
   }
   else {
     qDebug() << Q_FUNC_INFO << "fetch mapping failed " << m_bookmarkMap->mapping(id) << id;
   }
-  //  connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+  //  connect(m_bookmarkMap,SIGNAL(mapped(QString())triggered()),m_bookmarkMap,SLOT(map()));
   //  m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i)));
 
 }
