@@ -563,7 +563,7 @@ void LanesLexicon::createMenus() {
   m_fileMenu->addAction(m_exitAction);
   m_fileMenu->setObjectName("filemenu");
 
-  m_bookmarkMenu = m_mainmenu->addMenu(tr("Bookmark"));
+  m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmark"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
 
   m_bookmarkMenu->addAction(m_bookmarkListAction);
@@ -1239,7 +1239,9 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
  */
 void LanesLexicon::addBookmarkMenuItem(const QString & id) {
   qDebug() << Q_FUNC_INFO << "enter"  << id;
-
+  if (id == "-here-") {
+    return;
+  }
   QString ks = QString("jump-%1").arg(id);
   QShortcut * sc = qobject_cast<QShortcut *>(m_bookmarkMap->mapping(ks));
   if (sc) {
