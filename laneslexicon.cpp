@@ -903,7 +903,7 @@ void LanesLexicon::writeSettings() {
   }
   if (m_saveBookmarks) {
     settings.beginGroup("Bookmarks");
-    //    settings.remove("");
+    settings.remove("");
     QStringList keys = m_bookmarks.keys();
     for(int i=0;i < keys.size();i++) {
       Place p = m_bookmarks.value(keys[i]);
@@ -1228,7 +1228,6 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
   p.setType(Place::Bookmark);
   m_bookmarks.insert(id,p);
   addBookmarkMenuItem(id);
-  qDebug() << "bookmarks" << m_bookmarks.keys();
 }
 /**
  * we've added a bookmark so we need to add the jump-<id> shortcut to the
@@ -1238,7 +1237,6 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
  * @param id
  */
 void LanesLexicon::addBookmarkMenuItem(const QString & id) {
-  qDebug() << Q_FUNC_INFO << "enter"  << id;
   if (id == "-here-") {
     return;
   }
@@ -1264,7 +1262,7 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
     connect(action,SIGNAL(triggered()),sc,SIGNAL(activated()));
   }
   else {
-    qDebug() << Q_FUNC_INFO << "fetch mapping failed " << m_bookmarkMap->mapping(id) << id;
+    QLOG_DEBUG() << Q_FUNC_INFO << "fetch mapping failed " << m_bookmarkMap->mapping(id) << id;
   }
   //  connect(m_bookmarkMap,SIGNAL(mapped(QString())triggered()),m_bookmarkMap,SLOT(map()));
   //  m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i)));
@@ -1284,7 +1282,6 @@ void LanesLexicon::bookmarkJump(const QString & id) {
   Place cp = this->getCurrentPlace();
   cp.setType(Place::Bookmark);
   m_bookmarks.insert("-here-",cp);
-  /// TODO add to menu
   showPlace(p,false);
 }
 void LanesLexicon::restoreBookmarks() {
@@ -1292,17 +1289,12 @@ void LanesLexicon::restoreBookmarks() {
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Bookmarks");
   QStringList keys = settings.childKeys();
-  qDebug() << "restore bookmarks" << keys;
   for(int i=0;i < keys.size();i++) {
     QString t = settings.value(keys[i]).toString();
     Place p = Place::fromString(t);
     if (p.isValid()) {
       m_bookmarks.insert(keys[i],p);
       addBookmarkMenuItem(keys[i]);
-      /// TODO add to menu
-    }
-    else {
-      qDebug() << "invalid place" << keys[i] << t;
     }
   }
 }
