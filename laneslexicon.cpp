@@ -570,7 +570,7 @@ void LanesLexicon::createMenus() {
   m_bookmarkMenu->addAction(m_bookmarkClearAction);
   m_bookmarkMenu->addAction(m_bookmarkRevertAction);
   m_bookmarkMenu->addAction(m_bookmarkAddAction);
-  m_bookmarkMenu->addAction(m_bookmarkJumpAction);
+  //  m_bookmarkMenu->addAction(m_bookmarkJumpAction);
 
   connect(m_mainmenu,SIGNAL(rebuildBookmarks()),this,SLOT(bookmarkRebuildMenu()));
 }
@@ -1200,7 +1200,7 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
   }
   if (key == "clear") {
     /// TODO warning dialog ?
-    m_bookmarks.clear();
+    bookmarkClear();
     /// TODO clear menu
     return;
   }
@@ -1227,7 +1227,7 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
   }
   p.setType(Place::Bookmark);
   m_bookmarks.insert(id,p);
-  addBookmarkMenuItem(key,id);
+  addBookmarkMenuItem(id);
   qDebug() << "bookmarks" << m_bookmarks.keys();
 }
 /**
@@ -1237,16 +1237,28 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
  * @param action
  * @param id
  */
-void LanesLexicon::addBookmarkMenuItem(const QString & action,const QString & id) {
-  qDebug() << Q_FUNC_INFO << "enter" << action << id;
+void LanesLexicon::addBookmarkMenuItem(const QString & id) {
+  qDebug() << Q_FUNC_INFO << "enter"  << id;
 
   QString ks = QString("jump-%1").arg(id);
   QShortcut * sc = qobject_cast<QShortcut *>(m_bookmarkMap->mapping(ks));
   if (sc) {
+    QList<QAction *> actions  = m_bookmarkMenu->actions();
+    int ix = -1;
+    for(int i=0;i < actions.size();i++) {
+      if (actions[i]->shortcut() == sc->key()) {
+        qDebug() << "action match" << i;
+        ix = i;
+      }
+    }
+    if (ix != -1) {
+      qDebug() << "removing action" << ix;
+      m_bookmarkMenu->removeAction(actions[ix]);
+    }
     Place p = m_bookmarks.value(id);
     QAction * action = m_bookmarkMenu->addAction(p.getText());
     action->setShortcut(sc->key());
-    action->setShortcutContext(Qt::ApplicationShortcut);
+    action->setShortcutContext(Qt::WidgetShortcut);
     connect(action,SIGNAL(triggered()),sc,SIGNAL(activated()));
   }
   else {
@@ -1284,6 +1296,7 @@ void LanesLexicon::restoreBookmarks() {
     Place p = Place::fromString(t);
     if (p.isValid()) {
       m_bookmarks.insert(keys[i],p);
+      addBookmarkMenuItem(keys[i]);
       /// TODO add to menu
     }
     else {
@@ -1328,6 +1341,8 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkMap->setMapping(sc,QString("list"));
   m_bookmarkListAction = new QAction(tr("List"),this);
   m_bookmarkListAction->setShortcut(sc->key());
+  m_bookmarkListAction->setShortcutContext(Qt::WidgetShortcut);
+  connect(m_bookmarkListAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
 
   key = settings.value("Revert","Ctrl+B,Ctrl+R").toString();
   sc = new QShortcut(key,this);
@@ -1335,6 +1350,8 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkMap->setMapping(sc,QString("revert"));
   m_bookmarkRevertAction = new QAction(tr("Revert"),this);
   m_bookmarkRevertAction->setShortcut(sc->key());
+  m_bookmarkRevertAction->setShortcutContext(Qt::WidgetShortcut);
+  connect(m_bookmarkRevertAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
 
   key = settings.value("Clear","Ctrl+B,Ctrl+C").toString();
   sc = new QShortcut(key,this);
@@ -1342,14 +1359,11 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkMap->setMapping(sc,QString("clear"));
   m_bookmarkClearAction = new QAction(tr("Clear"),this);
   m_bookmarkClearAction->setShortcut(sc->key());
-
+  m_bookmarkClearAction->setShortcutContext(Qt::WidgetShortcut);
+  connect(m_bookmarkClearAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
   connect(m_bookmarkMap,SIGNAL(mapped(QString)),this,SLOT(bookmarkShortcut(const QString &)));
 
   connect(m_bookmarkAddAction,SIGNAL(triggered()),this,SLOT(bookmarkAdd()));
-  connect(m_bookmarkJumpAction,SIGNAL(triggered()),this,SLOT(bookmarkJump()));
-  connect(m_bookmarkClearAction,SIGNAL(triggered()),this,SLOT(bookmarkClear()));
-  connect(m_bookmarkListAction,SIGNAL(triggered()),this,SLOT(bookmarkList()));
-  connect(m_bookmarkRevertAction,SIGNAL(triggered()),this,SLOT(bookmarkRevert()));
 
 }
 
@@ -1362,6 +1376,7 @@ void LanesLexicon::bookmarkAdd() {
     bookmarkShortcut("add-" + text);
 
 }
+/*
 void LanesLexicon::bookmarkJump() {
   bool ok;
   QString text = QInputDialog::getText(this, tr("Bookmark Jump"),
@@ -1370,15 +1385,31 @@ void LanesLexicon::bookmarkJump() {
   if (ok && !text.isEmpty())
     bookmarkShortcut("jump-" + text);
 }
-
+*/
+/**
+ * remove the menu items and then clear the map
+ *
+ */
 void LanesLexicon::bookmarkClear() {
-  bookmarkShortcut("clear");
-}
-void LanesLexicon::bookmarkList() {
-  bookmarkShortcut("list");
-}
-void LanesLexicon::bookmarkRevert() {
-  bookmarkShortcut("revert");
+  QStringList keys = m_bookmarks.keys();
+  for(int i=0;i < keys.size();i++) {
+    QString ks = QString("jump-%1").arg(keys[i]);
+    QShortcut * sc = qobject_cast<QShortcut *>(m_bookmarkMap->mapping(ks));
+    if (sc) {
+      QList<QAction *> actions  = m_bookmarkMenu->actions();
+      int ix = -1;
+      for(int j=0;j < actions.size();j++) {
+        if (actions[j]->shortcut() == sc->key()) {
+          ix = j;
+          j = actions.size();
+        }
+      }
+      if (ix != -1) {
+        m_bookmarkMenu->removeAction(actions[ix]);
+      }
+    }
+  }
+  m_bookmarks.clear();
 }
 void LanesLexicon::bookmarkRebuildMenu() {
   qDebug() << Q_FUNC_INFO;

@@ -105,10 +105,10 @@ public:
 
     void bookmarkShortcut(const QString &);
     void bookmarkAdd();
-    void bookmarkJump();
-    void bookmarkClear();
-    void bookmarkList();
-    void bookmarkRevert();
+
+
+
+
     void bookmarkRebuildMenu();
 
 private:
@@ -156,7 +156,8 @@ private:
     QAction * m_bookmarkClearAction;
     QAction * m_bookmarkRevertAction;
     QMenu   * m_bookmarkMenu;
-    void addBookmarkMenuItem(const QString & action,const QString &);
+    void addBookmarkMenuItem(const QString & id);
+    void bookmarkClear();
     AppMenu * m_mainmenu;
 
     void setupShortcuts();
