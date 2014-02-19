@@ -32,11 +32,14 @@ void EntryItem::searchItem() {
   qDebug() << Q_FUNC_INFO;
 }
 void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
-  QLOG_DEBUG() << "hoverEnter" << this->getPlace().getText();
-  QGraphicsTextItem::hoverEnterEvent(event);
+  QLOG_DEBUG() << Q_FUNC_INFO << this->getPlace().getText();
+  //  QGraphicsTextItem::hoverEnterEvent(event);
+  scene()->setFocusItem(this);
+  //  focusItem();
 }
 void EntryItem::focusInEvent(QFocusEvent * event) {
-  //  QLOG_DEBUG() << "focusIn" << this->getPlace().getText();
+  QLOG_DEBUG() << Q_FUNC_INFO << this->getPlace().getText();
+  emit(placeChanged(this->getPlace()));
   QGraphicsTextItem::focusInEvent(event);
 }
 void EntryItem::copy() {

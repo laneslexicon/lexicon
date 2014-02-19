@@ -756,6 +756,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
     connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
     connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
+    connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
     return gi;
 }
 /**
@@ -1018,4 +1019,7 @@ void GraphicsEntry::showPerseus(const Place & p) {
   QMessageBox msgBox;
   msgBox.setText(xml);
   msgBox.exec();
+}
+void GraphicsEntry::updateCurrentPlace(const Place & p) {
+  m_place = p;
 }

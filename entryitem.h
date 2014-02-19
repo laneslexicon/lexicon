@@ -68,6 +68,7 @@ class EntryItem : public QGraphicsTextItem {
     void copy();
  signals:
     void showPerseus(const Place &);
+    void placeChanged(const Place &);
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);

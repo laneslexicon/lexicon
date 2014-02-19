@@ -75,6 +75,7 @@ class GraphicsEntry : public QWidget {
     void nextPageRequested();
     void prevPageRequested();
     void showPerseus(const Place &);
+    void updateCurrentPlace(const Place &);
  private:
     QColor m_supplementBg;
     bool prepareQueries();
