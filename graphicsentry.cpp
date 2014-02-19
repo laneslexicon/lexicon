@@ -174,7 +174,8 @@ void GraphicsEntry::moveFocusDown() {
     int m = m_items.size() - 1;
     for(int i=0;i < m ;i++) {
       if (m_items[i] == item) {
-        m_view->centerOn(m_items[i+1]);
+        //        m_view->centerOn(m_items[i+1]);
+        m_view->ensureVisible(m_items[i+1]);
         m_scene->setFocusItem(m_items[i+1]);
         //        qDebug() << "focus moved from" << m_items[i]->getPlace().getText();
         //        qDebug() << "focus moved to  " << m_items[i + 1]->getPlace().getText();
@@ -189,7 +190,8 @@ void GraphicsEntry::moveFocusUp() {
     int m = m_items.size();
     for(int i=1;i < m ;i++) {
       if (m_items[i] == item) {
-        m_view->centerOn(m_items[i-1]);
+        //        m_view->centerOn(m_items[i-1]);
+        m_view->ensureVisible(m_items[i-1]);
         m_scene->setFocusItem(m_items[i-1]);
         //        qDebug() << "focus moved from" << m_items[i]->getPlace().getText();
         //        qDebug() << "focus moved to  " << m_items[i - 1]->getPlace().getText();
