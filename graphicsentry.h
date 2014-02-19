@@ -114,7 +114,6 @@ class GraphicsEntry : public QWidget {
     void onClearScene();
     void nextPageRequested();
     void prevPageRequested();
-    void nodeChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void showPerseus(const Place &);
  private:
     QColor m_supplementBg;

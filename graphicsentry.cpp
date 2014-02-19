@@ -196,8 +196,6 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   connect(m_view,SIGNAL(backPage()),this,SLOT(prevPageRequested()));
 
 
-  connect(this,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
-          this,SLOT(nodeChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
   m_view->setInteractive(true);
   m_item = new QGraphicsTextItem("");
@@ -1127,19 +1125,6 @@ void GraphicsEntry::highlight(const QString & target) {
       }
     }
     m_items[ix]->setTextCursor(cursor);
-  }
-}
-void GraphicsEntry::nodeChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason /* reason */) {
-
-  EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
-  if (item) {
-    QString node = item->getNode();
-    QString word = item->getWord();
-    QString root = item->getRoot();
-
-    //    m_showPlace->setNode(node);
-    //    m_showPlace->setWord(word);
-    //    m_showPlace->setRoot(root);
   }
 }
 void GraphicsEntry::showPerseus(const Place & p) {

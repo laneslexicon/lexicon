@@ -660,9 +660,6 @@ Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) 
         p.setNode(node);
         w->hasPlace(p,GraphicsEntry::NodeSearch,true);
       }
-      //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
-      //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
-
     }
   }
   else {
@@ -715,9 +712,6 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
       m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
       np = w->getXmlForRoot(p);
       /// TODO decide whether to make new tab the current tab
-      //      connect(w,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
-      //              this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
-
     }
     else {
       return p;
@@ -750,9 +744,12 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
  * @param reason
  */
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
-
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
   if (item) {
+    Place p = item->getPlace();
+    statusBar()->showMessage(p.getText());
+    qDebug() << Q_FUNC_INFO << p.getText();
+    /*
     m_pwidget->setPlace(item->getPlace());
     QString node = item->getNode();
     QString word = item->getWord();
@@ -766,6 +763,7 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * ol
         emit(nodeActivated(item->getNode(),item->getWord()));
       }
     }
+    */
   }
 
 }
@@ -1247,12 +1245,11 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
     int ix = -1;
     for(int i=0;i < actions.size();i++) {
       if (actions[i]->shortcut() == sc->key()) {
-        qDebug() << "action match" << i;
         ix = i;
+        i = actions.size();
       }
     }
     if (ix != -1) {
-      qDebug() << "removing action" << ix;
       m_bookmarkMenu->removeAction(actions[ix]);
     }
     Place p = m_bookmarks.value(id);
