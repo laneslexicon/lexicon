@@ -40,6 +40,7 @@ SOURCES += main.cpp\
         contentswidget.cpp \
         bookmarkwidget.cpp \
         graphicsentry.cpp \
+        entryitem.cpp \
         xsltsupport.cpp \
         searchwidget.cpp \
         noteswidget.cpp \
@@ -54,6 +55,7 @@ HEADERS  += laneslexicon.h \
             contentswidget.h \
             bookmarkwidget.h \
             graphicsentry.h \
+            entryitem.h \
             xsltsupport.h \
             searchwidget.h \
             noteswidget.h \

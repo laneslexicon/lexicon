@@ -38,47 +38,7 @@
 #include "history.h"
 #include "place.h"
 #include "placewidget.h"
-//#include "laneslexicon.h"
-
-class EntryItem : public QGraphicsTextItem {
-  Q_OBJECT
-
- public:
-  EntryItem(const QString &, QGraphicsItem * parent = 0);
-  EntryItem(QGraphicsItem * parent = 0);
-  void setNode(const QString & id);
-  void setRoot(const QString & root,bool isRootEntry = false);
-  void setWord(const QString & word);
-  void setSupplement(int v);
-  void setPage(int x);
-  void setPlace(const Place &);
-  void setBackground(QColor & c) { m_backgroundColor = c;}
-  Place getPlace();
-  QString getNode() { return m_place.getNode();}
-  QString getRoot() { return m_place.getRoot();}
-  QString getWord() { return m_place.getWord();}
-  bool isRoot() { return m_place.isRoot();}
-  int getSupplement() { return m_place.getSupplement();}
-  int getPage() { return m_place.getPage();}
-  QString getOutputHTML() { return m_html; }
-  void setOutputHTML(const QString & html) { m_html = html;}
-  QTextCursor highlight(const QString &);
-  QTextCursor highlightRx(const QString &);
-  public slots:
-    void searchItem();
-    void copy();
- signals:
-    void showPerseus(const Place &);
- protected:
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
-  void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
-  void focusInEvent(QFocusEvent *);
-  void paint( QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-  QColor m_backgroundColor;
-  private:
-  Place m_place;
-  QString m_html;    /// saves the generated HTML for debug, only set when dumpOutputHTM is true
-};
+#include "entryitem.h"
 class LaneGraphicsView;
 class GraphicsEntry : public QWidget {
   Q_OBJECT
