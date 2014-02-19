@@ -92,6 +92,12 @@ class GraphicsEntry : public QWidget {
     bool m_dumpOutputHTML;
     void appendEntries(int);
     void prependEntries(int);
+
+    QString m_moveFocusUpKey;
+    QString m_moveFocusDownKey;
+    QString m_zoomInKey;
+    QString m_zoomOutKey;
+
     QList<EntryItem *> m_items;
     EntryItem * createEntry(const QString & xml);
     //    const XalanCompiledStylesheet * m_compiledXsl;
@@ -105,8 +111,8 @@ class GraphicsEntry : public QWidget {
     QTextOption m_textOption;
 #
     QPushButton * m_clearSceneBtn;
-    QPushButton * m_zoomIn;
-    QPushButton * m_zoomOut;
+    QPushButton * m_zoomInBtn;
+    QPushButton * m_zoomOutBtn;
 
 
     LaneGraphicsView * m_view;

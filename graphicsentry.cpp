@@ -29,7 +29,7 @@ void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
   */
 }
 void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
-  //  QLOG_DEBUG() << "got key";
+  //  QLOG_DEBUG() << Q_FUNC_INFO << "got key" << event->modifiers() << event->key();
   QGraphicsView::keyPressEvent(event);
 }
 GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
@@ -43,19 +43,20 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_scale = 1.0;
 
   QHBoxLayout * btnslayout = new QHBoxLayout;
-  m_zoomIn = new QPushButton(QIcon("./images/zoom-in-32.png"),tr(""));
-  m_zoomIn->setToolTip(tr("Zoom in"));
-  m_zoomOut = new QPushButton(QIcon("./images/zoom-out-32.png"),tr(""));
-  m_zoomOut->setToolTip(tr("Zoom out"));
+  /// TODO from settings
+  m_zoomInBtn = new QPushButton(QIcon("./images/zoom-in-32.png"),tr(""));
+  m_zoomInBtn->setToolTip(tr("Zoom in"));
+  m_zoomOutBtn = new QPushButton(QIcon("./images/zoom-out-32.png"),tr(""));
+  m_zoomOutBtn->setToolTip(tr("Zoom out"));
   m_clearSceneBtn = new QPushButton(QIcon("./images/32/cleaning-erase-eraser-icone-4970-32.png"),tr("Clear"));
   m_clearSceneBtn->setToolTip("Clear contents");
-  btnslayout->addWidget(m_zoomIn);
-  btnslayout->addWidget(m_zoomOut);
+  btnslayout->addWidget(m_zoomInBtn);
+  btnslayout->addWidget(m_zoomOutBtn);
   btnslayout->addWidget(m_clearSceneBtn);
   layout->addLayout(btnslayout);
 
-  connect(m_zoomIn,SIGNAL(clicked()),this,SLOT(onZoomIn()));
-  connect(m_zoomOut,SIGNAL(clicked()),this,SLOT(onZoomOut()));
+  connect(m_zoomInBtn,SIGNAL(clicked()),this,SLOT(onZoomIn()));
+  connect(m_zoomOutBtn,SIGNAL(clicked()),this,SLOT(onZoomOut()));
   connect(m_clearSceneBtn,SIGNAL(clicked()),this,SLOT(onClearScene()));
 
 
@@ -123,6 +124,13 @@ void GraphicsEntry::readSettings() {
     m_supplementBg = QColor::fromRgb(255,255,255);
   }
   m_clearScene = settings.value("Clear",true).toBool();
+
+  m_moveFocusUpKey = settings.value("Move focus up",QString("w")).toString();
+  m_moveFocusDownKey = settings.value("Move focus down",QString("s")).toString();
+  m_zoomInKey = settings.value("Zoom in",QString("+")).toString();
+  m_zoomOutKey = settings.value("Zoom out",QString("-")).toString();
+
+  qDebug() << "Focus up" << m_moveFocusUpKey  << "down" << m_moveFocusDownKey;
   settings.endGroup();
 
   settings.beginGroup("Debug");
@@ -140,18 +148,23 @@ void GraphicsEntry::writeDefaultSettings() {
   settings.setValue("Clear",true);
   settings.setValue("Margin",0);
   settings.setValue("Supplement Background Color","rgb(255,254,253)");
+
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
-  switch(event->key()) {
-  case Qt::Key_Plus: {
+  qDebug() << Q_FUNC_INFO << event->modifiers() << event->key();
+  if (event->text() == m_zoomInKey) {
     onZoomIn();
-    break;
   }
-  case Qt::Key_Minus: {
+  else if (event->text() == m_zoomOutKey) {
     onZoomOut();
-    break;
   }
-  default:
+  else if (event->text() ==  m_moveFocusDownKey)  {
+    qDebug() << "move focus down";
+  }
+  else if (event->text() ==  m_moveFocusUpKey) {
+    qDebug() << "move focus up";
+  }
+  else {
     QWidget::keyPressEvent(event);
   }
 
@@ -197,8 +210,8 @@ void GraphicsEntry::linkHovered(const QString & link) {
   }
   else {
     gi->setCursor(QCursor(Qt::PointingHandCursor));
-    QLOG_DEBUG() << "Link hovered" << link;
-    QLOG_DEBUG() << QApplication::keyboardModifiers();
+    //    QLOG_DEBUG() << "Link hovered" << link;
+    //    QLOG_DEBUG() << QApplication::keyboardModifiers();
   }
 }
 /**
