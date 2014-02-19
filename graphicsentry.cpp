@@ -124,13 +124,12 @@ void GraphicsEntry::readSettings() {
     m_supplementBg = QColor::fromRgb(255,255,255);
   }
   m_clearScene = settings.value("Clear",true).toBool();
-
-  m_moveFocusUpKey = settings.value("Move focus up",QString("w")).toString();
-  m_moveFocusDownKey = settings.value("Move focus down",QString("s")).toString();
+  /// these are set to empty to disable the feature
+  m_moveFocusUpKey = settings.value("Move focus up",QString()).toString();
+  m_moveFocusDownKey = settings.value("Move focus down",QString()).toString();
   m_zoomInKey = settings.value("Zoom in",QString("+")).toString();
   m_zoomOutKey = settings.value("Zoom out",QString("-")).toString();
 
-  qDebug() << "Focus up" << m_moveFocusUpKey  << "down" << m_moveFocusDownKey;
   settings.endGroup();
 
   settings.beginGroup("Debug");
@@ -151,7 +150,7 @@ void GraphicsEntry::writeDefaultSettings() {
 
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
-  qDebug() << Q_FUNC_INFO << event->modifiers() << event->key();
+  //  qDebug() << Q_FUNC_INFO << event->modifiers() << event->key();
   if (event->text() == m_zoomInKey) {
     onZoomIn();
   }
@@ -159,15 +158,45 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
     onZoomOut();
   }
   else if (event->text() ==  m_moveFocusDownKey)  {
-    qDebug() << "move focus down";
+    moveFocusDown();
   }
   else if (event->text() ==  m_moveFocusUpKey) {
-    qDebug() << "move focus up";
+    moveFocusUp();
   }
   else {
     QWidget::keyPressEvent(event);
   }
 
+}
+void GraphicsEntry::moveFocusDown() {
+  EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
+  if (item) {
+    int m = m_items.size() - 1;
+    for(int i=0;i < m ;i++) {
+      if (m_items[i] == item) {
+        m_view->centerOn(m_items[i+1]);
+        m_scene->setFocusItem(m_items[i+1]);
+        //        qDebug() << "focus moved from" << m_items[i]->getPlace().getText();
+        //        qDebug() << "focus moved to  " << m_items[i + 1]->getPlace().getText();
+        return;
+      }
+    }
+  }
+}
+void GraphicsEntry::moveFocusUp() {
+  EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
+  if (item) {
+    int m = m_items.size();
+    for(int i=1;i < m ;i++) {
+      if (m_items[i] == item) {
+        m_view->centerOn(m_items[i-1]);
+        m_scene->setFocusItem(m_items[i-1]);
+        //        qDebug() << "focus moved from" << m_items[i]->getPlace().getText();
+        //        qDebug() << "focus moved to  " << m_items[i - 1]->getPlace().getText();
+        return;
+      }
+    }
+  }
 }
 void GraphicsEntry::focusInEvent(QFocusEvent * event) {
   QLOG_DEBUG() << "Got input focus";

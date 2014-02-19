@@ -95,6 +95,8 @@ class GraphicsEntry : public QWidget {
 
     QString m_moveFocusUpKey;
     QString m_moveFocusDownKey;
+    void moveFocusUp();
+    void moveFocusDown();
     QString m_zoomInKey;
     QString m_zoomOutKey;
 
