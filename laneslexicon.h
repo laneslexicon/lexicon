@@ -105,6 +105,7 @@ public:
 
     void bookmarkShortcut(const QString &);
     void bookmarkAdd();
+    void bookmarkAdd(const QString & id,const Place & p);
 
 
 

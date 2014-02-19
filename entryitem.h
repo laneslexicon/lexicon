@@ -69,6 +69,7 @@ class EntryItem : public QGraphicsTextItem {
  signals:
     void showPerseus(const Place &);
     void placeChanged(const Place &);
+    void bookmarkAdd(const QString & id,const Place & p);
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);

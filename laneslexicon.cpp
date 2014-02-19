@@ -165,7 +165,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(prevRoot(const QString &)),this,SLOT(findPrevRoot(const QString &)));
   connect(entry,SIGNAL(historyPositionChanged(int)),this,SLOT(historyPositionChanged(int)));
   connect(entry,SIGNAL(historyAddition()),this,SLOT(historyAddition()));
-
+  connect(entry,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SLOT(bookmarkAdd(const QString &,const Place &)));
   //  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
 
   connect(entry,SIGNAL(placeChanged(const Place &)),this,SLOT(placeChanged (const Place &)));
@@ -1409,4 +1409,10 @@ void LanesLexicon::bookmarkClear() {
 }
 void LanesLexicon::bookmarkRebuildMenu() {
   qDebug() << Q_FUNC_INFO;
+}
+void LanesLexicon::bookmarkAdd(const QString & id,const Place & p) {
+  //  p.setType(Place::Bookmark);
+  m_bookmarks.insert(id,p);
+  addBookmarkMenuItem(id);
+
 }

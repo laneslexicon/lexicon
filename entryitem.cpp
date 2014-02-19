@@ -23,6 +23,16 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   if (selectedAction == perseusAction) {
     emit(showPerseus(p));
   }
+  else if (selectedAction == markAction) {
+    bool ok;
+    QString text = QInputDialog::getText(0, tr("Bookmark Add)"),
+                                         tr("Bookmark ID:"), QLineEdit::Normal,
+                                         QString(), &ok);
+    if (ok && !text.isEmpty()) {
+      emit(bookmarkAdd(text,p));
+    }
+
+  }
 }
 void EntryItem::setPlace(const Place & p) {
  m_place = p;
@@ -32,13 +42,12 @@ void EntryItem::searchItem() {
   qDebug() << Q_FUNC_INFO;
 }
 void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
-  QLOG_DEBUG() << Q_FUNC_INFO << this->getPlace().getText();
   //  QGraphicsTextItem::hoverEnterEvent(event);
   scene()->setFocusItem(this);
-  //  focusItem();
 }
 void EntryItem::focusInEvent(QFocusEvent * event) {
-  QLOG_DEBUG() << Q_FUNC_INFO << this->getPlace().getText();
+  //  QLOG_DEBUG() << Q_FUNC_INFO << this->getPlace().getText();
+  /// this updates m_place in graphicsentry so the current node is saved on exit
   emit(placeChanged(this->getPlace()));
   QGraphicsTextItem::focusInEvent(event);
 }

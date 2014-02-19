@@ -149,6 +149,7 @@ class GraphicsEntry : public QWidget {
     void placeChanged(const Place &);
     void historyPositionChanged(int);
     void historyAddition();
+    void bookmarkAdd(const QString & id,const Place &);
 };
 
 class LaneGraphicsView : public QGraphicsView {
