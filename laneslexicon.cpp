@@ -374,8 +374,6 @@ void LanesLexicon::setupShortcuts() {
       QString k = settings.value(keys[i]).toString();
       QShortcut * sc = new QShortcut(k,this);
       connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
-      /// doesn't seem to be emitted
-      connect(sc,SIGNAL(activatedAmbiguously()),this,SLOT(ambiguousShortcut()));
       /// use the setting name as the shortcut 'name'
       m_signalMapper->setMapping(sc,keys[i]);
     }
@@ -960,7 +958,6 @@ HistoryMaster * LanesLexicon::history() {
  */
 void LanesLexicon::findNextRoot(const QString & root) {
   GraphicsEntry * entry = dynamic_cast<GraphicsEntry *>(QObject::sender());
-  qDebug() << Q_FUNC_INFO  << root;
   QString nroot = m_tree->findNextRoot(root);
   if (entry && ! nroot.isEmpty()) {
     entry->setPagingForward();
@@ -969,7 +966,6 @@ void LanesLexicon::findNextRoot(const QString & root) {
 }
 void LanesLexicon::findPrevRoot(const QString & root) {
   GraphicsEntry * entry = dynamic_cast<GraphicsEntry *>(QObject::sender());
-  qDebug() << Q_FUNC_INFO  << root;
   QString nroot = m_tree->findPrevRoot(root);
   if (entry && ! nroot.isEmpty()) {
     entry->setPagingBackward();
@@ -985,11 +981,8 @@ void LanesLexicon::findPrevRoot(const QString & root) {
  *
  */
 void LanesLexicon::on_actionNextRoot() {
-  qDebug() << Q_FUNC_INFO;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    //    QString root =  entry->currentRoot();
-    //    QString nroot = m_tree->findNextRoot(root);
     Place p  =  entry->getPlace();
     Place np = m_tree->findNextPlace(p);
     if (! np.isEmpty()) {
@@ -1008,8 +1001,6 @@ void LanesLexicon::on_actionNextRoot() {
 void LanesLexicon::on_actionPrevRoot() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    //    QString root =  entry->currentRoot();
-    //    QString nroot = m_tree->findPrevRoot(root);
     Place p  =  entry->getPlace();
     Place np = m_tree->findPrevPlace(p);
     if (! np.isEmpty()) {
@@ -1041,7 +1032,6 @@ void LanesLexicon::rootChanged(const QString & root,const QString & node) {
   m_tree->ensureVisible(root,true);
 }
 void LanesLexicon::placeChanged(const Place & p) {
-  qDebug() << Q_FUNC_INFO << p.getRoot();
   m_tree->ensurePlaceVisible(p,true);
 }
 void LanesLexicon::getFirstAndLast() {
@@ -1064,19 +1054,8 @@ void LanesLexicon::getFirstAndLast() {
     m_lastRoot = query.value(0).toString();
     m_lastPage = query.value(1).toInt();
   }
-  qDebug() << "First" << m_firstRoot << "last" << m_lastRoot;
-  qDebug() << "First page" << m_firstPage << "last page" << m_lastPage;
-}
-void LanesLexicon::shortcutActivated() {
-  QShortcut * sc = qobject_cast<QShortcut *>(QObject::sender());
-  qDebug() << "got the fucking shortcut" << sc->key().toString();
-}
-void LanesLexicon::ambiguousShortcut() {
-  QShortcut * sc = qobject_cast<QShortcut *>(QObject::sender());
-  qDebug() << "got the ambiguous shortcut" << sc->key().toString();
 }
 void LanesLexicon::onGoToPage(int page) {
-  qDebug() << Q_FUNC_INFO;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->setPagingForward();
@@ -1129,9 +1108,6 @@ void LanesLexicon::on_actionLastPage() {
     entry->getPage(m_lastPage);
     //        m_tree->ensurePlaceVisible(np,true);
   }
-}
-bool LanesLexicon::sanityCheck() {
-  /// TODO check database exists and entry stylesheet
 }
 /**
  * Converts supplied param to Arabic using the default map

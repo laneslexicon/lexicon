@@ -99,9 +99,6 @@ public:
     void placeChanged(const Place &);
     void historyPositionChanged(int);
     void historyAddition();
-    // shortcuts
-    void shortcutActivated();
-    void ambiguousShortcut();
 
     void bookmarkShortcut(const QString &);
     void bookmarkAdd();
@@ -172,7 +169,7 @@ private:
     void createStatusBar();
     bool eventFilter(QObject * target, QEvent *);
     bool openDatabase(const QString &);
-    bool sanityCheck();
+
 
     Place m_place;
     Place getCurrentPlace();
