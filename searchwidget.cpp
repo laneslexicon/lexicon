@@ -76,8 +76,8 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   setWindowTitle(tr("Search for node"));
   QVBoxLayout * layout = new QVBoxLayout;
-  m_edit = new WrappedEdit;
-  m_edit->setSz(QSize(300,30));
+  m_edit = new QLineEdit;
+
   m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                      | QDialogButtonBox::Cancel);
 
@@ -93,7 +93,7 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setLayout(layout);
 }
 QString NodeSearchDialog::getText() {
-  return m_edit->editor()->toPlainText().trimmed();
+  return m_edit->text();
 }
 /**
  *

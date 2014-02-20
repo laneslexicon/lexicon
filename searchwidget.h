@@ -40,7 +40,7 @@ class NodeSearchDialog : public QDialog {
   NodeSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   QString getText();
  private:
-  WrappedEdit * m_edit;
+  QLineEdit * m_edit;
   QDialogButtonBox * m_buttonBox;
 };
 class WordSearchDialog : public QDialog {
