@@ -93,7 +93,11 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setLayout(layout);
 }
 QString NodeSearchDialog::getText() {
-  return m_edit->text();
+  QString t = m_edit->text();
+  if (! t.startsWith("n")) {
+    t = "n" + t;
+  }
+  return t;
 }
 /**
  *
