@@ -368,8 +368,6 @@ void LanesLexicon::setupShortcuts() {
         QString ks = QString("%1,%2").arg(settings.value(keys[i]).toString()).arg(j);
         QShortcut * sc = new QShortcut(ks,this);
         connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
-        /// doesn't seem to be emitted
-        connect(sc,SIGNAL(activatedAmbiguously()),this,SLOT(ambiguousShortcut()));
         m_signalMapper->setMapping(sc,QString("%1-%2").arg(keys[i]).arg(j));
       }
     }
