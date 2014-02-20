@@ -720,7 +720,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (w->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
       np = w->getXmlForRoot(p);
-      m_tabs->setTabText(currentTab,root);
+      m_tabs->setTabText(currentTab,np.getRoot());
       // this works but sets it for all tabs
       //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
       // this sets it for all the items in graphicsentry
