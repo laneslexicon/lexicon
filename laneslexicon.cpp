@@ -213,7 +213,10 @@ void LanesLexicon::shortcut(const QString & k) {
       if (! t.isEmpty()) {
         /// TODO make this an option to always show root
         /// show only node
-        Place p = showNode(t,true);
+        //        Place p = showNode(t,true);
+        Place p;
+        p.setNode(t);
+        p = showPlace(p,false);
         if (! p.isValid()) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));
@@ -741,7 +744,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
  * @param oldFocus
  * @param reason
  */
-void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus, Qt::FocusReason reason) {
+void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /* oldFocus */, Qt::FocusReason /* reason */) {
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
   if (item) {
     Place p = item->getPlace();
