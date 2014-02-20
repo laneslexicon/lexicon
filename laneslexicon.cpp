@@ -188,7 +188,7 @@ void LanesLexicon::onCloseTab(int ix) {
 void LanesLexicon::shortcut(const QString & k) {
   QString key = k.toCaseFolded();
   qDebug() << Q_FUNC_INFO << k;
-  if (key == QString("Root search").toCaseFolded()) {
+  if (key == QString("search root")) {
     RootSearchDialog * d = new RootSearchDialog(this);
     if (d->exec()) {
       QString t = d->getText();
@@ -206,7 +206,7 @@ void LanesLexicon::shortcut(const QString & k) {
     }
     delete d;
   }
-  else if (key == QString("Node search").toCaseFolded()) {
+  else if (key == QString("search node")) {
     NodeSearchDialog * d = new NodeSearchDialog(this);
     if (d->exec()) {
       QString t = d->getText();
@@ -226,7 +226,7 @@ void LanesLexicon::shortcut(const QString & k) {
     }
     delete d;
   }
-  else if (key == QString("Word search").toCaseFolded()) {
+  else if (key == QString("search word")) {
     WordSearchDialog * d = new WordSearchDialog(this);
     if (d->exec()) {
       QString t = d->getText();
