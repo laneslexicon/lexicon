@@ -9,8 +9,10 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
 
   QMenu menu(tr("Entry Menu"));
   menu.setObjectName("entry");
-  QAction *markAction = menu.addAction("Bookmark");
+  QAction *markAction = menu.addAction(tr("Add Bookmark"));
   QAction *searchAction = menu.addAction("Find");
+  QAction *selectAction = menu.addAction(tr("Select current entry"));
+  QAction *selectAllAction = menu.addAction(tr("Select all"));
   connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
 
   if (this->textCursor().hasSelection()) {
@@ -33,6 +35,21 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     }
 
   }
+  else if (selectedAction == selectAction) {
+    qDebug() << "select entry" << "null" << this->textCursor().isNull();
+    QTextCursor c = this->textCursor();
+    c.select(QTextCursor::Document);
+    this->setTextCursor(c);
+    //    qDebug() << "text" << c.selectionStart() << c.selectionEnd();
+    //    qDebug() << c.selectedText();
+  }
+}
+void EntryItem::selectAll() {
+    qDebug() << "select entry" << "null" << this->textCursor().isNull();
+    QTextCursor c = this->textCursor();
+    c.select(QTextCursor::Document);
+    qDebug() << "text" << c.selectionStart() << c.selectionEnd();
+    qDebug() << c.selectedText();
 }
 void EntryItem::setPlace(const Place & p) {
  m_place = p;

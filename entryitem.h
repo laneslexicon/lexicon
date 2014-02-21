@@ -52,6 +52,7 @@ class EntryItem : public QGraphicsTextItem {
   void setPage(int x);
   void setPlace(const Place &);
   void setBackground(QColor & c) { m_backgroundColor = c;}
+  void selectAll();
   Place getPlace();
   QString getNode() { return m_place.getNode();}
   QString getRoot() { return m_place.getRoot();}
