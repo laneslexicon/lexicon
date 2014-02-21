@@ -102,6 +102,10 @@ class GraphicsEntry : public QWidget {
     QString m_zoomInKey;
     QString m_zoomOutKey;
 
+    QString m_moveForwardKey;
+    QString m_moveBackwardKey;
+    void moveForward();
+    void moveBackward();
     QList<EntryItem *> m_items;
     EntryItem * createEntry(const QString & xml);
     //    const XalanCompiledStylesheet * m_compiledXsl;

@@ -128,6 +128,8 @@ void GraphicsEntry::readSettings() {
   /// these are set to empty to disable the feature
   m_moveFocusUpKey = settings.value("Move focus up",QString()).toString();
   m_moveFocusDownKey = settings.value("Move focus down",QString()).toString();
+  m_moveForwardKey = settings.value("Forward",QString()).toString();
+  m_moveBackwardKey = settings.value("Back",QString()).toString();
   m_zoomInKey = settings.value("Zoom in",QString("+")).toString();
   m_zoomOutKey = settings.value("Zoom out",QString("-")).toString();
 
@@ -179,6 +181,12 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   }
   else if (event->text() ==  m_moveFocusUpKey) {
     moveFocusUp();
+  }
+  else if (event->text() ==  m_moveForwardKey) {
+    moveForward();
+  }
+  else if (event->text() ==  m_moveBackwardKey) {
+    moveBackward();
   }
   else {
     QWidget::keyPressEvent(event);
@@ -258,8 +266,8 @@ void GraphicsEntry::linkHovered(const QString & link) {
   }
   else {
     gi->setCursor(QCursor(Qt::PointingHandCursor));
-    //    QLOG_DEBUG() << "Link hovered" << link;
-    //    QLOG_DEBUG() << QApplication::keyboardModifiers();
+    QLOG_DEBUG() << "Link hovered" << link;
+    QLOG_DEBUG() << QApplication::keyboardModifiers();
   }
 }
 /**
@@ -1100,4 +1108,10 @@ void GraphicsEntry::selectEntry() {
   if (item) {
     item->selectAll();
   }
+}
+void GraphicsEntry::moveForward() {
+  emit(nextRoot(m_place.getRoot()));
+}
+void GraphicsEntry::moveBackward() {
+  emit(prevRoot(m_place.getRoot()));
 }
