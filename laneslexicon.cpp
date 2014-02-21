@@ -347,6 +347,19 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key.startsWith("bookmark")) {
     bookmarkShortcut(key);
   }
+  else if (key == "select entry") {
+
+    GraphicsEntry * page = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+    if (page) {
+      page->selectEntry();
+    }
+  }
+  else if (key == "select all") {
+    GraphicsEntry * page = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+    if (page) {
+      page->selectAll();
+    }
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -837,6 +850,8 @@ void LanesLexicon::readSettings() {
   settings.beginGroup("History");
   m_historyEnabled = settings.value("Enabled",true).toBool();
   settings.endGroup();
+
+
   /**
    * we are have a default map set that is used to convert input to Arabic
    *

@@ -76,6 +76,8 @@ class GraphicsEntry : public QWidget {
     void prevPageRequested();
     void showPerseus(const Place &);
     void updateCurrentPlace(const Place &);
+    void selectAll();
+    void selectEntry();
  private:
     QColor m_supplementBg;
     bool prepareQueries();
@@ -137,6 +139,7 @@ class GraphicsEntry : public QWidget {
     QString m_xsltSource;
     int m_textWidth;
     //    XalanTransformer * m_xalan;
+
  protected:
     void keyPressEvent(QKeyEvent *);
     void focusInEvent(QFocusEvent *);

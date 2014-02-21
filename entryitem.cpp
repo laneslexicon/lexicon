@@ -36,20 +36,16 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
 
   }
   else if (selectedAction == selectAction) {
-    qDebug() << "select entry" << "null" << this->textCursor().isNull();
-    QTextCursor c = this->textCursor();
-    c.select(QTextCursor::Document);
-    this->setTextCursor(c);
-    //    qDebug() << "text" << c.selectionStart() << c.selectionEnd();
-    //    qDebug() << c.selectedText();
+    this->selectAll();
+  }
+  else if (selectedAction == selectAllAction) {
+    emit(selectAllItems());
   }
 }
 void EntryItem::selectAll() {
-    qDebug() << "select entry" << "null" << this->textCursor().isNull();
     QTextCursor c = this->textCursor();
     c.select(QTextCursor::Document);
-    qDebug() << "text" << c.selectionStart() << c.selectionEnd();
-    qDebug() << c.selectedText();
+    this->setTextCursor(c);
 }
 void EntryItem::setPlace(const Place & p) {
  m_place = p;

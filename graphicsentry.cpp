@@ -104,6 +104,7 @@ GraphicsEntry::~GraphicsEntry() {
 }
 void GraphicsEntry::readSettings() {
   QSettings settings;
+  settings.setIniCodec("UTF-8");
   settings.beginGroup("Entry");
   QString css = settings.value("CSS",QString("entry.css")).toString();
   readCssFromFile(css);
@@ -137,10 +138,26 @@ void GraphicsEntry::readSettings() {
   m_dumpHTML = settings.value("Dump HTML",false).toBool();
   m_dumpOutputHTML = settings.value("Dump output HTML",false).toBool();
   settings.endGroup();
+
+  /*
+  settings.beginGroup("Shortcut");
+  QString t = settings.value("Select all","Ctrl+C,A").toString();
+  QShortcut * sc = new QShortcut(t,this);
+  sc->setContext(Qt::WidgetShortcut);
+  //  connect(sc,SIGNAL(activated()),this,SLOT(selectAll()));
+  //  connect(sc,SIGNAL(activatedAmbiguously()),this,SLOT(selectAll()));
+  qDebug() << "select all set to" << t << sc->key() << sc->id();
+  t = settings.value("Select entry","Ctrl+C,E").toString();
+  sc = new QShortcut(t,this);
+  sc->setContext(Qt::WidgetShortcut);
+  //  connect(sc,SIGNAL(activated()),this,SLOT(selectEntry()));
+  qDebug() << "select entry set to" << t << sc->key() << sc->id();
+  */
 }
 void GraphicsEntry::writeDefaultSettings() {
   QSettings settings;
-  settings.beginGroup("Entry");
+   settings.setIniCodec("UTF-8");
+ settings.beginGroup("Entry");
   settings.setValue("CSS","entry.css");
   settings.setValue("XSLT","entry.xslt");
   settings.setValue("Text Width",300);
@@ -801,6 +818,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
     connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
     connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
+    connect(gi,SIGNAL(selectAllItems()),this,SLOT(selectAll()));
     /// pass through signal for mainwindow to handle
     connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
     return gi;
@@ -1068,4 +1086,18 @@ void GraphicsEntry::showPerseus(const Place & p) {
 }
 void GraphicsEntry::updateCurrentPlace(const Place & p) {
   m_place = p;
+}
+
+void GraphicsEntry::selectAll() {
+  qDebug() << "select all";
+  for(int i=0;i < m_items.size();i++) {
+    m_items[i]->selectAll();
+  }
+}
+void GraphicsEntry::selectEntry() {
+  qDebug() << "select entry";
+  EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
+  if (item) {
+    item->selectAll();
+  }
 }
