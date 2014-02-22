@@ -371,7 +371,7 @@ void LanesLexicon::shortcut(const QString & k) {
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
-
+  updateStatusBar();
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
 }
 /**
@@ -596,7 +596,13 @@ void LanesLexicon::createMenus() {
 }
 
 void LanesLexicon::createStatusBar() {
-  statusBar()->showMessage(tr("Ready"));
+
+  m_navModeIndicator = new QLabel("");
+  m_placeIndicator = new QLabel("");
+  statusBar()->addPermanentWidget(m_placeIndicator);
+  statusBar()->addPermanentWidget(m_navModeIndicator);
+
+  updateStatusBar();
 }
 QSize LanesLexicon::sizeHint() const {
   return QSize(800,600);
@@ -767,7 +773,7 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
   if (item) {
     Place p = item->getPlace();
-    statusBar()->showMessage(p.getText());
+    m_placeIndicator->setText(p.getText());
     qDebug() << Q_FUNC_INFO << p.getText();
     /*
     m_pwidget->setPlace(item->getPlace());
@@ -1439,4 +1445,22 @@ void LanesLexicon::movePrevious(const Place & p) {
   else {
     on_actionPrevPage();
   }
+}
+void LanesLexicon::updateStatusBar() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    m_placeIndicator->setText(entry->getPlace().getText());
+  }
+  else {
+    m_placeIndicator->setText("");
+
+  }
+  if (m_navMode == 0) {
+    m_navModeIndicator->setText("Nav mode: by root");
+
+  }
+  else {
+    m_navModeIndicator->setText("Nav mode: by page");
+  }
+
 }
