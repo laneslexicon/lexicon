@@ -3,6 +3,7 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   : QDialog(parent) {
   setWindowTitle(tr("Current Bookmarks"));
   m_list = new QListWidget;
+  m_list->setObjectName("bookmarklist");
   QStringList keys = marks.keys();
   keys.removeOne("-here-");
   for(int i=0;i < keys.size();i++) {
@@ -15,6 +16,7 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(setPlace()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   QVBoxLayout * layout = new QVBoxLayout;
+  m_list->setMinimumWidth(m_list->sizeHintForColumn(0));
   layout->addWidget(m_list);
   layout->addWidget(buttonBox);
   setLayout(layout);
