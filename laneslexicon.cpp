@@ -838,6 +838,13 @@ void LanesLexicon::readSettings() {
   m_navigationMode = settings.value("Navigation","root").toString();
   m_useNotes = settings.value("Use notes",false).toBool();
   m_activeMap = settings.value("Default map","Buckwalter").toString();
+  if (settings.value("Nav mode","root").toString() == "page") {
+    m_navMode = 1;
+  }
+  else {
+    m_navMode = 0;
+  }
+
   settings.endGroup();
 
   settings.beginGroup("Debug");

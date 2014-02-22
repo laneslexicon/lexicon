@@ -115,6 +115,8 @@ private:
 
     QString m_interface;    // "default","minimal"
     void setupInterface();
+    /// 0 - root mode, 1 - page mode
+    int m_navMode;
     bool m_ok;
     bool m_docked;          // whether to use docked widget
     bool m_valgrind;
