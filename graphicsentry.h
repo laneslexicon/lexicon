@@ -152,6 +152,8 @@ class GraphicsEntry : public QWidget {
     void rootChanged(const QString & root,const QString & node);
     void nextRoot(const QString &);
     void prevRoot(const QString &);
+    void next(const Place &);
+    void prev(const Place &);
     void cssChanged();
     void placeChanged(const Place &);
     void historyPositionChanged(int);

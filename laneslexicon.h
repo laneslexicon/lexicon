@@ -75,6 +75,9 @@ public:
       void shortcut(const QString &);
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
+
+    void moveNext(const Place &);
+    void movePrevious(const Place &);
     void onCloseTab(int) ;
     void onGoToPage(int);
     void on_actionExit();

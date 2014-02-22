@@ -1110,8 +1110,8 @@ void GraphicsEntry::selectEntry() {
   }
 }
 void GraphicsEntry::moveForward() {
-  emit(nextRoot(m_place.getRoot()));
+  emit(next(m_place));
 }
 void GraphicsEntry::moveBackward() {
-  emit(prevRoot(m_place.getRoot()));
+  emit(prev(m_place));
 }

@@ -163,6 +163,8 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
   connect(entry,SIGNAL(nextRoot(const QString &)),this,SLOT(findNextRoot(const QString &)));
   connect(entry,SIGNAL(prevRoot(const QString &)),this,SLOT(findPrevRoot(const QString &)));
+  connect(entry,SIGNAL(next(const Place &)),this,SLOT(moveNext(const Place &)));
+  connect(entry,SIGNAL(prev(const Place &)),this,SLOT(movePrevious(const Place &)));
   connect(entry,SIGNAL(historyPositionChanged(int)),this,SLOT(historyPositionChanged(int)));
   connect(entry,SIGNAL(historyAddition()),this,SLOT(historyAddition()));
   connect(entry,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SLOT(bookmarkAdd(const QString &,const Place &)));
@@ -359,6 +361,12 @@ void LanesLexicon::shortcut(const QString & k) {
     if (page) {
       page->selectAll();
     }
+  }
+  else if (key == "root mode") {
+    m_navMode = 0;
+  }
+  else if (key == "page mode") {
+    m_navMode = 1;
   }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
@@ -1414,4 +1422,21 @@ void LanesLexicon::bookmarkAdd(const QString & id,const Place & p) {
   m_bookmarks.insert(id,p);
   addBookmarkMenuItem(id);
 
+}
+
+void LanesLexicon::moveNext(const Place & p) {
+  if (m_navMode == 0) {
+    findNextRoot(p.getRoot());
+  }
+  else {
+    on_actionNextPage();
+  }
+}
+void LanesLexicon::movePrevious(const Place & p) {
+  if (m_navMode == 0) {
+    findPrevRoot(p.getRoot());
+  }
+  else {
+    on_actionPrevPage();
+  }
 }
