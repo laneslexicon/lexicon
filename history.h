@@ -38,16 +38,19 @@ class HistoryMaster {
   void readSettings();
   HistoryEvent * getEvent(int id);
   Place getLastPlace();
-  void setEnabled(bool v) { m_historyEnabled = v;}
+  void setEnabled(bool v);
   bool add(const Place &);
-  void on() { m_historyOn = true;}
-  void off() { m_historyOn = false;}
+  void on();
+  void off();
   bool isOn() { return m_historyOn;}
+  bool isOk() { return m_ok;}
   QList<HistoryEvent *> getHistory();
  private:
   QSqlDatabase m_db;
   int m_size;
   int m_lastId;
+  /// set to false if we failed to open the db
+  bool m_ok;
   bool openDatabase(const QString & dbname);
   /// this is turned on/off depending on user actions
   bool m_historyOn;

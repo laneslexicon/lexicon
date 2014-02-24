@@ -14,6 +14,7 @@ bool HistoryEvent::matches(HistoryEvent * event) {
 //CREATE TABLE history(id integer primary key,nodeId text,word text,root text,timewhen text);
 HistoryMaster::HistoryMaster(const QString & dbname) {
   m_historyOn = false;
+  m_ok = false;
   readSettings();
   m_getQuery = 0;
   m_listQuery = 0;
@@ -46,6 +47,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
         }
         m_historyOn = true;
         m_historyEnabled = true;
+        m_ok = true;
         }
     else {
       QLOG_WARN() << "History not available" << m_db.lastError().text();
@@ -72,6 +74,18 @@ HistoryMaster::~HistoryMaster() {
     m_db.close();
   }
 }
+void HistoryMaster::setEnabled(bool v) {
+  if (m_ok)
+    m_historyEnabled = v;
+}
+void HistoryMaster::on() {
+  if (m_ok)
+    m_historyOn = true;
+}
+void HistoryMaster::off() {
+  m_historyOn = false;
+}
+
 Place HistoryMaster::getLastPlace() {
   Place p;
 

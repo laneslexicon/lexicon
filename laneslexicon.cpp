@@ -33,7 +33,11 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   /// at the end of the history, but we should be able to restore from settings
   /// TODO would we want restore our current position in history?
-  m_history = new HistoryMaster(m_notesDbName);
+  m_history = new HistoryMaster(m_historyDbName);
+  if ( ! m_history->isOk()) {
+    QLOG_WARN() << "History is not available";
+    m_historyEnabled = false;
+  }
   m_history->setEnabled(m_historyEnabled);
   m_pwidget = new PlaceWidget(this);
   //  m_notes->setObjectName("notes");
@@ -883,6 +887,7 @@ void LanesLexicon::readSettings() {
   settings.endGroup();
   settings.beginGroup("History");
   m_historyEnabled = settings.value("Enabled",true).toBool();
+  m_historyDbName = settings.value("Database","history.sqlite").toString();
   settings.endGroup();
 
 

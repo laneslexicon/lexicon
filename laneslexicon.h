@@ -140,6 +140,7 @@ private:
     QString m_activeMap;
     QString m_dbName;
     QString m_notesDbName;
+    QString m_historyDbName;
     bool m_historyEnabled;
     bool m_saveTabs;
     bool m_restoreTabs;
