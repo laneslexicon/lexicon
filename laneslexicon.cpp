@@ -368,6 +368,15 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == "page mode") {
     m_navMode = 1;
   }
+  else if (key == "history next") {
+    /// increment history pos
+  }
+  else if (key == "history back") {
+    if (m_historyPos > 0) {
+      m_historyPos--;
+      setupHistory(m_historyPos);
+    }
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -514,6 +523,8 @@ void LanesLexicon::createToolBar() {
  *
  */
 void LanesLexicon::historyAddition() {
+  qDebug() << Q_FUNC_INFO;
+  statusBar()->showMessage(tr("History added"));
   setupHistory(-1);
 }
 void LanesLexicon::historyPositionChanged(int pos) {
