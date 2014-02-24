@@ -91,8 +91,10 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   /// TOTDO replace this last visited item
   if (m_restoreTabs) {
     restoreTabs();
-    m_tabs->currentWidget()->setFocus();
   }
+  if (m_tabs->count() > 0) {
+      m_tabs->currentWidget()->setFocus();
+   }
   else {
     GraphicsEntry * entry = new GraphicsEntry(this);
     entry->installEventFilter(this);
