@@ -588,24 +588,26 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   //    delete rootItem;
   //  }
 
-  if (! m_place.isValid() || (! m_place.isSamePlace(centerItem->getPlace()))) {
-    m_place = centerItem->getPlace();
-    m_place.setType(dp.getType());
+  /// we're done
+  if (! m_place.isValid() || m_place.isSamePlace(centerItem->getPlace())) {
+    return m_place;
+  }
+
+  m_place = centerItem->getPlace();
+  m_place.setType(dp.getType());
   /// we have changed places, so add to the history
-    if (getHistory()->isOn()) {
-      if (dp.getType() == Place::User) {
-        m_place.setType(dp.getType());
-        qDebug() << "history add place" << m_place;
-        getHistory()->add(m_place);
-        /// this allows mainwindow to update the history list
-        emit(historyAddition());
-      }
-      else if (dp.getType() == Place::History) {
-        emit(historyPositionChanged(dp.getId()));
-      }
+  if (getHistory()->isOn()) {
+    if (dp.getType() == Place::User) {
+      m_place.setType(dp.getType());
+      qDebug() << "history add place" << m_place;
+      getHistory()->add(m_place);
+      /// this allows mainwindow to update the history list
+      emit(historyAddition());
+    }
+    else if (dp.getType() == Place::History) {
+      emit(historyPositionChanged(dp.getId()));
     }
   }
-  qDebug() << "Place set to:" << m_place;
   return m_place;
 }
 Place GraphicsEntry::getPage(const int page) {
@@ -719,7 +721,6 @@ Place GraphicsEntry::getPage(const int page) {
     QLOG_INFO() << "No entries found for page" << page;
     return p;
   }
-  QLOG_DEBUG() << "Page" << page << "Roots" << rootCount << "Entries" << entryCount;
   /**
    * we have all the new items to show.
    * If we are going forward, add them to the end
@@ -806,7 +807,8 @@ Place GraphicsEntry::getPage(const int page) {
  * @return
  */
 EntryItem * GraphicsEntry::createEntry(const QString & xml) {
-    QString html =transform(m_xsltSource,xml);
+    QString html =
+transform(m_xsltSource,xml);
     if (html.isEmpty()) {
       return NULL;
     }
