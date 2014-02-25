@@ -42,6 +42,11 @@ void Place::setPage(int p) {
 QString Place::getText() const {
   QString txt;
 
+  if (m_pageMode) {
+    if ( m_page != -1) {
+      txt += QString(QObject::tr("Vol %1,Page %2")).arg(m_vol).arg(m_page);
+    }
+  }
   if (! m_root.isEmpty()) {
     txt += QString(QObject::tr("Root:%1")).arg(m_root);
   }
@@ -51,7 +56,7 @@ QString Place::getText() const {
     }
     txt += QString(QObject::tr("Entry:%1")).arg(m_word);
   }
-  if ( m_page != -1) {
+  if ((! m_pageMode) && ( m_page != -1)) {
     if (! txt.isEmpty()) {
       txt += ",";
     }

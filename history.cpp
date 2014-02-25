@@ -32,7 +32,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
     m_backQuery = new QSqlQuery(m_db);
     m_lastQuery = new QSqlQuery(m_db);
     if (
-        (m_addQuery->prepare("insert into history (node,word,root,supplement,page,vol,timewhen,nodeOnly) values (?,?,?,?,?,?,?,?)")) &&
+        (m_addQuery->prepare("insert into history (node,word,root,supplement,page,vol,timewhen,nodeOnly,pagemode) values (?,?,?,?,?,?,?,?,?)")) &&
         (m_backQuery->prepare("select * from history where id <= ? order by id desc")) &&
         (m_forQuery->prepare("select * from history where id > ? order by id asc")) &&
         (m_lastQuery->prepare("select * from history where id = (select max(id) from history)")) &&
@@ -146,6 +146,7 @@ bool HistoryMaster::add(const Place & p) {
   m_addQuery->bindValue(5,p.getVol());
   m_addQuery->bindValue(6,event->getWhen());
   m_addQuery->bindValue(7,p.getNodeOnly());
+  m_addQuery->bindValue(8,p.getPageMode());
   return m_addQuery->exec();
 
 
