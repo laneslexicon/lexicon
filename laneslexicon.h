@@ -79,7 +79,7 @@ public:
     void moveNext(const Place &);
     void movePrevious(const Place &);
     void onCloseTab(int) ;
-    void onGoToPage(int);
+    void onGoToPage(const Place &);
     void on_actionExit();
     void on_actionTest();
 

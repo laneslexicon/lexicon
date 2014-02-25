@@ -49,7 +49,7 @@ class GraphicsEntry : public QWidget {
   enum SearchType { RootSearch, WordSearch, NodeSearch };
   //  Place getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString(),bool nodeOnly = false);
     Place getXmlForRoot(const Place &);
-    Place getPage(const int );
+    Place getPage(const Place & );
     //    Place getXmlForPlace(const Place &);
 
     Place getPlace() { return m_place;}

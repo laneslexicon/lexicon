@@ -264,7 +264,9 @@ void LanesLexicon::shortcut(const QString & k) {
     int page = QInputDialog::getInt(this, tr("Page Search"),
                                     tr("Page:"), -1,1,3016, 1,&ok);
     if (ok && (page != -1)) {
-      this->onGoToPage(page);
+      Place p;
+      p.setPage(page);
+      this->onGoToPage(p);
     }
   }
   else if (key == QString("Contents collapse all").toCaseFolded()) {
@@ -555,6 +557,7 @@ void LanesLexicon::setupHistory(int currPos) {
     QMenu * m = new QMenu;
     m->setObjectName("history");
     QActionGroup * group = new QActionGroup(this);
+    /// for pagemode entries change the text
     while(events.size() > 0) {
       HistoryEvent * event = events.takeFirst();
       QString root = event->getRoot();
@@ -629,7 +632,12 @@ void LanesLexicon::onHistorySelection() {
   QVariant v = action->data();
   Place p = v.value<Place>();
   p.setType(Place::History);
-  showPlace(p,false);
+  if (p.getPageMode()) {
+    onGoToPage(p);
+  }
+  else {
+    showPlace(p,false);
+  }
 }
 void LanesLexicon::on_actionExit()
 {
@@ -1110,31 +1118,33 @@ void LanesLexicon::getFirstAndLast() {
     m_lastPage = query.value(1).toInt();
   }
 }
-void LanesLexicon::onGoToPage(int page) {
+void LanesLexicon::onGoToPage(const Place & p) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->setPagingForward();
-    entry->getPage(page);
+    entry->getPage(p);
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }
 void LanesLexicon::on_actionNextPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    int page = entry->getPlace().getPage();
+    Place p = entry->getPlace();
+    int page = p.getPage();
     if (page == -1) {
       page = 0;
     }
-    page++;
+    p.setPage(page + 1);
     entry->setPagingForward();
-    entry->getPage(page);
+    entry->getPage(p);
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }
 void LanesLexicon::on_actionPrevPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    int page = entry->getPlace().getPage();
+    Place p = entry->getPlace();
+    int page = p.getPage();
     if (page < 0) {
       page = 1;
     }
@@ -1142,9 +1152,9 @@ void LanesLexicon::on_actionPrevPage() {
       QLOG_INFO() << "At first page";
       return;
     }
-    page--;
+    p.setPage(page - 1);
     entry->setPagingForward();
-    entry->getPage(page);
+    entry->getPage(p);
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }
@@ -1152,7 +1162,9 @@ void LanesLexicon::on_actionFirstPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->setPagingForward();
-    entry->getPage(m_firstPage);
+    Place p;
+    p.setPage(m_firstPage);
+    entry->getPage(p);
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }
@@ -1160,7 +1172,9 @@ void LanesLexicon::on_actionLastPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->setPagingForward();
-    entry->getPage(m_lastPage);
+    Place p;
+    p.setPage(m_lastPage);
+    entry->getPage(p);
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }

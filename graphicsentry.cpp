@@ -610,15 +610,14 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   }
   return m_place;
 }
-Place GraphicsEntry::getPage(const int page) {
+Place GraphicsEntry::getPage(const Place & p) {
   QList<EntryItem *> items;
   EntryItem * item;
   QString arRoot;
   QString str;
   EntryItem * focusItem;
-  Place p;
+  int page = p.getPage();
 
-  p.setPage(page);
 
 
   m_pageQuery->bindValue(0,page);
@@ -788,6 +787,7 @@ Place GraphicsEntry::getPage(const int page) {
 
 
   m_place = focusItem->getPlace();
+  m_place.setPageMode(true);
   /**
    * we need to know whether we got here by accessing the history button
    * or not
