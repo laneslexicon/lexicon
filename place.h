@@ -23,6 +23,7 @@ class Place    {
     m_id = -1;
     m_showOnlyNodes = false;
     m_type = Place::User;
+    m_pageMode = false;
   }
   Place(const QString & root) {
     m_root = root;
@@ -31,6 +32,7 @@ class Place    {
     m_id = -1;
     m_showOnlyNodes = false;
     m_type = Place::User;
+    m_pageMode = false;
   }
   Place(const QString & root,int supp) {
     m_root = root;
@@ -40,6 +42,7 @@ class Place    {
     m_id = -1;
     m_showOnlyNodes = false;
     m_type = Place::User;
+    m_pageMode = false;
   }
   ~Place() {
   }
@@ -94,6 +97,12 @@ class Place    {
   bool isSamePlace  (const Place & p) const {
     return ((m_root == p.m_root) && (m_node == p.m_node));
   }
+  bool getPageMode() const {
+    return m_pageMode;
+  }
+  void setPageMode(bool v) {
+    m_pageMode = v;
+  }
   void setId(int id) { m_id = id;}
   int getId() const { return m_id;}
   void setRoot(const QString & root) { m_root = root;};
@@ -125,6 +134,7 @@ class Place    {
   int m_id;
   int m_supplement;
   bool m_showOnlyNodes;
+  bool m_pageMode;
   QVariant m_data;
 };
 
