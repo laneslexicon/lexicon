@@ -557,15 +557,19 @@ void LanesLexicon::setupHistory(int currPos) {
     QMenu * m = new QMenu;
     m->setObjectName("history");
     QActionGroup * group = new QActionGroup(this);
-    /// for pagemode entries change the text
+    /// TODO for pagemode entries change the text
     while(events.size() > 0) {
       HistoryEvent * event = events.takeFirst();
-      QString root = event->getRoot();
-      QString word = event->getWord();
+      Place p = event->getPlace();
+      QString root = p.getRoot();
+      QString word = p.getWord();
       int id = event->getId();
 
       QString txt;
-      if (! word.isEmpty()) {
+      if (p.getPageMode()) {
+        txt = QString(tr("%1 Page %2")).arg(id).arg(p.getPage());
+      }
+      else if (! word.isEmpty()) {
         txt = QString("%1 %2").arg(id).arg(word);
       }
       else {
@@ -579,7 +583,6 @@ void LanesLexicon::setupHistory(int currPos) {
       else {
         action->setChecked(false);
       }
-      Place p = event->getPlace();
       //      m_historyPos = p.getId();
       action->setData(QVariant(p));//event->getId());
       connect(action,SIGNAL(triggered()),this,SLOT(onHistorySelection()));
