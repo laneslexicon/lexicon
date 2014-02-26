@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QList>
 #include "QsLog.h"
+#include <QDateTime>
 /*
   Using the QVariant;
     Place p;
@@ -111,19 +112,29 @@ class Place    {
     m_word = word;
   }
   void setNode(const QString & node) { m_node = node;}
+
   QString getRoot() const { return m_root;}
+
   int getSupplement() const { return m_supplement;}
   void setSupplement(int i) { m_supplement = i;}
   bool isSupplement() { return (m_supplement == 1);}
+
   int getPage() const { return m_page;}
   void setPage(int i);
+
   void setVol(int i) { m_vol = i; }
   int getVol() const { return m_vol;}
+
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
-  bool getNodeOnly() const { return m_showOnlyNodes;}
 
+  bool getNodeOnly() const { return m_showOnlyNodes;}
   void setNodeOnly(bool v) { m_showOnlyNodes = v;}
+
+  void setWhen(const QString & t) {
+    m_when = QDateTime::fromString(t);
+  }
+  QDateTime getWhen() const { return m_when;}
  private:
   QString m_root;
   QString m_node;
@@ -136,6 +147,7 @@ class Place    {
   bool m_showOnlyNodes;
   bool m_pageMode;
   QVariant m_data;
+  QDateTime m_when;
 };
 
 Q_DECLARE_METATYPE(Place);
