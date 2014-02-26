@@ -11,7 +11,9 @@ bool HistoryEvent::matches(HistoryEvent * event) {
           (m_place.getNode() == p.getNode()));
 
 }
-//CREATE TABLE history(id integer primary key,nodeId text,word text,root text,timewhen text);
+/*
+CREATE TABLE history(id integer primary key,node text,word text,root text,supplement int,page int,vol int,timewhen text,nodeonly int, pagemode int);
+*/
 HistoryMaster::HistoryMaster(const QString & dbname) {
   m_historyOn = false;
   m_ok = false;
@@ -22,7 +24,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
   m_forQuery = 0;
   m_backQuery = 0;
   m_lastQuery = 0;
-
+  QString fields = "id,node,word,root,supplement,page,vol,timewhen,nodeOnly,pagemode";
   bool ok = openDatabase(dbname);
   if (ok) {
     m_getQuery = new QSqlQuery(m_db);
@@ -32,13 +34,12 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
     m_backQuery = new QSqlQuery(m_db);
     m_lastQuery = new QSqlQuery(m_db);
     if (
-        (m_addQuery->prepare("insert into history (node,word,root,supplement,page,vol,timewhen,nodeOnly,pagemode) values (?,?,?,?,?,?,?,?,?)")) &&
-        (m_backQuery->prepare("select * from history where id <= ? order by id desc")) &&
-        (m_forQuery->prepare("select * from history where id > ? order by id asc")) &&
-        (m_lastQuery->prepare("select * from history where id = (select max(id) from history)")) &&
-        (m_listQuery->prepare(QString("select * from history order by id desc limit %1").arg(m_size))) &&
-        (m_getQuery->prepare("select * from history where id = ?"))
-          )
+        m_addQuery->prepare(QString("insert into history (%1) values (?,?,?,?,?,?,?,?,?)").arg(fields)) &&
+        m_backQuery->prepare(QString("select %1 from history where id <= ? order by id desc").arg(fields)) &&
+        m_forQuery->prepare(QString("select %1 from history where id > ? order by id asc").arg(fields)) &&
+        m_lastQuery->prepare(QString("select %1 from history where id = (select max(id) from history)").arg(fields)) &&
+        m_listQuery->prepare(QString("select %1 from history order by id desc limit %2").arg(fields).arg(m_size)) &&
+        m_getQuery->prepare(QString("select %1 from history where id = ?").arg(fields)))
         {
         QSqlQuery mq(m_db);
         mq.exec("select max(id) from history");
@@ -97,6 +98,23 @@ Place HistoryMaster::getLastPlace() {
     p.setRoot(m_lastQuery->value(3).toString());
   }
   return p;
+}
+//  QString fields = "id,node,word,root,supplement,page,vol,timewhen,nodeOnly,pagemode";
+Place HistoryMaster::toPlace(QSqlQuery * sql) {
+  Place p;
+  p.setId(sql->value(0).toInt());
+  p.setNode(sql->value(1).toString());
+  p.setWord(sql->value(2).toString());
+  p.setRoot(sql->value(3).toString());
+  p.setSupplement(sql->value(4).toInt());
+  p.setPage(sql->value(5).toInt());
+  p.setVol(sql->value(6).toInt());
+
+  p.setWhen(sql->value(7).toString());
+  p.setNodeOnly(sql->value(8).toBool());
+  p.setPageMode(sql->value(9).toBool());
+  return p;
+
 }
 //create table history(id integer primary key,nodeId text,word text,root text,timewhen text);
 bool HistoryMaster::openDatabase(const QString & dbname) {

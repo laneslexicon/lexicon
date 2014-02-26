@@ -56,6 +56,7 @@ class HistoryMaster {
   bool m_historyOn;
     /// this disables history altogether
   bool m_historyEnabled;
+  Place toPlace(QSqlQuery *);
   QSqlQuery * m_listQuery;
   QSqlQuery * m_getQuery;
   QSqlQuery * m_addQuery;
