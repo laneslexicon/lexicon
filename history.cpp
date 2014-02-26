@@ -34,7 +34,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
     m_backQuery = new QSqlQuery(m_db);
     m_lastQuery = new QSqlQuery(m_db);
     if (
-        m_addQuery->prepare(QString("insert into history (%1) values (?,?,?,?,?,?,?,?,?)").arg(fields)) &&
+        m_addQuery->prepare(QString("insert into history (node,word,root,supplement,page,vol,timewhen,nodeOnly,pagemode) values (?,?,?,?,?,?,?,?,?)")) &&
         m_backQuery->prepare(QString("select %1 from history where id <= ? order by id desc").arg(fields)) &&
         m_forQuery->prepare(QString("select %1 from history where id > ? order by id asc").arg(fields)) &&
         m_lastQuery->prepare(QString("select %1 from history where id = (select max(id) from history)").arg(fields)) &&
@@ -51,6 +51,24 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
         m_ok = true;
         }
     else {
+      if (m_getQuery->lastError().isValid()) {
+        QLOG_WARN() << "Error on getQuery" << m_getQuery->lastError().text();
+      }
+      if (m_listQuery->lastError().isValid()) {
+        QLOG_WARN() << "Error on listQuery" << m_listQuery->lastError().text();
+      }
+      if (m_addQuery->lastError().isValid()) {
+        QLOG_WARN() << "Error on addQuery" << m_addQuery->lastError().text();
+      }
+      if (m_forQuery->lastError().isValid()) {
+        QLOG_WARN() << "Error on forQuery" << m_forQuery->lastError().text();
+      }
+      if (m_backQuery->lastError().isValid()) {
+        QLOG_WARN() << "Error on backQuery" << m_backQuery->lastError().text();
+      }
+      if (m_lastQuery->lastError().isValid()) {
+        QLOG_WARN() << "Error on lastQuery" << m_lastQuery->lastError().text();
+      }
       QLOG_WARN() << "History not available" << m_db.lastError().text();
     }
   }
@@ -92,10 +110,7 @@ Place HistoryMaster::getLastPlace() {
 
   m_lastQuery->exec();
   if (m_lastQuery->first()) {
-    p.setId(m_lastQuery->value(0).toInt());
-    p.setNode(m_lastQuery->value(1).toString());
-    p.setWord(m_lastQuery->value(2).toString());
-    p.setRoot(m_lastQuery->value(3).toString());
+    return(this->toPlace(m_lastQuery));
   }
   return p;
 }
@@ -180,12 +195,7 @@ bool HistoryMaster::add(const Place & p) {
     HistoryEvent * event = new HistoryEvent();
     int fno = m_listQuery->record().indexOf("id");
     event->setId(m_listQuery->value(fno).toInt());
-    Place p;
-    /// TODO add other place fields
-    p.setNode(m_listQuery->value(1).toString());
-    p.setWord(m_listQuery->value(2).toString());
-    p.setRoot(m_listQuery->value(3).toString());
-    p.setId(m_listQuery->value(0).toInt());
+    Place p = this->toPlace(m_listQuery);
     event->setPlace(p);
     event->setWhen(m_listQuery->value(4).toDateTime());
     events << event;
@@ -201,11 +211,7 @@ HistoryEvent * HistoryMaster::getEvent(int id) {
    m_getQuery->exec();
    if (m_getQuery->first()) {
        event->setId(m_getQuery->value(0).toInt());
-       Place p;
-       p.setNode(m_getQuery->value(1).toString());
-       p.setWord(m_getQuery->value(2).toString());
-       p.setRoot(m_getQuery->value(3).toString());
-       p.setId(m_backQuery->value(0).toInt());
+       Place p = this->toPlace(m_getQuery);
        event->setPlace(p);
        event->setWhen(m_getQuery->value(4).toDateTime());
    }
