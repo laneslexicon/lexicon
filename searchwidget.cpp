@@ -73,6 +73,12 @@ void RootSearchDialog::onCancel() {
 QString RootSearchDialog::getText() {
   return m_edit->text().trimmed();
 }
+bool RootSearchDialog::getNewTab() {
+  if (m_newTab->checkState() == Qt::Checked) {
+    return true;
+  }
+  return false;
+}
 NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   setWindowTitle(tr("Search for node"));
@@ -94,6 +100,7 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setModal(true);
   setTabOrder(m_newTab,m_edit);
   setLayout(layout);
+  m_edit->setFocus();
 }
 QString NodeSearchDialog::getText() {
   QString t = m_edit->text();
@@ -101,6 +108,12 @@ QString NodeSearchDialog::getText() {
     t = "n" + t;
   }
   return t;
+}
+bool NodeSearchDialog::getNewTab() {
+  if (m_newTab->checkState() == Qt::Checked) {
+    return true;
+  }
+  return false;
 }
 /**
  *
