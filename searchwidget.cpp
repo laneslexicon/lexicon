@@ -19,7 +19,7 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setWindowTitle(tr("Search for root"));
 
   QVBoxLayout * layout = new QVBoxLayout;
-  m_edit = new ImLineEdit;
+  m_edit = new ImLineEdit(this);
   //  m_edit->setSz(QSize(300,30));
   m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                      | QDialogButtonBox::Cancel);
@@ -50,11 +50,12 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
       layout->addWidget(group);
   }
 
-
+  m_newTab = new QCheckBox(tr("Open in &new tab"),this);
+  layout->addWidget(m_newTab);
   layout->addWidget(m_edit,0);
   layout->addStretch(1);
   layout->addWidget(m_buttonBox);
-
+  setTabOrder(m_newTab,m_edit);
   setModal(true);
   setLayout(layout);
   m_edit->setFocus();
@@ -76,7 +77,7 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   setWindowTitle(tr("Search for node"));
   QVBoxLayout * layout = new QVBoxLayout;
-  m_edit = new QLineEdit;
+  m_edit = new QLineEdit(this);
 
   m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                      | QDialogButtonBox::Cancel);
@@ -84,12 +85,14 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-
+  m_newTab = new QCheckBox(tr("Open in &new tab"),this);
+  layout->addWidget(m_newTab);
   layout->addWidget(m_edit,0);
   layout->addStretch(1);
   layout->addWidget(m_buttonBox);
 
   setModal(true);
+  setTabOrder(m_newTab,m_edit);
   setLayout(layout);
 }
 QString NodeSearchDialog::getText() {
@@ -109,7 +112,7 @@ WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   setWindowTitle(tr("Search for word"));
   QVBoxLayout * layout = new QVBoxLayout;
-  m_edit = new ImLineEdit;
+  m_edit = new ImLineEdit(this);
   m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                      | QDialogButtonBox::Cancel);
 

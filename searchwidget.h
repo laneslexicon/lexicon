@@ -5,6 +5,7 @@
 #include <QGroupBox>
 #include <QRadioButton>
 #include <QDialog>
+#include <QCheckBox>
 #include <QDialogButtonBox>
 #include "imedit.h"
 #include "imlineedit.h"
@@ -31,7 +32,8 @@ class RootSearchDialog : public QDialog {
  private:
     //  WrappedEdit * m_edit;
     ImLineEdit * m_edit;
-  QDialogButtonBox * m_buttonBox;
+    QCheckBox * m_newTab;
+    QDialogButtonBox * m_buttonBox;
 };
 class NodeSearchDialog : public QDialog {
   Q_OBJECT
@@ -41,6 +43,7 @@ class NodeSearchDialog : public QDialog {
   QString getText();
  private:
   QLineEdit * m_edit;
+  QCheckBox * m_newTab;
   QDialogButtonBox * m_buttonBox;
 };
 class WordSearchDialog : public QDialog {
