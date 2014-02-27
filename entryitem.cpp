@@ -9,17 +9,18 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
 
   QMenu menu(tr("Entry Menu"));
   menu.setObjectName("entry");
-  QAction *markAction = menu.addAction(tr("Add Bookmark"));
-  QAction *searchAction = menu.addAction("Find");
-  QAction *selectAction = menu.addAction(tr("Select current entry"));
-  QAction *selectAllAction = menu.addAction(tr("Select all"));
-  connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
+  QAction *markAction = menu.addAction(tr("Add &Bookmark"));
+  //  QAction *searchAction = menu.addAction("Find");
+  //  connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
+  QAction *selectAction = menu.addAction(tr("Select current &entry"));
+  QAction *selectAllAction = menu.addAction(tr("Select &all"));
+
 
   if (this->textCursor().hasSelection()) {
-    QAction *copyAction = menu.addAction("Copy");
+    QAction *copyAction = menu.addAction("&Copy");
     connect(copyAction,SIGNAL(triggered()),this,SLOT(copy()));
   }
-  QAction * perseusAction = menu.addAction("Show Perseus XML");
+  QAction * perseusAction = menu.addAction("Show &Perseus XML");
   Place p = this->getPlace();
   QAction *selectedAction = menu.exec(event->screenPos());
   if (selectedAction == perseusAction) {
