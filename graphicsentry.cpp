@@ -299,14 +299,11 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
   for(int i=0;i < m_items.size();i++) {
     EntryItem * item = m_items[i];
     if (item->getNode() == node) {
-      QLOG_DEBUG() << "Found local node" << node;
       m_scene->setFocusItem(item);
-      //m_view->ensureVisible(item);
        m_view->centerOn(item);
        /// update the place
        m_place = item->getPlace();
-      //     m_scene->clearFocus();
-      return m_place;
+       return m_place;
     }
   }
   /// trying out of page jump
@@ -320,12 +317,9 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
     np = getXmlForRoot(p);
     if (np != p) {
       emit(placeChanged(np));
-      qDebug() << "emitted place changed";
       m_place = np;
     }
-    return m_place;
   }
-
   return np;
 }
 /**
