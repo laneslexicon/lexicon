@@ -25,6 +25,7 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   layout->addWidget(splitter);
 
   bool ok = false;
+  /// TODO replace select *
   QString sql = QString("select * from xref where word = ? order by root,entry asc");
   if (m_query.prepare(sql)) {
     if (m_nodeQuery.prepare("select * from entry where nodeId = ?")) {
