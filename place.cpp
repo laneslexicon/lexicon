@@ -39,6 +39,17 @@ void Place::setPage(int p) {
     }
   }
 }
+QString Place::getShortText() const {
+  QString txt;
+
+  if (! m_root.isEmpty()) {
+    txt = QString(QObject::tr("%1")).arg(m_root);
+  }
+  if (! m_word.isEmpty()) {
+    txt = QString(QObject::tr("%1")).arg(m_word);
+  }
+  return txt;
+}
 QString Place::getText() const {
   QString txt;
 
@@ -76,7 +87,8 @@ QString Place::getText() const {
   return txt;
 }
 QString Place::toString() const {
-  QString t = QString("%1,%2,%3,%4,%5,%6,%7,%8,%9").arg(m_root)
+  QString t = QString("%1,%2,%3,%4,%5,%6,%7,%8,%9,%10")
+    .arg(m_root)
     .arg(m_node)
     .arg(m_word)
     .arg(m_type)
@@ -84,7 +96,8 @@ QString Place::toString() const {
     .arg(m_vol)
     .arg(m_id)
     .arg(m_supplement)
-    .arg(m_showOnlyNodes);
+    .arg(m_showOnlyNodes)
+    .arg(m_pageMode);
 
   return t;
 }
@@ -92,20 +105,39 @@ Place Place::fromString(const QString & str) {
   bool ok;
   QStringList x = str.split(",");
   Place p;
-  p.setRoot(x[0]);
-  p.setNode(x[1]);
-  p.setWord(x[2]);
-  p.setType(x[3].toInt(&ok));
-  p.setPage(x[4].toInt(&ok));
-  p.setVol(x[5].toInt(&ok));
-  p.setId(x[6].toInt(&ok));
-  p.setSupplement(x[7].toInt(&ok));
+  int sz = x.size();
+  qDebug() << Q_FUNC_INFO << str << sz;
+  if (sz > 0)
+    p.setRoot(x[0]);
+  if (sz > 1)
+    p.setNode(x[1]);
+  if (sz > 2)
+    p.setWord(x[2]);
+  if (sz > 3)
+    p.setType(x[3].toInt(&ok));
+  if (sz > 4)
+    p.setPage(x[4].toInt(&ok));
+  if (sz > 5)
+    p.setVol(x[5].toInt(&ok));
+  if (sz > 6)
+    p.setId(x[6].toInt(&ok));
+  if (sz > 7)
+    p.setSupplement(x[7].toInt(&ok));
+  if (sz > 8) {
   if (x[8] == "1") {
     p.setNodeOnly(true);
   }
   else {
     p.setNodeOnly(false);
   }
-
+  }
+  if (sz > 9) {
+    if (x[9] == "1") {
+      p.setPageMode(true);
+    }
+    else {
+      p.setPageMode(false);
+    }
+  }
   return p;
 }

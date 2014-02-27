@@ -48,6 +48,7 @@ class Place    {
   ~Place() {
   }
   QString getText() const;
+  QString getShortText() const;
   QString toString() const;
   static Place fromString(const QString &);
   static int m_vols[8];
