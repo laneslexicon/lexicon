@@ -422,6 +422,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
     else {
       QLOG_WARN() << "Node not found" << node;
+      qDebug() << Q_FUNC_INFO << "exiting 3 with place" << retval.toString();
       return retval;
     }
   }
@@ -436,6 +437,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     else {
       QLOG_WARN() << QString(tr("Root not found %1")).arg(root);
     }
+    qDebug() << Q_FUNC_INFO << "exiting 4 with place" << retval.toString();
     return retval;
   }
   /// this will be set to the right word if a node has been supplied
@@ -593,13 +595,15 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   //    delete rootItem;
   //  }
 
+
   /// we're done
-  if (! m_place.isValid() || m_place.isSamePlace(centerItem->getPlace())) {
+  if (m_place.isSamePlace(centerItem->getPlace())) {
+    qDebug() << Q_FUNC_INFO << "exiting 1 with place" << m_place.toString();
     return m_place;
   }
-
   m_place = centerItem->getPlace();
   m_place.setType(dp.getType());
+
   /// we have changed places, so add to the history
   if (getHistory()->isOn()) {
     if (dp.getType() == Place::User) {
@@ -613,6 +617,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       emit(historyPositionChanged(dp.getId()));
     }
   }
+  qDebug() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
   return m_place;
 }
 Place GraphicsEntry::getPage(const Place & p) {
