@@ -204,7 +204,7 @@ void LanesLexicon::shortcut(const QString & k) {
         if (! UcdScripts::isScript(t,"Arabic")) {
           t = convertString(t);
         }
-        Place p = showPlace(Place(t),false);
+        Place p = showPlace(Place(t),d->getNewTab());
         if (! p.isValid()) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));
@@ -224,7 +224,7 @@ void LanesLexicon::shortcut(const QString & k) {
         //        Place p = showNode(t,true);
         Place p;
         p.setNode(t);
-        p = showPlace(p,false);
+        p = showPlace(p,d->getNewTab());
         if (! p.isValid()) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));
@@ -690,10 +690,9 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
 }
 Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   Place np;
-  QString root = p.getRoot();
   GraphicsEntry * entry;
   if (! p.isValid()) {
-    return np;
+    return p;
   }
   int currentTab = m_tabs->currentIndex();
   if (currentTab == -1) {
@@ -714,17 +713,12 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   if (createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
-    GraphicsEntry * w = new GraphicsEntry(this);
-    setSignals(w);
-    w->installEventFilter(this);
-    if (w->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
-      m_tabs->insertTab(m_tabs->currentIndex()+1,w,root);
-      np = w->getXmlForRoot(p);
-      /// TODO decide whether to make new tab the current tab
-    }
-    else {
-      return p;
-    }
+    entry = new GraphicsEntry(this);
+    setSignals(entry);
+    entry->installEventFilter(this);
+    np = entry->getXmlForRoot(p);
+    m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
+    /// TODO decide whether to make new tab the current tab
   }
   else {
     if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
