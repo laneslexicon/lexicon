@@ -256,7 +256,12 @@ void GraphicsEntry::linkActivated(const QString & link) {
   node.remove(0,1);
   Place p;
   p.setNode(node);
-  showPlace(p);
+  bool newTab = false;
+  if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+    newTab = true;
+  }
+
+  showPlace(p,newTab);
 }
 void GraphicsEntry::linkHovered(const QString & link) {
   QGraphicsTextItem * gi = static_cast<QGraphicsTextItem *>(QObject::sender());
