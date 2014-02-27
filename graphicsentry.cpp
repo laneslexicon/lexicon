@@ -293,7 +293,7 @@ void GraphicsEntry::anchorTest() {
     }
   }
 }
-bool GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
+Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
   /// check if the node is on this page
   QString node = p.getNode();
   for(int i=0;i < m_items.size();i++) {
@@ -306,30 +306,36 @@ bool GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
        /// update the place
        m_place = item->getPlace();
       //     m_scene->clearFocus();
-      return true;
+      return m_place;
     }
   }
-  QLOG_DEBUG() << "Not found on page" << node;
   /// trying out of page jump
   /// TODO this does not return Place needs fixing
+  Place np;
   if (! thisPageOnly ) {
-    QLOG_DEBUG() << "Out of page jump" << node;
     Place p;
     p.setNode(node);
     p.setNodeOnly(false);
     //    getXmlForNode(node);
-    getXmlForRoot(p);
+    np = getXmlForRoot(p);
+    if (np != p) {
+      emit(placeChanged(np));
+      qDebug() << "emitted place changed";
+      m_place = np;
+    }
+    return m_place;
   }
-  return false;
+
+  return np;
 }
 /**
- *
+ * lines beginning with - are omitted
  *
  */
 bool GraphicsEntry::readCssFromFile(const QString & name) {
   QFile f(name);
   if (! f.open(QIODevice::ReadOnly)) {
-    QLOG_WARN()  << "Cannot open file for reading: "
+    QLOG_WARN()  << "Cannot open CSS file for reading: " << name
                  << f.errorString();
     return false;
 
@@ -343,7 +349,7 @@ bool GraphicsEntry::readCssFromFile(const QString & name) {
   }
   f.close();
   if (! css.isEmpty()) {
-    m_currentCSS= css;
+    m_currentCSS = css;
     emit(cssChanged());
   }
   return true;
@@ -813,7 +819,7 @@ Place GraphicsEntry::getPage(const Place & p) {
  */
 EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     QString html =
-transform(m_xsltSource,xml);
+      transform(m_xsltSource,xml);
     if (html.isEmpty()) {
       return NULL;
     }

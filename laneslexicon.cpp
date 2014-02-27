@@ -700,6 +700,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     createTab = true;
   }
   else {
+    /// it could be either a graphicsentry or a search results window
     entry = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (! entry ) {
       SearchResultsWidget * w = dynamic_cast<SearchResultsWidget *>(m_tabs->widget(currentTab));
@@ -1076,6 +1077,14 @@ void LanesLexicon::rootChanged(const QString & root,const QString & node) {
   m_tree->ensureVisible(root,true);
 }
 void LanesLexicon::placeChanged(const Place & p) {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());
+  if (entry) {
+    int ix = m_tabs->indexOf(entry);
+    if (ix != -1) {
+      m_tabs->setTabText(ix,p.getShortText());
+    }
+  }
+
   m_tree->ensurePlaceVisible(p,true);
 }
 void LanesLexicon::getFirstAndLast() {
