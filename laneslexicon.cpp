@@ -688,66 +688,10 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   Place m(root,p);
   showPlace(m,newTab);
 }
-/// TODO is this redundant ?
-Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) {
-  Place p;
-  p.setNode(node);
-  /// TODO make this come from QSettings
-  p.setNodeOnly(false);
-  int currentTab = m_tabs->currentIndex();
-  if (currentTab == -1) {
-    createTab = true;
-  }
- if (createTab) {
-    /// turn history on as the user has clicked on something
-    /// and the root is not already shown
-    GraphicsEntry * w = new GraphicsEntry(this);
-    setSignals(w);
-    w->installEventFilter(this);
-    if (w->hasPlace(p,GraphicsEntry::NodeSearch,true) == -1) {
-      m_history->on();
-      m_tabs->insertTab(m_tabs->currentIndex()+1,w,node);
-      //      p = w->getXmlForNode(node,nodeOnly);
-      p = w->getXmlForRoot(p);
-      if (p.isValid()) {
-        /// set focus
-        p.setNode(node);
-        w->hasPlace(p,GraphicsEntry::NodeSearch,true);
-      }
-    }
-  }
-  else {
-    GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
-    if (w->hasPlace(p,GraphicsEntry::NodeSearch,true) == -1) {
-      m_history->on();
-      //      p = w->getXmlForNode(node,nodeOnly);
-      p = w->getXmlForRoot(p);
-      m_tabs->setTabText(0,p.getText());
-      if (p.isValid()) {
-        /// set focus
-        p.setNode(node);
-        w->hasPlace(p,GraphicsEntry::NodeSearch,true);
-      }
-      // this works but sets it for all tabs
-      //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
-      // this sets it for all the items in graphicsentry
-      // but not the tab title
-      //    w->setStyleSheet("font-family : Amiri;font-size : 16px");
-      w->setFocus();
-    }
-  }
- if (p.isValid()) {
-   if (m_place.getRoot() != p.getRoot()) {
-     placeChanged(p);
-   }
-   m_place = p;
- }
- return p;
-}
 Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   Place np;
   QString root = p.getRoot();
-
+  GraphicsEntry * entry;
   if (! p.isValid()) {
     return np;
   }
@@ -755,8 +699,18 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   if (currentTab == -1) {
     createTab = true;
   }
-  qDebug() << Q_FUNC_INFO << currentTab << createTab;
- if (createTab) {
+  else {
+    entry = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
+    if (! entry ) {
+      SearchResultsWidget * w = dynamic_cast<SearchResultsWidget *>(m_tabs->widget(currentTab));
+      if (w) {
+        m_tabs->removeTab(currentTab);
+        delete w;
+        createTab = true;
+      }
+    }
+  }
+  if (createTab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
     GraphicsEntry * w = new GraphicsEntry(this);
@@ -773,6 +727,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   }
   else {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
+
     if (w->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
       np = w->getXmlForRoot(p);
       m_tabs->setTabText(currentTab,np.getText());
