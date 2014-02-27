@@ -722,7 +722,7 @@ Place LanesLexicon::showNode(const QString & node,bool nodeOnly,bool createTab) 
       m_history->on();
       //      p = w->getXmlForNode(node,nodeOnly);
       p = w->getXmlForRoot(p);
-      m_tabs->setTabText(0,p.getNode());
+      m_tabs->setTabText(0,p.getText());
       if (p.isValid()) {
         /// set focus
         p.setNode(node);
@@ -775,7 +775,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     GraphicsEntry * w = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (w->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
       np = w->getXmlForRoot(p);
-      m_tabs->setTabText(currentTab,np.getRoot());
+      m_tabs->setTabText(currentTab,np.getText());
       // this works but sets it for all tabs
       //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
       // this sets it for all the items in graphicsentry
@@ -949,12 +949,18 @@ void LanesLexicon::writeSettings() {
       if (entry) {
         Place p = entry->getPlace();
         settings.beginGroup(QString("Tab-%1").arg(i));
+        /*
         settings.setValue("root",p.getRoot());
         settings.setValue("word",p.getWord());
         settings.setValue("node",p.getNode());
         settings.setValue("supplement",p.getSupplement());
         //        settings.setValue("nodeOnly",p.getNodeOnly());
         settings.setValue("page",p.getPage());
+        */
+        settings.setValue("place",p.toString());
+        //           QVariant v;
+        //   v.setValue(p);
+
         settings.endGroup();
       }
     }
@@ -983,9 +989,16 @@ void LanesLexicon::restoreTabs() {
   Place wp;
   settings.beginGroup("Tabs");
   QStringList tabs = settings.childGroups();
+  /// restore tab may fail, so we need to keep count of the actual tabs
+  int j = 0;
   for(int i=0;i < tabs.size();i++) {
     settings.beginGroup(tabs[i]);
     Place p;
+    QString v = settings.value("place",QString()).toString();
+    if (! v.isNull()) {
+      p = Place::fromString(v);
+    }
+    /*
     p.setNode(settings.value("node",QString()).toString());
     p.setRoot(settings.value("root",QString()).toString());
     p.setSupplement(settings.value("supplement").toInt());
@@ -994,15 +1007,27 @@ void LanesLexicon::restoreTabs() {
     if (p.getNode().isEmpty()) {
       //      p.setNodeOnly(false);
     }
-    if (tab == i) {
-      wp = p;
+    */
+    if (p.isValid()) {
+      if (tab == i) {
+        tab = j;
+        wp = p;
+      }
+      GraphicsEntry * entry = new GraphicsEntry(this);
+      setSignals(entry);
+      p.setType(Place::RestoreTab);
+      if (p.getPageMode()) {
+        entry->setPagingForward();
+        entry->getPage(p);
+      }
+      else {
+        entry->getXmlForRoot(p);
+      }
+      //      qDebug() << Q_FUNC_INFO << "adding tab" << p.getShortText();
+      m_tabs->addTab(entry,p.getShortText());
+      m_tree->ensurePlaceVisible(p,true);
+      j++;
     }
-    GraphicsEntry * entry = new GraphicsEntry(this);
-    setSignals(entry);
-    p.setType(Place::RestoreTab);
-    p = entry->getXmlForRoot(p);
-    m_tabs->addTab(entry,p.getRoot());
-    m_tree->ensurePlaceVisible(p,true);
     settings.endGroup();
   }
   settings.endGroup();
