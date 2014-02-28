@@ -198,6 +198,7 @@ void LanesLexicon::shortcut(const QString & k) {
   qDebug() << Q_FUNC_INFO << k;
   if (key == QString("search root")) {
     RootSearchDialog * d = new RootSearchDialog(this);
+    d->setNewTab(m_searchNewTab);
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
@@ -216,6 +217,7 @@ void LanesLexicon::shortcut(const QString & k) {
   }
   else if (key == QString("search node")) {
     NodeSearchDialog * d = new NodeSearchDialog(this);
+    d->setNewTab(m_searchNewTab);
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
@@ -835,6 +837,11 @@ void LanesLexicon::readSettings() {
     m_navMode = 0;
   }
 
+  settings.endGroup();
+
+  settings.beginGroup("Search");
+  m_searchNewTab = settings.value("New tab",true).toBool();
+  m_searchSwitchTab = settings.value("Switch tab",true).toBool();
   settings.endGroup();
 
   settings.beginGroup("Debug");

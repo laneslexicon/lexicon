@@ -144,6 +144,8 @@ private:
     bool m_historyEnabled;
     bool m_saveTabs;
     bool m_restoreTabs;
+    bool m_searchNewTab;
+    bool m_searchSwitchTab;
     QString m_navigationMode;
     void getFirstAndLast();
     void restoreTabs();
