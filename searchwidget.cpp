@@ -21,12 +21,18 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QVBoxLayout * layout = new QVBoxLayout;
   m_edit = new ImLineEdit(this);
   //  m_edit->setSz(QSize(300,30));
+  m_more = new QPushButton(tr("Options"),this);
+  m_more->setCheckable(true);
+
   m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                      | QDialogButtonBox::Cancel);
+  m_buttonBox->addButton(m_more, QDialogButtonBox::ActionRole);
 
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
+  m_options = new QWidget(this);
+  QVBoxLayout * optionsLayout = new QVBoxLayout;
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->getActiveMap();
@@ -35,7 +41,7 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   }
   maps << m_edit->getNullMap();
   if (maps.size() > 0) {
-    QGroupBox * group = new QGroupBox(tr("Keymap"));
+    m_group = new QGroupBox(tr("Keymap"));
     /// TODO this should be Grid to use less space ?
     QVBoxLayout * btnlayout = new QVBoxLayout;
       for(int i=0;i < maps.size();i++) {
@@ -46,19 +52,31 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
         btnlayout->addWidget(btn);
         connect(btn,SIGNAL(clicked()),this,SLOT(keymapChanged()));
       }
-      group->setLayout(btnlayout);
-      layout->addWidget(group);
+      m_group->setLayout(btnlayout);
+      optionsLayout->addWidget(m_group);
   }
 
   m_newTab = new QCheckBox(tr("Open in &new tab"),this);
-  layout->addWidget(m_newTab);
+  optionsLayout->addWidget(m_newTab);
+  m_options->setLayout(optionsLayout);
+
+  connect(m_more, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
   layout->addWidget(m_edit,0);
-  layout->addStretch(1);
+  layout->addStretch(0);
   layout->addWidget(m_buttonBox);
+  layout->addWidget(m_options);
   setTabOrder(m_newTab,m_edit);
   setModal(true);
   setLayout(layout);
+
+  m_options->hide();
   m_edit->setFocus();
+}
+void RootSearchDialog::showOptions(bool v) {
+  m_options->setVisible(v);
+  this->adjustSize();
+  if (!v)
+    m_edit->setFocus();
 }
 void RootSearchDialog::keymapChanged() {
   QRadioButton * btn = qobject_cast<QRadioButton *>(QObject::sender());

@@ -31,11 +31,14 @@ class RootSearchDialog : public QDialog {
   public slots:
     void onCancel();
     void keymapChanged();
+    void showOptions(bool);
  private:
-    //  WrappedEdit * m_edit;
+    QGroupBox * m_group;
     ImLineEdit * m_edit;
     QCheckBox * m_newTab;
     QDialogButtonBox * m_buttonBox;
+    QPushButton * m_more;
+    QWidget * m_options;
 };
 class NodeSearchDialog : public QDialog {
   Q_OBJECT
