@@ -27,6 +27,7 @@ class RootSearchDialog : public QDialog {
   RootSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   QString getText();
   bool getNewTab();
+  void setNewTab(bool v);
   public slots:
     void onCancel();
     void keymapChanged();
@@ -41,8 +42,9 @@ class NodeSearchDialog : public QDialog {
 
  public:
   NodeSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
-  QString getText();
-  bool getNewTab();
+  QString getText() const;
+  bool getNewTab() const;
+  void setNewTab(bool v);
  private:
   QLineEdit * m_edit;
   QCheckBox * m_newTab;

@@ -79,6 +79,15 @@ bool RootSearchDialog::getNewTab() {
   }
   return false;
 }
+void RootSearchDialog::setNewTab(bool v) {
+  m_newTab->setChecked(v);
+}
+/**
+ *
+ *
+ * @param parent
+ * @param f
+ */
 NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   setWindowTitle(tr("Search for node"));
@@ -102,14 +111,17 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setLayout(layout);
   m_edit->setFocus();
 }
-QString NodeSearchDialog::getText() {
+void NodeSearchDialog::setNewTab(bool v) {
+  m_newTab->setChecked(v);
+}
+QString NodeSearchDialog::getText() const {
   QString t = m_edit->text();
   if (! t.startsWith("n")) {
     t = "n" + t;
   }
   return t;
 }
-bool NodeSearchDialog::getNewTab() {
+bool NodeSearchDialog::getNewTab() const {
   if (m_newTab->checkState() == Qt::Checked) {
     return true;
   }
