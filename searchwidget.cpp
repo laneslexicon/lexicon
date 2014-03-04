@@ -19,20 +19,34 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setWindowTitle(tr("Search for root"));
 
   QVBoxLayout * layout = new QVBoxLayout;
-  m_edit = new ImLineEdit(this);
-  //  m_edit->setSz(QSize(300,30));
-  m_more = new QPushButton(tr("Options"),this);
-  m_more->setCheckable(true);
+  m_prompt = new QLabel(tr("Find &root"));
+  m_edit = new ImLineEdit;
+  m_prompt->setBuddy(m_edit);
 
-  m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                     | QDialogButtonBox::Cancel);
-  m_buttonBox->addButton(m_more, QDialogButtonBox::ActionRole);
+  m_newTab = new QCheckBox(tr("Open in &new tab"));
+  m_switchFocus = new QCheckBox(tr("Switch to &new tab"));
+
+
+  m_findButton = new QPushButton(tr("&Find"));
+  m_findButton->setDefault(true);
+
+  m_moreButton = new QPushButton(tr("&More"));
+  m_moreButton->setCheckable(true);
+  m_moreButton->setAutoDefault(false);
+
+  m_options = new QWidget;
+
+  m_buttonBox = new QDialogButtonBox(Qt::Vertical);
+  m_buttonBox->addButton(m_findButton, QDialogButtonBox::AcceptRole);
+  m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
+  m_buttonBox->addButton(m_moreButton, QDialogButtonBox::ActionRole);
 
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-  m_options = new QWidget(this);
   QVBoxLayout * optionsLayout = new QVBoxLayout;
+  optionsLayout->setMargin(0);
+  optionsLayout->addWidget(m_switchFocus);
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->getActiveMap();
@@ -55,12 +69,27 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
       m_group->setLayout(btnlayout);
       optionsLayout->addWidget(m_group);
   }
-
-  m_newTab = new QCheckBox(tr("Open in &new tab"),this);
-  optionsLayout->addWidget(m_newTab);
   m_options->setLayout(optionsLayout);
 
-  connect(m_more, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
+  connect(m_moreButton, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
+  QHBoxLayout *topLeftLayout = new QHBoxLayout;
+  topLeftLayout->addWidget(m_prompt);
+  topLeftLayout->addWidget(m_edit);
+
+  QVBoxLayout *leftLayout = new QVBoxLayout;
+  leftLayout->addLayout(topLeftLayout);
+  leftLayout->addWidget(m_newTab);
+
+  QGridLayout *mainLayout = new QGridLayout;
+  mainLayout->setSizeConstraint(QLayout::SetFixedSize);
+  mainLayout->addLayout(leftLayout, 0, 0);
+  mainLayout->addWidget(m_buttonBox, 0, 1);
+  mainLayout->addWidget(m_options, 1, 0, 1, 2);
+  mainLayout->setRowStretch(2, 1);
+
+  setLayout(mainLayout);
+  /*
+
   layout->addWidget(m_edit,0);
   layout->addStretch(0);
   layout->addWidget(m_buttonBox);
@@ -68,13 +97,14 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setTabOrder(m_newTab,m_edit);
   setModal(true);
   setLayout(layout);
-
+  */
   m_options->hide();
   m_edit->setFocus();
 }
 void RootSearchDialog::showOptions(bool v) {
+  qDebug() << Q_FUNC_INFO << v;
   m_options->setVisible(v);
-  this->adjustSize();
+  //  this->adjustSize();
   if (!v)
     m_edit->setFocus();
 }

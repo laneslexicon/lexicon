@@ -6,7 +6,9 @@
 #include <QRadioButton>
 #include <QDialog>
 #include <QCheckBox>
+#include <QGridLayout>
 #include <QDialogButtonBox>
+#include <QLabel>
 #include "imedit.h"
 #include "imlineedit.h"
 class SearchWidget : public QWidget {
@@ -33,11 +35,14 @@ class RootSearchDialog : public QDialog {
     void keymapChanged();
     void showOptions(bool);
  private:
+    QLabel * m_prompt;
     QGroupBox * m_group;
     ImLineEdit * m_edit;
     QCheckBox * m_newTab;
+    QCheckBox * m_switchFocus;
     QDialogButtonBox * m_buttonBox;
-    QPushButton * m_more;
+    QPushButton * m_moreButton;
+    QPushButton * m_findButton;
     QWidget * m_options;
 };
 class NodeSearchDialog : public QDialog {
