@@ -15,7 +15,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = laneslexicon
 TEMPLATE = app
 libxslt {
-INCLUDEPATH += /opt/include/libxml2
+INCLUDEPATH += /usr/include/libxml2
 LIBS += -L /opt/lib -lxml2 -lxslt
 DEFINES += USE_LIBXSLT
 }
