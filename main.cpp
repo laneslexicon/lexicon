@@ -1,5 +1,6 @@
 #include "laneslexicon.h"
 #include <QApplication>
+#include <QFontDatabase>
 #include <QCommandLineOption>
 #include <QCommandLineParser>
 #include "QsLog.h"
@@ -36,6 +37,8 @@ int main(int argc, char *argv[])
      // An option with a value
     QCommandLineOption nodeOption(QStringList() <<"n" << "node","make the given node the initial display","node");
     parser.addOption(nodeOption);
+    QCommandLineOption fontOption("f","List your systems Arabic fonts");
+    parser.addOption(fontOption);
     //    a.setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
 
     QsLogging::Logger& logger = QsLogging::Logger::instance();
@@ -60,6 +63,11 @@ int main(int argc, char *argv[])
 
     progOptions.dump = parser.isSet(dumpOption);
     progOptions.node = parser.value(nodeOption);
+    if (parser.isSet(fontOption) ) {
+      QFontDatabase fdb;
+      qDebug() << fdb.families(QFontDatabase::Arabic);
+      return 0;
+    }
     //    qDebug() << "node = " << node << dump;
     //    qDebug() << "args = " << args;
     int ret;
