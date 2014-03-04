@@ -54,9 +54,14 @@ class NodeSearchDialog : public QDialog {
   bool getNewTab() const;
   void setNewTab(bool v);
  private:
+  QLabel * m_prompt;
   QLineEdit * m_edit;
   QCheckBox * m_newTab;
+  QCheckBox * m_switchFocus;
   QDialogButtonBox * m_buttonBox;
+  QPushButton * m_moreButton;
+  QPushButton * m_findButton;
+  QWidget * m_options;
 };
 class WordSearchDialog : public QDialog {
   Q_OBJECT
