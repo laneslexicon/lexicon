@@ -197,7 +197,9 @@ void LanesLexicon::shortcut(const QString & k) {
   QString key = k.toCaseFolded();
   qDebug() << Q_FUNC_INFO << k;
   if (key == QString("search root")) {
-    RootSearchDialog * d = new RootSearchDialog(this);
+    SearchDialog * d = new SearchDialog(this);
+    d->setWindowTitle(tr("Search for Root"));
+    d->setPrompt(tr("Find root"));
     d->setNewTab(m_searchNewTab);
     if (d->exec()) {
       QString t = d->getText();
@@ -237,7 +239,9 @@ void LanesLexicon::shortcut(const QString & k) {
     delete d;
   }
   else if (key == QString("search word")) {
-    WordSearchDialog * d = new WordSearchDialog(this);
+    SearchDialog * d = new SearchDialog(this);
+    d->setWindowTitle(tr("Search for Word"));
+    d->setPrompt(tr("Find word"));
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {

@@ -11,23 +11,13 @@
 #include <QLabel>
 #include "imedit.h"
 #include "imlineedit.h"
-class SearchWidget : public QWidget {
-  Q_OBJECT
- public:
-  SearchWidget(QWidget * parent = 0);
-  public slots:
-    void onCancel();
- private:
-  WrappedEdit * m_edit;
-  QPushButton * m_cancelBtn;
-};
-
-class RootSearchDialog : public QDialog {
+class SearchDialog : public QDialog {
   Q_OBJECT
 
  public:
-  RootSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
+  SearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   QString getText();
+  void setPrompt(const QString &);
   bool getNewTab();
   void setNewTab(bool v);
   bool getSwitchFocus();
@@ -35,7 +25,7 @@ class RootSearchDialog : public QDialog {
   public slots:
     void keymapChanged();
     void showOptions(bool);
- private:
+ protected:
     QLabel * m_prompt;
     QGroupBox * m_group;
     ImLineEdit * m_edit;
@@ -63,18 +53,5 @@ class NodeSearchDialog : public QDialog {
   QPushButton * m_moreButton;
   QPushButton * m_findButton;
   QWidget * m_options;
-};
-class WordSearchDialog : public QDialog {
-  Q_OBJECT
-
- public:
-  WordSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
-  QString getText();
-  public slots:
-    void keymapChanged();
- private:
-  //  WrappedEdit * m_edit;
-    ImLineEdit * m_edit;
-  QDialogButtonBox * m_buttonBox;
 };
 #endif
