@@ -20,7 +20,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
 
   if (this->textCursor().hasSelection()) {
     QAction *copyAction = menu.addAction("&Copy");
-    connect(copyAction,SIGNAL(triggered()),this,SLOT(copy()));
+    connect(copyAction,SIGNAL(triggered()),this,SIGNAL(copy()));
     QAction *clearCurrentAction = menu.addAction(tr("Clear current entry selection"));
     connect(clearCurrentAction,SIGNAL(triggered()),this,SLOT(clearSelection()));
     QAction *clearAllAction = menu.addAction(tr("Clear all selected items"));
@@ -82,11 +82,13 @@ void EntryItem::focusInEvent(QFocusEvent * event) {
   emit(placeChanged(this->getPlace()));
   QGraphicsTextItem::focusInEvent(event);
 }
+/*
 void EntryItem::copy() {
   QString txt = this->textCursor().selectedText();
   QClipboard *clipboard = QApplication::clipboard();
   clipboard->setText(txt);
 }
+*/
 void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWidget *w) {
   QPen pen = painter->pen();
   QBrush brush = painter->brush();

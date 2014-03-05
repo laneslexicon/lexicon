@@ -68,7 +68,7 @@ class EntryItem : public QGraphicsTextItem {
   bool  getFocusOnHover() const { return m_focusOnHover;}
   public slots:
     void searchItem();
-    void copy();
+
     void clearSelection();
  signals:
     void showPerseus(const Place &);
@@ -76,6 +76,7 @@ class EntryItem : public QGraphicsTextItem {
     void bookmarkAdd(const QString & id,const Place & p);
     void selectAllItems();
     void clearAllItems();
+    void copy();
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);

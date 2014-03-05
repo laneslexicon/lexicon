@@ -79,6 +79,7 @@ class GraphicsEntry : public QWidget {
     void selectAll();
     void clearAll();
     void selectEntry();
+    void copy();
  private:
     QColor m_supplementBg;
     bool prepareQueries();

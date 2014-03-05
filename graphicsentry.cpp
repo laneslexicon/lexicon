@@ -842,6 +842,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(clearAllItems()),this,SLOT(clearAll()));
     /// pass through signal for mainwindow to handle
     connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
+    connect(gi,SIGNAL(copy()),this,SLOT(copy()));
     return gi;
 }
 /**
@@ -1108,7 +1109,19 @@ void GraphicsEntry::showPerseus(const Place & p) {
 void GraphicsEntry::updateCurrentPlace(const Place & p) {
   m_place = p;
 }
+/**
+ *
+ *
+ */
+void GraphicsEntry::copy() {
+  QString txt;
+  QClipboard *clipboard = QApplication::clipboard();
 
+  for(int i=0;i < m_items.size();i++) {
+   txt += m_items[i]->textCursor().selectedText();
+  }
+  clipboard->setText(txt);
+}
 void GraphicsEntry::selectAll() {
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->selectAll();
