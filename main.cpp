@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
       qDebug() << fdb.families(QFontDatabase::Arabic);
       return 0;
     }
+    QFontDatabase::addApplicationFont("./resources/fonts/amiri/amiri-regular.ttf");
     //    qDebug() << "node = " << node << dump;
     //    qDebug() << "args = " << args;
     int ret;
