@@ -30,8 +30,9 @@ class RootSearchDialog : public QDialog {
   QString getText();
   bool getNewTab();
   void setNewTab(bool v);
+  bool getSwitchFocus();
+  void setSwitchFocus(bool v);
   public slots:
-    void onCancel();
     void keymapChanged();
     void showOptions(bool);
  private:

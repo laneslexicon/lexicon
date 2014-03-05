@@ -90,9 +90,7 @@ RootSearchDialog::RootSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_edit->setFocus();
 }
 void RootSearchDialog::showOptions(bool v) {
-  qDebug() << Q_FUNC_INFO << v;
   m_options->setVisible(v);
-  //  this->adjustSize();
   if (!v)
     m_edit->setFocus();
 }
@@ -102,9 +100,6 @@ void RootSearchDialog::keymapChanged() {
   /// this will deactive the current map as there is no such map
   m_edit->activateMap(btn->text(),true);
   m_edit->setFocus();
-}
-void RootSearchDialog::onCancel() {
-  //  reject();
 }
 QString RootSearchDialog::getText() {
   return m_edit->text().trimmed();
@@ -117,6 +112,15 @@ bool RootSearchDialog::getNewTab() {
 }
 void RootSearchDialog::setNewTab(bool v) {
   m_newTab->setChecked(v);
+}
+bool RootSearchDialog::getSwitchFocus() {
+  if (m_switchFocus->checkState() == Qt::Checked) {
+    return true;
+  }
+  return false;
+}
+void RootSearchDialog::setSwitchFocus(bool v) {
+  m_switchFocus->setChecked(v);
 }
 /**
  *
