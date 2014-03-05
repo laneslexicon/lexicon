@@ -17,12 +17,6 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_text = new GraphicsEntry;
-  QSplitter * splitter = new QSplitter(Qt::Vertical);
-  splitter->addWidget(m_list);
-  splitter->addWidget(m_text);
-  splitter->setStretchFactor(0,0);
-  splitter->setStretchFactor(1,1);
-  layout->addWidget(splitter);
 
   bool ok = false;
   /// TODO replace select *
@@ -64,7 +58,13 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
       nodes << t;
     }
   }
-  //  m_list->resizeColumnsToContents();
+  QSplitter * splitter = new QSplitter(Qt::Vertical);
+  splitter->addWidget(m_list);
+  splitter->addWidget(m_text);
+  splitter->setStretchFactor(0,0);
+  splitter->setStretchFactor(1,1);
+  layout->addWidget(splitter);
+  m_list->adjustSize();//resizeColumnsToContents();
 
   setLayout(layout);
   connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
