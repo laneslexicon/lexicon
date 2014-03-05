@@ -69,11 +69,13 @@ class EntryItem : public QGraphicsTextItem {
   public slots:
     void searchItem();
     void copy();
+    void clearSelection();
  signals:
     void showPerseus(const Place &);
     void placeChanged(const Place &);
     void bookmarkAdd(const QString & id,const Place & p);
     void selectAllItems();
+    void clearAllItems();
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);

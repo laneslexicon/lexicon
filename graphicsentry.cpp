@@ -839,6 +839,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
     connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
     connect(gi,SIGNAL(selectAllItems()),this,SLOT(selectAll()));
+    connect(gi,SIGNAL(clearAllItems()),this,SLOT(clearAll()));
     /// pass through signal for mainwindow to handle
     connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
     return gi;
@@ -1109,9 +1110,13 @@ void GraphicsEntry::updateCurrentPlace(const Place & p) {
 }
 
 void GraphicsEntry::selectAll() {
-  qDebug() << "select all";
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->selectAll();
+  }
+}
+void GraphicsEntry::clearAll() {
+  for(int i=0;i < m_items.size();i++) {
+    m_items[i]->clearSelection();
   }
 }
 void GraphicsEntry::selectEntry() {

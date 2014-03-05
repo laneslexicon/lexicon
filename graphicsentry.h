@@ -77,6 +77,7 @@ class GraphicsEntry : public QWidget {
     void showPerseus(const Place &);
     void updateCurrentPlace(const Place &);
     void selectAll();
+    void clearAll();
     void selectEntry();
  private:
     QColor m_supplementBg;
