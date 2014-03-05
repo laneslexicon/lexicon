@@ -64,6 +64,8 @@ class EntryItem : public QGraphicsTextItem {
   void setOutputHTML(const QString & html) { m_html = html;}
   QTextCursor highlight(const QString &);
   QTextCursor highlightRx(const QString &);
+  void setFocusOnHover(bool v) { m_focusOnHover = v;};
+  bool  getFocusOnHover() const { return m_focusOnHover;}
   public slots:
     void searchItem();
     void copy();
@@ -78,6 +80,7 @@ class EntryItem : public QGraphicsTextItem {
   void focusInEvent(QFocusEvent *);
   void paint( QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
   QColor m_backgroundColor;
+  bool m_focusOnHover;
   private:
   Place m_place;
   QString m_html;    /// saves the generated HTML for debug, only set when dumpOutputHTM is true

@@ -1,8 +1,9 @@
 #include "entryitem.h"
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
+  m_focusOnHover = false;
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
-
+  m_focusOnHover = false;
 }
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
@@ -56,8 +57,9 @@ void EntryItem::searchItem() {
   qDebug() << Q_FUNC_INFO;
 }
 void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
-  //  QGraphicsTextItem::hoverEnterEvent(event);
-  scene()->setFocusItem(this);
+  if (m_focusOnHover)
+    scene()->setFocusItem(this);
+  QGraphicsTextItem::hoverEnterEvent(event);
 }
 void EntryItem::focusInEvent(QFocusEvent * event) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << this->getPlace().getText();
