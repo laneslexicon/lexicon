@@ -486,10 +486,13 @@ void LanesLexicon::createActions() {
   m_pageFirstAction = new QAction(QIcon(imgdir + "/go-first.png"),tr("First Page"),this);
   m_pageLastAction = new QAction(QIcon(imgdir + "/go-last.png"),tr("Last Page"),this);
 
+  m_docAction = new QAction("Open docs",this);
+
   connect(m_pageForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextPage()));
   connect(m_pageBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevPage()));
   connect(m_pageFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstPage()));
   connect(m_pageLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastPage()));
+  connect(m_docAction,SIGNAL(triggered()),this,SLOT(on_actionDocs()));
 }
 void LanesLexicon::createToolBar() {
   m_fileToolBar = addToolBar(tr("&File"));
@@ -497,8 +500,6 @@ void LanesLexicon::createToolBar() {
   m_fileToolBar->addAction(m_testAction);
 
   QToolBar * history = addToolBar(tr("History"));
-
-
 
 
   m_hBackwardBtn = new QToolButton(history);
@@ -530,6 +531,9 @@ void LanesLexicon::createToolBar() {
 
   QToolBar * place = addToolBar("Place");
   place->addWidget(m_pwidget);
+
+  QToolBar * docs = addToolBar("&Docs");
+  docs->addAction(m_docAction);
 }
 /**
  * when user has done something that adds to history
@@ -1490,4 +1494,37 @@ void LanesLexicon::updateStatusBar() {
     m_navModeIndicator->setText("Nav mode: by page");
   }
 
+}
+void LanesLexicon::on_actionDocs() {
+  qDebug() << Q_FUNC_INFO;
+  QFile f("site/index.html");
+  if ( ! f.open(QIODevice::ReadOnly)) {
+    QLOG_WARN() << "Unable to open index.html";
+    return;
+  }
+  QTextStream in(&f);
+  in.setCodec("UTF-8");
+  QString t;
+  while(! in.atEnd()) {
+    t += in.readLine();
+  }
+
+   QWebView *view = new QWebView(this);
+   // this works:
+   //   QUrl url = QUrl::fromLocalFile("/home/andrewsg/qt5projects/LanesLexicon/site/index.html");
+   //   view->load(url);
+
+
+   //  this loads the html but not stylesheets etc
+   //   view->setHtml(t,QUrl::fromLocalFile("./site"));
+   //   view->setHtml(t,QUrl::fromLocalFile("/home/andrewsg/qt5projects/LanesLexicon/site"));
+   //   view->setHtml(t,QUrl::fromLocalFile("/home/andrewsg/qt5projects/LanesLexicon/site/."));
+   // this works:
+   // view->setHtml(t,QUrl::fromLocalFile("/home/andrewsg/qt5projects/LanesLexicon/site/"));
+   // this loads the html but not stylesheets etc
+   view->setHtml(t,QUrl::fromLocalFile("site/"));
+   view->show();
+   m_tabs->addTab(view,"Docs");
+   //   "file:///home/andrewsg/qt5projects/LanesLexicon/site/index.html"
+   qDebug() << "Bytes:" << view->page()->totalBytes();
 }
