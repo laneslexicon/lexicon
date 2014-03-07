@@ -10,7 +10,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
 
   QMenu menu(m_place.getShortText());
   menu.setObjectName("entry");
-  QAction *markAction = menu.addAction(tr("Add &Bookmark"));
+  QAction *markAction = menu.addAction(tr("Add &bookmark"));
   //  QAction *searchAction = menu.addAction("Find");
   //  connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
   QAction *selectAction;// = menu.addAction(tr("Select current &entry"));
@@ -21,14 +21,14 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   if (this->textCursor().hasSelection()) {
     QAction *copyAction = menu.addAction("&Copy");
     connect(copyAction,SIGNAL(triggered()),this,SIGNAL(copy()));
-    QAction *clearCurrentAction = menu.addAction(tr("Clear current entry selection"));
+    QAction *clearCurrentAction = menu.addAction(tr("Clear current &entry selection"));
     connect(clearCurrentAction,SIGNAL(triggered()),this,SLOT(clearSelection()));
-    QAction *clearAllAction = menu.addAction(tr("Clear all selected items"));
+    QAction *clearAllAction = menu.addAction(tr("Clear all selected &items"));
     connect(clearAllAction,SIGNAL(triggered()),this,SIGNAL(clearAllItems()));
 
   }
   else {
-    selectAction = menu.addAction(tr("Select current &entry"));
+    selectAction = menu.addAction(tr("&Select current entry"));
   }
   QAction * perseusAction = menu.addAction("Show &Perseus XML");
   Place p = this->getPlace();
