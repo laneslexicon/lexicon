@@ -376,10 +376,10 @@ void LanesLexicon::shortcut(const QString & k) {
       page->selectAll();
     }
   }
-  else if (key == "root mode") {
+  else if (key == "nav root mode") {
     m_navMode = 0;
   }
-  else if (key == "page mode") {
+  else if (key == "nav page mode") {
     m_navMode = 1;
   }
   else if (key == "history next") {
@@ -520,14 +520,23 @@ void LanesLexicon::createToolBar() {
   history->addWidget(m_hBackwardBtn);
 
   history->addSeparator();
-  QToolBar * navigation = addToolBar(tr("Root Navigation"));
-  navigation->addWidget(new QLabel("Navigate<br/>by root"));
-  navigation->addAction(m_rootFirstAction);
-  navigation->addAction(m_rootForwardAction);
-  navigation->addAction(m_rootBackwardAction);
-  navigation->addAction(m_rootLastAction);
+  QToolBar * navigation = addToolBar(tr("Navigation"));
+  m_navText = new QLabel("");
+  if (m_navMode == 0) {
+    m_navText->setText(tr("Root"));
+  }
+  else {
+    m_navText->setText(tr("Page"));
+  }
+
+  navigation->addWidget(m_navText);
+  navigation->addAction(m_navFirstAction);
+  navigation->addAction(m_navNextAction);
+  navigation->addAction(m_navPrevAction);
+  navigation->addAction(m_navLastAction);
   navigation->addSeparator();
   navigation->setFloatable(true);
+  /*
   navigation = addToolBar(tr("Page Navigation"));
   navigation->addWidget(new QLabel("Navigate<br/>by page"));
   navigation->addAction(m_pageFirstAction);
@@ -536,7 +545,7 @@ void LanesLexicon::createToolBar() {
   navigation->addAction(m_pageLastAction);
   navigation->addSeparator();
   navigation->setFloatable(true);
-
+  */
 }
 /**
  * when user has done something that adds to history
@@ -1471,11 +1480,12 @@ void LanesLexicon::updateStatusBar() {
 
   }
   if (m_navMode == 0) {
-    m_navModeIndicator->setText("Nav mode: by root");
-
+    m_navModeIndicator->setText(tr("Nav mode: by root"));
+    m_navText->setText(tr("Root"));
   }
   else {
-    m_navModeIndicator->setText("Nav mode: by page");
+    m_navModeIndicator->setText(tr("Nav mode: by page"));
+    m_navText->setText(tr("Page"));
   }
 
 }

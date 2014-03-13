@@ -208,6 +208,7 @@ private:
     QAction * m_navPrevAction;
     QAction * m_navFirstAction;
     QAction * m_navLastAction;
+    QLabel * m_navText;
 
     // root navigation
     QAction * m_rootForwardAction;
