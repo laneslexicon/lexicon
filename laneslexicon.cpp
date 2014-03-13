@@ -6,6 +6,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 {
   m_ok = false;
   m_history = 0;
+  m_revertEnabled = false;
   m_mapper = im_new();
   readSettings();
 
@@ -158,6 +159,7 @@ void LanesLexicon::setupInterface() {
     statusBar()->show();
     menuBar()->show();
   }
+  updateMenu();
 }
 /**
  * convenience
@@ -1277,13 +1279,13 @@ Place LanesLexicon::getCurrentPlace() {
  * @param key
  */
 void LanesLexicon::bookmarkShortcut(const QString & key) {
-  qDebug() << "bookmark" << key;
-  if (key == "revert") {
+  if (m_revertEnabled && (key == "revert")) {
     if (! m_bookmarks.contains("-here-")) {
       return;
     }
     Place p = m_bookmarks.value("-here-");
     showPlace(p,false);
+    m_revertEnabled = false;
     return;
   }
   if (key == "list") {
@@ -1381,6 +1383,8 @@ void LanesLexicon::bookmarkJump(const QString & id) {
   cp.setType(Place::Bookmark);
   m_bookmarks.insert("-here-",cp);
   showPlace(p,false);
+  m_revertEnabled = true;
+  updateMenu();
 }
 void LanesLexicon::restoreBookmarks() {
   QSettings settings;
@@ -1565,6 +1569,12 @@ void LanesLexicon::updateMenu() {
   }
   else {
     m_navModeRootAction->setChecked(false);
+  }
+  if (m_revertEnabled) {
+    m_bookmarkRevertAction->setEnabled(true);
+  }
+  else {
+    m_bookmarkRevertAction->setEnabled(false);
   }
 }
 void LanesLexicon::on_actionNavNext() {

@@ -175,6 +175,7 @@ private:
     void addBookmarkMenuItem(const QString & id);
     void bookmarkClear();
     AppMenu * m_mainmenu;
+    bool m_revertEnabled;
 
     void setupShortcuts();
     int m_historyPos;
