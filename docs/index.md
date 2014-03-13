@@ -1,6 +1,6 @@
 # Inrita hanc taedas inque quoniam inquit esse
 
-## Mactatos pectora Aeneas et opto urbe cruciata
+## Introduction
 
 Lorem [markdownum pia](http://www.billmays.net/) nec circumdata tamen iugalibus
 Theseus et transit, moveret usque et [vatibus
@@ -13,7 +13,7 @@ lusus, natum nec genuit. Roganti saliente a licet, **Cupidinis** funesto simul
 speciosaque omnis vicit vos fecit imagine. Nec obusta sensit populator et
 canebat petit, et cum sed.
 
-## Vitamque diligitur citaeque cum quae
+## Walkthrough
 
 Multorumque rostris dextrae, innumeras extrema fuerat debere animo, es unda.
 Matrisque putavi! Cum et perdere Pythia!
@@ -40,7 +40,7 @@ Matrisque putavi! Cum et perdere Pythia!
                 leafDebugMultiprocessing, queryE(isdn_worm, quad_certificate));
     }
 
-## Lingua virginis compressit peregit vittisconcutiens laevaque Baccheaque
+## Changing the way it looks and works
 
 Ferenti Prochytenque erat sanguine vacet indignis [pectore](http://example.com/)
 ferunt urbis arbitrio. Potest nam unus homini, deos inquit movit sparsos
