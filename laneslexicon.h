@@ -114,6 +114,8 @@ public:
 
     void bookmarkRebuildMenu();
 
+    void docsEnableBack(bool);
+
 private:
     Place showPlace(const Place &,bool newTab = false);
 
