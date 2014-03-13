@@ -83,6 +83,11 @@ public:
     void on_actionExit();
     void on_actionTest();
 
+    void on_actionNavNext();
+    void on_actionNavPrev();
+    void on_actionNavFirst();
+    void on_actionNavLast();
+
     void on_actionNextRoot();
     void on_actionPrevRoot();
     void on_actionFirstRoot();
@@ -198,6 +203,12 @@ private:
     QAction * m_testAction;
 
     QAction * m_hBackward;
+    /// Navigation
+    QAction * m_navNextAction;
+    QAction * m_navPrevAction;
+    QAction * m_navFirstAction;
+    QAction * m_navLastAction;
+
     // root navigation
     QAction * m_rootForwardAction;
     QAction * m_rootBackwardAction;

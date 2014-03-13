@@ -469,8 +469,17 @@ void LanesLexicon::createActions() {
 
   m_hBackward = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Back"),this);
 
+  m_navNextAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next"),this);
+  m_navPrevAction = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Prev"),this);
+  m_navFirstAction = new QAction(QIcon(imgdir + "/go-first.png"),tr("First"),this);
+  m_navLastAction = new QAction(QIcon(imgdir + "/go-last.png"),tr("Last "),this);
 
-  //    openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
+  connect(m_navNextAction,SIGNAL(triggered()),this,SLOT(on_actionNavNext()));
+  connect(m_navPrevAction,SIGNAL(triggered()),this,SLOT(on_actionNavPrev()));
+  connect(m_navFirstAction,SIGNAL(triggered()),this,SLOT(on_actionNavFirst()));
+  connect(m_navLastAction,SIGNAL(triggered()),this,SLOT(on_actionNavLast()));
+
+
   m_rootForwardAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next Root"),this);
   m_rootBackwardAction = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Prev Root"),this);
   m_rootFirstAction = new QAction(QIcon(imgdir + "/go-first.png"),tr("First Root"),this);
@@ -1469,4 +1478,36 @@ void LanesLexicon::updateStatusBar() {
     m_navModeIndicator->setText("Nav mode: by page");
   }
 
+}
+void LanesLexicon::on_actionNavNext() {
+  if (m_navMode == 0) {
+    on_actionNextRoot();
+  }
+  else {
+    on_actionNextPage();
+  }
+}
+void LanesLexicon::on_actionNavPrev()  {
+  if (m_navMode == 0) {
+    on_actionPrevRoot();
+  }
+  else {
+    on_actionPrevPage();
+  }
+}
+void LanesLexicon::on_actionNavFirst()   {
+  if (m_navMode == 0) {
+    on_actionFirstRoot();
+  }
+  else {
+    on_actionFirstPage();
+  }
+}
+void LanesLexicon::on_actionNavLast()   {
+  if (m_navMode == 0) {
+    on_actionLastRoot();
+  }
+  else {
+    on_actionLastPage();
+  }
 }
