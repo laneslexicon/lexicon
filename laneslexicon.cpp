@@ -39,7 +39,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     m_historyEnabled = false;
   }
   m_history->setEnabled(m_historyEnabled);
-  m_pwidget = new PlaceWidget(this);
+
   //  m_notes->setObjectName("notes");
   if (m_docked) {
     m_treeDock = new QDockWidget("Contents",this);
@@ -528,8 +528,6 @@ void LanesLexicon::createToolBar() {
   navigation->addSeparator();
   navigation->setFloatable(true);
 
-  QToolBar * place = addToolBar("Place");
-  place->addWidget(m_pwidget);
 }
 /**
  * when user has done something that adds to history
@@ -537,12 +535,10 @@ void LanesLexicon::createToolBar() {
  *
  */
 void LanesLexicon::historyAddition() {
-  qDebug() << Q_FUNC_INFO;
   statusBar()->showMessage(tr("History added"));
   setupHistory(-1);
 }
 void LanesLexicon::historyPositionChanged(int pos) {
-  qDebug() << Q_FUNC_INFO << pos;
   setupHistory(pos);
 }
 /**
@@ -756,22 +752,6 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
   if (item) {
     Place p = item->getPlace();
     m_placeIndicator->setText(p.getText());
-    qDebug() << Q_FUNC_INFO << p.getText();
-    /*
-    m_pwidget->setPlace(item->getPlace());
-    QString node = item->getNode();
-    QString word = item->getWord();
-    QString root = item->getRoot();
-    QPointF p = item->pos();
-    if (! node.isEmpty()) {
-      QString txt = QString("%1  %2  At:%3,%4").arg(node).arg(word).arg(p.x()).arg(p.y());
-      statusBar()->showMessage(txt);
-      if (m_useNotes) {
-        m_notesBtn->setEnabled(true);
-        emit(nodeActivated(item->getNode(),item->getWord()));
-      }
-    }
-    */
   }
 
 }
@@ -993,7 +973,6 @@ void LanesLexicon::restoreTabs() {
   wp.setType(Place::RestoreTab);
   if ((tab >=0) && (tab << m_tabs->count())) {
     m_tabs->setCurrentIndex(tab);
-    m_pwidget->setPlace(wp);
   }
 
 }

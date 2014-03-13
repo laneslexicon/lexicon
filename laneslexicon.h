@@ -188,7 +188,6 @@ private:
     ContentsWidget * m_tree;
     //    GraphicsEntry * m_entry;
     NotesWidget * m_notes;
-    PlaceWidget * m_pwidget;
     QSqlDatabase m_db;
     QTabWidget * m_tabs;
     QToolBar  * m_tools;
