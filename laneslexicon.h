@@ -112,7 +112,7 @@ public:
     void bookmarkAdd();
     void bookmarkAdd(const QString & id,const Place & p);
 
-
+    void onNavModeChanged();
 
 
     void bookmarkRebuildMenu();
@@ -209,6 +209,7 @@ private:
     QAction * m_navFirstAction;
     QAction * m_navLastAction;
     QLabel * m_navText;
+    QToolButton * m_navBtn;
 
     // root navigation
     QAction * m_rootForwardAction;

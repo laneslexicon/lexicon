@@ -501,6 +501,7 @@ void LanesLexicon::createActions() {
   connect(m_pageLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastPage()));
 }
 void LanesLexicon::createToolBar() {
+  QString imgdir = QString("./images/32");
   m_fileToolBar = addToolBar(tr("&File"));
   m_fileToolBar->addAction(m_exitAction);
   m_fileToolBar->addAction(m_testAction);
@@ -529,7 +530,44 @@ void LanesLexicon::createToolBar() {
     m_navText->setText(tr("Page"));
   }
 
-  navigation->addWidget(m_navText);
+  QToolButton * m_navBtn = new QToolButton(navigation);
+  m_navBtn->setIcon(QIcon(imgdir + "/go-jump.png"));
+
+
+
+  QActionGroup * group = new QActionGroup(this);
+
+  QAction * action = group->addAction(tr("By root"));
+  action->setCheckable(true);
+  if (m_navMode == 0) {
+    action->setChecked(true);
+  }
+  else {
+    action->setChecked(false);
+  }
+  action->setData(QVariant(0));//event->getId());
+  connect(action,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
+
+  action = group->addAction(tr("By page"));
+  action->setCheckable(true);
+
+  if (m_navMode == 1) {
+    action->setChecked(true);
+  }
+  else {
+    action->setChecked(false);
+  }
+  action->setData(QVariant(1));//event->getId());
+  connect(action,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
+  QMenu * m = new QMenu;
+  m->addActions(group->actions());
+  m_navBtn->setEnabled(true);
+  m_navBtn->setMenu(m);
+  //  m_navBtn->setDefaultAction(m_hBackward);
+  m_navBtn->setPopupMode(QToolButton::MenuButtonPopup);
+
+  //  navigation->addWidget(m_navText);
+  navigation->addWidget(m_navBtn);
   navigation->addAction(m_navFirstAction);
   navigation->addAction(m_navNextAction);
   navigation->addAction(m_navPrevAction);
@@ -1519,5 +1557,17 @@ void LanesLexicon::on_actionNavLast()   {
   }
   else {
     on_actionLastPage();
+  }
+}
+void LanesLexicon::onNavModeChanged() {
+  qDebug() << Q_FUNC_INFO;
+  QAction * action = qobject_cast<QAction *>(QObject::sender());
+  if (action) {
+    bool ok;
+    int m = action->data().toInt(&ok);
+    if (ok) {
+      m_navMode = m;
+      updateStatusBar();
+    }
   }
 }
