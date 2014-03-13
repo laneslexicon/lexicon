@@ -71,6 +71,7 @@ public:
     bool isOk() { return m_ok;}
     QString convertString(const QString &) const;
     HistoryMaster * history();
+    enum NavMode {ByRoot, ByPage };
     private slots:
       void shortcut(const QString &);
     void findNextRoot(const QString &);
@@ -128,6 +129,7 @@ private:
     QLabel * m_navModeIndicator;
     QLabel * m_placeIndicator;
     void updateStatusBar();
+    void updateMenu();
     bool m_ok;
     bool m_docked;          // whether to use docked widget
     bool m_valgrind;
@@ -210,6 +212,9 @@ private:
     QAction * m_navLastAction;
     QLabel * m_navText;
     QToolButton * m_navBtn;
+    QMenu * m_navMenu;
+    QAction * m_navModeRootAction;
+    QAction * m_navModePageAction;
 
     // root navigation
     QAction * m_rootForwardAction;

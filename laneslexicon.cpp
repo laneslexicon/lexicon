@@ -395,6 +395,7 @@ void LanesLexicon::shortcut(const QString & k) {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
   updateStatusBar();
+  updateMenu();
   //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
 }
 /**
@@ -499,6 +500,21 @@ void LanesLexicon::createActions() {
   connect(m_pageBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevPage()));
   connect(m_pageFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstPage()));
   connect(m_pageLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastPage()));
+
+  m_navModeRootAction = new QAction(tr("By root"),this);
+  m_navModeRootAction->setData(LanesLexicon::ByRoot);
+  m_navModeRootAction->setCheckable(true);
+  if (m_navMode == LanesLexicon::ByRoot) {
+    m_navModeRootAction->setChecked(true);
+  }
+  m_navModePageAction = new QAction(tr("By page"),this);
+  m_navModePageAction->setData(LanesLexicon::ByPage);
+  m_navModePageAction->setCheckable(true);
+  if (m_navMode == LanesLexicon::ByPage) {
+    m_navModePageAction->setChecked(true);
+  }
+  connect(m_navModeRootAction,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
+  connect(m_navModePageAction,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
 }
 void LanesLexicon::createToolBar() {
   QString imgdir = QString("./images/32");
@@ -534,6 +550,7 @@ void LanesLexicon::createToolBar() {
   m_navBtn->setIcon(QIcon(imgdir + "/go-jump.png"));
 
 
+  /// TODO should we reuse the m_navMode{Root,Page}Action
 
   QActionGroup * group = new QActionGroup(this);
 
@@ -674,6 +691,15 @@ void LanesLexicon::createMenus() {
   //  m_bookmarkMenu->addAction(m_bookmarkJumpAction);
 
   connect(m_mainmenu,SIGNAL(rebuildBookmarks()),this,SLOT(bookmarkRebuildMenu()));
+
+  m_navMenu = m_mainmenu->addMenu(tr("&Navigation"));
+  m_navMenu->setObjectName("navigationmenu");
+  m_navMenu->addAction(m_navFirstAction);
+  m_navMenu->addAction(m_navNextAction);
+  m_navMenu->addAction(m_navPrevAction);
+  m_navMenu->addAction(m_navLastAction);
+  m_navMenu->addAction(m_navModeRootAction);
+  m_navMenu->addAction(m_navModePageAction);
 }
 
 void LanesLexicon::createStatusBar() {
@@ -1527,6 +1553,20 @@ void LanesLexicon::updateStatusBar() {
   }
 
 }
+void LanesLexicon::updateMenu() {
+  if (m_navMode == LanesLexicon::ByRoot) {
+    m_navModeRootAction->setChecked(true);
+  }
+  else {
+    m_navModeRootAction->setChecked(false);
+  }
+  if (m_navMode == LanesLexicon::ByPage) {
+    m_navModePageAction->setChecked(true);
+  }
+  else {
+    m_navModeRootAction->setChecked(false);
+  }
+}
 void LanesLexicon::on_actionNavNext() {
   if (m_navMode == 0) {
     on_actionNextRoot();
@@ -1568,6 +1608,7 @@ void LanesLexicon::onNavModeChanged() {
     if (ok) {
       m_navMode = m;
       updateStatusBar();
+      updateMenu();
     }
   }
 }
