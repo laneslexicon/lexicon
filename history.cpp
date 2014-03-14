@@ -225,3 +225,16 @@ void HistoryMaster::readSettings() {
   m_size = settings.value("Size",10).toInt();
 
 }
+bool HistoryMaster::clear() {
+   if ( ! m_historyEnabled ) {
+     return true;
+   }
+   QSqlQuery qry(m_db);
+   if (qry.prepare("delete from history")) {
+     return qry.exec();
+   }
+   else {
+     qDebug() << "Error preparing delete history sql";
+   }
+   return false;
+}

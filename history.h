@@ -44,6 +44,7 @@ class HistoryMaster {
   void off();
   bool isOn() { return m_historyOn;}
   bool isOk() { return m_ok;}
+  bool clear();
   QList<HistoryEvent *> getHistory();
  private:
   QSqlDatabase m_db;
