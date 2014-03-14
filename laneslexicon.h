@@ -98,7 +98,7 @@ public:
     void on_actionPrevPage();
     void on_actionFirstPage();
     void on_actionLastPage();
-
+    void on_actionClearHistory();
     void onHistorySelection();
     void rootClicked(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
@@ -178,6 +178,7 @@ private:
     AppMenu * m_mainmenu;
     bool m_revertEnabled;
 
+
     void setupShortcuts();
     int m_historyPos;
     QMenu * m_historyMenu;
@@ -230,7 +231,7 @@ private:
     QAction * m_pageFirstAction;
     QAction * m_pageLastAction;
     // history
-
+    QAction * m_clearHistoryAction;
     QToolButton * m_hBackwardBtn;
     HistoryMaster * m_history;
  signals:

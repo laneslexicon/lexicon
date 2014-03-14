@@ -466,6 +466,9 @@ void LanesLexicon::createActions() {
   m_exitAction = new QAction(tr("Exit"),this);
   connect(m_exitAction,SIGNAL(triggered()),this,SLOT(on_actionExit()));
 
+  m_clearHistoryAction = new QAction(tr("Clear"),this);
+  connect(m_clearHistoryAction,SIGNAL(triggered()),this,SLOT(on_actionClearHistory()));
+
   m_testAction = new QAction(tr("Test"),this);
   connect(m_testAction,SIGNAL(triggered()),this,SLOT(on_actionTest()));
   /// probably need icons
@@ -621,11 +624,19 @@ void LanesLexicon::setupHistory(int currPos) {
   m_historyPos = currPos;
   QList<HistoryEvent *> events = m_history->getHistory();//10,0,currPos);
   if (events.size() == 0) {
-    m_hBackwardBtn->setEnabled(true);
+    m_hBackwardBtn->setEnabled(false);
+    m_clearHistoryAction->setEnabled(false);
   }
   else {
-    m_historyMenu->clear();
-    m_historyMenu->setObjectName("history");
+    // m_historyMenu->clear();
+    m_hBackwardBtn->setEnabled(true);
+    m_clearHistoryAction->setEnabled(true);
+    QList<QAction *> actions = m_historyMenu->actions();
+    actions.removeOne(m_clearHistoryAction);
+    for(int i=0;i < actions.size();i++) {
+        m_historyMenu->removeAction(actions[i]);
+        delete actions[i];
+    }
     QActionGroup * group = new QActionGroup(this);
     while(events.size() > 0) {
       HistoryEvent * event = events.takeFirst();
@@ -689,7 +700,7 @@ void LanesLexicon::createMenus() {
 
   m_historyMenu = m_mainmenu->addMenu(tr("&History"));
   m_historyMenu->setObjectName("history");
-
+  m_historyMenu->addAction(m_clearHistoryAction);
   m_navMenu = m_mainmenu->addMenu(tr("&Navigation"));
   m_navMenu->setObjectName("navigationmenu");
   m_navMenu->addAction(m_navFirstAction);
@@ -1621,4 +1632,8 @@ void LanesLexicon::onNavModeChanged() {
       updateMenu();
     }
   }
+}
+void LanesLexicon::on_actionClearHistory() {
+  qDebug() << Q_FUNC_INFO <<  m_history->clear();
+  setupHistory();
 }
