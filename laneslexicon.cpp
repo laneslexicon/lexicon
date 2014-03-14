@@ -830,7 +830,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
  * @param newFocus
  * @param oldFocus
  * @param reason
- */
+ **/
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /* oldFocus */, Qt::FocusReason /* reason */) {
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
   if (item) {
@@ -877,6 +877,10 @@ void LanesLexicon::on_actionTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
 }
+/**
+ * TODO tidy up navMode
+ *
+ */
 void LanesLexicon::readSettings() {
   QSettings settings;
   settings.setIniCodec("UTF-8");
@@ -898,11 +902,11 @@ void LanesLexicon::readSettings() {
   m_navigationMode = settings.value("Navigation","root").toString();
   m_useNotes = settings.value("Use notes",false).toBool();
   m_activeMap = settings.value("Default map","Buckwalter").toString();
-  if (settings.value("Nav mode","root").toString() == "page") {
-    m_navMode = 1;
+  if (m_navigationMode.toLower() == "root") {
+    m_navMode = LanesLexicon::ByRoot;
   }
   else {
-    m_navMode = 0;
+    m_navMode = LanesLexicon::ByPage;
   }
 
   settings.endGroup();
@@ -1568,7 +1572,7 @@ void LanesLexicon::updateMenu() {
     m_navModePageAction->setChecked(true);
   }
   else {
-    m_navModeRootAction->setChecked(false);
+    m_navModePageAction->setChecked(false);
   }
   if (m_revertEnabled) {
     m_bookmarkRevertAction->setEnabled(true);
