@@ -63,8 +63,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   setupBookmarkShortcuts();
 
   createActions();
-  createToolBar();
   createMenus();
+  createToolBar();
   createStatusBar();
 
   if (m_db.isOpen()) {
@@ -525,20 +525,15 @@ void LanesLexicon::createToolBar() {
   m_fileToolBar->addAction(m_testAction);
 
   QToolBar * history = addToolBar(tr("History"));
-
-
-
-
   m_hBackwardBtn = new QToolButton(history);
   m_hBackwardBtn->setText("Back");
   m_hBackwardBtn->setDefaultAction(m_hBackward);
   m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_hBackwardBtn->setEnabled(false);
-
-
   history->addWidget(m_hBackwardBtn);
-
   history->addSeparator();
+
+
   QToolBar * navigation = addToolBar(tr("Navigation"));
   m_navText = new QLabel("");
   if (m_navMode == 0) {
@@ -582,10 +577,7 @@ void LanesLexicon::createToolBar() {
   m->addActions(group->actions());
   m_navBtn->setEnabled(true);
   m_navBtn->setMenu(m);
-  //  m_navBtn->setDefaultAction(m_hBackward);
   m_navBtn->setPopupMode(QToolButton::MenuButtonPopup);
-
-  //  navigation->addWidget(m_navText);
   navigation->addWidget(m_navBtn);
   navigation->addAction(m_navFirstAction);
   navigation->addAction(m_navNextAction);
@@ -593,16 +585,16 @@ void LanesLexicon::createToolBar() {
   navigation->addAction(m_navLastAction);
   navigation->addSeparator();
   navigation->setFloatable(true);
-  /*
-  navigation = addToolBar(tr("Page Navigation"));
-  navigation->addWidget(new QLabel("Navigate<br/>by page"));
-  navigation->addAction(m_pageFirstAction);
-  navigation->addAction(m_pageForwardAction);
-  navigation->addAction(m_pageBackwardAction);
-  navigation->addAction(m_pageLastAction);
-  navigation->addSeparator();
-  navigation->setFloatable(true);
-  */
+  QToolBar * bookmarks = addToolBar(tr("Bookmarks"));
+  m_bookmarkBtn = new QToolButton(bookmarks);
+  m_bookmarkBtn->setIcon(QIcon(imgdir + "/user-bookmarks.png"));
+  m_bookmarkBtn->setText("Bookmarks");
+  //  m_bookmarkBtn->setDefaultAction(m_hBackward);
+  m_bookmarkBtn->setPopupMode(QToolButton::MenuButtonPopup);
+  m_bookmarkBtn->setEnabled(true);
+  m_bookmarkBtn->setMenu(m_bookmarkMenu);
+  bookmarks->addWidget(m_bookmarkBtn);
+  bookmarks->addSeparator();
 }
 /**
  * when user has done something that adds to history
@@ -634,7 +626,6 @@ void LanesLexicon::setupHistory(int currPos) {
     QMenu * m = new QMenu;
     m->setObjectName("history");
     QActionGroup * group = new QActionGroup(this);
-    /// TODO for pagemode entries change the text
     while(events.size() > 0) {
       HistoryEvent * event = events.takeFirst();
       Place p = event->getPlace();
@@ -670,6 +661,7 @@ void LanesLexicon::setupHistory(int currPos) {
     m_hBackwardBtn->setEnabled(true);
     //    m_hBackwardBtn->addActions(group->actions());//setMenu(m);
     m_hBackwardBtn->setMenu(m);
+
   }
   if (currPos  == -1) {
     return;
@@ -693,6 +685,8 @@ void LanesLexicon::createMenus() {
   //  m_bookmarkMenu->addAction(m_bookmarkJumpAction);
 
   connect(m_mainmenu,SIGNAL(rebuildBookmarks()),this,SLOT(bookmarkRebuildMenu()));
+
+  m_historyMenu = m_mainmenu->addMenu(tr("&History"));
 
   m_navMenu = m_mainmenu->addMenu(tr("&Navigation"));
   m_navMenu->setObjectName("navigationmenu");

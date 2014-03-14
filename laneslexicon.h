@@ -172,6 +172,7 @@ private:
     QAction * m_bookmarkClearAction;
     QAction * m_bookmarkRevertAction;
     QMenu   * m_bookmarkMenu;
+    QToolButton * m_bookmarkBtn;
     void addBookmarkMenuItem(const QString & id);
     void bookmarkClear();
     AppMenu * m_mainmenu;
@@ -179,6 +180,7 @@ private:
 
     void setupShortcuts();
     int m_historyPos;
+    QMenu * m_historyMenu;
     void setSignals(GraphicsEntry *);
     void loadStyleSheet();
     void createActions();
