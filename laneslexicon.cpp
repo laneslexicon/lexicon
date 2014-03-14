@@ -530,6 +530,7 @@ void LanesLexicon::createToolBar() {
   m_hBackwardBtn->setDefaultAction(m_hBackward);
   m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_hBackwardBtn->setEnabled(false);
+  m_hBackwardBtn->setMenu(m_historyMenu);
   history->addWidget(m_hBackwardBtn);
   history->addSeparator();
 
@@ -623,8 +624,8 @@ void LanesLexicon::setupHistory(int currPos) {
     m_hBackwardBtn->setEnabled(true);
   }
   else {
-    QMenu * m = new QMenu;
-    m->setObjectName("history");
+    m_historyMenu->clear();
+    m_historyMenu->setObjectName("history");
     QActionGroup * group = new QActionGroup(this);
     while(events.size() > 0) {
       HistoryEvent * event = events.takeFirst();
@@ -656,11 +657,11 @@ void LanesLexicon::setupHistory(int currPos) {
       connect(action,SIGNAL(triggered()),this,SLOT(onHistorySelection()));
       delete event;
     }
-    m->addActions(group->actions());
+    m_historyMenu->addActions(group->actions());
     //    m->addActions(group);
     m_hBackwardBtn->setEnabled(true);
     //    m_hBackwardBtn->addActions(group->actions());//setMenu(m);
-    m_hBackwardBtn->setMenu(m);
+    //    m_hBackwardBtn->setMenu(m);
 
   }
   if (currPos  == -1) {
@@ -687,6 +688,7 @@ void LanesLexicon::createMenus() {
   connect(m_mainmenu,SIGNAL(rebuildBookmarks()),this,SLOT(bookmarkRebuildMenu()));
 
   m_historyMenu = m_mainmenu->addMenu(tr("&History"));
+  m_historyMenu->setObjectName("history");
 
   m_navMenu = m_mainmenu->addMenu(tr("&Navigation"));
   m_navMenu->setObjectName("navigationmenu");
