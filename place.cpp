@@ -113,7 +113,7 @@ Place Place::fromString(const QString & str) {
   QStringList x = str.split(",");
   Place p;
   int sz = x.size();
-  qDebug() << Q_FUNC_INFO << str << sz;
+  //  qDebug() << Q_FUNC_INFO << str << sz;
   if (sz > 0)
     p.setRoot(x[0]);
   if (sz > 1)

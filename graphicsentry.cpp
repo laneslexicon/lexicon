@@ -315,6 +315,7 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
     p.setNodeOnly(false);
     //    getXmlForNode(node);
     np = getXmlForRoot(p);
+    /// is this right ?
     if (np != p) {
       emit(placeChanged(np));
       m_place = np;
@@ -427,7 +428,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
   }
 
-  QLOG_DEBUG() << Q_FUNC_INFO << p;
+  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << p << p.getType();
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   if (! m_rootQuery->first()) {
@@ -447,6 +448,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   EntryItem * rootItem  = createEntry(str);
   /// will be null if the XSLT/XML has not parsed correctly
   if (rootItem == NULL) {
+    qDebug() << Q_FUNC_INFO << "exiting 5 with place";
     return p;
   }
 
@@ -608,7 +610,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (getHistory()->isOn()) {
     if (dp.getType() == Place::User) {
       m_place.setType(dp.getType());
-      qDebug() << "history add place" << m_place;
       getHistory()->add(m_place);
       /// this allows mainwindow to update the history list
       emit(historyAddition());
@@ -616,6 +617,12 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     else if (dp.getType() == Place::History) {
       emit(historyPositionChanged(dp.getId()));
     }
+    else {
+      //      qDebug() << "unknown place type"  << dp.getType();
+    }
+  }
+  else {
+    //    qDebug() << "history off";
   }
   qDebug() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
   return m_place;
@@ -987,7 +994,7 @@ int GraphicsEntry::hasPlace(const Place & p,int type,bool setFocus) {
     }
 
   }
-  qDebug() << Q_FUNC_INFO << p << ix;
+  //  qDebug() << Q_FUNC_INFO << p << ix;
   if ((ix != -1) && setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);
@@ -1107,7 +1114,7 @@ void GraphicsEntry::showPerseus(const Place & p) {
   msgBox.exec();
 }
 void GraphicsEntry::updateCurrentPlace(const Place & p) {
-  m_place = p;
+  //  m_place = p;
 }
 /**
  *

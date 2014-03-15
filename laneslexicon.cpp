@@ -82,7 +82,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   connect(m_tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 
-  connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
+  //  connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
   connect(m_tabs,SIGNAL(tabCloseRequested(int)),this,SLOT(onCloseTab(int)));
 
 
@@ -779,6 +779,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     newTab = true;
   }
   Place m(root,p);
+  m.setType(Place::User);
   showPlace(m,newTab);
 }
 Place LanesLexicon::showPlace(const Place & p,bool createTab) {
