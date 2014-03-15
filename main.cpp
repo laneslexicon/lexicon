@@ -69,7 +69,8 @@ int main(int argc, char *argv[])
       return 0;
     }
     QFontDatabase::addApplicationFont("./resources/fonts/amiri/amiri-regular.ttf");
-    //    qDebug() << "node = " << node << dump;
+    QFontDatabase::addApplicationFont("./site/fonts/fontawesome-webfont.ttf");
+  //    qDebug() << "node = " << node << dump;
     //    qDebug() << "args = " << args;
     int ret;
     LanesLexicon * w = new LanesLexicon;

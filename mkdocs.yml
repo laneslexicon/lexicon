@@ -1,0 +1,8 @@
+site_name: Lanes Lexicon
+pages:
+- ['index.md', 'Introduction']
+- ['user-guide/using.md', 'User Guide', 'Introduction']
+- ['user-guide/configuring.md', 'User Guide', 'Configuration']
+- ['lane/preface.md','Lane','Preface']
+- ['lane/citations.md','Lane','Citations']
+- ['about/license.md', 'About', 'License']

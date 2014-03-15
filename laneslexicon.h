@@ -39,6 +39,8 @@
 #include <QDockWidget>
 #include <QInputDialog>
 #include <QActionGroup>
+#include <QtWebKitWidgets/QWebView>
+#include <QUrl>
 #include "inputmapper.h"
 #include "contentswidget.h"
 #include "graphicsentry.h"
@@ -114,9 +116,10 @@ public:
     void bookmarkAdd(const QString & id,const Place & p);
 
     void onNavModeChanged();
-
-
+    void on_actionDocs();
     void bookmarkRebuildMenu();
+
+    void docsEnableBack(bool);
 
 private:
     Place showPlace(const Place &,bool newTab = false);
@@ -171,6 +174,7 @@ private:
     QAction * m_bookmarkJumpAction;
     QAction * m_bookmarkClearAction;
     QAction * m_bookmarkRevertAction;
+    QAction * m_docAction;
     QMenu   * m_bookmarkMenu;
     QToolButton * m_bookmarkBtn;
     void addBookmarkMenuItem(const QString & id);

@@ -501,10 +501,13 @@ void LanesLexicon::createActions() {
   m_pageFirstAction = new QAction(QIcon(imgdir + "/go-first.png"),tr("First Page"),this);
   m_pageLastAction = new QAction(QIcon(imgdir + "/go-last.png"),tr("Last Page"),this);
 
+  m_docAction = new QAction("Open docs",this);
+
   connect(m_pageForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextPage()));
   connect(m_pageBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevPage()));
   connect(m_pageFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstPage()));
   connect(m_pageLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastPage()));
+
 
   m_navModeRootAction = new QAction(tr("By root"),this);
   m_navModeRootAction->setData(LanesLexicon::ByRoot);
@@ -520,6 +523,9 @@ void LanesLexicon::createActions() {
   }
   connect(m_navModeRootAction,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
   connect(m_navModePageAction,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
+
+  connect(m_docAction,SIGNAL(triggered()),this,SLOT(on_actionDocs()));
+
 }
 void LanesLexicon::createToolBar() {
   QString imgdir = QString("./images/32");
@@ -589,6 +595,7 @@ void LanesLexicon::createToolBar() {
   navigation->addAction(m_navLastAction);
   navigation->addSeparator();
   navigation->setFloatable(true);
+
   QToolBar * bookmarks = addToolBar(tr("Bookmarks"));
   m_bookmarkBtn = new QToolButton(bookmarks);
   m_bookmarkBtn->setIcon(QIcon(imgdir + "/user-bookmarks.png"));
@@ -599,6 +606,11 @@ void LanesLexicon::createToolBar() {
   m_bookmarkBtn->setMenu(m_bookmarkMenu);
   bookmarks->addWidget(m_bookmarkBtn);
   bookmarks->addSeparator();
+
+
+  QToolBar * docs = addToolBar("&Docs");
+  docs->addAction(m_docAction);
+
 }
 /**
  * when user has done something that adds to history
@@ -1637,4 +1649,47 @@ void LanesLexicon::onNavModeChanged() {
 void LanesLexicon::on_actionClearHistory() {
   qDebug() << Q_FUNC_INFO <<  m_history->clear();
   setupHistory();
+}
+void LanesLexicon::docsEnableBack(bool v) {
+  qDebug() << Q_FUNC_INFO << v;
+}
+void LanesLexicon::on_actionDocs() {
+  qDebug() << Q_FUNC_INFO;
+  //  QFile f("site/lane/preface/index.html");
+  QFile f("site/index.html");
+  if ( ! f.open(QIODevice::ReadOnly)) {
+    QLOG_WARN() << "Unable to open index.html";
+    return;
+  }
+  QTextStream in(&f);
+  in.setCodec("UTF-8");
+  QString t;
+  while(! in.atEnd()) {
+    t += in.readLine();
+  }
+
+   QTextBrowser *view = new QTextBrowser(this);
+   connect(view,SIGNAL(backwardAvailable(bool)),this,SLOT(docsEnableBack(bool)));
+   QFont font("FontAwesome", 12, QFont::Normal);
+   qDebug() << "font" << font.toString();
+   // this works:
+   QUrl url = QUrl::fromLocalFile("/home/andrewsg/qt5projects/LanesLexicon/site/lane/preface/index.html");
+   //   view->load(url);
+   view->document()->setDefaultStyleSheet("body { font-family : FontAwesome;font-size : 12px; line-height : 60px;}");
+
+   view->setHtml(t); //"<html><body><p class=\"doc\">testing testing testing</p></body></html>");
+   //   view->setFont(font);
+
+   //  this loads the html but not stylesheets etc
+   //   view->setHtml(t,QUrl::fromLocalFile("./site"));
+   //   view->setHtml(t,QUrl::fromLocalFile("/home/andrewsg/qt5projects/LanesLexicon/site"));
+   //   view->setHtml(t,QUrl::fromLocalFile("/home/andrewsg/qt5projects/LanesLexicon/site/."));
+   // this works:
+   //view->setHtml(t,QUrl::fromLocalFile("./site"));
+   // this loads the html but not stylesheets etc
+   //view->setHtml(t,QUrl::fromLocalFile("site/"));
+   view->show();
+   m_tabs->addTab(view,"Docs");
+   //   "file:///home/andrewsg/qt5projects/LanesLexicon/site/index.html"
+   //   qDebug() << "Bytes:" << view->page()->totalBytes();
 }
