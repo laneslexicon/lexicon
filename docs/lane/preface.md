@@ -84,6 +84,27 @@ The "Ṣiḥáḥ," or same call it, "Ṣaḥáḥ," of El-Jowharee, [commonly, 
 
 #####xv
 
+The "Jámi'" of El-Ḳazzáz, [who died in the year of the Fligh 412. Ḥájjee Khaleefeh mentions it as "an esteemed book, but rare." It is not unfrequently cited in the Táj el-'Aroos.]
+
+The "Moo'ab" (thus, with fet-ḥ to the غ,) of Aboo-Ghálib Ibn-Temám, [or, according to Ibn-Khillikán, Abool-Ghálib Temám,] known by the appellation of Ibn-Et-Teiyánee, [who died in the year of the Flight 436;] a work of very great utility, consisting of what is correct of the  contents of the 'Eyn, not omitting anything of the confirmatory examples from the Ḳur-án and Traditions and the genuine poems of the Arabs, but rejecting what it contains of examples respecting which there is disagreement, and of mistranscribed words, and faulty formations; and adding what Ibn-Dureyd has added in the Jemharah. It is rarely found; for people have not persevered in transcribing it, but have rahter inclined to the Jemharah of Ibn-Dureyd and Moḥkam of Ibn-Seedeh and the Jámi' of El-Ḳazzáz and Ṣiḥáḥ &c.
+
+The "Moḥkam" of Ibn-Seedeh the Andalusian, who was blind, [as was also his father; and who died in the year of the Flight 458, aged abount 60 years.] This is the greatest of the lexicological books [i.e. of the lexicons] composed since the age of the Ṣiḥáḥ [to the time of the author of the Muzhir, of those known to him. It follows the arrangement of the 'Eyn; and it is held in very high estimation for it copiousness, its accuracy, its critical remarks, and its numerous examples from classical poets. In copiousness and in some other respects, it is superior, and in others hardly (if at all) inferior, to the Ṣiḥáḥ. It is one of the two chief sources of the Ḳamoos; the other being the 'Obáb of Eṣ-Ṣaghánee: and I have drawn from it very largely, both immediately and through the medium of the Lisán el-'Arab and of the Táj el-'Aroos, for my own lexicon. I possess the last fifth part of it in a volume of the "Tahdheeb et-Tahdheeb;" and another large portion, and a smaller portion, of a most admirable copy which has been dispersed, written in the year of the Flight 675, for the library of a Sulṭán, apparently the celebrated Beybars.]
+
+[The "Asás" of Ez-Zamamkhsheree, who was born in the year of the Fligh 467, and died in 538. This lexicon is a very excellent repertory of choice and chaste words and phrases; and espectially and peculairarly valuable as comprising a very large collection of trpoical signifcations, distinguised as such, which has greatly contributed, by indirectly illustrating proper significations as well as otherwise, to the value of my own lexicon, as my numerous citations of it will show, althought I have generally been obliged to draw from it through the medium of the Táj el-'Aroos, which often does not name it in quoting it. Its order is the same as that of the Mujmal, apparently in most copies: but some, which are said to be abridged, follow the order of Ṣiḥáḥ.]
+
+[The "Mughrib" of El-Muṭarrizee, who was born in Khuwárezm, in the yeaer of the Flight 536, and died in 610. This is a lexicon of select words and phrases, and particularly of such as occur in books of Traditions, and other works relating to the law. It forms a very valuable companion and supplement to the other lexicons; and I have constantly consulted it and drawn from it in composing the present work. Its arrangement of the roots is that of the usual order of the alphabet, with respect to the first, second, and third letters of each. I possess a very excellent copy of it, written in the year of the Flight 977, presented to me by the Rev. J.R.T. Lieder, late of the English Church-Mission in Cairo.]
+
+The "'Obáb" of Eṣ-Ṣaghánee, or Eṣ-Ṣághánee, [who was born in the year of the Flight 577, and died in 660, according to the Muzhir (48th Section), or, as is said in the Táj el-'Aroos (art. صغن), in 655, on the authority of one who attended his funeral.] This, afther the Moḥkam, is the greatest of the lexicological works composed since the age of the Ṣiḥáḥ [to the time of the author of the Muzhir, of those known to him. It was left unfinished. If, as I believe is the case, it follow the order of the Ṣiḥáḥ, the portion completed was somewhat more that three fourths; for] the author reached, in it, the section of بكم: which occasioned the saying,
+
+
+ <div align="center">
+
+               * إِنَّ الصَّغَانِىَّ  آلَّذِى  *  حَازَ آٱْعُلُومَ وَآلْحِكَمْ  * كَانَ قُصَارَى * أَنِ آنْتَهَى إِلَى بَكَمْ *
+
+ </div>
+ <br/>
+
+#####xvi
 
 
 
