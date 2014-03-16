@@ -97,17 +97,29 @@ The "Moḥkam" of Ibn-Seedeh the Andalusian, who was blind, [as was also his fat
 The "'Obáb" of Eṣ-Ṣaghánee, or Eṣ-Ṣághánee, [who was born in the year of the Flight 577, and died in 660, according to the Muzhir (48th Section), or, as is said in the Táj el-'Aroos (art. صغن), in 655, on the authority of one who attended his funeral.] This, afther the Moḥkam, is the greatest of the lexicological works composed since the age of the Ṣiḥáḥ [to the time of the author of the Muzhir, of those known to him. It was left unfinished. If, as I believe is the case, it follow the order of the Ṣiḥáḥ, the portion completed was somewhat more that three fourths; for] the author reached, in it, the section of بكم: which occasioned the saying,
 
 
- <div align="center">
-
-               * إِنَّ الصَّغَانِىَّ  آلَّذِى  *  حَازَ آٱْعُلُومَ وَآلْحِكَمْ  * كَانَ قُصَارَى * أَنِ آنْتَهَى إِلَى بَكَمْ *
-
- </div>
- <br/>
+<div align="center">
+* إِنَّ الصَّغَانِىَّ  آلَّذِى  *  حَازَ آٱْعُلُومَ وَآلْحِكَمْ  * كَانَ قُصَارَى * أَنِ آنْتَهَى إِلَى بَكَمْ *
+</div>
+<br/>
 
 #####xvi
 
+["Verily Eṣ-Ṣaghánee, who mastered the sciences and the doctrines of philosophy, the utmost of his case was that he reached to بَكَم," which signifies "dumbness," &c. —Though a man of extensive learning, he was opiniative, and addicted to unjust criticism of his superiors. A copy of the 'Obáb, and a copy of the same author's Supplement to the Ṣiḥáḥ, before mentioned, used by the author of the Táj el-'Aroos, belonged to the library of the the mosque of the Emeer Ṣarghatmish, in Cairo; but on my causing an inquiry to be made for them, the librarian declared that they were no longer found there. They have probably been stolen; or had not been returned by the author Táj el-'Aroos when he died; on which occasion, it is said, his house was plundered of the books &c. that he left.]
 
 
+[The "Lisán el-'Arab" of the Ibn-Mukarram, who was born in the year of the Flight 630, and died in 711. In the copy of his lexicon in the library of the collegiate mosque called the "Ashrafeeyeh," in Cairo, constisting of the twenty-eight quarto-volumes, he is styled "Jemál-ed-Deen Moḥammad Ibn-esh-sheykh-el-imám-el-marḥoom-Jelál-ed-Deen-Abi-l-'Izz-Mukarram Ibn-esh-sheykh-Nejeeb-ed-Deen-Abi-l-Ḥasan-El-Anṣáree:" but in the Táj el-'Aroos, he is almost always called in Ibn-Manḍhoor (اِبْن مَنْظُور). I shall give an account of this great work in describing the Táj el-'Aroos.]
+
+[The "Tahdheeb et-Tahdheeb" of Maḥmood Et-Tanookhee, who died in the year of the Flight 723. It is a combination of the contents of the Moḥkam and Tahdheeb (the former occupying the first place in each article) with a few additions from other sources. Thus it forms one of the best and most comprehensive of the Arabic lexicons, without any exceptions known to me but the Lisán el-'Arab and the Táj el-'Aroos. Of the original autograph copy of this work, in five full-page large quarto-volumes, I possess the last volume, constisting of 501 pages. I made a diligent search for the other volumes, but without success.]
+
+[The "Miṣbáḥ" of El-Feiyoomee (Aḥmad Ibn-Moḥammad Ibn-'Alee El-Muḳri). Its full title is "El-Miṣbáḥ el-Muneer fee Ghareeb esh-Sharḥ el-Kebeer." This is a lexicon similar to the Mughrib, above mentioned; but much more comprehensive; forming a most valuable companion and supplement to the larger lexicons. Notwithstanding its title, it comprises a very large collection of classical words and phrases and significations of frequent occurrence; in many instances with more clear and full explanations than I have found elsewhere. I have therefore constantly drawn from it in composing my own lexicon; possessing a very accurate copy of it, a full-paged quarto-volume of 742 pages. Its author states in it that he finished its composition in the year of the Flight 734.]
+
+[The "Mughnee" as it is commonly called, or "Mughni-l-Lebeeb," of the celebrated grammarian Ibn-Hishám, who was born in the year of the Fligh 708, and died in 761 or the following year. A large work, where a little more that one half consists of an elaborate lexicon of the particles and similar words, for which it is my chief authority, as it was, also, that of the author of the Ḳámoos, whose explanations of the particles are, however, very meagre and unsatisfactory. I am fortunate in possessing a most excellent copy of it, a quarto-volume of 609 pages.]
+
+
+The "Ḳámoos" of El-Feyroozábádee, [or, as some pronounce it, El-Feeroozábádee, (from the city of Férózábád, or Feerózábád, pronounced by the Arabs Feyroozábád,) who was born in the year of the Flight 729, and died in 816.[13](#n13) This, after the Moḥkam and 'Obáb, is the greatest of the lexicological works composed since the age of the Ṣiḥáḥ [to the time of the author of the Muzhir, of those known to him]: but none of the three [he adds] has attained to be as much used as the Ṣiḥáḥ; nor has the rank of the Ṣiḥáḥ, nor its celebrity, been diminished by the existence of these; because it is restricted to what is genuine, so that it is, among the books of lexicology, like the Ṣaḥeeḥ of El-Bukháree among the books
+
+
+#####xvii
 
 
 <a name="n1">1.</a>Respecting this fair, see some extracts from the first of M. Fresnel's "Lettres sur l'Histoire des Arabes avant l'Islamisme" in Note 18 to the first chapter of my Translation of the Thousand and one Nights.
@@ -145,3 +157,6 @@ The "'Obáb" of Eṣ-Ṣaghánee, or Eṣ-Ṣághánee, [who was born in the yea
 <a name="n11">11. </a> In the present work, whatever is given as on the authority of El-Leyth is from the 'Eyn; I believe, through the medium of the Tahdheeb of El-Azheree, except, perhaps, in a very few instances: and from the 'Eyn also is generally derived (probably in almost every instance) what is given as on the authority of El-Khaleel.
 
 <a name="n12">12. </a> I have the express authority of the Táj el-'Aroos (in art. خلك) for thus writing the name of this author.
+
+
+<a name="n13">13. </a> It is stated at the end of article وجد in the Táj el-'Aroos that the author of the Ḳámoos wrote at the end of the first volume of the second copy of that work made by his own hand, which volume ended with the article above mentioned, that he finished the transcription of that volume in Dhu-l-Ḥijjeh 768.
