@@ -3,6 +3,8 @@
 #include <QFontDatabase>
 #include <QCommandLineOption>
 #include <QCommandLineParser>
+#include <QSplashScreen>
+#include <QPixmap>
 #include "QsLog.h"
 #include "QsLogDest.h"
 cmdOptions progOptions;
@@ -73,9 +75,14 @@ int main(int argc, char *argv[])
   //    qDebug() << "node = " << node << dump;
     //    qDebug() << "args = " << args;
     int ret;
+    QPixmap pixmap("./images/frontis.png");
+    QSplashScreen splash(pixmap);
+    splash.show();
+    a.processEvents();
     LanesLexicon * w = new LanesLexicon;
     if (w->isOk()) {
       w->show();
+      splash.finish(w);
       ret = a.exec();
       delete w;
     }
