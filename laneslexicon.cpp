@@ -1655,8 +1655,8 @@ void LanesLexicon::docsEnableBack(bool v) {
 }
 void LanesLexicon::on_actionDocs() {
   qDebug() << Q_FUNC_INFO;
-  //  QFile f("site/lane/preface/index.html");
-  QFile f("site/index.html");
+  QFile f("site/lane/preface/index.html");
+  // QFile f("site/index.html");
   if ( ! f.open(QIODevice::ReadOnly)) {
     QLOG_WARN() << "Unable to open index.html";
     return;
