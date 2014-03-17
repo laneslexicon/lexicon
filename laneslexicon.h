@@ -41,6 +41,10 @@
 #include <QActionGroup>
 #include <QtWebKitWidgets/QWebView>
 #include <QUrl>
+#include <QHelpEngine>
+#include <QHelpContentWidget>
+#include <QHelpIndexModel>
+#include <QHelpIndexWidget>
 #include "inputmapper.h"
 #include "contentswidget.h"
 #include "graphicsentry.h"
@@ -75,6 +79,8 @@ public:
     HistoryMaster * history();
     enum NavMode {ByRoot, ByPage };
     private slots:
+      void testSlot();
+      void helpLinkActivated(const QUrl &);
       void shortcut(const QString &);
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
@@ -238,6 +244,8 @@ private:
     QAction * m_clearHistoryAction;
     QToolButton * m_hBackwardBtn;
     HistoryMaster * m_history;
+    QHelpEngine * m_helpEngine;
+    QTextBrowser * m_helpViewer;
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };

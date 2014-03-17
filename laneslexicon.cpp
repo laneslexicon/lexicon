@@ -1654,42 +1654,44 @@ void LanesLexicon::docsEnableBack(bool v) {
   qDebug() << Q_FUNC_INFO << v;
 }
 void LanesLexicon::on_actionDocs() {
+  QHelpEngine* he = new QHelpEngine("./help/lanedocs.qhc");
+  m_helpViewer = new QTextBrowser(this);
+  //    QHelpContentModel *contentModel = he->contentModel();
+  he->setupData();
+  //  if (he->registerDocumentation("./help/lanedocs.qch")) {
+  //    qDebug() << "registered docs";
+  //  }
+    QHelpContentWidget *contentWidget = he->contentWidget();
+    QHelpContentModel *contentModel =
+        qobject_cast<QHelpContentModel*>(contentWidget->model());
+    connect(contentModel, SIGNAL(contentsCreated()), this, SLOT(testSlot()));
+    //    contentModel->createContents("Lanes Lexicon 1.0");
+    QHelpIndexModel* indexModel = he->indexModel();
+    QHelpIndexWidget* indexWidget = he->indexWidget();
+
+    QSplitter* splitter = new QSplitter();
+    splitter->addWidget(contentWidget);
+    //    splitter->addWidget(indexWidget);
+    splitter->addWidget(m_helpViewer);
+
+    //    contentWidget->setModel(contentModel);
+    contentWidget->expandAll();
+    indexWidget->setModel(indexModel);
+    qDebug() << "cols" << contentModel->columnCount();
+    qDebug() << "row" << contentModel->rowCount();
+    splitter->show();
+   m_tabs->addTab(splitter,"Docs");
+   m_helpEngine = he;
+   qDebug() << "help collection file" << he->collectionFile();
+   connect(contentWidget,SIGNAL(linkActivated(const QUrl &)),this,SLOT(helpLinkActivated(const QUrl &)));
+}
+void LanesLexicon::testSlot() {
   qDebug() << Q_FUNC_INFO;
-  QFile f("site/lane/preface/index.html");
-  // QFile f("site/index.html");
-  if ( ! f.open(QIODevice::ReadOnly)) {
-    QLOG_WARN() << "Unable to open index.html";
-    return;
-  }
-  QTextStream in(&f);
-  in.setCodec("UTF-8");
-  QString t;
-  while(! in.atEnd()) {
-    t += in.readLine();
-  }
-
-   QTextBrowser *view = new QTextBrowser(this);
-   connect(view,SIGNAL(backwardAvailable(bool)),this,SLOT(docsEnableBack(bool)));
-   QFont font("FontAwesome", 12, QFont::Normal);
-   qDebug() << "font" << font.toString();
-   // this works:
-   QUrl url = QUrl::fromLocalFile("/home/andrewsg/qt5projects/LanesLexicon/site/lane/preface/index.html");
-   //   view->load(url);
-   view->document()->setDefaultStyleSheet("body { font-family : FontAwesome;font-size : 12px; line-height : 60px;}");
-
-   view->setHtml(t); //"<html><body><p class=\"doc\">testing testing testing</p></body></html>");
-   //   view->setFont(font);
-
-   //  this loads the html but not stylesheets etc
-   //   view->setHtml(t,QUrl::fromLocalFile("./site"));
-   //   view->setHtml(t,QUrl::fromLocalFile("/home/andrewsg/qt5projects/LanesLexicon/site"));
-   //   view->setHtml(t,QUrl::fromLocalFile("/home/andrewsg/qt5projects/LanesLexicon/site/."));
-   // this works:
-   //view->setHtml(t,QUrl::fromLocalFile("./site"));
-   // this loads the html but not stylesheets etc
-   //view->setHtml(t,QUrl::fromLocalFile("site/"));
-   view->show();
-   m_tabs->addTab(view,"Docs");
-   //   "file:///home/andrewsg/qt5projects/LanesLexicon/site/index.html"
-   //   qDebug() << "Bytes:" << view->page()->totalBytes();
+}
+void LanesLexicon::helpLinkActivated(const QUrl & url) {
+  qDebug() << Q_FUNC_INFO << url;
+  QByteArray helpData = m_helpEngine->fileData(url);//.constBegin().value());
+  //  qDebug() << helpData;
+  m_helpViewer->setHtml(helpData);
+  m_helpViewer->setFocus(Qt::OtherFocusReason);
 }

@@ -5,7 +5,7 @@
 QT       += core gui printsupport
 QT       += webkitwidgets
 QT       += sql
-
+QT       += help
 CONFIG   += debug
 CONFIG   += libxslt
 QMAKE_CXXFLAGS += -g
