@@ -16,8 +16,13 @@ class HelpBrowser : public QTextBrowser {
   void setHelpEngine(QHelpEngine * he) {
     m_he = he;
   }
+  void toAnchor();
  private:
   QHelpEngine * m_he;
+  QString m_firstAnchor;
+  private slots:
+    void getAnchor(const QUrl &);
+
  protected:
   QVariant loadResource(int type, const QUrl &name);
 

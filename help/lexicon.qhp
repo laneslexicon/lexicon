@@ -10,18 +10,21 @@
          <filterAttribute>myapp</filterAttribute>
          <filterAttribute>1.0</filterAttribute>
          <toc>
-             <section title="My Application Manual" ref="./index.html">
-                 <section title="Introduction" ref="./intro.html"/>
-                 <section title="Configuration" ref="./config.html">
-                    <section title="Look and feel" ref="./look.html" />
-                    <section title="Shortcuts" ref="./shortcut.html" />
+             <section title="My Application Manual" ref="index.html">
+                 <section title="Introduction" ref="intro.html"/>
+                 <section title="Configuration" ref="config.html">
+                    <section title="Look and feel" ref="look.html" />
+                    <section title="Shortcuts" ref="shortcut.html" />
                  </section>
-                 <section title="Lane's Preface" ref="./preface.html"/>
+                 <section title="Lane's Preface" ref="preface.html">
+                   <section title="v"  ref="preface.html#v" />
+                   <section title="x"  ref="preface.html#x" />
+                 </section>
              </section>
          </toc>
          <keywords>
-             <keyword name="config" id="MyApplication::config" ref="./config.html#foo"/>
-             <keyword name="preface" id="idPreface" ref="./preface.html"/>
+             <keyword name="config" id="MyApplication::config" ref="config.html#foo"/>
+             <keyword name="preface" id="idPreface" ref="preface.html"/>
          </keywords>
          <files>
              <file>help.css</file>

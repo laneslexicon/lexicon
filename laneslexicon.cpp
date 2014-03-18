@@ -1712,15 +1712,19 @@ void LanesLexicon::testSlot() {
     qDebug() << files[i] << ba.size();
   }
 
-  //  m_helpEngine->setCurrentFilter("Lanes Lexicon 1.0");
+  m_helpEngine->setCurrentFilter("Lanes Lexicon 1.0");
   qDebug() << "Filter attributes" << m_helpEngine->filterAttributes();
 
 }
 void LanesLexicon::helpLinkActivated(const QUrl & url) {
-  qDebug() << Q_FUNC_INFO << url;
+  qDebug() << Q_FUNC_INFO << url << url.fragment();
   QByteArray helpData = m_helpEngine->fileData(url);//.constBegin().value());
   //  qDebug() << helpData;
   m_helpViewer->browser()->setHtml(helpData);
+  if (url.hasFragment()) {
+    m_helpViewer->browser()->scrollToAnchor(url.fragment());
+  }
+  //  m_helpViewer->browser()->setSource(url);
   m_helpViewer->setFocus(Qt::OtherFocusReason);
   qDebug() << "source" << m_helpViewer->browser()->source();
 }
