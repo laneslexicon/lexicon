@@ -1655,9 +1655,14 @@ void LanesLexicon::docsEnableBack(bool v) {
 }
 void LanesLexicon::on_actionDocs() {
   QHelpEngine* he = new QHelpEngine("./help/lanedocs.qhc");
-  m_helpViewer = new QTextBrowser(this);
+  m_helpViewer = new HelpViewer(this);
+  m_helpViewer->browser()->setHelpEngine(he);
   //    QHelpContentModel *contentModel = he->contentModel();
   he->setupData();
+  QUrl url("intro.html");
+  url.setScheme("qthelp");
+  qDebug() << "find intro" << he->findFile(url);
+
   //  if (he->registerDocumentation("./help/lanedocs.qch")) {
   //    qDebug() << "registered docs";
   //  }
@@ -1673,6 +1678,8 @@ void LanesLexicon::on_actionDocs() {
     splitter->addWidget(contentWidget);
     //    splitter->addWidget(indexWidget);
     splitter->addWidget(m_helpViewer);
+    splitter->setStretchFactor(0,0);
+    splitter->setStretchFactor(1,1);
 
     //    contentWidget->setModel(contentModel);
     contentWidget->expandAll();
@@ -1682,16 +1689,38 @@ void LanesLexicon::on_actionDocs() {
     splitter->show();
    m_tabs->addTab(splitter,"Docs");
    m_helpEngine = he;
-   qDebug() << "help collection file" << he->collectionFile();
    connect(contentWidget,SIGNAL(linkActivated(const QUrl &)),this,SLOT(helpLinkActivated(const QUrl &)));
 }
 void LanesLexicon::testSlot() {
   qDebug() << Q_FUNC_INFO;
+  QHelpContentWidget *contentWidget = m_helpEngine->contentWidget();
+  contentWidget->expandAll();
+  // get registered docs
+  qDebug() << "Collection file" << m_helpEngine->collectionFile();
+   QStringList regs =  m_helpEngine->registeredDocumentations();
+  qDebug() << "Registered documentation" << regs;
+
+  qDebug() << "Current filter" << m_helpEngine->currentFilter();
+  QList<QStringList> fa = m_helpEngine->filterAttributeSets(regs[0]);
+  qDebug() << "Filter attribute sets" << fa;
+
+  QList<QUrl> files;
+  files = m_helpEngine->files(regs[0],fa[0]);
+
+  for(int i=0;i < files.size();i++) {
+    QByteArray ba = m_helpEngine->fileData(files[i]);
+    qDebug() << files[i] << ba.size();
+  }
+
+  //  m_helpEngine->setCurrentFilter("Lanes Lexicon 1.0");
+  qDebug() << "Filter attributes" << m_helpEngine->filterAttributes();
+
 }
 void LanesLexicon::helpLinkActivated(const QUrl & url) {
   qDebug() << Q_FUNC_INFO << url;
   QByteArray helpData = m_helpEngine->fileData(url);//.constBegin().value());
   //  qDebug() << helpData;
-  m_helpViewer->setHtml(helpData);
+  m_helpViewer->browser()->setHtml(helpData);
   m_helpViewer->setFocus(Qt::OtherFocusReason);
+  qDebug() << "source" << m_helpViewer->browser()->source();
 }

@@ -59,6 +59,7 @@
 #include "searchresults.h"
 #include "xsltsupport.h"
 #include "menubar.h"
+#include "helpviewer.h"
 struct cmdOptions {
   bool dump;
   QString node;
@@ -245,7 +246,7 @@ private:
     QToolButton * m_hBackwardBtn;
     HistoryMaster * m_history;
     QHelpEngine * m_helpEngine;
-    QTextBrowser * m_helpViewer;
+    HelpViewer * m_helpViewer;
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };

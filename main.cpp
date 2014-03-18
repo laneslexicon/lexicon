@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    a.addLibraryPath("./images");
     QCoreApplication::setOrganizationName("Gabanjo");
     QCoreApplication::setOrganizationDomain("nowhere.com");
     QCoreApplication::setApplicationName("Lanes Lexicon");
