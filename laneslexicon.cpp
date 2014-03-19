@@ -1720,6 +1720,8 @@ void LanesLexicon::helpLinkActivated(const QUrl & url) {
   qDebug() << Q_FUNC_INFO << url << url.fragment();
   QByteArray helpData = m_helpEngine->fileData(url);//.constBegin().value());
   //  qDebug() << helpData;
+  QUrl helpUrl = m_helpEngine->findFile(QUrl("help.css"));
+  qDebug() << "help" << helpUrl;
   m_helpViewer->browser()->setHtml(helpData);
   if (url.hasFragment()) {
     m_helpViewer->browser()->scrollToAnchor(url.fragment());

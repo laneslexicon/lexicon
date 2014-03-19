@@ -30,8 +30,10 @@ void HelpBrowser::getAnchor(const QUrl & url) {
 }
 void HelpBrowser::toAnchor() {
   if ( ! m_firstAnchor.isEmpty()) {
-    qDebug() << "scroll to anchor" << m_firstAnchor;
-    this->scrollToAnchor(m_firstAnchor);
+    QString c = m_firstAnchor;
+    c = "j" + c.remove(0,1);
+    qDebug() << "scroll to anchor" << m_firstAnchor << " --->"  << c;
+    this->scrollToAnchor(c);
   }
 }
 HelpViewer::HelpViewer(QWidget * parent) : QWidget(parent) {

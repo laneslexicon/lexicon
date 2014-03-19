@@ -11,7 +11,11 @@
          <filterAttribute>1.0</filterAttribute>
          <toc>
              <section title="My Application Manual" ref="index.html">
-                 <section title="Introduction" ref="intro.html"/>
+                 <section title="Introduction" ref="intro.html">
+                   <section title="Using" ref="user-guide/using.html" />
+                   <section title="Configuring" ref="user-guide/configuring.html" />
+                 </section>
+
                  <section title="Configuration" ref="config.html">
                     <section title="Look and feel" ref="look.html" />
                     <section title="Shortcuts" ref="shortcut.html" />
@@ -34,7 +38,9 @@
              <file>look.html</file>
              <file>shortcut.html</file>
              <file>preface.html</file>
-             <file>frontis_half.png</file>
+             <file>images/frontis_half.png</file>
+             <file>user-guide/using.html</file>b
+             <file>user-guide/configuring.html</file>b
          </files>
      </filterSection>
  </QtHelpProject>
