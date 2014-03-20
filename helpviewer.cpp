@@ -63,6 +63,7 @@ void HelpViewer::goBack() {
   }
 }
 HelpWidget::HelpWidget(QWidget * parent) : QWidget(parent) {
+  readSettings();
   m_he = new QHelpEngine("./help/lanedocs.qhc");
   m_viewer = new HelpViewer(this);
   m_viewer->browser()->setHelpEngine(m_he);
@@ -89,7 +90,12 @@ HelpWidget::HelpWidget(QWidget * parent) : QWidget(parent) {
     layout->addWidget(splitter);
     setLayout(layout);
    connect(contentWidget,SIGNAL(linkActivated(const QUrl &)),this,SLOT(helpLinkActivated(const QUrl &)));
-
+   if (! m_currentUrl.isEmpty()) {
+     helpLinkActivated(m_currentUrl);
+   }
+}
+HelpWidget::~HelpWidget() {
+  writeSettings();
 }
 void HelpWidget::contentsCreated() {
   qDebug() << Q_FUNC_INFO;
@@ -137,6 +143,14 @@ void HelpWidget::helpLinkActivated(const QUrl & url)  {
     m_viewer->browser()->scrollToAnchor(url.fragment());
   }
   m_viewer->setFocus(Qt::OtherFocusReason);
+  m_currentUrl = url;
+}
+
+void HelpWidget::writeSettings() {
+  QSettings settings;
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Help");
+  settings.setValue("Current page",m_currentUrl);
 }
 void HelpWidget::readSettings() {
   QSettings settings;
@@ -145,7 +159,7 @@ void HelpWidget::readSettings() {
 
   settings.beginGroup("Help");
   m_helpCollection = settings.value("Help collection","lanedocs.qhc").toString();
-  m_helpPage = settings.value("Current page","intro.html").toString();
+  m_currentUrl = settings.value("Current page").toUrl();
 }
 /*
  TRACE_OBJ

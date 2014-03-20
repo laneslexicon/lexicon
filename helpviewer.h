@@ -56,7 +56,9 @@ class HelpWidget : public QWidget {
 
  public:
   HelpWidget(QWidget * parent = 0);
+  ~HelpWidget();
   void readSettings();
+  void writeSettings();
  public slots:
   void contentsCreated();
   void helpLinkActivated(const QUrl &);
@@ -65,5 +67,6 @@ class HelpWidget : public QWidget {
   HelpViewer * m_viewer;
   QString m_helpCollection;
   QString m_helpPage;
+  QUrl m_currentUrl;
 };
 #endif
