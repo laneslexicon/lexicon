@@ -37,7 +37,6 @@ void HelpBrowser::toAnchor() {
   }
 }
 HelpViewer::HelpViewer(QWidget * parent) : QWidget(parent) {
-
   QVBoxLayout * layout = new QVBoxLayout;
   m_browser = new HelpBrowser;
   m_backBtn = new QPushButton("Back");
@@ -46,6 +45,9 @@ HelpViewer::HelpViewer(QWidget * parent) : QWidget(parent) {
   layout->addWidget(m_backBtn);
   layout->addWidget(m_browser);
   setLayout(layout);
+}
+HelpViewer::~HelpViewer() {
+  qDebug() << Q_FUNC_INFO;
 }
 void HelpViewer::backwardAvailable(bool available) {
   qDebug() << Q_FUNC_INFO << available;
@@ -59,6 +61,79 @@ void HelpViewer::goBack() {
   else {
     m_browser->backward();
   }
+}
+HelpWidget::HelpWidget(QWidget * parent) : QWidget(parent) {
+  m_he = new QHelpEngine("./help/lanedocs.qhc");
+  m_viewer = new HelpViewer(this);
+  m_viewer->browser()->setHelpEngine(m_he);
+  //    QHelpContentModel *contentModel = he->contentModel();
+  m_he->setupData();
+
+    QHelpContentWidget *contentWidget = m_he->contentWidget();
+    QHelpContentModel *contentModel =
+        qobject_cast<QHelpContentModel*>(contentWidget->model());
+    connect(contentModel, SIGNAL(contentsCreated()), this, SLOT(contentsCreated()));
+
+    QHelpIndexModel* indexModel = m_he->indexModel();
+    QHelpIndexWidget* indexWidget = m_he->indexWidget();
+
+    QSplitter* splitter = new QSplitter();
+    splitter->addWidget(contentWidget);
+    //    splitter->addWidget(indexWidget);
+    splitter->addWidget(m_viewer);
+    splitter->setStretchFactor(0,0);
+    splitter->setStretchFactor(1,1);
+
+    //    contentWidget->setModel(contentModel);
+    contentWidget->expandAll();
+    indexWidget->setModel(indexModel);
+    QVBoxLayout * layout = new QVBoxLayout;
+    layout->addWidget(splitter);
+    setLayout(layout);
+   connect(contentWidget,SIGNAL(linkActivated(const QUrl &)),this,SLOT(helpLinkActivated(const QUrl &)));
+
+}
+void HelpWidget::contentsCreated() {
+  qDebug() << Q_FUNC_INFO;
+  QHelpContentWidget *contentWidget = m_he->contentWidget();
+  contentWidget->expandAll();
+  // get registered docs
+  qDebug() << "Collection file" << m_he->collectionFile();
+   QStringList regs =  m_he->registeredDocumentations();
+  qDebug() << "Registered documentation" << regs;
+
+  qDebug() << "Current filter" << m_he->currentFilter();
+  QList<QStringList> fa = m_he->filterAttributeSets(regs[0]);
+  qDebug() << "Filter attribute sets" << fa;
+
+  QList<QUrl> files;
+  files = m_he->files(regs[0],fa[0]);
+
+  for(int i=0;i < files.size();i++) {
+    QByteArray ba = m_he->fileData(files[i]);
+    qDebug() << files[i] << ba.size();
+  }
+
+  m_he->setCurrentFilter("Lanes Lexicon 1.0");
+  qDebug() << "Filter attributes" << m_he->filterAttributes();
+}
+void HelpWidget::helpLinkActivated(const QUrl & url)  {
+  qDebug() << Q_FUNC_INFO << url << url.fragment();
+  QByteArray helpData = m_he->fileData(url);//.constBegin().value());
+  m_viewer->browser()->setHtml(helpData);
+  if (url.hasFragment()) {
+    m_viewer->browser()->scrollToAnchor(url.fragment());
+  }
+  m_viewer->setFocus(Qt::OtherFocusReason);
+}
+void HelpWidget::readSettings() {
+  QSettings settings;
+  settings.setIniCodec("UTF-8");
+
+
+  settings.beginGroup("Help");
+  m_helpCollection = settings.value("Help collection","lanedocs.qhc").toString();
+  m_helpPage = settings.value("Current page","intro.html").toString();
 }
 /*
  TRACE_OBJ

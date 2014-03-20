@@ -9,6 +9,13 @@
 #include <QHelpEngine>
 #include <QByteArray>
 #include <QImage>
+#include <QSplitter>
+#include <QSettings>
+#include <QUrl>
+#include <QHelpEngine>
+#include <QHelpContentWidget>
+#include <QHelpIndexModel>
+#include <QHelpIndexWidget>
 class HelpBrowser : public QTextBrowser {
   Q_OBJECT;
  public:
@@ -33,6 +40,7 @@ class HelpViewer : public QWidget {
 
  public:
   HelpViewer(QWidget * parent = 0);
+  ~HelpViewer();
   HelpBrowser * browser() { return m_browser;}
   public slots:
     void backwardAvailable(bool);
@@ -40,5 +48,21 @@ class HelpViewer : public QWidget {
  private:
   HelpBrowser * m_browser;
   QPushButton * m_backBtn;
+  QHelpEngine * m_he;
+};
+class HelpWidget : public QWidget {
+  Q_OBJECT;
+
+ public:
+  HelpWidget(QWidget * parent = 0);
+  void readSettings();
+ public slots:
+  void contentsCreated();
+  void helpLinkActivated(const QUrl &);
+ private:
+  QHelpEngine * m_he;
+  HelpViewer * m_viewer;
+  QString m_helpCollection;
+  QString m_helpPage;
 };
 #endif

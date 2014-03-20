@@ -963,13 +963,16 @@ void LanesLexicon::readSettings() {
   settings.beginGroup(m_activeMap);
   QString filename = settings.value("file",QString()).toString();
   QFile file(filename);
-  if ( ! file.exists() ) {
-    QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(m_activeMap).arg(filename);
-    return;
-  }
-  if (! im_load_map_from_json(m_mapper,filename.toUtf8().constData(),m_activeMap.toUtf8().constData())) {
+  if ( file.exists() ) {
+    if (! im_load_map_from_json(m_mapper,filename.toUtf8().constData(),m_activeMap.toUtf8().constData())) {
       QLOG_WARN() << QString(tr("Could not load <%1> from file <%2>")).arg(m_activeMap).arg(filename);
+    }
   }
+  else {
+    QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(m_activeMap).arg(filename);
+  }
+  settings.endGroup();
+  settings.endGroup();
 }
 void LanesLexicon::writeSettings() {
   QSettings settings;
@@ -1650,83 +1653,10 @@ void LanesLexicon::on_actionClearHistory() {
   qDebug() << Q_FUNC_INFO <<  m_history->clear();
   setupHistory();
 }
-void LanesLexicon::docsEnableBack(bool v) {
-  qDebug() << Q_FUNC_INFO << v;
-}
 void LanesLexicon::on_actionDocs() {
-  QHelpEngine* he = new QHelpEngine("./help/lanedocs.qhc");
-  m_helpViewer = new HelpViewer(this);
-  m_helpViewer->browser()->setHelpEngine(he);
-  //    QHelpContentModel *contentModel = he->contentModel();
-  he->setupData();
-  QUrl url("intro.html");
-  url.setScheme("qthelp");
-  qDebug() << "find intro" << he->findFile(url);
-
-  //  if (he->registerDocumentation("./help/lanedocs.qch")) {
-  //    qDebug() << "registered docs";
-  //  }
-    QHelpContentWidget *contentWidget = he->contentWidget();
-    QHelpContentModel *contentModel =
-        qobject_cast<QHelpContentModel*>(contentWidget->model());
-    connect(contentModel, SIGNAL(contentsCreated()), this, SLOT(testSlot()));
-    //    contentModel->createContents("Lanes Lexicon 1.0");
-    QHelpIndexModel* indexModel = he->indexModel();
-    QHelpIndexWidget* indexWidget = he->indexWidget();
-
-    QSplitter* splitter = new QSplitter();
-    splitter->addWidget(contentWidget);
-    //    splitter->addWidget(indexWidget);
-    splitter->addWidget(m_helpViewer);
-    splitter->setStretchFactor(0,0);
-    splitter->setStretchFactor(1,1);
-
-    //    contentWidget->setModel(contentModel);
-    contentWidget->expandAll();
-    indexWidget->setModel(indexModel);
-    qDebug() << "cols" << contentModel->columnCount();
-    qDebug() << "row" << contentModel->rowCount();
-    splitter->show();
-   m_tabs->addTab(splitter,"Docs");
-   m_helpEngine = he;
-   connect(contentWidget,SIGNAL(linkActivated(const QUrl &)),this,SLOT(helpLinkActivated(const QUrl &)));
+  HelpWidget * w = new HelpWidget(this);
+   m_tabs->setCurrentIndex(m_tabs->addTab(w,"Docs"));
+   return;
 }
 void LanesLexicon::testSlot() {
-  qDebug() << Q_FUNC_INFO;
-  QHelpContentWidget *contentWidget = m_helpEngine->contentWidget();
-  contentWidget->expandAll();
-  // get registered docs
-  qDebug() << "Collection file" << m_helpEngine->collectionFile();
-   QStringList regs =  m_helpEngine->registeredDocumentations();
-  qDebug() << "Registered documentation" << regs;
-
-  qDebug() << "Current filter" << m_helpEngine->currentFilter();
-  QList<QStringList> fa = m_helpEngine->filterAttributeSets(regs[0]);
-  qDebug() << "Filter attribute sets" << fa;
-
-  QList<QUrl> files;
-  files = m_helpEngine->files(regs[0],fa[0]);
-
-  for(int i=0;i < files.size();i++) {
-    QByteArray ba = m_helpEngine->fileData(files[i]);
-    qDebug() << files[i] << ba.size();
-  }
-
-  m_helpEngine->setCurrentFilter("Lanes Lexicon 1.0");
-  qDebug() << "Filter attributes" << m_helpEngine->filterAttributes();
-
-}
-void LanesLexicon::helpLinkActivated(const QUrl & url) {
-  qDebug() << Q_FUNC_INFO << url << url.fragment();
-  QByteArray helpData = m_helpEngine->fileData(url);//.constBegin().value());
-  //  qDebug() << helpData;
-  QUrl helpUrl = m_helpEngine->findFile(QUrl("help.css"));
-  qDebug() << "help" << helpUrl;
-  m_helpViewer->browser()->setHtml(helpData);
-  if (url.hasFragment()) {
-    m_helpViewer->browser()->scrollToAnchor(url.fragment());
-  }
-  //  m_helpViewer->browser()->setSource(url);
-  m_helpViewer->setFocus(Qt::OtherFocusReason);
-  qDebug() << "source" << m_helpViewer->browser()->source();
 }
