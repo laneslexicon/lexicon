@@ -67,13 +67,13 @@ HelpWidget::HelpWidget(QWidget * parent) : QWidget(parent) {
   m_viewer = new HelpViewer(this);
   m_viewer->browser()->setHelpEngine(m_he);
   //    QHelpContentModel *contentModel = he->contentModel();
-  m_he->setupData();
+
 
     QHelpContentWidget *contentWidget = m_he->contentWidget();
     QHelpContentModel *contentModel =
         qobject_cast<QHelpContentModel*>(contentWidget->model());
     connect(contentModel, SIGNAL(contentsCreated()), this, SLOT(contentsCreated()));
-
+  m_he->setupData();
     QHelpIndexModel* indexModel = m_he->indexModel();
     QHelpIndexWidget* indexWidget = m_he->indexWidget();
 
@@ -84,8 +84,6 @@ HelpWidget::HelpWidget(QWidget * parent) : QWidget(parent) {
     splitter->setStretchFactor(0,0);
     splitter->setStretchFactor(1,1);
 
-    //    contentWidget->setModel(contentModel);
-    contentWidget->expandAll();
     indexWidget->setModel(indexModel);
     QVBoxLayout * layout = new QVBoxLayout;
     layout->addWidget(splitter);
@@ -95,8 +93,7 @@ HelpWidget::HelpWidget(QWidget * parent) : QWidget(parent) {
 }
 void HelpWidget::contentsCreated() {
   qDebug() << Q_FUNC_INFO;
-  QHelpContentWidget *contentWidget = m_he->contentWidget();
-  contentWidget->expandAll();
+
   // get registered docs
   qDebug() << "Collection file" << m_he->collectionFile();
    QStringList regs =  m_he->registeredDocumentations();
@@ -116,9 +113,24 @@ void HelpWidget::contentsCreated() {
 
   m_he->setCurrentFilter("Lanes Lexicon 1.0");
   qDebug() << "Filter attributes" << m_he->filterAttributes();
+  QMap<QString,QUrl> links = m_he->linksForIdentifier(QLatin1String("MyApplication::config"));
+  qDebug() << "Links for ID size:" << links.size();
+  QMapIterator<QString, QUrl> i(links);
+  while (i.hasNext()) {
+    i.next();
+    qDebug() << i.key() << ": " << i.value();
+  }
+  links = m_he->linksForIdentifier(QLatin1String("lanex"));
+  qDebug() << "Links for ID size:" << links.size();
+  QMapIterator<QString, QUrl> it(links);
+  while (it.hasNext()) {
+    it.next();
+    qDebug() << it.key() << ": " << it.value();
+  }
+  m_he->contentWidget()->expandAll();
 }
 void HelpWidget::helpLinkActivated(const QUrl & url)  {
-  qDebug() << Q_FUNC_INFO << url << url.fragment();
+  qDebug() << Q_FUNC_INFO << url << "fragment" << url.fragment();
   QByteArray helpData = m_he->fileData(url);//.constBegin().value());
   m_viewer->browser()->setHtml(helpData);
   if (url.hasFragment()) {

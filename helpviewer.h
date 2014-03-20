@@ -12,6 +12,7 @@
 #include <QSplitter>
 #include <QSettings>
 #include <QUrl>
+#include <QMap>
 #include <QHelpEngine>
 #include <QHelpContentWidget>
 #include <QHelpIndexModel>

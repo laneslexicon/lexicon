@@ -10,8 +10,8 @@
          <filterAttribute>myapp</filterAttribute>
          <filterAttribute>1.0</filterAttribute>
          <toc>
-             <section title="My Application Manual" ref="index.html">
-                 <section title="Introduction" ref="intro.html">
+             <section title="User guide for Lane's Arabic English Lexicon" ref="index.html">
+                 <section title="Introduction" id="intro" ref="intro.html">
                    <section title="Using" ref="user-guide/using.html" />
                    <section title="Configuring" ref="user-guide/configuring.html" />
                  </section>
@@ -29,6 +29,8 @@
          <keywords>
              <keyword name="config" id="MyApplication::config" ref="config.html#foo"/>
              <keyword name="preface" id="idPreface" ref="preface.html"/>
+             <keyword name="introname" id="MyApplication::intro"  ref="intro.html#xxx"/>
+             <keyword  id="lanex" ref="preface.html#x"/>
          </keywords>
          <files>
              <file>help.css</file>
