@@ -93,6 +93,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   //  m_xalan = getXalan();
   initXslt();
   prepareQueries();
+  m_transform = m_view->transform();
 }
 GraphicsEntry::~GraphicsEntry() {
   qDebug() << Q_FUNC_INFO;
@@ -956,6 +957,13 @@ void GraphicsEntry::onZoomOut() {
   m_view->setTransform(m_transform);
   m_scale -= .1;
   m_view->scale(m_scale,m_scale);
+}
+void GraphicsEntry::setScale(qreal v, bool use) {
+  m_scale = v;
+  if (use) {
+    m_view->setTransform(m_transform);
+    m_view->scale(m_scale,m_scale);
+  }
 }
 /**
  *

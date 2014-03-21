@@ -1012,15 +1012,8 @@ void LanesLexicon::writeSettings() {
       if (entry) {
         Place p = entry->getPlace();
         settings.beginGroup(QString("Tab-%1").arg(i));
-        /*
-        settings.setValue("root",p.getRoot());
-        settings.setValue("word",p.getWord());
-        settings.setValue("node",p.getNode());
-        settings.setValue("supplement",p.getSupplement());
-        //        settings.setValue("nodeOnly",p.getNodeOnly());
-        settings.setValue("page",p.getPage());
-        */
         settings.setValue("place",p.toString());
+        settings.setValue("zoom",entry->getScale());
         //           QVariant v;
         //   v.setValue(p);
 
@@ -1061,6 +1054,12 @@ void LanesLexicon::restoreTabs() {
     settings.beginGroup(tabs[i]);
     Place p;
     QString v = settings.value("place",QString()).toString();
+    bool ok;
+    qreal scale = settings.value("zoom",1.0).toReal(&ok);
+    qDebug() << "tab" << i << scale;
+    if ( !ok ) {
+      scale = 1.0;
+    }
     if (! v.isNull()) {
       p = Place::fromString(v);
     }
@@ -1089,6 +1088,7 @@ void LanesLexicon::restoreTabs() {
       else {
         entry->getXmlForRoot(p);
       }
+      entry->setScale(scale);
       //      qDebug() << Q_FUNC_INFO << "adding tab" << p.getShortText();
       m_tabs->addTab(entry,p.getShortText());
       m_tree->ensurePlaceVisible(p,true);

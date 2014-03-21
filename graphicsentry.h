@@ -63,6 +63,8 @@ class GraphicsEntry : public QWidget {
     void setPagingBackward() {
       m_pagingDir = 1;
     }
+    qreal getScale() { return m_scale;}
+    void setScale(qreal v, bool use = true);
     void highlight(const QString & t);
   public slots:
     void anchorClicked(const QUrl &);
