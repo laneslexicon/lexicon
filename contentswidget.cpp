@@ -1,15 +1,23 @@
 #include "contentswidget.h"
 
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
-  m_debug = true;
+  readSettings();
   setColumnCount(2);
   setHeaderLabels(
                   QStringList() << tr("Letter/Root") << tr("Supplement"));
   setSelectionMode(QAbstractItemView::SingleSelection);
   header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
+  this->setStyleSheet(QString("selection-background-color : %1").arg(m_backgroundColor));
 }
 ContentsWidget::~ContentsWidget() {
   qDebug() << Q_FUNC_INFO;
+}
+void ContentsWidget::readSettings() {
+  QSettings settings;
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Roots");
+  m_backgroundColor = settings.value("Background","lightgray").toString();
+  m_debug = settings.value("Debug",false).toBool();
 }
 void ContentsWidget::loadContents() {
   QSqlQuery query;
@@ -386,4 +394,16 @@ void ContentsWidget::ensureVisible(const QString & root, int supplement,bool sel
   if (index.isValid()) {
     scrollTo(index);
   }
+}
+void ContentsWidget::focusInEvent(QFocusEvent * event) {
+  /// clearing the style sheets has the effect that the systems default
+  /// will be used
+  this->setStyleSheet("");
+  QTreeWidgetItem * item = this->currentItem();
+  QTreeWidget::focusInEvent(event);
+
+}
+void ContentsWidget::focusOutEvent(QFocusEvent * event) {
+  this->setStyleSheet(QString("selection-background-color : %1").arg(m_backgroundColor));
+  QTreeWidget::focusOutEvent(event);
 }

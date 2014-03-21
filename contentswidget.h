@@ -13,6 +13,7 @@
 #include <QTextStream>
 #include <QFileInfo>
 #include <QDir>
+#include <QSettings>
 #include "QsLog.h"
 #include "place.h"
 class ContentsWidget : public QTreeWidget {
@@ -27,8 +28,15 @@ class ContentsWidget : public QTreeWidget {
   Place findPrevPlace(const Place &);
   void ensureVisible(const QString & root, int supp = 0,bool select = false);
   void ensurePlaceVisible(const Place & p, bool select = false);
+ protected:
+  void focusInEvent(QFocusEvent *);
+  void focusOutEvent(QFocusEvent *);
  private:
+  void readSettings();
   bool m_debug;
+  /// this is the background color of the select item when the window
+  /// does not have focus
+  QString m_backgroundColor;
  protected:
   virtual void 	keyPressEvent(QKeyEvent * event);
  signals:
