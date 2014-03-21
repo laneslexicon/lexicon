@@ -342,7 +342,7 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
         }
       }
       else {
-        emit(itemActivated(item,0));
+        emit(itemDoubleClicked(item,0));
       }
     }
     break;
