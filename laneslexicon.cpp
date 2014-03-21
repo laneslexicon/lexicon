@@ -44,6 +44,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   //  m_notes->setObjectName("notes");
   if (m_docked) {
     m_treeDock = new QDockWidget("Contents",this);
+    m_treeDock->setObjectName("contentsdock");
     m_treeDock->setAllowedAreas(Qt::LeftDockWidgetArea |
                                 Qt::RightDockWidgetArea);
     m_treeDock->setWidget(m_tree);
@@ -55,7 +56,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     splitter->addWidget(m_tree);
     splitter->addWidget(m_tabs);
     splitter->setStretchFactor(0,0);
-    splitter->setStretchFactor(1,1);
+    splitter->setStretchFactor(1,4);
     //  m_tabs->addTab(m_notes,"Notes");
     setCentralWidget(splitter);
   }
@@ -123,6 +124,12 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 
   setupInterface();
+
+  QSettings settings;
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Main");
+  this->restoreGeometry(settings.value("Geometry").toByteArray());
+  this->restoreState(settings.value("State").toByteArray());
 }
 
 LanesLexicon::~LanesLexicon()
@@ -530,10 +537,13 @@ void LanesLexicon::createActions() {
 void LanesLexicon::createToolBar() {
   QString imgdir = QString("./images/32");
   m_fileToolBar = addToolBar(tr("&File"));
+  m_fileToolBar->setObjectName("filetoolbar");
+
   m_fileToolBar->addAction(m_exitAction);
   m_fileToolBar->addAction(m_testAction);
 
   QToolBar * history = addToolBar(tr("History"));
+  history->setObjectName("historytoolbar");
   m_hBackwardBtn = new QToolButton(history);
   m_hBackwardBtn->setText("Back");
   m_hBackwardBtn->setDefaultAction(m_hBackward);
@@ -545,6 +555,7 @@ void LanesLexicon::createToolBar() {
 
 
   QToolBar * navigation = addToolBar(tr("Navigation"));
+  navigation->setObjectName("navigationtoolbar");
   m_navText = new QLabel("");
   if (m_navMode == 0) {
     m_navText->setText(tr("Root"));
@@ -597,6 +608,7 @@ void LanesLexicon::createToolBar() {
   navigation->setFloatable(true);
 
   QToolBar * bookmarks = addToolBar(tr("Bookmarks"));
+  bookmarks->setObjectName("bookmarkstoolbar");
   m_bookmarkBtn = new QToolButton(bookmarks);
   m_bookmarkBtn->setIcon(QIcon(imgdir + "/user-bookmarks.png"));
   m_bookmarkBtn->setText("Bookmarks");
@@ -609,6 +621,7 @@ void LanesLexicon::createToolBar() {
 
 
   QToolBar * docs = addToolBar("&Docs");
+  docs->setObjectName("docstoolbar");
   docs->addAction(m_docAction);
 
 }
@@ -711,7 +724,7 @@ void LanesLexicon::createMenus() {
   connect(m_mainmenu,SIGNAL(rebuildBookmarks()),this,SLOT(bookmarkRebuildMenu()));
 
   m_historyMenu = m_mainmenu->addMenu(tr("&History"));
-  m_historyMenu->setObjectName("history");
+  m_historyMenu->setObjectName("historymenu");
   m_historyMenu->addAction(m_clearHistoryAction);
   m_navMenu = m_mainmenu->addMenu(tr("&Navigation"));
   m_navMenu->setObjectName("navigationmenu");
@@ -1029,6 +1042,9 @@ void LanesLexicon::writeSettings() {
     }
     settings.endGroup();
   }
+  settings.beginGroup("Main");
+  settings.setValue("State",this->saveState());
+  settings.setValue("Geometry", saveGeometry());
 }
 void LanesLexicon::restoreTabs() {
   QSettings settings;

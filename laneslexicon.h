@@ -124,7 +124,6 @@ public:
 private:
     Place showPlace(const Place &,bool newTab = false);
 
-
     QString m_interface;    // "default","minimal"
     void setupInterface();
     /// 0 - root mode, 1 - page mode
