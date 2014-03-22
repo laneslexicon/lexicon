@@ -1,6 +1,7 @@
 site_name: Lanes Lexicon
 pages:
 - ['index.md', Welcome]
+- ['download.md', Download]
 - ['user-guide/using.md', User Guide, 'Introduction']
 - ['user-guide/configuring.md', User Guide, 'Configuration']
 - ['lane/preface.md','Lane','Preface']
