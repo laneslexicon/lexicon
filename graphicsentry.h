@@ -82,6 +82,8 @@ class GraphicsEntry : public QWidget {
     void clearAll();
     void selectEntry();
     void copy();
+    void onWiden();
+    void onNarrow();
  private:
     QColor m_supplementBg;
     bool prepareQueries();
@@ -125,6 +127,8 @@ class GraphicsEntry : public QWidget {
     QPushButton * m_clearSceneBtn;
     QPushButton * m_zoomInBtn;
     QPushButton * m_zoomOutBtn;
+    QPushButton * m_widenBtn;
+    QPushButton * m_narrowBtn;
 
 
     LaneGraphicsView * m_view;

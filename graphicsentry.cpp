@@ -50,13 +50,24 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_zoomOutBtn->setToolTip(tr("Zoom out"));
   m_clearSceneBtn = new QPushButton(QIcon("./images/32/cleaning-erase-eraser-icone-4970-32.png"),tr("Clear"));
   m_clearSceneBtn->setToolTip("Clear contents");
+
+  m_widenBtn = new QPushButton("Widen");
+  m_narrowBtn = new QPushButton("Narrow");
+
   btnslayout->addWidget(m_zoomInBtn);
   btnslayout->addWidget(m_zoomOutBtn);
+
+  btnslayout->addWidget(m_widenBtn);
+  btnslayout->addWidget(m_narrowBtn);
   btnslayout->addWidget(m_clearSceneBtn);
   layout->addLayout(btnslayout);
 
   connect(m_zoomInBtn,SIGNAL(clicked()),this,SLOT(onZoomIn()));
   connect(m_zoomOutBtn,SIGNAL(clicked()),this,SLOT(onZoomOut()));
+
+  connect(m_widenBtn,SIGNAL(clicked()),this,SLOT(onWiden()));
+  connect(m_narrowBtn,SIGNAL(clicked()),this,SLOT(onNarrow()));
+
   connect(m_clearSceneBtn,SIGNAL(clicked()),this,SLOT(onClearScene()));
 
 
@@ -64,7 +75,8 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_view = new LaneGraphicsView(m_scene,this);
   m_view->setSceneRect(m_scene->sceneRect());
 
-  //  m_view->setBackgroundBrush(QBrush(Qt::red, Qt::SolidPattern));
+
+
   connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
   connect(m_view,SIGNAL(backPage()),this,SLOT(prevPageRequested()));
 
@@ -1159,4 +1171,16 @@ void GraphicsEntry::moveForward() {
 }
 void GraphicsEntry::moveBackward() {
   emit(prev(m_place));
+}
+void GraphicsEntry::onWiden() {
+  m_textWidth += 50;
+  for(int i=0;i < m_items.size();i++) {
+      m_items[i]->setTextWidth(m_textWidth);
+  }
+}
+void GraphicsEntry::onNarrow() {
+  m_textWidth -= 50;
+  for(int i=0;i < m_items.size();i++) {
+      m_items[i]->setTextWidth(m_textWidth);
+  }
 }

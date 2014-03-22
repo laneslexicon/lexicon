@@ -1675,4 +1675,8 @@ void LanesLexicon::on_actionDocs() {
    return;
 }
 void LanesLexicon::testSlot() {
+  qDebug() << Q_FUNC_INFO;
+
+
+
 }
