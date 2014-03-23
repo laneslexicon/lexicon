@@ -89,7 +89,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_scene->addItem(m_item);
 
   // add the graphics viwe
-  layout->addWidget(m_view,1);
+  layout->addWidget(m_view);
 
   //  m_showPlace = new PlaceWidget(this);
   //  layout->addWidget(m_showPlace,0);
@@ -638,6 +638,17 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     //    qDebug() << "history off";
   }
   qDebug() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
+  /*
+  qDebug() << "At exit" << m_view->sceneRect();
+  qDebug() << "Widget" << this->geometry();
+  qDebug() << "gview" << m_view->geometry();
+  qDebug() << "viewport geometry" << m_view->viewport()->geometry();
+  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
+  QRect viewport_rect(0, 0, m_view->viewport()->width(), m_view->viewport()->height());
+  QRectF visible_scene_rect = m_view->mapToScene(viewport_rect).boundingRect();
+  qDebug() << "viewport rect" << viewport_rect << "scene rect" << visible_scene_rect;
+  qDebug() << visible_scene_rect.width();
+  */
   return m_place;
 }
 Place GraphicsEntry::getPage(const Place & p) {
@@ -1177,10 +1188,19 @@ void GraphicsEntry::onWiden() {
   for(int i=0;i < m_items.size();i++) {
       m_items[i]->setTextWidth(m_textWidth);
   }
+  QGraphicsItem * item = m_scene->focusItem();
+  if (item) {
+    m_view->centerOn(item);
+  }
 }
 void GraphicsEntry::onNarrow() {
   m_textWidth -= 50;
   for(int i=0;i < m_items.size();i++) {
       m_items[i]->setTextWidth(m_textWidth);
   }
+  QGraphicsItem * item = m_scene->focusItem();
+  if (item) {
+    m_view->centerOn(item);
+  }
+
 }
