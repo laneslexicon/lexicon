@@ -98,6 +98,11 @@ public:
     void on_actionFirstRoot();
     void on_actionLastRoot();
 
+    void searchForWord();
+    void searchForPage();
+    void searchForNode();
+    void searchForRoot();
+
     void on_actionNextPage();
     void on_actionPrevPage();
     void on_actionFirstPage();
@@ -215,6 +220,14 @@ private:
     QAction * m_historyAction;
     QAction * m_bookmarkAction;
     QAction * m_navigationAction;
+
+    QAction * m_searchAction;
+    QToolButton * m_searchButton;
+    QMenu * m_searchMenu;
+    QAction * m_searchWordAction;
+    QAction * m_searchPageAction;
+    QAction * m_searchRootAction;
+    QAction * m_searchNodeAction;
     /// Navigation
     QAction * m_navNextAction;
     QAction * m_navPrevAction;

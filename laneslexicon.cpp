@@ -207,83 +207,16 @@ void LanesLexicon::shortcut(const QString & k) {
   QString key = k.toCaseFolded();
   qDebug() << Q_FUNC_INFO << k;
   if (key == QString("search root")) {
-    SearchDialog * d = new SearchDialog(this);
-    d->setWindowTitle(tr("Search for Root"));
-    d->setPrompt(tr("Find root"));
-    d->setNewTab(m_searchNewTab);
-    if (d->exec()) {
-      QString t = d->getText();
-      if (! t.isEmpty()) {
-        if (! UcdScripts::isScript(t,"Arabic")) {
-          t = convertString(t);
-        }
-        Place p = showPlace(Place(t),d->getNewTab());
-        if (! p.isValid()) {
-          QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
-          msgBox.exec();
-        }
-      }
-    }
-    delete d;
+    searchForRoot();
   }
   else if (key == QString("search node")) {
-    NodeSearchDialog * d = new NodeSearchDialog(this);
-    d->setNewTab(m_searchNewTab);
-    if (d->exec()) {
-      QString t = d->getText();
-      if (! t.isEmpty()) {
-        /// TODO make this an option to always show root
-        /// show only node
-        //        Place p = showNode(t,true);
-        Place p;
-        p.setNode(t);
-        p = showPlace(p,d->getNewTab());
-        if (! p.isValid()) {
-          QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
-          msgBox.exec();
-        }
-      }
-    }
-    delete d;
+    searchForNode();
   }
   else if (key == QString("search word")) {
-    SearchDialog * d = new SearchDialog(this);
-    d->setWindowTitle(tr("Search for Word"));
-    d->setPrompt(tr("Find word"));
-    if (d->exec()) {
-      QString t = d->getText();
-      if (! t.isEmpty()) {
-        if (! UcdScripts::isScript(t,"Arabic")) {
-          t = convertString(t);
-        }
-        SearchResultsWidget * s = new SearchResultsWidget(t,this);
-        if (s->count() == 0) {
-          QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
-          msgBox.exec();
-          delete s;
-        }
-        else {
-          int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
-          m_tabs->setCurrentIndex(i);
-          setSignals(s->getEntry());
-        }
-      }
-    }
-    delete d;
+    searchForWord();
   }
   else if (key == QString("Page search").toCaseFolded()) {
-    bool ok;
-    /// not sure about putting max/mins
-    int page = QInputDialog::getInt(this, tr("Page Search"),
-                                    tr("Page:"), -1,1,3016, 1,&ok);
-    if (ok && (page != -1)) {
-      Place p;
-      p.setPage(page);
-      this->onGoToPage(p);
-    }
+    searchForPage();
   }
   else if (key == QString("Contents collapse all").toCaseFolded()) {
     m_tree->collapseAll();
@@ -533,6 +466,8 @@ void LanesLexicon::createActions() {
 
   m_navigationAction = createIconAction(imgdir,settings.value("Move",QString()).toString(),tr("Move"));
 
+  m_searchAction = createIconAction(imgdir,settings.value("Search",QString()).toString(),tr("Search"));
+
   //  connect(m_pageForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextPage()));
   //  connect(m_pageBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevPage()));
   //  connect(m_pageFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstPage()));
@@ -555,6 +490,15 @@ void LanesLexicon::createActions() {
   connect(m_navModePageAction,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
 
   connect(m_docAction,SIGNAL(triggered()),this,SLOT(on_actionDocs()));
+
+  m_searchWordAction = new QAction(tr("For &word"),this);
+  connect(m_searchWordAction,SIGNAL(triggered()),this,SLOT(searchForWord()));
+  m_searchPageAction = new QAction(tr("For &page"),this);
+  connect(m_searchPageAction,SIGNAL(triggered()),this,SLOT(searchForPage()));
+  m_searchRootAction = new QAction(tr("For &root"),this);
+  connect(m_searchRootAction,SIGNAL(triggered()),this,SLOT(searchForRoot()));
+  m_searchNodeAction = new QAction(tr("For &node"),this);
+  connect(m_searchNodeAction,SIGNAL(triggered()),this,SLOT(searchForNode()));
 
 }
 void LanesLexicon::createToolBar() {
@@ -640,6 +584,17 @@ void LanesLexicon::createToolBar() {
   m_bookmarkBtn->setMenu(m_bookmarkMenu);
   bookmarks->addWidget(m_bookmarkBtn);
   bookmarks->addSeparator();
+
+  QToolBar * search = addToolBar(tr("Search"));
+  search->setObjectName("searchtoolbar");
+  m_searchButton = new QToolButton(search);
+  m_searchButton->setDefaultAction(m_searchAction);
+  m_searchButton->setText(tr("Search"));
+  m_searchButton->setPopupMode(QToolButton::MenuButtonPopup);
+  m_searchButton->setEnabled(true);
+  m_searchButton->setMenu(m_searchMenu);
+  search->addWidget(m_searchButton);
+  search->addSeparator();
 
 
   QToolBar * docs = addToolBar("&Docs");
@@ -756,6 +711,12 @@ void LanesLexicon::createMenus() {
   m_navMenu->addAction(m_navLastAction);
   m_navMenu->addAction(m_navModeRootAction);
   m_navMenu->addAction(m_navModePageAction);
+
+  m_searchMenu = m_mainmenu->addMenu(tr("&Search"));
+  m_searchMenu->addAction(m_searchRootAction);
+  m_searchMenu->addAction(m_searchWordAction);
+  m_searchMenu->addAction(m_searchPageAction);
+  m_searchMenu->addAction(m_searchNodeAction);
 }
 
 void LanesLexicon::createStatusBar() {
@@ -1698,7 +1659,83 @@ void LanesLexicon::on_actionDocs() {
 }
 void LanesLexicon::testSlot() {
   qDebug() << Q_FUNC_INFO;
-
-
-
+}
+void LanesLexicon::searchForPage() {
+    bool ok;
+    /// not sure about putting max/mins
+    int page = QInputDialog::getInt(this, tr("Page Search"),
+                                    tr("Page:"), -1,1,3016, 1,&ok);
+    if (ok && (page != -1)) {
+      Place p;
+      p.setPage(page);
+      this->onGoToPage(p);
+    }
+}
+void LanesLexicon::searchForRoot() {
+    SearchDialog * d = new SearchDialog(this);
+    d->setWindowTitle(tr("Search for Root"));
+    d->setPrompt(tr("Find root"));
+    d->setNewTab(m_searchNewTab);
+    if (d->exec()) {
+      QString t = d->getText();
+      if (! t.isEmpty()) {
+        if (! UcdScripts::isScript(t,"Arabic")) {
+          t = convertString(t);
+        }
+        Place p = showPlace(Place(t),d->getNewTab());
+        if (! p.isValid()) {
+          QMessageBox msgBox;
+          msgBox.setText(QString(tr("%1 not found")).arg(t));
+          msgBox.exec();
+        }
+      }
+    }
+    delete d;
+}
+void LanesLexicon::searchForWord() {
+    SearchDialog * d = new SearchDialog(this);
+    d->setWindowTitle(tr("Search for Word"));
+    d->setPrompt(tr("Find word"));
+    if (d->exec()) {
+      QString t = d->getText();
+      if (! t.isEmpty()) {
+        if (! UcdScripts::isScript(t,"Arabic")) {
+          t = convertString(t);
+        }
+        SearchResultsWidget * s = new SearchResultsWidget(t,this);
+        if (s->count() == 0) {
+          QMessageBox msgBox;
+          msgBox.setText(QString(tr("%1 not found")).arg(t));
+          msgBox.exec();
+          delete s;
+        }
+        else {
+          int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
+          m_tabs->setCurrentIndex(i);
+          setSignals(s->getEntry());
+        }
+      }
+    }
+    delete d;
+}
+void LanesLexicon::searchForNode() {
+    NodeSearchDialog * d = new NodeSearchDialog(this);
+    d->setNewTab(m_searchNewTab);
+    if (d->exec()) {
+      QString t = d->getText();
+      if (! t.isEmpty()) {
+        /// TODO make this an option to always show root
+        /// show only node
+        //        Place p = showNode(t,true);
+        Place p;
+        p.setNode(t);
+        p = showPlace(p,d->getNewTab());
+        if (! p.isValid()) {
+          QMessageBox msgBox;
+          msgBox.setText(QString(tr("%1 not found")).arg(t));
+          msgBox.exec();
+        }
+      }
+    }
+    delete d;
 }
