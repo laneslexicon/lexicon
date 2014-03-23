@@ -212,7 +212,9 @@ private:
     QAction * m_exitAction;
     QAction * m_testAction;
 
-    QAction * m_hBackward;
+    QAction * m_historyAction;
+    QAction * m_bookmarkAction;
+    QAction * m_navigationAction;
     /// Navigation
     QAction * m_navNextAction;
     QAction * m_navPrevAction;

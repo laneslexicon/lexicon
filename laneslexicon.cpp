@@ -498,7 +498,7 @@ void LanesLexicon::createActions() {
   connect(m_testAction,SIGNAL(triggered()),this,SLOT(on_actionTest()));
   /// probably need icons
 
-  m_hBackward = createIconAction(imgdir,settings.value("History",QString()).toString(),tr("Back"));
+  m_historyAction = createIconAction(imgdir,settings.value("History",QString()).toString(),tr("History"));
     //ew QAction(QIcon(imgdir + "/go-previous.png"),tr("Back"),this);
 
   m_navNextAction = createIconAction(imgdir,settings.value("Next",QString()).toString(),tr("Next"));
@@ -517,10 +517,10 @@ void LanesLexicon::createActions() {
   m_rootFirstAction = new QAction(QIcon(imgdir + "/go-first.png"),tr("First Root"),this);
   m_rootLastAction = new QAction(QIcon(imgdir + "/go-last.png"),tr("Last Root"),this);
 
-  connect(m_rootForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextRoot()));
-  connect(m_rootBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevRoot()));
-  connect(m_rootFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstRoot()));
-  connect(m_rootLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastRoot()));
+  //  connect(m_rootForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextRoot()));
+  //  connect(m_rootBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevRoot()));
+  //  connect(m_rootFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstRoot()));
+  //  connect(m_rootLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastRoot()));
 
   m_pageForwardAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next Page"),this);
   m_pageBackwardAction = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Prev Page"),this);
@@ -529,10 +529,14 @@ void LanesLexicon::createActions() {
 
   m_docAction = createIconAction(imgdir,settings.value("Docs",QString()).toString(),tr("Docs"));
 
-  connect(m_pageForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextPage()));
-  connect(m_pageBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevPage()));
-  connect(m_pageFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstPage()));
-  connect(m_pageLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastPage()));
+  m_bookmarkAction = createIconAction(imgdir,settings.value("Bookmarks",QString()).toString(),tr("Bookmarks"));
+
+  m_navigationAction = createIconAction(imgdir,settings.value("Move",QString()).toString(),tr("Move"));
+
+  //  connect(m_pageForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextPage()));
+  //  connect(m_pageBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevPage()));
+  //  connect(m_pageFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstPage()));
+  //  connect(m_pageLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastPage()));
 
 
   m_navModeRootAction = new QAction(tr("By root"),this);
@@ -554,13 +558,6 @@ void LanesLexicon::createActions() {
 
 }
 void LanesLexicon::createToolBar() {
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Icons");
-  QString imgdir = settings.value("Directory","images").toString();
-  QFileInfo  fi;
-  QString iconfile;
-
   m_fileToolBar = addToolBar(tr("&File"));
   m_fileToolBar->setObjectName("filetoolbar");
 
@@ -570,8 +567,8 @@ void LanesLexicon::createToolBar() {
   QToolBar * history = addToolBar(tr("History"));
   history->setObjectName("historytoolbar");
   m_hBackwardBtn = new QToolButton(history);
-  m_hBackwardBtn->setText("Back");
-  m_hBackwardBtn->setDefaultAction(m_hBackward);
+  m_hBackwardBtn->setText("History");
+  m_hBackwardBtn->setDefaultAction(m_historyAction);
   m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_hBackwardBtn->setEnabled(false);
   m_hBackwardBtn->setMenu(m_historyMenu);
@@ -590,11 +587,7 @@ void LanesLexicon::createToolBar() {
   }
 
   QToolButton * m_navBtn = new QToolButton(navigation);
-  iconfile = settings.value("Move",QString()).toString();
-  fi.setFile(imgdir,iconfile);
-  if ( ! iconfile.isEmpty() && fi.exists() ) {
-    m_navBtn->setIcon(QIcon(fi.absoluteFilePath()));
-  }
+  m_navBtn->setDefaultAction(m_navigationAction);
   m_navBtn->setText(tr("Move"));
 
 
@@ -639,15 +632,9 @@ void LanesLexicon::createToolBar() {
 
   QToolBar * bookmarks = addToolBar(tr("Bookmarks"));
   bookmarks->setObjectName("bookmarkstoolbar");
-
   m_bookmarkBtn = new QToolButton(bookmarks);
-  iconfile = settings.value("Bookmarks",QString()).toString();
-  fi.setFile(imgdir,iconfile);
-  if ( ! iconfile.isEmpty() && fi.exists() ) {
-    m_bookmarkBtn->setIcon(QIcon(fi.absoluteFilePath()));
-  }
+  m_bookmarkBtn->setDefaultAction(m_bookmarkAction);
   m_bookmarkBtn->setText(tr("Bookmarks"));
-  //  m_bookmarkBtn->setDefaultAction(m_hBackward);
   m_bookmarkBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_bookmarkBtn->setEnabled(true);
   m_bookmarkBtn->setMenu(m_bookmarkMenu);
