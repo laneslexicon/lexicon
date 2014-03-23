@@ -117,12 +117,15 @@ GraphicsEntry::~GraphicsEntry() {
 }
 void GraphicsEntry::readSettings() {
   QSettings settings;
+  bool ok;
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Entry");
   QString css = settings.value("CSS",QString("entry.css")).toString();
   readCssFromFile(css);
   m_xsltSource = settings.value("XSLT",QString("entry.xslt")).toString();
   m_textWidth = settings.value("Text width",300).toInt();
+  m_defaultWidth = m_textWidth;
+
   m_entryMargin = settings.value("Margin",10).toInt();
 
   QString bg = settings.value("Supplement background color",QString("rgb(255,254,253)")).toString();
@@ -145,6 +148,13 @@ void GraphicsEntry::readSettings() {
   m_moveBackwardKey = settings.value("Back",QString()).toString();
   m_zoomInKey = settings.value("Zoom in",QString("+")).toString();
   m_zoomOutKey = settings.value("Zoom out",QString("-")).toString();
+
+  m_widenKey = settings.value("Widen",QString("i")).toString();
+  m_narrowKey = settings.value("Narrow",QString("o")).toString();
+  m_widenStep = settings.value("Step",50).toInt(&ok);
+  if ( ! ok ) {
+    m_widenStep = 50;
+  }
 
   settings.endGroup();
 
@@ -200,6 +210,12 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   }
   else if (event->text() ==  m_moveBackwardKey) {
     moveBackward();
+  }
+  else if (event->text() ==  m_widenKey) {
+    onWiden();
+  }
+  else if (event->text() ==  m_narrowKey) {
+    onNarrow();
   }
   else {
     QWidget::keyPressEvent(event);

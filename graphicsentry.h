@@ -105,11 +105,18 @@ class GraphicsEntry : public QWidget {
     QString m_moveFocusDownKey;
     void moveFocusUp();
     void moveFocusDown();
+
     QString m_zoomInKey;
     QString m_zoomOutKey;
 
     QString m_moveForwardKey;
     QString m_moveBackwardKey;
+
+    QString m_widenKey;
+    QString m_narrowKey;
+    int m_widenStep;
+    int m_defaultWidth;
+
     void moveForward();
     void moveBackward();
     QList<EntryItem *> m_items;
