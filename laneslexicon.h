@@ -253,6 +253,13 @@ private:
     QAction * m_clearHistoryAction;
     QToolButton * m_hBackwardBtn;
     HistoryMaster * m_history;
+
+    // controls for the current graphics entry
+    QAction * m_zoomInAction;
+    QAction * m_zoomOutAction;
+    QAction * m_widenAction;
+    QAction * m_narrowAction;
+    QAction * m_printAction;
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };

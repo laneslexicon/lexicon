@@ -500,6 +500,13 @@ void LanesLexicon::createActions() {
   m_searchNodeAction = new QAction(tr("For &node"),this);
   connect(m_searchNodeAction,SIGNAL(triggered()),this,SLOT(searchForNode()));
 
+  m_zoomInAction = createIconAction(imgdir,settings.value("ZoomIn",QString()).toString(),tr("Zoom in"));
+  m_zoomOutAction = createIconAction(imgdir,settings.value("ZoomOut",QString()).toString(),tr("Zoom in"));
+  m_widenAction = createIconAction(imgdir,settings.value("Widen",QString()).toString(),tr("Widen text"));
+  m_narrowAction = createIconAction(imgdir,settings.value("Narrow",QString()).toString(),tr("Narrow text"));
+  m_printAction = createIconAction(imgdir,settings.value("Print",QString()).toString(),tr("Print"));
+
+
 }
 void LanesLexicon::createToolBar() {
   m_fileToolBar = addToolBar(tr("&File"));
@@ -601,6 +608,14 @@ void LanesLexicon::createToolBar() {
   docs->setObjectName("docstoolbar");
   docs->addAction(m_docAction);
 
+  QToolBar * page = addToolBar("&Page");
+  page->setObjectName("pagetoolbar");
+  page->addAction(m_zoomInAction);
+  page->addAction(m_zoomOutAction);
+  page->addAction(m_widenAction);
+  page->addAction(m_narrowAction);
+  page->addAction(m_printAction);
+  page->addSeparator();
 }
 /**
  * when user has done something that adds to history
