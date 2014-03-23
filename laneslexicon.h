@@ -123,6 +123,7 @@ public:
 
 private:
     Place showPlace(const Place &,bool newTab = false);
+    QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
 
     QString m_interface;    // "default","minimal"
     void setupInterface();
