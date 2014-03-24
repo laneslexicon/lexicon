@@ -23,6 +23,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+#ifdef __APPLE__
+    QString resourceDir = QCoreApplication::applicationDirPath() + "/../Resources";
+    chdir(resourceDir.toLocal8Bit().data());
+#endif
     a.addLibraryPath("./images");
     QCoreApplication::setOrganizationName("Gabanjo");
     QCoreApplication::setOrganizationDomain("nowhere.com");
@@ -71,7 +75,7 @@ int main(int argc, char *argv[])
       qDebug() << fdb.families(QFontDatabase::Arabic);
       return 0;
     }
-    QFontDatabase::addApplicationFont("./resources/fonts/amiri/amiri-regular.ttf");
+    QFontDatabase::addApplicationFont("fonts/amiri/amiri-regular.ttf");
     QFontDatabase::addApplicationFont("./site/fonts/fontawesome-webfont.ttf");
   //    qDebug() << "node = " << node << dump;
     //    qDebug() << "args = " << args;
