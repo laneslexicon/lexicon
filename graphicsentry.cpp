@@ -8,7 +8,7 @@
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
   QGraphicsView(scene,parent) {
   //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  //  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
 void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
   QGraphicsView::scrollContentsBy(dx,dy);
@@ -83,6 +83,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 
 
   m_view->setInteractive(true);
+  //  m_view->setAlignment(Qt::AlignLeft);
   m_item = new QGraphicsTextItem("");
   m_item->setTextInteractionFlags(Qt::TextBrowserInteraction);
   m_item->setTextWidth(m_textWidth);
@@ -654,6 +655,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     //    qDebug() << "history off";
   }
   qDebug() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
+  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
   /*
   qDebug() << "At exit" << m_view->sceneRect();
   qDebug() << "Widget" << this->geometry();
@@ -1199,46 +1201,58 @@ void GraphicsEntry::moveForward() {
 void GraphicsEntry::moveBackward() {
   emit(prev(m_place));
 }
+/**
+ *
+ */
 void GraphicsEntry::onWiden() {
   m_textWidth += 50;
+  //  qDebug() << "Scene rect before widen" << m_view->sceneRect() << m_textWidth;
   for(int i=0;i < m_items.size();i++) {
       m_items[i]->setTextWidth(m_textWidth);
   }
   reposition();
+  m_view->setSceneRect(m_scene->sceneRect());
+  //  m_view->update();
+  //  qDebug() << "Scene rect after" << m_view->sceneRect();
   QGraphicsItem * item = m_scene->focusItem();
-  if (item) {
-    m_view->centerOn(item);
+  if ( ! item ) {
+    item = m_items[0];
   }
-  m_view->update();
+  if (item) {
+    m_view->centerOn(item);//x,pos.y());
+  }
 }
 void GraphicsEntry::onNarrow() {
   m_textWidth -= 50;
+  //  qDebug() << "Scene rect before narrow" << m_view->sceneRect() << m_textWidth;
   for(int i=0;i < m_items.size();i++) {
       m_items[i]->setTextWidth(m_textWidth);
   }
   reposition();
+  m_view->setSceneRect(m_scene->sceneRect());
+  //  qDebug() << "Scene rect after" << m_view->sceneRect();
   QGraphicsItem * item = m_scene->focusItem();
+  //  m_view->setAlignment(Qt::AlignCenter);
+  if ( ! item ) {
+    item = m_items[0];
+  }
   if (item) {
     m_view->centerOn(item);
   }
-  m_view->update();
 }
 void GraphicsEntry::reposition() {
   qreal ypos = 0;
   qreal xpos = 0;
   QRectF r;
   QSizeF sz;
-  /// calculate the y-position of the last item currently in the scene
-  /// add items updating the ypos as we go
+  qreal maxwidth = 0;
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->setPos(xpos,ypos);
-    //    m_scene->addItem(m_items[i]);
     sz = m_items[i]->document()->size();
-    //    r = m_items[i]->boundingRect();
-    //    QGraphicsRectItem * ri = m_scene->addRect(r);
-    //    ri->setPos(xpos,ypos);
-    //    ri->setPen(QPen(Qt::NoPen));
-    //    ri->setBrush(Qt::cyan);
     ypos += sz.height() + m_entryMargin;
+    if (sz.width() > maxwidth) {
+      maxwidth = sz.width();
+    }
   }
+  m_scene->setSceneRect(QRectF(0,0,maxwidth,m_scene->height()));
 }
