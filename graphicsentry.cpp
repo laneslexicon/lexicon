@@ -1204,19 +1204,41 @@ void GraphicsEntry::onWiden() {
   for(int i=0;i < m_items.size();i++) {
       m_items[i]->setTextWidth(m_textWidth);
   }
+  reposition();
   QGraphicsItem * item = m_scene->focusItem();
   if (item) {
     m_view->centerOn(item);
   }
+  m_view->update();
 }
 void GraphicsEntry::onNarrow() {
   m_textWidth -= 50;
   for(int i=0;i < m_items.size();i++) {
       m_items[i]->setTextWidth(m_textWidth);
   }
+  reposition();
   QGraphicsItem * item = m_scene->focusItem();
   if (item) {
     m_view->centerOn(item);
   }
-
+  m_view->update();
+}
+void GraphicsEntry::reposition() {
+  qreal ypos = 0;
+  qreal xpos = 0;
+  QRectF r;
+  QSizeF sz;
+  /// calculate the y-position of the last item currently in the scene
+  /// add items updating the ypos as we go
+  for(int i=0;i < m_items.size();i++) {
+    m_items[i]->setPos(xpos,ypos);
+    //    m_scene->addItem(m_items[i]);
+    sz = m_items[i]->document()->size();
+    //    r = m_items[i]->boundingRect();
+    //    QGraphicsRectItem * ri = m_scene->addRect(r);
+    //    ri->setPos(xpos,ypos);
+    //    ri->setPen(QPen(Qt::NoPen));
+    //    ri->setBrush(Qt::cyan);
+    ypos += sz.height() + m_entryMargin;
+  }
 }

@@ -98,6 +98,7 @@ class GraphicsEntry : public QWidget {
     bool m_dumpXML;
     bool m_dumpHTML;
     bool m_dumpOutputHTML;
+    void reposition();
     void appendEntries(int);
     void prependEntries(int);
 
