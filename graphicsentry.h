@@ -66,6 +66,8 @@ class GraphicsEntry : public QWidget {
     qreal getScale() { return m_scale;}
     void setScale(qreal v, bool use = true);
     void highlight(const QString & t);
+    int getTextWidth() const { return m_textWidth; }
+    void setTextWidth(int w) { m_textWidth = w;}
   public slots:
     void anchorClicked(const QUrl &);
     void linkActivated(const QString &);

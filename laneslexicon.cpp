@@ -1014,6 +1014,7 @@ void LanesLexicon::writeSettings() {
         settings.beginGroup(QString("Tab-%1").arg(i));
         settings.setValue("place",p.toString());
         settings.setValue("zoom",entry->getScale());
+        settings.setValue("textwidth",entry->getTextWidth());
         //           QVariant v;
         //   v.setValue(p);
 
@@ -1040,10 +1041,18 @@ void LanesLexicon::writeSettings() {
   settings.setValue("Geometry", saveGeometry());
 }
 void LanesLexicon::restoreTabs() {
+  bool ok;
   QSettings settings;
   settings.setIniCodec("UTF-8");
   settings.beginGroup("System");
   int tab =  settings.value("Focus tab",0).toInt();
+  settings.endGroup();
+  int textWidth;
+  settings.beginGroup("Entry");
+  textWidth = settings.value("Text width",400).toInt(&ok);
+  if (!ok) {
+    textWidth = 400;
+  }
   settings.endGroup();
   Place wp;
   settings.beginGroup("Tabs");
@@ -1054,33 +1063,29 @@ void LanesLexicon::restoreTabs() {
     settings.beginGroup(tabs[i]);
     Place p;
     QString v = settings.value("place",QString()).toString();
-    bool ok;
+
     qreal scale = settings.value("zoom",1.0).toReal(&ok);
-    qDebug() << "tab" << i << scale;
+
     if ( !ok ) {
       scale = 1.0;
     }
     if (! v.isNull()) {
       p = Place::fromString(v);
     }
-    /*
-    p.setNode(settings.value("node",QString()).toString());
-    p.setRoot(settings.value("root",QString()).toString());
-    p.setSupplement(settings.value("supplement").toInt());
-    p.setWord(settings.value("word",QString()).toString());
-    //    p.setNodeOnly(settings.value("nodeOnly",false).toBool());
-    if (p.getNode().isEmpty()) {
-      //      p.setNodeOnly(false);
+    int tw = settings.value("textwidth",textWidth).toInt(&ok);
+    if (!ok) {
+      tw = textWidth;
     }
-    */
     if (p.isValid()) {
       if (tab == i) {
         tab = j;
         wp = p;
       }
       GraphicsEntry * entry = new GraphicsEntry(this);
+      entry->setTextWidth(tw);
       setSignals(entry);
       p.setType(Place::RestoreTab);
+
       if (p.getPageMode()) {
         entry->setPagingForward();
         entry->getPage(p);

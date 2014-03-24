@@ -655,7 +655,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     //    qDebug() << "history off";
   }
   qDebug() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
-  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
+  //  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
   /*
   qDebug() << "At exit" << m_view->sceneRect();
   qDebug() << "Widget" << this->geometry();
