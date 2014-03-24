@@ -260,6 +260,7 @@ private:
     QAction * m_widenAction;
     QAction * m_narrowAction;
     QAction * m_printAction;
+    QAction * m_localSearchAction;
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };

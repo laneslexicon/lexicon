@@ -505,6 +505,7 @@ void LanesLexicon::createActions() {
   m_widenAction = createIconAction(imgdir,settings.value("Widen",QString()).toString(),tr("Widen text"));
   m_narrowAction = createIconAction(imgdir,settings.value("Narrow",QString()).toString(),tr("Narrow text"));
   m_printAction = createIconAction(imgdir,settings.value("Print",QString()).toString(),tr("Print"));
+  m_localSearchAction = createIconAction(imgdir,settings.value("LocalSearch",QString()).toString(),tr("Search page"));
 
 
 }
@@ -615,6 +616,7 @@ void LanesLexicon::createToolBar() {
   page->addAction(m_widenAction);
   page->addAction(m_narrowAction);
   page->addAction(m_printAction);
+  page->addAction(m_localSearchAction);
   page->addSeparator();
 }
 /**
