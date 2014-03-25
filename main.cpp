@@ -7,6 +7,7 @@
 #include <QPixmap>
 #include "QsLog.h"
 #include "QsLogDest.h"
+#include "application.h"
 cmdOptions progOptions;
 LanesLexicon * getApp() {
   foreach(QWidget *widget, qApp->topLevelWidgets()) {
@@ -21,17 +22,8 @@ HistoryMaster * getHistory() {
 }
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    MyApp a(argc, argv);
 
-#ifdef __APPLE__
-    QString resourceDir = QCoreApplication::applicationDirPath() + "/../Resources";
-    chdir(resourceDir.toLocal8Bit().data());
-#endif
-    a.addLibraryPath("./images");
-    QCoreApplication::setOrganizationName("Gabanjo");
-    QCoreApplication::setOrganizationDomain("nowhere.com");
-    QCoreApplication::setApplicationName("Lanes Lexicon");
-    QCoreApplication::setApplicationVersion("0.1");
 
     QCommandLineParser parser;
     parser.setApplicationDescription("This is Lane's Arabic-English Lexicon");

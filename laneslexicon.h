@@ -59,16 +59,18 @@
 struct cmdOptions {
   bool dump;
   QString node;
+  QString config;
 };
-
+extern QSettings * getSettings();
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit LanesLexicon(QWidget *parent = 0);
+    explicit LanesLexicon(QString configFile,QWidget *parent = 0);
     ~LanesLexicon();
     QSize sizeHint() const;
+    QString getConfigFile() const { return m_configFile;}
     void readSettings();
     void writeSettings();
     bool isOk() { return m_ok;}
@@ -129,7 +131,7 @@ public:
 private:
     Place showPlace(const Place &,bool newTab = false);
     QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
-
+    QString m_configFile;
     QString m_interface;    // "default","minimal"
     void setupInterface();
     /// 0 - root mode, 1 - page mode
