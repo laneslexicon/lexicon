@@ -30,12 +30,13 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addVersionOption();
 
-    // A boolean option with a single name (-p)
-    QCommandLineOption dumpOption("p", QCoreApplication::translate("main", "Show progress during copy"));
-    parser.addOption(dumpOption);
      // An option with a value
     QCommandLineOption nodeOption(QStringList() <<"n" << "node","make the given node the initial display","node");
     parser.addOption(nodeOption);
+
+    QCommandLineOption configOption(QStringList() <<"c" << "config","use the given INI file","config");
+    parser.addOption(configOption);
+
     QCommandLineOption fontOption("f","List your systems Arabic fonts");
     parser.addOption(fontOption);
     //    a.setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
@@ -60,7 +61,6 @@ int main(int argc, char *argv[])
     // source is args.at(0), destination is args.at(1)
 
 
-    progOptions.dump = parser.isSet(dumpOption);
     progOptions.node = parser.value(nodeOption);
     if (parser.isSet(fontOption) ) {
       QFontDatabase fdb;
@@ -71,6 +71,14 @@ int main(int argc, char *argv[])
     QFontDatabase::addApplicationFont("./site/fonts/fontawesome-webfont.ttf");
   //    qDebug() << "node = " << node << dump;
     //    qDebug() << "args = " << args;
+    QString configFile;
+    if (parser.isSet(configOption)) {
+        configFile = parser.value(configOption);
+    }
+    else {
+      configFile = "default.ini";
+    }
+    a.setConfig(configFile);
     int ret;
     QPixmap pixmap("./images/frontis.png");
     QSplashScreen splash(pixmap);

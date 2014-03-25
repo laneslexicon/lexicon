@@ -67,10 +67,9 @@ class LanesLexicon : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit LanesLexicon(QString configFile,QWidget *parent = 0);
+    explicit LanesLexicon(QWidget *parent = 0);
     ~LanesLexicon();
     QSize sizeHint() const;
-    QString getConfigFile() const { return m_configFile;}
     void readSettings();
     void writeSettings();
     bool isOk() { return m_ok;}
