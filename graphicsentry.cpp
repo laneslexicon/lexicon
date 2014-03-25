@@ -118,20 +118,19 @@ GraphicsEntry::~GraphicsEntry() {
 }
 void GraphicsEntry::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  qDebug() << "config file is" << app->getConfig();
-  QSettings settings;
+  QSettings * settings = app->getSettings();
   bool ok;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Entry");
-  QString css = settings.value("CSS",QString("entry.css")).toString();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("Entry");
+  QString css = settings->value("CSS",QString("entry.css")).toString();
   readCssFromFile(css);
-  m_xsltSource = settings.value("XSLT",QString("entry.xslt")).toString();
-  m_textWidth = settings.value("Text width",300).toInt();
+  m_xsltSource = settings->value("XSLT",QString("entry.xslt")).toString();
+  m_textWidth = settings->value("Text width",300).toInt();
   m_defaultWidth = m_textWidth;
 
-  m_entryMargin = settings.value("Margin",10).toInt();
+  m_entryMargin = settings->value("Margin",10).toInt();
 
-  QString bg = settings.value("Supplement background color",QString("rgb(255,254,253)")).toString();
+  QString bg = settings->value("Supplement background color",QString("rgb(255,254,253)")).toString();
   QRegExp rx("^rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\s*\\)");
   if (rx.indexIn(bg) != -1) {
     //    qDebug() << bg << "color" << rx.cap(1) << rx.cap(2) << rx.cap(3);
@@ -143,55 +142,47 @@ void GraphicsEntry::readSettings() {
   else {
     m_supplementBg = QColor::fromRgb(255,255,255);
   }
-  m_clearScene = settings.value("Clear",true).toBool();
+  m_clearScene = settings->value("Clear",true).toBool();
   /// these are set to empty to disable the feature
-  m_moveFocusUpKey = settings.value("Move focus up",QString()).toString();
-  m_moveFocusDownKey = settings.value("Move focus down",QString()).toString();
-  m_moveForwardKey = settings.value("Forward",QString()).toString();
-  m_moveBackwardKey = settings.value("Back",QString()).toString();
-  m_zoomInKey = settings.value("Zoom in",QString("+")).toString();
-  m_zoomOutKey = settings.value("Zoom out",QString("-")).toString();
+  m_moveFocusUpKey = settings->value("Move focus up",QString()).toString();
+  m_moveFocusDownKey = settings->value("Move focus down",QString()).toString();
+  m_moveForwardKey = settings->value("Forward",QString()).toString();
+  m_moveBackwardKey = settings->value("Back",QString()).toString();
+  m_zoomInKey = settings->value("Zoom in",QString("+")).toString();
+  m_zoomOutKey = settings->value("Zoom out",QString("-")).toString();
 
-  m_widenKey = settings.value("Widen",QString("i")).toString();
-  m_narrowKey = settings.value("Narrow",QString("o")).toString();
-  m_widenStep = settings.value("Step",50).toInt(&ok);
+  m_widenKey = settings->value("Widen",QString("i")).toString();
+  m_narrowKey = settings->value("Narrow",QString("o")).toString();
+  m_widenStep = settings->value("Step",50).toInt(&ok);
   if ( ! ok ) {
     m_widenStep = 50;
   }
 
-  settings.endGroup();
+  settings->endGroup();
 
-  settings.beginGroup("Debug");
-  m_dumpXML = settings.value("Dump XML",false).toBool();
-  m_dumpHTML = settings.value("Dump HTML",false).toBool();
-  m_dumpOutputHTML = settings.value("Dump output HTML",false).toBool();
-  settings.endGroup();
+  settings->beginGroup("Debug");
+  m_dumpXML = settings->value("Dump XML",false).toBool();
+  m_dumpHTML = settings->value("Dump HTML",false).toBool();
+  m_dumpOutputHTML = settings->value("Dump output HTML",false).toBool();
+  settings->endGroup();
 
   /*
-  settings.beginGroup("Shortcut");
-  QString t = settings.value("Select all","Ctrl+C,A").toString();
+  settings->beginGroup("Shortcut");
+  QString t = settings->value("Select all","Ctrl+C,A").toString();
   QShortcut * sc = new QShortcut(t,this);
   sc->setContext(Qt::WidgetShortcut);
   //  connect(sc,SIGNAL(activated()),this,SLOT(selectAll()));
   //  connect(sc,SIGNAL(activatedAmbiguously()),this,SLOT(selectAll()));
   qDebug() << "select all set to" << t << sc->key() << sc->id();
-  t = settings.value("Select entry","Ctrl+C,E").toString();
+  t = settings->value("Select entry","Ctrl+C,E").toString();
   sc = new QShortcut(t,this);
   sc->setContext(Qt::WidgetShortcut);
   //  connect(sc,SIGNAL(activated()),this,SLOT(selectEntry()));
   qDebug() << "select entry set to" << t << sc->key() << sc->id();
   */
+  delete settings;
 }
 void GraphicsEntry::writeDefaultSettings() {
-  QSettings settings;
-   settings.setIniCodec("UTF-8");
- settings.beginGroup("Entry");
-  settings.setValue("CSS","entry.css");
-  settings.setValue("XSLT","entry.xslt");
-  settings.setValue("Text Width",300);
-  settings.setValue("Clear",true);
-  settings.setValue("Margin",0);
-  settings.setValue("Supplement Background Color","rgb(255,254,253)");
 
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {

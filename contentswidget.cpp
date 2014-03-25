@@ -13,11 +13,13 @@ ContentsWidget::~ContentsWidget() {
   qDebug() << Q_FUNC_INFO;
 }
 void ContentsWidget::readSettings() {
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Roots");
-  m_backgroundColor = settings.value("Background","lightgray").toString();
-  m_debug = settings.value("Debug",false).toBool();
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("Roots");
+  m_backgroundColor = settings->value("Background","lightgray").toString();
+  m_debug = settings->value("Debug",false).toBool();
+  delete settings;
 }
 void ContentsWidget::loadContents() {
   QSqlQuery query;

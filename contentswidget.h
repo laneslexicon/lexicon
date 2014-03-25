@@ -16,6 +16,7 @@
 #include <QSettings>
 #include "QsLog.h"
 #include "place.h"
+#include "application.h"
 class ContentsWidget : public QTreeWidget {
   Q_OBJECT;
  public:
