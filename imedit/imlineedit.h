@@ -18,6 +18,7 @@
 #include <QVBoxLayout>
 #include <QShortcut>
 #include "scripts.h"
+#include "application.h"
 class ImLineEdit : public QLineEdit {
     Q_OBJECT
   public:

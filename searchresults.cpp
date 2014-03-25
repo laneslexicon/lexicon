@@ -1,13 +1,14 @@
 #include "searchresults.h"
 SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) : QWidget(parent) {
   m_target = str;
-
-  QSettings settings;
-  settings.beginGroup("Search");
-  QString f = settings.value("Results font",QString()).toString();
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->beginGroup("Search");
+  QString f = settings->value("Results font",QString()).toString();
   if (! f.isEmpty()) {
     m_resultsFont.fromString(f);
   }
+  delete settings;
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QTableWidget;
   m_list->setColumnCount(3);

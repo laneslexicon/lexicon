@@ -37,7 +37,6 @@
 #include "xsltsupport.h"
 #include "history.h"
 #include "place.h"
-#include "placewidget.h"
 #include "entryitem.h"
 #include "application.h"
 class LaneGraphicsView;
@@ -155,7 +154,7 @@ class GraphicsEntry : public QWidget {
     QString m_currentHtml;
     QString m_currentRoot;
     Place m_place;
-    PlaceWidget * m_showPlace;
+
     // read/set from readSettings
 
     QString m_currentCSS;

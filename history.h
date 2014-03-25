@@ -10,7 +10,7 @@
 #include <QDebug>
 #include "place.h"
 #include "QsLog.h"
-
+#include "application.h"
 class HistoryEvent {
  public:
   HistoryEvent();

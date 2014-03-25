@@ -17,6 +17,7 @@
 #include <QHelpContentWidget>
 #include <QHelpIndexModel>
 #include <QHelpIndexWidget>
+#include "application.h"
 class HelpBrowser : public QTextBrowser {
   Q_OBJECT;
  public:

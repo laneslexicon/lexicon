@@ -20,6 +20,7 @@
 #include <QFont>
 #include <QWidget>
 #include "graphicsentry.h"
+#include "application.h"
 class SearchResultsWidget : public QWidget
 {
     Q_OBJECT

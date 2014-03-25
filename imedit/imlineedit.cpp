@@ -48,22 +48,23 @@ void ImLineEdit::shortcutActivated() {
   }
 }
 void ImLineEdit::readSettings() {
-  QSettings settings;
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
 
-  settings.beginGroup("System");
-  m_nullMap = settings.value("Null map","None").toString();
-  settings.endGroup();
+  settings->beginGroup("System");
+  m_nullMap = settings->value("Null map","None").toString();
+  settings->endGroup();
 
-  settings.beginGroup("Maps");
-  QStringList groups = settings.childGroups();
+  settings->beginGroup("Maps");
+  QStringList groups = settings->childGroups();
   qDebug() << Q_FUNC_INFO << groups;
   for(int i=0;i < groups.size();i++) {
-    settings.beginGroup(groups[i]);
-    QString file = settings.value("file",QString()).toString();
+    settings->beginGroup(groups[i]);
+    QString file = settings->value("file",QString()).toString();
     if (! file.isEmpty()) {
       loadMap(file,groups[i]);
     }
-    QString scut = settings.value("shortcut",QString()).toString();
+    QString scut = settings->value("shortcut",QString()).toString();
     if (! scut.isEmpty()) {
       QKeySequence k = QKeySequence(scut);
       QShortcut * sc = new QShortcut(k,this);
@@ -71,12 +72,13 @@ void ImLineEdit::readSettings() {
       sc->setContext(Qt::WidgetShortcut);
       connect(sc,SIGNAL(activated()),this,SLOT(shortcutActivated()));
     }
-    bool  enabled = settings.value("enabled",false).toBool();
+    bool  enabled = settings->value("enabled",false).toBool();
     if (enabled) {
       m_activeMap = groups[i];
     }
-    settings.endGroup();
+    settings->endGroup();
   }
+  delete settings;
 }
 void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;

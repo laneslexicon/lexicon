@@ -49,7 +49,6 @@
 #include "history.h"
 #include "QsLog.h"
 #include "place.h"
-#include "placewidget.h"
 #include "searchwidget.h"
 #include "bookmarkwidget.h"
 #include "scripts.h"

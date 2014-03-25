@@ -218,12 +218,13 @@ HistoryEvent * HistoryMaster::getEvent(int id) {
    return event;
 }
 void HistoryMaster::readSettings() {
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("History");
-  m_historyEnabled = settings.value("Enabled",true).toBool();
-  m_size = settings.value("Size",10).toInt();
-
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("History");
+  m_historyEnabled = settings->value("Enabled",true).toBool();
+  m_size = settings->value("Size",10).toInt();
+  delete settings;
 }
 bool HistoryMaster::clear() {
    if ( ! m_historyEnabled ) {

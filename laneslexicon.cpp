@@ -347,21 +347,22 @@ void LanesLexicon::shortcut(const QString & k) {
  *
  */
 void LanesLexicon::setupShortcuts() {
-  QSettings settings;
-  settings.beginGroup("Shortcut");
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->beginGroup("Shortcut");
   m_signalMapper = new QSignalMapper(this);
-  QStringList keys = settings.childKeys();
+  QStringList keys = settings->childKeys();
   for(int i=0;i < keys.size();i++) {
     if (keys[i] == "Go Tab") {
       for(int j=1;j < 10;j++) {
-        QString ks = QString("%1,%2").arg(settings.value(keys[i]).toString()).arg(j);
+        QString ks = QString("%1,%2").arg(settings->value(keys[i]).toString()).arg(j);
         QShortcut * sc = new QShortcut(ks,this);
         connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
         m_signalMapper->setMapping(sc,QString("%1-%2").arg(keys[i]).arg(j));
       }
     }
     else {
-      QString k = settings.value(keys[i]).toString();
+      QString k = settings->value(keys[i]).toString();
       QShortcut * sc = new QShortcut(k,this);
       connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
       /// use the setting name as the shortcut 'name'
@@ -369,7 +370,8 @@ void LanesLexicon::setupShortcuts() {
     }
   }
   connect(m_signalMapper,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
-  settings.endGroup();
+  settings->endGroup();
+  delete settings;
 }
 
 
@@ -416,13 +418,14 @@ QAction * LanesLexicon::createIconAction(const QString imgdir,const QString & ic
 }
 void LanesLexicon::createActions() {
   /// TODO get this from QSettings
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Icons");
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("Icons");
 
-  QString imgdir = settings.value("Directory","images").toString();
+  QString imgdir = settings->value("Directory","images").toString();
 
-  m_exitAction = createIconAction(imgdir,settings.value("Exit",QString()).toString(),tr("Exit"));
+  m_exitAction = createIconAction(imgdir,settings->value("Exit",QString()).toString(),tr("Exit"));
   connect(m_exitAction,SIGNAL(triggered()),this,SLOT(on_actionExit()));
 
   m_clearHistoryAction = new QAction(tr("Clear"),this);
@@ -432,13 +435,13 @@ void LanesLexicon::createActions() {
   connect(m_testAction,SIGNAL(triggered()),this,SLOT(on_actionTest()));
   /// probably need icons
 
-  m_historyAction = createIconAction(imgdir,settings.value("History",QString()).toString(),tr("History"));
+  m_historyAction = createIconAction(imgdir,settings->value("History",QString()).toString(),tr("History"));
     //ew QAction(QIcon(imgdir + "/go-previous.png"),tr("Back"),this);
 
-  m_navNextAction = createIconAction(imgdir,settings.value("Next",QString()).toString(),tr("Next"));
-  m_navPrevAction = createIconAction(imgdir,settings.value("Back",QString()).toString(),tr("Back"));
-  m_navFirstAction = createIconAction(imgdir,settings.value("First",QString()).toString(),tr("First"));
-  m_navLastAction = createIconAction(imgdir,settings.value("Last",QString()).toString(),tr("Last"));
+  m_navNextAction = createIconAction(imgdir,settings->value("Next",QString()).toString(),tr("Next"));
+  m_navPrevAction = createIconAction(imgdir,settings->value("Back",QString()).toString(),tr("Back"));
+  m_navFirstAction = createIconAction(imgdir,settings->value("First",QString()).toString(),tr("First"));
+  m_navLastAction = createIconAction(imgdir,settings->value("Last",QString()).toString(),tr("Last"));
 
   connect(m_navNextAction,SIGNAL(triggered()),this,SLOT(on_actionNavNext()));
   connect(m_navPrevAction,SIGNAL(triggered()),this,SLOT(on_actionNavPrev()));
@@ -461,13 +464,13 @@ void LanesLexicon::createActions() {
   m_pageFirstAction = new QAction(QIcon(imgdir + "/go-first.png"),tr("First Page"),this);
   m_pageLastAction = new QAction(QIcon(imgdir + "/go-last.png"),tr("Last Page"),this);
 
-  m_docAction = createIconAction(imgdir,settings.value("Docs",QString()).toString(),tr("Docs"));
+  m_docAction = createIconAction(imgdir,settings->value("Docs",QString()).toString(),tr("Docs"));
 
-  m_bookmarkAction = createIconAction(imgdir,settings.value("Bookmarks",QString()).toString(),tr("Bookmarks"));
+  m_bookmarkAction = createIconAction(imgdir,settings->value("Bookmarks",QString()).toString(),tr("Bookmarks"));
 
-  m_navigationAction = createIconAction(imgdir,settings.value("Move",QString()).toString(),tr("Move"));
+  m_navigationAction = createIconAction(imgdir,settings->value("Move",QString()).toString(),tr("Move"));
 
-  m_searchAction = createIconAction(imgdir,settings.value("Search",QString()).toString(),tr("Search"));
+  m_searchAction = createIconAction(imgdir,settings->value("Search",QString()).toString(),tr("Search"));
 
   //  connect(m_pageForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextPage()));
   //  connect(m_pageBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevPage()));
@@ -501,14 +504,14 @@ void LanesLexicon::createActions() {
   m_searchNodeAction = new QAction(tr("For &node"),this);
   connect(m_searchNodeAction,SIGNAL(triggered()),this,SLOT(searchForNode()));
 
-  m_zoomInAction = createIconAction(imgdir,settings.value("ZoomIn",QString()).toString(),tr("Zoom in"));
-  m_zoomOutAction = createIconAction(imgdir,settings.value("ZoomOut",QString()).toString(),tr("Zoom in"));
-  m_widenAction = createIconAction(imgdir,settings.value("Widen",QString()).toString(),tr("Widen text"));
-  m_narrowAction = createIconAction(imgdir,settings.value("Narrow",QString()).toString(),tr("Narrow text"));
-  m_printAction = createIconAction(imgdir,settings.value("Print",QString()).toString(),tr("Print"));
-  m_localSearchAction = createIconAction(imgdir,settings.value("LocalSearch",QString()).toString(),tr("Search page"));
+  m_zoomInAction = createIconAction(imgdir,settings->value("ZoomIn",QString()).toString(),tr("Zoom in"));
+  m_zoomOutAction = createIconAction(imgdir,settings->value("ZoomOut",QString()).toString(),tr("Zoom in"));
+  m_widenAction = createIconAction(imgdir,settings->value("Widen",QString()).toString(),tr("Widen text"));
+  m_narrowAction = createIconAction(imgdir,settings->value("Narrow",QString()).toString(),tr("Narrow text"));
+  m_printAction = createIconAction(imgdir,settings->value("Print",QString()).toString(),tr("Print"));
+  m_localSearchAction = createIconAction(imgdir,settings->value("LocalSearch",QString()).toString(),tr("Search page"));
 
-
+  delete settings;
 }
 void LanesLexicon::createToolBar() {
   m_fileToolBar = addToolBar(tr("&File"));
