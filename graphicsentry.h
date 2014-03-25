@@ -39,6 +39,7 @@
 #include "place.h"
 #include "placewidget.h"
 #include "entryitem.h"
+#include "application.h"
 class LaneGraphicsView;
 class GraphicsEntry : public QWidget {
   Q_OBJECT

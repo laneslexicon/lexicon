@@ -125,12 +125,13 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   setupInterface();
 
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Main");
-  this->restoreGeometry(settings.value("Geometry").toByteArray());
-  this->restoreState(settings.value("State").toByteArray());
-
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("Main");
+  this->restoreGeometry(settings->value("Geometry").toByteArray());
+  this->restoreState(settings->value("State").toByteArray());
+  delete settings;
 }
 
 LanesLexicon::~LanesLexicon()
@@ -915,26 +916,27 @@ void LanesLexicon::on_actionTest() {
  *
  */
 void LanesLexicon::readSettings() {
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("System");
-  m_dbName = settings.value("Database","lexicon.sqlite").toString();
-  QString ar = settings.value("Arabic font").toString();
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("System");
+  m_dbName = settings->value("Database","lexicon.sqlite").toString();
+  QString ar = settings->value("Arabic font").toString();
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
   }
 
-  m_saveTabs = settings.value("Save tabs",true).toBool();
-  m_restoreTabs = settings.value("Restore tabs",true).toBool();
+  m_saveTabs = settings->value("Save tabs",true).toBool();
+  m_restoreTabs = settings->value("Restore tabs",true).toBool();
 
-  m_saveBookmarks = settings.value("Save bookmarks",true).toBool();
-  m_restoreBookmarks = settings.value("Restore bookmarks",true).toBool();
+  m_saveBookmarks = settings->value("Save bookmarks",true).toBool();
+  m_restoreBookmarks = settings->value("Restore bookmarks",true).toBool();
 
-  m_docked = settings.value("Docked",false).toBool();
-  m_interface = settings.value("Interface","default").toString();
-  m_navigationMode = settings.value("Navigation","root").toString();
-  m_useNotes = settings.value("Use notes",false).toBool();
-  m_activeMap = settings.value("Default map","Buckwalter").toString();
+  m_docked = settings->value("Docked",false).toBool();
+  m_interface = settings->value("Interface","default").toString();
+  m_navigationMode = settings->value("Navigation","root").toString();
+  m_useNotes = settings->value("Use notes",false).toBool();
+  m_activeMap = settings->value("Default map","Buckwalter").toString();
   if (m_navigationMode.toLower() == "root") {
     m_navMode = LanesLexicon::ByRoot;
   }
@@ -942,24 +944,24 @@ void LanesLexicon::readSettings() {
     m_navMode = LanesLexicon::ByPage;
   }
 
-  settings.endGroup();
+  settings->endGroup();
 
-  settings.beginGroup("Search");
-  m_searchNewTab = settings.value("New tab",true).toBool();
-  m_searchSwitchTab = settings.value("Switch tab",true).toBool();
-  settings.endGroup();
+  settings->beginGroup("Search");
+  m_searchNewTab = settings->value("New tab",true).toBool();
+  m_searchSwitchTab = settings->value("Switch tab",true).toBool();
+  settings->endGroup();
 
-  settings.beginGroup("Debug");
-  m_valgrind = settings.value("Valgrind",false).toBool();
-  settings.endGroup();
+  settings->beginGroup("Debug");
+  m_valgrind = settings->value("Valgrind",false).toBool();
+  settings->endGroup();
 
-  settings.beginGroup("Notes");
-  m_notesDbName = settings.value("Database","notes.sqlite").toString();
-  settings.endGroup();
-  settings.beginGroup("History");
-  m_historyEnabled = settings.value("Enabled",true).toBool();
-  m_historyDbName = settings.value("Database","history.sqlite").toString();
-  settings.endGroup();
+  settings->beginGroup("Notes");
+  m_notesDbName = settings->value("Database","notes.sqlite").toString();
+  settings->endGroup();
+  settings->beginGroup("History");
+  m_historyEnabled = settings->value("Enabled",true).toBool();
+  m_historyDbName = settings->value("Database","history.sqlite").toString();
+  settings->endGroup();
 
 
   /**
@@ -967,14 +969,14 @@ void LanesLexicon::readSettings() {
    *
    */
 
-  settings.beginGroup("Maps");
-  QStringList groups = settings.childGroups();
+  settings->beginGroup("Maps");
+  QStringList groups = settings->childGroups();
   if ( ! groups.contains(m_activeMap) ) {
     QLOG_WARN() << QString(tr("Default map <%1> not found in settings")).arg(m_activeMap);
     return;
   }
-  settings.beginGroup(m_activeMap);
-  QString filename = settings.value("file",QString()).toString();
+  settings->beginGroup(m_activeMap);
+  QString filename = settings->value("file",QString()).toString();
   QFile file(filename);
   if ( file.exists() ) {
     if (! im_load_map_from_json(m_mapper,filename.toUtf8().constData(),m_activeMap.toUtf8().constData())) {
@@ -984,87 +986,93 @@ void LanesLexicon::readSettings() {
   else {
     QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(m_activeMap).arg(filename);
   }
-  settings.endGroup();
-  settings.endGroup();
+  settings->endGroup();
+  settings->endGroup();
+  delete settings;
 }
 void LanesLexicon::writeSettings() {
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
+  QSettings * settings;
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
   /*
-  settings.beginGroup("System");
+  settings->beginGroup("System");
   QDateTime now = QDateTime::currentDateTime();
-  settings.setValue("Run date",now);
-  settings.setValue("Save Tabs",m_saveTabs);
-  settings.setValue("Database",m_dbName);
-  settings.setValue("History",m_historyEnabled);
-  settings.setValue("Arabic font",arFont.toString());
-  settings.setValue("Restore Tabs",m_restoreTabs);
-  settings.setValue("Interface",m_interface);
-  settings.setValue("Use Notes",m_useNotes);
-  settings.setValue("Navigation",m_navigationMode);
-  settings.endGroup();
+  settings->setValue("Run date",now);
+  settings->setValue("Save Tabs",m_saveTabs);
+  settings->setValue("Database",m_dbName);
+  settings->setValue("History",m_historyEnabled);
+  settings->setValue("Arabic font",arFont.toString());
+  settings->setValue("Restore Tabs",m_restoreTabs);
+  settings->setValue("Interface",m_interface);
+  settings->setValue("Use Notes",m_useNotes);
+  settings->setValue("Navigation",m_navigationMode);
+  settings->endGroup();
   */
   if (m_saveTabs) {
-    settings.beginGroup("Tabs");
-    settings.remove("");
+    settings->beginGroup("Tabs");
+    settings->remove("");
     for(int i=0;i < m_tabs->count();i++) {
       GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
       if (entry) {
         Place p = entry->getPlace();
-        settings.beginGroup(QString("Tab-%1").arg(i));
-        settings.setValue("place",p.toString());
-        settings.setValue("zoom",entry->getScale());
-        settings.setValue("textwidth",entry->getTextWidth());
+        settings->beginGroup(QString("Tab-%1").arg(i));
+        settings->setValue("place",p.toString());
+        settings->setValue("zoom",entry->getScale());
+        settings->setValue("textwidth",entry->getTextWidth());
         //           QVariant v;
         //   v.setValue(p);
 
-        settings.endGroup();
+        settings->endGroup();
       }
     }
-    settings.endGroup();
-    settings.beginGroup("System");
-    settings.setValue("Focus tab",m_tabs->currentIndex());
-    settings.endGroup();
+    settings->endGroup();
+    settings->beginGroup("System");
+    settings->setValue("Focus tab",m_tabs->currentIndex());
+    settings->endGroup();
   }
   if (m_saveBookmarks) {
-    settings.beginGroup("Bookmarks");
-    settings.remove("");
+    settings->beginGroup("Bookmarks");
+    settings->remove("");
     QStringList keys = m_bookmarks.keys();
     for(int i=0;i < keys.size();i++) {
       Place p = m_bookmarks.value(keys[i]);
-      settings.setValue(keys[i],p.toString());
+      settings->setValue(keys[i],p.toString());
     }
-    settings.endGroup();
+    settings->endGroup();
   }
-  settings.beginGroup("Main");
-  settings.setValue("State",this->saveState());
-  settings.setValue("Geometry", saveGeometry());
+  settings->beginGroup("Main");
+  settings->setValue("State",this->saveState());
+  settings->setValue("Geometry", saveGeometry());
+  delete settings;
 }
 void LanesLexicon::restoreTabs() {
   bool ok;
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("System");
-  int tab =  settings.value("Focus tab",0).toInt();
-  settings.endGroup();
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("System");
+  int tab =  settings->value("Focus tab",0).toInt();
+  settings->endGroup();
   int textWidth;
-  settings.beginGroup("Entry");
-  textWidth = settings.value("Text width",400).toInt(&ok);
+  settings->beginGroup("Entry");
+  textWidth = settings->value("Text width",400).toInt(&ok);
   if (!ok) {
     textWidth = 400;
   }
-  settings.endGroup();
+  settings->endGroup();
   Place wp;
-  settings.beginGroup("Tabs");
-  QStringList tabs = settings.childGroups();
+  settings->beginGroup("Tabs");
+  QStringList tabs = settings->childGroups();
   /// restore tab may fail, so we need to keep count of the actual tabs
   int j = 0;
   for(int i=0;i < tabs.size();i++) {
-    settings.beginGroup(tabs[i]);
+    settings->beginGroup(tabs[i]);
     Place p;
-    QString v = settings.value("place",QString()).toString();
+    QString v = settings->value("place",QString()).toString();
 
-    qreal scale = settings.value("zoom",1.0).toReal(&ok);
+    qreal scale = settings->value("zoom",1.0).toReal(&ok);
 
     if ( !ok ) {
       scale = 1.0;
@@ -1072,7 +1080,7 @@ void LanesLexicon::restoreTabs() {
     if (! v.isNull()) {
       p = Place::fromString(v);
     }
-    int tw = settings.value("textwidth",textWidth).toInt(&ok);
+    int tw = settings->value("textwidth",textWidth).toInt(&ok);
     if (!ok) {
       tw = textWidth;
     }
@@ -1099,14 +1107,14 @@ void LanesLexicon::restoreTabs() {
       m_tree->ensurePlaceVisible(p,true);
       j++;
     }
-    settings.endGroup();
+    settings->endGroup();
   }
-  settings.endGroup();
+  settings->endGroup();
   wp.setType(Place::RestoreTab);
   if ((tab >=0) && (tab << m_tabs->count())) {
     m_tabs->setCurrentIndex(tab);
   }
-
+  delete settings;
 }
 
 HistoryMaster * LanesLexicon::history() {
@@ -1435,18 +1443,20 @@ void LanesLexicon::bookmarkJump(const QString & id) {
   updateMenu();
 }
 void LanesLexicon::restoreBookmarks() {
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Bookmarks");
-  QStringList keys = settings.childKeys();
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("Bookmarks");
+  QStringList keys = settings->childKeys();
   for(int i=0;i < keys.size();i++) {
-    QString t = settings.value(keys[i]).toString();
+    QString t = settings->value(keys[i]).toString();
     Place p = Place::fromString(t);
     if (p.isValid()) {
       m_bookmarks.insert(keys[i],p);
       addBookmarkMenuItem(keys[i]);
     }
   }
+  delete settings;
 }
 void LanesLexicon::setupBookmarkShortcuts() {
   /**
@@ -1455,12 +1465,14 @@ void LanesLexicon::setupBookmarkShortcuts() {
    *
    *  TODO bookmark Icons ?
    */
-  QSettings settings;
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Bookmark");
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("Bookmark");
   m_bookmarkMap = new QSignalMapper(this);
-  QString key = settings.value("Add","Ctrl+B").toString();
-  QString ids = settings.value("Id","abcdefghijklmnopqrstuvwxyz").toString();
+  QString key = settings->value("Add","Ctrl+B").toString();
+  QString ids = settings->value("Id","abcdefghijklmnopqrstuvwxyz").toString();
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
     QShortcut * sc = new QShortcut(ks,this);
@@ -1470,7 +1482,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   }
   m_bookmarkAddAction = new QAction(tr("Add"),this);
 
-  key = settings.value("Jump","Ctrl+J").toString();
+  key = settings->value("Jump","Ctrl+J").toString();
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
     QShortcut * sc = new QShortcut(ks,this);
@@ -1480,7 +1492,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkJumpAction = new QAction(tr("Jump"),this);
 
   QShortcut * sc;
-  key = settings.value("List","Ctrl+B,Ctrl+L").toString();
+  key = settings->value("List","Ctrl+B,Ctrl+L").toString();
   sc = new QShortcut(key,this);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
   connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
@@ -1491,7 +1503,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkListAction->setShortcutContext(Qt::WidgetShortcut);
   connect(m_bookmarkListAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
 
-  key = settings.value("Revert","Ctrl+B,Ctrl+R").toString();
+  key = settings->value("Revert","Ctrl+B,Ctrl+R").toString();
   sc = new QShortcut(key,this);
     sc->setContext(Qt::ApplicationShortcut);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
@@ -1501,7 +1513,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkRevertAction->setShortcutContext(Qt::WidgetShortcut);
   connect(m_bookmarkRevertAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
 
-  key = settings.value("Clear","Ctrl+B,Ctrl+C").toString();
+  key = settings->value("Clear","Ctrl+B,Ctrl+C").toString();
   sc = new QShortcut(key,this);
     sc->setContext(Qt::ApplicationShortcut);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
@@ -1513,7 +1525,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   connect(m_bookmarkMap,SIGNAL(mapped(QString)),this,SLOT(bookmarkShortcut(const QString &)));
 
   connect(m_bookmarkAddAction,SIGNAL(triggered()),this,SLOT(bookmarkAdd()));
-
+  delete settings;
 }
 
 void LanesLexicon::bookmarkAdd() {

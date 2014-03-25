@@ -22,7 +22,7 @@ HistoryMaster * getHistory() {
 }
 int main(int argc, char *argv[])
 {
-    MyApp a(argc, argv);
+    Lexicon a(argc, argv);
 
 
     QCommandLineParser parser;
@@ -74,11 +74,8 @@ int main(int argc, char *argv[])
     QString configFile;
     if (parser.isSet(configOption)) {
         configFile = parser.value(configOption);
+        a.setConfig(configFile);
     }
-    else {
-      configFile = "default.ini";
-    }
-    a.setConfig(configFile);
     int ret;
     QPixmap pixmap("./images/frontis.png");
     QSplashScreen splash(pixmap);

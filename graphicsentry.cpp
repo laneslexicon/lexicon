@@ -117,6 +117,8 @@ GraphicsEntry::~GraphicsEntry() {
   /// TODO xalan cleanup ?
 }
 void GraphicsEntry::readSettings() {
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  qDebug() << "config file is" << app->getConfig();
   QSettings settings;
   bool ok;
   settings.setIniCodec("UTF-8");

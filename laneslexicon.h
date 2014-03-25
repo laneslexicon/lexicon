@@ -41,6 +41,7 @@
 #include <QActionGroup>
 #include <QtWebKitWidgets/QWebView>
 #include <QUrl>
+#include "application.h"
 #include "inputmapper.h"
 #include "contentswidget.h"
 #include "graphicsentry.h"

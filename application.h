@@ -4,11 +4,13 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QDebug>
-class MyApp : public QApplication {
+#include <QSettings>
+class Lexicon : public QApplication {
   Q_OBJECT;
 public:
-  MyApp(int & argc, char ** argv);
+  Lexicon(int & argc, char ** argv);
   QString getConfig() const;
+  QSettings * getSettings();
   void setConfig(const QString & fileName);
  private:
   QString m_configFile;
