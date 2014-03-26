@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QDebug>
 #include <QSettings>
+#include <iostream>
 class Lexicon : public QApplication {
   Q_OBJECT;
 public:
@@ -12,7 +13,10 @@ public:
   QString getConfig() const;
   QSettings * getSettings();
   void setConfig(const QString & fileName);
+  bool isOk() { return m_ok;}
  private:
   QString m_configFile;
+  QString m_showFirst;
+  bool m_ok;
 };
 #endif

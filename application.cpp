@@ -1,17 +1,19 @@
 #include "application.h"
 Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QString resourceDir;
-
-#ifdef Q_WS_MAC
+  m_ok = true;
+#ifdef __APPLE__
   resourceDir = QCoreApplication::applicationDirPath() + "/../Resources";
 #else
   resourceDir = QCoreApplication::applicationDirPath() + "/Resources";
 #endif
 
   if ( ! QDir::setCurrent(resourceDir)) {
-    qDebug() << "Failed to changed current directory" << resourceDir;
+    QString errmsg  = QString(QObject::tr("Warning failed to change application workding directory to : %1")).arg(resourceDir);
+    std::cout << errmsg.toLocal8Bit().data() << std::endl;
+    m_ok = false;
   }
-  addLibraryPath("./images");
+  addLibraryPath("/images");
   QCoreApplication::setOrganizationName("Gabanjo");
   QCoreApplication::setOrganizationDomain("theunwalledcity.com");
   QCoreApplication::setApplicationName("Lanes Lexicon");

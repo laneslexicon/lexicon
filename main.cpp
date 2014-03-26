@@ -8,6 +8,7 @@
 #include "QsLog.h"
 #include "QsLogDest.h"
 #include "application.h"
+#include <iostream>
 cmdOptions progOptions;
 LanesLexicon * getApp() {
   foreach(QWidget *widget, qApp->topLevelWidgets()) {
@@ -24,7 +25,9 @@ int main(int argc, char *argv[])
 {
     Lexicon a(argc, argv);
 
-
+    //    if ( ! a.isOk() ) {
+    //      return 0;
+    //    }
     QCommandLineParser parser;
     parser.setApplicationDescription("This is Lane's Arabic-English Lexicon");
     parser.addHelpOption();
@@ -34,12 +37,14 @@ int main(int argc, char *argv[])
     QCommandLineOption nodeOption(QStringList() <<"n" << "node","make the given node the initial display","node");
     parser.addOption(nodeOption);
 
+    QCommandLineOption rootOption(QStringList() <<"r" << "root","make the given root the initial display","node");
+    parser.addOption(rootOption);
+
     QCommandLineOption configOption(QStringList() <<"c" << "config","use the given INI file","config");
     parser.addOption(configOption);
 
-    QCommandLineOption fontOption("f","List your systems Arabic fonts");
+    QCommandLineOption fontOption(QStringList() << "f" << "fonts","List your systems Arabic fonts");
     parser.addOption(fontOption);
-    //    a.setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
 
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);
@@ -62,13 +67,21 @@ int main(int argc, char *argv[])
 
 
     progOptions.node = parser.value(nodeOption);
+    QFontDatabase::addApplicationFont("fonts/amiri/amiri-regular.ttf");
+
+
     if (parser.isSet(fontOption) ) {
       QFontDatabase fdb;
-      qDebug() << fdb.families(QFontDatabase::Arabic);
+      QStringList fonts = fdb.families(QFontDatabase::Arabic);
+      std::cout << "Arabic fonts available:" << std::endl;
+      std::cout << "=======================" << std::endl;
+      for(int i=0;i < fonts.size(); i++) {
+        std::cout << "\t" << fonts[i].toLocal8Bit().data() << std::endl;
+      }
       return 0;
     }
-    QFontDatabase::addApplicationFont("fonts/amiri/amiri-regular.ttf");
-    QFontDatabase::addApplicationFont("./site/fonts/fontawesome-webfont.ttf");
+
+    //    QFontDatabase::addApplicationFont("./site/fonts/fontawesome-webfont.ttf");
   //    qDebug() << "node = " << node << dump;
     //    qDebug() << "args = " << args;
     QString configFile;
@@ -77,7 +90,7 @@ int main(int argc, char *argv[])
         a.setConfig(configFile);
     }
     int ret;
-    QPixmap pixmap("./images/frontis.png");
+    QPixmap pixmap("images/frontis.png");
     QSplashScreen splash(pixmap);
     splash.show();
     a.processEvents();
