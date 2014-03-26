@@ -511,6 +511,12 @@ void LanesLexicon::createActions() {
   m_printAction = createIconAction(imgdir,settings->value("Print",QString()).toString(),tr("Print"));
   m_localSearchAction = createIconAction(imgdir,settings->value("LocalSearch",QString()).toString(),tr("Search page"));
 
+  connect(m_zoomInAction,SIGNAL(triggered()),this,SLOT(pageZoomIn()));
+  connect(m_zoomOutAction,SIGNAL(triggered()),this,SLOT(pageZoomOut()));
+  connect(m_widenAction,SIGNAL(triggered()),this,SLOT(pageWiden()));
+  connect(m_narrowAction,SIGNAL(triggered()),this,SLOT(pageNarrow()));
+  connect(m_printAction,SIGNAL(triggered()),this,SLOT(pagePrint()));
+  connect(m_localSearchAction,SIGNAL(triggered()),this,SLOT(pageSearch()));
   delete settings;
 }
 void LanesLexicon::createToolBar() {
@@ -1775,4 +1781,32 @@ void LanesLexicon::searchForNode() {
       }
     }
     delete d;
+}
+void LanesLexicon::pageZoomIn() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->onZoomIn();
+  }
+}
+void LanesLexicon::pageZoomOut() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->onZoomOut();
+  }
+}
+void LanesLexicon::pageWiden() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->onWiden();
+  }
+}
+void LanesLexicon::pageNarrow() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->onNarrow();
+  }
+}
+void LanesLexicon::pagePrint() {
+}
+void LanesLexicon::pageSearch() {
 }

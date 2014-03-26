@@ -127,6 +127,13 @@ public:
     void on_actionDocs();
     void bookmarkRebuildMenu();
 
+    /// these apply to the current graphicsentry
+    void pageZoomIn();
+    void pageZoomOut();
+    void pageWiden();
+    void pageNarrow();
+    void pagePrint();
+    void pageSearch();
 private:
     Place showPlace(const Place &,bool newTab = false);
     QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
