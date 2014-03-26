@@ -64,7 +64,7 @@ void HelpViewer::goBack() {
 }
 HelpWidget::HelpWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
-  m_he = new QHelpEngine("./help/lanedocs.qhc");
+  m_he = new QHelpEngine(m_helpCollection);
   m_viewer = new HelpViewer(this);
   m_viewer->browser()->setHelpEngine(m_he);
   //    QHelpContentModel *contentModel = he->contentModel();
