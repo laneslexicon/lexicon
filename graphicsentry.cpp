@@ -42,35 +42,6 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_pagingDir = 0;
   m_scale = 1.0;
 
-  QHBoxLayout * btnslayout = new QHBoxLayout;
-  /// TODO from settings
-  m_zoomInBtn = new QPushButton(QIcon("./images/zoom-in-32.png"),tr(""));
-  m_zoomInBtn->setToolTip(tr("Zoom in"));
-  m_zoomOutBtn = new QPushButton(QIcon("./images/zoom-out-32.png"),tr(""));
-  m_zoomOutBtn->setToolTip(tr("Zoom out"));
-  m_clearSceneBtn = new QPushButton(QIcon("./images/32/cleaning-erase-eraser-icone-4970-32.png"),tr("Clear"));
-  m_clearSceneBtn->setToolTip("Clear contents");
-
-  m_widenBtn = new QPushButton("Widen");
-  m_narrowBtn = new QPushButton("Narrow");
-
-  btnslayout->addWidget(m_zoomInBtn);
-  btnslayout->addWidget(m_zoomOutBtn);
-
-  btnslayout->addWidget(m_widenBtn);
-  btnslayout->addWidget(m_narrowBtn);
-  btnslayout->addWidget(m_clearSceneBtn);
-  layout->addLayout(btnslayout);
-
-  connect(m_zoomInBtn,SIGNAL(clicked()),this,SLOT(onZoomIn()));
-  connect(m_zoomOutBtn,SIGNAL(clicked()),this,SLOT(onZoomOut()));
-
-  connect(m_widenBtn,SIGNAL(clicked()),this,SLOT(onWiden()));
-  connect(m_narrowBtn,SIGNAL(clicked()),this,SLOT(onNarrow()));
-
-  connect(m_clearSceneBtn,SIGNAL(clicked()),this,SLOT(onClearScene()));
-
-
   m_scene = new QGraphicsScene(this);
   m_view = new LaneGraphicsView(m_scene,this);
   m_view->setSceneRect(m_scene->sceneRect());
