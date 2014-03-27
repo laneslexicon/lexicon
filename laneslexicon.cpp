@@ -188,6 +188,8 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   //  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
 
   connect(entry,SIGNAL(placeChanged(const Place &)),this,SLOT(placeChanged (const Place &)));
+  connect(entry,SIGNAL(clearPage()),this,SLOT(pageClear()));
+  connect(entry,SIGNAL(searchPage()),this,SLOT(pageSearch()));
 }
 void LanesLexicon::onCloseTab(int ix) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
@@ -510,6 +512,8 @@ void LanesLexicon::createActions() {
   m_narrowAction = createIconAction(imgdir,settings->value("Narrow",QString()).toString(),tr("Narrow text"));
   m_printAction = createIconAction(imgdir,settings->value("Print",QString()).toString(),tr("Print"));
   m_localSearchAction = createIconAction(imgdir,settings->value("LocalSearch",QString()).toString(),tr("Search page"));
+  m_clearAction = createIconAction(imgdir,settings->value("Clear",QString()).toString(),tr("Clear highlights"));
+  m_clearAction->setEnabled(false);
 
   connect(m_zoomInAction,SIGNAL(triggered()),this,SLOT(pageZoomIn()));
   connect(m_zoomOutAction,SIGNAL(triggered()),this,SLOT(pageZoomOut()));
@@ -517,6 +521,8 @@ void LanesLexicon::createActions() {
   connect(m_narrowAction,SIGNAL(triggered()),this,SLOT(pageNarrow()));
   connect(m_printAction,SIGNAL(triggered()),this,SLOT(pagePrint()));
   connect(m_localSearchAction,SIGNAL(triggered()),this,SLOT(pageSearch()));
+  connect(m_clearAction,SIGNAL(triggered()),this,SLOT(pageClear()));
+
   delete settings;
 }
 void LanesLexicon::createToolBar() {
@@ -627,6 +633,7 @@ void LanesLexicon::createToolBar() {
   page->addAction(m_narrowAction);
   page->addAction(m_printAction);
   page->addAction(m_localSearchAction);
+  page->addAction(m_clearAction);
   page->addSeparator();
 }
 /**
@@ -1809,6 +1816,15 @@ void LanesLexicon::pagePrint() {
 void LanesLexicon::pageSearch() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if ( entry ) {
-    entry->search();
+    if (entry->search() > 0) {
+      m_clearAction->setEnabled(true);
+    }
+  }
+}
+void LanesLexicon::pageClear() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if ( entry ) {
+    entry->clearHighlights();
+    m_clearAction->setEnabled(false);
   }
 }

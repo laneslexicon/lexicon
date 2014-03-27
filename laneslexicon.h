@@ -137,6 +137,7 @@ public:
     void pageNarrow();
     void pagePrint();
     void pageSearch();
+    void pageClear();
 private:
     Place showPlace(const Place &,bool newTab = false);
     QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
@@ -273,6 +274,9 @@ private:
     QAction * m_narrowAction;
     QAction * m_printAction;
     QAction * m_localSearchAction;
+    // clear the highlights
+
+    QAction * m_clearAction;
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };

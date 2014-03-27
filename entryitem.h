@@ -67,6 +67,7 @@ class EntryItem : public QGraphicsTextItem {
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
   int findCount() const { return m_searchPositions.size(); }
+  void clearHighlights();
   public slots:
     void searchItem();
 

@@ -126,6 +126,16 @@ QTextCursor EntryItem::highlight(const QString & target) {
   }
   return firstPos;
 }
+void EntryItem::clearHighlights() {
+  QTextCursor c = this->textCursor();
+  c.select(QTextCursor::Document);
+
+  QTextCharFormat fmt;
+  /// TODO get from QSettings
+  fmt.setBackground(Qt::white);
+  c.setCharFormat(fmt);
+  c.clearSelection();
+}
 /**
  * this is the one that is used by default
  *

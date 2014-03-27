@@ -113,22 +113,23 @@ void GraphicsEntry::readSettings() {
   else {
     m_supplementBg = QColor::fromRgb(255,255,255);
   }
-  m_clearScene = settings->value("Clear",true).toBool();
+  m_clearScene = settings->value("Clear scene",true).toBool();
   /// these are set to empty to disable the feature
   m_moveFocusUpKey = settings->value("Move focus up",QString()).toString();
   m_moveFocusDownKey = settings->value("Move focus down",QString()).toString();
   m_moveForwardKey = settings->value("Forward",QString()).toString();
   m_moveBackwardKey = settings->value("Back",QString()).toString();
-  m_zoomInKey = settings->value("Zoom in",QString("+")).toString();
-  m_zoomOutKey = settings->value("Zoom out",QString("-")).toString();
+  m_zoomInKey = settings->value("Zoom in",QString()).toString();
+  m_zoomOutKey = settings->value("Zoom out",QString()).toString();
 
-  m_widenKey = settings->value("Widen",QString("i")).toString();
-  m_narrowKey = settings->value("Narrow",QString("o")).toString();
+  m_widenKey = settings->value("Widen",QString()).toString();
+  m_narrowKey = settings->value("Narrow",QString()).toString();
   m_widenStep = settings->value("Step",50).toInt(&ok);
   if ( ! ok ) {
     m_widenStep = 50;
   }
-
+  m_searchKey = settings->value("Find",QString()).toString();
+  m_clearKey = settings->value("Clean",QString()).toString();
   settings->endGroup();
 
   settings->beginGroup("Debug");
@@ -157,37 +158,48 @@ void GraphicsEntry::writeDefaultSettings() {
 
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
-  //  qDebug() << Q_FUNC_INFO << event->modifiers() << event->key();
+  // qDebug() << Q_FUNC_INFO << event->modifiers() << event->key() << event->text();
   if (! m_zoomInKey.isEmpty() && (event->text() == m_zoomInKey)) {
     onZoomIn();
+    return;
   }
-  else if (! m_zoomOutKey.isEmpty() && (event->text() == m_zoomOutKey)) {
+  if (! m_zoomOutKey.isEmpty() && (event->text() == m_zoomOutKey)) {
     onZoomOut();
+    return;
   }
-  else if (! m_moveFocusDownKey.isEmpty() && (event->text() ==  m_moveFocusDownKey))  {
+  if (! m_moveFocusDownKey.isEmpty() && (event->text() ==  m_moveFocusDownKey))  {
     moveFocusDown();
+    return;
   }
-  else if (! m_moveFocusUpKey.isEmpty() && (event->text() ==  m_moveFocusUpKey)) {
+  if (! m_moveFocusUpKey.isEmpty() && (event->text() ==  m_moveFocusUpKey)) {
     moveFocusUp();
+    return;
   }
-  else if (! m_moveForwardKey.isEmpty() && (event->text() ==  m_moveForwardKey)) {
+  if (! m_moveForwardKey.isEmpty() && (event->text() ==  m_moveForwardKey)) {
     moveForward();
+    return;
   }
-  else if (! m_moveBackwardKey.isEmpty() && (event->text() ==  m_moveBackwardKey)) {
+  if (! m_moveBackwardKey.isEmpty() && (event->text() ==  m_moveBackwardKey)) {
     moveBackward();
+    return;
   }
- else if (! m_widenKey.isEmpty() && (event->text() ==  m_widenKey)) {
+  if (! m_widenKey.isEmpty() && (event->text() ==  m_widenKey)) {
     onWiden();
+    return;
   }
- else if (! m_narrowKey.isEmpty() && (event->text() ==  m_narrowKey)) {
+  if (! m_narrowKey.isEmpty() && (event->text() ==  m_narrowKey)) {
     onNarrow();
+    return;
   }
-   else if (! m_searchKey.isEmpty() && (event->text() == m_searchKey)) {
-    search();
+  if (! m_searchKey.isEmpty() && (event->text() == m_searchKey)) {
+    emit(searchPage());
+    return;
   }
-  else {
-    QWidget::keyPressEvent(event);
+  if (! m_clearKey.isEmpty() && (event->text() == m_clearKey)) {
+    emit(clearPage());
+    return;
   }
+  QWidget::keyPressEvent(event);
 
 }
 void GraphicsEntry::moveFocusDown() {
@@ -1223,7 +1235,7 @@ void GraphicsEntry::reposition() {
   }
   m_scene->setSceneRect(QRectF(0,0,maxwidth,m_scene->height()));
 }
-void GraphicsEntry::search() {
+int GraphicsEntry::search() {
   QString target = "and";
   int count = 0;
   int step = 10;
@@ -1241,4 +1253,10 @@ void GraphicsEntry::search() {
   }
   progress.setValue(max);
   qDebug() << "Found" << count;
+  return count;
+}
+void GraphicsEntry::clearHighlights() {
+  for(int i=0;i < m_items.size();i++) {
+    m_items[i]->clearHighlights();
+  }
 }
