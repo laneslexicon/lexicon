@@ -526,24 +526,49 @@ void LanesLexicon::createActions() {
   delete settings;
 }
 void LanesLexicon::createToolBar() {
-  m_fileToolBar = addToolBar(tr("&File"));
-  m_fileToolBar->setObjectName("filetoolbar");
+  QToolBar * mainbar = addToolBar("Main");
+  //m_fileToolBar->setObjectName("filetoolbar");
 
-  m_fileToolBar->addAction(m_exitAction);
-  m_fileToolBar->addAction(m_testAction);
+  mainbar->addAction(m_exitAction);
+  mainbar->addAction(m_testAction);
 
-  QToolBar * history = addToolBar(tr("History"));
-  history->setObjectName("historytoolbar");
-  m_hBackwardBtn = new QToolButton(history);
+  //  QToolBar * history = addToolBar(tr("History"));
+  //  history->setObjectName("historytoolbar");
+  m_hBackwardBtn = new QToolButton(mainbar);
   m_hBackwardBtn->setText("History");
   m_hBackwardBtn->setDefaultAction(m_historyAction);
   m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_hBackwardBtn->setEnabled(false);
   m_hBackwardBtn->setMenu(m_historyMenu);
-  history->addWidget(m_hBackwardBtn);
-  history->addSeparator();
+  mainbar->addWidget(m_hBackwardBtn);
+  //  history->addSeparator();
+
+  //  QToolBar * bookmarks = addToolBar(tr("Bookmarks"));
+  //  bookmarks->setObjectName("bookmarkstoolbar");
+  m_bookmarkBtn = new QToolButton(mainbar);
+  m_bookmarkBtn->setDefaultAction(m_bookmarkAction);
+  m_bookmarkBtn->setText(tr("Bookmarks"));
+  m_bookmarkBtn->setPopupMode(QToolButton::MenuButtonPopup);
+  m_bookmarkBtn->setEnabled(true);
+  m_bookmarkBtn->setMenu(m_bookmarkMenu);
+  mainbar->addWidget(m_bookmarkBtn);
+
+  //  QToolBar * search = addToolBar(tr("Search"));
+  //  search->setObjectName("searchtoolbar");
+  m_searchButton = new QToolButton(mainbar);
+  m_searchButton->setDefaultAction(m_searchAction);
+  m_searchButton->setText(tr("Search"));
+  m_searchButton->setPopupMode(QToolButton::MenuButtonPopup);
+  m_searchButton->setEnabled(true);
+  m_searchButton->setMenu(m_searchMenu);
+  mainbar->addWidget(m_searchButton);
 
 
+  //  QToolBar * docs = addToolBar("&Docs");
+  //  docs->setObjectName("docstoolbar");
+  mainbar->addAction(m_docAction);
+  mainbar->setFloatable(true);
+  //  addToolBarBreak();
   QToolBar * navigation = addToolBar(tr("Navigation"));
   navigation->setObjectName("navigationtoolbar");
   m_navText = new QLabel("");
@@ -598,32 +623,7 @@ void LanesLexicon::createToolBar() {
   navigation->addSeparator();
   navigation->setFloatable(true);
 
-  QToolBar * bookmarks = addToolBar(tr("Bookmarks"));
-  bookmarks->setObjectName("bookmarkstoolbar");
-  m_bookmarkBtn = new QToolButton(bookmarks);
-  m_bookmarkBtn->setDefaultAction(m_bookmarkAction);
-  m_bookmarkBtn->setText(tr("Bookmarks"));
-  m_bookmarkBtn->setPopupMode(QToolButton::MenuButtonPopup);
-  m_bookmarkBtn->setEnabled(true);
-  m_bookmarkBtn->setMenu(m_bookmarkMenu);
-  bookmarks->addWidget(m_bookmarkBtn);
-  bookmarks->addSeparator();
-
-  QToolBar * search = addToolBar(tr("Search"));
-  search->setObjectName("searchtoolbar");
-  m_searchButton = new QToolButton(search);
-  m_searchButton->setDefaultAction(m_searchAction);
-  m_searchButton->setText(tr("Search"));
-  m_searchButton->setPopupMode(QToolButton::MenuButtonPopup);
-  m_searchButton->setEnabled(true);
-  m_searchButton->setMenu(m_searchMenu);
-  search->addWidget(m_searchButton);
-  search->addSeparator();
-
-
-  QToolBar * docs = addToolBar("&Docs");
-  docs->setObjectName("docstoolbar");
-  docs->addAction(m_docAction);
+  //  addToolBarBreak();
 
   QToolBar * page = addToolBar("&Page");
   page->setObjectName("pagetoolbar");
@@ -634,7 +634,8 @@ void LanesLexicon::createToolBar() {
   page->addAction(m_printAction);
   page->addAction(m_localSearchAction);
   page->addAction(m_clearAction);
-  page->addSeparator();
+  page->setFloatable(true);
+
 }
 /**
  * when user has done something that adds to history
