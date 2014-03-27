@@ -27,6 +27,7 @@
 #include <QScrollBar>
 #include <QMenu>
 #include <QAction>
+#include <QProgressDialog>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QKeyEvent>
 #include <QFocusEvent>
@@ -68,6 +69,8 @@ class GraphicsEntry : public QWidget {
     void highlight(const QString & t);
     int getTextWidth() const { return m_textWidth; }
     void setTextWidth(int w) { m_textWidth = w;}
+    QGraphicsScene * getScene() { return m_scene;}
+    void search();
   public slots:
     void anchorClicked(const QUrl &);
     void linkActivated(const QString &);
@@ -117,6 +120,7 @@ class GraphicsEntry : public QWidget {
 
     QString m_widenKey;
     QString m_narrowKey;
+    QString m_searchKey;
     int m_widenStep;
     int m_defaultWidth;
 

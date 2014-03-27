@@ -1807,4 +1807,8 @@ void LanesLexicon::pagePrint() {
   }
 }
 void LanesLexicon::pageSearch() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if ( entry ) {
+    entry->search();
+  }
 }

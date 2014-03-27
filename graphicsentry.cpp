@@ -1223,3 +1223,22 @@ void GraphicsEntry::reposition() {
   }
   m_scene->setSceneRect(QRectF(0,0,maxwidth,m_scene->height()));
 }
+void GraphicsEntry::search() {
+  QString target = "and";
+  int count = 0;
+  int step = 10;
+  int max = m_items.size() * step;
+  QProgressDialog progress("Searching...", "Cancel search", 0,  max, this);
+  progress.setWindowModality(Qt::WindowModal);
+  progress.show();
+  for(int i=0;i < m_items.size();i++) {
+    //    QApplication::processEvents();
+    progress.setValue(i * step);
+    m_items[i]->highlight(target);
+    count += m_items[i]->findCount();
+    if (progress.wasCanceled())
+      break;
+  }
+  progress.setValue(max);
+  qDebug() << "Found" << count;
+}
