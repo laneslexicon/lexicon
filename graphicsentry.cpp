@@ -158,29 +158,32 @@ void GraphicsEntry::writeDefaultSettings() {
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   //  qDebug() << Q_FUNC_INFO << event->modifiers() << event->key();
-  if (event->text() == m_zoomInKey) {
+  if (! m_zoomInKey.isEmpty() && (event->text() == m_zoomInKey)) {
     onZoomIn();
   }
-  else if (event->text() == m_zoomOutKey) {
+  else if (! m_zoomOutKey.isEmpty() && (event->text() == m_zoomOutKey)) {
     onZoomOut();
   }
-  else if (event->text() ==  m_moveFocusDownKey)  {
+  else if (! m_moveFocusDownKey.isEmpty() && (event->text() ==  m_moveFocusDownKey))  {
     moveFocusDown();
   }
-  else if (event->text() ==  m_moveFocusUpKey) {
+  else if (! m_moveFocusUpKey.isEmpty() && (event->text() ==  m_moveFocusUpKey)) {
     moveFocusUp();
   }
-  else if (event->text() ==  m_moveForwardKey) {
+  else if (! m_moveForwardKey.isEmpty() && (event->text() ==  m_moveForwardKey)) {
     moveForward();
   }
-  else if (event->text() ==  m_moveBackwardKey) {
+  else if (! m_moveBackwardKey.isEmpty() && (event->text() ==  m_moveBackwardKey)) {
     moveBackward();
   }
-  else if (event->text() ==  m_widenKey) {
+ else if (! m_widenKey.isEmpty() && (event->text() ==  m_widenKey)) {
     onWiden();
   }
-  else if (event->text() ==  m_narrowKey) {
+ else if (! m_narrowKey.isEmpty() && (event->text() ==  m_narrowKey)) {
     onNarrow();
+  }
+   else if (! m_searchKey.isEmpty() && (event->text() == m_searchKey)) {
+    search();
   }
   else {
     QWidget::keyPressEvent(event);
