@@ -111,10 +111,13 @@ QTextCursor EntryItem::highlight(const QString & target) {
   QTextCharFormat fmt;
   /// TODO get from QSettings
   fmt.setBackground(Qt::yellow);
+
+  m_searchPositions.clear();
   cursor = doc->find(target,QTextDocument::FindWholeWords);
   firstPos = cursor;
   while(! cursor.isNull()) {
     pos =  cursor.position();
+    m_searchPositions << pos;
     //    qDebug() << Q_FUNC_INFO << "found at" << pos;
     cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
     cursor.setPosition(pos, QTextCursor::KeepAnchor);

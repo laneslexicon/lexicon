@@ -60,12 +60,13 @@ class EntryItem : public QGraphicsTextItem {
   bool isRoot() { return m_place.isRoot();}
   int getSupplement() { return m_place.getSupplement();}
   int getPage() { return m_place.getPage();}
-  QString getOutputHTML() { return m_html; }
+  QString getOutputHTML() const { return m_html; }
   void setOutputHTML(const QString & html) { m_html = html;}
   QTextCursor highlight(const QString &);
   QTextCursor highlightRx(const QString &);
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
+  int findCount() const { return m_searchPositions.size(); }
   public slots:
     void searchItem();
 
@@ -85,6 +86,7 @@ class EntryItem : public QGraphicsTextItem {
   QColor m_backgroundColor;
   bool m_focusOnHover;
   private:
+  QList<int> m_searchPositions;
   Place m_place;
   QString m_html;    /// saves the generated HTML for debug, only set when dumpOutputHTM is true
 };
