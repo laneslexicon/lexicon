@@ -12,6 +12,8 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QTableWidget;
   m_list->setColumnCount(3);
+  m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QStringList headers;
   headers << tr("Root") << tr("Entry") << tr("Node");
   m_list->setHorizontalHeaderLabels(headers);
