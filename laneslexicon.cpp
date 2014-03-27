@@ -495,7 +495,7 @@ void LanesLexicon::createActions() {
 
   connect(m_docAction,SIGNAL(triggered()),this,SLOT(on_actionDocs()));
 
-  m_searchWordAction = new QAction(tr("For &word"),this);
+  m_searchWordAction = new QAction(tr("For Arabic &word"),this);
   connect(m_searchWordAction,SIGNAL(triggered()),this,SLOT(searchForWord()));
   m_searchPageAction = new QAction(tr("For &page"),this);
   connect(m_searchPageAction,SIGNAL(triggered()),this,SLOT(searchForPage()));
@@ -1004,20 +1004,7 @@ void LanesLexicon::writeSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   settings = app->getSettings();
   settings->setIniCodec("UTF-8");
-  /*
-  settings->beginGroup("System");
-  QDateTime now = QDateTime::currentDateTime();
-  settings->setValue("Run date",now);
-  settings->setValue("Save Tabs",m_saveTabs);
-  settings->setValue("Database",m_dbName);
-  settings->setValue("History",m_historyEnabled);
-  settings->setValue("Arabic font",arFont.toString());
-  settings->setValue("Restore Tabs",m_restoreTabs);
-  settings->setValue("Interface",m_interface);
-  settings->setValue("Use Notes",m_useNotes);
-  settings->setValue("Navigation",m_navigationMode);
-  settings->endGroup();
-  */
+
   if (m_saveTabs) {
     settings->beginGroup("Tabs");
     settings->remove("");
@@ -1029,9 +1016,6 @@ void LanesLexicon::writeSettings() {
         settings->setValue("place",p.toString());
         settings->setValue("zoom",entry->getScale());
         settings->setValue("textwidth",entry->getTextWidth());
-        //           QVariant v;
-        //   v.setValue(p);
-
         settings->endGroup();
       }
     }
@@ -1040,6 +1024,7 @@ void LanesLexicon::writeSettings() {
     settings->setValue("Focus tab",m_tabs->currentIndex());
     settings->endGroup();
   }
+
   if (m_saveBookmarks) {
     settings->beginGroup("Bookmarks");
     settings->remove("");
