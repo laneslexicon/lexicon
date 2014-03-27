@@ -41,6 +41,9 @@
 #include <QActionGroup>
 #include <QtWebKitWidgets/QWebView>
 #include <QUrl>
+#include <QPrinter>
+#include <QPrintDialog>
+#include <QPainter>
 #include "application.h"
 #include "inputmapper.h"
 #include "contentswidget.h"
@@ -139,6 +142,7 @@ private:
     QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
     QString m_configFile;
     QString m_interface;    // "default","minimal"
+    QPrinter m_printer;
     void setupInterface();
     /// 0 - root mode, 1 - page mode
     int m_navMode;

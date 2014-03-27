@@ -1807,6 +1807,19 @@ void LanesLexicon::pageNarrow() {
   }
 }
 void LanesLexicon::pagePrint() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    QPrintDialog printDialog(&m_printer, this);
+    if (printDialog.exec() == QDialog::Accepted) {
+      // print ...
+
+      //  printer->setPaperSize(QPrinter::A4);
+      //  printer->setOutputFileName();
+      QPainter painter(&m_printer);
+      painter.setRenderHint(QPainter::Antialiasing);
+      entry->getScene()->render(&painter);
+    }
+  }
 }
 void LanesLexicon::pageSearch() {
 }
