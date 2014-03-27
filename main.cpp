@@ -89,6 +89,9 @@ int main(int argc, char *argv[])
         configFile = parser.value(configOption);
         a.setConfig(configFile);
     }
+    else {
+      a.setConfig("default.ini");
+    }
     int ret;
     QPixmap pixmap("images/frontis.png");
     QSplashScreen splash(pixmap);
