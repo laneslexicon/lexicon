@@ -507,7 +507,7 @@ void LanesLexicon::createActions() {
   connect(m_searchNodeAction,SIGNAL(triggered()),this,SLOT(searchForNode()));
 
   m_zoomInAction = createIconAction(imgdir,settings->value("ZoomIn",QString()).toString(),tr("Zoom in"));
-  m_zoomOutAction = createIconAction(imgdir,settings->value("ZoomOut",QString()).toString(),tr("Zoom in"));
+  m_zoomOutAction = createIconAction(imgdir,settings->value("ZoomOut",QString()).toString(),tr("Zoom out"));
   m_widenAction = createIconAction(imgdir,settings->value("Widen",QString()).toString(),tr("Widen text"));
   m_narrowAction = createIconAction(imgdir,settings->value("Narrow",QString()).toString(),tr("Narrow text"));
   m_printAction = createIconAction(imgdir,settings->value("Print",QString()).toString(),tr("Print"));
@@ -527,7 +527,7 @@ void LanesLexicon::createActions() {
 }
 void LanesLexicon::createToolBar() {
   QToolBar * mainbar = addToolBar("Main");
-  //m_fileToolBar->setObjectName("filetoolbar");
+  mainbar->setObjectName("maintoolbar");
 
   mainbar->addAction(m_exitAction);
   mainbar->addAction(m_testAction);

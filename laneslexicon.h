@@ -223,8 +223,6 @@ private:
     NotesWidget * m_notes;
     QSqlDatabase m_db;
     QTabWidget * m_tabs;
-    QToolBar  * m_tools;
-    QToolBar * m_fileToolBar;
     QMenu * m_fileMenu;
     // actions
     QAction * m_exitAction;
