@@ -200,7 +200,7 @@ private:
     void bookmarkClear();
     AppMenu * m_mainmenu;
     bool m_revertEnabled;
-
+    QSize m_toolbarIconSize;
 
     void setupShortcuts();
     int m_historyPos;

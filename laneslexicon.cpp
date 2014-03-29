@@ -550,9 +550,11 @@ void LanesLexicon::createToolBar() {
   //  docs->setObjectName("docstoolbar");
   mainbar->addAction(m_docAction);
   mainbar->setFloatable(true);
+  mainbar->setIconSize(m_toolbarIconSize);
   //  addToolBarBreak();
   QToolBar * navigation = addToolBar(tr("Navigation"));
   navigation->setObjectName("navigationtoolbar");
+  navigation->setIconSize(m_toolbarIconSize);
   m_navText = new QLabel("");
   if (m_navMode == 0) {
     m_navText->setText(tr("Root"));
@@ -609,6 +611,7 @@ void LanesLexicon::createToolBar() {
 
   QToolBar * page = addToolBar("&Page");
   page->setObjectName("pagetoolbar");
+  page->setIconSize(m_toolbarIconSize);
   page->addAction(m_zoomInAction);
   page->addAction(m_zoomOutAction);
   page->addAction(m_widenAction);
@@ -944,6 +947,9 @@ void LanesLexicon::readSettings() {
   }
   QString title = settings->value("Title",tr("Lane's Arabic-English Lexicon")).toString();
   this->setWindowTitle(title);
+
+  m_toolbarIconSize = settings->value("Icon size",QSize(16,16)).toSize();
+
   settings->endGroup();
 
   settings->beginGroup("Search");
