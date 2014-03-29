@@ -15,10 +15,17 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = laneslexicon
 TEMPLATE = app
 libxslt {
-INCLUDEPATH += /usr/include/libxml2
-LIBS += -L /opt/lib -lxml2 -lxslt
+! win32 {
+  INCLUDEPATH += /usr/include/libxml2
+  LIBS += -L /opt/lib -lxml2 -lxslt
+}
+win32 {
+  INCLUDEPATH += c:/Users/andrewsg/xslt/include
+  LIBS += -Lc:/Users/andrewsg/xslt/lib -llibxml2 -llibxslt
+}
 DEFINES += USE_LIBXSLT
 }
+
 xalan {
 INCLUDEPATH += /usr/include/xalanc/PlatformSupport
 INCLUDEPATH += /usr/include/xalanc/XalanTransformer
