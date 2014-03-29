@@ -56,7 +56,7 @@ void initXslt() {
 int compileStylesheet(const QString & xsl) {
    if (cur == 0) {
       /// if errors in xslt they will be xmlParseErrors
-      cur = xsltParseStylesheetFile((const xmlChar *)xsl.toLocal8Bit().data());
+      cur = xsltParseStylesheetFile((const xmlChar *)xsl.toUtf8().data());
       return xmlParseErrors.size();
    }
    return 0;
@@ -67,7 +67,7 @@ QString xsltTransform(const QString & xml) {
   xmlDocPtr doc, res;
   const char *params[16 + 1];
   memset(params,0x00,sizeof(params));
-  QByteArray ba = xml.toLocal8Bit();
+  QByteArray ba = xml.toUtf8();
   doc = xmlParseMemory(ba.data(),ba.size());
   /// if errors in xml they will be xmlParseErrors
   if (doc == 0) {
@@ -82,7 +82,11 @@ QString xsltTransform(const QString & xml) {
   xmlFreeDoc(res);
   xmlFreeDoc(doc);
   QString html = QString((char *) buf);
-  xmlFree(buf);
+  /// this causes link errors in Window
+  //  xmlFree(buf);
+  // the link below recommends replacing xmlFree with free and explains why it is ok
+  //https://stackoverflow.com/questions/4984853/mingw-libxml2-issue
+  free(buf);
   return html;
 }
 void freeXslt() {
