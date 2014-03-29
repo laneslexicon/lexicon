@@ -451,21 +451,6 @@ void LanesLexicon::createActions() {
   connect(m_navLastAction,SIGNAL(triggered()),this,SLOT(on_actionNavLast()));
 
 
-  m_rootForwardAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next Root"),this);
-  m_rootBackwardAction = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Prev Root"),this);
-  m_rootFirstAction = new QAction(QIcon(imgdir + "/go-first.png"),tr("First Root"),this);
-  m_rootLastAction = new QAction(QIcon(imgdir + "/go-last.png"),tr("Last Root"),this);
-
-  //  connect(m_rootForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextRoot()));
-  //  connect(m_rootBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevRoot()));
-  //  connect(m_rootFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstRoot()));
-  //  connect(m_rootLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastRoot()));
-
-  m_pageForwardAction = new QAction(QIcon(imgdir + "/go-next.png"),tr("Next Page"),this);
-  m_pageBackwardAction = new QAction(QIcon(imgdir + "/go-previous.png"),tr("Prev Page"),this);
-  m_pageFirstAction = new QAction(QIcon(imgdir + "/go-first.png"),tr("First Page"),this);
-  m_pageLastAction = new QAction(QIcon(imgdir + "/go-last.png"),tr("Last Page"),this);
-
   m_docAction = createIconAction(imgdir,settings->value("Docs",QString()).toString(),tr("Docs"));
 
   m_bookmarkAction = createIconAction(imgdir,settings->value("Bookmarks",QString()).toString(),tr("Bookmarks"));
@@ -474,10 +459,6 @@ void LanesLexicon::createActions() {
 
   m_searchAction = createIconAction(imgdir,settings->value("Search",QString()).toString(),tr("Search"));
 
-  //  connect(m_pageForwardAction,SIGNAL(triggered()),this,SLOT(on_actionNextPage()));
-  //  connect(m_pageBackwardAction,SIGNAL(triggered()),this,SLOT(on_actionPrevPage()));
-  //  connect(m_pageFirstAction,SIGNAL(triggered()),this,SLOT(on_actionFirstPage()));
-  //  connect(m_pageLastAction,SIGNAL(triggered()),this,SLOT(on_actionLastPage()));
 
 
   m_navModeRootAction = new QAction(tr("By root"),this);

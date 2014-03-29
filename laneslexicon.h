@@ -250,16 +250,6 @@ private:
     QAction * m_navModeRootAction;
     QAction * m_navModePageAction;
 
-    // root navigation
-    QAction * m_rootForwardAction;
-    QAction * m_rootBackwardAction;
-    QAction * m_rootFirstAction;
-    QAction * m_rootLastAction;
-    // page navigation
-    QAction * m_pageForwardAction;
-    QAction * m_pageBackwardAction;
-    QAction * m_pageFirstAction;
-    QAction * m_pageLastAction;
     // history
     QAction * m_clearHistoryAction;
     QToolButton * m_hBackwardBtn;
