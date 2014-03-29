@@ -941,7 +941,8 @@ void LanesLexicon::readSettings() {
   else {
     m_navMode = LanesLexicon::ByPage;
   }
-
+  QString title = settings->value("Title",tr("Lane's Arabic-English Lexicon")).toString();
+  this->setWindowTitle(title);
   settings->endGroup();
 
   settings->beginGroup("Search");
