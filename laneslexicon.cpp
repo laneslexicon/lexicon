@@ -512,7 +512,7 @@ void LanesLexicon::createToolBar() {
   mainbar->setObjectName("maintoolbar");
 
   mainbar->addAction(m_exitAction);
-  mainbar->addAction(m_testAction);
+  //  mainbar->addAction(m_testAction);
 
   //  QToolBar * history = addToolBar(tr("History"));
   //  history->setObjectName("historytoolbar");
@@ -1038,7 +1038,7 @@ void LanesLexicon::restoreTabs() {
 
   settings->setIniCodec("UTF-8");
   settings->beginGroup("System");
-  int tab =  settings->value("Focus tab",0).toInt();
+  int focusTab =  settings->value("Focus tab",0).toInt();
   settings->endGroup();
   int textWidth;
   settings->beginGroup("Entry");
@@ -1070,9 +1070,10 @@ void LanesLexicon::restoreTabs() {
       tw = textWidth;
     }
     if (p.isValid()) {
-      if (tab == i) {
-        tab = j;
+      if (focusTab == i) {
+        focusTab = j;
         wp = p;
+        qDebug() << "focustab set to" << focusTab;
       }
       GraphicsEntry * entry = new GraphicsEntry(this);
       entry->setTextWidth(tw);
@@ -1092,14 +1093,18 @@ void LanesLexicon::restoreTabs() {
       m_tree->ensurePlaceVisible(p,true);
       j++;
     }
+    else {
+      qDebug() << Q_FUNC_INFO << "invalid place" << p;
+    }
     settings->endGroup();
   }
   settings->endGroup();
   wp.setType(Place::RestoreTab);
-  if ((tab >=0) && (tab << m_tabs->count())) {
-    m_tabs->setCurrentIndex(tab);
+  if (focusTab < m_tabs->count()) {
+    m_tabs->setCurrentIndex(focusTab);
     /// sync the current tab with the tree
-    currentTabChanged(tab);
+    qDebug() << "Synching tab" << focusTab;
+    currentTabChanged(focusTab);
   }
   delete settings;
 }
