@@ -80,10 +80,6 @@ int main(int argc, char *argv[])
       }
       return 0;
     }
-
-    //    QFontDatabase::addApplicationFont("./site/fonts/fontawesome-webfont.ttf");
-  //    qDebug() << "node = " << node << dump;
-    //    qDebug() << "args = " << args;
     QString configFile;
     if (parser.isSet(configOption)) {
         configFile = parser.value(configOption);

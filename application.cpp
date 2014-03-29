@@ -9,10 +9,13 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
 #endif
 
   if ( ! QDir::setCurrent(resourceDir)) {
-    QString errmsg  = QString(QObject::tr("Warning failed to change application workding directory to : %1")).arg(resourceDir);
+    QString errmsg  = QString(QObject::tr("Warning failed to change application working directory to : %1")).arg(resourceDir);
     std::cout << errmsg.toLocal8Bit().data() << std::endl;
     m_ok = false;
   }
+ QFontDatabase::addApplicationFont(resourceDir + "/fonts/amiri/amiri-regular.ttf");
+
+
   addLibraryPath("/images");
   QCoreApplication::setOrganizationName("Gabanjo");
   QCoreApplication::setOrganizationDomain("theunwalledcity.com");

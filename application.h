@@ -5,7 +5,9 @@
 #include <QFileInfo>
 #include <QDebug>
 #include <QSettings>
+#include <QFontDatabase>
 #include <iostream>
+
 class Lexicon : public QApplication {
   Q_OBJECT;
 public:

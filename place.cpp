@@ -81,7 +81,7 @@ QString Place::getText() const {
     txt += QString(QObject::tr("Vol %1,Page %2")).arg(m_vol).arg(m_page);
   }
   if (! m_node.isEmpty()) {
-    bool b;
+    bool b = false;
     if (! txt.isEmpty()) {
       txt += " (";
       b = true;
