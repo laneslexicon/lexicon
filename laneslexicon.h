@@ -130,6 +130,7 @@ public:
     void on_actionDocs();
     void bookmarkRebuildMenu();
 
+    void currentTabChanged(int);
     /// these apply to the current graphicsentry
     void pageZoomIn();
     void pageZoomOut();

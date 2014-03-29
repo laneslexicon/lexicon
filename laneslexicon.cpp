@@ -85,6 +85,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   //  connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
   connect(m_tabs,SIGNAL(tabCloseRequested(int)),this,SLOT(onCloseTab(int)));
+  connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(currentTabChanged(int)));
 
 
   if ( m_useNotes ) {
@@ -1097,6 +1098,8 @@ void LanesLexicon::restoreTabs() {
   wp.setType(Place::RestoreTab);
   if ((tab >=0) && (tab << m_tabs->count())) {
     m_tabs->setCurrentIndex(tab);
+    /// sync the current tab with the tree
+    currentTabChanged(tab);
   }
   delete settings;
 }
@@ -1810,4 +1813,12 @@ void LanesLexicon::pageClear() {
     entry->clearHighlights();
     m_clearAction->setEnabled(false);
   }
+}
+void LanesLexicon::currentTabChanged(int) {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if ( entry ) {
+    Place p = entry->getPlace();
+    m_tree->ensurePlaceVisible(p,true);
+  }
+
 }
