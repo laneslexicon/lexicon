@@ -3,11 +3,11 @@
      <namespace>theunwalledcity.com.laneslexicon.1.0</namespace>
      <virtualFolder>doc</virtualFolder>
      <customFilter name="Lanes Lexicon 1.0">
-         <filterAttribute>myapp</filterAttribute>
+         <filterAttribute>Lexicon</filterAttribute>
          <filterAttribute>1.0</filterAttribute>
      </customFilter>
      <filterSection>
-         <filterAttribute>myapp</filterAttribute>
+         <filterAttribute>Lexicon</filterAttribute>
          <filterAttribute>1.0</filterAttribute>
          <toc>
              <section title="User guide for Lane's Arabic English Lexicon" ref="index.html">
@@ -27,9 +27,9 @@
              </section>
          </toc>
          <keywords>
-             <keyword name="config" id="MyApplication::config" ref="config.html#foo"/>
+             <keyword name="config" id="Lexicon::config" ref="config.html#foo"/>
              <keyword name="preface" id="idPreface" ref="preface.html"/>
-             <keyword name="introname" id="MyApplication::intro"  ref="intro.html#xxx"/>
+             <keyword name="introname" id="Lexicon::intro"  ref="intro.html#xxx"/>
              <keyword  id="lanex" ref="preface.html#x"/>
          </keywords>
          <files>
