@@ -1239,7 +1239,7 @@ int GraphicsEntry::search() {
   for(int i=0;i < m_items.size();i++) {
     //    QApplication::processEvents();
     progress.setValue(i * step);
-    m_items[i]->highlight(target);
+    m_items[i]->highlight(target,Qt::yellow);
     count += m_items[i]->findCount();
     if (progress.wasCanceled())
       break;

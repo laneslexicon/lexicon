@@ -62,7 +62,7 @@ class EntryItem : public QGraphicsTextItem {
   int getPage() { return m_place.getPage();}
   QString getOutputHTML() const { return m_html; }
   void setOutputHTML(const QString & html) { m_html = html;}
-  QTextCursor highlight(const QString &);
+  QTextCursor highlight(const QString &,Qt::GlobalColor color = Qt::yellow);
   QTextCursor highlightRx(const QString &);
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
@@ -89,6 +89,7 @@ class EntryItem : public QGraphicsTextItem {
   private:
   QList<int> m_searchPositions;
   Place m_place;
+  QString m_searchText;
   QString m_html;    /// saves the generated HTML for debug, only set when dumpOutputHTM is true
 };
 #endif

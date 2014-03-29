@@ -103,15 +103,13 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
   painter->setPen(pen);
   QGraphicsTextItem::paint(painter, o, w);
 }
-QTextCursor EntryItem::highlight(const QString & target) {
+QTextCursor EntryItem::highlight(const QString & target, Qt::GlobalColor color) {
   int pos;
   QTextCursor cursor;
   QTextCursor firstPos;
   QTextDocument * doc = this->document();
-  QTextCharFormat fmt;
-  /// TODO get from QSettings
-  fmt.setBackground(Qt::yellow);
 
+  m_searchText = target;
   m_searchPositions.clear();
   cursor = doc->find(target,QTextDocument::FindWholeWords);
   firstPos = cursor;
@@ -121,12 +119,15 @@ QTextCursor EntryItem::highlight(const QString & target) {
     //    qDebug() << Q_FUNC_INFO << "found at" << pos;
     cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
     cursor.setPosition(pos, QTextCursor::KeepAnchor);
+    QTextCharFormat fmt = cursor.charFormat();
+    fmt.setBackground(color);
     cursor.setCharFormat(fmt);
     cursor = doc->find(target,pos,QTextDocument::FindWholeWords);
   }
   return firstPos;
 }
 void EntryItem::clearHighlights() {
+  /*
   QTextCursor c = this->textCursor();
   c.select(QTextCursor::Document);
 
@@ -135,6 +136,8 @@ void EntryItem::clearHighlights() {
   fmt.setBackground(Qt::white);
   c.setCharFormat(fmt);
   c.clearSelection();
+  */
+  this->highlight(m_searchText,Qt::white);
 }
 /**
  * this is the one that is used by default
