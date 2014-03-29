@@ -460,7 +460,18 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     qDebug() << Q_FUNC_INFO << "exiting 5 with place";
     return p;
   }
-
+  ///
+  /// write a history record because we are leaving this page
+  ///
+  if (getHistory()->isOn()) {
+    qDebug() << "History old place" << m_place;
+    qDebug() << "New place" << dp;
+    if (dp.getType() == Place::User) {
+      getHistory()->add(m_place);
+      /// this allows mainwindow to update the history list
+      emit(historyAddition());
+    }
+  }
 
   if (m_clearScene) {
     onClearScene();
@@ -602,10 +613,10 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       //      pt.setY(pt.y() + h/2 - 10);
       //      m_view->centerOn(pt);
       //  }
-  //  if (nodeOnly) {
-  //    delete rootItem;
-  //  }
 
+  if (dp.getType() == Place::History) {
+      emit(historyPositionChanged(dp.getId()));
+  }
 
   /// we're done
   if (m_place.isSamePlace(centerItem->getPlace())) {
@@ -615,24 +626,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   m_place = centerItem->getPlace();
   m_place.setType(dp.getType());
 
-  /// we have changed places, so add to the history
-  if (getHistory()->isOn()) {
-    if (dp.getType() == Place::User) {
-      m_place.setType(dp.getType());
-      getHistory()->add(m_place);
-      /// this allows mainwindow to update the history list
-      emit(historyAddition());
-    }
-    else if (dp.getType() == Place::History) {
-      emit(historyPositionChanged(dp.getId()));
-    }
-    else {
-      //      qDebug() << "unknown place type"  << dp.getType();
-    }
-  }
-  else {
-    //    qDebug() << "history off";
-  }
   qDebug() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
   //  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
   /*
