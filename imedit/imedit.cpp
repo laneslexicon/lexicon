@@ -82,6 +82,9 @@ void ImEdit::keyPressEvent(QKeyEvent * event) {
     event->ignore();
     QKeyEvent * nevent = new QKeyEvent(QEvent::KeyPress, cc->uc, Qt::NoModifier,cc->c);
     prev_char = cc->uc;
+    if (cc->consume) {
+      this->textCursor().deletePreviousChar();
+    }
     QTextEdit::keyPressEvent(nevent);
     if (m_debug) {
       QString t;
