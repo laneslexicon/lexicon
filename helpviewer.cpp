@@ -63,6 +63,7 @@ void HelpViewer::goBack() {
   }
 }
 HelpWidget::HelpWidget(QWidget * parent) : QWidget(parent) {
+  m_ok = false;
   readSettings();
   m_he = new QHelpEngine(m_helpCollection);
   m_viewer = new HelpViewer(this);
@@ -106,6 +107,10 @@ void HelpWidget::contentsCreated() {
   qDebug() << "Registered documentation" << regs;
 
   qDebug() << "Current filter" << m_he->currentFilter();
+  if (regs.size() == 0) {
+    qDebug() << "No documents registered";
+    return;
+  }
   QList<QStringList> fa = m_he->filterAttributeSets(regs[0]);
   qDebug() << "Filter attribute sets" << fa;
 
@@ -134,6 +139,7 @@ void HelpWidget::contentsCreated() {
     qDebug() << it.key() << ": " << it.value();
   }
   m_he->contentWidget()->expandAll();
+  m_ok = true;
 }
 void HelpWidget::helpLinkActivated(const QUrl & url)  {
   qDebug() << Q_FUNC_INFO << url << "fragment" << url.fragment();

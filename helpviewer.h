@@ -60,6 +60,7 @@ class HelpWidget : public QWidget {
   ~HelpWidget();
   void readSettings();
   void writeSettings();
+  bool hasContent() { return m_ok; }
  public slots:
   void contentsCreated();
   void helpLinkActivated(const QUrl &);
@@ -69,5 +70,6 @@ class HelpWidget : public QWidget {
   QString m_helpCollection;
   QString m_helpPage;
   QUrl m_currentUrl;
+  bool m_ok;
 };
 #endif
