@@ -4,8 +4,10 @@ SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setWindowTitle(tr("Search"));
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  m_edit->readSettings(settings);
   m_prompt->setBuddy(m_edit);
-
   m_newTab = new QCheckBox(tr("Open in &new tab"));
   m_switchFocus = new QCheckBox(tr("Switch to &new tab"));
 

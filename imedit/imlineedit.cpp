@@ -5,7 +5,6 @@ ImLineEdit::ImLineEdit(QWidget * parent)
   m_mapper = im_new();
   m_prev_char = 0;
   m_debug = false;
-  readSettings();
 }
 ImLineEdit::~ImLineEdit() {
   im_free(m_mapper);
@@ -47,9 +46,11 @@ void ImLineEdit::shortcutActivated() {
     m_activeMap.clear();
   }
 }
-void ImLineEdit::readSettings() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
+void ImLineEdit::readSettings(QSettings * settings) {
+  if (! settings ) {
+    settings = new QSettings;
+  }
+
 
   settings->beginGroup("System");
   m_nullMap = settings->value("Null map","None").toString();

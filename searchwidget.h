@@ -9,6 +9,7 @@
 #include <QGridLayout>
 #include <QDialogButtonBox>
 #include <QLabel>
+#include "application.h"
 #include "imedit.h"
 #include "imlineedit.h"
 class SearchDialog : public QDialog {
