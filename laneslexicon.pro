@@ -3,7 +3,7 @@
 #
 #-------------------------------------------------
 QT       += core gui printsupport
-QT       += webkitwidgets
+#QT       += webkitwidgets
 QT       += sql
 QT       += help
 CONFIG   += debug

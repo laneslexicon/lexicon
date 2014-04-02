@@ -24,7 +24,6 @@ HistoryMaster * getHistory() {
 int main(int argc, char *argv[])
 {
     Lexicon a(argc, argv);
-
     //    if ( ! a.isOk() ) {
     //      return 0;
     //    }

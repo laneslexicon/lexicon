@@ -39,7 +39,7 @@
 #include <QDockWidget>
 #include <QInputDialog>
 #include <QActionGroup>
-#include <QtWebKitWidgets/QWebView>
+
 #include <QUrl>
 #include <QPrinter>
 #include <QPrintDialog>

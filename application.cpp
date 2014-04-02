@@ -13,14 +13,15 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
     std::cout << errmsg.toLocal8Bit().data() << std::endl;
     m_ok = false;
   }
- QFontDatabase::addApplicationFont(resourceDir + "/fonts/amiri/amiri-regular.ttf");
+  QFontDatabase::addApplicationFont(resourceDir + "/fonts/amiri/amiri-regular.ttf");
+  addLibraryPath(resourceDir + "/lib");
 
 
-  addLibraryPath("/images");
   QCoreApplication::setOrganizationName("Gabanjo");
   QCoreApplication::setOrganizationDomain("theunwalledcity.com");
   QCoreApplication::setApplicationName("Lanes Lexicon");
   QCoreApplication::setApplicationVersion("0.1");
+
 }
 QString Lexicon::getConfig() const {
   return m_configFile;
@@ -36,4 +37,18 @@ QSettings * Lexicon::getSettings() {
     return new QSettings;
   }
   return new QSettings(m_configFile,QSettings::IniFormat);
+}
+QString Lexicon::getFontName(const QString & type) {
+  QString k = "name_" + type;
+  if (m_fonts.contains(k)) {
+    return m_fonts.value(k);
+  }
+  return QString();
+}
+QString Lexicon::getFontSize(const QString & type) {
+  QString k = "size_" + type;
+  if (m_fonts.contains(k)) {
+    return m_fonts.value(k);
+  }
+  return QString();
 }
