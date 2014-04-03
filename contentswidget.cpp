@@ -341,6 +341,14 @@ Place ContentsWidget::findPrevPlace(const Place & p) {
 }
 void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   switch (event->key()) {
+  case Qt::Key_Return : {
+    QTreeWidgetItem * item = this->currentItem();
+    /// this catches
+    if ((item->parent() != 0) && (item->parent()->parent() != 0)) {
+      emit(itemActivated(item,0));
+    }
+    break;
+  }
   case Qt::Key_Space: {
     QTreeWidgetItem * item = this->currentItem();
     if (item) {
@@ -434,5 +442,7 @@ void ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
     parent->addChild(item);
 
   }
-
+  if ( ! parent->isExpanded()) {
+    parent->setExpanded(true);
+  }
 }

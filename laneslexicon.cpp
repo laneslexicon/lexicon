@@ -83,7 +83,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   connect(m_tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
 
-  //  connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
+  connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(entryActivated(QTreeWidgetItem *,int)));
+
   connect(m_tabs,SIGNAL(tabCloseRequested(int)),this,SLOT(onCloseTab(int)));
   connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(currentTabChanged(int)));
 
@@ -797,23 +798,43 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString supp = item->text(1);
   int p = 0;
 
-  if (item->parent()->parent() == 0) {
-    m_tree->addEntries(root,item);
-    if (supp == "*") {
-      p = 1;
+  /// check that the user hasa not clicked on a letter
+  if (item->parent() != 0) {
+    /// and that they've clicked on a root
+    if  (item->parent()->parent() == 0) {
+      m_tree->addEntries(root,item);
+      if (supp == "*") {
+        p = 1;
+      }
+      if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+        newTab = true;
+      }
+      Place m(root,p);
+      m.setType(Place::User);
+      showPlace(m,newTab);
     }
-    if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-      newTab = true;
+    else {
+      qDebug() << "double clicked on entry" << item->data(0,Qt::UserRole).toString();
     }
-    Place m(root,p);
-    m.setType(Place::User);
-    showPlace(m,newTab);
-  }
-  else {
-    qDebug() << "double clicked on entry" << item->data(0,Qt::UserRole).toString();
-
   }
 }
+/**
+ * if the user clicks or hits space an entry (i.e. below a root) make
+ * sure it is visible
+ *
+ * @param item
+ * @param col
+ */
+void LanesLexicon::entryActivated(QTreeWidgetItem * item, int col) {
+  /// ignore clicks on the root or the letter
+  qDebug() << Q_FUNC_INFO;
+  if ((item->parent() == 0) || (item->parent()->parent() == 0)) {
+    return;
+  }
+ qDebug() << "activated entry" << item->data(0,Qt::UserRole).toString();
+
+}
+
 Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   Place np;
   GraphicsEntry * entry;
@@ -843,8 +864,10 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     setSignals(entry);
     entry->installEventFilter(this);
     np = entry->getXmlForRoot(p);
+
     m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
     /// TODO decide whether to make new tab the current tab
+    //    entry->setFocus();
   }
   else {
     if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {

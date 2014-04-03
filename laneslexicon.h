@@ -114,6 +114,7 @@ public:
     void on_actionClearHistory();
     void onHistorySelection();
     void rootClicked(QTreeWidgetItem * , int);
+    void entryActivated(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void onNotesClicked();
     //    void historyItemActivated();
