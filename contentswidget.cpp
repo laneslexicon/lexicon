@@ -401,10 +401,7 @@ void ContentsWidget::ensureVisible(const QString & root, int supplement,bool sel
   if (select) {
     qDebug() << Q_FUNC_INFO << "setCurrentItem";
     setCurrentItem(item);
-    /// get the entries for this root if we haven't already done so
-    if (item->childCount() == 0) {
-      addEntries(root,item);
-    }
+    addEntries(root,item);
   }
   QModelIndex index = indexFromItem(item);
   if (index.isValid()) {
@@ -424,12 +421,16 @@ void ContentsWidget::focusOutEvent(QFocusEvent * event) {
   QTreeWidget::focusOutEvent(event);
 }
 void ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
+  if (parent->childCount() > 0) {
+    return;
+  }
   m_entryQuery->bindValue(0,root);
   m_entryQuery->exec();
   while(m_entryQuery->next()) {
     qDebug() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
     QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << m_entryQuery->value("itype").toString() << m_entryQuery->value("word").toString());
     item->setFont(0,m_itypeFont);
+    item->setData(0,Qt::UserRole,m_entryQuery->value("nodeId"));//.toString()
     parent->addChild(item);
 
   }

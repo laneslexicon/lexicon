@@ -787,28 +787,32 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
   if (m_db.isOpen()) {
     m_db.close();
   }
-  bool ok;
   m_db = QSqlDatabase::addDatabase("QSQLITE");
   m_db.setDatabaseName(dbname);
-  ok = m_db.open();
-
-  QLOG_INFO() << "Opened database" << dbname;
-  return ok;
+  return m_db.open();
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   bool newTab = false;
   QString root = item->text(0);
   QString supp = item->text(1);
   int p = 0;
-  if (supp == "*") {
-    p = 1;
+
+  if (item->parent()->parent() == 0) {
+    m_tree->addEntries(root,item);
+    if (supp == "*") {
+      p = 1;
+    }
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+      newTab = true;
+    }
+    Place m(root,p);
+    m.setType(Place::User);
+    showPlace(m,newTab);
   }
-  if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-    newTab = true;
+  else {
+    qDebug() << "double clicked on entry" << item->data(0,Qt::UserRole).toString();
+
   }
-  Place m(root,p);
-  m.setType(Place::User);
-  showPlace(m,newTab);
 }
 Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   Place np;

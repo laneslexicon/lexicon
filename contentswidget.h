@@ -29,6 +29,7 @@ class ContentsWidget : public QTreeWidget {
   Place findPrevPlace(const Place &);
   void ensureVisible(const QString & root, int supp = 0,bool select = false);
   void ensurePlaceVisible(const Place & p, bool select = false);
+  void addEntries(const QString & root,QTreeWidgetItem *);
  protected:
   void focusInEvent(QFocusEvent *);
   void focusOutEvent(QFocusEvent *);
@@ -39,7 +40,7 @@ class ContentsWidget : public QTreeWidget {
   /// does not have focus
   QString m_backgroundColor;
   QSqlQuery * m_entryQuery;
-  void addEntries(const QString & root,QTreeWidgetItem *);
+
   QFont m_itypeFont;
  protected:
   virtual void 	keyPressEvent(QKeyEvent * event);
