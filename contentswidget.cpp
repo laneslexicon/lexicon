@@ -8,6 +8,10 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   setSelectionMode(QAbstractItemView::SingleSelection);
   header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
   this->setStyleSheet(QString("selection-background-color : %1").arg(m_backgroundColor));
+
+  connect(this,SIGNAL(itemExpanded(QTreeWidgetItem *)),this,SLOT(nodeExpanded(QTreeWidgetItem *)));
+  connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(nodeCollapsed(QTreeWidgetItem *)));
+  this->setExpandsOnDoubleClick(false);
 }
 ContentsWidget::~ContentsWidget() {
   qDebug() << Q_FUNC_INFO;
@@ -352,17 +356,23 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   case Qt::Key_Space: {
     QTreeWidgetItem * item = this->currentItem();
     if (item) {
-      /// it is a top level item so expand it
-      if (item->childCount() > 0) {
-        if (item->isExpanded()) {
-          collapseItem(item);
-        }
-        else {
-          expandItem(item);
-        }
+      /// if it is an entry item
+      if ((item->parent() != 0)  && (item->parent()->parent() != 0)) {
+        emit(itemActivated(item,0));
       }
       else {
-        emit(itemDoubleClicked(item,0));
+      /// it is a top level item so expand it
+        if (item->childCount() > 0) {
+          if (item->isExpanded()) {
+            collapseItem(item);
+          }
+          else {
+            expandItem(item);
+          }
+        }
+        else {
+          emit(itemDoubleClicked(item,0));
+        }
       }
     }
     break;
@@ -405,7 +415,9 @@ void ContentsWidget::ensureVisible(const QString & root, int supplement,bool sel
     QLOG_WARN() << "Ensure visible error";
     return;
   }
-  topItem->setExpanded(true);
+  if ( ! topItem->isExpanded() )
+    topItem->setExpanded(true);
+
   if (select) {
     qDebug() << Q_FUNC_INFO << "setCurrentItem";
     setCurrentItem(item);
@@ -435,7 +447,7 @@ void ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   m_entryQuery->bindValue(0,root);
   m_entryQuery->exec();
   while(m_entryQuery->next()) {
-    qDebug() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
+    //qDebug() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
     QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << m_entryQuery->value("itype").toString() << m_entryQuery->value("word").toString());
     item->setFont(0,m_itypeFont);
     item->setData(0,Qt::UserRole,m_entryQuery->value("nodeId"));//.toString()
@@ -443,6 +455,13 @@ void ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
 
   }
   if ( ! parent->isExpanded()) {
+    qDebug() << "Expanding parent";
     parent->setExpanded(true);
   }
+}
+void ContentsWidget::nodeExpanded(QTreeWidgetItem * /*item */) {
+  qDebug() << Q_FUNC_INFO;
+}
+void ContentsWidget::nodeCollapsed(QTreeWidgetItem * /*item */) {
+  qDebug() << Q_FUNC_INFO;
 }

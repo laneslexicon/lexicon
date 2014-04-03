@@ -30,6 +30,9 @@ class ContentsWidget : public QTreeWidget {
   void ensureVisible(const QString & root, int supp = 0,bool select = false);
   void ensurePlaceVisible(const Place & p, bool select = false);
   void addEntries(const QString & root,QTreeWidgetItem *);
+  public slots:
+    void nodeExpanded(QTreeWidgetItem * item);
+    void nodeCollapsed(QTreeWidgetItem * item);
  protected:
   void focusInEvent(QFocusEvent *);
   void focusOutEvent(QFocusEvent *);

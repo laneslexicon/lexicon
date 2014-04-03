@@ -157,6 +157,9 @@ private:
     bool m_docked;          // whether to use docked widget
     bool m_valgrind;
     bool m_useNotes;
+
+    bool m_treeKeepsFocus;
+
     QDockWidget * m_treeDock;
     QFont arFont;
 

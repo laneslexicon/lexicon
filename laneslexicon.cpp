@@ -134,6 +134,11 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   this->restoreGeometry(settings->value("Geometry").toByteArray());
   this->restoreState(settings->value("State").toByteArray());
   delete settings;
+
+  qDebug() << "-----------------------";
+  qDebug() << "Initialisation complete";
+  qDebug() << "-----------------------";
+
 }
 
 LanesLexicon::~LanesLexicon()
@@ -797,7 +802,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
   QString supp = item->text(1);
   int p = 0;
-
+  qDebug() << Q_FUNC_INFO << "enter";
   /// check that the user hasa not clicked on a letter
   if (item->parent() != 0) {
     /// and that they've clicked on a root
@@ -817,6 +822,14 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
       qDebug() << "double clicked on entry" << item->data(0,Qt::UserRole).toString();
     }
   }
+  if (m_treeKeepsFocus)
+    m_tree->setFocus();
+
+  qDebug() << Q_FUNC_INFO << "expanding" << item->isExpanded();
+  if ( ! item->isExpanded() ) {
+    item->setExpanded(true);
+  }
+  qDebug() << Q_FUNC_INFO << "exit";
 }
 /**
  * if the user clicks or hits space an entry (i.e. below a root) make
@@ -873,11 +886,6 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
       np = entry->getXmlForRoot(p);
       m_tabs->setTabText(currentTab,np.getShortText());
-      // this works but sets it for all tabs
-      //m_tabs->setStyleSheet("QTabBar {font-family : Amiri;font-size : 16px}");
-      // this sets it for all the items in graphicsentry
-      // but not the tab title
-      //    w->setStyleSheet("font-family : Amiri;font-size : 16px");
       entry->setFocus();
     }
     else {
@@ -996,6 +1004,9 @@ void LanesLexicon::readSettings() {
   m_historyDbName = settings->value("Database","history.sqlite").toString();
   settings->endGroup();
 
+  settings->beginGroup("Roots");
+  m_treeKeepsFocus = settings->value("Keep focus",true).toBool();
+  settings->endGroup();
 
   /**
    * we are have a default map set that is used to convert input to Arabic
