@@ -16,6 +16,8 @@ public:
   QSettings * getSettings();
   void setConfig(const QString & fileName);
   bool isOk() { return m_ok;}
+  QString getFontName(const QString &);
+  QString getFontSize(const QString &);
  private:
   QString m_configFile;
   QString m_showFirst;

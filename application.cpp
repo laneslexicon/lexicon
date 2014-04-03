@@ -39,16 +39,20 @@ QSettings * Lexicon::getSettings() {
   return new QSettings(m_configFile,QSettings::IniFormat);
 }
 QString Lexicon::getFontName(const QString & type) {
+  /*
   QString k = "name_" + type;
   if (m_fonts.contains(k)) {
     return m_fonts.value(k);
   }
+  */
   return QString();
 }
 QString Lexicon::getFontSize(const QString & type) {
+  /*
   QString k = "size_" + type;
   if (m_fonts.contains(k)) {
     return m_fonts.value(k);
   }
+  */
   return QString();
 }
