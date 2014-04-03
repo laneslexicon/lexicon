@@ -18,6 +18,10 @@ void ContentsWidget::readSettings() {
   settings->setIniCodec("UTF-8");
   settings->beginGroup("Roots");
   m_backgroundColor = settings->value("Background","lightgray").toString();
+  QString fontString = settings->value("Itype font",QString()).toString();
+  if ( ! fontString.isEmpty()) {
+    m_itypeFont.fromString(fontString);
+  }
   m_debug = settings->value("Debug",false).toBool();
   delete settings;
 }
@@ -88,6 +92,12 @@ void ContentsWidget::loadContents() {
     f.close();
     delete out;
   }
+  m_entryQuery = new QSqlQuery;
+  bool ok = m_entryQuery->prepare("select word,itype,bword,nodeId from entry where root = ? order by nodenum asc");
+  if ( ! ok ) {
+    QLOG_WARN() << "Entry SQL prepare failed" << m_entryQuery->lastError();
+  }
+
 }
 Place ContentsWidget::findNextPlace(const Place & p) {
   QTreeWidgetItem * currentItem;
@@ -391,6 +401,10 @@ void ContentsWidget::ensureVisible(const QString & root, int supplement,bool sel
   if (select) {
     qDebug() << Q_FUNC_INFO << "setCurrentItem";
     setCurrentItem(item);
+    /// get the entries for this root if we haven't already done so
+    if (item->childCount() == 0) {
+      addEntries(root,item);
+    }
   }
   QModelIndex index = indexFromItem(item);
   if (index.isValid()) {
@@ -408,4 +422,16 @@ void ContentsWidget::focusInEvent(QFocusEvent * event) {
 void ContentsWidget::focusOutEvent(QFocusEvent * event) {
   this->setStyleSheet(QString("selection-background-color : %1").arg(m_backgroundColor));
   QTreeWidget::focusOutEvent(event);
+}
+void ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
+  m_entryQuery->bindValue(0,root);
+  m_entryQuery->exec();
+  while(m_entryQuery->next()) {
+    qDebug() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
+    QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << m_entryQuery->value("itype").toString() << m_entryQuery->value("word").toString());
+    item->setFont(0,m_itypeFont);
+    parent->addChild(item);
+
+  }
+
 }

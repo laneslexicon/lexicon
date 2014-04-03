@@ -38,6 +38,9 @@ class ContentsWidget : public QTreeWidget {
   /// this is the background color of the select item when the window
   /// does not have focus
   QString m_backgroundColor;
+  QSqlQuery * m_entryQuery;
+  void addEntries(const QString & root,QTreeWidgetItem *);
+  QFont m_itypeFont;
  protected:
   virtual void 	keyPressEvent(QKeyEvent * event);
  signals:
