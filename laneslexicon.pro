@@ -41,6 +41,7 @@ OBJECTS_DIR = ./obj
 QMAKE_CXXFLAGS += -Wunused-parameter
 include(qslog/QsLog.pri)
 include(imedit/imedit.pri)
+include(keyboard/keyboard.pri)
 SOURCES += main.cpp\
         eventtype.cpp \
         laneslexicon.cpp \
