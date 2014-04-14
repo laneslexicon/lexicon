@@ -12,6 +12,8 @@
 #include "application.h"
 #include "imedit.h"
 #include "imlineedit.h"
+#include "keyboardwidget.h"
+
 class SearchDialog : public QDialog {
   Q_OBJECT
 
@@ -26,7 +28,10 @@ class SearchDialog : public QDialog {
   public slots:
     void keymapChanged();
     void showOptions(bool);
+    void showKeyboard();
  protected:
+    KeyboardWidget * m_keyboard;
+    bool m_attached;
     QLabel * m_prompt;
     QGroupBox * m_group;
     ImLineEdit * m_edit;
@@ -35,6 +40,7 @@ class SearchDialog : public QDialog {
     QDialogButtonBox * m_buttonBox;
     QPushButton * m_moreButton;
     QPushButton * m_findButton;
+    QPushButton * m_keyboardButton;
     QWidget * m_options;
 };
 class NodeSearchDialog : public QDialog {

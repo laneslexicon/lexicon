@@ -15,6 +15,8 @@ SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_findButton = new QPushButton(tr("&Find"));
   m_findButton->setDefault(true);
 
+  m_keyboardButton  = new QPushButton(tr("Show keyboard"));
+
   m_moreButton = new QPushButton(tr("&More"));
   m_moreButton->setCheckable(true);
   m_moreButton->setAutoDefault(false);
@@ -25,10 +27,11 @@ SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_buttonBox->addButton(m_findButton, QDialogButtonBox::AcceptRole);
   m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
   m_buttonBox->addButton(m_moreButton, QDialogButtonBox::ActionRole);
+  m_buttonBox->addButton(m_keyboardButton,QDialogButtonBox::ActionRole);
 
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-
+  connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
   QVBoxLayout * optionsLayout = new QVBoxLayout;
   optionsLayout->setMargin(0);
   optionsLayout->addWidget(m_switchFocus);
@@ -74,6 +77,28 @@ SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setLayout(mainLayout);
   m_options->hide();
   m_edit->setFocus();
+  m_attached = false;
+  m_keyboard = new KeyboardWidget(this);
+  QPoint p = this->pos();
+  qDebug() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
+  int h = this->frameGeometry().height();
+  qDebug() << "search dialog frame geometry" << this->frameGeometry();
+  m_keyboard->move(p.x(),p.y() + h);
+  //  delete settings;
+}
+void SearchDialog::showKeyboard() {
+  m_keyboard->attach(m_edit);
+  m_attached = ! m_attached;
+  if (m_attached) {
+    m_keyboardButton->setText(tr("Hide keyboard"));
+    QPoint p = this->pos();
+    int h = this->frameGeometry().height();
+    /// TODO adjust this
+    m_keyboard->move(p.x() - 50,p.y() + h);
+  }
+  else
+    m_keyboardButton->setText(tr("Show keyboard"));
+
 }
 void SearchDialog::showOptions(bool v) {
   m_options->setVisible(v);
