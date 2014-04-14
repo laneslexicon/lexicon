@@ -4,7 +4,7 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   readSettings();
   setColumnCount(2);
   setHeaderLabels(
-                  QStringList() << tr("Letter/Root") << tr("Supplement"));
+                  QStringList() << tr("Letter/Root") << tr("") );
   setSelectionMode(QAbstractItemView::SingleSelection);
   header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
   this->setStyleSheet(QString("selection-background-color : %1").arg(m_backgroundColor));

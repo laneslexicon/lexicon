@@ -1241,6 +1241,7 @@ int GraphicsEntry::search() {
     progress.setValue(i * step);
     m_items[i]->highlight(target,Qt::yellow);
     count += m_items[i]->findCount();
+    /// TODO check this spelling
     if (progress.wasCanceled())
       break;
   }
@@ -1251,5 +1252,31 @@ int GraphicsEntry::search() {
 void GraphicsEntry::clearHighlights() {
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->clearHighlights();
+  }
+}
+void GraphicsEntry::shiftFocus() {
+  QGraphicsItem * item = m_scene->focusItem();
+  if ( ! item  && (m_items.size() > 0)) {
+    item = m_items[0];
+  }
+  if (item) {
+    qDebug() << "ensuring current node is visible";
+    this->setFocus();
+    m_view->ensureVisible(item);
+    m_scene->setFocusItem(item);
+  }
+  return;
+}
+void GraphicsEntry::focusNode(const QString & node) {
+  if (node.isEmpty()) {
+    return;
+  }
+  for(int i=0;i < m_items.size();i++) {
+    Place p = m_items[i]->getPlace();
+    if (p.getNode() == node) {
+      m_view->ensureVisible(m_items[i]);
+      m_scene->setFocusItem(m_items[i]);
+      return;
+    }
   }
 }

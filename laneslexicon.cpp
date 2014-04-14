@@ -297,7 +297,12 @@ void LanesLexicon::shortcut(const QString & k) {
     this->on_actionLastPage();
   }
   else if (key == QString("Focus Content").toCaseFolded()) {
-    m_tabs->currentWidget()->setFocus();
+    /// if an item has focus, this loses it
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+
+    if (entry) {
+      entry->shiftFocus();
+    }
   }
   else if (key == QString("Focus Tree").toCaseFolded()) {
     m_tree->setFocus();
@@ -382,7 +387,6 @@ void LanesLexicon::setupShortcuts() {
   settings->endGroup();
   delete settings;
 }
-
 
 
 
@@ -844,8 +848,11 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int col) {
   if ((item->parent() == 0) || (item->parent()->parent() == 0)) {
     return;
   }
- qDebug() << "activated entry" << item->data(0,Qt::UserRole).toString();
-
+ QString node = item->data(0,Qt::UserRole).toString();
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry && ! node.isEmpty()) {
+    entry->focusNode(node);
+  }
 }
 
 Place LanesLexicon::showPlace(const Place & p,bool createTab) {

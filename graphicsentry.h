@@ -71,6 +71,8 @@ class GraphicsEntry : public QWidget {
     void setTextWidth(int w) { m_textWidth = w;}
     QGraphicsScene * getScene() { return m_scene;}
     int search();
+    void focusNode(const QString &);
+    void shiftFocus();
   public slots:
     void anchorClicked(const QUrl &);
     void linkActivated(const QString &);
