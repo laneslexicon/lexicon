@@ -146,6 +146,7 @@ void GraphicsButton::setup() {
     }
 
  }
+
   setPen(QPen(m_keyboardColor));
 }
 QGraphicsTextItem * GraphicsButton::decorateKey(const QRectF & cell,int group,int level) {
@@ -330,7 +331,6 @@ KeyboardView::KeyboardView(QWidget * parent) : QGraphicsView(parent) {
    * set the key pen from the ini file
    *
    */
-  m_scene->setBackgroundBrush(Qt::darkGray);
   setScene(m_scene);
   //  setSceneRect(QRectF());
 }
@@ -432,6 +432,6 @@ void KeyboardView::loadKeyboard(const QString & fileName) {
 
   //  qDebug() << Q_FUNC_INFO << "scene rect" << m_scene->sceneRect();
   /// TODO get from ini and poss to KeyboardDef before creating buttons
-  m_scene->setBackgroundBrush(Qt::darkGray);
+  m_scene->setBackgroundBrush(QColor(keyboardColor));
 
 }
