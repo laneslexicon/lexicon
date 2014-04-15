@@ -27,7 +27,7 @@ class SearchDialog : public QDialog {
   void setSwitchFocus(bool v);
   public slots:
     void keymapChanged();
-    void showOptions(bool);
+    virtual void showOptions(bool);
     void showKeyboard();
  protected:
     KeyboardWidget * m_keyboard;
@@ -37,13 +37,23 @@ class SearchDialog : public QDialog {
     ImLineEdit * m_edit;
     QCheckBox * m_newTab;
     QCheckBox * m_switchFocus;
-    QCheckBox * m_ignoreDiacritics;
-    QCheckBox * m_wholeWordMatch;
     QDialogButtonBox * m_buttonBox;
     QPushButton * m_moreButton;
     QPushButton * m_findButton;
     QPushButton * m_keyboardButton;
     QWidget * m_options;
+};
+class WordSearchDialog : public SearchDialog {
+  Q_OBJECT
+ public:
+  WordSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
+  public slots:
+    virtual void showOptions(bool);
+
+ private:
+    QCheckBox * m_ignoreDiacritics;
+    QCheckBox * m_wholeWordMatch;
+
 };
 class NodeSearchDialog : public QDialog {
   Q_OBJECT

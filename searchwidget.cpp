@@ -10,13 +10,11 @@ SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_prompt->setBuddy(m_edit);
   m_newTab = new QCheckBox(tr("Open in &new tab"));
   m_switchFocus = new QCheckBox(tr("Switch to &new tab"));
-  m_ignoreDiacritics = new QCheckBox(tr("Ignore diacritics"));
-  m_wholeWordMatch = new QCheckBox(tr("Whole word match"));
 
   m_findButton = new QPushButton(tr("&Find"));
   m_findButton->setDefault(true);
 
-  m_keyboardButton  = new QPushButton(tr("Show keyboard"));
+  m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
 
   m_moreButton = new QPushButton(tr("&More"));
   m_moreButton->setCheckable(true);
@@ -37,7 +35,102 @@ SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QVBoxLayout * optionsLayout = new QVBoxLayout;
   optionsLayout->setMargin(0);
 
-  //  QWidget * w = new QWidget(this);
+
+  QGridLayout * glayout = new QGridLayout;
+
+  glayout->addWidget(m_switchFocus,0,0);
+  glayout->addWidget(m_newTab,0,1);
+
+
+  QStringList maps = m_edit->getMaps();
+  QString map = m_edit->getActiveMap();
+  if (map.isEmpty()) {
+    map = m_edit->getNullMap();
+  }
+  maps << m_edit->getNullMap();
+  if (maps.size() > 0) {
+    m_group = new QGroupBox(tr("Keymap"));
+    QVBoxLayout * btnlayout = new QVBoxLayout;
+      for(int i=0;i < maps.size();i++) {
+        QRadioButton * btn = new QRadioButton(maps[i]);
+        if (maps[i].toCaseFolded() == map.toCaseFolded()) {
+          btn->setChecked(true);
+        }
+        btnlayout->addWidget(btn);
+        connect(btn,SIGNAL(clicked()),this,SLOT(keymapChanged()));
+      }
+      m_group->setLayout(btnlayout);
+      optionsLayout->addWidget(m_group);
+  }
+  m_options->setLayout(optionsLayout);
+
+  connect(m_moreButton, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
+  QHBoxLayout *topLeftLayout = new QHBoxLayout;
+  topLeftLayout->addWidget(m_prompt);
+  topLeftLayout->addWidget(m_edit);
+
+  QVBoxLayout *leftLayout = new QVBoxLayout;
+  leftLayout->addLayout(topLeftLayout);
+  leftLayout->addLayout(glayout);
+
+  QGridLayout *mainLayout = new QGridLayout;
+  mainLayout->setSizeConstraint(QLayout::SetFixedSize);
+  mainLayout->addLayout(leftLayout, 0, 0);
+  mainLayout->addWidget(m_buttonBox, 0, 1);
+  mainLayout->addWidget(m_options, 1, 0, 1, 2);
+  mainLayout->setRowStretch(2, 1);
+
+  setLayout(mainLayout);
+  m_options->hide();
+  m_edit->setFocus();
+  m_attached = false;
+  m_keyboard = new KeyboardWidget(this);
+  QPoint p = this->pos();
+  qDebug() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
+  int h = this->frameGeometry().height();
+  qDebug() << "search dialog frame geometry" << this->frameGeometry();
+  m_keyboard->move(p.x(),p.y() + h);
+  //  delete settings;
+}
+WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
+  SearchDialog(parent,f) {
+  setWindowTitle(tr("Search"));
+  m_prompt = new QLabel(tr("Find"));
+  m_edit = new ImLineEdit;
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  m_edit->readSettings(settings);
+  m_prompt->setBuddy(m_edit);
+  m_newTab = new QCheckBox(tr("Open in &new tab"));
+  m_switchFocus = new QCheckBox(tr("Switch to &new tab"));
+  m_ignoreDiacritics = new QCheckBox(tr("Ignore diacritics"));
+  m_wholeWordMatch = new QCheckBox(tr("Whole word match"));
+
+  m_findButton = new QPushButton(tr("&Find"));
+  m_findButton->setDefault(true);
+
+  m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
+
+  m_moreButton = new QPushButton(tr("&More"));
+  m_moreButton->setCheckable(true);
+  m_moreButton->setAutoDefault(false);
+
+
+
+  m_buttonBox = new QDialogButtonBox(Qt::Vertical);
+  m_buttonBox->addButton(m_findButton, QDialogButtonBox::AcceptRole);
+  m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
+  m_buttonBox->addButton(m_moreButton, QDialogButtonBox::ActionRole);
+  m_buttonBox->addButton(m_keyboardButton,QDialogButtonBox::ActionRole);
+
+  connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
+  m_options = new QWidget;
+  QVBoxLayout * optionsLayout = new QVBoxLayout;
+  optionsLayout->setMargin(0);
+
+
   QGridLayout * glayout = new QGridLayout;
 
   glayout->addWidget(m_switchFocus,1,0);
@@ -45,8 +138,9 @@ SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   glayout->addWidget(m_ignoreDiacritics,0,0);
   glayout->addWidget(m_wholeWordMatch,0,1);
 
-  //  w->setLayout(glayout);
-
+  /// they will be shown via the 'more' button
+  m_switchFocus->hide();
+  m_newTab->hide();
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->getActiveMap();
@@ -113,6 +207,13 @@ void SearchDialog::showKeyboard() {
 
 }
 void SearchDialog::showOptions(bool v) {
+  m_options->setVisible(v);
+  if (!v)
+    m_edit->setFocus();
+}
+void WordSearchDialog::showOptions(bool v) {
+  m_switchFocus->setVisible(v);
+  m_newTab->setVisible(v);
   m_options->setVisible(v);
   if (!v)
     m_edit->setFocus();
