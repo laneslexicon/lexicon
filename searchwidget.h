@@ -37,6 +37,8 @@ class SearchDialog : public QDialog {
     ImLineEdit * m_edit;
     QCheckBox * m_newTab;
     QCheckBox * m_switchFocus;
+    QCheckBox * m_ignoreDiacritics;
+    QCheckBox * m_wholeWordMatch;
     QDialogButtonBox * m_buttonBox;
     QPushButton * m_moreButton;
     QPushButton * m_findButton;
