@@ -25,11 +25,14 @@ class SearchDialog : public QDialog {
   void setNewTab(bool v);
   bool getSwitchFocus();
   void setSwitchFocus(bool v);
-  public slots:
+  virtual void setup();
+    public slots:
     void keymapChanged();
     virtual void showOptions(bool);
     void showKeyboard();
  protected:
+
+    virtual void addOptions(QGridLayout *);
     KeyboardWidget * m_keyboard;
     bool m_attached;
     QLabel * m_prompt;
@@ -47,8 +50,12 @@ class WordSearchDialog : public SearchDialog {
   Q_OBJECT
  public:
   WordSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
+  virtual void setup();
   public slots:
     virtual void showOptions(bool);
+ protected:
+
+  virtual void addOptions(QGridLayout *);
 
  private:
     QCheckBox * m_ignoreDiacritics;

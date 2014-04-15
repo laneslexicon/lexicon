@@ -225,6 +225,9 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == QString("search word")) {
     searchForWord();
   }
+  else if (key == QString("search entry")) {
+    searchForEntry();
+  }
   else if (key == QString("Page search").toCaseFolded()) {
     searchForPage();
   }
@@ -1337,7 +1340,7 @@ void LanesLexicon::on_actionLastPage() {
 }
 /**
  * Converts supplied param to Arabic using the default map
- *
+ * unrecognised characters are left in place
  * @param s
  *
  * @return the equivalent arabic string
@@ -1749,6 +1752,8 @@ void LanesLexicon::searchForPage() {
     }
 }
 void LanesLexicon::searchForRoot() {
+  /// TODO this will show 'ignore diacritics' and 'whole word'
+  /// which doesn't make much sense ?
     SearchDialog * d = new SearchDialog(this);
     d->setWindowTitle(tr("Search for Root"));
     d->setPrompt(tr("Find root"));
@@ -1756,6 +1761,7 @@ void LanesLexicon::searchForRoot() {
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
+        /// TODO maybe change this to if == Latin
         if (! UcdScripts::isScript(t,"Arabic")) {
           t = convertString(t);
         }
@@ -1769,10 +1775,42 @@ void LanesLexicon::searchForRoot() {
     }
     delete d;
 }
+/**
+ * TODO need to distinguish between searching for an entry i.e a head word
+ * and searching within the text
+ */
 void LanesLexicon::searchForWord() {
-    SearchDialog * d = new SearchDialog(this);
+    WordSearchDialog * d = new WordSearchDialog(this);
+    d->setup();
     d->setWindowTitle(tr("Search for Word"));
     d->setPrompt(tr("Find word"));
+    if (d->exec()) {
+      QString t = d->getText();
+      if (! t.isEmpty()) {
+        if (! UcdScripts::isScript(t,"Arabic")) {
+          t = convertString(t);
+        }
+        SearchResultsWidget * s = new SearchResultsWidget(t,this);
+        if (s->count() == 0) {
+          QMessageBox msgBox;
+          msgBox.setText(QString(tr("%1 not found")).arg(t));
+          msgBox.exec();
+          delete s;
+        }
+        else {
+          int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
+          m_tabs->setCurrentIndex(i);
+          setSignals(s->getEntry());
+        }
+      }
+    }
+    delete d;
+}
+void LanesLexicon::searchForEntry() {
+    WordSearchDialog * d = new WordSearchDialog(this);
+    d->setup();
+    d->setWindowTitle(tr("Search for Entry"));
+    d->setPrompt(tr("Find entry"));
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {

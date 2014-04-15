@@ -1,6 +1,8 @@
 #include "searchwidget.h"
 SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
+}
+void SearchDialog::setup() {
   setWindowTitle(tr("Search"));
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
@@ -38,8 +40,7 @@ SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
 
   QGridLayout * glayout = new QGridLayout;
 
-  glayout->addWidget(m_switchFocus,0,0);
-  glayout->addWidget(m_newTab,0,1);
+  this->addOptions(glayout);
 
 
   QStringList maps = m_edit->getMaps();
@@ -92,8 +93,15 @@ SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_keyboard->move(p.x(),p.y() + h);
   //  delete settings;
 }
+void SearchDialog::addOptions(QGridLayout * glayout) {
+  glayout->addWidget(m_switchFocus,0,0);
+  glayout->addWidget(m_newTab,0,1);
+}
 WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   SearchDialog(parent,f) {
+
+}
+void WordSearchDialog::setup() {
   setWindowTitle(tr("Search"));
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
@@ -132,12 +140,7 @@ WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
 
 
   QGridLayout * glayout = new QGridLayout;
-
-  glayout->addWidget(m_switchFocus,1,0);
-  glayout->addWidget(m_newTab,1,1);
-  glayout->addWidget(m_ignoreDiacritics,0,0);
-  glayout->addWidget(m_wholeWordMatch,0,1);
-
+  this->addOptions(glayout);
   /// they will be shown via the 'more' button
   m_switchFocus->hide();
   m_newTab->hide();
@@ -191,6 +194,15 @@ WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   qDebug() << "search dialog frame geometry" << this->frameGeometry();
   m_keyboard->move(p.x(),p.y() + h);
   //  delete settings;
+}
+void WordSearchDialog::addOptions(QGridLayout * glayout) {
+  m_ignoreDiacritics = new QCheckBox(tr("Ignore diacritics"));
+  m_wholeWordMatch = new QCheckBox(tr("Whole word match"));
+
+  glayout->addWidget(m_ignoreDiacritics,0,0);
+  glayout->addWidget(m_wholeWordMatch,0,1);
+  glayout->addWidget(m_switchFocus,1,0);
+  glayout->addWidget(m_newTab,1,1);
 }
 void SearchDialog::showKeyboard() {
   m_keyboard->attach(m_edit);

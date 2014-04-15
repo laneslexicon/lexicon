@@ -106,6 +106,7 @@ public:
     void searchForPage();
     void searchForNode();
     void searchForRoot();
+    void searchForEntry();
 
     void on_actionNextPage();
     void on_actionPrevPage();
