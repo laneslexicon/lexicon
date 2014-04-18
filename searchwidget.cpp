@@ -17,6 +17,7 @@ void SearchDialog::setup() {
   m_findButton->setDefault(true);
 
   m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
+  m_keyboardButton->setAutoDefault(false);
 
   m_moreButton = new QPushButton(tr("&More"));
   m_moreButton->setCheckable(true);
@@ -29,6 +30,8 @@ void SearchDialog::setup() {
   m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
   m_buttonBox->addButton(m_moreButton, QDialogButtonBox::ActionRole);
   m_buttonBox->addButton(m_keyboardButton,QDialogButtonBox::ActionRole);
+
+  m_findButton->setFocus();
 
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -118,6 +121,7 @@ void WordSearchDialog::setup() {
   m_findButton->setDefault(true);
 
   m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
+  m_keyboardButton->setAutoDefault(false);
 
   m_moreButton = new QPushButton(tr("&More"));
   m_moreButton->setCheckable(true);
@@ -130,6 +134,8 @@ void WordSearchDialog::setup() {
   m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
   m_buttonBox->addButton(m_moreButton, QDialogButtonBox::ActionRole);
   m_buttonBox->addButton(m_keyboardButton,QDialogButtonBox::ActionRole);
+
+  m_findButton->setFocus();
 
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
