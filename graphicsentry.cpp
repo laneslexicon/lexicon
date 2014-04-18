@@ -432,7 +432,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
     else {
       QLOG_WARN() << "Node not found" << node;
-      qDebug() << Q_FUNC_INFO << "exiting 3 with place" << retval.toString();
+      //      qDebug() << Q_FUNC_INFO << "exiting 3 with place" << retval.toString();
       return retval;
     }
   }
@@ -457,7 +457,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   EntryItem * rootItem  = createEntry(str);
   /// will be null if the XSLT/XML has not parsed correctly
   if (rootItem == NULL) {
-    qDebug() << Q_FUNC_INFO << "exiting 5 with place";
+    //    qDebug() << Q_FUNC_INFO << "exiting 5 with place";
     return p;
   }
   ///
@@ -620,13 +620,13 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
 
   /// we're done
   if (m_place.isSamePlace(centerItem->getPlace())) {
-    qDebug() << Q_FUNC_INFO << "exiting 1 with place" << m_place.toString();
+    //    qDebug() << Q_FUNC_INFO << "exiting 1 with place" << m_place.toString();
     return m_place;
   }
   m_place = centerItem->getPlace();
   m_place.setType(dp.getType());
 
-  qDebug() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
+  //  qDebug() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
   //  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
   /*
   qDebug() << "At exit" << m_view->sceneRect();
@@ -1097,7 +1097,7 @@ void GraphicsEntry::highlight(const QString & target) {
       ix = i;
     }
   }
-  qDebug() << Q_FUNC_INFO << "item" << ix << "pos" << cursor.position() << cursor.hasSelection();
+  //  qDebug() << Q_FUNC_INFO << "item" << ix << "pos" << cursor.position() << cursor.hasSelection();
   /// unselect the text otherwise it will be in the select color
   /// center the view on the word
   if (ix != -1) {
