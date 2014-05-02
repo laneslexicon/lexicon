@@ -809,8 +809,8 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
   QString supp = item->text(1);
   int p = 0;
-  qDebug() << Q_FUNC_INFO << "enter";
-  /// check that the user hasa not clicked on a letter
+  qDebug() << Q_FUNC_INFO << root << supp;
+  /// check that the user has not clicked on a letter
   if (item->parent() != 0) {
     /// and that they've clicked on a root
     if  (item->parent()->parent() == 0) {
@@ -826,17 +826,16 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
       showPlace(m,newTab);
     }
     else {
-      qDebug() << "double clicked on entry" << item->data(0,Qt::UserRole).toString();
+      /// double clicked on head word, highlight it
+      entryActivated(item,0);
     }
   }
   if (m_treeKeepsFocus)
     m_tree->setFocus();
 
-  qDebug() << Q_FUNC_INFO << "expanding" << item->isExpanded();
   if ( ! item->isExpanded() ) {
     item->setExpanded(true);
   }
-  qDebug() << Q_FUNC_INFO << "exit";
 }
 /**
  * if the user clicks or hits space an entry (i.e. below a root) make
@@ -845,7 +844,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
  * @param item
  * @param col
  */
-void LanesLexicon::entryActivated(QTreeWidgetItem * item, int col) {
+void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   /// ignore clicks on the root or the letter
   qDebug() << Q_FUNC_INFO;
   if ((item->parent() == 0) || (item->parent()->parent() == 0)) {
@@ -1806,6 +1805,7 @@ void LanesLexicon::searchForWord() {
     }
     delete d;
 }
+/// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
     WordSearchDialog * d = new WordSearchDialog(this);
     d->setup();
