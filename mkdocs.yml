@@ -6,4 +6,5 @@ pages:
 - ['user-guide/configuring.md', User Guide, 'Configuration']
 - ['lane/preface.md','Lane','Preface']
 - ['lane/citations.md','Lane','Citations']
+- ['build.md', 'Building', 'Building']
 - ['about/license.md', 'About', 'License']
