@@ -29,10 +29,14 @@ class SearchResultsWidget : public QWidget
    SearchResultsWidget(const QString & str, QWidget * parent = 0);
    GraphicsEntry * getEntry() { return m_text;}
    int count();
+
+
  public slots:
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
+   void itemDoubleClicked(QTableWidgetItem *);
 
  private:
+   bool eventFilter(QObject * target,QEvent * event);
    QSqlQuery m_query;
    QSqlQuery m_nodeQuery;
    QString m_target;

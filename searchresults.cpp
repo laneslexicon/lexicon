@@ -19,6 +19,9 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_list->installEventFilter(this);
+  QStyle * style = m_list->style();
+  qDebug() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   m_text = new GraphicsEntry;
 
   bool ok = false;
@@ -70,8 +73,16 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   m_list->adjustSize();//resizeColumnsToContents();
 
   setLayout(layout);
-  connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
-          this,SLOT(itemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
+  //connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
+  //      this,SLOT(itemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
+  connect(m_list,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
+          this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
+  /// show the first item in the list
+  /// TODO decide who gets focus and select the first row
+  /// TODO if table loses focus, change the background selection color
+  if (m_list->rowCount() > 0)
+    m_list->itemDoubleClicked(m_list->item(0,0));
+
 }
 int SearchResultsWidget::count() {
   return m_list->rowCount();
@@ -98,4 +109,65 @@ void SearchResultsWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem *
   else {
     QLOG_DEBUG() << "Invalid place returned for node" << node;
   }
+}
+void SearchResultsWidget::itemDoubleClicked(QTableWidgetItem * item) {
+  /// get the node
+  item = item->tableWidget()->item(item->row(),2);
+  QString node = item->text();
+  m_nodeQuery.bindValue(0,node);
+  m_nodeQuery.exec();
+  /// missing node
+  if ( ! m_nodeQuery.first()) {
+    QLOG_WARN() << "No record for node" << node;
+    return;
+  }
+  /// TODO make this a QSettings option or dialog option
+  Place np;
+  np.setNode(node);
+  //  np.setNodeOnly(true);
+  Place p = m_text->getXmlForRoot(np);
+  if (p.isValid()) {
+    m_text->highlight(m_target);
+  }
+  else {
+    QLOG_DEBUG() << "Invalid place returned for node" << node;
+  }
+}
+bool SearchResultsWidget::eventFilter(QObject * target,QEvent * event) {
+
+  if (event->type() == QEvent::KeyPress) {
+    qDebug() << Q_FUNC_INFO;
+    QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
+    switch(keyEvent->key()) {
+      case Qt::Key_Enter: {
+        qDebug() << "hit enter on table";
+        if (keyEvent->modifiers() && Qt::ControlModifier) {
+          //          m_tree->setFocus();
+          return true;
+        }
+        break;
+      }
+    case Qt::Key_Return:
+    case Qt::Key_Space: {
+        qDebug() << "hit return on table";
+        //        if (keyEvent->modifiers() && Qt::ControlModifier) {
+        QTableWidgetItem * item = m_list->currentItem();
+        if (item)
+          m_list->itemDoubleClicked(item);
+
+        break;
+      }
+      case Qt::Key_E: {
+        if (keyEvent->modifiers() && Qt::ControlModifier) {
+          //          if (target == m_tree)
+            //          m_tabs->currentWidget()->setFocus();
+          return true;
+        }
+        break;
+      }
+    default:
+      break;
+    }
+  }
+  return QWidget::eventFilter(target,event);
 }
