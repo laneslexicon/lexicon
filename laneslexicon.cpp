@@ -1754,6 +1754,7 @@ void LanesLexicon::searchForRoot() {
   /// TODO this will show 'ignore diacritics' and 'whole word'
   /// which doesn't make much sense ?
     SearchDialog * d = new SearchDialog(this);
+    d->setup();
     d->setWindowTitle(tr("Search for Root"));
     d->setPrompt(tr("Find root"));
     d->setNewTab(m_searchNewTab);
