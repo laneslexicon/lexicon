@@ -60,18 +60,23 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+<!---
+  These use characters from Arabic Presentation Forms-B to show short vowels u/i/a
+  Replace &#xhhhhn; by the e.g u will work.
+  &#160; is a non-breaking space. (XSLT processor objects to named character entities eg &nbsp;
+-->
 
   <xsl:template match="form">
     <xsl:if test="@n='infl'">
       <xsl:choose>
       <xsl:when test="orth/@orig = 'Bu'">
-      <span class="infl">u</span>
+      <span class="infl">&#xfe79;&#160;</span>
       </xsl:when>
       <xsl:when test="orth/@orig = 'Bi'">
-      <span class="infl">i</span>
+      <span class="infl">&#xfe7b;&#160;</span>
       </xsl:when>
       <xsl:when test="orth/@orig = 'Ba'">
-      <span class="infl">a</span>
+      <span class="infl">&#xfe77;&#160;</span>
       </xsl:when>
       <xsl:otherwise>
       </xsl:otherwise>
