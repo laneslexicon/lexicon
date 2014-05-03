@@ -303,7 +303,7 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   optionsLayout->addWidget(m_switchFocus);
   m_options->setLayout(optionsLayout);
 
-  connect(m_moreButton, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
+  //  connect(m_moreButton, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
   QHBoxLayout *topLeftLayout = new QHBoxLayout;
   topLeftLayout->addWidget(m_prompt);
   topLeftLayout->addWidget(m_edit);

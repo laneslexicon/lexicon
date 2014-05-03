@@ -76,7 +76,6 @@ class NodeSearchDialog : public QDialog {
   QCheckBox * m_newTab;
   QCheckBox * m_switchFocus;
   QDialogButtonBox * m_buttonBox;
-  QPushButton * m_moreButton;
   QPushButton * m_findButton;
   QWidget * m_options;
 };
