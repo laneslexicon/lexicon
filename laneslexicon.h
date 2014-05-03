@@ -79,6 +79,8 @@ public:
     QString convertString(const QString &) const;
     HistoryMaster * history();
     enum NavMode {ByRoot, ByPage };
+    public slots:
+    void gotoPlace(const Place &,bool newTab = false);
     private slots:
       void testSlot();
       void shortcut(const QString &);

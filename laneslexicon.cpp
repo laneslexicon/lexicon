@@ -192,11 +192,14 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(historyPositionChanged(int)),this,SLOT(historyPositionChanged(int)));
   connect(entry,SIGNAL(historyAddition()),this,SLOT(historyAddition()));
   connect(entry,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SLOT(bookmarkAdd(const QString &,const Place &)));
+
   //  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
 
   connect(entry,SIGNAL(placeChanged(const Place &)),this,SLOT(placeChanged (const Place &)));
   connect(entry,SIGNAL(clearPage()),this,SLOT(pageClear()));
   connect(entry,SIGNAL(searchPage()),this,SLOT(pageSearch()));
+
+  connect(entry,SIGNAL(gotoNode(const Place &,bool)),this,SLOT(gotoPlace(const Place &,bool)));
 }
 void LanesLexicon::onCloseTab(int ix) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
@@ -857,6 +860,9 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   }
 }
 
+void LanesLexicon::gotoPlace(const Place & p,bool createTab) {
+  showPlace(p,createTab);
+}
 Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   Place np;
   GraphicsEntry * entry;
