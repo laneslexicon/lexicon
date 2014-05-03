@@ -7,9 +7,28 @@ EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
 }
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
-
+  QString href;
+  QString anchor;
+  QAction *jumpAction;
+  QTextCursor c = textCursor();
+  c.setPosition(document()->documentLayout()->hitTest(event->pos(), Qt::FuzzyHit));
+  c.select(QTextCursor::WordUnderCursor);
+  qDebug() << "selected text:" << c.selectedText();
+  if (c.charFormat().isAnchor()) {
+    qDebug() << "is anchor" << c.charFormat().isAnchor() << c.charFormat().anchorHref();
+    href = c.charFormat().anchorHref();
+    if (href.startsWith("#")) {
+      href.remove(0,1);
+    }
+    anchor = c.selectedText();
+  }
   QMenu menu(m_place.getShortText());
   menu.setObjectName("entry");
+  if ( ! href.isEmpty()) {
+    QString t = QString("Goto %1").arg(anchor);
+    jumpAction = menu.addAction(t);
+    jumpAction->setData(href);
+  }
   QAction *markAction = menu.addAction(tr("Add &bookmark"));
   //  QAction *searchAction = menu.addAction("Find");
   //  connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
@@ -51,6 +70,13 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   }
   else if (selectedAction == selectAllAction) {
     emit(selectAllItems());
+  }
+  else if ((jumpAction != NULL) && (selectedAction == jumpAction)) {
+    qDebug() << "GOTO" << jumpAction->data();
+    Place p;
+    p.setNode(jumpAction->data().toString());
+    emit(gotoNode(p,true));
+
   }
   this->setFocus();
 }
