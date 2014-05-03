@@ -62,6 +62,21 @@
   </xsl:template>
 
   <xsl:template match="form">
+    <xsl:if test="@n='infl'">
+      <xsl:choose>
+      <xsl:when test="orth/@orig = 'Bu'">
+      <span class="infl">u</span>
+      </xsl:when>
+      <xsl:when test="orth/@orig = 'Bi'">
+      <span class="infl">i</span>
+      </xsl:when>
+      <xsl:when test="orth/@orig = 'Ba'">
+      <span class="infl">a</span>
+      </xsl:when>
+      <xsl:otherwise>
+      </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
   </xsl:template>
   <!---
 http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
@@ -165,6 +180,7 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
               <span class="hi"><xsl:value-of select="text()" /></span>
             </xsl:when>
             <xsl:when test="name() = 'form'">
+              <xsl:apply-templates select="." />
             </xsl:when>
             <xsl:when test="name() = 'pb'">
               <xsl:apply-templates select="." />
