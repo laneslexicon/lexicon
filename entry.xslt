@@ -114,6 +114,22 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
   <br/>
   </xsl:template>
 
+  <xsl:template match="quote">
+    <table align="center" width="100%">
+      <xsl:for-each select="L">
+        <tr>
+          <td width="10%">*</td>
+          <td align="center" width="80%">
+            <span class="arabicquote">
+              <xsl:value-of select="foreign"/>
+            </span>
+          </td>
+          <td width="10%">*</td>
+        </tr>
+      </xsl:for-each>
+    </table>
+  </xsl:template>
+
   <xsl:template match="entryFree" priority="100">
 
     <span>
@@ -151,6 +167,9 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
             <xsl:when test="name() = 'form'">
             </xsl:when>
             <xsl:when test="name() = 'pb'">
+              <xsl:apply-templates select="." />
+            </xsl:when>
+            <xsl:when test="name() = 'quote'">
               <xsl:apply-templates select="." />
             </xsl:when>
             <xsl:when test="name() = 'sense'">
