@@ -135,6 +135,7 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
   </xsl:template>
 
   <xsl:template match="quote">
+    <div class="arabicquoteblock">
     <table align="center" width="100%">
       <xsl:for-each select="L">
         <tr>
@@ -148,6 +149,7 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
         </tr>
       </xsl:for-each>
     </table>
+    </div>
   </xsl:template>
 
   <xsl:template match="entryFree" priority="100">
