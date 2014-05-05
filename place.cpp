@@ -102,8 +102,7 @@ QString Place::toString() const {
     .arg(m_page)
     .arg(m_vol)
     .arg(m_id)
-    .arg(m_supplement)
-    .arg(m_showOnlyNodes);
+    .arg(m_supplement);
 
   return t;
 }
@@ -129,13 +128,6 @@ Place Place::fromString(const QString & str) {
     p.setId(x[6].toInt(&ok));
   if (sz > 7)
     p.setSupplement(x[7].toInt(&ok));
-  if (sz > 8) {
-  if (x[8] == "1") {
-    p.setNodeOnly(true);
-  }
-  else {
-    p.setNodeOnly(false);
-  }
-  }
+
   return p;
 }

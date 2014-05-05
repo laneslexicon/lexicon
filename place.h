@@ -22,7 +22,6 @@ class Place    {
     m_page = -1;
     m_vol = -1;
     m_id = -1;
-    m_showOnlyNodes = false;
     m_type = Place::User;
   }
   Place(const QString & root) {
@@ -30,7 +29,6 @@ class Place    {
     m_page = -1;
     m_vol = -1;
     m_id = -1;
-    m_showOnlyNodes = false;
     m_type = Place::User;
   }
   Place(const QString & root,int supp) {
@@ -39,7 +37,6 @@ class Place    {
     m_page = -1;
     m_vol = -1;
     m_id = -1;
-    m_showOnlyNodes = false;
     m_type = Place::User;
   }
   ~Place() {
@@ -66,7 +63,6 @@ class Place    {
                         << p.getSupplement() << ","
                         << p.getVol() << ","
                         << p.getPage() << ","
-                        << p.getNodeOnly() << ","
                         << p.getType() << ","
                         << p.getId() << "," << "\n"
                         << p.getRoot() << ","
@@ -120,8 +116,6 @@ class Place    {
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
 
-  bool getNodeOnly() const { return m_showOnlyNodes;}
-  void setNodeOnly(bool v) { m_showOnlyNodes = v;}
 
   void setWhen(const QString & t) {
     m_when = QDateTime::fromString(t);
@@ -136,7 +130,6 @@ class Place    {
   int m_vol;
   int m_id;
   int m_supplement;
-  bool m_showOnlyNodes;
   QVariant m_data;
   QDateTime m_when;
 };

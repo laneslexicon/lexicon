@@ -322,8 +322,6 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
   if (! thisPageOnly ) {
     Place p;
     p.setNode(node);
-    p.setNodeOnly(false);
-    //    getXmlForNode(node);
     np = getXmlForRoot(p);
     /// is this right ?
     if (np != p) {
