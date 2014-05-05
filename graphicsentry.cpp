@@ -1281,3 +1281,15 @@ void GraphicsEntry::focusNode(const QString & node) {
     }
   }
 }
+bool GraphicsEntry::hasNode(const QString & node) {
+  if (node.isEmpty()) {
+    return true;
+  }
+  for(int i=0;i < m_items.size();i++) {
+    Place p = m_items[i]->getPlace();
+    if (p.getNode() == node) {
+      return true;
+    }
+  }
+  return false;
+}
