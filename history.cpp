@@ -34,7 +34,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
     m_backQuery = new QSqlQuery(m_db);
     m_lastQuery = new QSqlQuery(m_db);
     if (
-        m_addQuery->prepare(QString("insert into history (node,word,root,supplement,page,vol,timewhen,nodeOnly,pagemode) values (?,?,?,?,?,?,?,?,?)")) &&
+        m_addQuery->prepare(QString("insert into history (node,word,root,supplement,page,vol,timewhen,nodeOnly) values (?,?,?,?,?,?,?,?)")) &&
         m_backQuery->prepare(QString("select %1 from history where id <= ? order by id desc").arg(fields)) &&
         m_forQuery->prepare(QString("select %1 from history where id > ? order by id asc").arg(fields)) &&
         m_lastQuery->prepare(QString("select %1 from history where id = (select max(id) from history)").arg(fields)) &&
@@ -127,7 +127,7 @@ Place HistoryMaster::toPlace(QSqlQuery * sql) {
 
   p.setWhen(sql->value(7).toString());
   p.setNodeOnly(sql->value(8).toBool());
-  p.setPageMode(sql->value(9).toBool());
+  //  p.setPageMode(sql->value(9).toBool());
   return p;
 
 }
@@ -179,7 +179,7 @@ bool HistoryMaster::add(const Place & p) {
   m_addQuery->bindValue(5,p.getVol());
   m_addQuery->bindValue(6,event->getWhen());
   m_addQuery->bindValue(7,p.getNodeOnly());
-  m_addQuery->bindValue(8,p.getPageMode());
+  //  m_addQuery->bindValue(8,0);//p.getPageMode());
   return m_addQuery->exec();
 
 

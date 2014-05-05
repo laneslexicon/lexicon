@@ -818,7 +818,6 @@ Place GraphicsEntry::getPage(const Place & p) {
 
 
   m_place = focusItem->getPlace();
-  m_place.setPageMode(true);
   /**
    * we need to know whether we got here by accessing the history button
    * or not

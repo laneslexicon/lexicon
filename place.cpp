@@ -57,10 +57,10 @@ QString Place::getShortText() const {
   }
   return QString();
 }
-QString Place::getText() const {
+QString Place::getText(bool pageOnly) const {
   QString txt;
 
-  if (m_pageMode) {
+  if (pageOnly) {
     if ( m_page != -1) {
       txt += QString(QObject::tr("Vol %1,Page %2")).arg(m_vol).arg(m_page);
     }
@@ -74,7 +74,7 @@ QString Place::getText() const {
     }
     txt += QString(QObject::tr("Entry:%1")).arg(m_word);
   }
-  if ((! m_pageMode) && ( m_page != -1)) {
+  if ((! pageOnly) && ( m_page != -1)) {
     if (! txt.isEmpty()) {
       txt += ",";
     }
@@ -103,8 +103,7 @@ QString Place::toString() const {
     .arg(m_vol)
     .arg(m_id)
     .arg(m_supplement)
-    .arg(m_showOnlyNodes)
-    .arg(m_pageMode);
+    .arg(m_showOnlyNodes);
 
   return t;
 }
@@ -137,14 +136,6 @@ Place Place::fromString(const QString & str) {
   else {
     p.setNodeOnly(false);
   }
-  }
-  if (sz > 9) {
-    if (x[9] == "1") {
-      p.setPageMode(true);
-    }
-    else {
-      p.setPageMode(false);
-    }
   }
   return p;
 }

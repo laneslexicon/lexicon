@@ -684,10 +684,7 @@ void LanesLexicon::setupHistory(int currPos) {
       int id = event->getId();
 
       QString txt;
-      if (p.getPageMode()) {
-        txt = QString(tr("%1 Page %2")).arg(id).arg(p.getPage());
-      }
-      else if (! word.isEmpty()) {
+      if (! word.isEmpty()) {
         txt = QString("%1 %2").arg(id).arg(word);
       }
       else {
@@ -772,12 +769,8 @@ void LanesLexicon::onHistorySelection() {
   QVariant v = action->data();
   Place p = v.value<Place>();
   p.setType(Place::History);
-  if (p.getPageMode()) {
-    onGoToPage(p);
-  }
-  else {
-    showPlace(p,false);
-  }
+  showPlace(p,false);
+
 }
 void LanesLexicon::on_actionExit()
 {
@@ -1138,14 +1131,7 @@ void LanesLexicon::restoreTabs() {
       entry->setTextWidth(tw);
       setSignals(entry);
       p.setType(Place::RestoreTab);
-
-      if (p.getPageMode()) {
-        entry->setPagingForward();
-        entry->getPage(p);
-      }
-      else {
-        entry->getXmlForRoot(p);
-      }
+      entry->getXmlForRoot(p);
       entry->setScale(scale);
       //      qDebug() << Q_FUNC_INFO << "adding tab" << p.getShortText();
       m_tabs->addTab(entry,p.getShortText());
