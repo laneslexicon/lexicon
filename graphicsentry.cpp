@@ -36,6 +36,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_textOption.setTextDirection(Qt::LeftToRight);
+  m_showNodeOnly = false;
   //  m_compiledXsl = 0;
   /// 0 = paging forward, items are appended
   /// 1 = paging backward, items are prepended
@@ -409,7 +410,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QString root = dp.getRoot();
   int supp = dp.getSupplement();
   QString node = dp.getNode();
-  bool nodeOnly = dp.getNodeOnly();
+  //  bool nodeOnly = dp.getNodeOnly();
 
   Place p = dp;
   /**
@@ -441,7 +442,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   if (! m_rootQuery->first()) {
-    if (nodeOnly) {
+    if (m_showNodeOnly) {
       QLOG_WARN() << QString(tr("Root not found for word %1 (node %2)")).arg(p.getWord()).arg(p.getNode());
     }
     else {
@@ -481,7 +482,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   rootItem->setPage(m_rootQuery->value(5).toInt());
 
   items << rootItem;
-  if ( nodeOnly ) {
+  if ( m_showNodeOnly ) {
     rootItem->hide();
   }
 
@@ -544,7 +545,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         if (! node.isEmpty() && (item->getNode() == node)) {
           centerItem = item;
         }
-        if (nodeOnly) {
+        if (m_showNodeOnly) {
             item->hide();
         }
 

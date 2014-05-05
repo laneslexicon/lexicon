@@ -95,6 +95,7 @@ class GraphicsEntry : public QWidget {
     void clearHighlights();
  private:
     QColor m_supplementBg;
+    bool m_showNodeOnly;
     bool prepareQueries();
     bool m_clearScene;
     QString lastRoot();
