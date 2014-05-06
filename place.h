@@ -13,6 +13,14 @@
 
     Place np = v.value<Place>();
 
+    Need to think how we can subclass this for e.g Salmone or Buckwalter
+    Public interface:
+
+    Place::getText()
+    Place::getShortText()
+    Place::isSame(const & Place )
+    Place::==
+
 */
 
 class Place    {
