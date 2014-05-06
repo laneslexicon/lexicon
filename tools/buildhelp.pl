@@ -10,7 +10,7 @@ my @help = (
             {
             source => "lane/preface.md",
             output => "preface.html",
-            css => "test.css"
+            css => "tables.css"
             },
             {
             source => "user-guide/using.md",
