@@ -33,6 +33,7 @@
              <keyword  id="lanex" ref="preface.html#x"/>
          </keywords>
          <files>
+           <file>test.css</file>
              <file>help.css</file>
              <file>index.html</file>
              <file>intro.html</file>

@@ -9,7 +9,8 @@ my $helpDir = "help";
 my @help = (
             {
             source => "lane/preface.md",
-            output => "preface.html"
+            output => "preface.html",
+            css => "test.css"
             },
             {
             source => "user-guide/using.md",
@@ -22,8 +23,9 @@ my @help = (
             );
 
 
-my $header = "<html><head><meta charset=\"utf-8\"></meta></head><body>";
-my $footer = "</body></html>";
+my $headerStart = "<html><head><meta charset=\"utf-8\"></meta>\n";
+my $headerEnd = "</head><body>\n";
+my $footer = "</body></html>\n";
 
 binmode STDERR, ":utf8";
 binmode STDOUT, ":utf8";
@@ -38,7 +40,15 @@ foreach my $h (@help) {
     my $html = `$cmd`;
 #     print decode("UTF8",$html);
     open(OUT,">:encoding(UTF8)",$outfile);
-    print OUT $header;
+    print OUT $headerStart;
+     if (exists $h->{css}) {
+       my $css = $h->{css};
+       my @links = split "," , $css;
+       foreach my $link (@links) {
+         print OUT sprintf "  <link rel=\"stylesheet\" type=\"text/css\" href=\"%s\"/>\n",$link;
+       }
+     }
+     print OUT $headerEnd;
     print OUT decode("UTF-8",$html);
     print OUT $footer;
     close OUT;
