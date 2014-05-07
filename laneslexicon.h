@@ -146,6 +146,8 @@ public:
 private:
     Place showPlace(const Place &,bool newTab = false);
     QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
+    /// look through all tabs for the given node, -1 if not found, else tab index
+    int searchTabs(const QString & node);
     QString m_configFile;
     QString m_interface;    // "default","minimal"
     QPrinter m_printer;

@@ -847,9 +847,38 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
     return;
   }
  QString node = item->data(0,Qt::UserRole).toString();
+ qDebug() << "node" << node;
+ if ( node.isEmpty() )
+   return;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-  if (entry && ! node.isEmpty()) {
-    entry->focusNode(node);
+  if (entry) {
+    if (entry->hasNode(node)) {
+      entry->focusNode(node);
+    }
+    else {
+      /// node not in the current tab
+      int ix = this->searchTabs(node);
+      if (ix != -1) {
+        /// we found it in another tab, so switch to that one
+        m_tabs->setCurrentIndex(ix);
+        GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+        if (entry) {
+          if (entry->hasNode(node)) {
+            entry->focusNode(node);
+          }
+        }
+      }
+      else {
+        /// fetch to node and show it
+        Place p;
+        p.setNode(node);
+        /// TODO needs to check whether to open in new tab
+        p = showPlace(p,true);
+      }
+    }
+  }
+  else {
+    qDebug() << Q_FUNC_INFO << "No GraphicsEntry page available";
   }
 }
 
@@ -1908,4 +1937,15 @@ void LanesLexicon::currentTabChanged(int) {
     m_tree->ensurePlaceVisible(p,true);
   }
 
+}
+int LanesLexicon::searchTabs(const QString & node) {
+  for(int i=0;i < m_tabs->count();i++) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+    if (entry) {
+      if (entry->hasNode(node)) {
+        return i;
+      }
+    }
+  }
+  return -1;
 }
