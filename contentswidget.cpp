@@ -41,7 +41,7 @@ void ContentsWidget::loadContents() {
       out->setCodec("UTF-8");
     }
   }
-  QString sql = "select distinct letter from root order by letter";
+  QString sql = "select distinct letter from root where datasource = 1 order by letter";
   if ( ! query.prepare(sql)) {
     QLOG_FATAL() << "Error preparing SQL:" << sql;
     return;
@@ -49,7 +49,7 @@ void ContentsWidget::loadContents() {
   query.exec();
 
   QSqlQuery rootQuery;
-  sql = "select word,supplement from root where letter = ? order by word,supplement";
+  sql = "select word,supplement from root where letter = ? and datasource = 1 order by word,supplement";
   if (! rootQuery.prepare(sql)) {
     QLOG_FATAL() << "Error preparing SQL:" << sql;
     return;
@@ -97,7 +97,7 @@ void ContentsWidget::loadContents() {
     delete out;
   }
   m_entryQuery = new QSqlQuery;
-  bool ok = m_entryQuery->prepare("select word,itype,bword,nodeId from entry where root = ? order by nodenum asc");
+  bool ok = m_entryQuery->prepare("select word,itype,bword,nodeId from entry where datasource = 1 and root = ? order by nodenum asc");
   if ( ! ok ) {
     QLOG_WARN() << "Entry SQL prepare failed" << m_entryQuery->lastError();
   }

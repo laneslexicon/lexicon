@@ -34,7 +34,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
     m_backQuery = new QSqlQuery(m_db);
     m_lastQuery = new QSqlQuery(m_db);
     if (
-        m_addQuery->prepare(QString("insert into history (node,word,root,supplement,page,vol,timewhen) values (?,?,?,?,?,?,?)")) &&
+        m_addQuery->prepare(QString("insert into history (datasource,node,word,root,supplement,page,vol,timewhen) values (1,?,?,?,?,?,?,?)")) &&
         m_backQuery->prepare(QString("select %1 from history where id <= ? order by id desc").arg(fields)) &&
         m_forQuery->prepare(QString("select %1 from history where id > ? order by id asc").arg(fields)) &&
         m_lastQuery->prepare(QString("select %1 from history where id = (select max(id) from history)").arg(fields)) &&

@@ -1250,7 +1250,7 @@ void LanesLexicon::placeChanged(const Place & p) {
 }
 void LanesLexicon::getFirstAndLast() {
   QSqlQuery query;
-  bool ok = query.prepare("select root,page from entry order by nodenum limit 5;");
+  bool ok = query.prepare("select root,page from entry where datasource = 1 order by nodenum limit 5;");
   if (! ok ) {
     QLOG_DEBUG() << "first root SQL prepare failed";
   }
@@ -1259,7 +1259,7 @@ void LanesLexicon::getFirstAndLast() {
     m_firstRoot = query.value(0).toString();
     m_firstPage = query.value(1).toInt();
   }
-  ok = query.prepare("select root,page from entry order by nodenum desc limit 5;");
+  ok = query.prepare("select root,page from entry where datasource = 1 order by nodenum desc limit 5;");
   if (! ok ) {
     QLOG_DEBUG() << "last root SQL prepare failed";
   }

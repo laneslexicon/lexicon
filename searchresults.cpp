@@ -26,9 +26,9 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
 
   bool ok = false;
   /// TODO replace select *
-  QString sql = QString("select * from xref where word = ? order by root,entry asc");
+  QString sql = QString("select * from xref where datasource = 1 and word = ? order by root,entry asc");
   if (m_query.prepare(sql)) {
-    if (m_nodeQuery.prepare("select * from entry where nodeId = ?")) {
+    if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeId = ?")) {
       ok = true;
     }
   }

@@ -31,6 +31,7 @@ class Place    {
     m_vol = -1;
     m_id = -1;
     m_type = Place::User;
+    m_datasource = 1;
   }
   Place(const QString & root) {
     m_root = root;
@@ -38,6 +39,7 @@ class Place    {
     m_vol = -1;
     m_id = -1;
     m_type = Place::User;
+    m_datasource = 1;
   }
   Place(const QString & root,int supp) {
     m_root = root;
@@ -46,6 +48,7 @@ class Place    {
     m_vol = -1;
     m_id = -1;
     m_type = Place::User;
+    m_datasource = 1;
   }
   ~Place() {
   }
@@ -64,9 +67,12 @@ class Place    {
 
   void setType(int t) { m_type = t;}
   int getType() const { return m_type;}
+  int getSource() const { return m_datasource; }
+  void setSource(int x) { m_datasource = x;}
  inline friend QDebug operator<<(QDebug debug, const Place& p)
 {
 	debug.nospace() << "Place("
+                        << p.getSource() << ","
                         << p.getNode() << ","
                         << p.getSupplement() << ","
                         << p.getVol() << ","
@@ -130,6 +136,7 @@ class Place    {
   }
   QDateTime getWhen() const { return m_when;}
  private:
+  int m_datasource;
   QString m_root;
   QString m_node;
   QString m_word;
