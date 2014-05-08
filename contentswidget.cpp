@@ -425,7 +425,7 @@ void ContentsWidget::ensureVisible(const QString & root, int supplement,bool sel
   }
   QModelIndex index = indexFromItem(item);
   if (index.isValid()) {
-    scrollTo(index);
+    scrollTo(index,QAbstractItemView::PositionAtCenter);
   }
 }
 void ContentsWidget::focusInEvent(QFocusEvent * event) {
