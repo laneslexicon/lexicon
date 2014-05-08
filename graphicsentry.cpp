@@ -235,6 +235,19 @@ void GraphicsEntry::moveFocusUp() {
     }
   }
 }
+/**
+ * Returns either the Place of the focus item (i.e the node) or, if no item has focus,
+ * the Place of page (i.e the root)
+ *
+ * @return
+ */
+Place GraphicsEntry::getPlace() const {
+  EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
+  if (item)
+    return item->getPlace();
+
+ return m_place;
+}
 void GraphicsEntry::focusInEvent(QFocusEvent * event) {
   QLOG_DEBUG() << "Got input focus";
   m_view->setFocus();

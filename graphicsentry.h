@@ -53,7 +53,7 @@ class GraphicsEntry : public QWidget {
     Place getPage(const Place & );
     //    Place getXmlForPlace(const Place &);
 
-    Place getPlace() { return m_place;}
+    Place getPlace() const;
     //    int hasRoot(const QString & root,bool focus = true);
     int hasPlace(const Place & ,int searchtype,bool focus = true);
     QString currentRoot() { return m_currentRoot;}
