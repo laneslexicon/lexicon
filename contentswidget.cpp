@@ -382,10 +382,12 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   }
 }
 void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
-  qDebug() << Q_FUNC_INFO << p.getRoot() << p.getSupplement() << select;
-  ensureVisible(p.getRoot(),p.getSupplement(),select);
-}
-void ContentsWidget::ensureVisible(const QString & root, int supplement,bool select) {
+  qDebug() << Q_FUNC_INFO << p << select;
+  //  ensureVisible(p.getRoot(),p.getSupplement(),select);
+  QString root = p.getRoot();
+  int supplement = p.getSupplement();
+  //}
+  //void ContentsWidget::ensureVisible(const QString & root, int supplement,bool select) {
   QTreeWidgetItem * item;
   QTreeWidgetItem * topItem;
   int tc = topLevelItemCount();
