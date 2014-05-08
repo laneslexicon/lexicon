@@ -27,6 +27,7 @@ class ContentsWidget : public QTreeWidget {
   QString findPrevRoot(const QString &);
   Place findNextPlace(const Place &);
   Place findPrevPlace(const Place &);
+  QTreeWidgetItem * findPlace(const Place &) const;
   void ensurePlaceVisible(const Place & p, bool select = false);
   void addEntries(const QString & root,QTreeWidgetItem *);
   public slots:

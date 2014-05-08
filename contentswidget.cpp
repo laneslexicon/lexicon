@@ -383,58 +383,72 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
 }
 void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
   qDebug() << Q_FUNC_INFO << p << select;
-  //  ensureVisible(p.getRoot(),p.getSupplement(),select);
   QString root = p.getRoot();
   int supplement = p.getSupplement();
-  //}
-  //void ContentsWidget::ensureVisible(const QString & root, int supplement,bool select) {
   QTreeWidgetItem * item;
-  QTreeWidgetItem * topItem;
-  int tc = topLevelItemCount();
-  int topIndex = -1;
-  int childIndex = -1;
-  bool found = false;
   QString suppTest;
   if (supplement == 1) {
     suppTest = "*";
   }
-  for(int i = 0;(i < tc) && ! found;i++) {
-    topItem = topLevelItem(i);
-    int kidCount = topItem->childCount();
-    for(int j=0;(j < kidCount) && ! found ;j++) {
-      item = topItem->child(j);
-      if ((item->text(0) == root) && (item->text(1) == suppTest)) {
-        topIndex = i;
-        childIndex = j;
-        found = true;
-      }
-    }
+  Place rootPlace;
+  rootPlace.setRoot(p.getRoot());
+  item = this->findPlace(rootPlace);
+  /**
+   * this is called when restoring tabs so we need to load
+   * the head words for each root we are restoring
+   */
+  if (item) {
+    addEntries(p.getRoot(),item);
   }
-  if (!item) {
+  else {
+    QLOG_WARN() << "Ensure visible error: could not find item" << p.getRoot() << p.getWord();
     return;
   }
-  if ((topIndex == -1) || (childIndex == -1)) {
-    QLOG_WARN() << "Ensure visible error";
-    return;
-  }
-  if ( ! topItem->isExpanded() )
-    topItem->setExpanded(true);
-
-  if (select) {
-    qDebug() << Q_FUNC_INFO << "setCurrentItem";
-    setCurrentItem(item);
-    addEntries(root,item);
-  }
+  item->setExpanded(true);
   QModelIndex index = indexFromItem(item);
   if (index.isValid()) {
     scrollTo(index,QAbstractItemView::PositionAtCenter);
   }
+  if (select)
+    setCurrentItem(item);
+  item = this->findPlace(p);
+  if (item) {
+     index = indexFromItem(item);
+     if (index.isValid()) {
+       scrollTo(index,QAbstractItemView::PositionAtCenter);
+       setCurrentItem(item);
+     }
+  }
+}
+QTreeWidgetItem * ContentsWidget::findPlace(const Place & p) const {
+  QModelIndex ix;
+  QTreeWidgetItem * item;
+  QString target;
+  int column;
+  if (p.isRoot()) {
+    column = 0;
+    target = p.getRoot();
+  }
+  else {
+    column = 1;
+    target = p.getWord();
+  }
+  qDebug() << Q_FUNC_INFO << target;
+  QList<QTreeWidgetItem *> items = this->findItems(target,Qt::MatchRecursive,column);
+  /// TODO multiple items, for supplement ?
+  if (items.size() > 0) {
+    item = items[0];
+  }
+  else {
+    //    qDebug() << "Not found";
+  }
+  return item;
 }
 void ContentsWidget::focusInEvent(QFocusEvent * event) {
   /// clearing the style sheets has the effect that the systems default
   /// will be used
   this->setStyleSheet("");
-  QTreeWidgetItem * item = this->currentItem();
+  //  QTreeWidgetItem * item = this->currentItem();
   QTreeWidget::focusInEvent(event);
 
 }
@@ -442,6 +456,13 @@ void ContentsWidget::focusOutEvent(QFocusEvent * event) {
   this->setStyleSheet(QString("selection-background-color : %1").arg(m_backgroundColor));
   QTreeWidget::focusOutEvent(event);
 }
+/**
+ * This loads the head words for the given root
+ * For head words there are two columns, the itype and word
+ *
+ * @param root
+ * @param parent
+ */
 void ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   if (parent->childCount() > 0) {
     return;
