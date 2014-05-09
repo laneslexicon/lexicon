@@ -1,9 +1,21 @@
 #include "entryitem.h"
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
   m_focusOnHover = false;
+  m_note = NULL;
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
   m_focusOnHover = false;
+  m_note = NULL;
+}
+/**
+ * the note dialog does not have a QWidget parent so delete it manually
+ *
+ */
+EntryItem::~EntryItem() {
+  if (m_note != NULL) {
+    m_note->close();
+    delete m_note;
+  }
 }
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
@@ -29,6 +41,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     jumpAction = menu.addAction(t);
     jumpAction->setData(href);
   }
+  QAction *addNoteAction = menu.addAction(tr("Add &note"));
   QAction *markAction = menu.addAction(tr("Add &bookmark"));
   //  QAction *searchAction = menu.addAction("Find");
   //  connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
@@ -70,6 +83,9 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   }
   else if (selectedAction == selectAllAction) {
     emit(selectAllItems());
+  }
+  else if (selectedAction == addNoteAction) {
+    this->addNote();
   }
   else if ((jumpAction != NULL) && (selectedAction == jumpAction)) {
     qDebug() << "GOTO" << jumpAction->data();
@@ -213,4 +229,11 @@ void EntryItem::setPage(const int page) {
 }
 Place EntryItem::getPlace() {
   return m_place;
+}
+void EntryItem::addNote() {
+  if (m_note == NULL) {
+    m_note = new NoteDialog(m_place);
+  }
+  m_note->show();
+
 }

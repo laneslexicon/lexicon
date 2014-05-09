@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
       w->show();
       splash.finish(w);
       ret = a.exec();
-      delete w;
+      //      delete w;
     }
     else {
       delete w;

@@ -168,6 +168,7 @@ class GraphicsEntry : public QWidget {
  protected:
     void keyPressEvent(QKeyEvent *);
     void focusInEvent(QFocusEvent *);
+    void closeEvent(QCloseEvent *);
  signals:
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void rootChanged(const QString & root,const QString & node);
@@ -184,6 +185,7 @@ class GraphicsEntry : public QWidget {
     void searchPage();
     void findCount(int);
     void gotoNode(const Place & p,bool);
+    void saveNote(const Note &);
 };
 
 class LaneGraphicsView : public QGraphicsView {

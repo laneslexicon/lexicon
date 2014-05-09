@@ -56,6 +56,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 
   m_view->setInteractive(true);
   //  m_view->setAlignment(Qt::AlignLeft);
+  /// TODO what is this for ?
   m_item = new QGraphicsTextItem("");
   m_item->setTextInteractionFlags(Qt::TextBrowserInteraction);
   m_item->setTextWidth(m_textWidth);
@@ -84,7 +85,6 @@ GraphicsEntry::~GraphicsEntry() {
   qDebug() << Q_FUNC_INFO;
   delete m_nodeQuery;
   delete m_rootQuery;
-
   delete m_pageQuery;
   /// TODO xalan cleanup ?
 }
@@ -476,8 +476,8 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// write a history record because we are leaving this page
   ///
   if (getHistory()->isOn()) {
-    qDebug() << "History old place" << m_place;
-    qDebug() << "New place" << dp;
+    //    qDebug() << "History old place" << m_place;
+    //    qDebug() << "New place" << dp;
     if (dp.getType() == Place::User) {
       getHistory()->add(m_place);
       /// this allows mainwindow to update the history list
@@ -876,6 +876,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     /// pass through signal for mainwindow to handle
     connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
     connect(gi,SIGNAL(copy()),this,SLOT(copy()));
+    connect(gi,SIGNAL(saveNote(const Note &)),this,SIGNAL(saveNote(const Note &)));
     return gi;
 }
 /**
@@ -1303,4 +1304,12 @@ bool GraphicsEntry::hasNode(const QString & node) {
     }
   }
   return false;
+}
+void GraphicsEntry::closeEvent(QCloseEvent * event) {
+  qDebug() << Q_FUNC_INFO;
+  while(m_items.size() > 0) {
+    EntryItem * item = m_items.takeFirst();
+    delete item;
+  }
+  QWidget::closeEvent(event);
 }

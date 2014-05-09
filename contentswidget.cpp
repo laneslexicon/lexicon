@@ -386,7 +386,7 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   }
 }
 void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
-  qDebug() << Q_FUNC_INFO << p << select;
+  //  qDebug() << Q_FUNC_INFO << p << select;
   QString root = p.getRoot();
   int supplement = p.getSupplement();
   QTreeWidgetItem * item;
@@ -437,7 +437,7 @@ QTreeWidgetItem * ContentsWidget::findPlace(const Place & p) const {
     column = 1;
     target = p.getWord();
   }
-  qDebug() << Q_FUNC_INFO << target;
+  //  qDebug() << Q_FUNC_INFO << target;
   QList<QTreeWidgetItem *> items = this->findItems(target,Qt::MatchRecursive,column);
   /// TODO multiple items, for supplement ?
   if (items.size() > 0) {

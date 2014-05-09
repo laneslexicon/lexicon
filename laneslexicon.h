@@ -59,6 +59,7 @@
 #include "xsltsupport.h"
 #include "menubar.h"
 #include "helpviewer.h"
+#include "notedialog.h"
 struct cmdOptions {
   bool dump;
   QString node;
@@ -144,7 +145,11 @@ public:
     void pageSearch();
     void pageClear();
     void syncContents();
+    void saveNote(const Note &);
+ protected:
+    void closeEvent(QCloseEvent *);
 private:
+    void cleanup();
     Place showPlace(const Place &,bool newTab = false);
     QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
     /// look through all tabs for the given node, -1 if not found, else tab index

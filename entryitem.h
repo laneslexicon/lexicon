@@ -37,7 +37,7 @@
 #include "xsltsupport.h"
 #include "history.h"
 #include "place.h"
-
+#include "notedialog.h"
 
 class EntryItem : public QGraphicsTextItem {
   Q_OBJECT
@@ -45,6 +45,7 @@ class EntryItem : public QGraphicsTextItem {
  public:
   EntryItem(const QString &, QGraphicsItem * parent = 0);
   EntryItem(QGraphicsItem * parent = 0);
+  ~EntryItem();
   void setNode(const QString & id);
   void setRoot(const QString & root,bool isRootEntry = false);
   void setWord(const QString & word);
@@ -80,14 +81,17 @@ class EntryItem : public QGraphicsTextItem {
     void clearAllItems();
     void copy();
     void gotoNode(const Place & p, bool createTab = true);
+    void saveNote(const Note &);
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
   void focusInEvent(QFocusEvent *);
   void paint( QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+  void addNote();
   QColor m_backgroundColor;
   bool m_focusOnHover;
   private:
+  NoteDialog * m_note;
   QList<int> m_searchPositions;
   Place m_place;
   QString m_searchText;

@@ -4,6 +4,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
 {
+  setAttribute(Qt::WA_DeleteOnClose);
   m_ok = false;
   m_history = 0;
   m_revertEnabled = false;
@@ -27,11 +28,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_tabs = new QTabWidget(this);
   m_tabs->setTabsClosable(true);
 
-  if ( m_useNotes) {
-    m_notes = new NotesWidget(this);
-    m_notes->hide();
-  }
-
   /// at the end of the history, but we should be able to restore from settings
   /// TODO would we want restore our current position in history?
   m_history = new HistoryMaster(m_historyDbName);
@@ -52,7 +48,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     setCentralWidget(m_tabs);
   }
   else {
-    QSplitter * splitter = new QSplitter;
+    QSplitter * splitter = new QSplitter(this);
     splitter->addWidget(m_tree);
     splitter->addWidget(m_tabs);
     splitter->setStretchFactor(0,0);
@@ -145,18 +141,31 @@ LanesLexicon::~LanesLexicon()
 {
   /// TODO make this check something has changed or give
   /// option to save settings ?
+  //  cleanup();
+}
+void LanesLexicon::closeEvent(QCloseEvent * event) {
+  cleanup();
+  QMainWindow::closeEvent(event);
+}
+void LanesLexicon::cleanup() {
   if (m_ok) {
     writeSettings();
   }
   if (m_history) {
     delete m_history;
   }
+  while(m_tabs->count() > 0) {
+    this->onCloseTab(0);
+  }
+
   if (m_db.isOpen()) {
     m_db.close();
   }
+  delete m_tree;
   /// TODO close notes db
   freeXslt();
   im_free(m_mapper);
+  qDebug() << Q_FUNC_INFO << "exit";
 }
 void LanesLexicon::setupInterface() {
   if (m_interface == "minimal") {
@@ -200,11 +209,13 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(searchPage()),this,SLOT(pageSearch()));
 
   connect(entry,SIGNAL(gotoNode(const Place &,bool)),this,SLOT(gotoPlace(const Place &,bool)));
+  connect(entry,SIGNAL(saveNote(const Note &)),this,SLOT(saveNote(const Note &)));
 }
 void LanesLexicon::onCloseTab(int ix) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
   if (entry) {
     m_tabs->removeTab(ix);
+    entry->close();
     delete entry;
     return;
   }
@@ -1962,4 +1973,8 @@ void LanesLexicon::syncContents() {
   Place p = entry->getPlace();
   if (p.isValid())
     m_tree->ensurePlaceVisible(p);
+}
+void LanesLexicon::saveNote(const Note & note) {
+  qDebug() << Q_FUNC_INFO;
+  qDebug() << "!!!!!!!!!!!!!!!!";
 }
