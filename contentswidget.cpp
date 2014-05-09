@@ -117,6 +117,7 @@ Place ContentsWidget::findNextPlace(const Place & p) {
   if (supp == 1) {
     suppTest = "*";
   }
+  /// TODO replace by code using findItems
   qDebug() << Q_FUNC_INFO << root << supp;
   for(int i = 0;(i < tc) && ! found;i++) {
     QTreeWidgetItem * topItem = topLevelItem(i);
@@ -181,6 +182,7 @@ QString ContentsWidget::findNextRoot(const QString & root) {
   int topIndex = -1;
   int childIndex = -1;
   bool found = false;
+  /// TODO replace by code using findItems
 
   for(int i = 0;(i < tc) && ! found;i++) {
     QTreeWidgetItem * topItem = topLevelItem(i);
@@ -232,6 +234,7 @@ QString ContentsWidget::findPrevRoot(const QString & root) {
   int topIndex = -1;
   int childIndex = -1;
   bool found = false;
+  /// TODO replace by code using findItems
 
   for(int i = 0;(i < tc) && ! found;i++) {
     QTreeWidgetItem * topItem = topLevelItem(i);
@@ -294,6 +297,7 @@ Place ContentsWidget::findPrevPlace(const Place & p) {
   if (supp == 1) {
     suppTest = "*";
   }
+  /// TODO replace by code using findItems
 
   for(int i = 0;(i < tc) && ! found;i++) {
     QTreeWidgetItem * topItem = topLevelItem(i);

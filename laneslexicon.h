@@ -143,6 +143,7 @@ public:
     void pagePrint();
     void pageSearch();
     void pageClear();
+    void syncContents();
 private:
     Place showPlace(const Place &,bool newTab = false);
     QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);

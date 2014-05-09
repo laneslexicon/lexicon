@@ -112,7 +112,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
       Place p;
       p.setRoot(m_firstRoot);
       showPlace(p,false);
-      m_tree->ensureVisible(m_firstRoot);
+      m_tree->ensurePlaceVisible(p);
     }
   }
   if (m_restoreBookmarks) {
@@ -231,13 +231,13 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == QString("search entry")) {
     searchForEntry();
   }
-  else if (key == QString("Page search").toCaseFolded()) {
+  else if (key == QString("page search")) {
     searchForPage();
   }
-  else if (key == QString("Contents collapse all").toCaseFolded()) {
+  else if (key == QString("contents collapse all")) {
     m_tree->collapseAll();
   }
-  else if (key == QString("Contents collapse letter").toCaseFolded()) {
+  else if (key == QString("contents collapse letter")) {
     QTreeWidgetItem * item = m_tree->currentItem();
     if (item) {
       /// if item is a root, get the parent (letter)
@@ -258,10 +258,10 @@ void LanesLexicon::shortcut(const QString & k) {
       qDebug() << Q_FUNC_INFO << "No current item";
     }
   }
-  else if (key == QString("Quit").toCaseFolded()) {
+  else if (key == QString("quit")) {
     on_actionExit();
   }
-  else if (key == QString("Toggle Interface").toCaseFolded()) {
+  else if (key == QString("toggle interface")) {
     if (m_interface == "minimal") {
       m_interface = "default";
     }
@@ -354,6 +354,9 @@ void LanesLexicon::shortcut(const QString & k) {
       m_historyPos--;
       setupHistory(m_historyPos);
     }
+  }
+  else if (key == "sync contents") {
+    syncContents();
   }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
@@ -1261,10 +1264,12 @@ void LanesLexicon::on_actionLastRoot() {
   Place p;
   p.setRoot(m_lastRoot);
   showPlace(p,false);
-  m_tree->ensureVisible(m_lastRoot);
+  m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::rootChanged(const QString & root,const QString & node) {
-  m_tree->ensureVisible(root,true);
+  Place p;
+  p.setRoot(root);
+  m_tree->ensurePlaceVisible(p,true);
 }
 void LanesLexicon::placeChanged(const Place & p) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());
@@ -1948,4 +1953,13 @@ int LanesLexicon::searchTabs(const QString & node) {
     }
   }
   return -1;
+}
+void LanesLexicon::syncContents() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if ( ! entry )
+    return;
+
+  Place p = entry->getPlace();
+  if (p.isValid())
+    m_tree->ensurePlaceVisible(p);
 }
