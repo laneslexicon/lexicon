@@ -1309,6 +1309,10 @@ void GraphicsEntry::closeEvent(QCloseEvent * event) {
   qDebug() << Q_FUNC_INFO;
   while(m_items.size() > 0) {
     EntryItem * item = m_items.takeFirst();
+    if (item->isNoteModified()) {
+      Note n = item->getNote();
+      emit(saveNote(n));
+    }
     delete item;
   }
   QWidget::closeEvent(event);

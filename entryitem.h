@@ -67,6 +67,8 @@ class EntryItem : public QGraphicsTextItem {
   QTextCursor highlightRx(const QString &);
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
+  bool isNoteModified() const;
+  Note  getNote();
   int findCount() const { return m_searchPositions.size(); }
   void clearHighlights();
   public slots:
@@ -90,7 +92,7 @@ class EntryItem : public QGraphicsTextItem {
   void addNote();
   QColor m_backgroundColor;
   bool m_focusOnHover;
-  private:
+ private:
   NoteDialog * m_note;
   QList<int> m_searchPositions;
   Place m_place;

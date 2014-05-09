@@ -18,7 +18,7 @@
 #include <QDialogButtonBox>
 #include <QMessageBox>
 #include "place.h"
-class Note : public QObject {
+class Note  {
  public:
   void setSubject(const QString & text) { m_subject = text;};
   void setPlace(const Place & p) { m_place = p;}
@@ -39,6 +39,7 @@ class NoteDialog : public QDialog {
   void setSubject(const QString &);
   void setModified(bool);
   bool isModified() const;
+  Note getNote() { return m_data;}
  protected:
   void closeEvent(QCloseEvent *);
  private:
