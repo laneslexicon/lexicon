@@ -185,7 +185,6 @@ class GraphicsEntry : public QWidget {
     void searchPage();
     void findCount(int);
     void gotoNode(const Place & p,bool);
-    void saveNote(const Note &);
 };
 
 class LaneGraphicsView : public QGraphicsView {

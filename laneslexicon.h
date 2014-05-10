@@ -59,7 +59,7 @@
 #include "xsltsupport.h"
 #include "menubar.h"
 #include "helpviewer.h"
-#include "notedialog.h"
+
 struct cmdOptions {
   bool dump;
   QString node;
@@ -145,7 +145,7 @@ public:
     void pageSearch();
     void pageClear();
     void syncContents();
-    void saveNote(const Note &);
+    void saveNote(Note *);
  protected:
     void closeEvent(QCloseEvent *);
 private:
@@ -238,6 +238,7 @@ private:
     //    GraphicsEntry * m_entry;
     NotesWidget * m_notes;
     QSqlDatabase m_db;
+    QSqlDatabase m_notesDb;
     QTabWidget * m_tabs;
     QMenu * m_fileMenu;
     // actions
@@ -284,6 +285,4 @@ private:
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };
-
-
-#endif // MAINWINDOW_H
+#endif

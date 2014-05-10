@@ -1,6 +1,5 @@
 #ifndef __NOTEDIALOG_H__
 #define __NOTEDIALOG_H__
-#define MAINWINDOW_H
 #include <QGridLayout>
 #include <QFormLayout>
 #include <QMenu>
@@ -17,9 +16,15 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QMessageBox>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include "QsLog.h"
 #include "place.h"
+
 class Note  {
  public:
+  Note();
   void setSubject(const QString & text) { m_subject = text;};
   void setPlace(const Place & p) { m_place = p;}
   void setNote(const QString & n) { m_note = n;}
@@ -27,6 +32,7 @@ class Note  {
   QString m_subject;
   Place m_place;
   QString m_created;
+  void save(QSqlDatabase *);
  private:
   int m_id;
 };
@@ -47,6 +53,7 @@ class NoteDialog : public QDialog {
   bool m_changed;
   bool m_autosave;
   int m_id;
+  Place m_place;
   QLineEdit * m_subject;
   QTextEdit * m_note;
   QLineEdit * m_tags;
@@ -54,6 +61,6 @@ class NoteDialog : public QDialog {
   QPushButton * m_moreButton;
   QDialogButtonBox * m_buttonBox;
  signals:
-  void saveNote(const Note &);
+  void saveNote(Note *);
 };
 #endif

@@ -67,8 +67,6 @@ class EntryItem : public QGraphicsTextItem {
   QTextCursor highlightRx(const QString &);
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
-  bool isNoteModified() const;
-  Note  getNote();
   int findCount() const { return m_searchPositions.size(); }
   void clearHighlights();
   public slots:
@@ -83,7 +81,6 @@ class EntryItem : public QGraphicsTextItem {
     void clearAllItems();
     void copy();
     void gotoNode(const Place & p, bool createTab = true);
-    void saveNote(const Note &);
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);

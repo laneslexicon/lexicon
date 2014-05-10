@@ -161,6 +161,9 @@ void LanesLexicon::cleanup() {
   if (m_db.isOpen()) {
     m_db.close();
   }
+  if (m_notesDb.isOpen())
+    m_notesDb.close();
+
   delete m_tree;
   /// TODO close notes db
   freeXslt();
@@ -209,7 +212,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(searchPage()),this,SLOT(pageSearch()));
 
   connect(entry,SIGNAL(gotoNode(const Place &,bool)),this,SLOT(gotoPlace(const Place &,bool)));
-  connect(entry,SIGNAL(saveNote(const Note &)),this,SLOT(saveNote(const Note &)));
+  connect(entry,SIGNAL(saveNote(Note *)),this,SLOT(saveNote(Note *)));
 }
 void LanesLexicon::onCloseTab(int ix) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
@@ -1974,7 +1977,28 @@ void LanesLexicon::syncContents() {
   if (p.isValid())
     m_tree->ensurePlaceVisible(p);
 }
-void LanesLexicon::saveNote(const Note & note) {
+void LanesLexicon::saveNote(Note * note) {
   qDebug() << Q_FUNC_INFO;
-  qDebug() << "!!!!!!!!!!!!!!!!";
+  if ( ! m_notesDb.isOpen()) {
+    QFile dbfile(m_notesDbName);
+    if (! dbfile.exists()) {
+      /// TODO maybe create database
+      m_useNotes = false;
+      QLOG_WARN() << "Cannot find notes database" << m_notesDbName;
+      delete note;
+      return;
+    }
+    m_notesDb = QSqlDatabase::addDatabase("QSQLITE","notesdb");
+    m_notesDb.setDatabaseName(m_notesDbName);
+    if (! m_notesDb.open()) {
+      QMessageBox::critical(0,QObject::tr("Database Error"),
+                            m_db.lastError().text());
+      m_useNotes = false;
+      delete note;
+      return;
+    }
+  }
+  note->save(&m_notesDb);
+  delete note;
+  return;
 }

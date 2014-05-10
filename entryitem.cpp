@@ -237,15 +237,3 @@ void EntryItem::addNote() {
   m_note->show();
 
 }
-bool EntryItem::isNoteModified() const {
-  if (m_note != NULL)
-    return m_note->isModified();
-
-  return false;
-}
-Note EntryItem::getNote() {
-  if (m_note != NULL)
-    return m_note->getNote();
-  Note n;
-  return n;
-}
