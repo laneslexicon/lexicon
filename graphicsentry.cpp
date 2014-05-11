@@ -1,4 +1,6 @@
 #include "graphicsentry.h"
+#include "laneslexicon.h"
+extern LanesLexicon * getApp();
 /**
  *
  *
@@ -550,6 +552,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         p.setRoot(root);
         p.setWord(m_rootQuery->value(2).toString());
         p.setPage(m_rootQuery->value(5).toInt());
+        QList<Note *> notes = getApp()->notes()->find(m_rootQuery->value(2).toString());
         item->setPlace(p);
         items << item;
         /// if we asked for a specific word/node, focus on it
