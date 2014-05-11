@@ -29,6 +29,8 @@
 #include <QAction>
 #include <QProgressDialog>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QToolButton>
+#include <QGraphicsWidget>
 #include <QKeyEvent>
 #include <QFocusEvent>
 #include <QSettings>

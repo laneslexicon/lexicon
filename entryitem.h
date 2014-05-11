@@ -38,6 +38,7 @@
 #include "history.h"
 #include "place.h"
 #include "notedialog.h"
+#include "notes.h"
 
 class EntryItem : public QGraphicsTextItem {
   Q_OBJECT
@@ -54,6 +55,8 @@ class EntryItem : public QGraphicsTextItem {
   void setPlace(const Place &);
   void setBackground(QColor & c) { m_backgroundColor = c;}
   void selectAll();
+  void setNotes(QList<Note *> notes);
+  bool hasNotes() const;
   Place getPlace();
   QString getNode() { return m_place.getNode();}
   QString getRoot() { return m_place.getRoot();}
@@ -93,6 +96,7 @@ class EntryItem : public QGraphicsTextItem {
   bool m_focusOnHover;
  private:
   NoteDialog * m_note;
+  QList<Note *> m_notes;
   QList<int> m_searchPositions;
   Place m_place;
   QString m_searchText;

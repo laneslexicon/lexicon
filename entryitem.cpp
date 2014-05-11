@@ -18,6 +18,19 @@ EntryItem::~EntryItem() {
     m_note->close();
     delete m_note;
   }
+  while(m_notes.size() > 0) {
+    Note * n = m_notes.takeFirst();
+    delete n;
+  }
+}
+void EntryItem::setNotes(QList<Note *> notes) {
+  m_notes = notes;
+}
+bool EntryItem::hasNotes() const {
+  if (m_notes.size() > 0)
+    return true;
+
+  return false;
 }
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);

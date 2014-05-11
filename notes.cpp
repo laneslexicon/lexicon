@@ -94,6 +94,13 @@ bool NoteMaster::openDb() {
   qDebug() << "=====================================";
   return true;
 }
+/**
+ * It is the responsibility of the calling routine
+ * to delete the notes
+ * @param word
+ *
+ * @return a list of notes for the given word
+ */
 QList<Note *> NoteMaster::find(const QString & word) {
   findQuery.bindValue(0,word);
   findQuery.exec();
@@ -108,7 +115,8 @@ QList<Note *> NoteMaster::find(const QString & word) {
     n->setWhen(findQuery.value(5).toString());
     notes << n;
   }
-  qDebug() << Q_FUNC_INFO << word << "find count" << notes.size();
+  if (notes.size() > 0)
+    qDebug() << Q_FUNC_INFO << word << "find count" << notes.size();
   return notes;
 }
 void NoteMaster::readSettings() {

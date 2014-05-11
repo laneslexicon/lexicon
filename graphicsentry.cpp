@@ -552,7 +552,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         p.setRoot(root);
         p.setWord(m_rootQuery->value(2).toString());
         p.setPage(m_rootQuery->value(5).toInt());
-        QList<Note *> notes = getApp()->notes()->find(m_rootQuery->value(2).toString());
+        item->setNotes(getApp()->notes()->find(m_rootQuery->value(2).toString()));
         item->setPlace(p);
         items << item;
         /// if we asked for a specific word/node, focus on it
@@ -742,6 +742,7 @@ Place GraphicsEntry::getPage(const Place & p) {
       item->setRoot(root);
       item->setWord(m_pageQuery->value(2).toString());
       item->setPage(m_pageQuery->value(5).toInt());
+      item->setNotes(getApp()->notes()->find(m_rootQuery->value(2).toString()));
       items << item;
 
       entryCount++;
@@ -914,10 +915,21 @@ void GraphicsEntry::appendEntries(int startPos) {
       }
     }
     sz = m_items[i]->document()->size();
-    //    QGraphicsRectItem * ri = m_scene->addRect(r);
-    //    ri->setPos(xpos,ypos);
-    //    ri->setPen(QPen(Qt::NoPen));
-    //    ri->setBrush(Qt::cyan);
+
+    if (m_items[i]->hasNotes()) {
+      qreal btnx;
+      qreal btny;
+      btnx = xpos + m_items[i]->boundingRect().width();
+      btny = ypos + sz.height();
+
+      QToolButton * notesBtn = new QToolButton;
+      notesBtn->setIcon(QIcon("notes-0.xpm"));
+      notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
+      QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
+      pushButton->setPos(btnx,btny);
+      qDebug() << "added note" << m_items[i]->getNode();
+      //      connect(notesBtn,SIGNAL(clicked()),this,SLOT(buttonPressed()));
+    }
     ypos += sz.height() + m_entryMargin;
   }
 }
