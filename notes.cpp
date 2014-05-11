@@ -4,34 +4,15 @@ extern LanesLexicon * getApp();
 Note::Note() {
   m_id = -1;
 }
-void Note::save(QSqlDatabase * db) {
-  qDebug() << Q_FUNC_INFO;
-  if (m_id == -1) {
-    QSqlQuery addQuery(*db);
-
-    if (! addQuery.prepare("insert into notes (datasource,word,place,subject,note,created) \
-           values (:datasource,:word,:place,:subject,:note,:created)")) {
-      QLOG_WARN() << "SQL prepare error" << addQuery.lastError().text();
-      return;
-    }
-    qDebug() << "note:" << m_note;
-    addQuery.bindValue(":datasource",m_place.getSource());
-    addQuery.bindValue(":word",m_place.getWord());
-    addQuery.bindValue(":place",m_place.toString());
-    addQuery.bindValue(":subject",m_subject);
-    addQuery.bindValue(":note",m_note);
-    addQuery.bindValue(":created",QDateTime::currentDateTime().toString());
-    if (! addQuery.exec()) {
-      QLOG_WARN() << "SQL exec error" << addQuery.lastError().text();
-      return;
-    }
-
-    //      addQuery.bindValue(
-  }
-}
 NoteMaster::NoteMaster() {
   readSettings();
   openDb();
+}
+void NoteMaster::remove(Note * n) {
+  deleteQuery.bindValue(0,n->getId());
+  if (! deleteQuery.exec()) {
+    QLOG_WARN() << "SQL delete note error" << deleteQuery.lastError().text();
+  }
 }
 void NoteMaster::save(Note * n) {
   if (n->getId() == -1) {     // add note

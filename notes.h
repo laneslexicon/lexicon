@@ -18,7 +18,6 @@ class Note  {
   void setWord(const QString & n) { m_word = n;}
   void setId(int id) { m_id = id;}
   void setWhen(const QString & t) { m_created = t;}
-  void save(QSqlDatabase *);
 
   QString getSubject() { return m_subject; }
   QString getNote() { return m_note; }
@@ -38,6 +37,7 @@ class NoteMaster {
   NoteMaster();
   bool openDb();
   void save(Note *);
+  void remove(Note *);
   QList<Note *> find(const QString & word);
  private:
   QSqlDatabase m_db;

@@ -1,6 +1,8 @@
 #include "graphicsentry.h"
 #include "laneslexicon.h"
+
 extern LanesLexicon * getApp();
+extern NoteMaster * getNotes();
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
 }
@@ -1372,9 +1374,13 @@ void GraphicsEntry::deleteNotes() {
   EntryItem * item = qobject_cast<EntryItem *>(QObject::sender());
   if ( ! item )
     return;
+
+  NoteMaster * m = getNotes();
   QList<Note *> notes = item->getNotes(true);
   qDebug() << "Delete" << notes.size() << "notes";
-  if (notes.size() > 0) {
-    qDebug() << notes[0]->getNote();
+  while(notes.size() > 0) {
+    Note * n = notes.takeFirst();
+    m->remove(n);
+    delete n;
   }
 }
