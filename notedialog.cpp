@@ -63,27 +63,53 @@ bool NoteMaster::openDb() {
   else {
     qDebug() << "tables" << m_db.tables();
   }
-  qDebug() << "Opened notes db";
+
   addQuery = QSqlQuery(m_db);
   if (! addQuery.prepare("insert into notes (datasource,word,place,subject,note,created) \
            values (:datasource,:word,:place,:subject,:note,:created)")) {
-      QLOG_WARN() << "SQL add prepare error" << addQuery.lastError().text();
-      m_enabled = false;
-      return false;
-    }
+    QLOG_WARN() << "SQL add prepare error" << addQuery.lastError().text();
+    m_enabled = false;
+    return false;
+  }
   updateQuery = QSqlQuery(m_db);
   if (! updateQuery.prepare("update notes set subject = ?, note = ? where id = ?")) {
-      QLOG_WARN() << "SQL update prepare error" << updateQuery.lastError().text();
-      m_enabled = false;
-      return false;
-    }
+    QLOG_WARN() << "SQL update prepare error" << updateQuery.lastError().text();
+    m_enabled = false;
+    return false;
+  }
   deleteQuery = QSqlQuery(m_db);
   if (! deleteQuery.prepare("delete from  notes  where id = ?")) {
-      QLOG_WARN() << "SQL delete error" << deleteQuery.lastError().text();
-      m_enabled = false;
-      return false;
-    }
+    QLOG_WARN() << "SQL delete error" << deleteQuery.lastError().text();
+    m_enabled = false;
+    return false;
+  }
+  findQuery = QSqlQuery(m_db);
+  if (! findQuery.prepare("select id,word,place,subject,note,created from notes where word = ?")) {
+    QLOG_WARN() << "SQL find error" << findQuery.lastError().text();
+    m_enabled = false;
+    return false;
+  }
+  qDebug() << "=====================================";
+  qDebug() << "Notes system successfully initialised";
+  qDebug() << "=====================================";
   return true;
+}
+QList<Note *> NoteMaster::find(const QString & word) {
+  findQuery.bindValue(0,word);
+  findQuery.exec();
+  QList<Note *> notes;
+  while(findQuery.next()) {
+    Note * n = new Note();
+    n->setId(findQuery.value(0).toInt());
+    n->setWord(findQuery.value(1).toString());
+    n->setPlace(Place::fromString(findQuery.value(2).toString()));
+    n->setSubject(findQuery.value(3).toString());
+    n->setNote(findQuery.value(4).toString());
+    n->setWhen(findQuery.value(5).toString());
+    notes << n;
+  }
+  qDebug() << Q_FUNC_INFO << word << "find count" << notes.size();
+  return notes;
 }
 void NoteMaster::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
