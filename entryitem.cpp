@@ -101,6 +101,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   }
   else if (selectedAction == addNoteAction) {
     this->addNote();
+    emit(addButton());
   }
   else if ((jumpAction != NULL) && (selectedAction == jumpAction)) {
     qDebug() << "GOTO" << jumpAction->data();

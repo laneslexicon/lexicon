@@ -884,6 +884,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     /// pass through signal for mainwindow to handle
     connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
     connect(gi,SIGNAL(copy()),this,SLOT(copy()));
+    connect(gi,SIGNAL(addButton()),this,SLOT(addButtonDecoration()));
     //    connect(gi,SIGNAL(saveNote(Note *)),this,SIGNAL(saveNote(Note *)));
     return gi;
 }
@@ -1337,5 +1338,29 @@ void GraphicsEntry::notesButtonPressed() {
     qDebug() << "index" << btn->getIndex();
     EntryItem * item = m_items[btn->getIndex()];
     item->showNote();
+
   }
+}
+void GraphicsEntry::addButtonDecoration() {
+  EntryItem * item = qobject_cast<EntryItem *>(QObject::sender());
+  if ( ! item )
+    return;
+
+  for(int i=0;i < m_items.size();i++) {
+    if (m_items[i] == item) {
+      qreal btnx;
+      qreal btny;
+      QPointF pos = item->pos();
+      btnx = pos.x() + item->boundingRect().width();
+      btny = pos.y();// + sz.height();
+
+      ToolButtonData  * notesBtn = new ToolButtonData(i);
+      notesBtn->setIcon(QIcon("notes-0.xpm"));
+      notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
+      QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
+      pushButton->setPos(btnx,btny);
+      connect(notesBtn,SIGNAL(clicked()),this,SLOT(notesButtonPressed()));
+    }
+  }
+
 }

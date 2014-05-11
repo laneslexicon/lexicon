@@ -95,6 +95,7 @@ class EntryItem : public QGraphicsTextItem {
     void clearAllItems();
     void copy();
     void gotoNode(const Place & p, bool createTab = true);
+    void addButton();
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
