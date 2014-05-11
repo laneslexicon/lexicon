@@ -9,7 +9,7 @@
 #include "QsLogDest.h"
 #include "application.h"
 #include <iostream>
-cmdOptions progOptions;
+
 LanesLexicon * getApp() {
   foreach(QWidget *widget, qApp->topLevelWidgets()) {
     if(widget->inherits("QMainWindow"))
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     // source is args.at(0), destination is args.at(1)
 
 
-    progOptions.node = parser.value(nodeOption);
+    //    progOptions.node = parser.value(nodeOption);
     QFontDatabase::addApplicationFont("fonts/amiri/amiri-regular.ttf");
 
 

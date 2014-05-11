@@ -1,5 +1,6 @@
 #include "laneslexicon.h"
-extern cmdOptions progOptions;
+//extern cmdOptions progOptions;
+extern QSettings * getSettings();
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 

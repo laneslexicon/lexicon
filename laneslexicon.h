@@ -58,13 +58,14 @@
 #include "xsltsupport.h"
 #include "menubar.h"
 #include "helpviewer.h"
-
+#include "notes.h"
+/*
 struct cmdOptions {
   bool dump;
   QString node;
   QString config;
 };
-extern QSettings * getSettings();
+*/
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
