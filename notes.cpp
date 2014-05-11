@@ -34,7 +34,26 @@ NoteMaster::NoteMaster() {
   openDb();
 }
 void NoteMaster::save(Note * n) {
-
+  if (n->getId() == -1) {     // add note
+    Place p = n->getPlace();
+    addQuery.bindValue(":datasource",p.getSource());
+    addQuery.bindValue(":word",n->getWord());
+    addQuery.bindValue(":place",p.toString());
+    addQuery.bindValue(":subject",n->getSubject());
+    addQuery.bindValue(":note",n->getNote());
+    addQuery.bindValue(":created",QDateTime::currentDateTime().toString());
+    if (! addQuery.exec()) {
+      QLOG_WARN() << "SQL add note error" << addQuery.lastError().text();
+    }
+    return;
+  }
+  updateQuery.bindValue(0,n->getSubject());
+  updateQuery.bindValue(1,n->getNote());
+  updateQuery.bindValue(2,n->getId());
+  if (! updateQuery.exec()) {
+    QLOG_WARN() << "SQL update note error" << updateQuery.lastError().text();
+  }
+  return;
 }
 bool NoteMaster::openDb() {
   qDebug() << Q_FUNC_INFO;

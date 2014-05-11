@@ -1973,27 +1973,5 @@ void LanesLexicon::syncContents() {
     m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::saveNote(Note * note) {
-  qDebug() << Q_FUNC_INFO;
-  if ( ! m_notesDb.isOpen()) {
-    QFile dbfile(m_notesDbName);
-    if (! dbfile.exists()) {
-      /// TODO maybe create database
-      m_useNotes = false;
-      QLOG_WARN() << "Cannot find notes database" << m_notesDbName;
-      delete note;
-      return;
-    }
-    m_notesDb = QSqlDatabase::addDatabase("QSQLITE","notesdb");
-    m_notesDb.setDatabaseName(m_notesDbName);
-    if (! m_notesDb.open()) {
-      QMessageBox::critical(0,QObject::tr("Database Error"),
-                            m_db.lastError().text());
-      m_useNotes = false;
-      delete note;
-      return;
-    }
-  }
-  note->save(&m_notesDb);
-  delete note;
-  return;
+  m_notes->save(note);
 }

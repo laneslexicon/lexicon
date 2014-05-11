@@ -57,6 +57,7 @@ void NoteDialog::closeEvent(QCloseEvent * event) {
         n->setSubject(m_subject->text());
         n->setNote(m_note->toPlainText());
         n->setPlace(m_place);
+        n->setWord(m_place.getWord());
         emit(saveNote(n));
     }
     else {
@@ -72,6 +73,7 @@ void NoteDialog::closeEvent(QCloseEvent * event) {
         n->setSubject(m_subject->text());
         n->setNote(m_note->toPlainText());
         n->setPlace(m_place);
+        n->setWord(m_place.getWord());
         emit(saveNote(n));
       }
     }

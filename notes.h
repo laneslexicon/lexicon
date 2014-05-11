@@ -22,7 +22,9 @@ class Note  {
 
   QString getSubject() { return m_subject; }
   QString getNote() { return m_note; }
+  QString getWord() { return m_word;}
   Place getPlace() { return m_place; }
+  int getId() { return m_id;}
  private:
   QString m_note;
   QString m_subject;
