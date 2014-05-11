@@ -4,7 +4,9 @@ extern LanesLexicon * getApp();
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
 }
-
+ToolButtonData::~ToolButtonData() {
+  qDebug() << Q_FUNC_INFO;
+}
 /**
  *
  *
@@ -885,7 +887,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
     connect(gi,SIGNAL(copy()),this,SLOT(copy()));
     connect(gi,SIGNAL(addButton()),this,SLOT(addButtonDecoration()));
-    //    connect(gi,SIGNAL(saveNote(Note *)),this,SIGNAL(saveNote(Note *)));
+    connect(gi,SIGNAL(deleteNotes()),this,SLOT(deleteNotes()));
     return gi;
 }
 /**
@@ -932,6 +934,7 @@ void GraphicsEntry::appendEntries(int startPos) {
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
+      m_items[i]->setProxy(pushButton);
       connect(notesBtn,SIGNAL(clicked()),this,SLOT(notesButtonPressed()));
     }
     ypos += sz.height() + m_entryMargin;
@@ -1363,4 +1366,15 @@ void GraphicsEntry::addButtonDecoration() {
     }
   }
 
+}
+void GraphicsEntry::deleteNotes() {
+  qDebug() << Q_FUNC_INFO;
+  EntryItem * item = qobject_cast<EntryItem *>(QObject::sender());
+  if ( ! item )
+    return;
+  QList<Note *> notes = item->getNotes(true);
+  qDebug() << "Delete" << notes.size() << "notes";
+  if (notes.size() > 0) {
+    qDebug() << notes[0]->getNote();
+  }
 }

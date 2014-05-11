@@ -4,10 +4,12 @@ extern LanesLexicon * getApp();
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
   m_focusOnHover = false;
   m_note = NULL;
+  m_noteWidget = NULL;
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
   m_focusOnHover = false;
   m_note = NULL;
+  m_noteWidget = NULL;
 }
 /**
  * the note dialog does not have a QWidget parent so delete it manually
@@ -22,6 +24,10 @@ EntryItem::~EntryItem() {
     Note * n = m_notes.takeFirst();
     delete n;
   }
+  /// TODO Check proxywidget are delete automatically
+}
+void EntryItem::setProxy(QGraphicsWidget * widget ) {
+  m_noteWidget = widget;
 }
 void EntryItem::setNotes(QList<Note *> notes) {
   m_notes = notes;
@@ -37,12 +43,15 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   QString href;
   QString anchor;
   QAction *jumpAction;
+  QAction *addNoteAction;
+  QAction *deleteNoteAction;
+  QAction *showNoteAction;
   QTextCursor c = textCursor();
   c.setPosition(document()->documentLayout()->hitTest(event->pos(), Qt::FuzzyHit));
   c.select(QTextCursor::WordUnderCursor);
-  qDebug() << "selected text:" << c.selectedText();
+  //  qDebug() << "selected text:" << c.selectedText();
   if (c.charFormat().isAnchor()) {
-    qDebug() << "is anchor" << c.charFormat().isAnchor() << c.charFormat().anchorHref();
+    //    qDebug() << "is anchor" << c.charFormat().isAnchor() << c.charFormat().anchorHref();
     href = c.charFormat().anchorHref();
     if (href.startsWith("#")) {
       href.remove(0,1);
@@ -56,7 +65,13 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     jumpAction = menu.addAction(t);
     jumpAction->setData(href);
   }
-  QAction *addNoteAction = menu.addAction(tr("Add &note"));
+  if (this->hasNotes()) {
+    showNoteAction = menu.addAction(tr("&Show note"));
+    deleteNoteAction = menu.addAction(tr("&Delete note"));
+  }
+  else {
+    addNoteAction = menu.addAction(tr("Add &note"));
+  }
   QAction *markAction = menu.addAction(tr("Add &bookmark"));
   //  QAction *searchAction = menu.addAction("Find");
   //  connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
@@ -102,6 +117,12 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   else if (selectedAction == addNoteAction) {
     this->addNote();
     emit(addButton());
+  }
+  else if (selectedAction == showNoteAction) {
+    this->showNote();
+  }
+  else if (selectedAction == deleteNoteAction) {
+    this->deleteNote();
   }
   else if ((jumpAction != NULL) && (selectedAction == jumpAction)) {
     qDebug() << "GOTO" << jumpAction->data();
@@ -253,10 +274,6 @@ void EntryItem::addNote() {
   m_note->show();
 
 }
-int EntryItem::getNoteId() {
-
-
-}
 /**
  * For the moment we are only doing the first note
  *
@@ -267,4 +284,27 @@ void EntryItem::showNote() {
   }
   m_note->show();
 
+}
+void EntryItem::deleteNote() {
+  qDebug() << Q_FUNC_INFO;
+  if (m_noteWidget != NULL) {
+    QGraphicsScene * scene = m_noteWidget->scene();
+    scene->removeItem(m_noteWidget);
+    delete m_noteWidget;
+    emit(deleteNotes());
+    m_noteWidget = NULL;
+  }
+}
+QList<Note *> EntryItem::getNotes(bool erase) {
+  QList<Note *> notes;
+  for(int i=0;i < m_notes.size();i++) {
+    notes << m_notes[i];
+  }
+  if (erase)
+    m_notes.clear();
+
+  return notes;
+}
+void EntryItem::destroyNotes() {
+  m_notes.clear();
 }

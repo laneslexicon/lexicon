@@ -12,6 +12,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsTextItem>
+#include <QGraphicsWidget>
 #include <QLabel>
 #include <QFile>
 #include <QFileInfo>
@@ -43,6 +44,7 @@ class ToolButtonData : public QToolButton {
   Q_OBJECT
  public:
   ToolButtonData(int id);
+  ~ToolButtonData();
   int getIndex() { return m_id;}
  private:
   int m_id;
@@ -54,6 +56,7 @@ class EntryItem : public QGraphicsTextItem {
   EntryItem(const QString &, QGraphicsItem * parent = 0);
   EntryItem(QGraphicsItem * parent = 0);
   ~EntryItem();
+  void setProxy(QGraphicsWidget *);
   void setNode(const QString & id);
   void setRoot(const QString & root,bool isRootEntry = false);
   void setWord(const QString & word);
@@ -63,6 +66,8 @@ class EntryItem : public QGraphicsTextItem {
   void setBackground(QColor & c) { m_backgroundColor = c;}
   void selectAll();
   void setNotes(QList<Note *> notes);
+  QList<Note *> getNotes(bool erase = false);
+  void destroyNotes();
   bool hasNotes() const;
   Place getPlace();
   QString getNode() { return m_place.getNode();}
@@ -77,15 +82,13 @@ class EntryItem : public QGraphicsTextItem {
   QTextCursor highlightRx(const QString &);
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
-  ///  return -1 for no note else id key of note
-  int  getNoteId();
   int findCount() const { return m_searchPositions.size(); }
   void showNote();
   void addNote();
+  void deleteNote();
   void clearHighlights();
   public slots:
     void searchItem();
-
     void clearSelection();
  signals:
     void showPerseus(const Place &);
@@ -96,6 +99,7 @@ class EntryItem : public QGraphicsTextItem {
     void copy();
     void gotoNode(const Place & p, bool createTab = true);
     void addButton();
+    void deleteNotes();
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
@@ -106,6 +110,7 @@ class EntryItem : public QGraphicsTextItem {
   QColor m_backgroundColor;
   bool m_focusOnHover;
  private:
+  QGraphicsWidget * m_noteWidget;
   NoteDialog * m_note;
   QList<Note *> m_notes;
   QList<int> m_searchPositions;

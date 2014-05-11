@@ -98,6 +98,7 @@ class GraphicsEntry : public QWidget {
     void clearHighlights();
     void notesButtonPressed();
     void addButtonDecoration();
+    void deleteNotes();
  private:
     QColor m_supplementBg;
     bool m_showNodeOnly;
