@@ -48,7 +48,6 @@
 #include "inputmapper.h"
 #include "contentswidget.h"
 #include "graphicsentry.h"
-#include "noteswidget.h"
 #include "history.h"
 #include "QsLog.h"
 #include "place.h"
@@ -79,6 +78,7 @@ public:
     bool isOk() { return m_ok;}
     QString convertString(const QString &) const;
     HistoryMaster * history();
+    NoteMaster * notes();
     enum NavMode {ByRoot, ByPage };
     public slots:
     void gotoPlace(const Place &,bool newTab = false);
@@ -120,8 +120,7 @@ public:
     void rootClicked(QTreeWidgetItem * , int);
     void entryActivated(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
-    void onNotesClicked();
-    //    void historyItemActivated();
+
     void rootChanged(const QString & root,const QString & node);
     void placeChanged(const Place &);
     void historyPositionChanged(int);
@@ -233,10 +232,8 @@ private:
 
     Place m_place;
     Place getCurrentPlace();
-    QPushButton * m_notesBtn;
     ContentsWidget * m_tree;
-    //    GraphicsEntry * m_entry;
-    NotesWidget * m_notes;
+
     QSqlDatabase m_db;
     QSqlDatabase m_notesDb;
     QTabWidget * m_tabs;
@@ -282,6 +279,8 @@ private:
     // clear the highlights
 
     QAction * m_clearAction;
+    /// Notes
+    NoteMaster * m_notes;
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };

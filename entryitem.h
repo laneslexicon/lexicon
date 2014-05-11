@@ -67,6 +67,8 @@ class EntryItem : public QGraphicsTextItem {
   QTextCursor highlightRx(const QString &);
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
+  ///  return -1 for no note else id key of note
+  int  getNoteId();
   int findCount() const { return m_searchPositions.size(); }
   void clearHighlights();
   public slots:

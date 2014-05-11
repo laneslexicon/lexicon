@@ -38,6 +38,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_history->setEnabled(m_historyEnabled);
 
   //  m_notes->setObjectName("notes");
+  m_notes = new NoteMaster();
   if (m_docked) {
     m_treeDock = new QDockWidget("Contents",this);
     m_treeDock->setObjectName("contentsdock");
@@ -86,9 +87,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 
   if ( m_useNotes ) {
-  connect(this,SIGNAL(nodeActivated(const QString & ,const QString & )),
-          m_notes,SLOT(setActiveNode(const QString & ,const QString & )));
-  connect(m_notesBtn,SIGNAL(clicked()),this,SLOT(onNotesClicked()));
+
   }
 
 
@@ -212,7 +211,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(searchPage()),this,SLOT(pageSearch()));
 
   connect(entry,SIGNAL(gotoNode(const Place &,bool)),this,SLOT(gotoPlace(const Place &,bool)));
-  connect(entry,SIGNAL(saveNote(Note *)),this,SLOT(saveNote(Note *)));
+  //  connect(entry,SIGNAL(saveNote(Note *)),this,SLOT(saveNote(Note *)));
 }
 void LanesLexicon::onCloseTab(int ix) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
@@ -794,15 +793,7 @@ void LanesLexicon::on_actionExit()
   if (m_db.isOpen()) {
     m_db.close();
   }
-  if (m_useNotes) {
-    m_notes->close();
-    delete m_notes;
-  }
   close();
-}
-void LanesLexicon::onNotesClicked() {
-  //  m_tabs->setCurrentWidget(m_notes);
-  m_notes->show();
 }
 bool LanesLexicon::openDatabase(const QString & dbname) {
   QFile dbfile(dbname);
@@ -1202,6 +1193,9 @@ void LanesLexicon::restoreTabs() {
 
 HistoryMaster * LanesLexicon::history() {
   return m_history;
+}
+NoteMaster * LanesLexicon::notes() {
+  return m_notes;
 }
 /**
  * this needs to be fixed to return supplement as well

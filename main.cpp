@@ -21,6 +21,10 @@ HistoryMaster * getHistory() {
   LanesLexicon * app = getApp();
   return app->history();
 }
+NoteMaster * getNotes() {
+  LanesLexicon * app = getApp();
+  return app->notes();
+}
 int main(int argc, char *argv[])
 {
     Lexicon a(argc, argv);

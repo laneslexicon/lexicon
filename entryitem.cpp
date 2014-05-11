@@ -1,4 +1,6 @@
 #include "entryitem.h"
+#include "laneslexicon.h"
+extern LanesLexicon * getApp();
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
   m_focusOnHover = false;
   m_note = NULL;
@@ -235,5 +237,9 @@ void EntryItem::addNote() {
     m_note = new NoteDialog(m_place);
   }
   m_note->show();
+
+}
+int EntryItem::getNoteId() {
+
 
 }
