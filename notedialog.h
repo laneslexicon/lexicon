@@ -26,6 +26,7 @@ class NoteDialog : public QDialog {
   Q_OBJECT
  public:
   NoteDialog(const Place & p,QWidget * parent = 0);
+  NoteDialog(Note *,QWidget * parent = 0);
   ~NoteDialog();
   QSize sizeHint() const;
   void setSubject(const QString &);

@@ -19,6 +19,10 @@ class Note  {
   void setId(int id) { m_id = id;}
   void setWhen(const QString & t) { m_created = t;}
   void save(QSqlDatabase *);
+
+  QString getSubject() { return m_subject; }
+  QString getNote() { return m_note; }
+  Place getPlace() { return m_place; }
  private:
   QString m_note;
   QString m_subject;

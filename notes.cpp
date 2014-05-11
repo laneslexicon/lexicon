@@ -109,7 +109,9 @@ QList<Note *> NoteMaster::find(const QString & word) {
     Note * n = new Note();
     n->setId(findQuery.value(0).toInt());
     n->setWord(findQuery.value(1).toString());
-    n->setPlace(Place::fromString(findQuery.value(2).toString()));
+    Place p = Place::fromString(findQuery.value(2).toString());
+    qDebug() << "Add note" << p.getNode();
+    n->setPlace(p);
     n->setSubject(findQuery.value(3).toString());
     n->setNote(findQuery.value(4).toString());
     n->setWhen(findQuery.value(5).toString());

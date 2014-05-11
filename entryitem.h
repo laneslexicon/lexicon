@@ -80,6 +80,8 @@ class EntryItem : public QGraphicsTextItem {
   ///  return -1 for no note else id key of note
   int  getNoteId();
   int findCount() const { return m_searchPositions.size(); }
+  void showNote();
+  void addNote();
   void clearHighlights();
   public slots:
     void searchItem();
@@ -98,7 +100,8 @@ class EntryItem : public QGraphicsTextItem {
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
   void focusInEvent(QFocusEvent *);
   void paint( QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-  void addNote();
+
+
   QColor m_backgroundColor;
   bool m_focusOnHover;
  private:

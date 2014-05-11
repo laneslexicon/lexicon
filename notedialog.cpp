@@ -21,6 +21,26 @@ NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
   m_autosave = false;
   connect(this,SIGNAL(saveNote(Note *)),getApp(),SLOT(saveNote(Note *)));
 }
+NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
+  m_data.setPlace(note->getPlace());
+  m_place = note->getPlace();
+  QVBoxLayout * layout = new QVBoxLayout;
+  m_subject = new QLineEdit(this);
+  m_subject->setText(note->getSubject());
+  m_note = new QTextEdit(this);
+  m_note->setText(note->getNote());
+  layout->addWidget(m_subject);
+  layout->addWidget(m_note);
+  setLayout(layout);
+  if (! m_subject->text().isEmpty()) {
+    m_note->setFocus();
+  }
+  //  setWindowFlags(Qt::CustomizeWindowHint);
+  setSizeGripEnabled(true);
+  m_changed = false;
+  m_autosave = false;
+  connect(this,SIGNAL(saveNote(Note *)),getApp(),SLOT(saveNote(Note *)));
+}
 void NoteDialog::setModified(bool v) {
   m_changed = v;
   m_note->document()->setModified(v);

@@ -256,3 +256,14 @@ int EntryItem::getNoteId() {
 
 
 }
+/**
+ * For the moment we are only doing the first note
+ *
+ */
+void EntryItem::showNote() {
+  if ((m_note == NULL) && (m_notes.size() > 0)){
+    m_note = new NoteDialog(m_notes[0]);
+  }
+  m_note->show();
+
+}

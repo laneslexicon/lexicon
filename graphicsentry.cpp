@@ -924,16 +924,13 @@ void GraphicsEntry::appendEntries(int startPos) {
       qreal btnx;
       qreal btny;
       btnx = xpos + m_items[i]->boundingRect().width();
-      btny = ypos + sz.height();
+      btny = ypos;// + sz.height();
 
       ToolButtonData  * notesBtn = new ToolButtonData(i);
       notesBtn->setIcon(QIcon("notes-0.xpm"));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
-
-
-      qDebug() << "added note" << m_items[i]->getNode();
       connect(notesBtn,SIGNAL(clicked()),this,SLOT(notesButtonPressed()));
     }
     ypos += sz.height() + m_entryMargin;
@@ -1338,5 +1335,7 @@ void GraphicsEntry::notesButtonPressed() {
   ToolButtonData * btn = qobject_cast<ToolButtonData *>(QObject::sender());
   if (btn) {
     qDebug() << "index" << btn->getIndex();
+    EntryItem * item = m_items[btn->getIndex()];
+    item->showNote();
   }
 }
