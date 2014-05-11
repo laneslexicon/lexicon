@@ -96,6 +96,7 @@ class GraphicsEntry : public QWidget {
     void onWiden();
     void onNarrow();
     void clearHighlights();
+    void notesButtonPressed();
  private:
     QColor m_supplementBg;
     bool m_showNodeOnly;

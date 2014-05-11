@@ -1,6 +1,10 @@
 #include "graphicsentry.h"
 #include "laneslexicon.h"
 extern LanesLexicon * getApp();
+ToolButtonData::ToolButtonData(int id) : QToolButton() {
+  m_id = id;
+}
+
 /**
  *
  *
@@ -922,13 +926,15 @@ void GraphicsEntry::appendEntries(int startPos) {
       btnx = xpos + m_items[i]->boundingRect().width();
       btny = ypos + sz.height();
 
-      QToolButton * notesBtn = new QToolButton;
+      ToolButtonData  * notesBtn = new ToolButtonData(i);
       notesBtn->setIcon(QIcon("notes-0.xpm"));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
+
+
       qDebug() << "added note" << m_items[i]->getNode();
-      //      connect(notesBtn,SIGNAL(clicked()),this,SLOT(buttonPressed()));
+      connect(notesBtn,SIGNAL(clicked()),this,SLOT(notesButtonPressed()));
     }
     ypos += sz.height() + m_entryMargin;
   }
@@ -1327,4 +1333,10 @@ void GraphicsEntry::closeEvent(QCloseEvent * event) {
     delete item;
   }
   QWidget::closeEvent(event);
+}
+void GraphicsEntry::notesButtonPressed() {
+  ToolButtonData * btn = qobject_cast<ToolButtonData *>(QObject::sender());
+  if (btn) {
+    qDebug() << "index" << btn->getIndex();
+  }
 }

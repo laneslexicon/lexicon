@@ -39,7 +39,14 @@
 #include "place.h"
 #include "notedialog.h"
 #include "notes.h"
-
+class ToolButtonData : public QToolButton {
+  Q_OBJECT
+ public:
+  ToolButtonData(int id);
+  int getIndex() { return m_id;}
+ private:
+  int m_id;
+};
 class EntryItem : public QGraphicsTextItem {
   Q_OBJECT
 
