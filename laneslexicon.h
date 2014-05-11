@@ -83,6 +83,7 @@ public:
     enum NavMode {ByRoot, ByPage };
     public slots:
     void gotoPlace(const Place &,bool newTab = false);
+    void saveNote(Note *);
     private slots:
       void testSlot();
       void shortcut(const QString &);
@@ -145,7 +146,7 @@ public:
     void pageSearch();
     void pageClear();
     void syncContents();
-    void saveNote(Note *);
+
  protected:
     void closeEvent(QCloseEvent *);
 private:

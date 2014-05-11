@@ -22,7 +22,8 @@ NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
   connect(this,SIGNAL(saveNote(Note *)),getApp(),SLOT(saveNote(Note *)));
 }
 NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
-  m_data.setPlace(note->getPlace());
+  //  m_data.setPlace(note->getPlace());
+  m_id = note->getId();
   m_place = note->getPlace();
   QVBoxLayout * layout = new QVBoxLayout;
   m_subject = new QLineEdit(this);
@@ -39,7 +40,7 @@ NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
   setSizeGripEnabled(true);
   m_changed = false;
   m_autosave = false;
-  connect(this,SIGNAL(saveNote(Note *)),getApp(),SLOT(saveNote(Note *)));
+  //  connect(this,SIGNAL(saveNote(Note *)),getApp(),SLOT(saveNote(Note *)));
 }
 void NoteDialog::setModified(bool v) {
   m_changed = v;
@@ -58,7 +59,8 @@ void NoteDialog::closeEvent(QCloseEvent * event) {
         n->setNote(m_note->toPlainText());
         n->setPlace(m_place);
         n->setWord(m_place.getWord());
-        emit(saveNote(n));
+        n->setId(m_id);
+        getApp()->saveNote(n);
     }
     else {
       QMessageBox msgBox;
@@ -74,7 +76,8 @@ void NoteDialog::closeEvent(QCloseEvent * event) {
         n->setNote(m_note->toPlainText());
         n->setPlace(m_place);
         n->setWord(m_place.getWord());
-        emit(saveNote(n));
+        n->setId(m_id);
+        getApp()->saveNote(n);
       }
     }
   }
@@ -85,7 +88,7 @@ NoteDialog::~NoteDialog() {
 }
 void NoteDialog::setSubject(const QString & text) {
   m_subject->setText(text);
-  m_data.setSubject(text);
+  //  m_data.setSubject(text);
   m_changed = true;
 }
 bool NoteDialog::isModified() const {

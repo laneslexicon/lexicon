@@ -1973,5 +1973,7 @@ void LanesLexicon::syncContents() {
     m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::saveNote(Note * note) {
+  qDebug() << Q_FUNC_INFO;
+  qDebug() << note->getNote();
   m_notes->save(note);
 }
