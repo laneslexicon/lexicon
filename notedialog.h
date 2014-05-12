@@ -32,11 +32,11 @@ class NoteDialog : public QDialog {
   void setSubject(const QString &);
   void setModified(bool);
   bool isModified() const;
-  Note getNote() { return m_data;}
+  QString getNote() { return m_note->toPlainText();}
+  void setAutosave(bool v) { m_autosave = v;}
  protected:
   void closeEvent(QCloseEvent *);
  private:
-  Note m_data;
   bool m_changed;
   bool m_autosave;
   int m_id;

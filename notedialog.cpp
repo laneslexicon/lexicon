@@ -2,7 +2,7 @@
 #include "laneslexicon.h"
 extern LanesLexicon * getApp();
 NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
-  m_data.setPlace(p);
+  //  m_data.setPlace(p);
   m_place = p;
   QVBoxLayout * layout = new QVBoxLayout;
   m_subject = new QLineEdit(this);
@@ -19,7 +19,8 @@ NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
   setSizeGripEnabled(true);
   m_changed = false;
   m_autosave = false;
-  connect(this,SIGNAL(saveNote(Note *)),getApp(),SLOT(saveNote(Note *)));
+  setWindowTitle(m_subject->text());
+  //  connect(this,SIGNAL(saveNote(Note *)),getApp(),SLOT(saveNote(Note *)));
 }
 NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
   //  m_data.setPlace(note->getPlace());
@@ -40,6 +41,7 @@ NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
   setSizeGripEnabled(true);
   m_changed = false;
   m_autosave = false;
+  setWindowTitle(m_subject->text());
   //  connect(this,SIGNAL(saveNote(Note *)),getApp(),SLOT(saveNote(Note *)));
 }
 void NoteDialog::setModified(bool v) {

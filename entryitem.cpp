@@ -1,6 +1,7 @@
 #include "entryitem.h"
 #include "laneslexicon.h"
 extern LanesLexicon * getApp();
+extern NoteMaster * getNotes();
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
   m_focusOnHover = false;
   m_note = NULL;
@@ -281,6 +282,7 @@ void EntryItem::addNote() {
 void EntryItem::showNote() {
   if ((m_note == NULL) && (m_notes.size() > 0)){
     m_note = new NoteDialog(m_notes[0]);
+    m_note->setAutosave(::getNotes()->autosave());
   }
   m_note->show();
 
