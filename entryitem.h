@@ -65,10 +65,6 @@ class EntryItem : public QGraphicsTextItem {
   void setPlace(const Place &);
   void setBackground(QColor & c) { m_backgroundColor = c;}
   void selectAll();
-  void setNotes(QList<Note *> notes);
-  QList<Note *> getNotes(bool erase = false);
-  void destroyNotes();
-  bool hasNotes() const;
   Place getPlace();
   QString getNode() { return m_place.getNode();}
   QString getRoot() { return m_place.getRoot();}
@@ -83,9 +79,16 @@ class EntryItem : public QGraphicsTextItem {
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
   int findCount() const { return m_searchPositions.size(); }
+
+  void setNotesEnabled(bool v) { m_notesEnabled = v;}
   void showNote();
   void addNote();
   void deleteNote();
+  void setNotes(QList<Note *> notes);
+  QList<Note *> getNotes(bool erase = false);
+  void destroyNotes();
+  bool hasNotes() const;
+
   void clearHighlights();
   public slots:
     void searchItem();
@@ -110,6 +113,7 @@ class EntryItem : public QGraphicsTextItem {
   QColor m_backgroundColor;
   bool m_focusOnHover;
  private:
+  bool m_notesEnabled;
   QGraphicsWidget * m_noteWidget;
   NoteDialog * m_note;
   QList<Note *> m_notes;

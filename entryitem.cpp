@@ -66,12 +66,14 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     jumpAction = menu.addAction(t);
     jumpAction->setData(href);
   }
-  if (this->hasNotes()) {
-    showNoteAction = menu.addAction(tr("&Show note"));
-    deleteNoteAction = menu.addAction(tr("&Delete note"));
-  }
-  else {
-    addNoteAction = menu.addAction(tr("Add &note"));
+  if (m_notesEnabled) {
+    if (this->hasNotes()) {
+      showNoteAction = menu.addAction(tr("&Show note"));
+      deleteNoteAction = menu.addAction(tr("&Delete note"));
+    }
+    else {
+      addNoteAction = menu.addAction(tr("Add &note"));
+    }
   }
   QAction *markAction = menu.addAction(tr("Add &bookmark"));
   //  QAction *searchAction = menu.addAction("Find");

@@ -149,20 +149,9 @@ void GraphicsEntry::readSettings() {
   m_dumpOutputHTML = settings->value("Dump output HTML",false).toBool();
   settings->endGroup();
 
-  /*
-  settings->beginGroup("Shortcut");
-  QString t = settings->value("Select all","Ctrl+C,A").toString();
-  QShortcut * sc = new QShortcut(t,this);
-  sc->setContext(Qt::WidgetShortcut);
-  //  connect(sc,SIGNAL(activated()),this,SLOT(selectAll()));
-  //  connect(sc,SIGNAL(activatedAmbiguously()),this,SLOT(selectAll()));
-  qDebug() << "select all set to" << t << sc->key() << sc->id();
-  t = settings->value("Select entry","Ctrl+C,E").toString();
-  sc = new QShortcut(t,this);
-  sc->setContext(Qt::WidgetShortcut);
-  //  connect(sc,SIGNAL(activated()),this,SLOT(selectEntry()));
-  qDebug() << "select entry set to" << t << sc->key() << sc->id();
-  */
+  settings->beginGroup("Notes");
+  m_notesEnabled = settings->value("Enabled",true).toBool();
+  settings->endGroup();
   delete settings;
 }
 void GraphicsEntry::writeDefaultSettings() {
@@ -875,6 +864,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
     gi->setAcceptHoverEvents(true);
     gi->setBackground(m_supplementBg);
+    gi->setNotesEnabled(m_notesEnabled);
     if (m_dumpOutputHTML) {
       gi->setOutputHTML(html);
     }

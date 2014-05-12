@@ -38,8 +38,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   m_history->setEnabled(m_historyEnabled);
 
-  //  m_notes->setObjectName("notes");
   m_notes = new NoteMaster();
+
+
   if (m_docked) {
     m_treeDock = new QDockWidget("Contents",this);
     m_treeDock->setObjectName("contentsdock");
@@ -1018,7 +1019,7 @@ void LanesLexicon::readSettings() {
   m_docked = settings->value("Docked",false).toBool();
   m_interface = settings->value("Interface","default").toString();
   m_navigationMode = settings->value("Navigation","root").toString();
-  m_useNotes = settings->value("Use notes",false).toBool();
+
   m_activeMap = settings->value("Default map","Buckwalter").toString();
   if (m_navigationMode.toLower() == "root") {
     m_navMode = LanesLexicon::ByRoot;
@@ -1044,6 +1045,7 @@ void LanesLexicon::readSettings() {
 
   settings->beginGroup("Notes");
   m_notesDbName = settings->value("Database","notes.sqlite").toString();
+  m_useNotes = settings->value("Enabled",true).toBool();
   settings->endGroup();
   settings->beginGroup("History");
   m_historyEnabled = settings->value("Enabled",true).toBool();

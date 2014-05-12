@@ -6,15 +6,20 @@ Note::Note() {
 }
 NoteMaster::NoteMaster() {
   readSettings();
-  openDb();
+  if (m_enabled)
+    openDb();
 }
 void NoteMaster::remove(Note * n) {
+  if (!m_enabled)
+    return;
   deleteQuery.bindValue(0,n->getId());
   if (! deleteQuery.exec()) {
     QLOG_WARN() << "SQL delete note error" << deleteQuery.lastError().text();
   }
 }
 void NoteMaster::save(Note * n) {
+  if (!m_enabled)
+    return;
   if (n->getId() == -1) {     // add note
     Place p = n->getPlace();
     addQuery.bindValue(":datasource",p.getSource());
@@ -102,9 +107,11 @@ bool NoteMaster::openDb() {
  * @return a list of notes for the given word
  */
 QList<Note *> NoteMaster::find(const QString & word) {
+  QList<Note *> notes;
+  if (!m_enabled)
+    return notes;
   findQuery.bindValue(0,word);
   findQuery.exec();
-  QList<Note *> notes;
   while(findQuery.next()) {
     Note * n = new Note();
     n->setId(findQuery.value(0).toInt());
