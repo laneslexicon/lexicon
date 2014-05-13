@@ -248,7 +248,7 @@ Place GraphicsEntry::getPlace() const {
  return m_place;
 }
 void GraphicsEntry::focusInEvent(QFocusEvent * event) {
-  QLOG_DEBUG() << "Got input focus";
+  //  QLOG_DEBUG() << "Got input focus";
   m_view->setFocus();
   QWidget::focusInEvent(event);
 
@@ -260,6 +260,8 @@ void GraphicsEntry::onClearScene() {
   while(m_items.size() > 0) {
     delete m_items.takeFirst();
   }
+  /// need to remove the graphicswidget for the items which have notes
+  m_scene->clear();
 }
 /**
  * redundant
@@ -963,6 +965,21 @@ void GraphicsEntry::prependEntries(int startPos) {
       }
     }
     sz = m_items[i]->document()->size();
+    if (m_items[i]->hasNotes()) {
+      qDebug() << "Adding note button for";
+      qreal btnx;
+      qreal btny;
+      btnx = xpos + m_items[i]->boundingRect().width();
+      btny = ypos;// + sz.height();
+
+      ToolButtonData  * notesBtn = new ToolButtonData(i);
+      notesBtn->setIcon(QIcon("notes-0.xpm"));
+      notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
+      QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
+      pushButton->setPos(btnx,btny);
+      m_items[i]->setProxy(pushButton);
+      connect(notesBtn,SIGNAL(clicked()),this,SLOT(notesButtonPressed()));
+    }
     ypos += sz.height() + m_entryMargin;
   }
 }
