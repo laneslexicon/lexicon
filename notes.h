@@ -12,6 +12,7 @@
 class Note  {
  public:
   Note();
+  Note(const Note &);
   void setSubject(const QString & text) { m_subject = text;};
   void setPlace(const Place & p) { m_place = p;}
   void setNote(const QString & n) { m_note = n;}

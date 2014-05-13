@@ -22,6 +22,9 @@
 #include "QsLog.h"
 #include "place.h"
 #include "notes.h"
+#include "imedit.h"
+#include "keyboardwidget.h"
+
 class NoteDialog : public QDialog {
   Q_OBJECT
  public:
@@ -34,19 +37,30 @@ class NoteDialog : public QDialog {
   bool isModified() const;
   QString getNote() { return m_note->toPlainText();}
   void setAutosave(bool v) { m_autosave = v;}
+  public slots:
+    void showOptions(bool);
+    void showKeyboard();
+    void cancel();
+    void save();
  protected:
   void closeEvent(QCloseEvent *);
  private:
+  void setup();
+  bool m_attached;
   bool m_changed;
   bool m_autosave;
-  int m_id;
+
   Place m_place;
+  KeyboardWidget * m_keyboard;
   QLineEdit * m_subject;
   QTextEdit * m_note;
   QLineEdit * m_tags;
   QPushButton * m_keyboardButton;
   QPushButton * m_moreButton;
+  QPushButton * m_printButton;
+  QDialogButtonBox * m_moreButtonBox;
   QDialogButtonBox * m_buttonBox;
+  Note * m_noteItem;
  signals:
   void saveNote(Note *);
 };

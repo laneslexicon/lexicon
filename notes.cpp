@@ -4,6 +4,14 @@ extern LanesLexicon * getApp();
 Note::Note() {
   m_id = -1;
 }
+Note::Note(const Note & other) {
+  m_note = other.m_note;
+  m_subject = other.m_subject;
+  m_created = other.m_created;
+  m_word = other.m_word;
+  m_id = other.m_id;
+  m_place = other.m_place;
+}
 NoteMaster::NoteMaster() {
   readSettings();
   if (m_enabled)
