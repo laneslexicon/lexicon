@@ -1210,7 +1210,9 @@ void LanesLexicon::findNextRoot(const QString & root) {
   QString nroot = m_tree->findNextRoot(root);
   if (entry && ! nroot.isEmpty()) {
     entry->setPagingForward();
-    entry->getXmlForRoot(Place(nroot));
+    Place p;
+    p.setRoot(nroot);
+    entry->getXmlForRoot(p);
   }
 }
 void LanesLexicon::findPrevRoot(const QString & root) {
@@ -1975,7 +1977,8 @@ void LanesLexicon::syncContents() {
     m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::saveNote(Note * note) {
-  qDebug() << Q_FUNC_INFO;
+  qDebug() << Q_FUNC_INFO << note->getId() << note->getWord();
   qDebug() << note->getNote();
   m_notes->save(note);
+  delete note;
 }
