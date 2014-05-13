@@ -42,6 +42,7 @@ class NoteDialog : public QDialog {
     void showKeyboard();
     void cancel();
     void save();
+    void print();
  protected:
   void closeEvent(QCloseEvent *);
  private:

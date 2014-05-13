@@ -17,6 +17,7 @@ NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
 
   /// set values from place
   m_subject->setText(p.getShortText());
+  m_note->setFocus();
 }
 /**
  * This constructor is used when updating a note
@@ -25,14 +26,12 @@ NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
  * @param parent
  */
 NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
-
   m_noteItem = new Note(*note);
-
   this->setup();
   /// set values from note
   m_subject->setText(note->getSubject());
   m_note->setText(note->getNote());
-
+  m_note->setFocus();
   setWindowTitle(m_subject->text());
 }
 void NoteDialog::setup() {
@@ -64,16 +63,13 @@ void NoteDialog::setup() {
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(save()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(cancel()));
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
-
+  connect(m_printButton,SIGNAL(clicked()),this,SLOT(print()));
 
   layout->addWidget(m_subject);
   layout->addWidget(m_note);
   layout->addWidget(m_buttonBox);
   layout->addWidget(m_moreButtonBox);
   setLayout(layout);
-  if (! m_subject->text().isEmpty()) {
-    m_note->setFocus();
-  }
   //  setWindowFlags(Qt::CustomizeWindowHint);
   setSizeGripEnabled(true);
   m_changed = false;
@@ -181,4 +177,17 @@ void NoteDialog::save() {
     showKeyboard();
   getApp()->saveNote(m_noteItem);
   this->accept();
+}
+void NoteDialog::print() {
+  QPrinter printer;
+  QPrintDialog printDialog(&printer, this);
+  if (printDialog.exec() == QDialog::Accepted) {
+    // print ...
+
+    //  printer->setPaperSize(QPrinter::A4);
+    //  printer->setOutputFileName();
+    //    QPainter painter(&m_printer);
+    //    painter.setRenderHint(QPainter::Antialiasing);
+    m_note->print(&printer);
+  }
 }
