@@ -59,6 +59,7 @@ SOURCES += main.cpp\
         menubar.cpp \
         notes.cpp \
         notedialog.cpp \
+        notebrowser.cpp \
         application.cpp
 
 
@@ -72,9 +73,10 @@ HEADERS  += laneslexicon.h \
             noteswidget.h \
             history.h \
             place.h \
-            notes.h \
             searchresults.h \
             helpviewer.h \
             menubar.h \
+            notes.h \
             notedialog.h \
+            notebrowser.h \
             application.h
