@@ -28,13 +28,15 @@ class NoteBrowser : public QWidget {
   NoteBrowser(QWidget * parent = 0);
   //  ~NotesWidget();
  public slots:
-   //  void onShowClicked();
-   //  void onSaveClicked();
+   void onNoteSelected(int );
+   void onCellClicked(int,int);
+   void onDeleteClicked();
    //  void onNewClicked();
   //  void onLexiconClicked();
   //  void showSelectedNote();
   //  void setActiveNode(const QString & node,const QString & word);
  private:
+   void loadTable();
   //  int m_currentRow;
   //  QString m_baseQuery;
   //  QSqlDatabase m_db;
@@ -47,7 +49,9 @@ class NoteBrowser : public QWidget {
   QPushButton * m_newBtn;
   QPushButton * m_showBtn;
   QPushButton * m_saveBtn;
-  QPushButton * m_deleteBtn;
+  QPushButton * m_deleteButton;
+  QPushButton * m_printButton;
+  QPushButton * m_viewButton;
   //  QPushButton * m_lexiconBtn;
   //  QWidget * createQueryWidget();
   //  QWidget * createEditWidget();
