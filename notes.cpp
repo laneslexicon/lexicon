@@ -43,7 +43,8 @@ void NoteMaster::save(Note * n) {
   }
   updateQuery.bindValue(0,n->getSubject());
   updateQuery.bindValue(1,n->getNote());
-  updateQuery.bindValue(2,n->getId());
+  updateQuery.bindValue(2,QDateTime::currentDateTime().toString());
+  updateQuery.bindValue(3,n->getId());
   if (! updateQuery.exec()) {
     QLOG_WARN() << "SQL update note error" << updateQuery.lastError().text();
   }
@@ -85,7 +86,7 @@ bool NoteMaster::openDb() {
     return false;
   }
   updateQuery = QSqlQuery(m_db);
-  if (! updateQuery.prepare("update notes set subject = ?, note = ? where id = ?")) {
+  if (! updateQuery.prepare("update notes set subject = ?, note = ?, amended = ? where id = ?")) {
     QLOG_WARN() << "SQL update prepare error" << updateQuery.lastError().text();
     m_enabled = false;
     return false;
@@ -97,7 +98,7 @@ bool NoteMaster::openDb() {
     return false;
   }
   findQuery = QSqlQuery(m_db);
-  if (! findQuery.prepare("select id,word,place,subject,note,created from notes where word = ?")) {
+  if (! findQuery.prepare("select id,word,place,subject,note,created,amended from notes where word = ?")) {
     QLOG_WARN() << "SQL find error" << findQuery.lastError().text();
     m_enabled = false;
     return false;
@@ -145,4 +146,22 @@ void NoteMaster::readSettings() {
   m_autosave = settings->value("Autosave",true).toBool();
   m_enabled = settings->value("Enabled",true).toBool();
 
+}
+// "select id,word,subject,create from notes"
+QSqlQuery NoteMaster::getNoteList(const QString & sql) {
+  QSqlQuery listQuery = QSqlQuery(m_db);
+  if (!listQuery.prepare(sql)) {
+    QLOG_WARN() << "SQL list error" << listQuery.lastError().text();
+  }
+  else {
+    listQuery.exec();
+  }
+  return listQuery;
+}
+void NoteMaster::deleteNotes(QList<int> ids) {
+  qDebug() << Q_FUNC_INFO << ids;
+  for(int i=0;i < ids.size();i++) {
+    deleteQuery.bindValue(0,ids[i]);
+    deleteQuery.exec();
+  }
 }

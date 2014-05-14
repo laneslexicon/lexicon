@@ -38,10 +38,12 @@ class NoteMaster {
   NoteMaster();
   bool openDb();
   void save(Note *);
+  void deleteNotes(QList<int>);
   void remove(Note *);
   bool autosave() { return m_autosave;}
   bool enabled() { return m_enabled; }
   QList<Note *> find(const QString & word);
+  QSqlQuery getNoteList(const QString & sql);
  private:
   QSqlDatabase m_db;
   QSqlQuery addQuery;
