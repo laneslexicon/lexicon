@@ -19,6 +19,7 @@ class Note  {
   void setWord(const QString & n) { m_word = n;}
   void setId(int id) { m_id = id;}
   void setWhen(const QString & t) { m_created = t;}
+  void setAmended(const QString & t) { m_amended = t;}
 
   QString getSubject() { return m_subject; }
   QString getNote() { return m_note; }
@@ -30,6 +31,7 @@ class Note  {
   QString m_subject;
   Place m_place;
   QString m_created;
+  QString m_amended;
   QString m_word;
   int m_id;
 };
@@ -38,11 +40,12 @@ class NoteMaster {
   NoteMaster();
   bool openDb();
   void save(Note *);
-  void deleteNotes(QList<int>);
+  QList<int> deleteNotes(QList<int>);
   void remove(Note *);
   bool autosave() { return m_autosave;}
   bool enabled() { return m_enabled; }
   QList<Note *> find(const QString & word);
+  Note * findOne(int);
   QSqlQuery getNoteList(const QString & sql);
  private:
   QSqlDatabase m_db;
@@ -50,6 +53,7 @@ class NoteMaster {
   QSqlQuery updateQuery;
   QSqlQuery deleteQuery;
   QSqlQuery findQuery;
+  QSqlQuery findOneQuery;
   QString m_dbName;
   bool m_autosave;
   bool m_enabled;

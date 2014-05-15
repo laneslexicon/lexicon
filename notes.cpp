@@ -103,6 +103,12 @@ bool NoteMaster::openDb() {
     m_enabled = false;
     return false;
   }
+  findOneQuery = QSqlQuery(m_db);
+  if (! findOneQuery.prepare("select word,place,subject,note,created,amended from notes where id = ?")) {
+    QLOG_WARN() << "SQL find error" << findOneQuery.lastError().text();
+    m_enabled = false;
+    return false;
+  }
   qDebug() << "=====================================";
   qDebug() << "Notes system successfully initialised";
   qDebug() << "=====================================";
@@ -137,6 +143,26 @@ QList<Note *> NoteMaster::find(const QString & word) {
     qDebug() << Q_FUNC_INFO << word << "find count" << notes.size();
   return notes;
 }
+Note * NoteMaster::findOne(int id) {
+  Note * note = NULL;
+  if (!m_enabled)
+    return note;
+
+  findOneQuery.bindValue(0,id);
+  if (findOneQuery.exec()) {
+    findOneQuery.first();
+    note = new Note();
+    note->setWord(findOneQuery.value(0).toString());
+    Place p = Place::fromString(findOneQuery.value(1).toString());
+    qDebug() << "Add note" << p.getNode();
+    note->setPlace(p);
+    note->setSubject(findOneQuery.value(2).toString());
+    note->setNote(findOneQuery.value(3).toString());
+    note->setWhen(findOneQuery.value(4).toString());
+    note->setAmended(findOneQuery.value(5).toString());
+  }
+  return note;
+}
 void NoteMaster::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
@@ -158,10 +184,14 @@ QSqlQuery NoteMaster::getNoteList(const QString & sql) {
   }
   return listQuery;
 }
-void NoteMaster::deleteNotes(QList<int> ids) {
+QList<int> NoteMaster::deleteNotes(QList<int> ids) {
+  QList<int> deletedNotes;
   qDebug() << Q_FUNC_INFO << ids;
   for(int i=0;i < ids.size();i++) {
     deleteQuery.bindValue(0,ids[i]);
-    deleteQuery.exec();
+    if (deleteQuery.exec()) {
+      deletedNotes << ids[i];
+    }
   }
+  return deletedNotes;
 }
