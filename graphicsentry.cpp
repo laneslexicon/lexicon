@@ -1347,7 +1347,7 @@ void GraphicsEntry::closeEvent(QCloseEvent * event) {
 void GraphicsEntry::notesButtonPressed() {
   ToolButtonData * btn = qobject_cast<ToolButtonData *>(QObject::sender());
   if (btn) {
-    qDebug() << "index" << btn->getIndex();
+    //qDebug() << "index" << btn->getIndex();
     EntryItem * item = m_items[btn->getIndex()];
     item->showNote();
 
