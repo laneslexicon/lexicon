@@ -59,6 +59,7 @@
 #include "menubar.h"
 #include "helpviewer.h"
 #include "notes.h"
+#include "notebrowser.h"
 /*
 struct cmdOptions {
   bool dump;
@@ -86,6 +87,7 @@ public:
     void saveNote(Note *);
     private slots:
       void testSlot();
+      void showNoteBrowser();
       void shortcut(const QString &);
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);

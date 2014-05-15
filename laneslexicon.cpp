@@ -136,6 +136,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   qDebug() << "Initialisation complete";
   qDebug() << "-----------------------";
 
+
 }
 
 LanesLexicon::~LanesLexicon()
@@ -227,6 +228,12 @@ void LanesLexicon::onCloseTab(int ix) {
   if (results) {
       m_tabs->removeTab(ix);
       delete results;
+      return;
+  }
+  NoteBrowser * notes = qobject_cast<NoteBrowser *>(m_tabs->widget(ix));
+  if (notes) {
+      m_tabs->removeTab(ix);
+      delete notes;
       return;
   }
   m_tabs->removeTab(ix);
@@ -372,6 +379,9 @@ void LanesLexicon::shortcut(const QString & k) {
   }
   else if (key == "sync contents") {
     syncContents();
+  }
+  else if (key == "show notes") {
+    showNoteBrowser();
   }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
@@ -1981,4 +1991,14 @@ void LanesLexicon::saveNote(Note * note) {
   qDebug() << note->getNote();
   m_notes->save(note);
   delete note;
+}
+void LanesLexicon::showNoteBrowser() {
+  for(int i=0;i < m_tabs->count();i++) {
+    NoteBrowser * notes = qobject_cast<NoteBrowser *>(m_tabs->widget(i));
+    if (notes) {
+      m_tabs->setCurrentIndex(i);
+      return;
+    }
+  }
+  m_tabs->addTab(new NoteBrowser(this),"Notes");
 }
