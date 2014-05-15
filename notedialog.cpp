@@ -8,10 +8,9 @@ extern LanesLexicon * getApp();
  * @param parent
  */
 NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
-  //  m_data.setPlace(p);
-  m_noteItem = new Note();
-  m_noteItem->setPlace(p);
-  m_noteItem->setWord(p.getWord());
+  m_id = -1;
+  m_place = p;
+  m_word = p.getWord();
   this->setup();
   setWindowTitle(m_subject->text());
 
@@ -26,11 +25,17 @@ NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
  * @param parent
  */
 NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
-  m_noteItem = new Note(*note);
+  m_id = note->getId();
+  m_place = note->getPlace();
+  m_word = note->getWord();
+  m_subjectText = note->getSubject();
+  m_noteText = note->getNote();
+
+
   this->setup();
   /// set values from note
-  m_subject->setText(note->getSubject());
-  m_note->setText(note->getNote());
+  m_subject->setText(m_subjectText);
+  m_note->setText(m_noteText);
   m_note->setFocus();
   setWindowTitle(m_subject->text());
 }
@@ -64,6 +69,7 @@ void NoteDialog::setup() {
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(cancel()));
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
   connect(m_printButton,SIGNAL(clicked()),this,SLOT(print()));
+
 
   layout->addWidget(m_subject);
   layout->addWidget(m_note);
@@ -101,14 +107,7 @@ void NoteDialog::closeEvent(QCloseEvent * event) {
   qDebug() << Q_FUNC_INFO << "modified" << this->isModified();
   if (this->isModified()) {
     if (m_autosave) {
-      /// saveNote deletes the note
-        Note * n = new Note();
-        n->setSubject(m_subject->text());
-        n->setNote(m_note->toPlainText());
-        n->setPlace(m_noteItem->getPlace());
-        n->setWord(m_noteItem->getWord());
-        n->setId(m_noteItem->getId());
-        getApp()->saveNote(n);
+      this->save();
     }
     else {
       QMessageBox msgBox;
@@ -119,13 +118,7 @@ void NoteDialog::closeEvent(QCloseEvent * event) {
       msgBox.setWindowModality(Qt::ApplicationModal);
       int ret = msgBox.exec();
       if (ret == QMessageBox::Save) {
-        Note * n = new Note();
-        n->setSubject(m_subject->text());
-        n->setNote(m_note->toPlainText());
-        n->setPlace(m_noteItem->getPlace());
-        n->setWord(m_noteItem->getWord());
-        n->setId(m_noteItem->getId());
-        getApp()->saveNote(n);
+        this->save();
       }
     }
   }
@@ -133,7 +126,7 @@ void NoteDialog::closeEvent(QCloseEvent * event) {
 }
 NoteDialog::~NoteDialog() {
   qDebug() << Q_FUNC_INFO;
-  delete m_noteItem;
+
 }
 void NoteDialog::setSubject(const QString & text) {
   m_subject->setText(text);
@@ -161,8 +154,8 @@ void NoteDialog::showKeyboard() {
 
 }
 void NoteDialog::cancel() {
-  m_note->setText(m_noteItem->getNote());
-  m_subject->setText(m_noteItem->getSubject());
+  m_note->setText(m_noteText);
+  m_subject->setText(m_subjectText);
   m_changed = false;
   if (m_attached)
     showKeyboard();
@@ -170,12 +163,21 @@ void NoteDialog::cancel() {
   this->reject();
 }
 void NoteDialog::save() {
-  m_noteItem->setNote(m_note->toPlainText());
-  m_noteItem->setSubject(m_subject->text());
+  Note * n = new Note();
+  n->setPlace(m_place);
+  n->setId(m_id);
+  n->setWord(m_word);
+  n->setSubject(m_subject->text());
+  n->setNote(m_note->toPlainText());
   m_changed = false;
   if (m_attached)
     showKeyboard();
-  getApp()->saveNote(m_noteItem);
+  NoteMaster * notes = getApp()->notes();
+  notes->save(n);
+  delete n;
+
+  m_subjectText = m_subject->text();
+  m_noteText = m_note->toPlainText();
   this->accept();
 }
 void NoteDialog::print() {

@@ -62,6 +62,10 @@ class NoteDialog : public QDialog {
   QDialogButtonBox * m_moreButtonBox;
   QDialogButtonBox * m_buttonBox;
   Note * m_noteItem;
+  QString m_subjectText;
+  QString m_noteText;
+  QString m_word;
+  int m_id;
  signals:
   void saveNote(Note *);
 };
