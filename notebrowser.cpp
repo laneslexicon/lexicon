@@ -122,7 +122,7 @@ void NoteBrowser::loadTable() {
     m_list->resizeColumnsToContents();
   }
 }
-void NoteBrowser::onNoteSelected(int state) {
+void NoteBrowser::onNoteSelected(int /* state */) {
   for(int i=0;i < m_list->rowCount();i++) {
     QCheckBox * box = qobject_cast<QCheckBox *>(m_list->cellWidget(i,0));
     if (box->isChecked()) {
@@ -142,23 +142,46 @@ void NoteBrowser::onCellClicked(int row,int /* column */) {
   if (item) {
     int id = item->data(Qt::UserRole).toInt();
     qDebug() << "id" << id;
+    LanesLexicon * app = getApp();
+    NoteMaster * notes = app->notes();
+    Note * note = notes->findOne(id);
+    if (note) {
+      m_subject->setText(note->getSubject());
+      m_note->setText(note->getNote());
+    }
   }
 
 
 }
 void NoteBrowser::onDeleteClicked() {
   QList<int> ids;
+  QMap<int,int> rowmap;
   for(int i=0;i < m_list->rowCount();i++) {
     QCheckBox * box = qobject_cast<QCheckBox *>(m_list->cellWidget(i,0));
     if (box->isChecked()) {
       QTableWidgetItem * item = m_list->item(i,2);
-      ids << item->data(Qt::UserRole).toInt();
+      int id =  item->data(Qt::UserRole).toInt();
+      ids << id;
+      rowmap.insert(id,i);
     }
   }
   if (ids.size() > 0) {
     LanesLexicon * app = getApp();
     NoteMaster * notes = app->notes();
-    notes->deleteNotes(ids);
-    m_list->clear();
+    /**
+     * get list of deleted ids, get the corresponding rows
+     * from row map, sort them, and call removeRow from the highest to lowest
+     */
+    QList<int> d = notes->deleteNotes(ids);
+    QList<int> rows;
+    for(int i=0;i < d.size();i++) {
+      rows << rowmap.value(d[i]);
+    }
+    qSort(rows);
+    for(int i=rows.size() - 1;i >= 0;i--) {
+      m_list->removeRow(rows[i]);
+    }
+    this->onNoteSelected(0);
   }
+
 }
