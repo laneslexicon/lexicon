@@ -35,7 +35,11 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   QFormLayout * containerlayout = new QFormLayout;
   m_subject = new QLineEdit;
   m_note = new QTextEdit;
-  m_note->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+  QSizePolicy policy = m_note->sizePolicy();
+  policy.setVerticalStretch(1);
+  m_note->setSizePolicy(policy);
+
   QHBoxLayout * btnlayout = new QHBoxLayout;
   m_printButton = new QPushButton(tr("Print"));
   m_deleteButton = new QPushButton(tr("Delete"));
@@ -45,9 +49,10 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   btnlayout->addWidget(m_deleteButton);
   btnlayout->addWidget(m_viewButton);
 
-  containerlayout->addRow(btnlayout);
+
   containerlayout->addRow("Subject",m_subject);
   containerlayout->addRow("Note",m_note);
+  containerlayout->addRow(btnlayout);
   container->setLayout(containerlayout);
   container->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
