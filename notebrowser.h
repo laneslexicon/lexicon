@@ -35,6 +35,8 @@ class NoteBrowser : public QWidget {
   //  void onLexiconClicked();
   //  void showSelectedNote();
   //  void setActiveNode(const QString & node,const QString & word);
+ protected:
+   bool eventFilter(QObject *, QEvent *);
  private:
    void loadTable();
   //  int m_currentRow;

@@ -14,6 +14,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 //  NoteMaster * notes = app->notes();
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QTableWidget;
+  m_list->installEventFilter(this);
   /// id, word,subject,date
   /*
   m_list->setColumnCount(5);
@@ -27,12 +28,14 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   */
   //  m_list->installEventFilter(this);
   QStyle * style = m_list->style();
-  //  qDebug() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
+  style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
+  this->setStyle(style);
   QSplitter * splitter = new QSplitter(Qt::Vertical);
   QWidget * container  = new QWidget(this);
   QFormLayout * containerlayout = new QFormLayout;
   m_subject = new QLineEdit;
   m_note = new QTextEdit;
+  m_note->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   QHBoxLayout * btnlayout = new QHBoxLayout;
   m_printButton = new QPushButton(tr("Print"));
   m_deleteButton = new QPushButton(tr("Delete"));
@@ -46,6 +49,8 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   containerlayout->addRow("Subject",m_subject);
   containerlayout->addRow("Note",m_note);
   container->setLayout(containerlayout);
+  container->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
   splitter->addWidget(m_list);
   splitter->addWidget(container);
   splitter->setStretchFactor(0,0);
@@ -141,7 +146,6 @@ void NoteBrowser::onCellClicked(int row,int /* column */) {
   QTableWidgetItem * item = m_list->item(row,2);
   if (item) {
     int id = item->data(Qt::UserRole).toInt();
-    qDebug() << "id" << id;
     LanesLexicon * app = getApp();
     NoteMaster * notes = app->notes();
     Note * note = notes->findOne(id);
@@ -184,4 +188,20 @@ void NoteBrowser::onDeleteClicked() {
     this->onNoteSelected(0);
   }
 
+}
+bool NoteBrowser::eventFilter(QObject * target,QEvent * event) {
+  if ((target == m_list) && (event->type() == QEvent::KeyPress)) {
+    QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
+    switch (keyEvent->key()) {
+    case Qt::Key_Enter :
+    case Qt::Key_Space :
+    case Qt::Key_Return : {
+      this->onCellClicked(m_list->currentRow(),0);
+      return true;
+    }
+    default:
+      return false;
+    }
+  }
+  return false;
 }
