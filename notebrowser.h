@@ -28,7 +28,7 @@ class NoteBrowser : public QWidget {
   NoteBrowser(QWidget * parent = 0);
   //  ~NotesWidget();
  public slots:
-   void onNoteSelected(int );
+   //   void onNoteSelected(int );
    void onCellClicked(int,int);
    void onDeleteClicked();
    //  void onNewClicked();

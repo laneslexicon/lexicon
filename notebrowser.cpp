@@ -1,6 +1,8 @@
 #include "notebrowser.h"
 #include "laneslexicon.h"
 extern LanesLexicon * getApp();
+#define COL_WITH_ID 1
+#define NOTE_SUBSTR_LENGTH 30
 NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   //  LanesLexicon * app = getApp();
   //  QSettings * settings = app->getSettings();
@@ -15,7 +17,6 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QTableWidget;
   m_list->installEventFilter(this);
-  /// id, word,subject,date
   /*
   m_list->setColumnCount(5);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -43,7 +44,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   QHBoxLayout * btnlayout = new QHBoxLayout;
   m_printButton = new QPushButton(tr("Print"));
   m_deleteButton = new QPushButton(tr("Delete"));
-  m_viewButton = new QPushButton(tr("View"));
+  m_viewButton = new QPushButton(tr("View entry"));
 
   btnlayout->addWidget(m_printButton);
   btnlayout->addWidget(m_deleteButton);
@@ -85,32 +86,29 @@ void NoteBrowser::loadTable() {
   NoteMaster * notes = app->notes();
   m_list->setColumnCount(5);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
   QStringList headers;
-  headers << tr("Mark") << tr("Id") << tr("Word") << tr("Created") << tr("Subject");
+  headers << tr("Id") << tr("Word") << tr("Created") << tr("Subject") << tr("Note");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
-  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
+  //  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
 
   QTableWidgetItem * item;
 
-  QSqlQuery q = notes->getNoteList("select id,word,subject,created,amended from notes");
+  QString sql = QString("select id,word,subject,created,amended,substr(note,1,%1) from notes").arg(NOTE_SUBSTR_LENGTH);
+  QSqlQuery q = notes->getNoteList(sql);
   while(q.next()) {
     QString word = q.value("word").toString();
     int row = m_list->rowCount();
     m_list->insertRow(row);
-    QCheckBox * check = new QCheckBox(this);
-    m_list->setCellWidget(row,0,check);
-
-    connect(check,SIGNAL(stateChanged(int)),this,SLOT(onNoteSelected(int)));
     item = new QTableWidgetItem(q.value("id").toString());
-    m_list->setItem(row,1,item);
+    m_list->setItem(row,0,item);
 
     item = new QTableWidgetItem(word);
     item->setData(Qt::UserRole,q.value("id").toInt());
     //      item->setFont(m_resultsFont);
     //      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_list->setItem(row,2,item);
+    m_list->setItem(row,COL_WITH_ID,item);
 
     QString when;
     when = q.value("amended").toString();
@@ -120,9 +118,14 @@ void NoteBrowser::loadTable() {
     QDateTime d = QDateTime::fromString(when);
     item = new QTableWidgetItem(d.toString( Qt::SystemLocaleShortDate));
     //      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_list->setItem(row,3,item);
+    m_list->setItem(row,2,item);
 
     item = new QTableWidgetItem(q.value("subject").toString());
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    //      item->setFont(m_resultsFont);
+    m_list->setItem(row,3,item);
+
+    item = new QTableWidgetItem(q.value(5).toString());
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     //      item->setFont(m_resultsFont);
     m_list->setItem(row,4,item);
@@ -132,23 +135,10 @@ void NoteBrowser::loadTable() {
     m_list->resizeColumnsToContents();
   }
 }
-void NoteBrowser::onNoteSelected(int /* state */) {
-  for(int i=0;i < m_list->rowCount();i++) {
-    QCheckBox * box = qobject_cast<QCheckBox *>(m_list->cellWidget(i,0));
-    if (box->isChecked()) {
-      m_deleteButton->setEnabled(true);
-      m_printButton->setEnabled(true);
-      m_viewButton->setEnabled(true);
-      return;
-    }
-  }
-  m_deleteButton->setEnabled(false);
-  m_printButton->setEnabled(false);
-  m_viewButton->setEnabled(false);
-}
 void NoteBrowser::onCellClicked(int row,int /* column */) {
   qDebug() << Q_FUNC_INFO << row;
-  QTableWidgetItem * item = m_list->item(row,2);
+  /// saving the id with word because we may not include id in release
+  QTableWidgetItem * item = m_list->item(row,COL_WITH_ID);
   if (item) {
     int id = item->data(Qt::UserRole).toInt();
     LanesLexicon * app = getApp();
@@ -159,19 +149,22 @@ void NoteBrowser::onCellClicked(int row,int /* column */) {
       m_note->setText(note->getNote());
     }
   }
-
-
+  m_deleteButton->setEnabled(true);
+  m_printButton->setEnabled(true);
+  m_viewButton->setEnabled(true);
 }
+
 void NoteBrowser::onDeleteClicked() {
   QList<int> ids;
   QMap<int,int> rowmap;
-  for(int i=0;i < m_list->rowCount();i++) {
-    QCheckBox * box = qobject_cast<QCheckBox *>(m_list->cellWidget(i,0));
-    if (box->isChecked()) {
-      QTableWidgetItem * item = m_list->item(i,2);
-      int id =  item->data(Qt::UserRole).toInt();
+  QList<QTableWidgetItem *> items = m_list->selectedItems();
+  for(int i=0;i < items.size();i++) {
+    int row = items[i]->row();
+    QTableWidgetItem * item = m_list->item(row,COL_WITH_ID);
+    if (item) {
+      int id = item->data(Qt::UserRole).toInt();
+      rowmap.insert(id,row);
       ids << id;
-      rowmap.insert(id,i);
     }
   }
   if (ids.size() > 0) {
@@ -190,7 +183,6 @@ void NoteBrowser::onDeleteClicked() {
     for(int i=rows.size() - 1;i >= 0;i--) {
       m_list->removeRow(rows[i]);
     }
-    this->onNoteSelected(0);
   }
 
 }
