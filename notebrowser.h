@@ -31,6 +31,7 @@ class NoteBrowser : public QWidget {
    //   void onNoteSelected(int );
    void onCellClicked(int,int);
    void onDeleteClicked();
+   void onViewClicked();
    //  void onNewClicked();
   //  void onLexiconClicked();
   //  void showSelectedNote();
@@ -44,6 +45,7 @@ class NoteBrowser : public QWidget {
   //  QSqlDatabase m_db;
   //QSqlQueryModel * m_model;
   //  EditableSqlModel * m_model;
+   QMap<int,int> getRowIdMap();
   QTableWidget * m_list;
   QTextEdit * m_note;
   QLineEdit * m_subject;

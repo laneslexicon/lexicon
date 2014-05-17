@@ -79,6 +79,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 
   connect(m_list,SIGNAL(cellClicked(int,int)),this,SLOT(onCellClicked(int,int)));
   connect(m_deleteButton,SIGNAL(clicked()),this,SLOT(onDeleteClicked()));
+  connect(m_viewButton,SIGNAL(clicked()),this,SLOT(onViewClicked()));
 
 }
 void NoteBrowser::loadTable() {
@@ -88,7 +89,7 @@ void NoteBrowser::loadTable() {
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
   QStringList headers;
-  headers << tr("Id") << tr("Word") << tr("Created") << tr("Subject") << tr("Note");
+  headers << tr("Id") << tr("Word") << tr("Date") << tr("Subject") << tr("Note");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   //  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -153,9 +154,7 @@ void NoteBrowser::onCellClicked(int row,int /* column */) {
   m_printButton->setEnabled(true);
   m_viewButton->setEnabled(true);
 }
-
-void NoteBrowser::onDeleteClicked() {
-  QList<int> ids;
+QMap<int,int> NoteBrowser::getRowIdMap() {
   QMap<int,int> rowmap;
   QList<QTableWidgetItem *> items = m_list->selectedItems();
   for(int i=0;i < items.size();i++) {
@@ -164,17 +163,21 @@ void NoteBrowser::onDeleteClicked() {
     if (item) {
       int id = item->data(Qt::UserRole).toInt();
       rowmap.insert(id,row);
-      ids << id;
     }
   }
-  if (ids.size() > 0) {
+  return rowmap;
+}
+void NoteBrowser::onDeleteClicked() {
+  QMap<int,int> rowmap = getRowIdMap();
+
+  if (rowmap.size() > 0) {
     LanesLexicon * app = getApp();
     NoteMaster * notes = app->notes();
     /**
      * get list of deleted ids, get the corresponding rows
      * from row map, sort them, and call removeRow from the highest to lowest
      */
-    QList<int> d = notes->deleteNotes(ids);
+    QList<int> d = notes->deleteNotes(rowmap.keys());
     QList<int> rows;
     for(int i=0;i < d.size();i++) {
       rows << rowmap.value(d[i]);
@@ -201,4 +204,30 @@ bool NoteBrowser::eventFilter(QObject * target,QEvent * event) {
     }
   }
   return false;
+}
+void NoteBrowser::onViewClicked() {
+  QMap<int,int> rowmap = getRowIdMap();
+
+  if (rowmap.size() == 0)
+    return;
+
+  LanesLexicon * app = getApp();
+  NoteMaster * notes = app->notes();
+  QList<int> ids = rowmap.keys();
+  qDebug() << "view ids" << ids;
+  for(int i=0;i < ids.size();i++) {
+    Note * n = notes->findOne(ids[i]);
+    if (n) {
+      Place p = n->getPlace();
+      QString k = p.getNode();
+      qDebug() << "search for" << p.getNode() << "root" << p.getRoot() << "word" << p.getWord();
+      if ( ! k.isEmpty() && ! app->hasPlace(p,GraphicsEntry::NodeSearch,false) ) {
+        qDebug() << "fetch node" << k;
+      }
+      k = p.getRoot();
+      if ( ! k.isEmpty() && ! app->hasPlace(p,GraphicsEntry::RootSearch,false) ) {
+        qDebug() << "fetch root" << k;
+      }
+    }
+  }
 }
