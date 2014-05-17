@@ -169,13 +169,14 @@ void NoteDialog::save() {
   n->setWord(m_word);
   n->setSubject(m_subject->text());
   n->setNote(m_note->toPlainText());
-  m_changed = false;
+
   if (m_attached)
     showKeyboard();
   NoteMaster * notes = getApp()->notes();
   notes->save(n);
   delete n;
-
+  m_changed = false;
+  m_note->document()->setModified(false);
   m_subjectText = m_subject->text();
   m_noteText = m_note->toPlainText();
   this->accept();
