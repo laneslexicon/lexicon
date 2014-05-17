@@ -115,6 +115,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   if (m_restoreBookmarks) {
     restoreBookmarks();
   }
+
   m_tree->resizeColumnToContents(0);
 
   if (m_historyEnabled) {
@@ -123,6 +124,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 
   setupInterface();
+
 
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
@@ -916,15 +918,10 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     createTab = true;
   }
   else {
-    /// it could be either a graphicsentry or a search results window
+    /// if current widget not graphicsentry, set createtab
     entry = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (! entry ) {
-      SearchResultsWidget * w = dynamic_cast<SearchResultsWidget *>(m_tabs->widget(currentTab));
-      if (w) {
-        m_tabs->removeTab(currentTab);
-        delete w;
-        createTab = true;
-      }
+      createTab = true;
     }
   }
   if (createTab) {
@@ -1106,10 +1103,22 @@ void LanesLexicon::writeSettings() {
       if (entry) {
         Place p = entry->getPlace();
         settings->beginGroup(QString("Tab-%1").arg(i));
+        settings->setValue("type","entry");
         settings->setValue("place",p.toString());
         settings->setValue("zoom",entry->getScale());
         settings->setValue("textwidth",entry->getTextWidth());
         settings->endGroup();
+      }
+      else {
+        NoteBrowser * browser = qobject_cast<NoteBrowser *>(m_tabs->widget(i));
+        if (browser) {
+          settings->beginGroup(QString("Tab-%1").arg(i));
+          settings->setValue("type","notes");
+          settings->endGroup();
+        }
+        else {
+          /// could be search results
+        }
       }
     }
     settings->endGroup();
@@ -1156,40 +1165,47 @@ void LanesLexicon::restoreTabs() {
   int j = 0;
   for(int i=0;i < tabs.size();i++) {
     settings->beginGroup(tabs[i]);
-    Place p;
-    QString v = settings->value("place",QString()).toString();
+    if (settings->value("type","entry").toString() == "notes") {
+      NoteBrowser * notes = new NoteBrowser(this);
+      m_tabs->addTab(notes,tr("Notes"));
 
-    qreal scale = settings->value("zoom",1.0).toReal(&ok);
-
-    if ( !ok ) {
-      scale = 1.0;
-    }
-    if (! v.isNull()) {
-      p = Place::fromString(v);
-    }
-    int tw = settings->value("textwidth",textWidth).toInt(&ok);
-    if (!ok) {
-      tw = textWidth;
-    }
-    if (p.isValid()) {
-      if (focusTab == i) {
-        focusTab = j;
-        wp = p;
-        qDebug() << "focustab set to" << focusTab;
-      }
-      GraphicsEntry * entry = new GraphicsEntry(this);
-      entry->setTextWidth(tw);
-      setSignals(entry);
-      p.setType(Place::RestoreTab);
-      entry->getXmlForRoot(p);
-      entry->setScale(scale);
-      //      qDebug() << Q_FUNC_INFO << "adding tab" << p.getShortText();
-      m_tabs->addTab(entry,p.getShortText());
-      m_tree->ensurePlaceVisible(p,true);
-      j++;
     }
     else {
-      qDebug() << Q_FUNC_INFO << "invalid place" << p;
+      Place p;
+      QString v = settings->value("place",QString()).toString();
+
+      qreal scale = settings->value("zoom",1.0).toReal(&ok);
+
+      if ( !ok ) {
+        scale = 1.0;
+      }
+      if (! v.isNull()) {
+        p = Place::fromString(v);
+      }
+      int tw = settings->value("textwidth",textWidth).toInt(&ok);
+      if (!ok) {
+        tw = textWidth;
+      }
+      if (p.isValid()) {
+        if (focusTab == i) {
+          focusTab = j;
+          wp = p;
+          qDebug() << "focustab set to" << focusTab;
+        }
+        GraphicsEntry * entry = new GraphicsEntry(this);
+        entry->setTextWidth(tw);
+        setSignals(entry);
+        p.setType(Place::RestoreTab);
+        entry->getXmlForRoot(p);
+        entry->setScale(scale);
+        //      qDebug() << Q_FUNC_INFO << "adding tab" << p.getShortText();
+        m_tabs->addTab(entry,p.getShortText());
+        m_tree->ensurePlaceVisible(p,true);
+        j++;
+      }
+      else {
+        qDebug() << Q_FUNC_INFO << "invalid place" << p;
+      }
     }
     settings->endGroup();
   }
@@ -1986,12 +2002,14 @@ void LanesLexicon::syncContents() {
   if (p.isValid())
     m_tree->ensurePlaceVisible(p);
 }
+/*
 void LanesLexicon::saveNote(Note * note) {
   qDebug() << Q_FUNC_INFO << note->getId() << note->getWord();
   qDebug() << note->getNote();
   m_notes->save(note);
   delete note;
 }
+*/
 void LanesLexicon::showNoteBrowser() {
   for(int i=0;i < m_tabs->count();i++) {
     NoteBrowser * notes = qobject_cast<NoteBrowser *>(m_tabs->widget(i));
@@ -2001,4 +2019,16 @@ void LanesLexicon::showNoteBrowser() {
     }
   }
   m_tabs->addTab(new NoteBrowser(this),"Notes");
+}
+bool LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
+  for(int i=0;i < m_tabs->count();i++) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+    if (entry) {
+      if (entry->hasPlace(p,searchtype,false) != -1) {
+        return true;
+      }
+    }
+  }
+  return false;
+
 }

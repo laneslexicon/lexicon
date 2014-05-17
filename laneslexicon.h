@@ -84,7 +84,8 @@ public:
     enum NavMode {ByRoot, ByPage };
     public slots:
     void gotoPlace(const Place &,bool newTab = false);
-    void saveNote(Note *);
+    bool hasPlace(const Place & p,int searchtype,bool setFocus);
+    //    void saveNote(Note *);
     private slots:
       void testSlot();
       void showNoteBrowser();
