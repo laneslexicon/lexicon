@@ -214,19 +214,26 @@ void NoteBrowser::onViewClicked() {
   LanesLexicon * app = getApp();
   NoteMaster * notes = app->notes();
   QList<int> ids = rowmap.keys();
-  qDebug() << "view ids" << ids;
+
   for(int i=0;i < ids.size();i++) {
     Note * n = notes->findOne(ids[i]);
     if (n) {
       Place p = n->getPlace();
       QString k = p.getNode();
       qDebug() << "search for" << p.getNode() << "root" << p.getRoot() << "word" << p.getWord();
-      if ( ! k.isEmpty() && ! app->hasPlace(p,GraphicsEntry::NodeSearch,false) ) {
-        qDebug() << "fetch node" << k;
+      /// search tabs for entry as node then as root
+      if ( !k.isEmpty() ) {
+        if ( ! app->hasPlace(p,GraphicsEntry::NodeSearch,false) ) {
+          qDebug() << "fetch node" << k;
+          app->gotoPlace(p,false);
+          return;
+        }
       }
       k = p.getRoot();
       if ( ! k.isEmpty() && ! app->hasPlace(p,GraphicsEntry::RootSearch,false) ) {
         qDebug() << "fetch root" << k;
+        app->gotoPlace(p,true);
+        return;
       }
     }
   }
