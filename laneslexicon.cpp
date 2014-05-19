@@ -137,6 +137,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   /// without this, the QSplashScreen is the active window
   QApplication::setActiveWindow(m_tabs->currentWidget());
   m_tabs->currentWidget()->setFocus();
+
+  setTabOrder(m_tree,m_tabs);
+  setTabOrder(m_tabs->tabBar(),m_tree);
   qDebug() << "-----------------------";
   qDebug() << "Initialisation complete";
   qDebug() << "-----------------------";
@@ -571,6 +574,7 @@ void LanesLexicon::createToolBar() {
   m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_hBackwardBtn->setEnabled(false);
   m_hBackwardBtn->setMenu(m_historyMenu);
+  m_hBackwardBtn->setFocusPolicy(Qt::ClickFocus);
   mainbar->addWidget(m_hBackwardBtn);
   //  history->addSeparator();
 
@@ -2024,15 +2028,18 @@ void LanesLexicon::showNoteBrowser() {
   }
   m_tabs->addTab(new NoteBrowser(this),"Notes");
 }
-bool LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
+int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
     if (entry) {
       if (entry->hasPlace(p,searchtype,false) != -1) {
-        return true;
+        if (setFocus) {
+          m_tabs->setCurrentIndex(i);
+        }
+        return i;
       }
     }
   }
-  return false;
+  return -1;
 
 }

@@ -43,9 +43,9 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   m_note->setSizePolicy(policy);
 
   QHBoxLayout * btnlayout = new QHBoxLayout;
-  m_printButton = new QPushButton(tr("Print"));
-  m_deleteButton = new QPushButton(tr("Delete"));
-  m_viewButton = new QPushButton(tr("View entry"));
+  m_printButton = new QPushButton(tr("&Print"));
+  m_deleteButton = new QPushButton(tr("&Delete"));
+  m_viewButton = new QPushButton(tr("&View entry"));
 
   btnlayout->addWidget(m_printButton);
   btnlayout->addWidget(m_deleteButton);
@@ -223,19 +223,16 @@ void NoteBrowser::onViewClicked() {
       QString k = p.getNode();
       qDebug() << "search for" << p.getNode() << "root" << p.getRoot() << "word" << p.getWord();
       /// search tabs for entry as node then as root
-      if ( !k.isEmpty() ) {
-        if ( ! app->hasPlace(p,GraphicsEntry::NodeSearch,false) ) {
-          qDebug() << "fetch node" << k;
-          app->gotoPlace(p,false);
-          return;
-        }
+      int ix = app->hasPlace(p,GraphicsEntry::NodeSearch,true);
+      if (k.isEmpty() || (ix == -1)) {
+          k = p.getRoot();
+          ix = app->hasPlace(p,GraphicsEntry::RootSearch,true);
+          if (k.isEmpty() || (ix == -1)) {
+            app->gotoPlace(p,false);
+            return;
+          }
       }
-      k = p.getRoot();
-      if ( ! k.isEmpty() && ! app->hasPlace(p,GraphicsEntry::RootSearch,false) ) {
-        qDebug() << "fetch root" << k;
-        app->gotoPlace(p,true);
-        return;
-      }
+      qDebug() << "found in tab" << ix;
     }
   }
 }
