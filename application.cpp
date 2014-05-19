@@ -22,6 +22,7 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QCoreApplication::setApplicationName("Lanes Lexicon");
   QCoreApplication::setApplicationVersion("0.1");
 
+  connect(this,SIGNAL(focusChanged(QWidget *,QWidget *)),this,SLOT(onFocusChange(QWidget *,QWidget *)));
 }
 QString Lexicon::getConfig() const {
   return m_configFile;
@@ -55,4 +56,8 @@ QString Lexicon::getFontSize(const QString & type) {
   }
   */
   return QString();
+}
+void Lexicon::onFocusChange(QWidget * old, QWidget * now) {
+  if (old && now)
+    qDebug() << old->metaObject()->className() << "--->" << now->metaObject()->className();
 }

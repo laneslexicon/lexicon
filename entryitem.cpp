@@ -6,11 +6,13 @@ EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTe
   m_focusOnHover = false;
   m_note = NULL;
   m_noteWidget = NULL;
+  setObjectName("entryitem");
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
   m_focusOnHover = false;
   m_note = NULL;
   m_noteWidget = NULL;
+  setObjectName("entryitem");
 }
 /**
  * the note dialog does not have a QWidget parent so delete it manually

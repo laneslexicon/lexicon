@@ -13,7 +13,7 @@ NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
   m_word = p.getWord();
   this->setup();
   setWindowTitle(m_subject->text());
-
+  setObjectName("notedialog");
   /// set values from place
   m_subject->setText(p.getShortText());
   m_note->setFocus();

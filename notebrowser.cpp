@@ -14,6 +14,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 //  delete settings;
 
 //  NoteMaster * notes = app->notes();
+  setObjectName("notebrowser");
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QTableWidget;
   m_list->installEventFilter(this);

@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QSettings>
 #include <QFontDatabase>
+#include <QWidget>
 #include <iostream>
 
 class Lexicon : public QApplication {
@@ -18,6 +19,8 @@ public:
   bool isOk() { return m_ok;}
   QString getFontName(const QString &);
   QString getFontSize(const QString &);
+  public slots:
+    void onFocusChange(QWidget *,QWidget *);
  private:
   QString m_configFile;
   QString m_showFirst;

@@ -25,6 +25,14 @@ NoteMaster * getNotes() {
   LanesLexicon * app = getApp();
   return app->notes();
 }
+void testfocus() {
+  QWidget * aw = QApplication::activeWindow();
+  foreach (QWidget *widget, QApplication::allWidgets()) {
+    qDebug() << "focus" << widget->metaObject()->className() << widget->objectName() << widget->hasFocus();
+    if (widget == aw)
+      qDebug() << "++++++++++++++++++++++++++++++++++++++";
+  }
+}
 int main(int argc, char *argv[])
 {
     Lexicon a(argc, argv);

@@ -1,11 +1,13 @@
 #include "laneslexicon.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
+extern void testfocus();
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
 {
   setAttribute(Qt::WA_DeleteOnClose);
+  setObjectName("lexicon");
   m_ok = false;
   m_history = 0;
   m_revertEnabled = false;
@@ -97,10 +99,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   if (m_restoreTabs) {
     restoreTabs();
   }
-  if (m_tabs->count() > 0) {
-      m_tabs->currentWidget()->setFocus();
-   }
-  else {
+  /// TODO if no tabs, show first root. Change this to somethign else ?
+  if (m_tabs->count() ==  0) {
     GraphicsEntry * entry = new GraphicsEntry(this);
     entry->installEventFilter(this);
     setSignals(entry);
@@ -134,6 +134,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   this->restoreState(settings->value("State").toByteArray());
   delete settings;
 
+  /// without this, the QSplashScreen is the active window
+  QApplication::setActiveWindow(m_tabs->currentWidget());
+  m_tabs->currentWidget()->setFocus();
   qDebug() << "-----------------------";
   qDebug() << "Initialisation complete";
   qDebug() << "-----------------------";
@@ -848,8 +851,10 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
       entryActivated(item,0);
     }
   }
-  if (m_treeKeepsFocus)
+  if (m_treeKeepsFocus) {
+    qDebug() << "tree focus";
     m_tree->setFocus();
+  }
 
   if ( ! item->isExpanded() ) {
     item->setExpanded(true);
@@ -1190,7 +1195,6 @@ void LanesLexicon::restoreTabs() {
         if (focusTab == i) {
           focusTab = j;
           wp = p;
-          qDebug() << "focustab set to" << focusTab;
         }
         GraphicsEntry * entry = new GraphicsEntry(this);
         entry->setTextWidth(tw);
@@ -1214,7 +1218,7 @@ void LanesLexicon::restoreTabs() {
   if (focusTab < m_tabs->count()) {
     m_tabs->setCurrentIndex(focusTab);
     /// sync the current tab with the tree
-    qDebug() << "Synching tab" << focusTab;
+    //qDebug() << "Synching tab" << focusTab;
     currentTabChanged(focusTab);
   }
   delete settings;

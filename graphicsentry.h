@@ -201,6 +201,8 @@ class LaneGraphicsView : public QGraphicsView {
  protected:
   virtual void scrollContentsBy(int,int);
   void keyPressEvent(QKeyEvent *);
+  void focusInEvent(QFocusEvent *);
+  void focusOutEvent(QFocusEvent *);
  signals:
   void nextPage();
   void backPage();

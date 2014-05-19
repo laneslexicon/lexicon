@@ -5,6 +5,7 @@ extern LanesLexicon * getApp();
 extern NoteMaster * getNotes();
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
+  setObjectName("toolbuttondata");
 }
 ToolButtonData::~ToolButtonData() {
   qDebug() << Q_FUNC_INFO;
@@ -17,6 +18,7 @@ ToolButtonData::~ToolButtonData() {
  */
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
   QGraphicsView(scene,parent) {
+  setObjectName("lexicongraphicsview");
   //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   //  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
@@ -42,7 +44,23 @@ void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << "got key" << event->modifiers() << event->key();
   QGraphicsView::keyPressEvent(event);
 }
+void LaneGraphicsView::focusInEvent(QFocusEvent * event) {
+  //  qDebug() << Q_FUNC_INFO << this->styleSheet();
+  //  this->setStyleSheet(" border : 1px red solid");
+  QGraphicsView::focusInEvent(event);
+}
+void LaneGraphicsView::focusOutEvent(QFocusEvent * event) {
+  QGraphicsView::focusOutEvent(event);
+  //  this->setStyleSheet("");
+}
+/**
+ *
+ *
+ * @param parent
+ */
 GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
+  setObjectName("graphicsentry");
+  setFocusPolicy(Qt::StrongFocus);
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_textOption.setTextDirection(Qt::LeftToRight);
@@ -248,7 +266,7 @@ Place GraphicsEntry::getPlace() const {
  return m_place;
 }
 void GraphicsEntry::focusInEvent(QFocusEvent * event) {
-  //  QLOG_DEBUG() << "Got input focus";
+  /// giving focus to the graphicsview so keyboard
   m_view->setFocus();
   QWidget::focusInEvent(event);
 
