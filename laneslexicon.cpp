@@ -28,7 +28,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_tree = new ContentsWidget(this);
   m_tree->setObjectName("treeRoots");
   m_tree->installEventFilter(this);
-  m_tabs = new QTabWidget(this);
+  m_tabs = new TabWidget(this);
   m_tabs->setTabsClosable(true);
 
   /// at the end of the history, but we should be able to restore from settings
@@ -135,11 +135,18 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   delete settings;
 
   /// without this, the QSplashScreen is the active window
-  QApplication::setActiveWindow(m_tabs->currentWidget());
-  m_tabs->currentWidget()->setFocus();
+
+  //  m_tabs->currentWidget()->setFocus();
 
   setTabOrder(m_tree,m_tabs);
   setTabOrder(m_tabs->tabBar(),m_tree);
+  QApplication::setActiveWindow(m_tabs->currentWidget());
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->setFocus();
+    entry->focusPlace();
+  }
+
   qDebug() << "-----------------------";
   qDebug() << "Initialisation complete";
   qDebug() << "-----------------------";
@@ -1177,14 +1184,11 @@ void LanesLexicon::restoreTabs() {
     if (settings->value("type","entry").toString() == "notes") {
       NoteBrowser * notes = new NoteBrowser(this);
       m_tabs->addTab(notes,tr("Notes"));
-
     }
     else {
       Place p;
       QString v = settings->value("place",QString()).toString();
-
       qreal scale = settings->value("zoom",1.0).toReal(&ok);
-
       if ( !ok ) {
         scale = 1.0;
       }
@@ -1221,6 +1225,9 @@ void LanesLexicon::restoreTabs() {
   wp.setType(Place::RestoreTab);
   if (focusTab < m_tabs->count()) {
     m_tabs->setCurrentIndex(focusTab);
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+    if (entry)
+      entry->focusPlace();
     /// sync the current tab with the tree
     //qDebug() << "Synching tab" << focusTab;
     currentTabChanged(focusTab);

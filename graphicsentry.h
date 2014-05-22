@@ -77,6 +77,7 @@ class GraphicsEntry : public QWidget {
     bool hasNode(const QString &);
     void focusNode(const QString &);
     void shiftFocus();
+    void setCurrentItem(EntryItem *);
   public slots:
     void anchorClicked(const QUrl &);
     void linkActivated(const QString &);
@@ -99,6 +100,7 @@ class GraphicsEntry : public QWidget {
     void notesButtonPressed();
     void addButtonDecoration();
     void deleteNotes();
+    void focusPlace();
  private:
     QColor m_supplementBg;
     bool m_notesEnabled;
@@ -134,6 +136,7 @@ class GraphicsEntry : public QWidget {
     QString m_narrowKey;
     QString m_searchKey;
     QString m_clearKey;
+
     int m_widenStep;
     int m_defaultWidth;
 
@@ -144,6 +147,7 @@ class GraphicsEntry : public QWidget {
     //    const XalanCompiledStylesheet * m_compiledXsl;
     //    bool showNode(const QString &,bool thisPageOnly = false);
     Place showPlace(const Place &,bool thisPageOnly = false);
+
     qreal m_scale;
 
     QTransform m_transform;

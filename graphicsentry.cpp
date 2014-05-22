@@ -19,6 +19,7 @@ ToolButtonData::~ToolButtonData() {
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
   QGraphicsView(scene,parent) {
   setObjectName("lexicongraphicsview");
+  setFocusPolicy(Qt::StrongFocus);
   //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   //  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
@@ -159,6 +160,8 @@ void GraphicsEntry::readSettings() {
   }
   m_searchKey = settings->value("Find",QString()).toString();
   m_clearKey = settings->value("Clean",QString()).toString();
+
+
   settings->endGroup();
 
   settings->beginGroup("Debug");
@@ -177,6 +180,20 @@ void GraphicsEntry::writeDefaultSettings() {
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   // qDebug() << Q_FUNC_INFO << event->modifiers() << event->key() << event->text();
+  if (event->key() == Qt::Key_Escape) {
+    QWidget * w = this->parentWidget();
+
+    while(w) {
+      qDebug() << w->metaObject()->className();
+      QTabWidget * tabw = qobject_cast<QTabWidget *>(w);
+      if (tabw)  {
+        qDebug() << "setting focus" << tabw->tabBar()->hasFocus();
+        tabw->tabBar()->setFocus();
+        return;
+      }
+      w = w->parentWidget();
+    }
+  }
   if (! m_zoomInKey.isEmpty() && (event->text() == m_zoomInKey)) {
     onZoomIn();
     return;
@@ -227,10 +244,11 @@ void GraphicsEntry::moveFocusDown() {
     for(int i=0;i < m ;i++) {
       if (m_items[i] == item) {
         //        m_view->centerOn(m_items[i+1]);
-        m_view->ensureVisible(m_items[i+1]);
-        m_scene->setFocusItem(m_items[i+1]);
+        //        m_view->ensureVisible(m_items[i+1]);
+        //        m_scene->setFocusItem(m_items[i+1]);
         //        qDebug() << "focus moved from" << m_items[i]->getPlace().getText();
         //        qDebug() << "focus moved to  " << m_items[i + 1]->getPlace().getText();
+        setCurrentItem(m_items[i+1]);
         return;
       }
     }
@@ -243,10 +261,12 @@ void GraphicsEntry::moveFocusUp() {
     for(int i=1;i < m ;i++) {
       if (m_items[i] == item) {
         //        m_view->centerOn(m_items[i-1]);
-        m_view->ensureVisible(m_items[i-1]);
-        m_scene->setFocusItem(m_items[i-1]);
+        //        m_view->ensureVisible(m_items[i-1]);
+        //        m_scene->setFocusItem(m_items[i-1]);
+        //        m_place = m_items[i-1]->getPlace();
         //        qDebug() << "focus moved from" << m_items[i]->getPlace().getText();
         //        qDebug() << "focus moved to  " << m_items[i - 1]->getPlace().getText();
+        setCurrentItem(m_items[i-1]);
         return;
       }
     }
@@ -267,7 +287,9 @@ Place GraphicsEntry::getPlace() const {
 }
 void GraphicsEntry::focusInEvent(QFocusEvent * event) {
   /// giving focus to the graphicsview so keyboard
-  m_view->setFocus();
+  //  m_view->setFocus();
+  qDebug() << Q_FUNC_INFO;
+  this->focusPlace();
   QWidget::focusInEvent(event);
 
 }
@@ -1333,11 +1355,17 @@ void GraphicsEntry::focusNode(const QString & node) {
   if (node.isEmpty()) {
     return;
   }
+  qDebug() << Q_FUNC_INFO << node;
   for(int i=0;i < m_items.size();i++) {
     Place p = m_items[i]->getPlace();
     if (p.getNode() == node) {
-      m_view->ensureVisible(m_items[i]);
-      m_scene->setFocusItem(m_items[i]);
+      //      m_view->ensureVisible(m_items[i]);
+      //      m_view->setFocus();
+      //      m_scene->setFocus();
+      //      m_scene->setFocusItem(m_items[i]);
+      //      m_items[i]->setSelected(true);
+      this->setCurrentItem(m_items[i]);
+      qDebug() << "set focus successful";
       return;
     }
   }
@@ -1408,4 +1436,18 @@ void GraphicsEntry::deleteNotes() {
     m->remove(n);
     delete n;
   }
+}
+void GraphicsEntry::focusPlace() {
+  Place p = this->getPlace();
+  if (! p.getNode().isEmpty()) {
+    qDebug() << Q_FUNC_INFO << p.getNode();
+    this->focusNode(p.getNode());
+  }
+
+}
+void GraphicsEntry::setCurrentItem(EntryItem * item) {
+  m_view->setFocus();
+  m_view->ensureVisible(item);
+  m_scene->setFocusItem(item);
+  m_place = item->getPlace();
 }

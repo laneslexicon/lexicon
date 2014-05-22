@@ -7,12 +7,16 @@ EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTe
   m_note = NULL;
   m_noteWidget = NULL;
   setObjectName("entryitem");
+  setFlag(QGraphicsItem::ItemIsSelectable,true);
+  setFlag(QGraphicsItem::ItemIsFocusable,true);
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
   m_focusOnHover = false;
   m_note = NULL;
   m_noteWidget = NULL;
   setObjectName("entryitem");
+  setFlag(QGraphicsItem::ItemIsSelectable,true);
+  setFlag(QGraphicsItem::ItemIsFocusable,true);
 }
 /**
  * the note dialog does not have a QWidget parent so delete it manually
@@ -183,7 +187,6 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
   else {
     painter->setBrush(m_backgroundColor);
   }
-  painter->drawRect(boundingRect());
   painter->setPen(pen);
   QGraphicsTextItem::paint(painter, o, w);
 }

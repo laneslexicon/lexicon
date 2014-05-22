@@ -60,13 +60,7 @@
 #include "helpviewer.h"
 #include "notes.h"
 #include "notebrowser.h"
-/*
-struct cmdOptions {
-  bool dump;
-  QString node;
-  QString config;
-};
-*/
+#include "tabwidget.h"
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
@@ -241,7 +235,7 @@ private:
 
     QSqlDatabase m_db;
     QSqlDatabase m_notesDb;
-    QTabWidget * m_tabs;
+    TabWidget * m_tabs;
     QMenu * m_fileMenu;
     // actions
     QAction * m_exitAction;
