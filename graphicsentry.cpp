@@ -1340,14 +1340,16 @@ void GraphicsEntry::clearHighlights() {
 }
 void GraphicsEntry::shiftFocus() {
   QGraphicsItem * item = m_scene->focusItem();
+  //  EntryItem * ei = qobject_cast<EntryItem *>(item);
   if ( ! item  && (m_items.size() > 0)) {
     item = m_items[0];
   }
   if (item) {
     qDebug() << "ensuring current node is visible";
-    this->setFocus();
-    m_view->ensureVisible(item);
-    m_scene->setFocusItem(item);
+    //    this->setFocus();
+    this->setCurrentItem(item);
+    //m_view->ensureVisible(item);
+    //    m_scene->setFocusItem(item);
   }
   return;
 }
@@ -1365,7 +1367,6 @@ void GraphicsEntry::focusNode(const QString & node) {
       //      m_scene->setFocusItem(m_items[i]);
       //      m_items[i]->setSelected(true);
       this->setCurrentItem(m_items[i]);
-      qDebug() << "set focus successful";
       return;
     }
   }
@@ -1442,12 +1443,15 @@ void GraphicsEntry::focusPlace() {
   if (! p.getNode().isEmpty()) {
     qDebug() << Q_FUNC_INFO << p.getNode();
     this->focusNode(p.getNode());
+    return;
   }
-
+  this->shiftFocus();
 }
-void GraphicsEntry::setCurrentItem(EntryItem * item) {
+void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
   m_view->setFocus();
   m_view->ensureVisible(item);
   m_scene->setFocusItem(item);
-  m_place = item->getPlace();
+  EntryItem * entry = dynamic_cast<EntryItem *>(item);
+  if (entry)
+    m_place = entry->getPlace();
 }

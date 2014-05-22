@@ -77,7 +77,7 @@ class GraphicsEntry : public QWidget {
     bool hasNode(const QString &);
     void focusNode(const QString &);
     void shiftFocus();
-    void setCurrentItem(EntryItem *);
+    void setCurrentItem(QGraphicsItem *);
   public slots:
     void anchorClicked(const QUrl &);
     void linkActivated(const QString &);
