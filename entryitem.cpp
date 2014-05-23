@@ -167,8 +167,13 @@ void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
 void EntryItem::focusInEvent(QFocusEvent * event) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << this->getPlace().getText();
   /// this updates m_place in graphicsentry so the current node is saved on exit
+  qDebug() << Q_FUNC_INFO << this->getPlace().getNode();
   emit(placeChanged(this->getPlace()));
   QGraphicsTextItem::focusInEvent(event);
+}
+void EntryItem::focusOutEvent(QFocusEvent * event) {
+  qDebug() << Q_FUNC_INFO << this->getPlace().getNode();
+  QGraphicsTextItem::focusOutEvent(event);
 }
 /*
 void EntryItem::copy() {
@@ -290,9 +295,11 @@ void EntryItem::showNote() {
   if ((m_note == NULL) && (m_notes.size() > 0)){
     m_note = new NoteDialog(m_notes[0]);
     m_note->setAutosave(::getNotes()->autosave());
+    connect(m_note,SIGNAL(rejected()),this,SLOT(notesRejected()));
+    connect(m_note,SIGNAL(accpeted()),this,SLOT(notesAccepted()));
   }
   m_note->show();
-
+  qDebug() << Q_FUNC_INFO << __LINE__;
 }
 void EntryItem::deleteNote() {
   qDebug() << Q_FUNC_INFO;
@@ -316,4 +323,12 @@ QList<Note *> EntryItem::getNotes(bool erase) {
 }
 void EntryItem::destroyNotes() {
   m_notes.clear();
+}
+void EntryItem::notesRejected() {
+  qDebug() << Q_FUNC_INFO;
+  this->setFocus();
+}
+void EntryItem::notesAccepted() {
+  qDebug() << Q_FUNC_INFO;
+  this->setFocus();
 }

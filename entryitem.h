@@ -93,6 +93,8 @@ class EntryItem : public QGraphicsTextItem {
   public slots:
     void searchItem();
     void clearSelection();
+    void notesRejected();
+    void notesAccepted();
  signals:
     void showPerseus(const Place &);
     void placeChanged(const Place &);
@@ -107,6 +109,7 @@ class EntryItem : public QGraphicsTextItem {
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
   void focusInEvent(QFocusEvent *);
+  void focusOutEvent(QFocusEvent *);
   void paint( QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
 
