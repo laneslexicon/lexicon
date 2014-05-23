@@ -142,9 +142,19 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   setTabOrder(m_tabs->tabBar(),m_tree);
   QApplication::setActiveWindow(m_tabs->currentWidget());
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  /**
+   * if the current widget is a graphics entry , sent it a <space> to simulate
+   * the user activating the page (<return> would do). This selects the current item
+   * and gives focus etc. It's a kludge, but the whole focus/selection stuff is a
+   * bit confusing.
+   */
+
   if (entry) {
-    entry->setFocus();
     entry->focusPlace();
+    QKeyEvent * event;
+    int k = 0x20;
+    event = new QKeyEvent(QEvent::KeyPress, k, Qt::NoModifier,QString(QChar(k)));
+    QApplication::postEvent(entry,event);
   }
 
   qDebug() << "-----------------------";
