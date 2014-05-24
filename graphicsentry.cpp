@@ -1445,13 +1445,15 @@ void GraphicsEntry::focusPlace() {
     this->focusNode(p.getNode());
     return;
   }
-  this->shiftFocus();
+  //  this->shiftFocus();
 }
 void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
+  qDebug() << Q_FUNC_INFO;
   m_view->setFocus();
   m_view->ensureVisible(item);
   m_scene->setFocusItem(item);
   EntryItem * entry = dynamic_cast<EntryItem *>(item);
   if (entry)
     m_place = entry->getPlace();
+
 }
