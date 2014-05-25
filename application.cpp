@@ -14,7 +14,11 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
     m_ok = false;
   }
   QFontDatabase::addApplicationFont(resourceDir + "/fonts/amiri/amiri-regular.ttf");
+  QFontDatabase::addApplicationFont(resourceDir + "/fonts/FiraSans/OTF/FiraSans-Regular.otf");
+  if (QFontDatabase::addApplicationFont(resourceDir + "/fonts/FiraSans/OTF/FiraSans-Book.otf") == -1)
+    std::cout << "Could not load FiraSans-Book font" << std::endl;
   addLibraryPath(resourceDir + "/lib");
+
 
 
   QCoreApplication::setOrganizationName("Gabanjo");

@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
 
     //    progOptions.node = parser.value(nodeOption);
-    QFontDatabase::addApplicationFont("fonts/amiri/amiri-regular.ttf");
+    //    QFontDatabase::addApplicationFont("fonts/amiri/amiri-regular.ttf");
 
 
     if (parser.isSet(fontOption) ) {

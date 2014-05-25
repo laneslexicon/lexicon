@@ -1,4 +1,5 @@
 #include "tabwidget.h"
+#include "graphicsentry.h"
 TabWidget::TabWidget(QWidget * parent) : QTabWidget(parent) {
 }
 void TabWidget::keyPressEvent(QKeyEvent * event) {

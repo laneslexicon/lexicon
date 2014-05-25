@@ -3,7 +3,7 @@
 #include <QTabWidget>
 #include <QKeyEvent>
 #include <QDebug>
-#include "graphicsentry.h"
+
 class TabWidget : public QTabWidget {
   Q_OBJECT
  public:
