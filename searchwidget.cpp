@@ -1,4 +1,6 @@
 #include "searchwidget.h"
+#include "QsLog.h"
+
 SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
 }
@@ -90,9 +92,9 @@ void SearchDialog::setup() {
   m_attached = false;
   m_keyboard = new KeyboardWidget(this);
   QPoint p = this->pos();
-  qDebug() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
+  QLOG_DEBUG() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
   int h = this->frameGeometry().height();
-  qDebug() << "search dialog frame geometry" << this->frameGeometry();
+  QLOG_DEBUG() << "search dialog frame geometry" << this->frameGeometry();
   m_keyboard->move(p.x(),p.y() + h);
   //  delete settings;
 }
@@ -195,9 +197,9 @@ void WordSearchDialog::setup() {
   m_attached = false;
   m_keyboard = new KeyboardWidget(this);
   QPoint p = this->pos();
-  qDebug() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
+  QLOG_DEBUG() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
   int h = this->frameGeometry().height();
-  qDebug() << "search dialog frame geometry" << this->frameGeometry();
+  QLOG_DEBUG() << "search dialog frame geometry" << this->frameGeometry();
   m_keyboard->move(p.x(),p.y() + h);
   //  delete settings;
 }

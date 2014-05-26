@@ -212,7 +212,7 @@ bool HistoryMaster::clear() {
      return qry.exec();
    }
    else {
-     qDebug() << "Error preparing delete history sql";
+     QLOG_DEBUG() << "Error preparing delete history sql";
    }
    return false;
 }

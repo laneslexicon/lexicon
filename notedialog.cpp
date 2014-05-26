@@ -104,7 +104,7 @@ QSize NoteDialog::sizeHint() const {
   return sz;
 }
 void NoteDialog::closeEvent(QCloseEvent * event) {
-  qDebug() << Q_FUNC_INFO << "modified" << this->isModified();
+  QLOG_DEBUG() << Q_FUNC_INFO << "modified" << this->isModified();
   if (this->isModified()) {
     if (m_autosave) {
       this->save();
@@ -125,7 +125,7 @@ void NoteDialog::closeEvent(QCloseEvent * event) {
   QDialog::closeEvent(event);
 }
 NoteDialog::~NoteDialog() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 
 }
 void NoteDialog::setSubject(const QString & text) {

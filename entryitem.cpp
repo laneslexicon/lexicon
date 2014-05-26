@@ -56,9 +56,9 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   QTextCursor c = textCursor();
   c.setPosition(document()->documentLayout()->hitTest(event->pos(), Qt::FuzzyHit));
   c.select(QTextCursor::WordUnderCursor);
-  //  qDebug() << "selected text:" << c.selectedText();
+  //  QLOG_DEBUG() << "selected text:" << c.selectedText();
   if (c.charFormat().isAnchor()) {
-    //    qDebug() << "is anchor" << c.charFormat().isAnchor() << c.charFormat().anchorHref();
+    //    QLOG_DEBUG() << "is anchor" << c.charFormat().isAnchor() << c.charFormat().anchorHref();
     href = c.charFormat().anchorHref();
     if (href.startsWith("#")) {
       href.remove(0,1);
@@ -134,7 +134,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     this->deleteNote();
   }
   else if ((jumpAction != NULL) && (selectedAction == jumpAction)) {
-    qDebug() << "GOTO" << jumpAction->data();
+    QLOG_DEBUG() << "GOTO" << jumpAction->data();
     Place p;
     p.setNode(jumpAction->data().toString());
     emit(gotoNode(p,true));
@@ -157,7 +157,7 @@ void EntryItem::setPlace(const Place & p) {
  setToolTip(m_place.getText());
  }
 void EntryItem::searchItem() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
   if (m_focusOnHover)
@@ -167,12 +167,10 @@ void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
 void EntryItem::focusInEvent(QFocusEvent * event) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << this->getPlace().getText();
   /// this updates m_place in graphicsentry so the current node is saved on exit
-  qDebug() << Q_FUNC_INFO << this->getPlace().getNode();
   emit(placeChanged(this->getPlace()));
   QGraphicsTextItem::focusInEvent(event);
 }
 void EntryItem::focusOutEvent(QFocusEvent * event) {
-  qDebug() << Q_FUNC_INFO << this->getPlace().getNode();
   QGraphicsTextItem::focusOutEvent(event);
 }
 /*
@@ -208,7 +206,7 @@ QTextCursor EntryItem::highlight(const QString & target, Qt::GlobalColor color) 
   while(! cursor.isNull()) {
     pos =  cursor.position();
     m_searchPositions << pos;
-    //    qDebug() << Q_FUNC_INFO << "found at" << pos;
+    //    QLOG_DEBUG() << Q_FUNC_INFO << "found at" << pos;
     cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
     cursor.setPosition(pos, QTextCursor::KeepAnchor);
     QTextCharFormat fmt = cursor.charFormat();
@@ -299,10 +297,10 @@ void EntryItem::showNote() {
     connect(m_note,SIGNAL(accpeted()),this,SLOT(notesAccepted()));
   }
   m_note->show();
-  qDebug() << Q_FUNC_INFO << __LINE__;
+  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__;
 }
 void EntryItem::deleteNote() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   if (m_noteWidget != NULL) {
     QGraphicsScene * scene = m_noteWidget->scene();
     scene->removeItem(m_noteWidget);
@@ -325,10 +323,10 @@ void EntryItem::destroyNotes() {
   m_notes.clear();
 }
 void EntryItem::notesRejected() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   this->setFocus();
 }
 void EntryItem::notesAccepted() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   this->setFocus();
 }

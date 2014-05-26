@@ -21,7 +21,7 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_list->installEventFilter(this);
   QStyle * style = m_list->style();
-  qDebug() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
+  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   m_text = new GraphicsEntry;
 
   bool ok = false;
@@ -136,11 +136,11 @@ void SearchResultsWidget::itemDoubleClicked(QTableWidgetItem * item) {
 bool SearchResultsWidget::eventFilter(QObject * target,QEvent * event) {
 
   if (event->type() == QEvent::KeyPress) {
-    qDebug() << Q_FUNC_INFO;
+    QLOG_DEBUG() << Q_FUNC_INFO;
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
       case Qt::Key_Enter: {
-        qDebug() << "hit enter on table";
+        QLOG_DEBUG() << "hit enter on table";
         if (keyEvent->modifiers() && Qt::ControlModifier) {
           //          m_tree->setFocus();
           return true;
@@ -149,7 +149,7 @@ bool SearchResultsWidget::eventFilter(QObject * target,QEvent * event) {
       }
     case Qt::Key_Return:
     case Qt::Key_Space: {
-        qDebug() << "hit return on table";
+        QLOG_DEBUG() << "hit return on table";
         //        if (keyEvent->modifiers() && Qt::ControlModifier) {
         QTableWidgetItem * item = m_list->currentItem();
         if (item)

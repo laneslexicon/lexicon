@@ -140,14 +140,14 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   setTabOrder(m_tree,m_tabs);
   setTabOrder(m_tabs->tabBar(),m_tree);
-  QApplication::setActiveWindow(m_tabs->currentWidget());
-  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   /**
    * if the current widget is a graphics entry , sent it a <space> to simulate
    * the user activating the page (<return> would do). This selects the current item
    * and gives focus etc. It's a kludge, but the whole focus/selection stuff is a
    * bit confusing.
    */
+  QApplication::setActiveWindow(m_tabs->currentWidget());
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
 
   if (entry) {
     entry->focusPlace();
@@ -157,9 +157,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     QApplication::postEvent(entry,event);
   }
 
-  qDebug() << "-----------------------";
-  qDebug() << "Initialisation complete";
-  qDebug() << "-----------------------";
+  QLOG_DEBUG() << "-----------------------";
+  QLOG_DEBUG() << "Initialisation complete";
+  QLOG_DEBUG() << "-----------------------";
 
 
 }
@@ -195,7 +195,7 @@ void LanesLexicon::cleanup() {
   /// TODO close notes db
   freeXslt();
   im_free(m_mapper);
-  qDebug() << Q_FUNC_INFO << "exit";
+  QLOG_DEBUG() << Q_FUNC_INFO << "exit";
 }
 void LanesLexicon::setupInterface() {
   if (m_interface == "minimal") {
@@ -265,7 +265,7 @@ void LanesLexicon::onCloseTab(int ix) {
 }
 void LanesLexicon::shortcut(const QString & k) {
   QString key = k.toCaseFolded();
-  qDebug() << Q_FUNC_INFO << k;
+  QLOG_DEBUG() << Q_FUNC_INFO << k;
   if (key == QString("search root")) {
     searchForRoot();
   }
@@ -302,7 +302,7 @@ void LanesLexicon::shortcut(const QString & k) {
       }
     }
     else {
-      qDebug() << Q_FUNC_INFO << "No current item";
+      QLOG_DEBUG() << Q_FUNC_INFO << "No current item";
     }
   }
   else if (key == QString("quit")) {
@@ -413,7 +413,7 @@ void LanesLexicon::shortcut(const QString & k) {
   }
   updateStatusBar();
   updateMenu();
-  //qDebug() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
+  //QLOG_DEBUG() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
 }
 /**
  * setup the shortcuts from the conf
@@ -712,7 +712,7 @@ void LanesLexicon::historyPositionChanged(int pos) {
 void LanesLexicon::setupHistory(int currPos) {
   // get backward history
   /// TODO set 10 to something from the QSettings
-  qDebug() << Q_FUNC_INFO << currPos;
+  QLOG_DEBUG() << Q_FUNC_INFO << currPos;
   m_historyPos = currPos;
   QList<HistoryEvent *> events = m_history->getHistory();//10,0,currPos);
   if (events.size() == 0) {
@@ -851,7 +851,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
   QString supp = item->text(1);
   int p = 0;
-  qDebug() << Q_FUNC_INFO << root << supp;
+  QLOG_DEBUG() << Q_FUNC_INFO << root << supp;
   /// check that the user has not clicked on a letter
   if (item->parent() != 0) {
     /// and that they've clicked on a root
@@ -873,7 +873,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     }
   }
   if (m_treeKeepsFocus) {
-    qDebug() << "tree focus";
+    QLOG_DEBUG() << "tree focus";
     m_tree->setFocus();
   }
 
@@ -890,12 +890,12 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
  */
 void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   /// ignore clicks on the root or the letter
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   if ((item->parent() == 0) || (item->parent()->parent() == 0)) {
     return;
   }
  QString node = item->data(0,Qt::UserRole).toString();
- qDebug() << "node" << node;
+ QLOG_DEBUG() << "node" << node;
  if ( node.isEmpty() )
    return;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
@@ -926,7 +926,7 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
     }
   }
   else {
-    qDebug() << Q_FUNC_INFO << "No GraphicsEntry page available";
+    QLOG_DEBUG() << Q_FUNC_INFO << "No GraphicsEntry page available";
   }
 }
 
@@ -1194,6 +1194,7 @@ void LanesLexicon::restoreTabs() {
     if (settings->value("type","entry").toString() == "notes") {
       NoteBrowser * notes = new NoteBrowser(this);
       m_tabs->addTab(notes,tr("Notes"));
+        j++;
     }
     else {
       Place p;
@@ -1220,13 +1221,13 @@ void LanesLexicon::restoreTabs() {
         p.setType(Place::RestoreTab);
         entry->getXmlForRoot(p);
         entry->setScale(scale);
-        //      qDebug() << Q_FUNC_INFO << "adding tab" << p.getShortText();
+        //      QLOG_DEBUG() << Q_FUNC_INFO << "adding tab" << p.getShortText();
         m_tabs->addTab(entry,p.getShortText());
         m_tree->ensurePlaceVisible(p,true);
         j++;
       }
       else {
-        qDebug() << Q_FUNC_INFO << "invalid place" << p;
+        QLOG_DEBUG() << Q_FUNC_INFO << "invalid place" << p;
       }
     }
     settings->endGroup();
@@ -1239,7 +1240,7 @@ void LanesLexicon::restoreTabs() {
     if (entry)
       entry->focusPlace();
     /// sync the current tab with the tree
-    //qDebug() << "Synching tab" << focusTab;
+    //QLOG_DEBUG() << "Synching tab" << focusTab;
     currentTabChanged(focusTab);
   }
   delete settings;
@@ -1708,7 +1709,7 @@ void LanesLexicon::bookmarkClear() {
   m_bookmarks.clear();
 }
 void LanesLexicon::bookmarkRebuildMenu() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void LanesLexicon::bookmarkAdd(const QString & id,const Place & p) {
   //  p.setType(Place::Bookmark);
@@ -1805,7 +1806,7 @@ void LanesLexicon::on_actionNavLast()   {
   }
 }
 void LanesLexicon::onNavModeChanged() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QAction * action = qobject_cast<QAction *>(QObject::sender());
   if (action) {
     bool ok;
@@ -1818,7 +1819,7 @@ void LanesLexicon::onNavModeChanged() {
   }
 }
 void LanesLexicon::on_actionClearHistory() {
-  qDebug() << Q_FUNC_INFO <<  m_history->clear();
+  QLOG_DEBUG() << Q_FUNC_INFO <<  m_history->clear();
   setupHistory();
 }
 void LanesLexicon::on_actionDocs() {
@@ -1827,7 +1828,7 @@ void LanesLexicon::on_actionDocs() {
    return;
 }
 void LanesLexicon::testSlot() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void LanesLexicon::searchForPage() {
     bool ok;
@@ -2029,8 +2030,8 @@ void LanesLexicon::syncContents() {
 }
 /*
 void LanesLexicon::saveNote(Note * note) {
-  qDebug() << Q_FUNC_INFO << note->getId() << note->getWord();
-  qDebug() << note->getNote();
+  QLOG_DEBUG() << Q_FUNC_INFO << note->getId() << note->getWord();
+  QLOG_DEBUG() << note->getNote();
   m_notes->save(note);
   delete note;
 }

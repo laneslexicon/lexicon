@@ -138,7 +138,7 @@ void NoteBrowser::loadTable() {
   }
 }
 void NoteBrowser::onCellClicked(int row,int /* column */) {
-  qDebug() << Q_FUNC_INFO << row;
+  QLOG_DEBUG() << Q_FUNC_INFO << row;
   /// saving the id with word because we may not include id in release
   QTableWidgetItem * item = m_list->item(row,COL_WITH_ID);
   if (item) {
@@ -221,7 +221,7 @@ void NoteBrowser::onViewClicked() {
     if (n) {
       Place p = n->getPlace();
       QString k = p.getNode();
-      qDebug() << "search for" << p.getNode() << "root" << p.getRoot() << "word" << p.getWord();
+      QLOG_DEBUG() << "search for" << p.getNode() << "root" << p.getRoot() << "word" << p.getWord();
       /// search tabs for entry as node then as root
       int ix = app->hasPlace(p,GraphicsEntry::NodeSearch,true);
       if (k.isEmpty() || (ix == -1)) {
@@ -232,7 +232,7 @@ void NoteBrowser::onViewClicked() {
             return;
           }
       }
-      qDebug() << "found in tab" << ix;
+      QLOG_DEBUG() << "found in tab" << ix;
     }
   }
 }

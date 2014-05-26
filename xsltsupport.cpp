@@ -104,7 +104,6 @@ void parseErrorHandler(void * /* ctx*/, const char *msg, ...) {
    vsnprintf(string, TMP_BUF_SIZE, msg, arg_ptr);
    va_end(arg_ptr);
    QString s = string;
-   qDebug() << s.trimmed();
    xmlParseErrors << s.trimmed();
   return;
 }

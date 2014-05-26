@@ -1,4 +1,5 @@
 #include "application.h"
+#include "QsLog.h"
 Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QString resourceDir;
   m_ok = true;
@@ -63,5 +64,5 @@ QString Lexicon::getFontSize(const QString & type) {
 }
 void Lexicon::onFocusChange(QWidget * old, QWidget * now) {
   if (old && now)
-    qDebug() << old->metaObject()->className() << "--->" << now->metaObject()->className();
+    QLOG_DEBUG() << old->metaObject()->className() << "--->" << now->metaObject()->className();
 }

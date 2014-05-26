@@ -51,7 +51,7 @@ void NoteMaster::save(Note * n) {
   return;
 }
 bool NoteMaster::openDb() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   if ( ! m_enabled )
     return false;
   if ( ! m_db.isOpen()) {
@@ -75,7 +75,7 @@ bool NoteMaster::openDb() {
     return false;
   }
   else {
-    qDebug() << "tables" << m_db.tables();
+    QLOG_DEBUG() << "tables" << m_db.tables();
   }
 
   addQuery = QSqlQuery(m_db);
@@ -109,9 +109,9 @@ bool NoteMaster::openDb() {
     m_enabled = false;
     return false;
   }
-  qDebug() << "=====================================";
-  qDebug() << "Notes system successfully initialised";
-  qDebug() << "=====================================";
+  QLOG_DEBUG() << "=====================================";
+  QLOG_DEBUG() << "Notes system successfully initialised";
+  QLOG_DEBUG() << "=====================================";
   return true;
 }
 /**
@@ -139,7 +139,7 @@ QList<Note *> NoteMaster::find(const QString & word) {
     notes << n;
   }
   if (notes.size() > 0)
-    qDebug() << Q_FUNC_INFO << word << "find count" << notes.size();
+    QLOG_DEBUG() << Q_FUNC_INFO << word << "find count" << notes.size();
   return notes;
 }
 Note * NoteMaster::findOne(int id) {
@@ -184,7 +184,7 @@ QSqlQuery NoteMaster::getNoteList(const QString & sql) {
 }
 QList<int> NoteMaster::deleteNotes(QList<int> ids) {
   QList<int> deletedNotes;
-  qDebug() << Q_FUNC_INFO << ids;
+  QLOG_DEBUG() << Q_FUNC_INFO << ids;
   for(int i=0;i < ids.size();i++) {
     deleteQuery.bindValue(0,ids[i]);
     if (deleteQuery.exec()) {

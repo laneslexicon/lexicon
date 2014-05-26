@@ -1,11 +1,12 @@
 #include "helpviewer.h"
+#include "QsLog.h"
 HelpBrowser::HelpBrowser(QWidget * parent) : QTextBrowser(parent) {
   connect(this,SIGNAL(anchorClicked(const QUrl &)),this,SLOT(getAnchor(const QUrl &)));
 }
 QVariant HelpBrowser::loadResource(int type, const QUrl &name)
 {
-  qDebug() << Q_FUNC_INFO << type << name;
-  //  qDebug() << m_he->currentFilter();
+  QLOG_DEBUG() << Q_FUNC_INFO << type << name;
+  //  QLOG_DEBUG() << m_he->currentFilter();
   if (type < 4) {
     QStringList regs =  m_he->registeredDocumentations();
     QList<QUrl> files;
@@ -22,9 +23,9 @@ QVariant HelpBrowser::loadResource(int type, const QUrl &name)
 void HelpBrowser::getAnchor(const QUrl & url) {
   m_firstAnchor = url.toString();
   m_firstAnchor = m_firstAnchor.remove(0,1);
-  qDebug() << url << m_firstAnchor;
+  QLOG_DEBUG() << url << m_firstAnchor;
   if ((this->backwardHistoryCount() == 0) && ! m_firstAnchor.isEmpty()) {
-    qDebug() << "emitting backward available";
+    QLOG_DEBUG() << "emitting backward available";
     emit(backwardAvailable(true));
   }
 }
@@ -32,7 +33,7 @@ void HelpBrowser::toAnchor() {
   if ( ! m_firstAnchor.isEmpty()) {
     QString c = m_firstAnchor;
     c = "j" + c.remove(0,1);
-    qDebug() << "scroll to anchor" << m_firstAnchor << " --->"  << c;
+    QLOG_DEBUG() << "scroll to anchor" << m_firstAnchor << " --->"  << c;
     this->scrollToAnchor(c);
   }
 }
@@ -47,14 +48,14 @@ HelpViewer::HelpViewer(QWidget * parent) : QWidget(parent) {
   setLayout(layout);
 }
 HelpViewer::~HelpViewer() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void HelpViewer::backwardAvailable(bool available) {
-  qDebug() << Q_FUNC_INFO << available;
+  QLOG_DEBUG() << Q_FUNC_INFO << available;
 }
 
 void HelpViewer::goBack() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   if (m_browser->backwardHistoryCount() == 0) {
     m_browser->toAnchor();
   }
@@ -99,50 +100,50 @@ HelpWidget::~HelpWidget() {
   writeSettings();
 }
 void HelpWidget::contentsCreated() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 
   // get registered docs
-  qDebug() << "Collection file" << m_he->collectionFile();
+  QLOG_DEBUG() << "Collection file" << m_he->collectionFile();
    QStringList regs =  m_he->registeredDocumentations();
-  qDebug() << "Registered documentation" << regs;
+  QLOG_DEBUG() << "Registered documentation" << regs;
 
-  qDebug() << "Current filter" << m_he->currentFilter();
+  QLOG_DEBUG() << "Current filter" << m_he->currentFilter();
   if (regs.size() == 0) {
-    qDebug() << "No documents registered";
+    QLOG_DEBUG() << "No documents registered";
     return;
   }
   QList<QStringList> fa = m_he->filterAttributeSets(regs[0]);
-  qDebug() << "Filter attribute sets" << fa;
+  QLOG_DEBUG() << "Filter attribute sets" << fa;
 
   QList<QUrl> files;
   files = m_he->files(regs[0],fa[0]);
 
   for(int i=0;i < files.size();i++) {
     QByteArray ba = m_he->fileData(files[i]);
-    qDebug() << files[i] << ba.size();
+    QLOG_DEBUG() << files[i] << ba.size();
   }
 
   m_he->setCurrentFilter("Lanes Lexicon 1.0");
-  qDebug() << "Filter attributes" << m_he->filterAttributes();
+  QLOG_DEBUG() << "Filter attributes" << m_he->filterAttributes();
   QMap<QString,QUrl> links = m_he->linksForIdentifier(QLatin1String("MyApplication::config"));
-  qDebug() << "Links for ID size:" << links.size();
+  QLOG_DEBUG() << "Links for ID size:" << links.size();
   QMapIterator<QString, QUrl> i(links);
   while (i.hasNext()) {
     i.next();
-    qDebug() << i.key() << ": " << i.value();
+    QLOG_DEBUG() << i.key() << ": " << i.value();
   }
   links = m_he->linksForIdentifier(QLatin1String("lanex"));
-  qDebug() << "Links for ID size:" << links.size();
+  QLOG_DEBUG() << "Links for ID size:" << links.size();
   QMapIterator<QString, QUrl> it(links);
   while (it.hasNext()) {
     it.next();
-    qDebug() << it.key() << ": " << it.value();
+    QLOG_DEBUG() << it.key() << ": " << it.value();
   }
   m_he->contentWidget()->expandAll();
   m_ok = true;
 }
 void HelpWidget::helpLinkActivated(const QUrl & url)  {
-  qDebug() << Q_FUNC_INFO << url << "fragment" << url.fragment();
+  QLOG_DEBUG() << Q_FUNC_INFO << url << "fragment" << url.fragment();
   QByteArray helpData = m_he->fileData(url);//.constBegin().value());
   m_viewer->browser()->setHtml(helpData);
   if (url.hasFragment()) {

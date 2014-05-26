@@ -28,7 +28,7 @@ void BookmarkWidget::setPlace() {
     QRegExp rx("(\\w+)\\s+");
     if (rx.indexIn(t,0) != -1) {
       m_mark = rx.cap(1);
-      //      qDebug() << "got" << m_mark;
+      //      QLOG_DEBUG() << "got" << m_mark;
     }
     else {
       QLOG_DEBUG() << Q_FUNC_INFO <<  "regex failed" << t;

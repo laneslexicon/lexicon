@@ -3,12 +3,12 @@
    Place p;
    p.setNode("test node");
    p.setId(33);
-   qDebug() << p;
+   QLOG_DEBUG() << p;
    QVariant v;
    v.setValue(p);
    Place x = v.value<Place>();
 
-   qDebug() << v.userType() << x.getNode() << x.getId();
+   QLOG_DEBUG() << v.userType() << x.getNode() << x.getId();
 */
 int Place::m_vols[8] = {367,837,1280,1757,2219,2475,2749,3064};
 
@@ -112,7 +112,7 @@ Place Place::fromString(const QString & str) {
   QStringList x = str.split(",");
   Place p;
   int sz = x.size();
-  //  qDebug() << Q_FUNC_INFO << str << sz;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << str << sz;
   if (sz > 0)
     p.setSource(x[0].toInt(&ok));
   if (sz > 1)

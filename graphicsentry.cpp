@@ -8,7 +8,7 @@ ToolButtonData::ToolButtonData(int id) : QToolButton() {
   setObjectName("toolbuttondata");
 }
 ToolButtonData::~ToolButtonData() {
-  qDebug() << Q_FUNC_INFO;
+
 }
 /**
  *
@@ -20,39 +20,20 @@ LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent
   QGraphicsView(scene,parent) {
   setObjectName("lexicongraphicsview");
   setFocusPolicy(Qt::StrongFocus);
-  //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  //  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
+/// TODO get rid of this
 void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
   QGraphicsView::scrollContentsBy(dx,dy);
-  /*
-  qDebug() << Q_FUNC_INFO << dx << dy;
-  QScrollBar * b = this->verticalScrollBar();
-  if (b->value() == b->maximum()) {
-    qDebug() << "nextPage emit";
-    emit(nextPage());
-  }
-  else if (b->value() == b->minimum()) {
-    qDebug() << "backPage emit";
-    emit(backPage());
-  }
-  else {
-
-  }
-  */
 }
 void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
-  //  QLOG_DEBUG() << Q_FUNC_INFO << "got key" << event->modifiers() << event->key();
+
   QGraphicsView::keyPressEvent(event);
 }
 void LaneGraphicsView::focusInEvent(QFocusEvent * event) {
-  //  qDebug() << Q_FUNC_INFO << this->styleSheet();
-  //  this->setStyleSheet(" border : 1px red solid");
   QGraphicsView::focusInEvent(event);
 }
 void LaneGraphicsView::focusOutEvent(QFocusEvent * event) {
   QGraphicsView::focusOutEvent(event);
-  //  this->setStyleSheet("");
 }
 /**
  *
@@ -94,7 +75,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   // add the graphics viwe
   layout->addWidget(m_view);
 
-  //  m_showPlace = new PlaceWidget(this);
+
   //  layout->addWidget(m_showPlace,0);
   m_nodeQuery = 0;
   setLayout(layout);
@@ -111,7 +92,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_transform = m_view->transform();
 }
 GraphicsEntry::~GraphicsEntry() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   delete m_nodeQuery;
   delete m_rootQuery;
   delete m_pageQuery;
@@ -134,7 +115,7 @@ void GraphicsEntry::readSettings() {
   QString bg = settings->value("Supplement background color",QString("rgb(255,254,253)")).toString();
   QRegExp rx("^rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\s*\\)");
   if (rx.indexIn(bg) != -1) {
-    //    qDebug() << bg << "color" << rx.cap(1) << rx.cap(2) << rx.cap(3);
+    //    QLOG_DEBUG() << bg << "color" << rx.cap(1) << rx.cap(2) << rx.cap(3);
     m_supplementBg = QColor::fromRgb(rx.cap(1).toInt(),rx.cap(2).toInt(),rx.cap(3).toInt());
     if (! m_supplementBg.isValid())  {
       m_supplementBg = QColor::fromRgb(255,255,255);
@@ -179,15 +160,13 @@ void GraphicsEntry::writeDefaultSettings() {
 
 }
 void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
-  // qDebug() << Q_FUNC_INFO << event->modifiers() << event->key() << event->text();
   if (event->key() == Qt::Key_Escape) {
     QWidget * w = this->parentWidget();
-
     while(w) {
-      qDebug() << w->metaObject()->className();
+      //      QLOG_DEBUG() << w->metaObject()->className();
       QTabWidget * tabw = qobject_cast<QTabWidget *>(w);
       if (tabw)  {
-        qDebug() << "setting focus" << tabw->tabBar()->hasFocus();
+        QLOG_DEBUG() << "setting focus" << tabw->tabBar()->hasFocus();
         tabw->tabBar()->setFocus();
         return;
       }
@@ -243,11 +222,6 @@ void GraphicsEntry::moveFocusDown() {
     int m = m_items.size() - 1;
     for(int i=0;i < m ;i++) {
       if (m_items[i] == item) {
-        //        m_view->centerOn(m_items[i+1]);
-        //        m_view->ensureVisible(m_items[i+1]);
-        //        m_scene->setFocusItem(m_items[i+1]);
-        //        qDebug() << "focus moved from" << m_items[i]->getPlace().getText();
-        //        qDebug() << "focus moved to  " << m_items[i + 1]->getPlace().getText();
         setCurrentItem(m_items[i+1]);
         return;
       }
@@ -260,12 +234,6 @@ void GraphicsEntry::moveFocusUp() {
     int m = m_items.size();
     for(int i=1;i < m ;i++) {
       if (m_items[i] == item) {
-        //        m_view->centerOn(m_items[i-1]);
-        //        m_view->ensureVisible(m_items[i-1]);
-        //        m_scene->setFocusItem(m_items[i-1]);
-        //        m_place = m_items[i-1]->getPlace();
-        //        qDebug() << "focus moved from" << m_items[i]->getPlace().getText();
-        //        qDebug() << "focus moved to  " << m_items[i - 1]->getPlace().getText();
         setCurrentItem(m_items[i-1]);
         return;
       }
@@ -288,7 +256,7 @@ Place GraphicsEntry::getPlace() const {
 void GraphicsEntry::focusInEvent(QFocusEvent * event) {
   /// giving focus to the graphicsview so keyboard
   //  m_view->setFocus();
-  qDebug() << Q_FUNC_INFO;
+  //  QLOG_DEBUG() << Q_FUNC_INFO;
   this->focusPlace();
   QWidget::focusInEvent(event);
 
@@ -300,7 +268,7 @@ void GraphicsEntry::onClearScene() {
   while(m_items.size() > 0) {
     delete m_items.takeFirst();
   }
-  /// need to remove the graphicswidget for the items which have notes
+  /// TODO need to remove the graphicswidget for the items which have notes
   m_scene->clear();
 }
 /**
@@ -324,7 +292,8 @@ void GraphicsEntry::linkActivated(const QString & link) {
   if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
     newTab = true;
   }
-
+  /// TODO replace this
+  /// including move to new tab stuff
   showPlace(p,newTab);
 }
 void GraphicsEntry::linkHovered(const QString & link) {
@@ -345,7 +314,6 @@ void GraphicsEntry::linkHovered(const QString & link) {
  */
 void GraphicsEntry::anchorTest() {
   QString node;
-  //  QList<QGraphicsItem *> items = m_scene->items();
   for(int i=0;i < m_items.size();i++) {
     EntryItem * item = m_items[i];
     if (item) {
@@ -485,7 +453,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
     else {
       QLOG_WARN() << "Node not found" << node;
-      //      qDebug() << Q_FUNC_INFO << "exiting 3 with place" << retval.toString();
+      //      QLOG_DEBUG() << Q_FUNC_INFO << "exiting 3 with place" << retval.toString();
       return retval;
     }
   }
@@ -500,7 +468,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     else {
       QLOG_WARN() << QString(tr("Root not found %1")).arg(root);
     }
-    qDebug() << Q_FUNC_INFO << "exiting 4 with place" << retval.toString();
+    QLOG_DEBUG() << Q_FUNC_INFO << "exiting 4 with place" << retval.toString();
     return retval;
   }
   /// this will be set to the right word if a node has been supplied
@@ -510,15 +478,15 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   EntryItem * rootItem  = createEntry(str);
   /// will be null if the XSLT/XML has not parsed correctly
   if (rootItem == NULL) {
-    //    qDebug() << Q_FUNC_INFO << "exiting 5 with place";
+    //    QLOG_DEBUG() << Q_FUNC_INFO << "exiting 5 with place";
     return p;
   }
   ///
   /// write a history record because we are leaving this page
   ///
   if (getHistory()->isOn()) {
-    //    qDebug() << "History old place" << m_place;
-    //    qDebug() << "New place" << dp;
+    //    QLOG_DEBUG() << "History old place" << m_place;
+    //    QLOG_DEBUG() << "New place" << dp;
     if (dp.getType() == Place::User) {
       getHistory()->add(m_place);
       /// this allows mainwindow to update the history list
@@ -656,7 +624,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     QTextLayout * layout = b.layout();
     QTextLine line = layout->lineForTextPosition(cursor.position());
     if (line.isValid()) {
-      qDebug() << Q_FUNC_INFO << "text line pos" << line.position() << line.textLength();
+      QLOG_DEBUG() << Q_FUNC_INFO << "text line pos" << line.position() << line.textLength();
         m_view->centerOn(line.position());
     }
     */
@@ -674,24 +642,24 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
 
   /// we're done
   if (m_place.isSamePlace(centerItem->getPlace())) {
-    //    qDebug() << Q_FUNC_INFO << "exiting 1 with place" << m_place.toString();
+    //    QLOG_DEBUG() << Q_FUNC_INFO << "exiting 1 with place" << m_place.toString();
     return m_place;
   }
   m_place = centerItem->getPlace();
   m_place.setType(dp.getType());
 
-  //  qDebug() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
+  //  QLOG_DEBUG() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
   //  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
   /*
-  qDebug() << "At exit" << m_view->sceneRect();
-  qDebug() << "Widget" << this->geometry();
-  qDebug() << "gview" << m_view->geometry();
-  qDebug() << "viewport geometry" << m_view->viewport()->geometry();
+  QLOG_DEBUG() << "At exit" << m_view->sceneRect();
+  QLOG_DEBUG() << "Widget" << this->geometry();
+  QLOG_DEBUG() << "gview" << m_view->geometry();
+  QLOG_DEBUG() << "viewport geometry" << m_view->viewport()->geometry();
   m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
   QRect viewport_rect(0, 0, m_view->viewport()->width(), m_view->viewport()->height());
   QRectF visible_scene_rect = m_view->mapToScene(viewport_rect).boundingRect();
-  qDebug() << "viewport rect" << viewport_rect << "scene rect" << visible_scene_rect;
-  qDebug() << visible_scene_rect.width();
+  QLOG_DEBUG() << "viewport rect" << viewport_rect << "scene rect" << visible_scene_rect;
+  QLOG_DEBUG() << visible_scene_rect.width();
   */
   return m_place;
 }
@@ -860,7 +828,7 @@ Place GraphicsEntry::getPage(const Place & p) {
     QTextLayout * layout = b.layout();
     QTextLine line = layout->lineForTextPosition(cursor.position());
     if (line.isValid()) {
-      qDebug() << Q_FUNC_INFO << "text line pos" << line.position() << line.textLength();
+      QLOG_DEBUG() << Q_FUNC_INFO << "text line pos" << line.position() << line.textLength();
         m_view->centerOn(line.position());
     }
     */
@@ -913,6 +881,8 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
     connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
     connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
+
+    /// TODO this is no longer used
     connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
     connect(gi,SIGNAL(selectAllItems()),this,SLOT(selectAll()));
     connect(gi,SIGNAL(clearAllItems()),this,SLOT(clearAll()));
@@ -1006,7 +976,7 @@ void GraphicsEntry::prependEntries(int startPos) {
     }
     sz = m_items[i]->document()->size();
     if (m_items[i]->hasNotes()) {
-      qDebug() << "Adding note button for";
+      QLOG_DEBUG() << "Adding note button for";
       qreal btnx;
       qreal btny;
       btnx = xpos + m_items[i]->boundingRect().width();
@@ -1099,7 +1069,7 @@ int GraphicsEntry::hasPlace(const Place & p,int type,bool setFocus) {
     }
 
   }
-  //  qDebug() << Q_FUNC_INFO << p << ix;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << p << ix;
   if ((ix != -1) && setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);
@@ -1125,7 +1095,7 @@ QString GraphicsEntry::lastRoot() {
       QLOG_DEBUG() << "Cannot find root on current page";
     }
     else {
-      qDebug() << "emit nextRoo" << root;
+      QLOG_DEBUG() << "emit nextRoo" << root;
       emit nextRoot(root);
     }
     return root;
@@ -1139,7 +1109,7 @@ QString GraphicsEntry::lastRoot() {
 QString GraphicsEntry::firstRoot() {
   /// find the first root item (should always be the first
   /// element in m_items
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   int ix = 0;
   int max = m_items.size();
   QString root;
@@ -1153,7 +1123,7 @@ QString GraphicsEntry::firstRoot() {
       QLOG_DEBUG() << "Cannot find root on current page";
     }
     else {
-      qDebug() << "emit prevRoot" << root;
+      QLOG_DEBUG() << "emit prevRoot" << root;
       emit prevRoot(root);
     }
     return root;
@@ -1181,7 +1151,7 @@ void GraphicsEntry::highlight(const QString & target) {
       ix = i;
     }
   }
-  //  qDebug() << Q_FUNC_INFO << "item" << ix << "pos" << cursor.position() << cursor.hasSelection();
+  //  QLOG_DEBUG() << Q_FUNC_INFO << "item" << ix << "pos" << cursor.position() << cursor.hasSelection();
   /// unselect the text otherwise it will be in the select color
   /// center the view on the word
   if (ix != -1) {
@@ -1191,7 +1161,7 @@ void GraphicsEntry::highlight(const QString & target) {
       QTextLayout * layout = b.layout();
       QTextLine line = layout->lineForTextPosition(cursor.position());
       if (line.isValid()) {
-        //        qDebug() << "text line pos" << line.position() << line.textLength();
+        //        QLOG_DEBUG() << "text line pos" << line.position() << line.textLength();
         m_view->centerOn(line.position());
       }
     }
@@ -1209,7 +1179,7 @@ void GraphicsEntry::showPerseus(const Place & p) {
   QString xml;
   if (m_nodeQuery->first()) {
     xml = m_nodeQuery->value("xml").toString();
-    qDebug() << xml;
+    QLOG_DEBUG() << xml;
   }
   else {
     xml = "No XML for " + node;
@@ -1245,7 +1215,7 @@ void GraphicsEntry::clearAll() {
   }
 }
 void GraphicsEntry::selectEntry() {
-  qDebug() << "select entry";
+  QLOG_DEBUG() << "select entry";
   EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
   if (item) {
     item->selectAll();
@@ -1262,14 +1232,14 @@ void GraphicsEntry::moveBackward() {
  */
 void GraphicsEntry::onWiden() {
   m_textWidth += 50;
-  //  qDebug() << "Scene rect before widen" << m_view->sceneRect() << m_textWidth;
+  //  QLOG_DEBUG() << "Scene rect before widen" << m_view->sceneRect() << m_textWidth;
   for(int i=0;i < m_items.size();i++) {
       m_items[i]->setTextWidth(m_textWidth);
   }
   reposition();
   m_view->setSceneRect(m_scene->sceneRect());
   //  m_view->update();
-  //  qDebug() << "Scene rect after" << m_view->sceneRect();
+  //  QLOG_DEBUG() << "Scene rect after" << m_view->sceneRect();
   QGraphicsItem * item = m_scene->focusItem();
   if ( ! item ) {
     item = m_items[0];
@@ -1280,13 +1250,13 @@ void GraphicsEntry::onWiden() {
 }
 void GraphicsEntry::onNarrow() {
   m_textWidth -= 50;
-  //  qDebug() << "Scene rect before narrow" << m_view->sceneRect() << m_textWidth;
+  //  QLOG_DEBUG() << "Scene rect before narrow" << m_view->sceneRect() << m_textWidth;
   for(int i=0;i < m_items.size();i++) {
       m_items[i]->setTextWidth(m_textWidth);
   }
   reposition();
   m_view->setSceneRect(m_scene->sceneRect());
-  //  qDebug() << "Scene rect after" << m_view->sceneRect();
+  //  QLOG_DEBUG() << "Scene rect after" << m_view->sceneRect();
   QGraphicsItem * item = m_scene->focusItem();
   //  m_view->setAlignment(Qt::AlignCenter);
   if ( ! item ) {
@@ -1330,7 +1300,7 @@ int GraphicsEntry::search() {
       break;
   }
   progress.setValue(max);
-  qDebug() << "Found" << count;
+  QLOG_DEBUG() << "Found" << count;
   return count;
 }
 void GraphicsEntry::clearHighlights() {
@@ -1345,7 +1315,7 @@ void GraphicsEntry::shiftFocus() {
     item = m_items[0];
   }
   if (item) {
-    qDebug() << "ensuring current node is visible";
+    QLOG_DEBUG() << "ensuring current node is visible";
     //    this->setFocus();
     this->setCurrentItem(item);
     //m_view->ensureVisible(item);
@@ -1357,7 +1327,7 @@ void GraphicsEntry::focusNode(const QString & node) {
   if (node.isEmpty()) {
     return;
   }
-  qDebug() << Q_FUNC_INFO << node;
+  QLOG_DEBUG() << Q_FUNC_INFO << node;
   for(int i=0;i < m_items.size();i++) {
     Place p = m_items[i]->getPlace();
     if (p.getNode() == node) {
@@ -1384,7 +1354,7 @@ bool GraphicsEntry::hasNode(const QString & node) {
   return false;
 }
 void GraphicsEntry::closeEvent(QCloseEvent * event) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   while(m_items.size() > 0) {
     EntryItem * item = m_items.takeFirst();
     delete item;
@@ -1394,7 +1364,7 @@ void GraphicsEntry::closeEvent(QCloseEvent * event) {
 void GraphicsEntry::notesButtonPressed() {
   ToolButtonData * btn = qobject_cast<ToolButtonData *>(QObject::sender());
   if (btn) {
-    //qDebug() << "index" << btn->getIndex();
+    //QLOG_DEBUG() << "index" << btn->getIndex();
     EntryItem * item = m_items[btn->getIndex()];
     item->showNote();
 
@@ -1424,14 +1394,14 @@ void GraphicsEntry::addButtonDecoration() {
 
 }
 void GraphicsEntry::deleteNotes() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   EntryItem * item = qobject_cast<EntryItem *>(QObject::sender());
   if ( ! item )
     return;
 
   NoteMaster * m = getNotes();
   QList<Note *> notes = item->getNotes(true);
-  qDebug() << "Delete" << notes.size() << "notes";
+  QLOG_DEBUG() << "Delete" << notes.size() << "notes";
   while(notes.size() > 0) {
     Note * n = notes.takeFirst();
     m->remove(n);
@@ -1441,14 +1411,16 @@ void GraphicsEntry::deleteNotes() {
 void GraphicsEntry::focusPlace() {
   Place p = this->getPlace();
   if (! p.getNode().isEmpty()) {
-    qDebug() << Q_FUNC_INFO << p.getNode();
+    QLOG_DEBUG() << Q_FUNC_INFO << p.getNode();
     this->focusNode(p.getNode());
     return;
   }
-  //  this->shiftFocus();
+  else {
+    QLOG_DEBUG() << "setting focus through shiftFocus()";
+    this->shiftFocus();
+  }
 }
 void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
-  qDebug() << Q_FUNC_INFO;
   m_view->setFocus();
   m_view->ensureVisible(item);
   m_scene->setFocusItem(item);

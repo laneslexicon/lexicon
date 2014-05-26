@@ -1,6 +1,8 @@
 #include "tabwidget.h"
 #include "graphicsentry.h"
 TabWidget::TabWidget(QWidget * parent) : QTabWidget(parent) {
+  setObjectName("entrywidget");
+  tabBar()->setObjectName("entrytabs");
 }
 void TabWidget::keyPressEvent(QKeyEvent * event) {
     switch (event->key()) {
@@ -18,5 +20,5 @@ void TabWidget::keyPressEvent(QKeyEvent * event) {
     }
 }
 //    if (event->key() == Qt::Key_Escape) {
-//      qDebug() << Q_FUNC_INFO << "escape";
+//      QLOG_DEBUG() << Q_FUNC_INFO << "escape";
 //    }

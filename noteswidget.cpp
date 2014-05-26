@@ -200,7 +200,7 @@ QWidget * NotesWidget::createEditWidget() {
   return editWidget;
 }
 NotesWidget::~NotesWidget() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   if (m_db.isOpen()) {
     m_db.close();
   }

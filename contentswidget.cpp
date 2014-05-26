@@ -14,7 +14,7 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   this->setExpandsOnDoubleClick(false);
 }
 ContentsWidget::~ContentsWidget() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void ContentsWidget::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
@@ -118,13 +118,13 @@ Place ContentsWidget::findNextPlace(const Place & p) {
     suppTest = "*";
   }
   /// TODO replace by code using findItems
-  qDebug() << Q_FUNC_INFO << root << supp;
+  QLOG_DEBUG() << Q_FUNC_INFO << root << supp;
   for(int i = 0;(i < tc) && ! found;i++) {
     QTreeWidgetItem * topItem = topLevelItem(i);
     int kidCount = topItem->childCount();
     for(int j=0;(j < kidCount) && ! found ;j++) {
       QTreeWidgetItem * child = topItem->child(j);
-      //      qDebug() << child->text(0) << child->text(1);
+      //      QLOG_DEBUG() << child->text(0) << child->text(1);
       if ((child->text(0) == root) && (child->text(1) == suppTest)) {
         currentItem = child;
         topIndex = i;
@@ -386,7 +386,7 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   }
 }
 void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
-  //  qDebug() << Q_FUNC_INFO << p << select;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << p << select;
   QString root = p.getRoot();
   int supplement = p.getSupplement();
   QTreeWidgetItem * item;
@@ -437,14 +437,14 @@ QTreeWidgetItem * ContentsWidget::findPlace(const Place & p) const {
     column = 1;
     target = p.getWord();
   }
-  //  qDebug() << Q_FUNC_INFO << target;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << target;
   QList<QTreeWidgetItem *> items = this->findItems(target,Qt::MatchRecursive,column);
   /// TODO multiple items, for supplement ?
   if (items.size() > 0) {
     item = items[0];
   }
   else {
-    //    qDebug() << "Not found";
+    //    QLOG_DEBUG() << "Not found";
   }
   return item;
 }
@@ -474,7 +474,7 @@ void ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   m_entryQuery->bindValue(0,root);
   m_entryQuery->exec();
   while(m_entryQuery->next()) {
-    //qDebug() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
+    //QLOG_DEBUG() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
     QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << m_entryQuery->value("itype").toString() << m_entryQuery->value("word").toString());
     item->setFont(0,m_itypeFont);
     item->setData(0,Qt::UserRole,m_entryQuery->value("nodeId"));//.toString()
@@ -482,13 +482,13 @@ void ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
 
   }
   if ( ! parent->isExpanded()) {
-    qDebug() << "Expanding parent";
+    QLOG_DEBUG() << "Expanding parent";
     parent->setExpanded(true);
   }
 }
 void ContentsWidget::nodeExpanded(QTreeWidgetItem * /*item */) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void ContentsWidget::nodeCollapsed(QTreeWidgetItem * /*item */) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
