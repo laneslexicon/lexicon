@@ -1130,17 +1130,6 @@ QString GraphicsEntry::firstRoot() {
     }
     return root;
 }
-/**
- * find the last root on the page
- * which will emit(nextRoot(<root>))
- */
-void GraphicsEntry::nextPageRequested() {
-  this->lastRoot();
-}
-
-void GraphicsEntry::prevPageRequested() {
-  this->firstRoot();
-}
 void GraphicsEntry::highlight(const QString & target) {
   int ix = -1;
   QTextCursor cursor;

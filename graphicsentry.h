@@ -86,8 +86,6 @@ class GraphicsEntry : public QWidget {
     void onZoomIn();
     void onZoomOut();
     void onClearScene();
-    void nextPageRequested();
-    void prevPageRequested();
     void showPerseus(const Place &);
     void updateCurrentPlace(const Place &);
     void selectAll();
