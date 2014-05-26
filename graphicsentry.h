@@ -155,7 +155,8 @@ class GraphicsEntry : public QWidget {
 
     QTextOption m_textOption;
 #
-    LaneGraphicsView * m_view;
+  //    LaneGraphicsView * m_view;
+ QGraphicsView * m_view;
     QGraphicsScene * m_scene;
     QGraphicsTextItem * m_item;
 

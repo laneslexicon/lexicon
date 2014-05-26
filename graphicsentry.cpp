@@ -54,13 +54,15 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_scale = 1.0;
 
   m_scene = new QGraphicsScene(this);
-  m_view = new LaneGraphicsView(m_scene,this);
+  //  m_view = new LaneGraphicsView(m_scene,this);
+  m_view = new QGraphicsView(m_scene,this);
+  m_view->setFocusPolicy(Qt::StrongFocus);
   m_view->setSceneRect(m_scene->sceneRect());
 
 
 
-  connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
-  connect(m_view,SIGNAL(backPage()),this,SLOT(prevPageRequested()));
+  //  connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
+  //  connect(m_view,SIGNAL(backPage()),this,SLOT(prevPageRequested()));
 
 
 
