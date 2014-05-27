@@ -43,7 +43,8 @@ class ContentsWidget : public QTreeWidget {
   /// does not have focus
   QString m_backgroundColor;
   QSqlQuery * m_entryQuery;
-
+  QString m_moveUp;
+  QString m_moveDown;
   QFont m_itypeFont;
  protected:
   virtual void 	keyPressEvent(QKeyEvent * event);

@@ -27,6 +27,8 @@ void ContentsWidget::readSettings() {
     m_itypeFont.fromString(fontString);
   }
   m_debug = settings->value("Debug",false).toBool();
+  m_moveDown = settings->value("Move down","s").toString();
+  m_moveUp = settings->value("Move up","w").toString();
   delete settings;
 }
 void ContentsWidget::loadContents() {
@@ -348,6 +350,20 @@ Place ContentsWidget::findPrevPlace(const Place & p) {
   return np;
 }
 void ContentsWidget::keyPressEvent(QKeyEvent * event) {
+  if (event->text() == m_moveUp) {
+    QTreeWidgetItem * item = this->itemAbove(this->currentItem());
+    if (item) {
+      this->setCurrentItem(item);
+      return;
+    }
+  }
+  if (event->text() == m_moveDown) {
+    QTreeWidgetItem * item = this->itemBelow(this->currentItem());
+    if (item) {
+      this->setCurrentItem(item);
+      return;
+    }
+  }
   switch (event->key()) {
   case Qt::Key_Return : {
     QTreeWidgetItem * item = this->currentItem();
