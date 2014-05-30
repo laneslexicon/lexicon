@@ -12,11 +12,11 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,int options,QWidget
   delete settings;
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QTableWidget;
-  m_list->setColumnCount(3);
+  m_list->setColumnCount(4);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QStringList headers;
-  headers << tr("Root") << tr("Entry") << tr("Node");
+  headers << tr("Root") << tr("Entry") << tr("Node") << tr("Count");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -33,7 +33,7 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,int options,QWidget
   //   select where bareword = ?
   //  part word without diacritics
   //   select where instr(bareword,?) > 0
-  sql = "select * from xref where datasource = 1 ";
+  sql = "select id,word,root,entry,node from xref where datasource = 1 ";
   if (options & Lane::Ignore_Diacritics) {
     qDebug() << "ignoring diacritics";
     if (options & Lane::Whole_Word_Match) {
@@ -67,18 +67,22 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,int options,QWidget
     QLOG_WARN() << "Error prepare SQL";
     return;
   }
+#define NODE_COLUMN 2
   m_query.bindValue(0,m_target);
   m_query.exec();
-  QStringList nodes;
+  QMap<QString,int> nodes;
 
   QTableWidgetItem * item;
   /// TODO include count in table ?
+  int count = 0;
   while(m_query.next()) {
+    count++;
     QString t = m_query.value("node").toString();
     if (! nodes.contains(t)) {
       int row = m_list->rowCount();
       m_list->insertRow(row);
       QString word = m_query.value("entry").toString();
+
       item = new QTableWidgetItem(m_query.value("root").toString());
       item->setFont(m_resultsFont);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
@@ -91,10 +95,21 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,int options,QWidget
 
       item = new QTableWidgetItem(t);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-      m_list->setItem(row,2,item);
-      nodes << t;
+      m_list->setItem(row,NODE_COLUMN,item);
+      nodes.insert(t,1);
+      m_list->setItem(row,3,new QTableWidgetItem("1"));
+    }
+    else {
+      nodes[t] = nodes.value(t) + 1;
     }
   }
+  for(int i=0; i < m_list->rowCount();i++) {
+    QString t = m_list->item(i,NODE_COLUMN)->text();
+    if (! t.isEmpty() && nodes.contains(t)) {
+      m_list->item(i,3)->setText(QString("%1").arg(nodes.value(t)));
+    }
+  }
+  //  qDebug() << "result count" << count;
   QSplitter * splitter = new QSplitter(Qt::Vertical);
   splitter->addWidget(m_list);
   splitter->addWidget(m_text);
