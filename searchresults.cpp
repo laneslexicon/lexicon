@@ -12,6 +12,9 @@ SearchResultsWidget::SearchResultsWidget(QWidget * parent) : QWidget(parent) {
   }
   delete settings;
   QVBoxLayout * layout = new QVBoxLayout;
+
+  QWidget * container = new QWidget;
+  QVBoxLayout * containerlayout = new QVBoxLayout;
   m_list = new QTableWidget;
   m_list->setColumnCount(4);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -22,13 +25,18 @@ SearchResultsWidget::SearchResultsWidget(QWidget * parent) : QWidget(parent) {
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_list->installEventFilter(this);
-  QStyle * style = m_list->style();
-  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
+  //QStyle * style = m_list->style();
+  //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
+  m_resultsText = new QLabel("");
+  m_resultsText->hide();
+  containerlayout->addWidget(m_list);
+  containerlayout->addWidget(m_resultsText);
+  container->setLayout(containerlayout);
   m_text = new GraphicsEntry;
   //  qDebug() << "result count" << count;
   //  this->search(str,options);
   QSplitter * splitter = new QSplitter(Qt::Vertical);
-  splitter->addWidget(m_list);
+  splitter->addWidget(container);
   splitter->addWidget(m_text);
   splitter->setStretchFactor(0,0);
   splitter->setStretchFactor(1,1);
@@ -270,7 +278,14 @@ void SearchResultsWidget::search(const QString & target,int options) {
       m_list->item(i,3)->setText(QString("%1").arg(nodes.value(t)));
     }
   }
-  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
+  //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
+  QString t = QString(tr("Search for %1, found %2 items")).arg(m_target).arg(count);
+  if (m_searchOptions & Lane::Ignore_Diacritics)
+    t += tr(", ignore diacritics");
+  if (m_searchOptions & Lane::Whole_Word_Match)
+    t += tr(", whole word match");
+  m_resultsText->setText(t);
+  m_resultsText->show();
   if (m_list->rowCount() > 0)
     m_list->itemDoubleClicked(m_list->item(0,0));
 }

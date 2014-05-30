@@ -42,6 +42,7 @@ class SearchResultsWidget : public QWidget
    QSqlQuery m_query;
    QSqlQuery m_nodeQuery;
    QString m_target;
+   QLabel * m_resultsText;
    QTableWidget * m_list;
    GraphicsEntry * m_text;
 /// for Arabic font from QSettings
