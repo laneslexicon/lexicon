@@ -1,5 +1,5 @@
 #include "contentswidget.h"
-
+#include <QTextStream>
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   readSettings();
   setColumnCount(2);

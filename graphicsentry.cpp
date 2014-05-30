@@ -165,10 +165,8 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   if (event->key() == Qt::Key_Escape) {
     QWidget * w = this->parentWidget();
     while(w) {
-      //      QLOG_DEBUG() << w->metaObject()->className();
       QTabWidget * tabw = qobject_cast<QTabWidget *>(w);
       if (tabw)  {
-        QLOG_DEBUG() << "setting focus" << tabw->tabBar()->hasFocus();
         tabw->tabBar()->setFocus();
         return;
       }
