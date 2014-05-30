@@ -27,9 +27,10 @@ class SearchResultsWidget : public QWidget
 
  public:
     SearchResultsWidget(const QString & str,int options,QWidget * parent = 0);
+    SearchResultsWidget(QWidget * parent = 0);
    GraphicsEntry * getEntry() { return m_text;}
    int count();
-
+   void search(const QString &,int options);
 
  public slots:
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
@@ -37,6 +38,7 @@ class SearchResultsWidget : public QWidget
 
  private:
    bool eventFilter(QObject * target,QEvent * event);
+   int m_searchOptions;
    QSqlQuery m_query;
    QSqlQuery m_nodeQuery;
    QString m_target;
@@ -44,5 +46,7 @@ class SearchResultsWidget : public QWidget
    GraphicsEntry * m_text;
 /// for Arabic font from QSettings
    QFont m_resultsFont;
+ signals:
+   void searchResult(const QString &);
 };
 #endif

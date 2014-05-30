@@ -1734,6 +1734,9 @@ void LanesLexicon::movePrevious(const Place & p) {
     on_actionPrevPage();
   }
 }
+void LanesLexicon::setStatus(const QString & txt) {
+  statusBar()->showMessage(txt);
+}
 void LanesLexicon::updateStatusBar() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
@@ -1881,7 +1884,9 @@ void LanesLexicon::searchForWord() {
         if (! UcdScripts::isScript(t,"Arabic")) {
           t = convertString(t);
         }
-        SearchResultsWidget * s = new SearchResultsWidget(t,d->getOptions(),this);
+        SearchResultsWidget * s = new SearchResultsWidget(this);
+        connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
+        s->search(t,d->getOptions());
         if (s->count() == 0) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));
@@ -1909,7 +1914,9 @@ void LanesLexicon::searchForEntry() {
         if (! UcdScripts::isScript(t,"Arabic")) {
           t = convertString(t);
         }
-        SearchResultsWidget * s = new SearchResultsWidget(t,d->getOptions(),this);
+        SearchResultsWidget * s = new SearchResultsWidget(this);
+        connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
+        s->search(t,d->getOptions());
         if (s->count() == 0) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));

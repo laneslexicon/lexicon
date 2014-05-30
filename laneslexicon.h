@@ -81,6 +81,7 @@ public:
     public slots:
     void gotoPlace(const Place &,bool newTab = false);
     int hasPlace(const Place & p,int searchtype,bool setFocus);
+    void setStatus(const QString &);
     //    void saveNote(Note *);
     private slots:
       void testSlot();

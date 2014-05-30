@@ -1,5 +1,53 @@
 #include "searchresults.h"
 #include "namespace.h"
+#include "laneslexicon.h"
+//extern LanesLexicon * getApp();
+SearchResultsWidget::SearchResultsWidget(QWidget * parent) : QWidget(parent) {
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->beginGroup("Search");
+  QString f = settings->value("Results font",QString()).toString();
+  if (! f.isEmpty()) {
+    m_resultsFont.fromString(f);
+  }
+  delete settings;
+  QVBoxLayout * layout = new QVBoxLayout;
+  m_list = new QTableWidget;
+  m_list->setColumnCount(4);
+  m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
+  QStringList headers;
+  headers << tr("Root") << tr("Entry") << tr("Node") << tr("Count");
+  m_list->setHorizontalHeaderLabels(headers);
+  m_list->horizontalHeader()->setStretchLastSection(true);
+  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_list->installEventFilter(this);
+  QStyle * style = m_list->style();
+  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
+  m_text = new GraphicsEntry;
+  //  qDebug() << "result count" << count;
+  //  this->search(str,options);
+  QSplitter * splitter = new QSplitter(Qt::Vertical);
+  splitter->addWidget(m_list);
+  splitter->addWidget(m_text);
+  splitter->setStretchFactor(0,0);
+  splitter->setStretchFactor(1,1);
+  layout->addWidget(splitter);
+  m_list->adjustSize();//resizeColumnsToContents();
+
+  setLayout(layout);
+  //connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
+  //      this,SLOT(itemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
+  connect(m_list,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
+          this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
+  /// show the first item in the list
+  /// TODO decide who gets focus and select the first row
+  /// TODO if table loses focus, change the background selection color
+  if (m_list->rowCount() > 0)
+    m_list->itemDoubleClicked(m_list->item(0,0));
+
+}
+/// TODO can remove this
 SearchResultsWidget::SearchResultsWidget(const QString & str,int options,QWidget * parent) : QWidget(parent) {
   m_target = str;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
@@ -24,92 +72,8 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,int options,QWidget
   QStyle * style = m_list->style();
   QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   m_text = new GraphicsEntry;
-  QString sql;
-  //  whole word with diacritics
-  //   select id,node where word = ?
-  //  part word with diacritics
-  //   select id,node from xref where instr(word,?) > 0;
-  //  whole word without diacritics
-  //   select where bareword = ?
-  //  part word without diacritics
-  //   select where instr(bareword,?) > 0
-  sql = "select id,word,root,entry,node from xref where datasource = 1 ";
-  if (options & Lane::Ignore_Diacritics) {
-    qDebug() << "ignoring diacritics";
-    if (options & Lane::Whole_Word_Match) {
-      qDebug() << "whole word match";
-      sql += "and bareword = ? ";
-    }
-    else {
-      sql += "and instr(bareword,?) > 0";
-    }
-  }
-  else {
-    if (options & Lane::Whole_Word_Match) {
-      qDebug() << "whole word match";
-      sql += "and word = ? ";
-    }
-    else {
-      sql += "and instr(word,?) > 0";
-    }
-  }
-  sql += " order by root,entry asc";
-  qDebug() << "search sql" << sql;
-  bool ok = false;
-  /// TODO replace select *
-  //   sql = QString("select * from xref where datasource = 1 and word = ? order by root,entry asc");
-  if (m_query.prepare(sql)) {
-    if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeId = ?")) {
-      ok = true;
-    }
-  }
-  if (! ok ) {
-    QLOG_WARN() << "Error prepare SQL";
-    return;
-  }
-#define NODE_COLUMN 2
-  m_query.bindValue(0,m_target);
-  m_query.exec();
-  QMap<QString,int> nodes;
-
-  QTableWidgetItem * item;
-  /// TODO include count in table ?
-  int count = 0;
-  while(m_query.next()) {
-    count++;
-    QString t = m_query.value("node").toString();
-    if (! nodes.contains(t)) {
-      int row = m_list->rowCount();
-      m_list->insertRow(row);
-      QString word = m_query.value("entry").toString();
-
-      item = new QTableWidgetItem(m_query.value("root").toString());
-      item->setFont(m_resultsFont);
-      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-      m_list->setItem(row,0,item);
-
-      item = new QTableWidgetItem(m_query.value("entry").toString());
-      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-      item->setFont(m_resultsFont);
-      m_list->setItem(row,1,item);
-
-      item = new QTableWidgetItem(t);
-      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-      m_list->setItem(row,NODE_COLUMN,item);
-      nodes.insert(t,1);
-      m_list->setItem(row,3,new QTableWidgetItem("1"));
-    }
-    else {
-      nodes[t] = nodes.value(t) + 1;
-    }
-  }
-  for(int i=0; i < m_list->rowCount();i++) {
-    QString t = m_list->item(i,NODE_COLUMN)->text();
-    if (! t.isEmpty() && nodes.contains(t)) {
-      m_list->item(i,3)->setText(QString("%1").arg(nodes.value(t)));
-    }
-  }
   //  qDebug() << "result count" << count;
+  this->search(str,options);
   QSplitter * splitter = new QSplitter(Qt::Vertical);
   splitter->addWidget(m_list);
   splitter->addWidget(m_text);
@@ -216,4 +180,97 @@ bool SearchResultsWidget::eventFilter(QObject * target,QEvent * event) {
     }
   }
   return QWidget::eventFilter(target,event);
+}
+void SearchResultsWidget::search(const QString & target,int options) {
+  m_target = target;
+  m_searchOptions = options;
+  QString sql;
+  //  whole word with diacritics
+  //   select id,node where word = ?
+  //  part word with diacritics
+  //   select id,node from xref where instr(word,?) > 0;
+  //  whole word without diacritics
+  //   select where bareword = ?
+  //  part word without diacritics
+  //   select where instr(bareword,?) > 0
+  sql = "select id,word,root,entry,node from xref where datasource = 1 ";
+  if (options & Lane::Ignore_Diacritics) {
+    qDebug() << "ignoring diacritics";
+    if (options & Lane::Whole_Word_Match) {
+      qDebug() << "whole word match";
+      sql += "and bareword = ? ";
+    }
+    else {
+      sql += "and instr(bareword,?) > 0";
+    }
+  }
+  else {
+    if (options & Lane::Whole_Word_Match) {
+      qDebug() << "whole word match";
+      sql += "and word = ? ";
+    }
+    else {
+      sql += "and instr(word,?) > 0";
+    }
+  }
+  sql += " order by root,entry asc";
+  qDebug() << "search sql" << sql;
+  bool ok = false;
+  /// TODO replace select *
+  //   sql = QString("select * from xref where datasource = 1 and word = ? order by root,entry asc");
+  if (m_query.prepare(sql)) {
+    if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeId = ?")) {
+      ok = true;
+    }
+  }
+  if (! ok ) {
+    QLOG_WARN() << "Error prepare SQL";
+    return;
+  }
+  m_list->setRowCount(0);
+#define NODE_COLUMN 2
+  m_query.bindValue(0,m_target);
+  m_query.exec();
+  QMap<QString,int> nodes;
+
+  QTableWidgetItem * item;
+  /// TODO include count in table ?
+  int count = 0;
+  while(m_query.next()) {
+    count++;
+    QString t = m_query.value("node").toString();
+    if (! nodes.contains(t)) {
+      int row = m_list->rowCount();
+      m_list->insertRow(row);
+      QString word = m_query.value("entry").toString();
+
+      item = new QTableWidgetItem(m_query.value("root").toString());
+      item->setFont(m_resultsFont);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      m_list->setItem(row,0,item);
+
+      item = new QTableWidgetItem(m_query.value("entry").toString());
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      item->setFont(m_resultsFont);
+      m_list->setItem(row,1,item);
+
+      item = new QTableWidgetItem(t);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      m_list->setItem(row,NODE_COLUMN,item);
+      nodes.insert(t,1);
+      m_list->setItem(row,3,new QTableWidgetItem("1"));
+    }
+    else {
+      nodes[t] = nodes.value(t) + 1;
+    }
+  }
+  for(int i=0; i < m_list->rowCount();i++) {
+    QString t = m_list->item(i,NODE_COLUMN)->text();
+    if (! t.isEmpty() && nodes.contains(t)) {
+      m_list->item(i,3)->setText(QString("%1").arg(nodes.value(t)));
+    }
+  }
+  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
+  if (m_list->rowCount() > 0)
+    m_list->itemDoubleClicked(m_list->item(0,0));
 }
