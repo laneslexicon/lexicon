@@ -26,7 +26,7 @@ class SearchResultsWidget : public QWidget
     Q_OBJECT
 
  public:
-   SearchResultsWidget(const QString & str, QWidget * parent = 0);
+    SearchResultsWidget(const QString & str,int options,QWidget * parent = 0);
    GraphicsEntry * getEntry() { return m_text;}
    int count();
 

@@ -1,5 +1,6 @@
 #include "searchresults.h"
-SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) : QWidget(parent) {
+#include "namespace.h"
+SearchResultsWidget::SearchResultsWidget(const QString & str,int options,QWidget * parent) : QWidget(parent) {
   m_target = str;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
@@ -23,10 +24,40 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,QWidget * parent) :
   QStyle * style = m_list->style();
   QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   m_text = new GraphicsEntry;
-
+  QString sql;
+  //  whole word with diacritics
+  //   select id,node where word = ?
+  //  part word with diacritics
+  //   select id,node from xref where instr(word,?) > 0;
+  //  whole word without diacritics
+  //   select where bareword = ?
+  //  part word without diacritics
+  //   select where instr(bareword,?) > 0
+  sql = "select * from xref where datasource = 1 ";
+  if (options & Lane::Ignore_Diacritics) {
+    qDebug() << "ignoring diacritics";
+    if (options & Lane::Whole_Word_Match) {
+      qDebug() << "whole word match";
+      sql += "and bareword = ? ";
+    }
+    else {
+      sql += "and instr(bareword,?) > 0";
+    }
+  }
+  else {
+    if (options & Lane::Whole_Word_Match) {
+      qDebug() << "whole word match";
+      sql += "and word = ? ";
+    }
+    else {
+      sql += "and instr(word,?) > 0";
+    }
+  }
+  sql += " order by root,entry asc";
+  qDebug() << "search sql" << sql;
   bool ok = false;
   /// TODO replace select *
-  QString sql = QString("select * from xref where datasource = 1 and word = ? order by root,entry asc");
+  //   sql = QString("select * from xref where datasource = 1 and word = ? order by root,entry asc");
   if (m_query.prepare(sql)) {
     if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeId = ?")) {
       ok = true;
