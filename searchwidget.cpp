@@ -1,6 +1,6 @@
 #include "searchwidget.h"
 #include "QsLog.h"
-
+#include "namespace.h"
 SearchDialog::SearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
 }
@@ -211,6 +211,22 @@ void WordSearchDialog::addOptions(QGridLayout * glayout) {
   glayout->addWidget(m_wholeWordMatch,0,1);
   glayout->addWidget(m_switchFocus,1,0);
   glayout->addWidget(m_newTab,1,1);
+}
+int WordSearchDialog::getOptions() {
+  int x = 0;
+  if (m_ignoreDiacritics->isChecked())
+    x |= Lane::Ignore_Diacritics;
+
+  if (m_wholeWordMatch->isChecked())
+    x |= Lane::Whole_Word_Match;
+
+  if (m_switchFocus->isChecked())
+    x |= Lane::Switch_Tab;
+
+  if (m_newTab->isChecked())
+    x |= Lane::Create_Tab;
+
+  return x;
 }
 void SearchDialog::showKeyboard() {
   m_keyboard->attach(m_edit);

@@ -61,6 +61,7 @@
 #include "notes.h"
 #include "notebrowser.h"
 #include "tabwidget.h"
+#include "namespace.h"
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
@@ -68,6 +69,7 @@ class LanesLexicon : public QMainWindow
 public:
     explicit LanesLexicon(QWidget *parent = 0);
     ~LanesLexicon();
+
     QSize sizeHint() const;
     void readSettings();
     void writeSettings();

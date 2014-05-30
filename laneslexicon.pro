@@ -81,4 +81,5 @@ HEADERS  += laneslexicon.h \
             notedialog.h \
             notebrowser.h \
             tabwidget.h \
+            namespace.h \
             application.h

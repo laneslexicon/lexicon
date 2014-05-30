@@ -51,6 +51,7 @@ class WordSearchDialog : public SearchDialog {
  public:
   WordSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   virtual void setup();
+  int getOptions();
   public slots:
     virtual void showOptions(bool);
  protected:

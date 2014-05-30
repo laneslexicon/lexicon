@@ -1881,7 +1881,7 @@ void LanesLexicon::searchForWord() {
         if (! UcdScripts::isScript(t,"Arabic")) {
           t = convertString(t);
         }
-        SearchResultsWidget * s = new SearchResultsWidget(t,this);
+        SearchResultsWidget * s = new SearchResultsWidget(t,d->getOptions(),this);
         if (s->count() == 0) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));
@@ -1909,7 +1909,7 @@ void LanesLexicon::searchForEntry() {
         if (! UcdScripts::isScript(t,"Arabic")) {
           t = convertString(t);
         }
-        SearchResultsWidget * s = new SearchResultsWidget(t,this);
+        SearchResultsWidget * s = new SearchResultsWidget(t,d->getOptions(),this);
         if (s->count() == 0) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));
