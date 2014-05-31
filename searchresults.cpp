@@ -105,7 +105,7 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,int options,QWidget
 int SearchResultsWidget::count() {
   return m_list->rowCount();
 }
-void SearchResultsWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * prev ) {
+void SearchResultsWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
   /// get the node
   item = item->tableWidget()->item(item->row(),2);
   QString node = item->text();
@@ -279,9 +279,9 @@ void SearchResultsWidget::search(const QString & target,int options) {
     }
   }
   //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
-  QString t = QString(tr("Search for %1, found %2 items")).arg(m_target).arg(count);
+  QString t = QString(tr("Search for %1, find count %2 ")).arg(m_target).arg(count);
   if (m_searchOptions & Lane::Ignore_Diacritics)
-    t += tr(", ignore diacritics");
+    t += tr(", ignoring diacritics");
   if (m_searchOptions & Lane::Whole_Word_Match)
     t += tr(", whole word match");
   m_resultsText->setText(t);
