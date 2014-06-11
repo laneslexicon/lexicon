@@ -5,6 +5,9 @@ ImLineEdit::ImLineEdit(QWidget * parent)
   m_mapper = im_new();
   m_prev_char = 0;
   m_debug = false;
+  m_forceLTR = false;
+  this->setText("كتب");
+  //this->setText("abcd");
 }
 ImLineEdit::~ImLineEdit() {
   im_free(m_mapper);
@@ -90,15 +93,23 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   if (m_debug) {
     QString t;
     QTextStream out(&t);
-    out << "ImEdit in: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << event->key() << " " << UcdScripts::getScript(event->key());
+    out << "ImLineEdit in: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << event->key() << " " << UcdScripts::getScript(event->key());
     out.reset();
     out << " " << event->text();
-
+    qDebug() << t;
   }
   if ( m_activeMap.isEmpty()) {
     return QLineEdit::keyPressEvent(event);
   }
+  qDebug() << this->text() << this->text().size() << this->cursorPosition();
 
+  if ((m_forceLTR) && (this->cursorPosition() == 1)) {
+    if (UcdScripts::getScript(event->key()) == "Unknown") {
+      event->ignore();
+      this->setCursorPosition(1);
+      return;
+    }
+  }
   //event->text().toUtf8().data());
   const QChar * uc = event->text().unicode();
   pc = uc->unicode();
@@ -129,4 +140,21 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
     m_prev_char = pc;
     QLineEdit::keyPressEvent(event);
   }
+}
+void ImLineEdit::setForceLTR(bool v) {
+  QString t = this->text();
+  QString ltr(QChar(0x202d));
+  //  QString ltr("X");
+  if (! v ) {
+    if (t.startsWith(ltr)) {
+      this->setText(t.remove(1,1));
+    }
+    m_forceLTR = false;
+    return;
+  }
+  //  this->setLayoutDirection(Qt::LeftToRight);
+ this->setLocale(QLocale(QLocale::C));
+
+  this->setText(ltr + t);
+  m_forceLTR = true;
 }
