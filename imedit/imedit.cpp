@@ -14,7 +14,7 @@ QString ImEdit::currentScript() {
   if ( ! mapEnabled ) {
     return QString();
   }
-  return mapper->getScript(mapname);
+  return mapper->getScript(m_activeMap);
 }
 QString ImEdit::convertString(const QString & str) {
   bool ok;
@@ -50,6 +50,20 @@ bool ImEdit::loadMap(const QString & fileName,const QString & mapname) {
   }
   return true;
 }
+void ImEdit::activateMap(const QString & name,bool activate) {
+  if (! activate ) {
+    m_activeMap.clear();
+    return;
+  }
+
+  if (mapper->hasMap(name) && activate) {
+    m_activeMap = name;
+    return;
+  }
+  if (! mapper->hasMap(name)) {
+    m_activeMap.clear();
+  }
+}
 void ImEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
   //  qDebug() << "keypress" << mapEnabled << mapname;;
@@ -64,7 +78,7 @@ void ImEdit::keyPressEvent(QKeyEvent * event) {
     out << " " << event->text();
     emit(logMessage(t)); //QString("ImEdit got: %1 %2").arg(event->key()).arg(qPrintable(event->text()))));
   }
-  if ((! mapEnabled) ||   mapname.isEmpty() ||  mapname.isNull())   {
+  if ((! mapEnabled) ||   m_activeMap.isEmpty() ||  m_activeMap.isNull())   {
     return QTextEdit::keyPressEvent(event);
   }
 
@@ -77,7 +91,7 @@ void ImEdit::keyPressEvent(QKeyEvent * event) {
     }
     return QTextEdit::keyPressEvent(event);
   }
-  im_char * cc = im_convert(this->mapper,this->mapname.toUtf8().constData(),uc->unicode(),prev_char);
+  im_char * cc = im_convert(this->mapper,this->m_activeMap.toUtf8().constData(),uc->unicode(),prev_char);
   if (cc->processed) {
     event->ignore();
     QKeyEvent * nevent = new QKeyEvent(QEvent::KeyPress, cc->uc, Qt::NoModifier,cc->c);
@@ -105,13 +119,13 @@ void ImEdit::keyPressEvent(QKeyEvent * event) {
 }
 void ImEdit::setMapname(const QString & name) {
   //  qDebug() << "setting map to:" << name;
-  mapname = name;
+  m_activeMap = name;
   bool v = true;
   if (name == "-none-") {
     v = false;
   }
   enableMapping(v);
-  qDebug() << Q_FUNC_INFO << "mapname" << name << v << mapper->getScript(name);
+  qDebug() << Q_FUNC_INFO << "m_activeMap" << name << v << mapper->getScript(name);
   emit(mapChanged(name));
   if (v) {
     QString s = mapper->getScript(name);
@@ -221,11 +235,13 @@ void ImEdit::focusInEvent(QFocusEvent * event ) {
   setCursorWidth(1);
   QTextEdit::focusInEvent(event);
 }
+#ifdef WITH_WRAPPED_EDIT
 /**
  *
  *
  * @param parent
  */
+
 WrappedEdit::WrappedEdit(QWidget * parent) : QWidget(parent) {
   bool ok;
   m_currentMap = "-none-";
@@ -353,6 +369,7 @@ QString WrappedEdit::getText() {
   }
   return t;
 }
+#endif
 #ifdef WITH_HUD
 /**
  *

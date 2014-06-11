@@ -17,7 +17,9 @@
 #include <QVBoxLayout>
 #include <QShortcut>
 #include "scripts.h"
+#ifdef WITH_WRAPPED_EDIT
 #include "hermesoptions.h"
+#endif
 extern QString getScript(int);
 class ImEdit : public QTextEdit
 {
@@ -37,16 +39,18 @@ public:
     void getMapNames(QStringList & m) {
       mapper->getMapNames(m);
     }
+    void activateMap(const QString &,bool enable = true);
     void getScriptNames(QStringList &);
     QString currentScript();
     QString convertString(const QString & source);
  private:
     InputMapper * mapper;
-    QString mapname;
     bool mapEnabled;
     ushort prev_char;
     QFont m_docFont;
     bool m_debug;
+    QString m_activeMap;
+    QString m_nullMap;
 
 protected:
     virtual void keyPressEvent(QKeyEvent *e);
@@ -72,6 +76,8 @@ public slots:
   void tabPressed();
   void editingFinished(); // added for QItemDelegate subclass
 };
+
+#ifdef WITH_WRAPPED_EDIT
 class WrappedEdit : public QWidget {
   Q_OBJECT
  public:
@@ -106,6 +112,7 @@ class WrappedEdit : public QWidget {
   void mapChanged();
   void editingFinished();
 };
+#endif
 #ifdef WITH_HUD
 class HudEdit : public WrappedEdit {
   Q_OBJECT
@@ -137,4 +144,5 @@ class HudEdit : public WrappedEdit {
 
 };
 #endif
+
 #endif

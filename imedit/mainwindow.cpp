@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
   m_edit = new ImEdit;
   m_edit->setDebug(true);
   m_edit->loadMap("buckwalter-1.4.js","Buckwalter");
+  m_edit->activateMap("Buckwalter");
   m_lineEdit = new ImLineEdit;
   m_lineEdit->loadMap("buckwalter-1.4.js","Buckwalter");
   m_lineEdit->activateMap("Buckwalter");
