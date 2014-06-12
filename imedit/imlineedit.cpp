@@ -7,6 +7,7 @@ ImLineEdit::ImLineEdit(QWidget * parent)
   m_debug = false;
   m_forceLTR = false;
   this->setText("كتب");
+  connect(this,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
   //this->setText("abcd");
 }
 ImLineEdit::~ImLineEdit() {
@@ -131,7 +132,7 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
       out << "ImLineEdit out: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << nevent->key();
       out.reset();
       out << nevent->text();
-
+      qDebug() << t;
     }
     //     QApplication::postEvent(event->target, nevent);
     return;
@@ -144,17 +145,23 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
 void ImLineEdit::setForceLTR(bool v) {
   QString t = this->text();
   QString ltr(QChar(0x202d));
-  //  QString ltr("X");
-  if (! v ) {
-    if (t.startsWith(ltr)) {
-      this->setText(t.remove(1,1));
-    }
-    m_forceLTR = false;
-    return;
-  }
-  //  this->setLayoutDirection(Qt::LeftToRight);
- this->setLocale(QLocale(QLocale::C));
 
-  this->setText(ltr + t);
-  m_forceLTR = true;
+  disconnect(this,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
+  if (! v ) {
+      this->setCursorPosition(this->text().size());
+      this->setText(t.remove(ltr));
+  }
+  else {
+    if (! t.startsWith(ltr)) {
+      t.remove(ltr);
+      this->setText(ltr + t);
+    }
+  }
+  m_forceLTR = v;
+  this->setFocus();
+  this->setCursorPosition(this->text().size());
+  connect(this,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
+}
+void ImLineEdit::onTextChanged(const QString & /* t */) {
+  this->setForceLTR(m_forceLTR);
 }

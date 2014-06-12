@@ -33,6 +33,7 @@ class ImLineEdit : public QLineEdit {
     void activateMap(const QString &,bool enable = true);
     void shortcutActivated();
     void setForceLTR(bool);
+    void onTextChanged(const QString &);
   private:
     InputMapper * m_mapper;
     ushort m_prev_char;

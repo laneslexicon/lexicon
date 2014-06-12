@@ -10,9 +10,14 @@ MainWindow::MainWindow(QWidget *parent) :
   m_edit->setDebug(true);
   m_edit->loadMap("buckwalter-1.4.js","Buckwalter");
   m_edit->activateMap("Buckwalter");
+  QString ltr(QChar(0x202d));
+
+  m_edit->setPlainText(ltr);
   m_lineEdit = new ImLineEdit;
   m_lineEdit->loadMap("buckwalter-1.4.js","Buckwalter");
   m_lineEdit->activateMap("Buckwalter");
+  m_lineEdit->setForceLTR(true);
+  m_lineEdit->setDebug(true);
   QWidget * w = new QWidget;
   layout->addWidget(m_lineEdit);
   layout->addWidget(m_edit);
