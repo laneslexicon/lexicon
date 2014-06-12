@@ -54,6 +54,8 @@ class WordSearchDialog : public SearchDialog {
   int getOptions();
   public slots:
     virtual void showOptions(bool);
+  void searchTargetChanged();
+  void searchTypeChanged();
  protected:
 
   virtual void addOptions(QGridLayout *);
@@ -61,7 +63,12 @@ class WordSearchDialog : public SearchDialog {
  private:
     QCheckBox * m_ignoreDiacritics;
     QCheckBox * m_wholeWordMatch;
-
+    QCheckBox * m_headButton;
+    QCheckBox * m_fullButton;
+    QRadioButton * m_normalButton;
+    QRadioButton * m_regexButton;
+    QRadioButton  * m_arabicTarget;
+    QRadioButton * m_buckwalterTarget;
 };
 class NodeSearchDialog : public QDialog {
   Q_OBJECT

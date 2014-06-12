@@ -113,11 +113,13 @@ void WordSearchDialog::setup() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
   m_edit->readSettings(settings);
+
   m_prompt->setBuddy(m_edit);
   m_newTab = new QCheckBox(tr("Open in &new tab"));
   m_switchFocus = new QCheckBox(tr("Switch to &new tab"));
   m_ignoreDiacritics = new QCheckBox(tr("Ignore diacritics"));
   m_wholeWordMatch = new QCheckBox(tr("Whole word match"));
+
 
   m_findButton = new QPushButton(tr("&Find"));
   m_findButton->setDefault(true);
@@ -201,16 +203,75 @@ void WordSearchDialog::setup() {
   int h = this->frameGeometry().height();
   QLOG_DEBUG() << "search dialog frame geometry" << this->frameGeometry();
   m_keyboard->move(p.x(),p.y() + h);
+  /// set the defaults
+  connect(m_arabicTarget,SIGNAL(clicked()),this,SLOT(searchTargetChanged()));
+  connect(m_buckwalterTarget,SIGNAL(clicked()),this,SLOT(searchTargetChanged()));
+  connect(m_normalButton,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
+  connect(m_regexButton,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
+  m_arabicTarget->setChecked(true);
   //  delete settings;
 }
 void WordSearchDialog::addOptions(QGridLayout * glayout) {
+  QGroupBox * btngroup = new QGroupBox(tr("Search context"));
+  m_headButton = new QCheckBox(tr("Head word"));
+  m_fullButton = new QCheckBox(tr("Full text"));
+  QHBoxLayout * layout = new QHBoxLayout;
+  layout->addWidget(m_headButton);
+  layout->addWidget(m_fullButton);
+  btngroup->setLayout(layout);
+
+  QGroupBox * targetgroup = new QGroupBox(tr("Search target"));
+  QHBoxLayout * layout1= new QHBoxLayout;
+  m_arabicTarget = new QRadioButton(tr("Arabic text"),targetgroup);
+  m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),targetgroup);
+  layout1->addWidget(m_arabicTarget);
+  layout1->addWidget(m_buckwalterTarget);
+  targetgroup->setLayout(layout1);
+
   m_ignoreDiacritics = new QCheckBox(tr("Ignore diacritics"));
   m_wholeWordMatch = new QCheckBox(tr("Whole word match"));
 
-  glayout->addWidget(m_ignoreDiacritics,0,0);
-  glayout->addWidget(m_wholeWordMatch,0,1);
-  glayout->addWidget(m_switchFocus,1,0);
-  glayout->addWidget(m_newTab,1,1);
+  QGroupBox * typegroup = new QGroupBox(tr("Search type"));
+  QHBoxLayout * layout2= new QHBoxLayout;
+
+  m_normalButton = new QRadioButton(tr("Normal"),typegroup);
+  m_regexButton = new QRadioButton(tr("Regular expression"),typegroup);
+  layout2->addWidget(m_normalButton);
+  layout2->addWidget(m_regexButton);
+  typegroup->setLayout(layout2);
+
+  int row = 0;
+  glayout->addWidget(btngroup,row,0,1,2);
+  row++;
+  glayout->addWidget(targetgroup,row,0,1,2);
+  row++;
+  glayout->addWidget(typegroup,row,0,1,2);
+  row++;
+  glayout->addWidget(m_ignoreDiacritics,row,0);
+  glayout->addWidget(m_wholeWordMatch,row,1);
+  row++;
+  glayout->addWidget(m_switchFocus,row,0);
+  glayout->addWidget(m_newTab,row,1);
+}
+void WordSearchDialog::searchTargetChanged() {
+  qDebug() << Q_FUNC_INFO;
+  if (m_arabicTarget->isChecked()) {
+    bool v = false;
+    if (m_normalButton->isChecked()) {
+      v = true;
+    }
+    m_ignoreDiacritics->setEnabled(v);
+    m_wholeWordMatch->setEnabled(v);
+  }
+}
+void WordSearchDialog::searchTypeChanged() {
+  qDebug() << Q_FUNC_INFO;
+  bool v = true;
+  if (m_regexButton->isChecked()) {
+    v = false;
+  }
+  m_ignoreDiacritics->setEnabled(v);
+  m_wholeWordMatch->setEnabled(v);
 }
 int WordSearchDialog::getOptions() {
   int x = 0;
