@@ -7,20 +7,7 @@ binmode STDOUT, ":utf8";
 my @lines;
 my @ini;
 my $keyStartPos = -1;
-getopts("o:i:");
-if ($opt_i) {
-  my $i = 0;
-  open(IN,"<:utf8",$opt_i) or die "No input file $opt_i";
-  while(<IN>) {
-    chomp;
-    if (/START_KEYS/) {
-      $keyStartPos = $i;
-    }
-    push @lines,$_;
-    $i++;
-  }
-  close IN;
-}
+
 sub test {
 
 @lines = <<EOL =~ m/(\S.*\S)/g;
@@ -59,6 +46,10 @@ sub test {
 EOL
 
 }
+###################################################
+# this will provide a dummy header if nono is given
+###################################################
+
 my $header = <<EOH;
 [Header]
 name=New keyboard
@@ -72,15 +63,38 @@ key down color=
 key up color=
 keyboard color=
 EOH
+
+
+getopts("o:i:");
+#
+# read all the lines in finding where the keys start
+#
+if ($opt_i) {
+  my $i = 0;
+  open(IN,"<:utf8",$opt_i) or die "No input file $opt_i";
+  while(<IN>) {
+    chomp;
+    if (/START_KEYS/) {
+      $keyStartPos = $i;
+    }
+    push @lines,$_;
+    $i++;
+  }
+  close IN;
+}
+#
+# if no START_KEYS found, use the dummy header
+# otherwise shift the header lines from @lines
+# to @ini
+#
 if ($keyStartPos == -1) {
   push @ini , "$header";
-}
-else {
+} else {
   push @ini , "[Header]";
-for(my $i=0;$i < $keyStartPos;$i++) {
-  my $t = shift @lines;
-  push @ini , "$t";
-}
+  for (my $i=0;$i < $keyStartPos;$i++) {
+    my $t = shift @lines;
+    push @ini , "$t";
+  }
   shift @lines;
 }
 # my $s = "4,2,ز:ظ";
@@ -91,7 +105,40 @@ for(my $i=0;$i < $keyStartPos;$i++) {
 # }
 # exit;
 
-
+####################################################################################################
+#
+# A line beginning with '#' will be ignored
+# A line begins with a row and column specification and then upto three further comma delimited fields
+# If the final entry on the line is bracketed with '[' and ']' this specifies special properties for
+# the key.
+# The other two entries specify the value to output when the key is pressed and what character is to appear on the keyboard (this is termed the 'decoration'
+# If the value is the same as the decoration, the decoration may be omitted.
+#
+# key line format
+# row,col,values,optional decoration ,[properties]
+#
+#   values     - colon separated list of values to send when the key is pressed>
+#                each element in the list represents a level, so the first
+#                item is level1, the second level2, etc
+#                Each value can be either the character itself or in the
+#                format 0xnnnn for a hex number
+#   decoration - if the character that appears on the keypad is not the same as the value, then
+#                decoration is a colon separated list of characters to show
+#                on the keypad, each element in the list corresponding to a level
+#
+#   properties  - a comma separated list properties, in the format <name>=<value> for the key
+#                span=n       the key occupies n columns on the keyboard
+#                sticky=true  the key stays down until a normal key is press i.e. shift key
+#                type=leveln  shifts the keyboard into level n
+#                type=groupn  shifts the keyboard into group n
+#                vpos=nn      the vertical position of the decoration on the keypad
+#                toogle=true  key stays down until it is pressed i.e. Caps Lock
+#
+#
+#  if the value or the decoration is e.g a comma or colon, you must use their hex values in the
+#  input file otherwise the script will get very confused.
+#
+###################################################################################################
 foreach $line (@lines) {
   next unless $line !~ /^#/;
   my @values;
