@@ -7,12 +7,13 @@ enum Tabs {
 };
  enum Search {
    Ignore_Diacritics = 0x00000010,
-   Whole_Word_Match =  0x00000020,
-   Regex_Match      =  0x00000040,
-   Buckwalter       =  0x00000080,
-   Arabic           =  0x00000100,
-   Head             =  0x00000200,
-   Full             =  0x00000400
+   Whole_Word        =  0x00000020,
+   Regex             =  0x00000040,
+   Buckwalter        =  0x00000080,
+   Arabic            =  0x00000100,
+   Head              =  0x00000200,
+   Full              =  0x00000400,
+   Normal            =  0x00000800
  };
 }
 #endif

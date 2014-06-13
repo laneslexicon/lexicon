@@ -375,7 +375,7 @@ int WordSearchDialog::getOptions() {
     x |= Lane::Ignore_Diacritics;
 
   if (m_wholeWordMatch->isChecked())
-    x |= Lane::Whole_Word_Match;
+    x |= Lane::Whole_Word;
 
   if (m_switchFocus->isChecked())
     x |= Lane::Switch_Tab;
@@ -386,7 +386,7 @@ int WordSearchDialog::getOptions() {
   if (m_regexButton->isChecked())
     x |= Lane::Regex;
 
-  if (m_normaButton->isChecked())
+  if (m_normalButton->isChecked())
     x |= Lane::Normal;
 
   if (m_arabicTarget->isChecked())

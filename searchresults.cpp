@@ -204,7 +204,7 @@ void SearchResultsWidget::search(const QString & target,int options) {
   sql = "select id,word,root,entry,node from xref where datasource = 1 ";
   if (options & Lane::Ignore_Diacritics) {
     qDebug() << "ignoring diacritics";
-    if (options & Lane::Whole_Word_Match) {
+    if (options & Lane::Whole_Word) {
       qDebug() << "whole word match";
       sql += "and bareword = ? ";
     }
@@ -213,7 +213,7 @@ void SearchResultsWidget::search(const QString & target,int options) {
     }
   }
   else {
-    if (options & Lane::Whole_Word_Match) {
+    if (options & Lane::Whole_Word) {
       qDebug() << "whole word match";
       sql += "and word = ? ";
     }
@@ -282,7 +282,7 @@ void SearchResultsWidget::search(const QString & target,int options) {
   QString t = QString(tr("Search for %1, find count %2 ")).arg(m_target).arg(count);
   if (m_searchOptions & Lane::Ignore_Diacritics)
     t += tr(", ignoring diacritics");
-  if (m_searchOptions & Lane::Whole_Word_Match)
+  if (m_searchOptions & Lane::Whole_Word)
     t += tr(", whole word match");
   m_resultsText->setText(t);
   m_resultsText->show();
