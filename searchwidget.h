@@ -69,6 +69,7 @@ class WordSearchDialog : public SearchDialog {
     QRadioButton * m_regexButton;
     QRadioButton  * m_arabicTarget;
     QRadioButton * m_buckwalterTarget;
+    void readSettings();
 };
 class NodeSearchDialog : public QDialog {
   Q_OBJECT

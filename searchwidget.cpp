@@ -102,6 +102,62 @@ void SearchDialog::addOptions(QGridLayout * glayout) {
   glayout->addWidget(m_switchFocus,0,0);
   glayout->addWidget(m_newTab,0,1);
 }
+void SearchDialog::showKeyboard() {
+  m_keyboard->attach(m_edit);
+  m_attached = ! m_attached;
+  if (m_attached) {
+    m_keyboardButton->setText(tr("Hide keyboard"));
+    QPoint p = this->pos();
+    int h = this->frameGeometry().height();
+    /// TODO adjust this
+    m_keyboard->move(p.x() - 50,p.y() + h);
+  }
+  else
+    m_keyboardButton->setText(tr("Show keyboard"));
+
+}
+void SearchDialog::showOptions(bool v) {
+  m_options->setVisible(v);
+  if (!v)
+    m_edit->setFocus();
+}
+void SearchDialog::keymapChanged() {
+  QRadioButton * btn = qobject_cast<QRadioButton *>(QObject::sender());
+  /// if passed the name of non-existent map
+  /// this will deactive the current map as there is no such map
+  m_edit->activateMap(btn->text(),true);
+  m_edit->setFocus();
+}
+QString SearchDialog::getText() {
+  return m_edit->text().trimmed();
+}
+bool SearchDialog::getNewTab() {
+  if (m_newTab->checkState() == Qt::Checked) {
+    return true;
+  }
+  return false;
+}
+void SearchDialog::setNewTab(bool v) {
+  m_newTab->setChecked(v);
+}
+bool SearchDialog::getSwitchFocus() {
+  if (m_switchFocus->checkState() == Qt::Checked) {
+    return true;
+  }
+  return false;
+}
+void SearchDialog::setSwitchFocus(bool v) {
+  m_switchFocus->setChecked(v);
+}
+void SearchDialog::setPrompt(const QString & text) {
+  m_prompt->setText(text);
+}
+/**
+ *
+ *
+ * @param parent
+ * @param f
+ */
 WordSearchDialog::WordSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   SearchDialog(parent,f) {
 
@@ -110,9 +166,6 @@ void WordSearchDialog::setup() {
   setWindowTitle(tr("Search"));
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  m_edit->readSettings(settings);
 
   m_prompt->setBuddy(m_edit);
   m_newTab = new QCheckBox(tr("Open in &new tab"));
@@ -209,7 +262,7 @@ void WordSearchDialog::setup() {
   connect(m_normalButton,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
   connect(m_regexButton,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
   m_arabicTarget->setChecked(true);
-  //  delete settings;
+  this->readSettings();
 }
 void WordSearchDialog::addOptions(QGridLayout * glayout) {
   QGroupBox * btngroup = new QGroupBox(tr("Search context"));
@@ -253,6 +306,42 @@ void WordSearchDialog::addOptions(QGridLayout * glayout) {
   glayout->addWidget(m_switchFocus,row,0);
   glayout->addWidget(m_newTab,row,1);
 }
+void WordSearchDialog::readSettings() {
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  m_edit->readSettings(settings);
+  /// the settings will be deleted in ImLineEdit::readSettings
+
+  settings = app->getSettings();
+  settings->beginGroup("Search");
+  QString v = settings->value("Context","header").toString();
+  if (v == "head") {
+    m_headButton->setChecked(true);
+    m_fullButton->setChecked(false);
+  }
+  else {
+    m_headButton->setChecked(false);
+    m_fullButton->setChecked(true);
+  }
+  v = settings->value("Type","normal").toString();
+  if (v == "normal") {
+    m_normalButton->setChecked(true);
+    m_regexButton->setChecked(false);
+  }
+  else {
+    m_normalButton->setChecked(false);
+    m_regexButton->setChecked(true);
+  }
+  v = settings->value("Target","arabic").toString();
+  if (v == "arabic") {
+    m_arabicTarget->setChecked(true);
+    m_buckwalterTarget->setChecked(false);
+  }
+  else {
+    m_arabicTarget->setChecked(false);
+    m_buckwalterTarget->setChecked(true);
+  }
+}
 void WordSearchDialog::searchTargetChanged() {
   qDebug() << Q_FUNC_INFO;
   if (m_arabicTarget->isChecked()) {
@@ -289,62 +378,12 @@ int WordSearchDialog::getOptions() {
 
   return x;
 }
-void SearchDialog::showKeyboard() {
-  m_keyboard->attach(m_edit);
-  m_attached = ! m_attached;
-  if (m_attached) {
-    m_keyboardButton->setText(tr("Hide keyboard"));
-    QPoint p = this->pos();
-    int h = this->frameGeometry().height();
-    /// TODO adjust this
-    m_keyboard->move(p.x() - 50,p.y() + h);
-  }
-  else
-    m_keyboardButton->setText(tr("Show keyboard"));
-
-}
-void SearchDialog::showOptions(bool v) {
-  m_options->setVisible(v);
-  if (!v)
-    m_edit->setFocus();
-}
 void WordSearchDialog::showOptions(bool v) {
   m_switchFocus->setVisible(v);
   m_newTab->setVisible(v);
   m_options->setVisible(v);
   if (!v)
     m_edit->setFocus();
-}
-void SearchDialog::keymapChanged() {
-  QRadioButton * btn = qobject_cast<QRadioButton *>(QObject::sender());
-  /// if passed the name of non-existent map
-  /// this will deactive the current map as there is no such map
-  m_edit->activateMap(btn->text(),true);
-  m_edit->setFocus();
-}
-QString SearchDialog::getText() {
-  return m_edit->text().trimmed();
-}
-bool SearchDialog::getNewTab() {
-  if (m_newTab->checkState() == Qt::Checked) {
-    return true;
-  }
-  return false;
-}
-void SearchDialog::setNewTab(bool v) {
-  m_newTab->setChecked(v);
-}
-bool SearchDialog::getSwitchFocus() {
-  if (m_switchFocus->checkState() == Qt::Checked) {
-    return true;
-  }
-  return false;
-}
-void SearchDialog::setSwitchFocus(bool v) {
-  m_switchFocus->setChecked(v);
-}
-void SearchDialog::setPrompt(const QString & text) {
-  m_prompt->setText(text);
 }
 /**
  *
