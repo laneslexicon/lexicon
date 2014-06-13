@@ -306,6 +306,10 @@ void WordSearchDialog::addOptions(QGridLayout * glayout) {
   glayout->addWidget(m_switchFocus,row,0);
   glayout->addWidget(m_newTab,row,1);
 }
+/**
+ *
+ *
+ */
 void WordSearchDialog::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
@@ -342,8 +346,11 @@ void WordSearchDialog::readSettings() {
     m_buckwalterTarget->setChecked(true);
   }
 }
+/**
+ *
+ *
+ */
 void WordSearchDialog::searchTargetChanged() {
-  qDebug() << Q_FUNC_INFO;
   if (m_arabicTarget->isChecked()) {
     bool v = false;
     if (m_normalButton->isChecked()) {
@@ -375,6 +382,25 @@ int WordSearchDialog::getOptions() {
 
   if (m_newTab->isChecked())
     x |= Lane::Create_Tab;
+
+  if (m_regexButton->isChecked())
+    x |= Lane::Regex;
+
+  if (m_normaButton->isChecked())
+    x |= Lane::Normal;
+
+  if (m_arabicTarget->isChecked())
+    x |= Lane::Arabic;
+
+  if (m_buckwalterTarget->isChecked())
+    x |= Lane::Buckwalter;
+
+  if (m_headButton->isChecked())
+    x |= Lane::Head;
+
+  if (m_fullButton->isChecked())
+    x |= Lane::Full;
+
 
   return x;
 }
