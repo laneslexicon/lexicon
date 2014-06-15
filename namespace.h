@@ -2,11 +2,11 @@
 #define __NAMESPACE_H__
 namespace Lane {
 enum Tabs {
-  Create_Tab = 0x00000001,
-  Switch_Tab = 0x00000002,
+  Create_Tab          = 0x00000001,
+  Switch_Tab          = 0x00000002,
 };
  enum Search {
-   Ignore_Diacritics = 0x00000010,
+   Ignore_Diacritics =  0x00000010,
    Whole_Word        =  0x00000020,
    Regex             =  0x00000040,
    Buckwalter        =  0x00000080,
