@@ -1,4 +1,5 @@
 #include "laneslexicon.h"
+#include "searchoptions.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
@@ -581,7 +582,7 @@ void LanesLexicon::createToolBar() {
   mainbar->setObjectName("maintoolbar");
 
   mainbar->addAction(m_exitAction);
-  //  mainbar->addAction(m_testAction);
+  mainbar->addAction(m_testAction);
 
   //  QToolBar * history = addToolBar(tr("History"));
   //  history->setObjectName("historytoolbar");
@@ -1027,6 +1028,11 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
 void LanesLexicon::on_actionTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
+  SearchOptions * s = new SearchOptions;
+    s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
+    m_tabs->addTab(s,"Test");
+    s->setOptions(Lane::Create_Tab | Lane::Regex | Lane::Arabic);
+    //    s->setOptions(0);
 }
 /**
  * TODO tidy up navMode
@@ -1832,6 +1838,7 @@ void LanesLexicon::on_actionDocs() {
 }
 void LanesLexicon::testSlot() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+  m_tabs->addTab(new SearchOptions,"Test");
 }
 void LanesLexicon::searchForPage() {
     bool ok;
