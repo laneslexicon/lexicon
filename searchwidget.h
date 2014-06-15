@@ -26,7 +26,7 @@ class SearchDialog : public QDialog {
   bool getSwitchFocus();
   void setSwitchFocus(bool v);
   virtual void setup();
-    public slots:
+  public slots:
     void keymapChanged();
     virtual void showOptions(bool);
     void showKeyboard();
@@ -69,6 +69,8 @@ class WordSearchDialog : public SearchDialog {
     QRadioButton * m_regexButton;
     QRadioButton  * m_arabicTarget;
     QRadioButton * m_buckwalterTarget;
+    QGroupBox * m_targetGroup;
+    QGroupBox * m_typeGroup;
     void readSettings();
 };
 class NodeSearchDialog : public QDialog {
