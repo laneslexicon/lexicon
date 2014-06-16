@@ -14,14 +14,15 @@
 #include "imlineedit.h"
 #include "keyboardwidget.h"
 class SearchOptions;
-class RootSearchDialog : public QDialog {
+class ArabicSearchDialog : public QDialog {
   Q_OBJECT
 
  public:
-  RootSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
+  ArabicSearchDialog(int type,QWidget * parent = 0, Qt::WindowFlags f = 0);
   QString getText();
   void setPrompt(const QString &);
   void setOptions(int);
+  int getOptions();
   public slots:
     //    void keymapChanged();
     virtual void showOptions(bool);
@@ -39,34 +40,7 @@ class RootSearchDialog : public QDialog {
     QPushButton * m_keyboardButton;
     SearchOptions  * m_options;
 };
-/*
-class WordSearchDialog : public SearchDialog {
-  Q_OBJECT
- public:
-  WordSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
-  virtual void setup();
-  int getOptions();
-  public slots:
-    virtual void showOptions(bool);
-  void searchTargetChanged();
-  void searchTypeChanged();
- protected:
 
-  virtual void addOptions(QGridLayout *);
-
- private:
-    QCheckBox * m_ignoreDiacritics;
-    QCheckBox * m_wholeWordMatch;
-    QCheckBox * m_headButton;
-    QCheckBox * m_fullButton;
-    QRadioButton * m_normalButton;
-    QRadioButton * m_regexButton;
-    QRadioButton  * m_arabicTarget;
-    QRadioButton * m_buckwalterTarget;
-    QGroupBox * m_targetGroup;
-    QGroupBox * m_typeGroup;
-    void readSettings();
-};
 class NodeSearchDialog : public QDialog {
   Q_OBJECT
 
@@ -84,5 +58,4 @@ class NodeSearchDialog : public QDialog {
   QPushButton * m_findButton;
   QWidget * m_options;
 };
-*/
 #endif
