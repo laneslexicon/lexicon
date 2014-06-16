@@ -40,6 +40,8 @@ class SearchOptions : public QWidget {
   QRadioButton * m_regexSearch;
   QRadioButton * m_arabicTarget;
   QRadioButton * m_buckwalterTarget;
+ signals:
+  void loadKeymap(const QString &);
 
 };
 #endif

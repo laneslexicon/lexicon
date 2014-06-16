@@ -252,4 +252,9 @@ void SearchOptions::addKeymaps(const QString & activeMap,const QStringList & map
   }
 }
 void SearchOptions::keymapChanged() {
+  QRadioButton * btn = qobject_cast<QRadioButton *>(QObject::sender());
+  if (btn) {
+    qDebug() << "keymap" << btn->text();
+    emit(loadKeymap(btn->text()));
+  }
 }
