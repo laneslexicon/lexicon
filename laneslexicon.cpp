@@ -1,5 +1,6 @@
 #include "laneslexicon.h"
 #include "searchoptions.h"
+#include "searchdialogs.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
@@ -1028,11 +1029,13 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
 void LanesLexicon::on_actionTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
-  SearchOptions * s = new SearchOptions;
+  SearchOptions * s = new SearchOptions(Lane::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
     m_tabs->addTab(s,"Test");
     s->setOptions(Lane::Create_Tab | Lane::Regex | Lane::Arabic);
     //    s->setOptions(0);
+    ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word);
+    d->exec();
 }
 /**
  * TODO tidy up navMode
@@ -1838,7 +1841,7 @@ void LanesLexicon::on_actionDocs() {
 }
 void LanesLexicon::testSlot() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  m_tabs->addTab(new SearchOptions,"Test");
+
 }
 void LanesLexicon::searchForPage() {
     bool ok;
@@ -1854,11 +1857,10 @@ void LanesLexicon::searchForPage() {
 void LanesLexicon::searchForRoot() {
   /// TODO this will show 'ignore diacritics' and 'whole word'
   /// which doesn't make much sense ?
-    SearchDialog * d = new SearchDialog(this);
-    d->setup();
-    d->setWindowTitle(tr("Search for Root"));
-    d->setPrompt(tr("Find root"));
-    d->setNewTab(m_searchNewTab);
+  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Root,this);
+  //    d->setWindowTitle(tr("Search for Root"));
+  //    d->setPrompt(tr("Find root"));
+  //    d->setNewTab(m_searchNewTab);
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
@@ -1866,7 +1868,8 @@ void LanesLexicon::searchForRoot() {
         if (! UcdScripts::isScript(t,"Arabic")) {
           t = convertString(t);
         }
-        Place p = showPlace(Place(t),d->getNewTab());
+        int opts = d->getOptions();
+        Place p = showPlace(Place(t),(opts & Lane::Create_Tab));
         if (! p.isValid()) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));
@@ -1881,10 +1884,10 @@ void LanesLexicon::searchForRoot() {
  * and searching within the text
  */
 void LanesLexicon::searchForWord() {
-    WordSearchDialog * d = new WordSearchDialog(this);
-    d->setup();
-    d->setWindowTitle(tr("Search for Word"));
-    d->setPrompt(tr("Find word"));
+  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
+    //    d->setup();
+    //    d->setWindowTitle(tr("Search for Word"));
+    //    d->setPrompt(tr("Find word"));
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
@@ -1911,10 +1914,10 @@ void LanesLexicon::searchForWord() {
 }
 /// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
-    WordSearchDialog * d = new WordSearchDialog(this);
-    d->setup();
-    d->setWindowTitle(tr("Search for Entry"));
-    d->setPrompt(tr("Find entry"));
+  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
+  //    d->setup();
+  //    d->setWindowTitle(tr("Search for Entry"));
+  //    d->setPrompt(tr("Find entry"));
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
