@@ -50,7 +50,7 @@ SOURCES += main.cpp\
         graphicsentry.cpp \
         entryitem.cpp \
         xsltsupport.cpp \
-        searchwidget.cpp \
+#        searchwidget.cpp \
         noteswidget.cpp \
         history.cpp \
         place.cpp \
@@ -62,7 +62,8 @@ SOURCES += main.cpp\
         notebrowser.cpp \
         tabwidget.cpp \
         application.cpp \
-        searchoptions.cpp
+        searchoptions.cpp \
+        searchdialogs.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -71,7 +72,7 @@ HEADERS  += laneslexicon.h \
             graphicsentry.h \
             entryitem.h \
             xsltsupport.h \
-            searchwidget.h \
+#            searchwidget.h \
             noteswidget.h \
             history.h \
             place.h \
@@ -84,4 +85,5 @@ HEADERS  += laneslexicon.h \
             tabwidget.h \
             namespace.h \
             application.h \
-            searchoptions.h
+            searchoptions.h \
+            searchdialogs.h

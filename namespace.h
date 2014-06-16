@@ -5,6 +5,10 @@ enum Tabs {
   Create_Tab          = 0x00000001,
   Switch_Tab          = 0x00000002,
 };
+ enum SearchType {
+  Root                = 0x00000004,
+  Word                = 0x00000008,
+ };
  enum Search {
    Ignore_Diacritics =  0x00000010,
    Whole_Word        =  0x00000020,
