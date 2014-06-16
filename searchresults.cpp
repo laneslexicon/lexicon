@@ -201,7 +201,12 @@ void SearchResultsWidget::search(const QString & target,int options) {
   //   select where bareword = ?
   //  part word without diacritics
   //   select where instr(bareword,?) > 0
+  if (options & Lane::Full) {
   sql = "select id,word,root,entry,node from xref where datasource = 1 ";
+  }
+  else {
+    sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 ";
+  }
   if (options & Lane::Ignore_Diacritics) {
     qDebug() << "ignoring diacritics";
     if (options & Lane::Whole_Word) {
@@ -221,7 +226,12 @@ void SearchResultsWidget::search(const QString & target,int options) {
       sql += "and instr(word,?) > 0";
     }
   }
-  sql += " order by root,entry asc";
+  if (options & Lane::Full) {
+    sql += " order by root,entry asc";
+  }
+  else {
+    sql += " order by root,nodenum asc";
+  }
   qDebug() << "search sql" << sql;
   bool ok = false;
   /// TODO replace select *
@@ -246,18 +256,26 @@ void SearchResultsWidget::search(const QString & target,int options) {
   int count = 0;
   while(m_query.next()) {
     count++;
-    QString t = m_query.value("node").toString();
+    QString t;
+    QString word;
+    if (options & Lane::Full) {
+      t = m_query.value("node").toString();
+      word = m_query.value("entry").toString();
+    }
+    else {
+      t = m_query.value("nodeid").toString();
+      word = m_query.value("word").toString();
+    }
+
     if (! nodes.contains(t)) {
       int row = m_list->rowCount();
       m_list->insertRow(row);
-      QString word = m_query.value("entry").toString();
-
       item = new QTableWidgetItem(m_query.value("root").toString());
       item->setFont(m_resultsFont);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,0,item);
 
-      item = new QTableWidgetItem(m_query.value("entry").toString());
+      item = new QTableWidgetItem(word);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       item->setFont(m_resultsFont);
       m_list->setItem(row,1,item);
