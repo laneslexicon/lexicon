@@ -12,7 +12,7 @@ class SearchOptions : public QWidget {
   Q_OBJECT
 
  public:
-  SearchOptions(QWidget * parent = 0);
+  SearchOptions(int searchType,QWidget * parent = 0);
   int getOptions();
   void setOptions(int);
   void showMore(bool);
@@ -23,6 +23,7 @@ class SearchOptions : public QWidget {
   void keymapChanged();
  private:
   bool m_hasMaps;
+  int m_searchType;
   QSpacerItem * m_spacer;
   QGroupBox *  m_targetGroup;
   QGroupBox * m_typeGroup;

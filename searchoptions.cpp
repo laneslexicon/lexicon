@@ -1,6 +1,7 @@
 #include "searchoptions.h"
 #include "namespace.h"
-SearchOptions::SearchOptions(QWidget * parent) : QWidget(parent) {
+SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) {
+  m_searchType = searchType;
   m_hasMaps = false;
   QVBoxLayout * mainlayout = new QVBoxLayout;
 
@@ -85,6 +86,18 @@ SearchOptions::SearchOptions(QWidget * parent) : QWidget(parent) {
   //  mainlayout->addStretch();
 }
 void SearchOptions::showMore(bool show) {
+  if (m_searchType & Lane::Root) {
+    m_contextGroup->setVisible(false);
+    m_targetGroup->setVisible(false);
+    m_typeGroup->setVisible(false);
+    m_ignoreDiacritics->setVisible(false);
+    m_wholeWordMatch->setVisible(false);
+    m_forceLTR->setVisible(false);
+    if (m_hasMaps)
+      m_keymapGroup->setVisible(show);
+
+    return;
+  }
   m_targetGroup->setVisible(show);
   m_typeGroup->setVisible(show);
   if (m_hasMaps)
@@ -92,6 +105,7 @@ void SearchOptions::showMore(bool show) {
   m_switchTab->setVisible(show);
   m_newTab->setVisible(show);
   m_forceLTR->setVisible(show);
+
 }
 
 int SearchOptions::getOptions() {
@@ -192,6 +206,9 @@ void SearchOptions::setOptions(int x) {
   else
     v = false;
   m_fullText->setChecked(v);
+
+  searchTargetChanged();
+  searchTypeChanged();
 }
 
 void SearchOptions::searchTargetChanged() {
