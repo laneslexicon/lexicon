@@ -50,7 +50,7 @@ SOURCES += main.cpp\
         graphicsentry.cpp \
         entryitem.cpp \
         xsltsupport.cpp \
-#        searchwidget.cpp \
+        searchwidget.cpp \
         noteswidget.cpp \
         history.cpp \
         place.cpp \
@@ -72,7 +72,7 @@ HEADERS  += laneslexicon.h \
             graphicsentry.h \
             entryitem.h \
             xsltsupport.h \
-#            searchwidget.h \
+            searchwidget.h \
             noteswidget.h \
             history.h \
             place.h \

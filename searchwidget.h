@@ -1,93 +1,64 @@
 #ifndef __SEARCHWIDGET_H__
 #define __SEARCHWIDGET_H__
-#include <QWidget>
+#include <QDebug>
+#include <QSplitter>
+#include <QTextEdit>
+#include <QSplitter>
+#include <QVBoxLayout>
 #include <QPushButton>
-#include <QGroupBox>
-#include <QRadioButton>
-#include <QDialog>
-#include <QCheckBox>
-#include <QGridLayout>
-#include <QDialogButtonBox>
+#include <QSettings>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QFile>
 #include <QLabel>
-#include "application.h"
-#include "imedit.h"
-#include "imlineedit.h"
-#include "keyboardwidget.h"
-
-class SearchDialog : public QDialog {
-  Q_OBJECT
+#include <QSettings>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QTextLine>
+#include <QTextLayout>
+#include <QTextBlock>
+#include <QFont>
+#include <QWidget>
+#include <QRegExp>
+class ImLineEdit;
+class GraphicsEntry;
+class SearchOptions;
+class SearchWidget : public QWidget
+{
+    Q_OBJECT
 
  public:
-  SearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
-  QString getText();
-  void setPrompt(const QString &);
-  bool getNewTab();
-  void setNewTab(bool v);
-  bool getSwitchFocus();
-  void setSwitchFocus(bool v);
-  virtual void setup();
-  public slots:
-    void keymapChanged();
-    virtual void showOptions(bool);
-    void showKeyboard();
- protected:
+    //    SearchWidget(const QString & str,int options,QWidget * parent = 0);
+    SearchWidget(QWidget * parent = 0);
+   GraphicsEntry * getEntry() { return m_text;}
+   int count();
+   void search(const QString &,int options);
+   void regexSearch(const QString &,int options);
 
-    virtual void addOptions(QGridLayout *);
-    KeyboardWidget * m_keyboard;
-    bool m_attached;
-    QLabel * m_prompt;
-    QGroupBox * m_group;
-    ImLineEdit * m_edit;
-    QCheckBox * m_newTab;
-    QCheckBox * m_switchFocus;
-    QDialogButtonBox * m_buttonBox;
-    QPushButton * m_moreButton;
-    QPushButton * m_findButton;
-    QPushButton * m_keyboardButton;
-    QWidget * m_options;
-};
-class WordSearchDialog : public SearchDialog {
-  Q_OBJECT
- public:
-  WordSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
-  virtual void setup();
-  int getOptions();
-  public slots:
-    virtual void showOptions(bool);
-  void searchTargetChanged();
-  void searchTypeChanged();
- protected:
-
-  virtual void addOptions(QGridLayout *);
-
+ public slots:
+   void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
+   void itemDoubleClicked(QTableWidgetItem *);
+   void hideOptions();
+   void findTarget();
  private:
-    QCheckBox * m_ignoreDiacritics;
-    QCheckBox * m_wholeWordMatch;
-    QCheckBox * m_headButton;
-    QCheckBox * m_fullButton;
-    QRadioButton * m_normalButton;
-    QRadioButton * m_regexButton;
-    QRadioButton  * m_arabicTarget;
-    QRadioButton * m_buckwalterTarget;
-    QGroupBox * m_targetGroup;
-    QGroupBox * m_typeGroup;
-    void readSettings();
-};
-class NodeSearchDialog : public QDialog {
-  Q_OBJECT
-
- public:
-  NodeSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
-  QString getText() const;
-  bool getNewTab() const;
-  void setNewTab(bool v);
- private:
-  QLabel * m_prompt;
-  QLineEdit * m_edit;
-  QCheckBox * m_newTab;
-  QCheckBox * m_switchFocus;
-  QDialogButtonBox * m_buttonBox;
-  QPushButton * m_findButton;
-  QWidget * m_options;
+   ImLineEdit * m_findTarget;
+   bool eventFilter(QObject * target,QEvent * event);
+   SearchOptions * m_search;
+   int m_searchOptions;
+   QSqlQuery m_query;
+   QSqlQuery m_nodeQuery;
+   QString m_target;
+   QLabel * m_resultsText;
+   QTableWidget * m_list;
+   QTableWidget * m_rxlist;
+   GraphicsEntry * m_text;
+   QPushButton * m_findButton;
+   QPushButton * m_hideOptionsButton;
+   QStringList m_nodes;
+   QStringList m_rxnodes;
+/// for Arabic font from QSettings
+   QFont m_resultsFont;
+ signals:
+   void searchResult(const QString &);
 };
 #endif

@@ -13,6 +13,7 @@ class SearchOptions : public QWidget {
 
  public:
   SearchOptions(int searchType,QWidget * parent = 0);
+  ~SearchOptions();
   int getOptions();
   void setOptions(int);
   void showMore(bool);

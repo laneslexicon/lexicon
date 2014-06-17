@@ -1,6 +1,7 @@
 #include "laneslexicon.h"
 #include "searchoptions.h"
 #include "searchdialogs.h"
+#include "searchwidget.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
@@ -1029,6 +1030,7 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
 void LanesLexicon::on_actionTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
+  if (0) {
   SearchOptions * s = new SearchOptions(Lane::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
     m_tabs->addTab(s,"Test");
@@ -1036,6 +1038,9 @@ void LanesLexicon::on_actionTest() {
     //    s->setOptions(0);
     ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word);
     d->exec();
+  }
+  SearchWidget * w = new SearchWidget(this);
+  m_tabs->addTab(w,"Search");
 }
 /**
  * TODO tidy up navMode

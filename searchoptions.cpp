@@ -85,6 +85,9 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   //  mainlayout->addWidget(new QCheckBox("test"));
   //  mainlayout->addStretch();
 }
+SearchOptions::~SearchOptions() {
+  qDebug() << Q_FUNC_INFO;
+}
 void SearchOptions::showMore(bool show) {
   if (m_searchType & Lane::Root) {
     m_contextGroup->setVisible(false);
