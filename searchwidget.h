@@ -43,6 +43,8 @@ class SearchWidget : public QWidget
  private:
    ImLineEdit * m_findTarget;
    bool eventFilter(QObject * target,QEvent * event);
+   QString buildSearchSql(int);
+   QString buildRxSql(int);
    SearchOptions * m_search;
    int m_searchOptions;
    QSqlQuery m_query;

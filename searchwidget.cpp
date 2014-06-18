@@ -7,7 +7,6 @@
 #include "imlineedit.h"
 //extern LanesLexicon * getApp();
 SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
-  qDebug() << Q_FUNC_INFO << "enter";
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
   settings->beginGroup("Search");
@@ -16,7 +15,6 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
     m_resultsFont.fromString(f);
   }
   delete settings;
-  qDebug() << "at" << 1;
   QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
@@ -32,8 +30,6 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   targetlayout->addWidget(m_hideOptionsButton);
 
   m_search = new SearchOptions(Lane::Word);
-  qDebug() << "at" << 2;
-
   QWidget * container = new QWidget;
   QVBoxLayout * containerlayout = new QVBoxLayout;
   m_list = new QTableWidget;
@@ -41,18 +37,16 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QStringList headers;
-  headers << tr("Root") << tr("Entry") << tr("Node") << tr("Count");
+  headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Count");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_list->installEventFilter(this);
 
   m_rxlist = new QTableWidget;
-  m_rxlist->setColumnCount(4);
+  m_rxlist->setColumnCount(5);
   m_rxlist->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_rxlist->setSelectionMode(QAbstractItemView::SingleSelection);
-
-  qDebug() << "at" << 3;
 
   m_rxlist->setHorizontalHeaderLabels(headers);
   m_rxlist->horizontalHeader()->setStretchLastSection(true);
@@ -73,7 +67,6 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
 
   m_text = new GraphicsEntry;
   m_text->hide();
-  qDebug() << "at" << 4;
 
   QSplitter * splitter = new QSplitter(Qt::Vertical);
   splitter->addWidget(container);
@@ -93,7 +86,6 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   /// TODO if table loses focus, change the background selection color
   if (m_list->rowCount() > 0)
     m_list->itemDoubleClicked(m_list->item(0,0));
-  qDebug() << Q_FUNC_INFO << "exit";
 
 }
 int SearchWidget::count() {
@@ -186,6 +178,7 @@ bool SearchWidget::eventFilter(QObject * target,QEvent * event) {
 void SearchWidget::search(const QString & target,int options) {
   m_target = target;
   m_searchOptions = options;
+  m_nodes.clear();
   QString sql;
   //  whole word with diacritics
   //   select id,node where word = ?
@@ -195,37 +188,7 @@ void SearchWidget::search(const QString & target,int options) {
   //   select where bareword = ?
   //  part word without diacritics
   //   select where instr(bareword,?) > 0
-  if (options & Lane::Full) {
-  sql = "select id,word,root,entry,node from xref where datasource = 1 ";
-  }
-  else {
-    sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 ";
-  }
-  if (options & Lane::Ignore_Diacritics) {
-    qDebug() << "ignoring diacritics";
-    if (options & Lane::Whole_Word) {
-      qDebug() << "whole word match";
-      sql += "and bareword = ? ";
-    }
-    else {
-      sql += "and instr(bareword,?) > 0";
-    }
-  }
-  else {
-    if (options & Lane::Whole_Word) {
-      qDebug() << "whole word match";
-      sql += "and word = ? ";
-    }
-    else {
-      sql += "and instr(word,?) > 0";
-    }
-  }
-  if (options & Lane::Full) {
-    sql += " order by root,entry asc";
-  }
-  else {
-    sql += " order by root,nodenum asc";
-  }
+  sql = buildSearchSql(options);
   qDebug() << "search sql" << sql;
   bool ok = false;
   /// TODO replace select *
@@ -254,15 +217,19 @@ void SearchWidget::search(const QString & target,int options) {
     count++;
     QString t;
     QString word;
+    QString entry;
     if (options & Lane::Full) {
       t = m_query.value("node").toString();
-      word = m_query.value("entry").toString();
+      word = m_query.value("word").toString();
+      entry = m_query.value("entry").toString();
     }
     else {
       t = m_query.value("nodeid").toString();
       word = m_query.value("word").toString();
+      entry = m_query.value("entry").toString();
     }
-    m_nodes << t;
+    if ( ! m_nodes.contains(t))
+      m_nodes << t;
     if (! nodes.contains(t)) {
       int row = m_list->rowCount();
       m_list->insertRow(row);
@@ -271,7 +238,7 @@ void SearchWidget::search(const QString & target,int options) {
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,0,item);
 
-      item = new QTableWidgetItem(word);
+      item = new QTableWidgetItem(entry);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       item->setFont(m_resultsFont);
       m_list->setItem(row,1,item);
@@ -279,6 +246,8 @@ void SearchWidget::search(const QString & target,int options) {
       item = new QTableWidgetItem(t);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,NODE_COLUMN,item);
+
+
       nodes.insert(t,1);
       m_list->setItem(row,3,new QTableWidgetItem("1"));
     }
@@ -319,59 +288,65 @@ void SearchWidget::hideOptions() {
 void SearchWidget::findTarget() {
   qDebug() << Q_FUNC_INFO;
   QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+
   this->search(m_findTarget->text(),m_search->getOptions());
   this->regexSearch(m_findTarget->text(),m_search->getOptions());
   m_text->show();
   bool ok = true;
   if (m_nodes.size() == m_rxnodes.size()) {
-
     for(int i=0;i < m_nodes.size();i++) {
       if (! m_rxnodes.contains(m_nodes[i]))
         ok = false;
     }
   }
+  else {
+    ok = false;
+  }
   qDebug() << "Search match" << ok;
+  qDebug() << QString("Unique node count: SQL search %1, Regex %2").arg(m_nodes.size()).arg(m_rxnodes.size());
 }
 /**
+ * There are two ways of doing the search if ignore diacritics are set
+ *    (1)  build a regex with with each with each character in the search string
+ *         followed by an optional character class of all the diacritics
  *
+ *    (2)  For each search word from the db, replace all characters from the
+ *         the diacritics class by an empty string and then do the search
+ *         i.e strip the diacritics and then attempt to match
  *
+ *    In the code below, if replaceSearch is true, the 2nd method is used
+ *    otherwise the first.
+ *
+ *  On my timings there second method adds about 200ms.
  * @param target
  * @param options
  */
 void SearchWidget::regexSearch(const QString & target,int options) {
+  bool replaceSearch = true;
   m_target = target;
   m_searchOptions = options;
-  QString sql;
-  //  whole word with diacritics
-  //   select id,node where word = ?
-  //  part word with diacritics
-  //   select id,node from xref where instr(word,?) > 0;
-  //  whole word without diacritics
-  //   select where bareword = ?
-  //  part word without diacritics
-  //   select where instr(bareword,?) > 0
-  if (options & Lane::Full) {
-  sql = "select id,word,root,entry,node from xref where datasource = 1 ";
-  }
-  else {
-    sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 ";
-  }
+  m_rxnodes.clear();
+  QString sql = buildRxSql(options);
   QRegExp rx;
   QString pattern;
-  if (options & Lane::Ignore_Diacritics) {
-    QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
-    QStringList cc = target.split("");
-    QString brx = "";
-    for(int i=0;i < cc.size();i++) {
-      pattern += cc[i] + ar;
-    }
+  QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
-  }
-  else {
-    pattern = target;
+  if (!replaceSearch) {
+    if (options & Lane::Ignore_Diacritics) {
+      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+      QStringList cc = target.split("");
+      QString brx = "";
+      for(int i=0;i < cc.size();i++) {
+        pattern += cc[i] + ar;
+      }
+      m_target = pattern;
+    }
   }
   if (options & Lane::Whole_Word) {
-    pattern += "\\b" + pattern + "\\b";
+    pattern = "\\b" + m_target + "\\b";
+  }
+  else {
+    pattern = m_target;
   }
   qDebug() << "Pattern" << pattern;
   rx.setPattern(pattern);
@@ -411,15 +386,20 @@ void SearchWidget::regexSearch(const QString & target,int options) {
     QString word;
     if (options & Lane::Full) {
       t = m_query.value("node").toString();
-      word = m_query.value("entry").toString();
+      word = m_query.value("word").toString();
     }
     else {
       t = m_query.value("nodeid").toString();
       word = m_query.value("word").toString();
     }
+    if (replaceSearch) {
+      if (options & Lane::Ignore_Diacritics)
+        word =  word.replace(rxclass,QString());
+    }
     if (word.indexOf(rx) != -1) {
       count++;
-      m_rxnodes << t;
+      if ( ! m_rxnodes.contains(t))
+        m_rxnodes << t;
       if (! nodes.contains(t)) {
         int row = m_rxlist->rowCount();
         m_rxlist->insertRow(row);
@@ -428,7 +408,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
         item->setFlags(item->flags() ^ Qt::ItemIsEditable);
         m_rxlist->setItem(row,0,item);
 
-        item = new QTableWidgetItem(word);
+        item = new QTableWidgetItem(m_query.value("entry").toString());
         item->setFlags(item->flags() ^ Qt::ItemIsEditable);
         item->setFont(m_resultsFont);
         m_rxlist->setItem(row,1,item);
@@ -442,6 +422,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
       else {
         nodes[t] = nodes.value(t) + 1;
       }
+      //      qDebug() << word.replace(rxclass,QString());
     }
   }
   for(int i=0; i < m_rxlist->rowCount();i++) {
@@ -451,7 +432,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
     }
   }
   //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
-  QString t = QString(tr("Search for %1, find count %2 ")).arg(m_target).arg(count);
+  QString t = QString(tr("Search for %1, find count %2 ")).arg(target).arg(count);
   if (m_searchOptions & Lane::Ignore_Diacritics)
     t += tr(", ignoring diacritics");
   if (m_searchOptions & Lane::Whole_Word)
@@ -460,5 +441,58 @@ void SearchWidget::regexSearch(const QString & target,int options) {
   m_resultsText->show();
   if (m_rxlist->rowCount() > 0)
     m_rxlist->itemDoubleClicked(m_rxlist->item(0,0));
-  qDebug() << "read count" << count << "time" <<   (QDateTime::currentMSecsSinceEpoch() - st);
+  qDebug() << "read count" << readCount << "find count" << count << "time" <<   (QDateTime::currentMSecsSinceEpoch() - st);
+}
+QString SearchWidget::buildSearchSql(int options) {
+  QString sql;
+  if (options & Lane::Full) {
+  sql = "select id,word,root,entry,node from xref where datasource = 1 ";
+  }
+  else {
+    sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 ";
+  }
+  if (options & Lane::Ignore_Diacritics) {
+    qDebug() << "ignoring diacritics";
+    if (options & Lane::Whole_Word) {
+      qDebug() << "whole word match";
+      sql += "and bareword = ? ";
+    }
+    else {
+      sql += "and instr(bareword,?) > 0";
+    }
+  }
+  else {
+    if (options & Lane::Whole_Word) {
+      qDebug() << "whole word match";
+      sql += "and word = ? ";
+    }
+    else {
+      sql += "and instr(word,?) > 0";
+    }
+  }
+  if (options & Lane::Full) {
+    sql += " order by root,entry asc";
+  }
+  else {
+    sql += " order by root,nodenum asc";
+  }
+  return sql;
+}
+QString SearchWidget::buildRxSql(int options) {
+  QString sql;
+  //  whole word with diacritics
+  //   select id,node where word = ?
+  //  part word with diacritics
+  //   select id,node from xref where instr(word,?) > 0;
+  //  whole word without diacritics
+  //   select where bareword = ?
+  //  part word without diacritics
+  //   select where instr(bareword,?) > 0
+  if (options & Lane::Full) {
+  sql = "select id,word,root,entry,node from xref where datasource = 1 ";
+  }
+  else {
+    sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 ";
+  }
+  return sql;
 }
