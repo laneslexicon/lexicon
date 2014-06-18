@@ -34,13 +34,14 @@ class SearchOptions : public QWidget {
   QCheckBox * m_switchTab;
   QCheckBox * m_ignoreDiacritics;
   QCheckBox * m_wholeWordMatch;
-  QCheckBox * m_headWord;
-  QCheckBox * m_fullText;
+  QRadioButton * m_headWord;
+  QRadioButton * m_fullText;
   QCheckBox * m_forceLTR;
   QRadioButton * m_normalSearch;
   QRadioButton * m_regexSearch;
   QRadioButton * m_arabicTarget;
   QRadioButton * m_buckwalterTarget;
+
  signals:
   void loadKeymap(const QString &);
 

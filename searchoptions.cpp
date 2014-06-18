@@ -18,8 +18,8 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_switchTab = new QCheckBox(tr("Switch to &new tab"));
   m_ignoreDiacritics = new QCheckBox(tr("Ignore diacritics"));
   m_wholeWordMatch = new QCheckBox(tr("Whole word match"));
-  m_headWord = new QCheckBox(tr("Head word"));
-  m_fullText = new QCheckBox(tr("Full text"));
+  m_headWord = new QRadioButton(tr("Head word"));
+  m_fullText = new QRadioButton(tr("Full text"));
   m_normalSearch = new QRadioButton(tr("Normal"),m_typeGroup);
   m_regexSearch = new QRadioButton(tr("Regular expression"),m_typeGroup);
   m_arabicTarget = new QRadioButton(tr("Arabic text"),m_targetGroup);
