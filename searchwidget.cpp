@@ -221,12 +221,10 @@ void SearchWidget::search(const QString & target,int options) {
     if (options & Lane::Full) {
       t = m_query.value("node").toString();
       word = m_query.value("word").toString();
-      entry = m_query.value("entry").toString();
     }
     else {
       t = m_query.value("nodeid").toString();
       word = m_query.value("word").toString();
-      entry = m_query.value("entry").toString();
     }
     if ( ! m_nodes.contains(t))
       m_nodes << t;
@@ -238,7 +236,7 @@ void SearchWidget::search(const QString & target,int options) {
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,0,item);
 
-      item = new QTableWidgetItem(entry);
+      item = new QTableWidgetItem(word);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       item->setFont(m_resultsFont);
       m_list->setItem(row,1,item);
@@ -408,7 +406,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
         item->setFlags(item->flags() ^ Qt::ItemIsEditable);
         m_rxlist->setItem(row,0,item);
 
-        item = new QTableWidgetItem(m_query.value("entry").toString());
+        item = new QTableWidgetItem(m_query.value("word").toString());
         item->setFlags(item->flags() ^ Qt::ItemIsEditable);
         item->setFont(m_resultsFont);
         m_rxlist->setItem(row,1,item);
@@ -443,6 +441,13 @@ void SearchWidget::regexSearch(const QString & target,int options) {
     m_rxlist->itemDoubleClicked(m_rxlist->item(0,0));
   qDebug() << "read count" << readCount << "find count" << count << "time" <<   (QDateTime::currentMSecsSinceEpoch() - st);
 }
+/**
+ * build SQL for search using DB style search
+ *
+ * @param options
+ *
+ * @return
+ */
 QString SearchWidget::buildSearchSql(int options) {
   QString sql;
   if (options & Lane::Full) {
@@ -478,6 +483,13 @@ QString SearchWidget::buildSearchSql(int options) {
   }
   return sql;
 }
+/**
+ * build SQL for search using regex
+ *
+ * @param options
+ *
+ * @return
+ */
 QString SearchWidget::buildRxSql(int options) {
   QString sql;
   //  whole word with diacritics
