@@ -80,6 +80,7 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   if (m_list->rowCount() > 0)
     m_list->itemDoubleClicked(m_list->item(0,0));
 
+  m_search->setOptions(m_defaultOptions);
 }
 int SearchWidget::count() {
   return m_list->rowCount();
@@ -568,5 +569,28 @@ void SearchWidget::readSettings() {
     m_resultsFont.fromString(f);
   }
   m_xsltSource = settings->value("XSLT",QString("node.xslt")).toString();
+  m_defaultOptions = 0;
+  QString v;
+  v  = settings->value("Where",QString("full")).toString();
+  if (v == "full")
+    m_defaultOptions |= Lane::Full;
+  else
+    m_defaultOptions |= Lane::Head;
+
+  v  = settings->value("Type",QString("normal")).toString();
+  if (v == "normal")
+    m_defaultOptions |= Lane::Normal;
+  else
+    m_defaultOptions |= Lane::Regex;
+
+  v = settings->value("Ignore diacritics",QString("yes")).toString();
+  if (v == "yes")
+    m_defaultOptions |= Lane::Ignore_Diacritics;
+
+  v = settings->value("Whole word",QString("yes")).toString();
+  if (v == "yes")
+    m_defaultOptions |= Lane::Whole_Word;
+
+
   delete settings;
 }

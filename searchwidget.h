@@ -63,6 +63,7 @@ class SearchWidget : public QWidget
    QPushButton * m_hideOptionsButton;
    QStringList m_nodes;
    QStringList m_rxnodes;
+   int m_defaultOptions;
 /// for Arabic font from QSettings
    QFont m_resultsFont;
  signals:
