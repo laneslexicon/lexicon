@@ -994,9 +994,9 @@ void GraphicsEntry::prependEntries(int startPos) {
   }
 }
 QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
-  int ok = compileStylesheet(xsl);
+  int ok = compileStylesheet(0,xsl);
   if (ok == 0) {
-    QString html = xsltTransform(xml);
+    QString html = xsltTransform(0,xml);
     if (! html.isEmpty()) {
       return html;
     }
