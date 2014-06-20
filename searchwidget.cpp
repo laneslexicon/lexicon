@@ -37,7 +37,7 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QStringList headers;
-  headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Count");
+  headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Context");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -228,37 +228,37 @@ void SearchWidget::search(const QString & target,int options) {
     }
     if ( ! m_nodes.contains(t))
       m_nodes << t;
-    if (! nodes.contains(t)) {
-      int row = m_list->rowCount();
-      m_list->insertRow(row);
-      item = new QTableWidgetItem(m_query.value("root").toString());
-      item->setFont(m_resultsFont);
-      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-      m_list->setItem(row,0,item);
-
-      item = new QTableWidgetItem(word);
-      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-      item->setFont(m_resultsFont);
-      m_list->setItem(row,1,item);
-
-      item = new QTableWidgetItem(t);
-      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-      m_list->setItem(row,NODE_COLUMN,item);
-
-
-      nodes.insert(t,1);
-      m_list->setItem(row,3,new QTableWidgetItem("1"));
-    }
     else {
       nodes[t] = nodes.value(t) + 1;
     }
+    int row = m_list->rowCount();
+    m_list->insertRow(row);
+    item = new QTableWidgetItem(m_query.value("root").toString());
+    item->setFont(m_resultsFont);
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_list->setItem(row,0,item);
+
+    item = new QTableWidgetItem(word);
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    item->setFont(m_resultsFont);
+    m_list->setItem(row,1,item);
+
+    item = new QTableWidgetItem(t);
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_list->setItem(row,NODE_COLUMN,item);
+
+
+    nodes.insert(t,1);
+    m_list->setItem(row,3,new QTableWidgetItem("1"));
   }
+  /*
   for(int i=0; i < m_list->rowCount();i++) {
     QString t = m_list->item(i,NODE_COLUMN)->text();
     if (! t.isEmpty() && nodes.contains(t)) {
       m_list->item(i,3)->setText(QString("%1").arg(nodes.value(t)));
     }
   }
+  */
   //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
   QString t = QString(tr("Search for %1, find count %2 ")).arg(m_target).arg(count);
   if (m_searchOptions & Lane::Ignore_Diacritics)
@@ -398,37 +398,39 @@ void SearchWidget::regexSearch(const QString & target,int options) {
       count++;
       if ( ! m_rxnodes.contains(t))
         m_rxnodes << t;
-      if (! nodes.contains(t)) {
-        int row = m_rxlist->rowCount();
-        m_rxlist->insertRow(row);
-        item = new QTableWidgetItem(m_query.value("root").toString());
-        item->setFont(m_resultsFont);
-        item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-        m_rxlist->setItem(row,0,item);
-
-        item = new QTableWidgetItem(m_query.value("word").toString());
-        item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-        item->setFont(m_resultsFont);
-        m_rxlist->setItem(row,1,item);
-
-        item = new QTableWidgetItem(t);
-        item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-        m_rxlist->setItem(row,NODE_COLUMN,item);
-        nodes.insert(t,1);
-        m_rxlist->setItem(row,3,new QTableWidgetItem("1"));
-      }
       else {
         nodes[t] = nodes.value(t) + 1;
       }
+
+      int row = m_rxlist->rowCount();
+      m_rxlist->insertRow(row);
+      item = new QTableWidgetItem(m_query.value("root").toString());
+      item->setFont(m_resultsFont);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      m_rxlist->setItem(row,0,item);
+
+      item = new QTableWidgetItem(m_query.value("word").toString());
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      item->setFont(m_resultsFont);
+      m_rxlist->setItem(row,1,item);
+
+      item = new QTableWidgetItem(t);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      m_rxlist->setItem(row,NODE_COLUMN,item);
+      nodes.insert(t,1);
+      m_rxlist->setItem(row,3,new QTableWidgetItem("1"));
+
       //      qDebug() << word.replace(rxclass,QString());
     }
   }
+  /*
   for(int i=0; i < m_rxlist->rowCount();i++) {
     QString t = m_rxlist->item(i,NODE_COLUMN)->text();
     if (! t.isEmpty() && nodes.contains(t)) {
       m_rxlist->item(i,3)->setText(QString("%1").arg(nodes.value(t)));
     }
   }
+  */
   //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
   QString t = QString(tr("Search for %1, find count %2 ")).arg(target).arg(count);
   if (m_searchOptions & Lane::Ignore_Diacritics)
