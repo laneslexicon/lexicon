@@ -5,16 +5,10 @@
 #include "namespace.h"
 #include "laneslexicon.h"
 #include "imlineedit.h"
+
 //extern LanesLexicon * getApp();
 SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->beginGroup("Search");
-  QString f = settings->value("Results font",QString()).toString();
-  if (! f.isEmpty()) {
-    m_resultsFont.fromString(f);
-  }
-  delete settings;
+  readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
@@ -81,9 +75,8 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   //      this,SLOT(itemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
   connect(m_list,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
-  /// show the first item in the list
-  /// TODO decide who gets focus and select the first row
-  /// TODO if table loses focus, change the background selection color
+
+  initXslt();
   if (m_list->rowCount() > 0)
     m_list->itemDoubleClicked(m_list->item(0,0));
 
@@ -359,7 +352,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
   /// TODO replace select *
   //   sql = QString("select * from xref where datasource = 1 and word = ? order by root,entry asc");
   if (m_query.prepare(sql)) {
-    if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeId = ?")) {
+    if (m_nodeQuery.prepare("select xml from entry where datasource = 1 and nodeId = ?")) {
       ok = true;
     }
   }
@@ -396,8 +389,11 @@ void SearchWidget::regexSearch(const QString & target,int options) {
     }
     if (word.indexOf(rx) != -1) {
       count++;
-      if ( ! m_rxnodes.contains(t))
+      if ( ! m_rxnodes.contains(t)) {
         m_rxnodes << t;
+        fetchDocument(t);
+        qDebug() << "node" << t << "chars" << m_nodeDoc.characterCount();
+      }
       else {
         nodes[t] = nodes.value(t) + 1;
       }
@@ -509,4 +505,68 @@ QString SearchWidget::buildRxSql(int options) {
     sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 ";
   }
   return sql;
+}
+void SearchWidget::fetchDocument(const QString & node) {
+  m_nodeDoc.clear();
+  m_nodeQuery.bindValue(0,node);
+  if (! m_nodeQuery.exec()) {
+    qDebug() << "Cannot find node" << node;
+    return;
+  }
+  if ( ! m_nodeQuery.first()) {
+    QLOG_WARN() << "No record for node" << node;
+    return;
+  }
+  QString xml = m_nodeQuery.value("xml").toString();
+  if (0) {
+    QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.xml").arg(node));
+    QFile f(fi.filePath());
+    if (f.open(QIODevice::WriteOnly)) {
+      QTextStream out(&f);
+      out.setCodec("UTF-8");
+      out << xml;
+    }
+  }
+  QString html = transform(xml);
+  m_nodeDoc.setHtml(html);
+}
+QString SearchWidget::transform(const QString & xml) {
+  int ok = compileStylesheet(1,m_xsltSource);
+  if (ok == 0) {
+    QString html = xsltTransform(1,xml);
+    if (! html.isEmpty()) {
+      return html;
+    }
+  }
+  /// could be errors in stylesheet or in the xml
+  QStringList errors = getParseErrors();
+  if (ok != 0) {
+    errors.prepend("Errors when processing stylesheet:");
+  }
+  else {
+    errors.prepend("Errors when processing entry:");
+  }
+  QMessageBox msgBox;
+  msgBox.setText(errors.join("\n"));
+  msgBox.exec();
+  clearParseErrors();
+  return QString();
+}
+void SearchWidget::readSettings() {
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  bool ok;
+  settings->setIniCodec("UTF-8");
+  //settings->beginGroup("Entry");
+  //  QString css = settings->value("CSS",QString("entry.css")).toString();
+  //  readCssFromFile(css);
+  //m_xsltSource = settings->value("XSLT",QString("entry.xslt")).toString();
+  //settings->endGroup();
+  settings->beginGroup("Search");
+  QString f = settings->value("Results font",QString()).toString();
+  if (! f.isEmpty()) {
+    m_resultsFont.fromString(f);
+  }
+  m_xsltSource = settings->value("XSLT",QString("node.xslt")).toString();
+  delete settings;
 }

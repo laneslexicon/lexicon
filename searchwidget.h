@@ -41,15 +41,20 @@ class SearchWidget : public QWidget
    void hideOptions();
    void findTarget();
  private:
+   void readSettings();
    ImLineEdit * m_findTarget;
    bool eventFilter(QObject * target,QEvent * event);
    QString buildSearchSql(int);
    QString buildRxSql(int);
+   void fetchDocument(const QString & node);
+   QString transform(const QString & xml);
+   QTextDocument m_nodeDoc;
    SearchOptions * m_search;
    int m_searchOptions;
    QSqlQuery m_query;
    QSqlQuery m_nodeQuery;
    QString m_target;
+   QString m_xsltSource;
    QLabel * m_resultsText;
    QTableWidget * m_list;
    QTableWidget * m_rxlist;
