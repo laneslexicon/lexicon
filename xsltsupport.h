@@ -33,8 +33,8 @@ using XALAN_CPP_NAMESPACE::XalanCompiledStylesheet;
 #endif
 
 void initXslt();
-int compileStylesheet(const QString & xsl);
-QString xsltTransform(const QString & xml);
+int compileStylesheet(int type,const QString & xsl);
+QString xsltTransform(int type,const QString & xml);
 const char * getCompileError();
 void freeXslt();
 void parseErrorHandler(void *,const char *, ...);
