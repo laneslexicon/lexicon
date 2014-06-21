@@ -444,8 +444,12 @@ void SearchWidget::addRow(const QString & root,const QString & headword, const Q
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
   m_rxlist->setItem(row,NODE_COLUMN,item);
 
-  if (text.size() > 0)
-    m_rxlist->setCellWidget(row,3,new QLineEdit(text));
+  if (text.size() > 0) {
+    QLineEdit * e = new QLineEdit(text);
+    QKeyEvent ke(QEvent::KeyPress, Qt::Key_Direction_L, 0);
+    QApplication::sendEvent(e, &ke);
+    m_rxlist->setCellWidget(row,3,e);
+  }
   else
     m_rxlist->setItem(row,3,new QTableWidgetItem(text));
 }
