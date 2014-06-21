@@ -33,7 +33,8 @@ class SearchWidget : public QWidget
    GraphicsEntry * getEntry() { return m_text;}
    int count();
    void search(const QString &,int options);
-   void regexSearch(const QString &,int options);
+   void regexFullSearch(const QString &,int options);
+   void regexHeadSearch(const QString &,int options);
 
  public slots:
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
@@ -44,9 +45,12 @@ class SearchWidget : public QWidget
    void readSettings();
    ImLineEdit * m_findTarget;
    bool eventFilter(QObject * target,QEvent * event);
+   QStringList m_fragments;
+   void addRow(const QString &,const QString &,const QString &,const QString &);
+   QStringList getTextFragments(QTextDocument * doc,const QString & target,int options);
    QString buildSearchSql(int);
    QString buildRxSql(int);
-   void fetchDocument(const QString & node);
+   QTextDocument * fetchDocument(const QString & node);
    QString transform(const QString & xml);
    QTextDocument m_nodeDoc;
    SearchOptions * m_search;
