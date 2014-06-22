@@ -20,6 +20,7 @@
 #include <QFont>
 #include <QWidget>
 #include <QRegExp>
+#include <QProgressBar>
 class ImLineEdit;
 class GraphicsEntry;
 class SearchOptions;
@@ -33,8 +34,8 @@ class SearchWidget : public QWidget
    GraphicsEntry * getEntry() { return m_text;}
    int count();
    void search(const QString &,int options);
-   void regexFullSearch(const QString &,int options);
-   void regexHeadSearch(const QString &,int options);
+   void regexSearch(const QString &,int options);
+
 
  public slots:
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
@@ -43,6 +44,9 @@ class SearchWidget : public QWidget
    void findTarget();
  private:
    void readSettings();
+   void setMaxRecords();
+   int m_maxRecordCount;
+   QProgressBar * m_progress;
    ImLineEdit * m_findTarget;
    bool eventFilter(QObject * target,QEvent * event);
    QStringList m_fragments;
