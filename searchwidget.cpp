@@ -5,7 +5,7 @@
 #include "namespace.h"
 #include "laneslexicon.h"
 #include "imlineedit.h"
-
+#include "nodeview.h"
 //extern LanesLexicon * getApp();
 SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
@@ -32,7 +32,7 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QStringList headers;
-  headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Context");
+  headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Position") << tr("Context");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -78,12 +78,12 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   setLayout(layout);
   //connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
   //      this,SLOT(itemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
-  connect(m_list,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
+  connect(m_rxlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
 
   initXslt();
-  if (m_list->rowCount() > 0)
-    m_list->itemDoubleClicked(m_list->item(0,0));
+  //  if (m_list->rowCount() > 0)
+  //    m_list->itemDoubleClicked(m_list->item(0,0));
 
   m_list->hide();
   m_search->setOptions(m_defaultOptions);
@@ -126,6 +126,13 @@ void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
     return;
   }
   /// TODO make this a QSettings option or dialog option
+  QString xml = m_nodeQuery.value("xml").toString();
+  QString html = this->transform(xml);
+  NodeView * v = new NodeView(html,this);
+  v->setModal(true);
+  v->exec();
+  delete v;
+  /*
   Place np;
   np.setNode(node);
   //  np.setNodeOnly(true);
@@ -136,6 +143,7 @@ void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   else {
     QLOG_DEBUG() << "Invalid place returned for node" << node;
   }
+  */
 }
 bool SearchWidget::eventFilter(QObject * target,QEvent * event) {
 
@@ -292,19 +300,7 @@ void SearchWidget::findTarget() {
   this->regexSearch(m_findTarget->text(),options);
 
   m_progress->hide();
-  //  m_text->show();
-  bool ok = true;
-  if (m_nodes.size() == m_rxnodes.size()) {
-    for(int i=0;i < m_nodes.size();i++) {
-      if (! m_rxnodes.contains(m_nodes[i]))
-        ok = false;
-    }
-  }
-  else {
-    ok = false;
-  }
-  qDebug() << "Search match" << ok;
-  qDebug() << QString("Unique node count: SQL search %1, Regex %2").arg(m_nodes.size()).arg(m_rxnodes.size());
+
 }
 /**
  * There are two ways of doing the search if ignore diacritics are set
@@ -327,7 +323,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
   qDebug() << Q_FUNC_INFO;
   m_target = target;
   m_searchOptions = options;
-  m_rxnodes.clear();
+
 
   QRegExp rx;
   QString pattern;
@@ -365,12 +361,20 @@ void SearchWidget::regexSearch(const QString & target,int options) {
     QLOG_WARN() << "Error prepare SQL";
     return;
   }
-  if (options & Lane::Head)
-    m_rxlist->hideColumn(3);
-  else
+  if (m_debug) {
+    m_rxlist->showColumn(2);
     m_rxlist->showColumn(3);
+  }
+  else {
+    m_rxlist->hideColumn(2);
+    m_rxlist->hideColumn(3);
+  }
+  if (options & Lane::Head)
+    m_rxlist->hideColumn(4);
+  else
+    m_rxlist->showColumn(4);
 
-  m_rxlist->hideColumn(4);
+
   m_rxlist->setRowCount(0);
 #define NODE_COLUMN 2
   qint64 st = QDateTime::currentMSecsSinceEpoch();
@@ -414,7 +418,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
             headword =  headword.replace(rxclass,QString());
         }
         if (headword.indexOf(rx) != -1) {
-          addRow(root,m_nodeQuery.value("word").toString(),node,"Head word");
+          addRow(root,m_nodeQuery.value("word").toString(),node,"Head word",0);
           headCount++;
         }
         headword = m_nodeQuery.value("word").toString();
@@ -422,11 +426,11 @@ void SearchWidget::regexSearch(const QString & target,int options) {
           QString xml = m_nodeQuery.value("xml").toString();
           QTextDocument * doc  = fetchDocument(xml);
           if (doc->characterCount() > 0) {
-            QStringList f = getTextFragments(doc,target,options);
-            for(int i=0;i <f.size();i++) {
-              addRow(root,headword,node,f[i]);
+            getTextFragments(doc,target,options);
+            for(int i=0;i < m_fragments.size();i++) {
+              addRow(root,headword,node,m_fragments[i],m_positions[i]);
             }
-            textCount += f.size();
+            textCount += m_fragments.size();
           }
         }
       }
@@ -448,11 +452,14 @@ void SearchWidget::regexSearch(const QString & target,int options) {
     t += tr(", whole word match");
   m_resultsText->setText(t);
   m_resultsText->show();
-  if (m_rxlist->rowCount() > 0)
-    m_rxlist->itemDoubleClicked(m_rxlist->item(0,0));
-
+  //  if (m_rxlist->rowCount() > 0)
+  //    m_rxlist->itemDoubleClicked(m_rxlist->item(0,0));
+  m_rxlist->resizeColumnToContents(0);
+  m_rxlist->resizeColumnToContents(2);
+  m_rxlist->resizeColumnToContents(3);
+  m_rxlist->resizeColumnToContents(4);
 }
-void SearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text) {
+void SearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos) {
   QTableWidgetItem * item;
   int row = m_rxlist->rowCount();
   m_rxlist->insertRow(row);
@@ -470,19 +477,24 @@ void SearchWidget::addRow(const QString & root,const QString & headword, const Q
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
   m_rxlist->setItem(row,NODE_COLUMN,item);
 
+  m_rxlist->setItem(row,3,new QTableWidgetItem(QString("%1").arg(pos)));
+
   if (text.size() > 0) {
-    QLineEdit * e = new QLineEdit(text);
+
     ///
     /// Force left justification, since the text could begin with arabic or english. From:
     /// https://stackoverflow.com/questions/10998105/qt-how-to-change-the-direction-of-placeholder-in-a-qlineedit
     ///
     ///
+    QLineEdit * e = new QLineEdit(text);
     QKeyEvent ke(QEvent::KeyPress, Qt::Key_Direction_L, 0);
     QApplication::sendEvent(e, &ke);
-    m_rxlist->setCellWidget(row,3,e);
+    m_rxlist->setCellWidget(row,4,e);
   }
   else
-    m_rxlist->setItem(row,3,new QTableWidgetItem(text));
+    m_rxlist->setItem(row,4,new QTableWidgetItem(text));
+
+
 }
 /**
  * build SQL for search using DB style search
@@ -623,14 +635,17 @@ void SearchWidget::readSettings() {
   if (v == "yes")
     m_defaultOptions |= Lane::Ignore_Diacritics;
 
-  v = settings->value("Whole word",QString("yes")).toString();
+  v = settings->value("Whole word",QString("no")).toString();
   if (v == "yes")
     m_defaultOptions |= Lane::Whole_Word;
 
 
+  m_fragmentSize = settings->value("Fragment size",40).toInt();
+
+  m_debug = settings->value("Debug",false).toBool();
   delete settings;
 }
-QStringList SearchWidget::getTextFragments(QTextDocument * doc,const QString & target,int options) {
+void SearchWidget::getTextFragments(QTextDocument * doc,const QString & target,int options) {
   QRegExp rx;
   QString pattern;
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
@@ -657,13 +672,14 @@ QStringList SearchWidget::getTextFragments(QTextDocument * doc,const QString & t
   //  qDebug() << "Pattern" << pattern;
   rx.setPattern(pattern);
   m_fragments.clear();
+  m_positions.clear();
   int position = 0;
   QTextCursor c = doc->find(rx,position);
   QString src = doc->toPlainText();
   QStringList f;
   int sx;
   int ex;
-  int sz = 40;
+  int sz = m_fragmentSize;
   while(! c.isNull()) {
     //    qDebug() << "cursor pos" << c.position() <<  "offset in string" << src.indexOf(rx,position);
     position = c.position();
@@ -676,20 +692,18 @@ QStringList SearchWidget::getTextFragments(QTextDocument * doc,const QString & t
       ex = src.size();
     else
       ex = position + sz;
-    f << src.mid(sx,ex - sx);
+    //    f << src.mid(sx,ex - sx);
+    m_positions << position;
+    m_fragments << src.mid(sx,ex - sx);
     c = doc->find(rx,position);
   }
-  return f;
 }
 void SearchWidget::setMaxRecords() {
-  bool ok;
+  bool ok = false;
   QSqlQuery maxq("select id from xref order by id desc limit 1");
-  maxq.exec();
-  maxq.next();
-  m_maxRecordCount = maxq.value(0).toInt(&ok);
+  if (maxq.exec() && maxq.next())
+    m_maxRecordCount = maxq.value(0).toInt(&ok);
+
   if (! ok )
     m_maxRecordCount = 544695;
-
-
-
 }

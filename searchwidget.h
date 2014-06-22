@@ -50,18 +50,22 @@ class SearchWidget : public QWidget
    ImLineEdit * m_findTarget;
    bool eventFilter(QObject * target,QEvent * event);
    QStringList m_fragments;
-   void addRow(const QString &,const QString &,const QString &,const QString &);
-   QStringList getTextFragments(QTextDocument * doc,const QString & target,int options);
+   QList<int> m_positions;
+   void addRow(const QString &,const QString &,const QString &,const QString &,int);
+   void getTextFragments(QTextDocument * doc,const QString & target,int options);
    QString buildSearchSql(int);
    QString buildRxSql(int);
    QTextDocument * fetchDocument(const QString & node);
    QString transform(const QString & xml);
    QTextDocument m_nodeDoc;
    SearchOptions * m_search;
+   bool m_debug;
+   int m_fragmentSize;
    int m_searchOptions;
    QSqlQuery m_query;
    QSqlQuery m_nodeQuery;
    QString m_target;
+   QRegExp m_currentRx;
    QString m_xsltSource;
    QLabel * m_resultsText;
    QTableWidget * m_list;
@@ -70,7 +74,6 @@ class SearchWidget : public QWidget
    QPushButton * m_findButton;
    QPushButton * m_hideOptionsButton;
    QStringList m_nodes;
-   QStringList m_rxnodes;
    int m_defaultOptions;
 /// for Arabic font from QSettings
    QFont m_resultsFont;

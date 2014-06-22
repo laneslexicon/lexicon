@@ -63,8 +63,8 @@ SOURCES += main.cpp\
         tabwidget.cpp \
         application.cpp \
         searchoptions.cpp \
-        searchdialogs.cpp
-
+        searchdialogs.cpp \
+        nodeview.cpp
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
@@ -86,4 +86,5 @@ HEADERS  += laneslexicon.h \
             namespace.h \
             application.h \
             searchoptions.h \
-            searchdialogs.h
+            searchdialogs.h \
+            nodeview.h
