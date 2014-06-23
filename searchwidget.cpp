@@ -24,7 +24,7 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   targetlayout->addWidget(m_findButton);
   targetlayout->addWidget(m_hideOptionsButton);
 
-  m_search = new SearchOptions(Lane::Word);
+  m_search = new SearchOptions(Lane::Word,this);
   QWidget * container = new QWidget;
   QVBoxLayout * containerlayout = new QVBoxLayout;
   m_list = new QTableWidget;
