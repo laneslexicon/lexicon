@@ -14,8 +14,6 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_keymapGroup = new QGroupBox(tr("Keymap"));
   m_keymapGroup->setObjectName("keymapgroup");
 
-  m_newTab = new QCheckBox(tr("Open in &new tab"));
-  m_switchTab = new QCheckBox(tr("Switch to &new tab"));
   m_ignoreDiacritics = new QCheckBox(tr("Ignore diacritics"));
   m_wholeWordMatch = new QCheckBox(tr("Whole word match"));
   m_headWord = new QRadioButton(tr("Head word"));
@@ -39,9 +37,6 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   //  hlayout2->setContentsMargins(5,0,0,0);
 
 
-  QHBoxLayout * tablayout = new QHBoxLayout;
-  tablayout->addWidget(m_newTab);
-  tablayout->addWidget(m_switchTab);
 
 
   /// search type
@@ -75,7 +70,6 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   mainlayout->addLayout(optionslayout);
   mainlayout->addLayout(forcelayout);
   mainlayout->addWidget(m_targetGroup);
-  mainlayout->addLayout(tablayout);
   mainlayout->addSpacerItem(m_spacer);
 
   setLayout(mainlayout);
@@ -102,7 +96,6 @@ void SearchOptions::showMore(bool show) {
   if (m_searchType & Lane::Root) {
     m_contextGroup->setVisible(false);
     m_targetGroup->setVisible(false);
-    m_typeGroup->setVisible(false);
     m_ignoreDiacritics->setVisible(false);
     m_wholeWordMatch->setVisible(false);
     m_forceLTR->setVisible(false);
@@ -112,11 +105,11 @@ void SearchOptions::showMore(bool show) {
     return;
   }
   m_targetGroup->setVisible(show);
-  m_typeGroup->setVisible(show);
+  m_typeGroup->setVisible(true);
+  m_normalSearch->setVisible(true);
+  m_regexSearch->setVisible(true);
   if (m_hasMaps)
     m_keymapGroup->setVisible(show);
-  m_switchTab->setVisible(show);
-  m_newTab->setVisible(show);
   m_forceLTR->setVisible(show);
 
 }
@@ -129,11 +122,6 @@ int SearchOptions::getOptions() {
   if (m_wholeWordMatch->isChecked())
     x |= Lane::Whole_Word;
 
-  if (m_switchTab->isChecked())
-    x |= Lane::Switch_Tab;
-
-  if (m_newTab->isChecked())
-    x |= Lane::Create_Tab;
 
   if (m_regexSearch->isChecked())
     x |= Lane::Regex;
@@ -171,18 +159,6 @@ void SearchOptions::setOptions(int x) {
     v = false;
   m_wholeWordMatch->setChecked(v);
 
-  if (x & Lane::Switch_Tab)
-    v = true;
-  else
-    v = false;
-  m_switchTab->setChecked(v);
-
-
-  if (x & Lane::Create_Tab)
-    v = true;
-  else
-    v = false;
-  m_newTab->setChecked(v);
 
   if (x & Lane::Regex)
     v = true;

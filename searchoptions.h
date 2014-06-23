@@ -30,8 +30,6 @@ class SearchOptions : public QWidget {
   QGroupBox * m_typeGroup;
   QGroupBox * m_contextGroup;
   QGroupBox * m_keymapGroup;
-  QCheckBox *  m_newTab;
-  QCheckBox * m_switchTab;
   QCheckBox * m_ignoreDiacritics;
   QCheckBox * m_wholeWordMatch;
   QRadioButton * m_headWord;
