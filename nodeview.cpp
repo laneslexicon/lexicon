@@ -30,17 +30,29 @@ NodeView::NodeView(QWidget * parent)
   //  m_browser->setHtml(html);
 
   QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                     | QDialogButtonBox::Cancel);
+                                                      | QDialogButtonBox::Cancel);
 
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    layout->addLayout(hlayout);
-    layout->addWidget(m_browser);
-    layout->addWidget(buttonBox);
-    setLayout(layout);
+  QPushButton * findFirst = new QPushButton(tr("Find first"));
+  m_findNextButton = new QPushButton(tr("Find next"));
+
+  buttonBox->addButton(findFirst,QDialogButtonBox::ActionRole);
+  buttonBox->addButton(m_findNextButton,QDialogButtonBox::ActionRole);
+
+  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+  connect(findFirst,SIGNAL(clicked()),this, SLOT(findFirst()));
+  connect(m_findNextButton,SIGNAL(clicked()),this, SLOT(findNext()));
+  layout->addLayout(hlayout);
+  layout->addWidget(m_browser);
+  layout->addWidget(buttonBox);
+  setLayout(layout);
 }
 NodeView::~NodeView() {
   qDebug() << Q_FUNC_INFO;
+}
+void NodeView::setPattern(const QRegExp & rx) {
+  m_pattern = rx;
 }
 QSize NodeView::sizeHint() const {
   return QSize(400,300);
@@ -60,6 +72,7 @@ void NodeView::setCSS(const QString & css) {
   m_browser->document()->setDefaultStyleSheet(css);
 }
 void NodeView::setHtml(const QString & html) {
+  m_findNextButton->setEnabled(false);
   m_browser->document()->setHtml(html);
   if (m_pattern.isEmpty())
     return;
@@ -67,33 +80,28 @@ void NodeView::setHtml(const QString & html) {
   if (c.isNull()) {
     return;
   }
+  c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
+  c.select(QTextCursor::WordUnderCursor);
+  m_browser->setTextCursor(c);
+  c = m_browser->document()->find(m_pattern,c.position());
+  if (! c.isNull())
+      m_findNextButton->setEnabled(true);
+}
+void NodeView::findFirst() {
+  QTextCursor c = m_browser->document()->find(m_pattern,0);
+  if (c.isNull()) {
+    return;
+  }
   c.select(QTextCursor::WordUnderCursor);
   m_browser->setTextCursor(c);
 }
-/*
-QString NodeView::transform(const QString & xml) {
-  int ok = compileStylesheet(1,m_xsltSource);
-  if (ok == 0) {
-    QString html = xsltTransform(1,xml);
-    if (! html.isEmpty()) {
-      return html;
-    }
+void NodeView::findNext() {
+  QTextCursor c = m_browser->textCursor();
+  c = m_browser->document()->find(m_pattern,c.position());
+  if (c.isNull()) {
+    return;
   }
-  /// could be errors in stylesheet or in the xml
-  QStringList errors = getParseErrors();
-  if (ok != 0) {
-    errors.prepend("Errors when processing stylesheet:");
-  }
-  else {
-    errors.prepend("Errors when processing entry:");
-  }
-  QMessageBox msgBox;
-  msgBox.setText(errors.join("\n"));
-  msgBox.exec();
-  clearParseErrors();
-  return QString();
+  c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
+  c.select(QTextCursor::WordUnderCursor);
+  m_browser->setTextCursor(c);
 }
-QString NodeView::getXml(const QString & node) {
-
-}
-*/
