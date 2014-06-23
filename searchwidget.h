@@ -31,6 +31,7 @@ class SearchWidget : public QWidget
  public:
     //    SearchWidget(const QString & str,int options,QWidget * parent = 0);
     SearchWidget(QWidget * parent = 0);
+    ~SearchWidget();
    GraphicsEntry * getEntry() { return m_text;}
    int count();
    void search(const QString &,int options);
@@ -44,6 +45,7 @@ class SearchWidget : public QWidget
    void findTarget();
  private:
    void readSettings();
+   bool readCssFromFile(const QString &);
    void setMaxRecords();
    int m_maxRecordCount;
    QProgressBar * m_progress;
@@ -74,6 +76,7 @@ class SearchWidget : public QWidget
    QPushButton * m_findButton;
    QPushButton * m_hideOptionsButton;
    QStringList m_nodes;
+   QString m_currentCSS;
    int m_defaultOptions;
 /// for Arabic font from QSettings
    QFont m_resultsFont;

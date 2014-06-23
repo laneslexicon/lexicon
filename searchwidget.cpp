@@ -88,6 +88,9 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->hide();
   m_search->setOptions(m_defaultOptions);
 }
+SearchWidget::~SearchWidget() {
+  qDebug() << Q_FUNC_INFO;
+}
 int SearchWidget::count() {
   return m_list->rowCount();
 }
@@ -128,10 +131,13 @@ void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   /// TODO make this a QSettings option or dialog option
   QString xml = m_nodeQuery.value("xml").toString();
   QString html = this->transform(xml);
-  NodeView * v = new NodeView(html,this);
-  v->setModal(true);
-  v->exec();
-  delete v;
+  NodeView * v = new NodeView(this);
+  v->setCSS(m_currentCSS);
+  v->setHeader(m_nodeQuery.value("root").toString(),m_nodeQuery.value("word").toString());
+  v->document()->setHtml(html);
+  v->show();
+  v->raise();
+  v->activateWindow();
   /*
   Place np;
   np.setNode(node);
@@ -486,10 +492,17 @@ void SearchWidget::addRow(const QString & root,const QString & headword, const Q
     /// https://stackoverflow.com/questions/10998105/qt-how-to-change-the-direction-of-placeholder-in-a-qlineedit
     ///
     ///
+    /*
     QLineEdit * e = new QLineEdit(text);
     QKeyEvent ke(QEvent::KeyPress, Qt::Key_Direction_L, 0);
     QApplication::sendEvent(e, &ke);
     m_rxlist->setCellWidget(row,4,e);
+    */
+    QTextEdit * d = new QTextEdit(this);
+    d->setHtml("<html><body>" + text + "</body></html>");
+    d->setReadOnly(true);
+    d->setMaximumHeight(30);
+    m_rxlist->setCellWidget(row,4,d);
   }
   else
     m_rxlist->setItem(row,4,new QTableWidgetItem(text));
@@ -606,11 +619,11 @@ void SearchWidget::readSettings() {
   QSettings * settings = app->getSettings();
   bool ok;
   settings->setIniCodec("UTF-8");
-  //settings->beginGroup("Entry");
-  //  QString css = settings->value("CSS",QString("entry.css")).toString();
-  //  readCssFromFile(css);
+  settings->beginGroup("Entry");
+  QString css = settings->value("CSS",QString("entry.css")).toString();
+  readCssFromFile(css);
   //m_xsltSource = settings->value("XSLT",QString("entry.xslt")).toString();
-  //settings->endGroup();
+  settings->endGroup();
   settings->beginGroup("Search");
   QString f = settings->value("Results font",QString()).toString();
   if (! f.isEmpty()) {
@@ -695,6 +708,7 @@ void SearchWidget::getTextFragments(QTextDocument * doc,const QString & target,i
     //    f << src.mid(sx,ex - sx);
     m_positions << position;
     m_fragments << src.mid(sx,ex - sx);
+    //    qDebug() << "fragment size" << (ex - sx);  //QString("[%1][%2][%3][%4]").arg(position).arg(sx).arg(ex).arg(src);
     c = doc->find(rx,position);
   }
 }
@@ -706,4 +720,30 @@ void SearchWidget::setMaxRecords() {
 
   if (! ok )
     m_maxRecordCount = 544695;
+}
+/**
+ * lines beginning with - are omitted
+ *
+ */
+bool SearchWidget::readCssFromFile(const QString & name) {
+  QFile f(name);
+  if (! f.open(QIODevice::ReadOnly)) {
+    QLOG_WARN()  << "Cannot open CSS file for reading: " << name
+                 << f.errorString();
+    return false;
+
+  }
+  QTextStream in(&f);
+  QString css;
+  while( ! in.atEnd()) {
+    if (! css.startsWith("-")) {
+      css += in.readLine();
+    }
+  }
+  f.close();
+  if (! css.isEmpty()) {
+    m_currentCSS = css;
+  }
+  qDebug() << m_currentCSS;
+  return true;
 }

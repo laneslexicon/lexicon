@@ -264,6 +264,11 @@ void LanesLexicon::onCloseTab(int ix) {
       delete notes;
       return;
   }
+  SearchWidget * search = qobject_cast<SearchWidget *>(m_tabs->widget(ix));
+  if (search) {
+    delete search;
+    return;
+  }
   m_tabs->removeTab(ix);
 }
 void LanesLexicon::shortcut(const QString & k) {

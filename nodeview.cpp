@@ -1,26 +1,63 @@
 #include "nodeview.h"
-NodeView::NodeView(const QString & html,QWidget * parent)
+#include "application.h"
+
+NodeView::NodeView(QWidget * parent)
   : QDialog(parent) {
 
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->beginGroup("System");
+  QString fontString = settings->value("Arabic font").toString();
+  delete settings;
+  QFont f;
+  if (! fontString.isEmpty())
+    f.fromString(fontString);
+  setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+  setSizeGripEnabled(true);
   QVBoxLayout * layout = new QVBoxLayout;
+  m_rlabel = new QLabel("");
+  m_rlabel->setFont(f);
+  m_hlabel = new QLabel("");
+  m_hlabel->setFont(f);
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  hlayout->addWidget(new QLabel(tr("Root")));
+  hlayout->addWidget(m_rlabel);
+  hlayout->addWidget(new QLabel(tr("Entry")));
+  hlayout->addWidget(m_hlabel);
+  hlayout->addStretch();
+
   m_browser = new QTextBrowser;
-  m_browser->setHtml(html);
+  //  m_browser->setHtml(html);
 
   QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                      | QDialogButtonBox::Cancel);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-
+    layout->addLayout(hlayout);
     layout->addWidget(m_browser);
     layout->addWidget(buttonBox);
     setLayout(layout);
+}
+NodeView::~NodeView() {
+  qDebug() << Q_FUNC_INFO;
+}
+QSize NodeView::sizeHint() const {
+  return QSize(400,300);
 }
 void NodeView::accept() {
   QDialog::accept();
 }
 void NodeView::reject() {
   QDialog::reject();
+}
+void NodeView::setHeader(const QString & root,const QString & head) {
+  m_rlabel->setText(root);
+  m_hlabel->setText(head);
+}
+void NodeView::setCSS(const QString & css) {
+  m_css = css;
+  m_browser->document()->setDefaultStyleSheet(css);
 }
 /*
 QString NodeView::transform(const QString & xml) {
