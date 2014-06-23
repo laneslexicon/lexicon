@@ -27,6 +27,7 @@ class NodeView : public QDialog {
     void findFirst();
     void findNext();
  private:
+    QTextCursor m_cursor;
     QPushButton * m_findNextButton;
     QTextBrowser * m_browser;
     QLabel * m_rlabel;
