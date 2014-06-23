@@ -15,6 +15,7 @@ class NodeView : public QDialog {
   NodeView(QWidget * parent = 0);
   ~NodeView();
   void setCSS(const QString &);
+  void setHtml(const QString &);
   void setHeader(const QString & root,const QString & head);
   void setPattern(const QRegExp & rx) { m_pattern = rx;}
   QTextDocument * document() { return m_browser->document(); }

@@ -59,6 +59,17 @@ void NodeView::setCSS(const QString & css) {
   m_css = css;
   m_browser->document()->setDefaultStyleSheet(css);
 }
+void NodeView::setHtml(const QString & html) {
+  m_browser->document()->setHtml(html);
+  if (m_pattern.isEmpty())
+    return;
+  QTextCursor c = m_browser->document()->find(m_pattern,0);
+  if (c.isNull()) {
+    return;
+  }
+  c.select(QTextCursor::WordUnderCursor);
+  m_browser->setTextCursor(c);
+}
 /*
 QString NodeView::transform(const QString & xml) {
   int ok = compileStylesheet(1,m_xsltSource);
