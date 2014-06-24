@@ -659,6 +659,12 @@ void SearchWidget::readSettings() {
   if (v == "yes")
     m_defaultOptions |= Lane::Whole_Word;
 
+  v = settings->value("Target",QString("Arabic")).toString();
+
+  if (v == "Arabic")
+    m_defaultOptions |= Lane::Arabic;
+  else
+    m_defaultOptions |= Lane::Buckwalter;
 
   m_fragmentSize = settings->value("Fragment size",40).toInt();
 
