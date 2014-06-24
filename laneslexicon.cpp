@@ -1921,39 +1921,29 @@ void LanesLexicon::searchForRoot() {
     delete d;
 }
 /**
- * TODO need to distinguish between searching for an entry i.e a head word
- * and searching within the text
+ *
+ *
  */
 void LanesLexicon::searchForWord() {
   ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
   d->setOptions(m_defaultSearchOptions);
-    //    d->setup();
-    //    d->setWindowTitle(tr("Search for Word"));
-    //    d->setPrompt(tr("Find word"));
-    if (d->exec()) {
-      QString t = d->getText();
-      if (! t.isEmpty()) {
-        if (! UcdScripts::isScript(t,"Arabic")) {
-          t = convertString(t);
-        }
-        SearchResultsWidget * s = new SearchResultsWidget(this);
-        connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
-        s->search(t,d->getOptions());
-        if (s->count() == 0) {
-          QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
-          msgBox.exec();
-          delete s;
-        }
-        else {
-          int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
-          m_tabs->setCurrentIndex(i);
-          setSignals(s->getEntry());
-        }
-      }
+  if (d->exec()) {
+    QString t = d->getText();
+    if (! t.isEmpty()) {
+      SearchWidget * s = new SearchWidget;
+      s->setOptionsHidden(true);
+      /// TODO Change tab title
+      int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
+      m_tabs->setCurrentIndex(i);
+      /// need to force repaint otherwise search not shown until completed
+      m_tabs->repaint();
+      s->setSearch(t,d->getOptions());
+      s->findTarget();
     }
-    delete d;
+  }
+  delete d;
 }
+
 /// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
   ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
