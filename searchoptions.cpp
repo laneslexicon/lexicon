@@ -75,19 +75,8 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
 
   setLayout(mainlayout);
 
-  connect(m_arabicTarget,SIGNAL(clicked()),this,SLOT(searchTargetChanged()));
-  connect(m_buckwalterTarget,SIGNAL(clicked()),this,SLOT(searchTargetChanged()));
   connect(m_normalSearch,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
   connect(m_regexSearch,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
-  //  showMore(false);
-
-
-
-  //  m_normalSearch->setChecked(true);
-  //  searchTypeChanged();
-
-  //  mainlayout->addWidget(new QCheckBox("test"));
-  //  mainlayout->addStretch();
 }
 SearchOptions::~SearchOptions() {
   qDebug() << Q_FUNC_INFO;
