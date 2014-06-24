@@ -109,8 +109,7 @@ void ArabicSearchDialog::showOptions(bool v) {
     m_edit->setFocus();
 
   /// this shrinks the dialog
-  if ( ! v )
-    this->layout()->setSizeConstraint(QLayout::SetFixedSize);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 QString ArabicSearchDialog::getText() {
   return m_edit->text().trimmed();
