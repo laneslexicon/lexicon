@@ -1,6 +1,7 @@
 #include "searchoptions.h"
 #include "namespace.h"
 SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) {
+  m_more = false;
   m_searchType = searchType;
   m_hasMaps = false;
   QVBoxLayout * mainlayout = new QVBoxLayout;
@@ -82,9 +83,8 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
 
 
 
-  m_normalSearch->setChecked(true);
-  searchTargetChanged();
-  searchTypeChanged();
+  //  m_normalSearch->setChecked(true);
+  //  searchTypeChanged();
 
   //  mainlayout->addWidget(new QCheckBox("test"));
   //  mainlayout->addStretch();
@@ -93,6 +93,8 @@ SearchOptions::~SearchOptions() {
   qDebug() << Q_FUNC_INFO;
 }
 void SearchOptions::showMore(bool show) {
+  m_more = show;
+
   if (m_searchType & Lane::Root) {
     m_contextGroup->setVisible(false);
     m_targetGroup->setVisible(false);
@@ -104,14 +106,26 @@ void SearchOptions::showMore(bool show) {
 
     return;
   }
-  m_targetGroup->setVisible(show);
-  m_typeGroup->setVisible(true);
-  m_normalSearch->setVisible(true);
-  m_regexSearch->setVisible(true);
+
   if (m_hasMaps)
     m_keymapGroup->setVisible(show);
-  m_forceLTR->setVisible(show);
 
+  if (m_regexSearch->isChecked()) {
+      m_targetGroup->setVisible(m_more);
+      m_forceLTR->setVisible(m_more);
+      m_arabicTarget->setVisible(m_more);
+      m_buckwalterTarget->setVisible(m_more);
+      m_ignoreDiacritics->setVisible(false);
+      m_wholeWordMatch->setVisible(false);
+  }
+  else {
+      m_targetGroup->setVisible(false);
+      m_forceLTR->setVisible(false);
+      m_arabicTarget->setVisible(false);
+      m_buckwalterTarget->setVisible(false);
+      m_ignoreDiacritics->setVisible(true);
+      m_wholeWordMatch->setVisible(true);
+  }
 }
 
 int SearchOptions::getOptions() {
@@ -196,36 +210,11 @@ void SearchOptions::setOptions(int x) {
     v = false;
   m_fullText->setChecked(v);
 
-  searchTargetChanged();
   searchTypeChanged();
 }
 
-void SearchOptions::searchTargetChanged() {
-  if (m_arabicTarget->isChecked()) {
-    bool v = false;
-    if (m_normalSearch->isChecked()) {
-      v = true;
-    }
-  }
-}
 void SearchOptions::searchTypeChanged() {
-  bool v = true;
-  if (m_regexSearch->isChecked()) {
-    m_ignoreDiacritics->setVisible(false);
-    m_wholeWordMatch->setVisible(false);
-    m_arabicTarget->setVisible(true);
-    m_buckwalterTarget->setVisible(true);
-    m_targetGroup->setVisible(true);
-    m_forceLTR->setVisible(true);
-  }
-  else {
-    m_ignoreDiacritics->setVisible(true);
-    m_wholeWordMatch->setVisible(true);
-    m_arabicTarget->setVisible(false);
-    m_buckwalterTarget->setVisible(false);
-    m_targetGroup->setVisible(false);
-    m_forceLTR->setVisible(false);
-  }
+  showMore(m_more);
 }
 void SearchOptions::addKeymaps(const QString & activeMap,const QStringList & maps) {
   if (maps.size() > 0)

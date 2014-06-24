@@ -20,10 +20,10 @@ class SearchOptions : public QWidget {
   void addKeymaps(const QString &activeMap,const QStringList & maps);
  public slots:
   void searchTypeChanged();
-  void searchTargetChanged();
   void keymapChanged();
  private:
   bool m_hasMaps;
+  bool m_more;                   // false basic, 1 show more
   int m_searchType;
   QSpacerItem * m_spacer;
   QGroupBox *  m_targetGroup;
