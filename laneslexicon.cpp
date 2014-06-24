@@ -266,7 +266,9 @@ void LanesLexicon::onCloseTab(int ix) {
   }
   SearchWidget * search = qobject_cast<SearchWidget *>(m_tabs->widget(ix));
   if (search) {
+    qDebug() << "begin delete search";
     delete search;
+    qDebug() << "end delete search";
     return;
   }
   m_tabs->removeTab(ix);
@@ -1089,6 +1091,35 @@ void LanesLexicon::readSettings() {
   settings->beginGroup("Search");
   m_searchNewTab = settings->value("New tab",true).toBool();
   m_searchSwitchTab = settings->value("Switch tab",true).toBool();
+  m_defaultSearchOptions = 0;
+  QString v;
+  v  = settings->value("Where",QString("full")).toString();
+  if (v == "full")
+    m_defaultSearchOptions |= Lane::Full;
+  else
+    m_defaultSearchOptions |= Lane::Head;
+
+  v  = settings->value("Type",QString("normal")).toString();
+  if (v == "normal")
+    m_defaultSearchOptions |= Lane::Normal;
+  else
+    m_defaultSearchOptions |= Lane::Regex;
+
+  v = settings->value("Ignore diacritics",QString("yes")).toString();
+  if (v == "yes")
+    m_defaultSearchOptions |= Lane::Ignore_Diacritics;
+
+  v = settings->value("Whole word",QString("no")).toString();
+  if (v == "yes")
+    m_defaultSearchOptions |= Lane::Whole_Word;
+
+  v = settings->value("Target",QString("Arabic")).toString();
+
+  if (v == "Arabic")
+    m_defaultSearchOptions |= Lane::Arabic;
+  else
+    m_defaultSearchOptions |= Lane::Buckwalter;
+
   settings->endGroup();
 
   settings->beginGroup("Debug");
@@ -1895,6 +1926,7 @@ void LanesLexicon::searchForRoot() {
  */
 void LanesLexicon::searchForWord() {
   ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
+  d->setOptions(m_defaultSearchOptions);
     //    d->setup();
     //    d->setWindowTitle(tr("Search for Word"));
     //    d->setPrompt(tr("Find word"));
