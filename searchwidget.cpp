@@ -62,13 +62,15 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   m_container->addLayout(targetlayout);
   m_container->addWidget(m_search);
   m_spacer = new QSpacerItem(0, 20,QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
+  m_container->addWidget(m_progress);
   m_container->addSpacerItem(m_spacer);
   //  QHBoxLayout * listlayout = new QHBoxLayout;
   //  listlayout->addWidget(m_list);
   //  listlayout->addWidget(m_rxlist);
+
   m_container->addWidget(m_rxlist);
   m_container->addWidget(m_resultsText);
-  m_container->addWidget(m_progress);
+
   container->setLayout(m_container);
 
   m_text = new GraphicsEntry;
