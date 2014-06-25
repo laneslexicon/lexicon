@@ -30,20 +30,27 @@ NodeView::NodeView(QWidget * parent)
   m_browser = new QTextBrowser;
   //  m_browser->setHtml(html);
 
-  QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                                      | QDialogButtonBox::Cancel);
+  QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
 
-  QPushButton * findFirst = new QPushButton(tr("Find first"));
-  m_findNextButton = new QPushButton(tr("Find next"));
+  QPushButton * findFirst = new QPushButton(tr("&Find first"));
+  m_findNextButton = new QPushButton(tr("Find &next"));
+
+  QPushButton * printButton = new QPushButton(tr("&Print"));
+  QPushButton * openButton = new QPushButton(tr("&Open in tab"));
 
   buttonBox->addButton(findFirst,QDialogButtonBox::ActionRole);
   buttonBox->addButton(m_findNextButton,QDialogButtonBox::ActionRole);
+  buttonBox->addButton(openButton,QDialogButtonBox::ActionRole);
+  buttonBox->addButton(printButton,QDialogButtonBox::ActionRole);
 
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
   connect(findFirst,SIGNAL(clicked()),this, SLOT(findFirst()));
   connect(m_findNextButton,SIGNAL(clicked()),this, SLOT(findNext()));
+  connect(printButton,SIGNAL(clicked()),this,SLOT(print()));
+  connect(openButton,SIGNAL(clicked()),this,SLOT(openEntry()));
+
   layout->addLayout(hlayout);
   layout->addWidget(m_browser);
   layout->addWidget(buttonBox);
@@ -51,6 +58,12 @@ NodeView::NodeView(QWidget * parent)
 }
 NodeView::~NodeView() {
   qDebug() << Q_FUNC_INFO;
+}
+void NodeView::print() {
+
+}
+void NodeView::openEntry() {
+  emit(openNode(m_node));
 }
 void NodeView::setPattern(const QRegExp & rx) {
   m_pattern = rx;
@@ -64,9 +77,10 @@ void NodeView::accept() {
 void NodeView::reject() {
   QDialog::reject();
 }
-void NodeView::setHeader(const QString & root,const QString & head) {
+ void NodeView::setHeader(const QString & root,const QString & head,const QString & node) {
   m_rlabel->setText(root);
   m_hlabel->setText(head);
+  m_node = node;
 }
 void NodeView::setCSS(const QString & css) {
   m_css = css;

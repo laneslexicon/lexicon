@@ -8,6 +8,7 @@
 #include "nodeview.h"
 #define NODE_COLUMN 2
 #define POSITION_COLUMN 3
+#define CONTEXT_COLUMN 4
 //extern LanesLexicon * getApp();
 SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
@@ -15,8 +16,8 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
-  m_findButton = new QPushButton(tr("Find"));
-  m_hideOptionsButton = new QPushButton(tr("Hide options"));
+  m_findButton = new QPushButton(tr("&Find"));
+  m_hideOptionsButton = new QPushButton(tr("&Hide options"));
   m_hideOptionsButton->setCheckable(true);
 
   connect(m_findButton,SIGNAL(clicked()),this,SLOT(findTarget()));
@@ -26,20 +27,22 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   targetlayout->addWidget(m_findButton);
   targetlayout->addWidget(m_hideOptionsButton);
 
+  QStringList headers;
+  headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Position") << tr("Context");
+
   m_search = new SearchOptions(Lane::Word,this);
   QWidget * container = new QWidget;
-  QVBoxLayout * containerlayout = new QVBoxLayout;
+  m_container = new QVBoxLayout;
+  /*
   m_list = new QTableWidget;
   m_list->setColumnCount(4);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  QStringList headers;
-  headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Position") << tr("Context");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_list->installEventFilter(this);
-
+  */
   m_rxlist = new QTableWidget;
   m_rxlist->setColumnCount(5);
   m_rxlist->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -56,15 +59,17 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   m_progress->hide();
   m_resultsText = new QLabel("");
   m_resultsText->hide();
-  containerlayout->addLayout(targetlayout);
-  containerlayout->addWidget(m_search);
-  QHBoxLayout * listlayout = new QHBoxLayout;
-  listlayout->addWidget(m_list);
-  listlayout->addWidget(m_rxlist);
-  containerlayout->addLayout(listlayout);
-  containerlayout->addWidget(m_resultsText);
-  containerlayout->addWidget(m_progress);
-  container->setLayout(containerlayout);
+  m_container->addLayout(targetlayout);
+  m_container->addWidget(m_search);
+  m_spacer = new QSpacerItem(0, 20,QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
+  m_container->addSpacerItem(m_spacer);
+  //  QHBoxLayout * listlayout = new QHBoxLayout;
+  //  listlayout->addWidget(m_list);
+  //  listlayout->addWidget(m_rxlist);
+  m_container->addWidget(m_rxlist);
+  m_container->addWidget(m_resultsText);
+  m_container->addWidget(m_progress);
+  container->setLayout(m_container);
 
   m_text = new GraphicsEntry;
   m_text->hide();
@@ -75,7 +80,7 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   splitter->setStretchFactor(0,0);
   splitter->setStretchFactor(1,1);
   layout->addWidget(splitter);
-  m_list->adjustSize();//resizeColumnsToContents();
+  //  m_list->adjustSize();//resizeColumnsToContents();
 
   setLayout(layout);
   //connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
@@ -87,14 +92,12 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   //  if (m_list->rowCount() > 0)
   //    m_list->itemDoubleClicked(m_list->item(0,0));
 
-  m_list->hide();
+  //  m_list->hide();
   m_search->setOptions(m_defaultOptions);
+  m_rxlist->hide();
 }
 SearchWidget::~SearchWidget() {
   qDebug() << Q_FUNC_INFO;
-}
-int SearchWidget::count() {
-  return m_list->rowCount();
 }
 void SearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
   /// get the node
@@ -141,7 +144,8 @@ void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   NodeView * v = new NodeView(this);
   v->setPattern(m_currentRx);
   v->setCSS(m_currentCSS);
-  v->setHeader(m_nodeQuery.value("root").toString(),m_nodeQuery.value("word").toString());
+  v->setHeader(m_nodeQuery.value("root").toString(),m_nodeQuery.value("word").toString(),node);
+  /// has to be call before setHtml otherwise it will select the first occurence
   v->setStartPosition(pos);
   v->setHtml(html);
   v->show();
@@ -161,9 +165,7 @@ void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   */
 }
 bool SearchWidget::eventFilter(QObject * target,QEvent * event) {
-
   if (event->type() == QEvent::KeyPress) {
-    QLOG_DEBUG() << Q_FUNC_INFO;
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
       case Qt::Key_Enter: {
@@ -176,11 +178,10 @@ bool SearchWidget::eventFilter(QObject * target,QEvent * event) {
       }
     case Qt::Key_Return:
     case Qt::Key_Space: {
-        QLOG_DEBUG() << "hit return on table";
         //        if (keyEvent->modifiers() && Qt::ControlModifier) {
-        QTableWidgetItem * item = m_list->currentItem();
+        QTableWidgetItem * item = m_rxlist->currentItem();
         if (item)
-          m_list->itemDoubleClicked(item);
+          m_rxlist->itemDoubleClicked(item);
 
         break;
       }
@@ -198,6 +199,7 @@ bool SearchWidget::eventFilter(QObject * target,QEvent * event) {
   }
   return QWidget::eventFilter(target,event);
 }
+/*
 void SearchWidget::search(const QString & target,int options) {
   m_target = target;
   m_searchOptions = options;
@@ -273,14 +275,6 @@ void SearchWidget::search(const QString & target,int options) {
     nodes.insert(t,1);
     m_list->setItem(row,3,new QTableWidgetItem("1"));
   }
-  /*
-  for(int i=0; i < m_list->rowCount();i++) {
-    QString t = m_list->item(i,NODE_COLUMN)->text();
-    if (! t.isEmpty() && nodes.contains(t)) {
-      m_list->item(i,3)->setText(QString("%1").arg(nodes.value(t)));
-    }
-  }
-  */
   //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
   QString t = QString(tr("Search for %1, find count %2 ")).arg(m_target).arg(count);
   if (m_searchOptions & Lane::Ignore_Diacritics)
@@ -295,6 +289,7 @@ void SearchWidget::search(const QString & target,int options) {
   qDebug() << "readcount" << count << "time" <<   (QDateTime::currentMSecsSinceEpoch() - st);
 
 }
+*/
 void SearchWidget::setSearch(const QString & searchFor,int options) {
   m_target = searchFor;
   m_search->setOptions(options);
@@ -421,6 +416,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
 
 
   m_rxlist->setRowCount(0);
+  //  m_rxlist->hide();
 #define NODE_COLUMN 2
   qint64 st = QDateTime::currentMSecsSinceEpoch();
   //  m_nodquery.bindValue(0,m_target);
@@ -485,7 +481,22 @@ void SearchWidget::regexSearch(const QString & target,int options) {
       }
     }
   }
-
+  m_container->removeItem(m_spacer);
+  m_rxlist->show();
+  /*
+  if (m_rxlist->rowCount() == 0) {
+    m_rxlist->insertRow(0);
+    QTableWidgetItem * noitems = new QTableWidgetItem(tr("Text not found"));
+    noitems->setTextAlignment(Qt::AlignCenter);
+    m_rxlist->setItem(0,CONTEXT_COLUMN,noitems);
+    m_rxlist->hideColumn(0);
+    m_rxlist->hideColumn(1);
+    m_rxlist->hideColumn(2);
+    m_rxlist->hideColumn(3);
+    m_rxlist->resizeColumnsToContents();
+    return;
+  }
+  */
   //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
   QString t;
   if (Lane::Full)
@@ -498,8 +509,10 @@ void SearchWidget::regexSearch(const QString & target,int options) {
     t += tr(", whole word match");
   m_resultsText->setText(t);
   m_resultsText->show();
-  //  if (m_rxlist->rowCount() > 0)
-  //    m_rxlist->itemDoubleClicked(m_rxlist->item(0,0));
+  if (m_rxlist->rowCount() > 0) {
+    m_rxlist->selectRow(0);
+    m_rxlist->setFocus();
+  }
   m_rxlist->resizeColumnToContents(0);
   m_rxlist->resizeColumnToContents(2);
   m_rxlist->resizeColumnToContents(3);
@@ -527,22 +540,30 @@ void SearchWidget::addRow(const QString & root,const QString & headword, const Q
 
   if (text.size() > 0) {
 
-    ///
-    /// Force left justification, since the text could begin with arabic or english. From:
+    /// For QLineEdit
+    /// force left justification, since the text could begin with arabic or english. From:
     /// https://stackoverflow.com/questions/10998105/qt-how-to-change-the-direction-of-placeholder-in-a-qlineedit
     ///
     ///
-    /*
-    QLineEdit * e = new QLineEdit(text);
-    QKeyEvent ke(QEvent::KeyPress, Qt::Key_Direction_L, 0);
-    QApplication::sendEvent(e, &ke);
-    m_rxlist->setCellWidget(row,4,e);
-    */
-    QTextEdit * d = new QTextEdit(this);
-    d->setHtml("<html><body>" + text + "</body></html>");
-    d->setReadOnly(true);
-    d->setMaximumHeight(30);
-    m_rxlist->setCellWidget(row,4,d);
+    if (0) {
+      QLineEdit * e = new QLineEdit(text);
+      e->setReadOnly(true);
+      QKeyEvent ke(QEvent::KeyPress, Qt::Key_Direction_L, 0);
+      QApplication::sendEvent(e, &ke);
+      m_rxlist->setCellWidget(row,CONTEXT_COLUMN,e);
+    }
+    if (0) {
+      QTextEdit * d = new QTextEdit(this);
+      d->setHtml("<html><body>" + text + "</body></html>");
+      d->setReadOnly(true);
+      d->setMaximumHeight(30);
+      m_rxlist->setCellWidget(row,CONTEXT_COLUMN,d);
+    }
+    if (1) {
+      item = new QTableWidgetItem(text);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      m_rxlist->setItem(row,CONTEXT_COLUMN,item);
+    }
   }
   else
     m_rxlist->setItem(row,4,new QTableWidgetItem(text));

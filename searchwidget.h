@@ -37,7 +37,6 @@ class SearchWidget : public QWidget
     SearchWidget(QWidget * parent = 0);
     ~SearchWidget();
    GraphicsEntry * getEntry() { return m_text;}
-   int count();
    void search(const QString &,int options);
    void regexSearch(const QString &,int options);
    void setSearch(const QString & searchFor,int options);
@@ -74,7 +73,9 @@ class SearchWidget : public QWidget
    QRegExp m_currentRx;
    QString m_xsltSource;
    QLabel * m_resultsText;
-   QTableWidget * m_list;
+   QSpacerItem * m_spacer;
+   QVBoxLayout * m_container;
+   //   QTableWidget * m_list;
    QTableWidget * m_rxlist;
    GraphicsEntry * m_text;
    QPushButton * m_findButton;

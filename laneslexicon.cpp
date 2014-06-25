@@ -1931,12 +1931,10 @@ void LanesLexicon::searchForWord() {
     QString t = d->getText();
     if (! t.isEmpty()) {
       SearchWidget * s = new SearchWidget;
-      s->setOptionsHidden(true);
+      s->setOptionsHidden(false);
       /// TODO Change tab title
       int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
       m_tabs->setCurrentIndex(i);
-      /// need to force repaint otherwise search not shown until completed
-      m_tabs->repaint();
       s->setSearch(t,d->getOptions());
       s->findTarget();
     }
