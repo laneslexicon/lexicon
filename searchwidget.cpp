@@ -6,6 +6,8 @@
 #include "laneslexicon.h"
 #include "imlineedit.h"
 #include "nodeview.h"
+#define NODE_COLUMN 2
+#define POSITION_COLUMN 3
 //extern LanesLexicon * getApp();
 SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
@@ -118,6 +120,7 @@ void SearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* pre
   }
 }
 void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
+  bool ok;
   /// get the node
   item = item->tableWidget()->item(item->row(),2);
   QString node = item->text();
@@ -128,6 +131,10 @@ void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
     QLOG_WARN() << "No record for node" << node;
     return;
   }
+  item = item->tableWidget()->item(item->row(),POSITION_COLUMN);
+  int pos =  item->text().toInt(&ok);
+  if ( !ok )
+    pos = 0;
   /// TODO make this a QSettings option or dialog option
   QString xml = m_nodeQuery.value("xml").toString();
   QString html = this->transform(xml);
@@ -135,6 +142,7 @@ void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   v->setPattern(m_currentRx);
   v->setCSS(m_currentCSS);
   v->setHeader(m_nodeQuery.value("root").toString(),m_nodeQuery.value("word").toString());
+  v->setStartPosition(pos);
   v->setHtml(html);
   v->show();
   v->raise();
@@ -218,7 +226,6 @@ void SearchWidget::search(const QString & target,int options) {
     return;
   }
   m_list->setRowCount(0);
-#define NODE_COLUMN 2
 
   qint64 st = QDateTime::currentMSecsSinceEpoch();
   m_query.bindValue(0,m_target);

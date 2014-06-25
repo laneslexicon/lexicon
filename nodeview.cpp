@@ -9,6 +9,7 @@ NodeView::NodeView(QWidget * parent)
   settings->beginGroup("System");
   QString fontString = settings->value("Arabic font").toString();
   delete settings;
+  m_startPosition = 0;
   QFont f;
   if (! fontString.isEmpty())
     f.fromString(fontString);
@@ -82,6 +83,8 @@ void NodeView::setHtml(const QString & html) {
   if (c.isNull()) {
     return;
   }
+  qDebug() << "Moving to" << m_startPosition;
+  c.setPosition(m_startPosition);
   c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
   c.select(QTextCursor::WordUnderCursor);
   m_browser->setTextCursor(c);
@@ -121,4 +124,7 @@ void NodeView::findNext() {
       m_findNextButton->setEnabled(false);
   else
       m_findNextButton->setEnabled(true);
+}
+void NodeView::setStartPosition(int pos) {
+  m_startPosition = pos;
 }

@@ -19,6 +19,7 @@ class NodeView : public QDialog {
   void setHtml(const QString &);
   void setHeader(const QString & root,const QString & head);
   void setPattern(const QRegExp & rx);
+  void setStartPosition(int);
   QTextDocument * document() { return m_browser->document(); }
   QSize sizeHint() const;
   public slots:
@@ -34,7 +35,7 @@ class NodeView : public QDialog {
     QLabel * m_hlabel;
     QString m_root;
     QString m_head;
-    QList<int> m_positions;
+    int m_startPosition;
     QRegExp m_pattern;
     QString m_css;
 };
