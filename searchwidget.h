@@ -21,6 +21,10 @@
 #include <QWidget>
 #include <QRegExp>
 #include <QProgressBar>
+#include <QEventLoop>
+#ifdef __APPLE__
+#include <QStyleFactory>
+#endif
 class ImLineEdit;
 class GraphicsEntry;
 class SearchOptions;
@@ -36,8 +40,8 @@ class SearchWidget : public QWidget
    int count();
    void search(const QString &,int options);
    void regexSearch(const QString &,int options);
-
-
+   void setSearch(const QString & searchFor,int options);
+   void setOptionsHidden(bool);
  public slots:
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);

@@ -288,6 +288,16 @@ void SearchWidget::search(const QString & target,int options) {
   qDebug() << "readcount" << count << "time" <<   (QDateTime::currentMSecsSinceEpoch() - st);
 
 }
+void SearchWidget::setSearch(const QString & searchFor,int options) {
+  m_target = searchFor;
+  m_search->setOptions(options);
+  m_findTarget->setText(m_target);
+}
+void SearchWidget::setOptionsHidden(bool hide) {
+  m_hideOptionsButton->setChecked(hide);
+  hideOptions();
+}
+
 void SearchWidget::hideOptions() {
   if (m_hideOptionsButton->isChecked()) {
     m_search->hide();
@@ -298,10 +308,25 @@ void SearchWidget::hideOptions() {
     m_hideOptionsButton->setText("Hide options");
   }
 }
+/**
+ *  for regex search do this:
+ *
+ TODO Check for regex special characters in buckwalter transliteration
+
+QString escaped = pattern;
+    escaped.replace("\\", "\\\\");
+    escaped.replace("\"", "\\\"");
+    escaped.prepend("\"");
+    escaped.append("\"");
+
+ */
 void SearchWidget::findTarget() {
   qDebug() << Q_FUNC_INFO;
   int options = m_search->getOptions();
-  //  this->search(m_findTarget->text(),options);
+  /// this shows text in progressbar
+#ifdef __APPLE__
+  m_progress->setStyle(QStyleFactory::create("Fusion"));
+#endif
   m_progress->setValue(0);
   m_progress->show();
   this->regexSearch(m_findTarget->text(),options);
@@ -402,14 +427,15 @@ void SearchWidget::regexSearch(const QString & target,int options) {
   QString root;
   QString headword;
 
-  //  qDebug() << "Pattern" << pattern;
-  //  qDebug() << "Sql" << sql;
-
+  /// Added QEventLoop because under OSX nothing was shown
+  /// the loop was finished
+  QEventLoop ep;
   m_query.exec();
   while(m_query.next()) {
     readCount++;
     if ((readCount % 1000) == 0) {
       m_progress->setValue(readCount);
+      ep.processEvents();
     }
 
     QString word = m_query.value("word").toString();
