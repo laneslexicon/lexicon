@@ -1,4 +1,5 @@
 #include "searchoptions.h"
+#include "searchwidget.h"
 #include "namespace.h"
 SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) {
   m_more = false;
@@ -71,7 +72,8 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   mainlayout->addLayout(optionslayout);
   mainlayout->addLayout(forcelayout);
   mainlayout->addWidget(m_targetGroup);
-  mainlayout->addSpacerItem(m_spacer);
+  if ( ! qobject_cast<SearchWidget *>(parent))
+    mainlayout->addSpacerItem(m_spacer);
 
   setLayout(mainlayout);
 
