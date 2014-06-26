@@ -10,14 +10,32 @@
 #define POSITION_COLUMN 3
 #define CONTEXT_COLUMN 4
 //extern LanesLexicon * getApp();
+SearchResultsTable::SearchResultsTable(QWidget * parent) : QTableWidget(parent) {
+}
+void SearchResultsTable::focusInEvent(QFocusEvent * event) {
+  qDebug() << Q_FUNC_INFO << event;
+  this->setStyleSheet("");
+  QTableWidget::focusInEvent(event);
+}
+void SearchResultsTable::focusOutEvent(QFocusEvent * event) {
+  qDebug() << Q_FUNC_INFO << event;
+  this->setStyleSheet("QTableView { selection-background-color : lightgray}"); //%1}").arg("lightg
+  QTableWidget::focusOutEvent(event);
+}
+/**
+ *o
+ *
+ * @param parent
+ */
 SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
   setMaxRecords();
   QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
-  m_findButton = new QPushButton(tr("&Find"));
-  m_hideOptionsButton = new QPushButton(tr("&Hide options"));
+  m_findButton = new QPushButton(tr("F&ind"));
+  m_findButton->setDefault(true);
+  m_hideOptionsButton = new QPushButton(tr("Hid&e options"));
   m_hideOptionsButton->setCheckable(true);
 
   connect(m_findButton,SIGNAL(clicked()),this,SLOT(findTarget()));
@@ -43,7 +61,7 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_list->installEventFilter(this);
   */
-  m_rxlist = new QTableWidget;
+  m_rxlist = new SearchResultsTable;
   m_rxlist->setColumnCount(5);
   m_rxlist->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_rxlist->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -97,6 +115,7 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   //  m_list->hide();
   m_search->setOptions(m_defaultOptions);
   m_rxlist->hide();
+  this->setFocus();
 }
 SearchWidget::~SearchWidget() {
   qDebug() << Q_FUNC_INFO;
@@ -538,7 +557,9 @@ void SearchWidget::addRow(const QString & root,const QString & headword, const Q
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
   m_rxlist->setItem(row,NODE_COLUMN,item);
 
-  m_rxlist->setItem(row,3,new QTableWidgetItem(QString("%1").arg(pos)));
+  item = new QTableWidgetItem(QString("%1").arg(pos));
+  item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+  m_rxlist->setItem(row,3,item);
 
   if (text.size() > 0) {
 
@@ -815,4 +836,28 @@ bool SearchWidget::readCssFromFile(const QString & name) {
   }
   qDebug() << m_currentCSS;
   return true;
+}
+void SearchWidget::focusInEvent(QFocusEvent * event) {
+  qDebug() << Q_FUNC_INFO << event;
+  if (event->reason() == Qt::OtherFocusReason) {
+    if (m_rxlist->rowCount() > 0) {
+      m_rxlist->setFocus();
+
+    }
+    else {
+      m_findTarget->setFocus();
+    }
+  }
+  QWidget::focusInEvent(event);
+}
+void SearchWidget::focusOutEvent(QFocusEvent * event) {
+  qDebug() << Q_FUNC_INFO << event;
+  /*
+  if (event->reason() == Qt::OtherFocusReason) {
+    if (m_rxlist->rowCount() > 0)
+      m_rxlist->setStyleSheet("QTableView { selection-background-color : green}"); //%1}").arg("lightgray"));
+    m_rxlist->repaint();
+  }
+  */
+  QWidget::focusOutEvent(event);
 }

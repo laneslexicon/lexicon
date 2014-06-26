@@ -28,6 +28,15 @@
 class ImLineEdit;
 class GraphicsEntry;
 class SearchOptions;
+class SearchResultsTable : public QTableWidget {
+    Q_OBJECT
+ public:
+    SearchResultsTable(QWidget * parent = 0);
+
+ protected:
+   void focusInEvent(QFocusEvent *);
+   void focusOutEvent(QFocusEvent *);
+};
 class SearchWidget : public QWidget
 {
     Q_OBJECT
@@ -46,6 +55,9 @@ class SearchWidget : public QWidget
    void itemDoubleClicked(QTableWidgetItem *);
    void hideOptions();
    void findTarget();
+ protected:
+   void focusInEvent(QFocusEvent *);
+   void focusOutEvent(QFocusEvent *);
  private:
    void readSettings();
    bool readCssFromFile(const QString &);
@@ -76,7 +88,7 @@ class SearchWidget : public QWidget
    QSpacerItem * m_spacer;
    QVBoxLayout * m_container;
    //   QTableWidget * m_list;
-   QTableWidget * m_rxlist;
+   SearchResultsTable * m_rxlist;
    GraphicsEntry * m_text;
    QPushButton * m_findButton;
    QPushButton * m_hideOptionsButton;
