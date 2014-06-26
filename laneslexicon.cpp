@@ -362,9 +362,11 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == QString("Focus Content").toCaseFolded()) {
     /// if an item has focus, this loses it
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-
     if (entry) {
       entry->shiftFocus();
+    }
+    else {
+      m_tabs->currentWidget()->setFocus();
     }
   }
   else if (key == QString("Focus Tree").toCaseFolded()) {
