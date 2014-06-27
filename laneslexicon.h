@@ -284,6 +284,8 @@ private:
     QAction * m_clearAction;
     /// Notes
     NoteMaster * m_notes;
+    ///
+    int getSearchCount();
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };

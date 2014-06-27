@@ -1050,7 +1050,8 @@ void LanesLexicon::on_actionTest() {
   }
   SearchWidget * w = new SearchWidget(this);
   connect(w,SIGNAL(showNode(const QString &)),this,SLOT(showNode(const QString &)));
-  m_tabs->addTab(w,"Search");
+  int c = this->getSearchCount();
+  m_tabs->addTab(w,QString(tr("Search %1")).arg(c+1));;
 }
 /**
  * TODO tidy up navMode
@@ -1935,8 +1936,8 @@ void LanesLexicon::searchForWord() {
     if (! t.isEmpty()) {
       SearchWidget * s = new SearchWidget;
       s->setOptionsHidden(false);
-      /// TODO Change tab title
-      int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
+      int c = this->getSearchCount();
+      int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Search %1")).arg(c+1));
       m_tabs->setCurrentIndex(i);
       s->setSearch(t,d->getOptions());
       s->findTarget();
@@ -2116,4 +2117,14 @@ void LanesLexicon::showNode(const QString & node) {
   Place p;
   p.setNode(node);
   this->gotoPlace(p,true);
+}
+int LanesLexicon::getSearchCount() {
+  int c = 0;
+  for(int i=0;i < m_tabs->count();i++) {
+    SearchWidget * w = qobject_cast<SearchWidget *>(m_tabs->widget(i));
+    if (w) {
+      c++;
+    }
+  }
+  return c;
 }
