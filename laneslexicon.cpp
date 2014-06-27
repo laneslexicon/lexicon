@@ -363,7 +363,7 @@ void LanesLexicon::shortcut(const QString & k) {
     /// if an item has focus, this loses it
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
     if (entry) {
-      entry->shiftFocus();
+      entry->focusPlace();
     }
     else {
       m_tabs->currentWidget()->setFocus();
@@ -865,24 +865,25 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   int p = 0;
   QLOG_DEBUG() << Q_FUNC_INFO << root << supp;
   /// check that the user has not clicked on a letter
-  if (item->parent() != 0) {
-    /// and that they've clicked on a root
-    if  (item->parent()->parent() == 0) {
-      m_tree->addEntries(root,item);
-      if (supp == "*") {
-        p = 1;
-      }
-      if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-        options |= Lane::Create_Tab;
-      }
-      Place m(root,p);
-      m.setType(Place::User);
-      showPlace(m,options);
+  if (item->parent() == 0) {
+    return;
+  }
+  if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+      options |= Lane::Create_Tab;
+  }
+  /// check whether root or head word
+  if  (item->parent()->parent() == 0) {
+    m_tree->addEntries(root,item);
+    if (supp == "*") {
+      p = 1;
     }
-    else {
-      /// double clicked on head word, highlight it
-      entryActivated(item,0);
-    }
+    Place m(root,p);
+    m.setType(Place::User);
+    showPlace(m,options);
+  }
+  else {
+    /// double clicked on head word, highlight it
+    entryActivated(item,0);
   }
   /// TODO are these still needed ?
   if (m_treeKeepsFocus) {
@@ -1053,7 +1054,7 @@ void LanesLexicon::on_actionTest() {
     d->exec();
   }
   SearchWidget * w = new SearchWidget(this);
-  connect(w,SIGNAL(showNode(const QString &)),this,SLOT(showNode(const QString &)));
+  connect(w,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
   int c = this->getSearchCount();
   m_tabs->addTab(w,QString(tr("Search %1")).arg(c+1));;
 }
@@ -1949,7 +1950,7 @@ void LanesLexicon::searchForWord() {
       m_tabs->setCurrentIndex(i);
       s->setSearch(t,d->getOptions());
       s->findTarget();
-      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showNode(const QString &)));
+      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
     }
   }
   delete d;
@@ -2122,7 +2123,12 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
   return -1;
 
 }
-void LanesLexicon::showNode(const QString & node) {
+/**
+ * Can be invoked by: NodeView,SearchWidget
+ *
+ * @param node
+ */
+void LanesLexicon::showSearchNode(const QString & node) {
   Place p;
   p.setNode(node);
   this->gotoPlace(p,Lane::Create_Tab);
