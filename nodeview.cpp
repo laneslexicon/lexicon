@@ -8,6 +8,12 @@ NodeView::NodeView(QWidget * parent)
   QSettings * settings = app->getSettings();
   settings->beginGroup("System");
   QString fontString = settings->value("Arabic font").toString();
+  settings->endGroup();
+  settings->beginGroup("Search");
+  QString sz = settings->value("Viewer size",QString()).toString();
+  if (! sz.isEmpty())
+    this->setPreferredSize(sz);
+
   delete settings;
   m_startPosition = 0;
   QFont f;
@@ -59,6 +65,23 @@ NodeView::NodeView(QWidget * parent)
 NodeView::~NodeView() {
   qDebug() << Q_FUNC_INFO;
 }
+void NodeView::setPreferredSize(const QString & szStr) {
+  m_size.setWidth(400);
+  m_size.setHeight(300);
+  QRegExp rx("(\\d+)x(\\d+)");
+  if ((rx.indexIn(szStr) != -1) && (rx.captureCount() == 2)) {
+    bool ok;
+    int w = rx.cap(1).toInt(&ok);
+    if (ok) {
+      int h = rx.cap(2).toInt(&ok);
+      if (ok) {
+        m_size.setWidth(w);
+        m_size.setHeight(h);
+      }
+    }
+  }
+}
+
 void NodeView::print() {
 
 }
@@ -69,7 +92,7 @@ void NodeView::setPattern(const QRegExp & rx) {
   m_pattern = rx;
 }
 QSize NodeView::sizeHint() const {
-  return QSize(400,300);
+  return m_size;
 }
 void NodeView::accept() {
   QDialog::accept();

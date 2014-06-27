@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QFont>
 #include <QPushButton>
+#include <QRegExp>
 class NodeView : public QDialog {
   Q_OBJECT
 
@@ -31,6 +32,8 @@ class NodeView : public QDialog {
     void openEntry();
  private:
     QTextCursor m_cursor;
+    QSize m_size;
+    void setPreferredSize(const QString &);
     QPushButton * m_findNextButton;
     //    QPushButton * m_printButton;
     //    QPushButton * m_tabOpenButton;
