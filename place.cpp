@@ -94,7 +94,7 @@ QString Place::getText(bool pageOnly) const {
   return txt;
 }
 QString Place::toString() const {
-  QString t = QString("%1,%2,%3,%4,%5,%6,%7,%8,%9")
+  QString t = QString("%1,%2,%3,%4,%5,%6,%7,%8,%9,%10")
     .arg(m_datasource)
     .arg(m_root)
     .arg(m_node)
@@ -103,7 +103,9 @@ QString Place::toString() const {
     .arg(m_page)
     .arg(m_vol)
     .arg(m_id)
-    .arg(m_supplement);
+    .arg(m_supplement)
+    .arg(m_options);
+
 
   return t;
 }
@@ -131,6 +133,7 @@ Place Place::fromString(const QString & str) {
     p.setId(x[7].toInt(&ok));
   if (sz > 8)
     p.setSupplement(x[8].toInt(&ok));
-
+  if (sz > 9)
+    p.setOptions(x[9].toInt(&ok));
   return p;
 }

@@ -32,6 +32,7 @@ class Place    {
     m_id = -1;
     m_type = Place::User;
     m_datasource = 1;
+    m_options = 0;
   }
   Place(const QString & root) {
     m_root = root;
@@ -40,6 +41,7 @@ class Place    {
     m_id = -1;
     m_type = Place::User;
     m_datasource = 1;
+    m_options = 0;
   }
   Place(const QString & root,int supp) {
     m_root = root;
@@ -49,6 +51,7 @@ class Place    {
     m_id = -1;
     m_type = Place::User;
     m_datasource = 1;
+    m_options = 0;
   }
   ~Place() {
   }
@@ -69,6 +72,8 @@ class Place    {
   int getType() const { return m_type;}
   int getSource() const { return m_datasource; }
   void setSource(int x) { m_datasource = x;}
+  int getOptions() const { return m_options; }
+  void setOptions(int x) { m_options = x;}
  inline friend QDebug operator<<(QDebug debug, const Place& p)
 {
 	debug.nospace() << "Place("
@@ -80,7 +85,8 @@ class Place    {
                         << p.getType() << ","
                         << p.getId() << "," << "\n"
                         << p.getRoot() << ","
-                        << p.getWord()
+                        << p.getWord() << ","
+                        << p.getOptions()
                         << ")";
 	return debug.space();
 }
@@ -145,6 +151,7 @@ class Place    {
   int m_vol;
   int m_id;
   int m_supplement;
+  int m_options;
   QVariant m_data;
   QDateTime m_when;
 };
