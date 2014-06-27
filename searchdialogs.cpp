@@ -196,3 +196,18 @@ bool NodeSearchDialog::getNewTab() const {
   }
   return false;
 }
+int NodeSearchDialog::getOptions() {
+  int options = 0;
+
+  if (m_newTab->checkState() == Qt::Checked)
+    options |= Lane::Create_Tab;
+
+  if (m_switchFocus->checkState() == Qt::Checked)
+    options |= Lane::Switch_Tab;
+
+  return options;
+}
+void NodeSearchDialog::setOptions(int options) {
+  m_newTab->setChecked(options & Lane::Create_Tab);
+  m_switchFocus->setChecked(options & Lane::Switch_Tab);
+}

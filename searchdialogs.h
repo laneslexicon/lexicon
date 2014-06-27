@@ -49,6 +49,8 @@ class NodeSearchDialog : public QDialog {
   QString getText() const;
   bool getNewTab() const;
   void setNewTab(bool v);
+  int getOptions();
+  void setOptions(int);
  private:
   QLabel * m_prompt;
   QLineEdit * m_edit;

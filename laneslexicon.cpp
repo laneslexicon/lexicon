@@ -859,7 +859,7 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
   return m_db.open();
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
-  bool newTab = false;
+  int options = 0;
   QString root = item->text(0);
   QString supp = item->text(1);
   int p = 0;
@@ -873,17 +873,18 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
         p = 1;
       }
       if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-        newTab = true;
+        options |= Lane::Create_Tab;
       }
       Place m(root,p);
       m.setType(Place::User);
-      showPlace(m,newTab);
+      showPlace(m,options);
     }
     else {
       /// double clicked on head word, highlight it
       entryActivated(item,0);
     }
   }
+  /// TODO are these still needed ?
   if (m_treeKeepsFocus) {
     QLOG_DEBUG() << "tree focus";
     m_tree->setFocus();
@@ -901,6 +902,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
  * @param col
  */
 void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
+  int options = 0;
   /// ignore clicks on the root or the letter
   QLOG_DEBUG() << Q_FUNC_INFO;
   if ((item->parent() == 0) || (item->parent()->parent() == 0)) {
@@ -933,7 +935,8 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
         Place p;
         p.setNode(node);
         /// TODO needs to check whether to open in new tab
-        p = showPlace(p,true);
+        options |= Lane::Create_Tab;
+        p = showPlace(p,options);
       }
     }
   }
@@ -957,7 +960,7 @@ Place LanesLexicon::showPlace(const Place & p,int options) {
   }
   else {
     /// if current widget not graphicsentry, set createtab
-    entry = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
+    entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (! entry ) {
       options |= Lane::Create_Tab;
     }
@@ -970,9 +973,10 @@ Place LanesLexicon::showPlace(const Place & p,int options) {
     entry->installEventFilter(this);
     np = entry->getXmlForRoot(p);
 
-    m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
-    /// TODO decide whether to make new tab the current tab
-    //    entry->setFocus();
+    int ix = m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
+    if (options & Lane::Switch_Tab) {
+      m_tabs->setCurrentIndex(ix);
+    }
   }
   else {
     if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
@@ -1248,7 +1252,7 @@ void LanesLexicon::restoreTabs() {
     if (settings->value("type","entry").toString() == "notes") {
       NoteBrowser * notes = new NoteBrowser(this);
       m_tabs->addTab(notes,tr("Notes"));
-        j++;
+      j++;
     }
     else {
       Place p;
@@ -1374,15 +1378,17 @@ void LanesLexicon::on_actionPrevRoot() {
   }
 }
 void LanesLexicon::on_actionFirstRoot() {
+  int options = 0;
   Place p;
   p.setRoot(m_firstRoot);
-  showPlace(p,false);
+  showPlace(p,options);
   m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::on_actionLastRoot() {
+  int options = 0;
   Place p;
   p.setRoot(m_lastRoot);
-  showPlace(p,false);
+  showPlace(p,options);
   m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::rootChanged(const QString & root,const QString & node) {
@@ -1525,12 +1531,13 @@ Place LanesLexicon::getCurrentPlace() {
  * @param key
  */
 void LanesLexicon::bookmarkShortcut(const QString & key) {
+  int options = 0;
   if (m_revertEnabled && (key == "revert")) {
     if (! m_bookmarks.contains("-here-")) {
       return;
     }
     Place p = m_bookmarks.value("-here-");
-    showPlace(p,false);
+    showPlace(p,options);
     m_revertEnabled = false;
     return;
   }
@@ -1615,6 +1622,7 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
 
 }
 void LanesLexicon::bookmarkJump(const QString & id) {
+  int options = 0;
   if ( ! m_bookmarks.contains(id) ) {
     QLOG_WARN() << QString(tr("Unknown bookmark jump activated: %1")).arg(id);
     return;
@@ -1628,7 +1636,7 @@ void LanesLexicon::bookmarkJump(const QString & id) {
   Place cp = this->getCurrentPlace();
   cp.setType(Place::Bookmark);
   m_bookmarks.insert("-here-",cp);
-  showPlace(p,false);
+  showPlace(p,options);
   m_revertEnabled = true;
   updateMenu();
 }
@@ -1978,8 +1986,9 @@ void LanesLexicon::searchForEntry() {
     delete d;
 }
 void LanesLexicon::searchForNode() {
+  int options = 0;
     NodeSearchDialog * d = new NodeSearchDialog(this);
-    d->setNewTab(m_searchNewTab);
+    d->setOptions(m_searchNewTab | m_searchSwitchTab);
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
@@ -1988,7 +1997,7 @@ void LanesLexicon::searchForNode() {
         //        Place p = showNode(t,true);
         Place p;
         p.setNode(t);
-        p = showPlace(p,d->getNewTab());
+        p = showPlace(p,d->getOptions());
         if (! p.isValid()) {
           QMessageBox msgBox;
           msgBox.setText(QString(tr("%1 not found")).arg(t));
