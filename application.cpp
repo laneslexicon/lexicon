@@ -44,7 +44,7 @@ QSettings * Lexicon::getSettings() {
   }
   return new QSettings(m_configFile,QSettings::IniFormat);
 }
-QString Lexicon::getFontName(const QString & type) {
+QString Lexicon::getFontName(const QString & /* type */) {
   /*
   QString k = "name_" + type;
   if (m_fonts.contains(k)) {
@@ -53,7 +53,7 @@ QString Lexicon::getFontName(const QString & type) {
   */
   return QString();
 }
-QString Lexicon::getFontSize(const QString & type) {
+QString Lexicon::getFontSize(const QString & /* type */) {
   /*
   QString k = "size_" + type;
   if (m_fonts.contains(k)) {
@@ -63,6 +63,7 @@ QString Lexicon::getFontSize(const QString & type) {
   return QString();
 }
 void Lexicon::onFocusChange(QWidget * old, QWidget * now) {
-  if (old && now)
+  if (old && now) {
     QLOG_DEBUG() << old->metaObject()->className() << "--->" << now->metaObject()->className();
+  }
 }
