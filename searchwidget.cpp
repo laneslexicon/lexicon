@@ -13,13 +13,12 @@
 SearchResultsTable::SearchResultsTable(QWidget * parent) : QTableWidget(parent) {
 }
 void SearchResultsTable::focusInEvent(QFocusEvent * event) {
-  qDebug() << Q_FUNC_INFO << event;
   this->setStyleSheet("");
   QTableWidget::focusInEvent(event);
 }
 void SearchResultsTable::focusOutEvent(QFocusEvent * event) {
-  qDebug() << Q_FUNC_INFO << event;
-  this->setStyleSheet("QTableView { selection-background-color : lightgray}"); //%1}").arg("lightg
+  /// TODO get from INI
+  this->setStyleSheet("QTableView { selection-background-color : lightgray}");
   QTableWidget::focusOutEvent(event);
 }
 /**

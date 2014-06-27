@@ -102,7 +102,7 @@ class EntryItem : public QGraphicsTextItem {
     void selectAllItems();
     void clearAllItems();
     void copy();
-    void gotoNode(const Place & p, bool createTab = true);
+    void gotoNode(const Place & p, int);
     void addButton();
     void deleteNotes();
  protected:

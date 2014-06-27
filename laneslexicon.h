@@ -78,7 +78,7 @@ public:
     NoteMaster * notes();
     enum NavMode {ByRoot, ByPage };
     public slots:
-    void gotoPlace(const Place &,bool newTab = false);
+    void gotoPlace(const Place &,int);
     int hasPlace(const Place & p,int searchtype,bool setFocus);
     void setStatus(const QString &);
     //    void saveNote(Note *);
@@ -151,7 +151,7 @@ public:
     void closeEvent(QCloseEvent *);
 private:
     void cleanup();
-    Place showPlace(const Place &,bool newTab = false);
+    Place showPlace(const Place &,int);
     QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
     /// look through all tabs for the given node, -1 if not found, else tab index
     int searchTabs(const QString & node);

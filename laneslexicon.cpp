@@ -241,7 +241,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(clearPage()),this,SLOT(pageClear()));
   connect(entry,SIGNAL(searchPage()),this,SLOT(pageSearch()));
 
-  connect(entry,SIGNAL(gotoNode(const Place &,bool)),this,SLOT(gotoPlace(const Place &,bool)));
+  connect(entry,SIGNAL(gotoNode(const Place &,int)),this,SLOT(gotoPlace(const Place &,int)));
   //  connect(entry,SIGNAL(saveNote(Note *)),this,SLOT(saveNote(Note *)));
 }
 void LanesLexicon::onCloseTab(int ix) {
@@ -942,10 +942,10 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   }
 }
 
-void LanesLexicon::gotoPlace(const Place & p,bool createTab) {
-  showPlace(p,createTab);
+void LanesLexicon::gotoPlace(const Place & p,int options) {
+  showPlace(p,options);
 }
-Place LanesLexicon::showPlace(const Place & p,bool createTab) {
+Place LanesLexicon::showPlace(const Place & p,int options) {
   Place np;
   GraphicsEntry * entry;
   if (! p.isValid()) {
@@ -953,16 +953,16 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   }
   int currentTab = m_tabs->currentIndex();
   if (currentTab == -1) {
-    createTab = true;
+    options |= Lane::Create_Tab;
   }
   else {
     /// if current widget not graphicsentry, set createtab
     entry = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (! entry ) {
-      createTab = true;
+      options |= Lane::Create_Tab;
     }
   }
-  if (createTab) {
+  if (options & Lane::Create_Tab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
     entry = new GraphicsEntry(this);
@@ -2116,7 +2116,7 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
 void LanesLexicon::showNode(const QString & node) {
   Place p;
   p.setNode(node);
-  this->gotoPlace(p,true);
+  this->gotoPlace(p,Lane::Create_Tab);
 }
 int LanesLexicon::getSearchCount() {
   int c = 0;

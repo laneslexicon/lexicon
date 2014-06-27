@@ -1,5 +1,6 @@
 #include "entryitem.h"
 #include "laneslexicon.h"
+#include "namespace.h"
 extern LanesLexicon * getApp();
 extern NoteMaster * getNotes();
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
@@ -137,7 +138,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     QLOG_DEBUG() << "GOTO" << jumpAction->data();
     Place p;
     p.setNode(jumpAction->data().toString());
-    emit(gotoNode(p,true));
+    emit(gotoNode(p,Lane::Create_Tab));
 
   }
   this->setFocus();

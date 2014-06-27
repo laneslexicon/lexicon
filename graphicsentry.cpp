@@ -217,6 +217,9 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
     if (! m_focusNode.isEmpty()) {
         this->focusNode(m_focusNode);
       }
+    else {
+      qDebug() << "No home to go to";
+    }
     return;
   }
   QWidget::keyPressEvent(event);
@@ -892,7 +895,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
     connect(gi,SIGNAL(selectAllItems()),this,SLOT(selectAll()));
     connect(gi,SIGNAL(clearAllItems()),this,SLOT(clearAll()));
-    connect(gi,SIGNAL(gotoNode(const Place &,bool)),this,SIGNAL(gotoNode(const Place &,bool)));
+    connect(gi,SIGNAL(gotoNode(const Place &,int)),this,SIGNAL(gotoNode(const Place &,int)));
     /// pass through signal for mainwindow to handle
     connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
     connect(gi,SIGNAL(copy()),this,SLOT(copy()));
