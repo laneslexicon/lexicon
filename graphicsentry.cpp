@@ -143,7 +143,7 @@ void GraphicsEntry::readSettings() {
   }
   m_searchKey = settings->value("Find",QString()).toString();
   m_clearKey = settings->value("Clean",QString()).toString();
-
+  m_homeKey = settings->value("Home",QString()).toString();
 
   settings->endGroup();
 
@@ -211,6 +211,12 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   }
   if (! m_clearKey.isEmpty() && (event->text() == m_clearKey)) {
     emit(clearPage());
+    return;
+  }
+  if (! m_clearKey.isEmpty() && (event->text() == m_homeKey)) {
+    if (! m_focusNode.isEmpty()) {
+        this->focusNode(m_focusNode);
+      }
     return;
   }
   QWidget::keyPressEvent(event);
@@ -431,7 +437,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   int supp = dp.getSupplement();
   QString node = dp.getNode();
   //  bool nodeOnly = dp.getNodeOnly();
-
+  m_focusNode = node;
   Place p = dp;
   /**
    * if we asked for the node, look up the root

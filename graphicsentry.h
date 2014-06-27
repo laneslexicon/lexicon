@@ -100,6 +100,9 @@ class GraphicsEntry : public QWidget {
     void deleteNotes();
     void focusPlace();
  private:
+
+    QString m_focusNode;
+
     QColor m_supplementBg;
     bool m_notesEnabled;
     bool m_showNodeOnly;
@@ -134,7 +137,7 @@ class GraphicsEntry : public QWidget {
     QString m_narrowKey;
     QString m_searchKey;
     QString m_clearKey;
-
+    QString m_homeKey;
     int m_widenStep;
     int m_defaultWidth;
 
