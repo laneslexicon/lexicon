@@ -60,6 +60,7 @@ class SearchWidget : public QWidget
    void focusOutEvent(QFocusEvent *);
  private:
    void readSettings();
+   QString buildText(int,int,int);
    bool readCssFromFile(const QString &);
    void setMaxRecords();
    int m_maxRecordCount;

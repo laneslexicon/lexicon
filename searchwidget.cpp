@@ -519,16 +519,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
   }
   */
   //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
-  QString t;
-  if (Lane::Full)
-    t = QString(tr("Search for %1, found %2 in %3 entries")).arg(target).arg(textCount + headCount).arg(entryCount);
-  else
-    t=  QString(tr("Search for %1, found %2 entries")).arg(target).arg(headCount);
-  if (m_searchOptions & Lane::Ignore_Diacritics)
-    t += tr(", ignoring diacritics");
-  if (m_searchOptions & Lane::Whole_Word)
-    t += tr(", whole word match");
-  m_resultsText->setText(t);
+  m_resultsText->setText(buildText(headCount,entryCount,options));
   m_resultsText->show();
   if (m_rxlist->rowCount() > 0) {
     m_rxlist->selectRow(0);
@@ -538,6 +529,57 @@ void SearchWidget::regexSearch(const QString & target,int options) {
   m_rxlist->resizeColumnToContents(2);
   m_rxlist->resizeColumnToContents(3);
   m_rxlist->resizeColumnToContents(4);
+}
+QString SearchWidget::buildText(int headCount,int entryCount,int options) {
+  QString t;
+  QString p1;
+  QString p2;
+  int findCount = headCount + entryCount;
+
+  if (options & Lane::Full) {
+    switch(findCount) {
+    case 0 :
+      p1 = "no items found";
+      break;
+    case 1:
+      p1 = "";
+      break;
+    default:
+        p1 ="s";
+    }
+    if (entryCount == 1) {
+      p2 = "y";
+    }
+    else {
+      p2 = "ies";
+    }
+    if (findCount == 0) {
+      t = QString(tr("Search for %1, %2")).arg(m_target).arg(p1);
+    }
+    else {
+      t = QString(tr("Search for %1, found %2 item%3 in %4 entr%5"))
+        .arg(m_target)
+        .arg(findCount)
+        .arg(p1)
+        .arg(entryCount)
+        .arg(p2);
+    }
+  }
+  else {
+    if (headCount == 1) {
+      p1 = "y";
+    }
+    else {
+      p1 = "ies";
+    }
+    t=  QString(tr("Search for %1, found %2 entr%3")).arg(m_target).arg(headCount).arg(p1);
+  }
+  if (m_searchOptions & Lane::Ignore_Diacritics)
+    t += tr(", ignoring diacritics");
+  if (m_searchOptions & Lane::Whole_Word)
+    t += tr(", whole word match");
+
+  return t;
 }
 void SearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos) {
   QTableWidgetItem * item;
