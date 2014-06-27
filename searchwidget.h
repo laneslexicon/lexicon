@@ -100,5 +100,6 @@ class SearchWidget : public QWidget
    QFont m_resultsFont;
  signals:
    void searchResult(const QString &);
+   void showNode(const QString &);
 };
 #endif

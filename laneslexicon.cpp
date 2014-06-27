@@ -1049,6 +1049,7 @@ void LanesLexicon::on_actionTest() {
     d->exec();
   }
   SearchWidget * w = new SearchWidget(this);
+  connect(w,SIGNAL(showNode(const QString &)),this,SLOT(showNode(const QString &)));
   m_tabs->addTab(w,"Search");
 }
 /**
@@ -1939,6 +1940,7 @@ void LanesLexicon::searchForWord() {
       m_tabs->setCurrentIndex(i);
       s->setSearch(t,d->getOptions());
       s->findTarget();
+      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showNode(const QString &)));
     }
   }
   delete d;
@@ -2109,4 +2111,9 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
   }
   return -1;
 
+}
+void LanesLexicon::showNode(const QString & node) {
+  Place p;
+  p.setNode(node);
+  this->gotoPlace(p,true);
 }

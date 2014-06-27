@@ -163,6 +163,9 @@ void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   QString xml = m_nodeQuery.value("xml").toString();
   QString html = this->transform(xml);
   NodeView * v = new NodeView(this);
+  v->setWindowTitle(QString(tr("Showing result %1 in search for %2")
+                            .arg(item->row() + 1)
+                            .arg(m_target)));
   v->setPattern(m_currentRx);
   v->setCSS(m_currentCSS);
   v->setHeader(m_nodeQuery.value("root").toString(),m_nodeQuery.value("word").toString(),node);
@@ -172,6 +175,7 @@ void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   v->show();
   v->raise();
   v->activateWindow();
+  connect(v,SIGNAL(openNode(const QString &)),this,SIGNAL(showNode(const QString &)));
   /*
   Place np;
   np.setNode(node);
