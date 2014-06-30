@@ -50,6 +50,7 @@ class SearchWidget : public QWidget
    void regexSearch(const QString &,int options);
    void setSearch(const QString & searchFor,int options);
    void setOptionsHidden(bool);
+   void showFirst();
  public slots:
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);

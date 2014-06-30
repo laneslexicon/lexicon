@@ -1972,32 +1972,38 @@ void LanesLexicon::searchForWord() {
 /// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
   ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
-  //    d->setup();
-  //    d->setWindowTitle(tr("Search for Entry"));
-  //    d->setPrompt(tr("Find entry"));
-    if (d->exec()) {
-      QString t = d->getText();
-      if (! t.isEmpty()) {
-        if (! UcdScripts::isScript(t,"Arabic")) {
-          t = convertString(t);
-        }
-        SearchResultsWidget * s = new SearchResultsWidget(this);
-        connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
-        s->search(t,d->getOptions());
-        if (s->count() == 0) {
-          QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
-          msgBox.exec();
-          delete s;
-        }
-        else {
-          int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
-          m_tabs->setCurrentIndex(i);
-          setSignals(s->getEntry());
-        }
+  int options = m_defaultSearchOptions;
+  if (options & Lane::Full) {
+    options -=  Lane::Full;
+    options |= Lane::Head;
+  }
+  d->setOptions(options);
+  if (d->exec()) {
+    QString t = d->getText();
+    if (! t.isEmpty()) {
+      if (! UcdScripts::isScript(t,"Arabic")) {
+        t = convertString(t);
+      }
+      SearchResultsWidget * s = new SearchResultsWidget(this);
+      connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
+      s->search(t,d->getOptions());
+      if (s->count() == 0) {
+        QMessageBox msgBox;
+        msgBox.setObjectName("wordnotfound");
+        msgBox.setTextFormat(Qt::RichText);
+        msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
+        msgBox.exec();
+        delete s;
+      }
+      else {
+        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
+        m_tabs->setCurrentIndex(i);
+        setSignals(s->getEntry());
+        s->showFirst();
       }
     }
-    delete d;
+  }
+  delete d;
 }
 void LanesLexicon::searchForNode() {
   int options = 0;
@@ -2014,7 +2020,7 @@ void LanesLexicon::searchForNode() {
         p = showPlace(p,d->getOptions());
         if (! p.isValid()) {
           QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
+          msgBox.setText(QString(tr("Node not found: %1")).arg(t));
           msgBox.exec();
         }
       }

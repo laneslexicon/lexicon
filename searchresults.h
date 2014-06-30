@@ -19,8 +19,8 @@
 #include <QTextBlock>
 #include <QFont>
 #include <QWidget>
-#include "graphicsentry.h"
-#include "application.h"
+#include <QRegExp>
+class GraphicsEntry;
 class SearchResultsWidget : public QWidget
 {
     Q_OBJECT
@@ -31,13 +31,15 @@ class SearchResultsWidget : public QWidget
    GraphicsEntry * getEntry() { return m_text;}
    int count();
    void search(const QString &,int options);
-
+   void showFirst();
  public slots:
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);
 
  private:
    bool eventFilter(QObject * target,QEvent * event);
+   QString buildText(int);
+   QRegExp m_currentRx;
    int m_searchOptions;
    QSqlQuery m_query;
    QSqlQuery m_nodeQuery;

@@ -556,6 +556,7 @@ QString SearchWidget::buildText(int headCount,int entryCount,int options) {
     else {
       p2 = "ies";
     }
+    /// TODO allow for Arabic font
     if (findCount == 0) {
       t = QString(tr("Search for %1, %2")).arg(m_target).arg(p1);
     }
@@ -577,9 +578,9 @@ QString SearchWidget::buildText(int headCount,int entryCount,int options) {
     }
     t=  QString(tr("Search for %1, found %2 entr%3")).arg(m_target).arg(headCount).arg(p1);
   }
-  if (m_searchOptions & Lane::Ignore_Diacritics)
+  if (options & Lane::Ignore_Diacritics)
     t += tr(", ignoring diacritics");
-  if (m_searchOptions & Lane::Whole_Word)
+  if (options & Lane::Whole_Word)
     t += tr(", whole word match");
 
   return t;

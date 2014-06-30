@@ -1,3 +1,5 @@
+#include "graphicsentry.h"
+#include "application.h"
 #include "searchresults.h"
 #include "namespace.h"
 #include "laneslexicon.h"
@@ -145,7 +147,8 @@ void SearchResultsWidget::itemDoubleClicked(QTableWidgetItem * item) {
   //  np.setNodeOnly(true);
   Place p = m_text->getXmlForRoot(np);
   if (p.isValid()) {
-    m_text->highlight(m_target);
+    //      m_text->highlight(m_target);
+    m_text->focusNode(node);
   }
   else {
     QLOG_DEBUG() << "Invalid place returned for node" << node;
@@ -190,6 +193,10 @@ bool SearchResultsWidget::eventFilter(QObject * target,QEvent * event) {
   return QWidget::eventFilter(target,event);
 }
 void SearchResultsWidget::search(const QString & target,int options) {
+  QRegExp rx;
+  QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+
+  bool replaceSearch = true;
   m_target = target;
   m_searchOptions = options;
   QString sql;
@@ -203,10 +210,37 @@ void SearchResultsWidget::search(const QString & target,int options) {
   //   select where instr(bareword,?) > 0
   if (options & Lane::Full) {
   sql = "select id,word,root,entry,node from xref where datasource = 1 ";
+  QLOG_WARN() << Q_FUNC_INFO << "search for Full word - we shouldn't be here";
   }
   else {
     sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 ";
   }
+  QString pattern;
+  if (options & Lane::Ignore_Diacritics) {
+    QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+    QStringList cc = target.split("");
+    QString brx = "";
+    for(int i=0;i < cc.size();i++) {
+      pattern += cc[i] + ar;
+    }
+  }
+  else {
+    pattern = target;
+  }
+  if (options & Lane::Whole_Word) {
+      pattern = "\\b" + pattern + "\\b";
+  }
+  m_currentRx.setPattern(pattern);
+
+  pattern.clear();
+  if (options & Lane::Whole_Word) {
+    pattern = "\\b" + m_target + "\\b";
+  }
+  else {
+    pattern = m_target;
+  }
+  rx.setPattern(pattern);
+  /*
   if (options & Lane::Ignore_Diacritics) {
     qDebug() << "ignoring diacritics";
     if (options & Lane::Whole_Word) {
@@ -226,6 +260,7 @@ void SearchResultsWidget::search(const QString & target,int options) {
       sql += "and instr(word,?) > 0";
     }
   }
+  */
   if (options & Lane::Full) {
     sql += " order by root,entry asc";
   }
@@ -247,7 +282,7 @@ void SearchResultsWidget::search(const QString & target,int options) {
   }
   m_list->setRowCount(0);
 #define NODE_COLUMN 2
-  m_query.bindValue(0,m_target);
+  //m_query.bindValue(0,m_target);
   m_query.exec();
   QMap<QString,int> nodes;
 
@@ -266,8 +301,12 @@ void SearchResultsWidget::search(const QString & target,int options) {
       t = m_query.value("nodeid").toString();
       word = m_query.value("word").toString();
     }
-
-    if (! nodes.contains(t)) {
+    /// strip diacritics if required
+    if (replaceSearch) {
+      if (options & Lane::Ignore_Diacritics)
+        word =  word.replace(rxclass,QString());
+    }
+    if (word.indexOf(rx) != -1) {
       int row = m_list->rowCount();
       m_list->insertRow(row);
       item = new QTableWidgetItem(m_query.value("root").toString());
@@ -283,27 +322,55 @@ void SearchResultsWidget::search(const QString & target,int options) {
       item = new QTableWidgetItem(t);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,NODE_COLUMN,item);
-      nodes.insert(t,1);
       m_list->setItem(row,3,new QTableWidgetItem("1"));
     }
-    else {
-      nodes[t] = nodes.value(t) + 1;
-    }
   }
+  /*
   for(int i=0; i < m_list->rowCount();i++) {
     QString t = m_list->item(i,NODE_COLUMN)->text();
     if (! t.isEmpty() && nodes.contains(t)) {
       m_list->item(i,3)->setText(QString("%1").arg(nodes.value(t)));
     }
   }
+  */
   //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
-  QString t = QString(tr("Search for %1, find count %2 ")).arg(m_target).arg(count);
+  m_resultsText->setText(this->buildText(options));
+  m_resultsText->show();
+  if (m_list->rowCount() > 0) {
+    m_list->selectRow(0);
+    m_list->setFocus();
+  }
+
+}
+void SearchResultsWidget::showFirst() {
+  if (m_list->rowCount() > 0) {
+    m_list->selectRow(0);
+    m_list->setFocus();
+  }
+}
+QString SearchResultsWidget::buildText(int options) {
+  QString t;
+  QString p1;
+  QString p2;
+  int findCount = m_list->rowCount();
+
+  t = QString("Search for %1: ").arg(m_target);
+  switch(findCount) {
+  case 0:
+    p1 = QString(tr("No items found"));
+    break;
+  case 1:
+    p1 = QString(tr("1 entry found"));
+    break;
+  default:
+    p1 = QString("%1 entries found").arg(findCount);
+    break;
+  }
+  t += p1;
   if (m_searchOptions & Lane::Ignore_Diacritics)
     t += tr(", ignoring diacritics");
   if (m_searchOptions & Lane::Whole_Word)
     t += tr(", whole word match");
-  m_resultsText->setText(t);
-  m_resultsText->show();
-  if (m_list->rowCount() > 0)
-    m_list->itemDoubleClicked(m_list->item(0,0));
+
+  return t;
 }
