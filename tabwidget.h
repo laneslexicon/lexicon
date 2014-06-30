@@ -8,6 +8,8 @@ class TabWidget : public QTabWidget {
   Q_OBJECT
  public:
   TabWidget(QWidget  * parent = 0);
+  public slots:
+    void onTabBarClicked(int);
  private:
   void keyPressEvent(QKeyEvent *);
 };

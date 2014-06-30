@@ -147,7 +147,7 @@ class GraphicsEntry : public QWidget {
     EntryItem * createEntry(const QString & xml);
     //    const XalanCompiledStylesheet * m_compiledXsl;
     //    bool showNode(const QString &,bool thisPageOnly = false);
-    Place showPlace(const Place &,bool thisPageOnly = false);
+    Place showPlace(const Place &,bool thisPageOnly,int options);
 
     qreal m_scale;
 

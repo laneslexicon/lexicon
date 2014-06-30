@@ -291,19 +291,19 @@ void GraphicsEntry::anchorClicked(const QUrl & link) {
 }
 void GraphicsEntry::linkActivated(const QString & link) {
   /// turn history on as the user has clicked on something
+  int options = 0;
   getHistory()->on();
   QString node(link);
   /// remove the leading #
   node.remove(0,1);
   Place p;
   p.setNode(node);
-  bool newTab = false;
-  if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-    newTab = true;
+  if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+    options |= Lane::Create_Tab;
   }
   /// TODO replace this
   /// including move to new tab stuff
-  showPlace(p,newTab);
+  showPlace(p,false,options);
 }
 void GraphicsEntry::linkHovered(const QString & link) {
   QGraphicsTextItem * gi = static_cast<QGraphicsTextItem *>(QObject::sender());
@@ -334,7 +334,7 @@ void GraphicsEntry::anchorTest() {
     }
   }
 }
-Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
+Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,int options) {
   /// check if the node is on this page
   QString node = p.getNode();
   for(int i=0;i < m_items.size();i++) {
@@ -352,13 +352,18 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly) {
   Place np;
   if (! thisPageOnly ) {
     Place p;
+    qDebug() << "Out of page for node" << node;
     p.setNode(node);
+    p.setOptions(options);
+    emit(gotoNode(p,options));
+    /*
     np = getXmlForRoot(p);
     /// is this right ?
     if (np != p) {
       emit(placeChanged(np));
       m_place = np;
     }
+    */
   }
   return np;
 }
@@ -440,7 +445,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   int supp = dp.getSupplement();
   QString node = dp.getNode();
   //  bool nodeOnly = dp.getNodeOnly();
+
   m_focusNode = node;
+  qDebug() << "Focus node set" << node;
   Place p = dp;
   /**
    * if we asked for the node, look up the root
@@ -637,8 +644,12 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         m_view->centerOn(line.position());
     }
     */
-  m_scene->setFocusItem(centerItem);
-  centerItem->ensureVisible();
+  if (centerItem) {
+    this->setCurrentItem(centerItem);
+  }
+  else {
+    qDebug() << Q_FUNC_INFO << "no center item";
+  }
       //      int h =  m_view->height();
       //      QPointF pt = centerItem->pos();
       //      pt.setY(pt.y() + h/2 - 10);
@@ -1338,6 +1349,7 @@ void GraphicsEntry::focusNode(const QString & node) {
       return;
     }
   }
+  qDebug() << "Warning: focusNode failed, cannot find node" << node;
 }
 bool GraphicsEntry::hasNode(const QString & node) {
   if (node.isEmpty()) {
