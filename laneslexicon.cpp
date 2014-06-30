@@ -420,6 +420,9 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == "show notes") {
     showNoteBrowser();
   }
+  else if (key == "delete tab") {
+    this->onCloseTab(m_tabs->currentIndex());
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -1926,7 +1929,17 @@ void LanesLexicon::searchForRoot() {
         Place p = showPlace(Place(t),(opts & Lane::Create_Tab));
         if (! p.isValid()) {
           QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
+          msgBox.setObjectName("rootnotfound");
+          msgBox.setTextFormat(Qt::RichText);
+          //          msgBox.setStyleSheet(".arabic { font-family : Amiri;font-size : 18px}");
+          /*this works, but affects the english and the arabic:
+          msgBox.setStyleSheet("font-family :  Amiri; font-size : 18px");
+          */
+          /// this also works
+          /// msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
+          ///
+          /// TODO get this from INI file
+          msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
           msgBox.exec();
         }
       }
