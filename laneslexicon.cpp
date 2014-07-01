@@ -266,9 +266,7 @@ void LanesLexicon::onCloseTab(int ix) {
   }
   SearchWidget * search = qobject_cast<SearchWidget *>(m_tabs->widget(ix));
   if (search) {
-    qDebug() << "begin delete search";
     delete search;
-    qDebug() << "end delete search";
     return;
   }
   m_tabs->removeTab(ix);
@@ -1950,20 +1948,49 @@ void LanesLexicon::searchForRoot() {
  *
  *
  */
+void LanesLexicon::search(int options,const QString & t) {
+  QString target = t;
+  if (options & Lane::Full) {
+      SearchWidget * s = new SearchWidget;
+      s->setOptionsHidden(false);
+      int c = this->getSearchCount();
+      int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Search %1")).arg(c+1));
+      m_tabs->setCurrentIndex(i);
+      s->setSearch(t,options);
+      s->findTarget();
+      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+      return;
+  }
+  if (options & Lane::Head) {
+      if (! UcdScripts::isScript(target,"Arabic")) {
+        target = convertString(target);
+      }
+      SearchResultsWidget * s = new SearchResultsWidget(this);
+      connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
+      s->search(target,options);
+      if (s->count() == 0) {
+        QMessageBox msgBox;
+        msgBox.setObjectName("wordnotfound");
+        msgBox.setTextFormat(Qt::RichText);
+        msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(target));
+        msgBox.exec();
+        delete s;
+      }
+      else {
+        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,target);
+        m_tabs->setCurrentIndex(i);
+        setSignals(s->getEntry());
+        s->showFirst();
+      }
+  }
+}
 void LanesLexicon::searchForWord() {
   ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
   d->setOptions(m_defaultSearchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
-      SearchWidget * s = new SearchWidget;
-      s->setOptionsHidden(false);
-      int c = this->getSearchCount();
-      int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Search %1")).arg(c+1));
-      m_tabs->setCurrentIndex(i);
-      s->setSearch(t,d->getOptions());
-      s->findTarget();
-      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+      this->search(d->getOptions(),t);
     }
   }
   delete d;
@@ -1981,26 +2008,7 @@ void LanesLexicon::searchForEntry() {
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
-      if (! UcdScripts::isScript(t,"Arabic")) {
-        t = convertString(t);
-      }
-      SearchResultsWidget * s = new SearchResultsWidget(this);
-      connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
-      s->search(t,d->getOptions());
-      if (s->count() == 0) {
-        QMessageBox msgBox;
-        msgBox.setObjectName("wordnotfound");
-        msgBox.setTextFormat(Qt::RichText);
-        msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
-        msgBox.exec();
-        delete s;
-      }
-      else {
-        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
-        m_tabs->setCurrentIndex(i);
-        setSignals(s->getEntry());
-        s->showFirst();
-      }
+      this->search(d->getOptions(),t);
     }
   }
   delete d;
