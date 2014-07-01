@@ -1,5 +1,6 @@
 #include "tabwidget.h"
 #include "graphicsentry.h"
+#include "searchresults.h"
 TabWidget::TabWidget(QWidget * parent) : QTabWidget(parent) {
   setObjectName("entrywidget");
   tabBar()->setObjectName("entrytabs");
@@ -13,9 +14,16 @@ void TabWidget::keyPressEvent(QKeyEvent * event) {
       GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(this->currentWidget());
       if (entry) {
         entry->focusPlace();
+        return;
       }
-      return;
+      SearchResultsWidget * search = qobject_cast<SearchResultsWidget *>(this->currentWidget());
+      if (search) {
+        search->focusTable();
+        return;
+      }
+      break;
     }
+
     default:
       return;
     }

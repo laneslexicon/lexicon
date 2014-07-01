@@ -32,6 +32,7 @@ class SearchResultsWidget : public QWidget
    int count();
    void search(const QString &,int options);
    void showFirst();
+   void focusTable();
  public slots:
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);
