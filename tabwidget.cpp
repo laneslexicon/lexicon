@@ -23,7 +23,6 @@ void TabWidget::keyPressEvent(QKeyEvent * event) {
 void TabWidget::onTabBarClicked(int ix) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(this->widget(ix));
   if (entry) {
-    qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!";
     entry->focusPlace();
   }
 }

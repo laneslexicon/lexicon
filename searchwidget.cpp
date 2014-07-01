@@ -507,21 +507,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
   }
   m_container->removeItem(m_spacer);
   m_rxlist->show();
-  /*
-  if (m_rxlist->rowCount() == 0) {
-    m_rxlist->insertRow(0);
-    QTableWidgetItem * noitems = new QTableWidgetItem(tr("Text not found"));
-    noitems->setTextAlignment(Qt::AlignCenter);
-    m_rxlist->setItem(0,CONTEXT_COLUMN,noitems);
-    m_rxlist->hideColumn(0);
-    m_rxlist->hideColumn(1);
-    m_rxlist->hideColumn(2);
-    m_rxlist->hideColumn(3);
-    m_rxlist->resizeColumnsToContents();
-    return;
-  }
-  */
-  //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
+
   m_resultsText->setText(buildText(headCount,entryCount,options));
   m_resultsText->show();
   if (m_rxlist->rowCount() > 0) {
