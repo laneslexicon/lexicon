@@ -55,6 +55,7 @@ SOURCES += main.cpp\
         history.cpp \
         place.cpp \
         fullsearch.cpp \
+        focustable.cpp \
         helpviewer.cpp \
         menubar.cpp \
         notes.cpp \
@@ -77,6 +78,7 @@ HEADERS  += laneslexicon.h \
             history.h \
             place.h \
             fullsearch.h \
+            focustable.h \
             helpviewer.h \
             menubar.h \
             notes.h \

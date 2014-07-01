@@ -28,15 +28,7 @@
 class ImLineEdit;
 class GraphicsEntry;
 class SearchOptions;
-class SearchResultsTable : public QTableWidget {
-    Q_OBJECT
- public:
-    SearchResultsTable(QWidget * parent = 0);
-
- protected:
-   void focusInEvent(QFocusEvent *);
-   void focusOutEvent(QFocusEvent *);
-};
+class FocusTable;
 class SearchWidget : public QWidget
 {
     Q_OBJECT
@@ -90,7 +82,7 @@ class SearchWidget : public QWidget
    QSpacerItem * m_spacer;
    QVBoxLayout * m_container;
    //   QTableWidget * m_list;
-   SearchResultsTable * m_rxlist;
+   FocusTable * m_rxlist;
    GraphicsEntry * m_text;
    QPushButton * m_findButton;
    QPushButton * m_hideOptionsButton;

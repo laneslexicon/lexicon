@@ -21,6 +21,7 @@
 #include <QWidget>
 #include <QRegExp>
 class GraphicsEntry;
+class FocusTable;
 class SearchResultsWidget : public QWidget
 {
     Q_OBJECT
@@ -46,7 +47,7 @@ class SearchResultsWidget : public QWidget
    QSqlQuery m_nodeQuery;
    QString m_target;
    QLabel * m_resultsText;
-   QTableWidget * m_list;
+   FocusTable * m_list;
    GraphicsEntry * m_text;
 /// for Arabic font from QSettings
    QFont m_resultsFont;

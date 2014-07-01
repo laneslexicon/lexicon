@@ -6,21 +6,10 @@
 #include "laneslexicon.h"
 #include "imlineedit.h"
 #include "nodeview.h"
+#include "focustable.h"
 #define NODE_COLUMN 2
 #define POSITION_COLUMN 3
 #define CONTEXT_COLUMN 4
-//extern LanesLexicon * getApp();
-SearchResultsTable::SearchResultsTable(QWidget * parent) : QTableWidget(parent) {
-}
-void SearchResultsTable::focusInEvent(QFocusEvent * event) {
-  this->setStyleSheet("");
-  QTableWidget::focusInEvent(event);
-}
-void SearchResultsTable::focusOutEvent(QFocusEvent * event) {
-  /// TODO get from INI
-  this->setStyleSheet("QTableView { selection-background-color : lightgray}");
-  QTableWidget::focusOutEvent(event);
-}
 /**
  *
  *
@@ -60,7 +49,7 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_list->installEventFilter(this);
   */
-  m_rxlist = new SearchResultsTable;
+  m_rxlist = new FocusTable;
   m_rxlist->setColumnCount(5);
   m_rxlist->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_rxlist->setSelectionMode(QAbstractItemView::SingleSelection);
