@@ -265,7 +265,7 @@ void LanesLexicon::onCloseTab(int ix) {
       delete notes;
       return;
   }
-  SearchWidget * search = qobject_cast<SearchWidget *>(m_tabs->widget(ix));
+  FullSearchWidget * search = qobject_cast<FullSearchWidget *>(m_tabs->widget(ix));
   if (search) {
     delete search;
     return;
@@ -1055,7 +1055,7 @@ void LanesLexicon::on_actionTest() {
     ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word);
     d->exec();
   }
-  SearchWidget * w = new SearchWidget(this);
+  FullSearchWidget * w = new FullSearchWidget(this);
   connect(w,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
   int c = this->getSearchCount();
   m_tabs->addTab(w,QString(tr("Search %1")).arg(c+1));;
@@ -1952,7 +1952,7 @@ void LanesLexicon::searchForRoot() {
 void LanesLexicon::search(int options,const QString & t) {
   QString target = t;
   if (options & Lane::Full) {
-      SearchWidget * s = new SearchWidget;
+      FullSearchWidget * s = new FullSearchWidget;
       s->setOptionsHidden(false);
       int c = this->getSearchCount();
       int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Search %1")).arg(c+1));
@@ -2152,7 +2152,7 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
 
 }
 /**
- * Can be invoked by: NodeView,SearchWidget
+ * Can be invoked by: NodeView,FullSearchWidget
  *
  * @param node
  */
@@ -2164,7 +2164,7 @@ void LanesLexicon::showSearchNode(const QString & node) {
 int LanesLexicon::getSearchCount() {
   int c = 0;
   for(int i=0;i < m_tabs->count();i++) {
-    SearchWidget * w = qobject_cast<SearchWidget *>(m_tabs->widget(i));
+    FullSearchWidget * w = qobject_cast<FullSearchWidget *>(m_tabs->widget(i));
     if (w) {
       c++;
     }

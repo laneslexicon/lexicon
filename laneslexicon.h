@@ -144,7 +144,7 @@ public:
     void pageSearch();
     void pageClear();
     void syncContents();
-    /// from SearchWidget
+    /// from FullSearchWidget
     void showSearchNode(const QString &);
  protected:
     void closeEvent(QCloseEvent *);

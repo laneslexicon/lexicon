@@ -15,7 +15,7 @@
  *
  * @param parent
  */
-SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
+FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
   setMaxRecords();
   QVBoxLayout * layout = new QVBoxLayout;
@@ -105,10 +105,10 @@ SearchWidget::SearchWidget(QWidget * parent) : QWidget(parent) {
   m_rxlist->hide();
   this->setFocus();
 }
-SearchWidget::~SearchWidget() {
+FullSearchWidget::~FullSearchWidget() {
   qDebug() << Q_FUNC_INFO;
 }
-void SearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
+void FullSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
   /// get the node
   item = item->tableWidget()->item(item->row(),2);
   QString node = item->text();
@@ -131,7 +131,7 @@ void SearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* pre
     QLOG_DEBUG() << "Invalid place returned for node" << node;
   }
 }
-void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
+void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   bool ok;
   /// get the node
   item = item->tableWidget()->item(item->row(),2);
@@ -177,7 +177,7 @@ void SearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   }
   */
 }
-bool SearchWidget::eventFilter(QObject * target,QEvent * event) {
+bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
@@ -213,7 +213,7 @@ bool SearchWidget::eventFilter(QObject * target,QEvent * event) {
   return QWidget::eventFilter(target,event);
 }
 /*
-void SearchWidget::search(const QString & target,int options) {
+void FullSearchWidget::search(const QString & target,int options) {
   m_target = target;
   m_searchOptions = options;
   m_nodes.clear();
@@ -303,17 +303,17 @@ void SearchWidget::search(const QString & target,int options) {
 
 }
 */
-void SearchWidget::setSearch(const QString & searchFor,int options) {
+void FullSearchWidget::setSearch(const QString & searchFor,int options) {
   m_target = searchFor;
   m_search->setOptions(options);
   m_findTarget->setText(m_target);
 }
-void SearchWidget::setOptionsHidden(bool hide) {
+void FullSearchWidget::setOptionsHidden(bool hide) {
   m_hideOptionsButton->setChecked(hide);
   hideOptions();
 }
 
-void SearchWidget::hideOptions() {
+void FullSearchWidget::hideOptions() {
   if (m_hideOptionsButton->isChecked()) {
     m_search->hide();
     m_hideOptionsButton->setText("Show options");
@@ -335,7 +335,7 @@ QString escaped = pattern;
     escaped.append("\"");
 
  */
-void SearchWidget::findTarget() {
+void FullSearchWidget::findTarget() {
   qDebug() << Q_FUNC_INFO;
   int options = m_search->getOptions();
   /// this shows text in progressbar
@@ -365,7 +365,7 @@ void SearchWidget::findTarget() {
  * @param target
  * @param options
  */
-void SearchWidget::regexSearch(const QString & target,int options) {
+void FullSearchWidget::regexSearch(const QString & target,int options) {
   bool replaceSearch = true;
   qDebug() << Q_FUNC_INFO;
   m_target = target;
@@ -508,7 +508,7 @@ void SearchWidget::regexSearch(const QString & target,int options) {
   m_rxlist->resizeColumnToContents(3);
   m_rxlist->resizeColumnToContents(4);
 }
-QString SearchWidget::buildText(int headCount,int entryCount,int options) {
+QString FullSearchWidget::buildText(int headCount,int entryCount,int options) {
   QString t;
   QString p1;
   QString p2;
@@ -560,7 +560,7 @@ QString SearchWidget::buildText(int headCount,int entryCount,int options) {
 
   return t;
 }
-void SearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos) {
+void FullSearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos) {
   QTableWidgetItem * item;
   int row = m_rxlist->rowCount();
   m_rxlist->insertRow(row);
@@ -621,7 +621,7 @@ void SearchWidget::addRow(const QString & root,const QString & headword, const Q
  *
  * @return
  */
-QString SearchWidget::buildSearchSql(int options) {
+QString FullSearchWidget::buildSearchSql(int options) {
   QString sql;
   if (options & Lane::Full) {
     sql = "select id,word,root,entry,node from xref where datasource = 1 ";
@@ -660,7 +660,7 @@ QString SearchWidget::buildSearchSql(int options) {
  *
  * @return
  */
-QString SearchWidget::buildRxSql(int options) {
+QString FullSearchWidget::buildRxSql(int options) {
   QString sql;
   //  whole word with diacritics
   //   select id,node where word = ?
@@ -678,7 +678,7 @@ QString SearchWidget::buildRxSql(int options) {
   }
   return sql;
 }
-QTextDocument * SearchWidget::fetchDocument(const QString & xml) {
+QTextDocument * FullSearchWidget::fetchDocument(const QString & xml) {
   /*
   if (1) {
     QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.xml").arg(node));
@@ -697,7 +697,7 @@ QTextDocument * SearchWidget::fetchDocument(const QString & xml) {
   doc->setHtml(html);
   return doc;
 }
-QString SearchWidget::transform(const QString & xml) {
+QString FullSearchWidget::transform(const QString & xml) {
   int ok = compileStylesheet(1,m_xsltSource);
   if (ok == 0) {
     QString html = xsltTransform(1,xml);
@@ -719,7 +719,7 @@ QString SearchWidget::transform(const QString & xml) {
   clearParseErrors();
   return QString();
 }
-void SearchWidget::readSettings() {
+void FullSearchWidget::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
   bool ok;
@@ -769,7 +769,7 @@ void SearchWidget::readSettings() {
   m_debug = settings->value("Debug",false).toBool();
   delete settings;
 }
-void SearchWidget::getTextFragments(QTextDocument * doc,const QString & target,int options) {
+void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,int options) {
   QRegExp rx;
   QString pattern;
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
@@ -823,7 +823,7 @@ void SearchWidget::getTextFragments(QTextDocument * doc,const QString & target,i
     c = doc->find(rx,position);
   }
 }
-void SearchWidget::setMaxRecords() {
+void FullSearchWidget::setMaxRecords() {
   bool ok = false;
   QSqlQuery maxq("select id from xref order by id desc limit 1");
   if (maxq.exec() && maxq.next())
@@ -836,7 +836,7 @@ void SearchWidget::setMaxRecords() {
  * lines beginning with - are omitted
  *
  */
-bool SearchWidget::readCssFromFile(const QString & name) {
+bool FullSearchWidget::readCssFromFile(const QString & name) {
   QFile f(name);
   if (! f.open(QIODevice::ReadOnly)) {
     QLOG_WARN()  << "Cannot open CSS file for reading: " << name
@@ -858,7 +858,7 @@ bool SearchWidget::readCssFromFile(const QString & name) {
   qDebug() << m_currentCSS;
   return true;
 }
-void SearchWidget::focusInEvent(QFocusEvent * event) {
+void FullSearchWidget::focusInEvent(QFocusEvent * event) {
   qDebug() << Q_FUNC_INFO << event;
   if (event->reason() == Qt::OtherFocusReason) {
     if (m_rxlist->rowCount() > 0) {
@@ -871,7 +871,7 @@ void SearchWidget::focusInEvent(QFocusEvent * event) {
   }
   QWidget::focusInEvent(event);
 }
-void SearchWidget::focusOutEvent(QFocusEvent * event) {
+void FullSearchWidget::focusOutEvent(QFocusEvent * event) {
   qDebug() << Q_FUNC_INFO << event;
   /*
   if (event->reason() == Qt::OtherFocusReason) {

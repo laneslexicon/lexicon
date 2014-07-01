@@ -29,14 +29,14 @@ class ImLineEdit;
 class GraphicsEntry;
 class SearchOptions;
 class FocusTable;
-class SearchWidget : public QWidget
+class FullSearchWidget : public QWidget
 {
     Q_OBJECT
 
  public:
-    //    SearchWidget(const QString & str,int options,QWidget * parent = 0);
-    SearchWidget(QWidget * parent = 0);
-    ~SearchWidget();
+    //    FullSearchWidget(const QString & str,int options,QWidget * parent = 0);
+    FullSearchWidget(QWidget * parent = 0);
+    ~FullSearchWidget();
    GraphicsEntry * getEntry() { return m_text;}
    void search(const QString &,int options);
    void regexSearch(const QString &,int options);

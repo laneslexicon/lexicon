@@ -8,7 +8,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSpacerItem>
-class SearchWidget;
+class FullSearchWidget;
 class SearchOptions : public QWidget {
   Q_OBJECT
 

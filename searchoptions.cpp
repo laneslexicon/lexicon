@@ -72,7 +72,7 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   mainlayout->addLayout(optionslayout);
   mainlayout->addLayout(forcelayout);
   mainlayout->addWidget(m_targetGroup);
-  if ( ! qobject_cast<SearchWidget *>(parent))
+  if ( ! qobject_cast<FullSearchWidget *>(parent))
     mainlayout->addSpacerItem(m_spacer);
 
   setLayout(mainlayout);
