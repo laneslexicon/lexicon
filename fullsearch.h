@@ -42,7 +42,7 @@ class FullSearchWidget : public QWidget
    void regexSearch(const QString &,int options);
    void setSearch(const QString & searchFor,int options);
    void setOptionsHidden(bool);
-
+   void focusTable();
  public slots:
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);
@@ -51,6 +51,7 @@ class FullSearchWidget : public QWidget
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);
+   //   void eventFilter(QObject *,QEvent *);
  private:
    void readSettings();
    QString buildText(int,int,int);

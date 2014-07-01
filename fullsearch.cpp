@@ -181,6 +181,22 @@ bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
+    case Qt::Key_Tab: {
+      m_findTarget->setFocus();
+      break;
+    }
+    case Qt::Key_Escape: {
+      QWidget * w = qobject_cast<QWidget *>(target);
+      while(w) {
+        QTabWidget * tabw = qobject_cast<QTabWidget *>(w);
+        if (tabw)  {
+          tabw->tabBar()->setFocus();
+          return true;
+        }
+        w = w->parentWidget();
+      }
+      break;
+    }
       case Qt::Key_Enter: {
         QLOG_DEBUG() << "hit enter on table";
         if (keyEvent->modifiers() && Qt::ControlModifier) {
@@ -881,4 +897,7 @@ void FullSearchWidget::focusOutEvent(QFocusEvent * event) {
   }
   */
   QWidget::focusOutEvent(event);
+}
+void FullSearchWidget::focusTable() {
+  m_rxlist->setFocus();
 }

@@ -22,6 +22,11 @@ void TabWidget::keyPressEvent(QKeyEvent * event) {
         search->focusTable();
         return;
       }
+      FullSearchWidget * fullsearch = qobject_cast<FullSearchWidget *>(this->currentWidget());
+      if (fullsearch) {
+        fullsearch->focusTable();
+        return;
+      }
       break;
     }
 
