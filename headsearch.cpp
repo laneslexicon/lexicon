@@ -1,6 +1,6 @@
 #include "graphicsentry.h"
 #include "application.h"
-#include "searchresults.h"
+#include "headsearch.h"
 #include "namespace.h"
 #include "laneslexicon.h"
 //extern LanesLexicon * getApp();

@@ -1,4 +1,4 @@
-#include "searchwidget.h"
+#include "fullsearch.h"
 #include "searchoptions.h"
 #include "graphicsentry.h"
 #include "application.h"
@@ -22,7 +22,7 @@ void SearchResultsTable::focusOutEvent(QFocusEvent * event) {
   QTableWidget::focusOutEvent(event);
 }
 /**
- *o
+ *
  *
  * @param parent
  */

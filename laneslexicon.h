@@ -53,7 +53,6 @@
 #include "place.h"
 #include "bookmarkwidget.h"
 #include "scripts.h"
-#include "searchresults.h"
 #include "xsltsupport.h"
 #include "menubar.h"
 #include "helpviewer.h"

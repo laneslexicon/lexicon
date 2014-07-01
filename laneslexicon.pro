@@ -50,11 +50,11 @@ SOURCES += main.cpp\
         graphicsentry.cpp \
         entryitem.cpp \
         xsltsupport.cpp \
-        searchwidget.cpp \
+        headsearch.cpp \
         noteswidget.cpp \
         history.cpp \
         place.cpp \
-        searchresults.cpp \
+        fullsearch.cpp \
         helpviewer.cpp \
         menubar.cpp \
         notes.cpp \
@@ -72,11 +72,11 @@ HEADERS  += laneslexicon.h \
             graphicsentry.h \
             entryitem.h \
             xsltsupport.h \
-            searchwidget.h \
+            headsearch.h \
             noteswidget.h \
             history.h \
             place.h \
-            searchresults.h \
+            fullsearch.h \
             helpviewer.h \
             menubar.h \
             notes.h \

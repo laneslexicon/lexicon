@@ -1,5 +1,5 @@
-#ifndef __SEARCHWIDGET_H__
-#define __SEARCHWIDGET_H__
+#ifndef __FULLSEARCH_H__
+#define __FULLSEARCH_H__
 #include <QDebug>
 #include <QSplitter>
 #include <QTextEdit>

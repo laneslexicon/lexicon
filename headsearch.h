@@ -1,5 +1,5 @@
-#ifndef __SEARCHRESULTS_H__
-#define __SEARCHRESULTS_H__
+#ifndef __HEADSEARCH_H__
+#define __HEADSEARCH_H__
 #include <QDebug>
 #include <QSplitter>
 #include <QTextEdit>

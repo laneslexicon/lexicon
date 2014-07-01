@@ -1,5 +1,5 @@
 #include "searchoptions.h"
-#include "searchwidget.h"
+#include "fullsearch.h"
 #include "namespace.h"
 SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) {
   m_more = false;

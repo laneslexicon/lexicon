@@ -1,7 +1,8 @@
 #include "laneslexicon.h"
 #include "searchoptions.h"
 #include "searchdialogs.h"
-#include "searchwidget.h"
+#include "fullsearch.h"
+#include "headsearch.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
