@@ -1,82 +1,106 @@
 #ifndef __SEARCHWIDGET_H__
 #define __SEARCHWIDGET_H__
-#include <QWidget>
+#include <QDebug>
+#include <QSplitter>
+#include <QTextEdit>
+#include <QSplitter>
+#include <QVBoxLayout>
 #include <QPushButton>
-#include <QGroupBox>
-#include <QRadioButton>
-#include <QDialog>
-#include <QCheckBox>
-#include <QGridLayout>
-#include <QDialogButtonBox>
+#include <QSettings>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QFile>
 #include <QLabel>
-#include "application.h"
-#include "imedit.h"
-#include "imlineedit.h"
-#include "keyboardwidget.h"
-
-class SearchDialog : public QDialog {
-  Q_OBJECT
-
+#include <QSettings>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QTextLine>
+#include <QTextLayout>
+#include <QTextBlock>
+#include <QFont>
+#include <QWidget>
+#include <QRegExp>
+#include <QProgressBar>
+#include <QEventLoop>
+#ifdef __APPLE__
+#include <QStyleFactory>
+#endif
+class ImLineEdit;
+class GraphicsEntry;
+class SearchOptions;
+class SearchResultsTable : public QTableWidget {
+    Q_OBJECT
  public:
-  SearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
-  QString getText();
-  void setPrompt(const QString &);
-  bool getNewTab();
-  void setNewTab(bool v);
-  bool getSwitchFocus();
-  void setSwitchFocus(bool v);
-  virtual void setup();
-    public slots:
-    void keymapChanged();
-    virtual void showOptions(bool);
-    void showKeyboard();
+    SearchResultsTable(QWidget * parent = 0);
+
  protected:
-
-    virtual void addOptions(QGridLayout *);
-    KeyboardWidget * m_keyboard;
-    bool m_attached;
-    QLabel * m_prompt;
-    QGroupBox * m_group;
-    ImLineEdit * m_edit;
-    QCheckBox * m_newTab;
-    QCheckBox * m_switchFocus;
-    QDialogButtonBox * m_buttonBox;
-    QPushButton * m_moreButton;
-    QPushButton * m_findButton;
-    QPushButton * m_keyboardButton;
-    QWidget * m_options;
+   void focusInEvent(QFocusEvent *);
+   void focusOutEvent(QFocusEvent *);
 };
-class WordSearchDialog : public SearchDialog {
-  Q_OBJECT
+class SearchWidget : public QWidget
+{
+    Q_OBJECT
+
  public:
-  WordSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
-  virtual void setup();
-  public slots:
-    virtual void showOptions(bool);
+    //    SearchWidget(const QString & str,int options,QWidget * parent = 0);
+    SearchWidget(QWidget * parent = 0);
+    ~SearchWidget();
+   GraphicsEntry * getEntry() { return m_text;}
+   void search(const QString &,int options);
+   void regexSearch(const QString &,int options);
+   void setSearch(const QString & searchFor,int options);
+   void setOptionsHidden(bool);
+
+ public slots:
+   void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
+   void itemDoubleClicked(QTableWidgetItem *);
+   void hideOptions();
+   void findTarget();
  protected:
-
-  virtual void addOptions(QGridLayout *);
-
+   void focusInEvent(QFocusEvent *);
+   void focusOutEvent(QFocusEvent *);
  private:
-    QCheckBox * m_ignoreDiacritics;
-    QCheckBox * m_wholeWordMatch;
-
-};
-class NodeSearchDialog : public QDialog {
-  Q_OBJECT
-
- public:
-  NodeSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
-  QString getText() const;
-  bool getNewTab() const;
-  void setNewTab(bool v);
- private:
-  QLabel * m_prompt;
-  QLineEdit * m_edit;
-  QCheckBox * m_newTab;
-  QCheckBox * m_switchFocus;
-  QDialogButtonBox * m_buttonBox;
-  QPushButton * m_findButton;
-  QWidget * m_options;
+   void readSettings();
+   QString buildText(int,int,int);
+   bool readCssFromFile(const QString &);
+   void setMaxRecords();
+   int m_maxRecordCount;
+   QProgressBar * m_progress;
+   ImLineEdit * m_findTarget;
+   bool eventFilter(QObject * target,QEvent * event);
+   QStringList m_fragments;
+   QList<int> m_positions;
+   void addRow(const QString &,const QString &,const QString &,const QString &,int);
+   void getTextFragments(QTextDocument * doc,const QString & target,int options);
+   QString buildSearchSql(int);
+   QString buildRxSql(int);
+   QTextDocument * fetchDocument(const QString & node);
+   QString transform(const QString & xml);
+   QTextDocument m_nodeDoc;
+   SearchOptions * m_search;
+   bool m_debug;
+   int m_fragmentSize;
+   int m_searchOptions;
+   QSqlQuery m_query;
+   QSqlQuery m_nodeQuery;
+   QString m_target;
+   QRegExp m_currentRx;
+   QString m_xsltSource;
+   QLabel * m_resultsText;
+   QSpacerItem * m_spacer;
+   QVBoxLayout * m_container;
+   //   QTableWidget * m_list;
+   SearchResultsTable * m_rxlist;
+   GraphicsEntry * m_text;
+   QPushButton * m_findButton;
+   QPushButton * m_hideOptionsButton;
+   QStringList m_nodes;
+   QString m_currentCSS;
+   int m_defaultOptions;
+/// for Arabic font from QSettings
+   QFont m_resultsFont;
+ signals:
+   void searchResult(const QString &);
+   void showNode(const QString &);
 };
 #endif

@@ -100,6 +100,9 @@ class GraphicsEntry : public QWidget {
     void deleteNotes();
     void focusPlace();
  private:
+
+    QString m_focusNode;
+
     QColor m_supplementBg;
     bool m_notesEnabled;
     bool m_showNodeOnly;
@@ -134,7 +137,7 @@ class GraphicsEntry : public QWidget {
     QString m_narrowKey;
     QString m_searchKey;
     QString m_clearKey;
-
+    QString m_homeKey;
     int m_widenStep;
     int m_defaultWidth;
 
@@ -144,7 +147,7 @@ class GraphicsEntry : public QWidget {
     EntryItem * createEntry(const QString & xml);
     //    const XalanCompiledStylesheet * m_compiledXsl;
     //    bool showNode(const QString &,bool thisPageOnly = false);
-    Place showPlace(const Place &,bool thisPageOnly = false);
+    Place showPlace(const Place &,bool thisPageOnly,int options);
 
     qreal m_scale;
 
@@ -194,7 +197,7 @@ class GraphicsEntry : public QWidget {
     void clearPage();
     void searchPage();
     void findCount(int);
-    void gotoNode(const Place & p,bool);
+    void gotoNode(const Place & p,int);
 };
 
 class LaneGraphicsView : public QGraphicsView {

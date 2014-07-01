@@ -627,7 +627,7 @@ void im_char_set(InputMapper * m,im_char * ic,QString c, int v,bool consume) {
   ic->processed = true;
 }
 im_char * im_convert(InputMapper * im,const QString & mapname,int curr_char, int prev_char) {
-  qDebug() << "im_convert" << mapname << curr_char << prev_char;
+  //  qDebug() << "im_convert" << mapname << curr_char << prev_char;
   im_char * ret = new im_char();
   im_char_set(im,ret,QString(curr_char),curr_char,false);
   ret->iv = curr_char;
@@ -722,7 +722,7 @@ bool im_match_diacritics(KeyEntry * k,QStringList & d) {
 }
 QString im_convert_string(InputMapper * im,const QString & mapping,const QString & source, bool * ok) {
   QString retval;
-  qDebug() <<  Q_FUNC_INFO << mapping << source;
+  //  qDebug() <<  Q_FUNC_INFO << mapping << source;
   QString mname(mapping);
   KeyMap * map = im_get_map(im,mname);
   if (map == NULL) {

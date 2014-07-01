@@ -1,4 +1,7 @@
 #include "laneslexicon.h"
+#include "searchoptions.h"
+#include "searchdialogs.h"
+#include "searchwidget.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
@@ -238,7 +241,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(clearPage()),this,SLOT(pageClear()));
   connect(entry,SIGNAL(searchPage()),this,SLOT(pageSearch()));
 
-  connect(entry,SIGNAL(gotoNode(const Place &,bool)),this,SLOT(gotoPlace(const Place &,bool)));
+  connect(entry,SIGNAL(gotoNode(const Place &,int)),this,SLOT(gotoPlace(const Place &,int)));
   //  connect(entry,SIGNAL(saveNote(Note *)),this,SLOT(saveNote(Note *)));
 }
 void LanesLexicon::onCloseTab(int ix) {
@@ -260,6 +263,13 @@ void LanesLexicon::onCloseTab(int ix) {
       m_tabs->removeTab(ix);
       delete notes;
       return;
+  }
+  SearchWidget * search = qobject_cast<SearchWidget *>(m_tabs->widget(ix));
+  if (search) {
+    qDebug() << "begin delete search";
+    delete search;
+    qDebug() << "end delete search";
+    return;
   }
   m_tabs->removeTab(ix);
 }
@@ -352,9 +362,11 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == QString("Focus Content").toCaseFolded()) {
     /// if an item has focus, this loses it
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-
     if (entry) {
-      entry->shiftFocus();
+      entry->focusPlace();
+    }
+    else {
+      m_tabs->currentWidget()->setFocus();
     }
   }
   else if (key == QString("Focus Tree").toCaseFolded()) {
@@ -407,6 +419,9 @@ void LanesLexicon::shortcut(const QString & k) {
   }
   else if (key == "show notes") {
     showNoteBrowser();
+  }
+  else if (key == "delete tab") {
+    this->onCloseTab(m_tabs->currentIndex());
   }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
@@ -581,7 +596,7 @@ void LanesLexicon::createToolBar() {
   mainbar->setObjectName("maintoolbar");
 
   mainbar->addAction(m_exitAction);
-  //  mainbar->addAction(m_testAction);
+  mainbar->addAction(m_testAction);
 
   //  QToolBar * history = addToolBar(tr("History"));
   //  history->setObjectName("historytoolbar");
@@ -847,31 +862,33 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
   return m_db.open();
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
-  bool newTab = false;
+  int options = 0;
   QString root = item->text(0);
   QString supp = item->text(1);
   int p = 0;
   QLOG_DEBUG() << Q_FUNC_INFO << root << supp;
   /// check that the user has not clicked on a letter
-  if (item->parent() != 0) {
-    /// and that they've clicked on a root
-    if  (item->parent()->parent() == 0) {
-      m_tree->addEntries(root,item);
-      if (supp == "*") {
-        p = 1;
-      }
-      if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-        newTab = true;
-      }
-      Place m(root,p);
-      m.setType(Place::User);
-      showPlace(m,newTab);
-    }
-    else {
-      /// double clicked on head word, highlight it
-      entryActivated(item,0);
-    }
+  if (item->parent() == 0) {
+    return;
   }
+  if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+      options |= Lane::Create_Tab;
+  }
+  /// check whether root or head word
+  if  (item->parent()->parent() == 0) {
+    m_tree->addEntries(root,item);
+    if (supp == "*") {
+      p = 1;
+    }
+    Place m(root,p);
+    m.setType(Place::User);
+    showPlace(m,options);
+  }
+  else {
+    /// double clicked on head word, highlight it
+    entryActivated(item,0);
+  }
+  /// TODO are these still needed ?
   if (m_treeKeepsFocus) {
     QLOG_DEBUG() << "tree focus";
     m_tree->setFocus();
@@ -889,6 +906,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
  * @param col
  */
 void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
+  int options = 0;
   /// ignore clicks on the root or the letter
   QLOG_DEBUG() << Q_FUNC_INFO;
   if ((item->parent() == 0) || (item->parent()->parent() == 0)) {
@@ -921,7 +939,8 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
         Place p;
         p.setNode(node);
         /// TODO needs to check whether to open in new tab
-        p = showPlace(p,true);
+        options |= Lane::Create_Tab;
+        p = showPlace(p,options);
       }
     }
   }
@@ -930,10 +949,10 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   }
 }
 
-void LanesLexicon::gotoPlace(const Place & p,bool createTab) {
-  showPlace(p,createTab);
+void LanesLexicon::gotoPlace(const Place & p,int options) {
+  showPlace(p,options);
 }
-Place LanesLexicon::showPlace(const Place & p,bool createTab) {
+Place LanesLexicon::showPlace(const Place & p,int options) {
   Place np;
   GraphicsEntry * entry;
   if (! p.isValid()) {
@@ -941,16 +960,16 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
   }
   int currentTab = m_tabs->currentIndex();
   if (currentTab == -1) {
-    createTab = true;
+    options |= Lane::Create_Tab;
   }
   else {
     /// if current widget not graphicsentry, set createtab
-    entry = dynamic_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
+    entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (! entry ) {
-      createTab = true;
+      options |= Lane::Create_Tab;
     }
   }
-  if (createTab) {
+  if (options & Lane::Create_Tab) {
     /// turn history on as the user has clicked on something
     /// and the root is not already shown
     entry = new GraphicsEntry(this);
@@ -958,9 +977,10 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab) {
     entry->installEventFilter(this);
     np = entry->getXmlForRoot(p);
 
-    m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
-    /// TODO decide whether to make new tab the current tab
-    //    entry->setFocus();
+    int ix = m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
+    if (options & Lane::Switch_Tab) {
+      m_tabs->setCurrentIndex(ix);
+    }
   }
   else {
     if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
@@ -1027,6 +1047,19 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
 void LanesLexicon::on_actionTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
+  if (0) {
+  SearchOptions * s = new SearchOptions(Lane::Word);
+    s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
+    m_tabs->addTab(s,"Test");
+    s->setOptions(Lane::Create_Tab | Lane::Regex | Lane::Arabic);
+    //    s->setOptions(0);
+    ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word);
+    d->exec();
+  }
+  SearchWidget * w = new SearchWidget(this);
+  connect(w,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+  int c = this->getSearchCount();
+  m_tabs->addTab(w,QString(tr("Search %1")).arg(c+1));;
 }
 /**
  * TODO tidy up navMode
@@ -1070,6 +1103,35 @@ void LanesLexicon::readSettings() {
   settings->beginGroup("Search");
   m_searchNewTab = settings->value("New tab",true).toBool();
   m_searchSwitchTab = settings->value("Switch tab",true).toBool();
+  m_defaultSearchOptions = 0;
+  QString v;
+  v  = settings->value("Where",QString("full")).toString();
+  if (v == "full")
+    m_defaultSearchOptions |= Lane::Full;
+  else
+    m_defaultSearchOptions |= Lane::Head;
+
+  v  = settings->value("Type",QString("normal")).toString();
+  if (v == "normal")
+    m_defaultSearchOptions |= Lane::Normal;
+  else
+    m_defaultSearchOptions |= Lane::Regex;
+
+  v = settings->value("Ignore diacritics",QString("yes")).toString();
+  if (v == "yes")
+    m_defaultSearchOptions |= Lane::Ignore_Diacritics;
+
+  v = settings->value("Whole word",QString("no")).toString();
+  if (v == "yes")
+    m_defaultSearchOptions |= Lane::Whole_Word;
+
+  v = settings->value("Target",QString("Arabic")).toString();
+
+  if (v == "Arabic")
+    m_defaultSearchOptions |= Lane::Arabic;
+  else
+    m_defaultSearchOptions |= Lane::Buckwalter;
+
   settings->endGroup();
 
   settings->beginGroup("Debug");
@@ -1194,7 +1256,7 @@ void LanesLexicon::restoreTabs() {
     if (settings->value("type","entry").toString() == "notes") {
       NoteBrowser * notes = new NoteBrowser(this);
       m_tabs->addTab(notes,tr("Notes"));
-        j++;
+      j++;
     }
     else {
       Place p;
@@ -1320,15 +1382,17 @@ void LanesLexicon::on_actionPrevRoot() {
   }
 }
 void LanesLexicon::on_actionFirstRoot() {
+  int options = 0;
   Place p;
   p.setRoot(m_firstRoot);
-  showPlace(p,false);
+  showPlace(p,options);
   m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::on_actionLastRoot() {
+  int options = 0;
   Place p;
   p.setRoot(m_lastRoot);
-  showPlace(p,false);
+  showPlace(p,options);
   m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::rootChanged(const QString & root,const QString & node) {
@@ -1471,12 +1535,13 @@ Place LanesLexicon::getCurrentPlace() {
  * @param key
  */
 void LanesLexicon::bookmarkShortcut(const QString & key) {
+  int options = 0;
   if (m_revertEnabled && (key == "revert")) {
     if (! m_bookmarks.contains("-here-")) {
       return;
     }
     Place p = m_bookmarks.value("-here-");
-    showPlace(p,false);
+    showPlace(p,options);
     m_revertEnabled = false;
     return;
   }
@@ -1561,6 +1626,7 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
 
 }
 void LanesLexicon::bookmarkJump(const QString & id) {
+  int options = 0;
   if ( ! m_bookmarks.contains(id) ) {
     QLOG_WARN() << QString(tr("Unknown bookmark jump activated: %1")).arg(id);
     return;
@@ -1574,7 +1640,7 @@ void LanesLexicon::bookmarkJump(const QString & id) {
   Place cp = this->getCurrentPlace();
   cp.setType(Place::Bookmark);
   m_bookmarks.insert("-here-",cp);
-  showPlace(p,false);
+  showPlace(p,options);
   m_revertEnabled = true;
   updateMenu();
 }
@@ -1734,6 +1800,9 @@ void LanesLexicon::movePrevious(const Place & p) {
     on_actionPrevPage();
   }
 }
+void LanesLexicon::setStatus(const QString & txt) {
+  statusBar()->showMessage(txt);
+}
 void LanesLexicon::updateStatusBar() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
@@ -1829,6 +1898,7 @@ void LanesLexicon::on_actionDocs() {
 }
 void LanesLexicon::testSlot() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+
 }
 void LanesLexicon::searchForPage() {
     bool ok;
@@ -1844,11 +1914,10 @@ void LanesLexicon::searchForPage() {
 void LanesLexicon::searchForRoot() {
   /// TODO this will show 'ignore diacritics' and 'whole word'
   /// which doesn't make much sense ?
-    SearchDialog * d = new SearchDialog(this);
-    d->setup();
-    d->setWindowTitle(tr("Search for Root"));
-    d->setPrompt(tr("Find root"));
-    d->setNewTab(m_searchNewTab);
+  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Root,this);
+  //    d->setWindowTitle(tr("Search for Root"));
+  //    d->setPrompt(tr("Find root"));
+  //    d->setNewTab(m_searchNewTab);
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
@@ -1856,10 +1925,21 @@ void LanesLexicon::searchForRoot() {
         if (! UcdScripts::isScript(t,"Arabic")) {
           t = convertString(t);
         }
-        Place p = showPlace(Place(t),d->getNewTab());
+        int opts = d->getOptions();
+        Place p = showPlace(Place(t),(opts & Lane::Create_Tab));
         if (! p.isValid()) {
           QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
+          msgBox.setObjectName("rootnotfound");
+          msgBox.setTextFormat(Qt::RichText);
+          //          msgBox.setStyleSheet(".arabic { font-family : Amiri;font-size : 18px}");
+          /*this works, but affects the english and the arabic:
+          msgBox.setStyleSheet("font-family :  Amiri; font-size : 18px");
+          */
+          /// this also works
+          /// msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
+          ///
+          /// TODO get this from INI file
+          msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
           msgBox.exec();
         }
       }
@@ -1867,67 +1947,68 @@ void LanesLexicon::searchForRoot() {
     delete d;
 }
 /**
- * TODO need to distinguish between searching for an entry i.e a head word
- * and searching within the text
+ *
+ *
  */
 void LanesLexicon::searchForWord() {
-    WordSearchDialog * d = new WordSearchDialog(this);
-    d->setup();
-    d->setWindowTitle(tr("Search for Word"));
-    d->setPrompt(tr("Find word"));
-    if (d->exec()) {
-      QString t = d->getText();
-      if (! t.isEmpty()) {
-        if (! UcdScripts::isScript(t,"Arabic")) {
-          t = convertString(t);
-        }
-        SearchResultsWidget * s = new SearchResultsWidget(t,this);
-        if (s->count() == 0) {
-          QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
-          msgBox.exec();
-          delete s;
-        }
-        else {
-          int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
-          m_tabs->setCurrentIndex(i);
-          setSignals(s->getEntry());
-        }
-      }
+  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
+  d->setOptions(m_defaultSearchOptions);
+  if (d->exec()) {
+    QString t = d->getText();
+    if (! t.isEmpty()) {
+      SearchWidget * s = new SearchWidget;
+      s->setOptionsHidden(false);
+      int c = this->getSearchCount();
+      int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Search %1")).arg(c+1));
+      m_tabs->setCurrentIndex(i);
+      s->setSearch(t,d->getOptions());
+      s->findTarget();
+      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
     }
-    delete d;
+  }
+  delete d;
 }
+
 /// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
-    WordSearchDialog * d = new WordSearchDialog(this);
-    d->setup();
-    d->setWindowTitle(tr("Search for Entry"));
-    d->setPrompt(tr("Find entry"));
-    if (d->exec()) {
-      QString t = d->getText();
-      if (! t.isEmpty()) {
-        if (! UcdScripts::isScript(t,"Arabic")) {
-          t = convertString(t);
-        }
-        SearchResultsWidget * s = new SearchResultsWidget(t,this);
-        if (s->count() == 0) {
-          QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
-          msgBox.exec();
-          delete s;
-        }
-        else {
-          int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
-          m_tabs->setCurrentIndex(i);
-          setSignals(s->getEntry());
-        }
+  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
+  int options = m_defaultSearchOptions;
+  if (options & Lane::Full) {
+    options -=  Lane::Full;
+    options |= Lane::Head;
+  }
+  d->setOptions(options);
+  if (d->exec()) {
+    QString t = d->getText();
+    if (! t.isEmpty()) {
+      if (! UcdScripts::isScript(t,"Arabic")) {
+        t = convertString(t);
+      }
+      SearchResultsWidget * s = new SearchResultsWidget(this);
+      connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
+      s->search(t,d->getOptions());
+      if (s->count() == 0) {
+        QMessageBox msgBox;
+        msgBox.setObjectName("wordnotfound");
+        msgBox.setTextFormat(Qt::RichText);
+        msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
+        msgBox.exec();
+        delete s;
+      }
+      else {
+        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,t);
+        m_tabs->setCurrentIndex(i);
+        setSignals(s->getEntry());
+        s->showFirst();
       }
     }
-    delete d;
+  }
+  delete d;
 }
 void LanesLexicon::searchForNode() {
+  int options = 0;
     NodeSearchDialog * d = new NodeSearchDialog(this);
-    d->setNewTab(m_searchNewTab);
+    d->setOptions(m_searchNewTab | m_searchSwitchTab);
     if (d->exec()) {
       QString t = d->getText();
       if (! t.isEmpty()) {
@@ -1936,10 +2017,10 @@ void LanesLexicon::searchForNode() {
         //        Place p = showNode(t,true);
         Place p;
         p.setNode(t);
-        p = showPlace(p,d->getNewTab());
+        p = showPlace(p,d->getOptions());
         if (! p.isValid()) {
           QMessageBox msgBox;
-          msgBox.setText(QString(tr("%1 not found")).arg(t));
+          msgBox.setText(QString(tr("Node not found: %1")).arg(t));
           msgBox.exec();
         }
       }
@@ -2060,4 +2141,24 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
   }
   return -1;
 
+}
+/**
+ * Can be invoked by: NodeView,SearchWidget
+ *
+ * @param node
+ */
+void LanesLexicon::showSearchNode(const QString & node) {
+  Place p;
+  p.setNode(node);
+  this->gotoPlace(p,Lane::Create_Tab);
+}
+int LanesLexicon::getSearchCount() {
+  int c = 0;
+  for(int i=0;i < m_tabs->count();i++) {
+    SearchWidget * w = qobject_cast<SearchWidget *>(m_tabs->widget(i));
+    if (w) {
+      c++;
+    }
+  }
+  return c;
 }

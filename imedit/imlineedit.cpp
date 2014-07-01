@@ -5,6 +5,10 @@ ImLineEdit::ImLineEdit(QWidget * parent)
   m_mapper = im_new();
   m_prev_char = 0;
   m_debug = false;
+  m_forceLTR = false;
+  this->setText("كتب");
+  connect(this,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
+  //this->setText("abcd");
 }
 ImLineEdit::~ImLineEdit() {
   im_free(m_mapper);
@@ -90,15 +94,23 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   if (m_debug) {
     QString t;
     QTextStream out(&t);
-    out << "ImEdit in: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << event->key() << " " << UcdScripts::getScript(event->key());
+    out << "ImLineEdit in: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << event->key() << " " << UcdScripts::getScript(event->key());
     out.reset();
     out << " " << event->text();
-
+    qDebug() << t;
   }
   if ( m_activeMap.isEmpty()) {
     return QLineEdit::keyPressEvent(event);
   }
+  qDebug() << this->text() << this->text().size() << this->cursorPosition();
 
+  if ((m_forceLTR) && (this->cursorPosition() == 1)) {
+    if (UcdScripts::getScript(event->key()) == "Unknown") {
+      event->ignore();
+      this->setCursorPosition(1);
+      return;
+    }
+  }
   //event->text().toUtf8().data());
   const QChar * uc = event->text().unicode();
   pc = uc->unicode();
@@ -120,7 +132,7 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
       out << "ImLineEdit out: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << nevent->key();
       out.reset();
       out << nevent->text();
-
+      qDebug() << t;
     }
     //     QApplication::postEvent(event->target, nevent);
     return;
@@ -129,4 +141,27 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
     m_prev_char = pc;
     QLineEdit::keyPressEvent(event);
   }
+}
+void ImLineEdit::setForceLTR(bool v) {
+  QString t = this->text();
+  QString ltr(QChar(0x202d));
+
+  disconnect(this,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
+  if (! v ) {
+      this->setCursorPosition(this->text().size());
+      this->setText(t.remove(ltr));
+  }
+  else {
+    if (! t.startsWith(ltr)) {
+      t.remove(ltr);
+      this->setText(ltr + t);
+    }
+  }
+  m_forceLTR = v;
+  this->setFocus();
+  this->setCursorPosition(this->text().size());
+  connect(this,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
+}
+void ImLineEdit::onTextChanged(const QString & /* t */) {
+  this->setForceLTR(m_forceLTR);
 }

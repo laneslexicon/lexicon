@@ -36,6 +36,7 @@ void freeXslt() {
 #endif
 #ifdef USE_LIBXSLT
 static xsltStylesheetPtr cur;
+static xsltStylesheetPtr curNode;
 QStringList xmlParseErrors;
 void initXslt() {
    static bool m_init = false;
@@ -53,16 +54,27 @@ void initXslt() {
  *
  * @return 0 if ok, otherwise the number of errors
  */
-int compileStylesheet(const QString & xsl) {
+int compileStylesheet(int type,const QString & xsl) {
+  if (type == 0) {
    if (cur == 0) {
       /// if errors in xslt they will be xmlParseErrors
       cur = xsltParseStylesheetFile((const xmlChar *)xsl.toUtf8().data());
       return xmlParseErrors.size();
    }
    return 0;
+  }
+  if (type == 1) {
+   if (curNode == 0) {
+      /// if errors in xslt they will be xmlParseErrors
+      curNode = xsltParseStylesheetFile((const xmlChar *)xsl.toUtf8().data());
+      return xmlParseErrors.size();
+   }
+   return 0;
+  }
+  return 0;
 }
 
-QString xsltTransform(const QString & xml) {
+QString xsltTransform(int type,const QString & xml) {
   QString result;
   xmlDocPtr doc, res;
   const char *params[16 + 1];
@@ -73,10 +85,17 @@ QString xsltTransform(const QString & xml) {
   if (doc == 0) {
      return QString();
   }
-  res = xsltApplyStylesheet(cur, doc, params);
+
   xmlChar * buf;
   int sz;
-  xsltSaveResultToString(&buf,&sz, res,cur);
+  if (type == 0) {
+    res = xsltApplyStylesheet(cur, doc, params);
+    xsltSaveResultToString(&buf,&sz, res,cur);
+  }
+  else {
+    res = xsltApplyStylesheet(curNode, doc, params);
+    xsltSaveResultToString(&buf,&sz, res,curNode);
+  }
 //  xsltSaveResultToFile(stdout, res, cur);
 
   xmlFreeDoc(res);
@@ -91,6 +110,7 @@ QString xsltTransform(const QString & xml) {
 }
 void freeXslt() {
   xsltFreeStylesheet(cur);
+  xsltFreeStylesheet(curNode);
   xsltCleanupGlobals();
   xmlCleanupParser();
 }

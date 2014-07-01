@@ -61,8 +61,10 @@ SOURCES += main.cpp\
         notedialog.cpp \
         notebrowser.cpp \
         tabwidget.cpp \
-        application.cpp
-
+        application.cpp \
+        searchoptions.cpp \
+        searchdialogs.cpp \
+        nodeview.cpp
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
@@ -81,4 +83,8 @@ HEADERS  += laneslexicon.h \
             notedialog.h \
             notebrowser.h \
             tabwidget.h \
-            application.h
+            namespace.h \
+            application.h \
+            searchoptions.h \
+            searchdialogs.h \
+            nodeview.h

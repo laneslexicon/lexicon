@@ -26,11 +26,14 @@ class ImLineEdit : public QLineEdit {
     QStringList getMaps() { return m_mapper->getMaps();};
     QString getActiveMap() { return m_activeMap;};
     QString getNullMap() { return m_nullMap;}
+    void setDebug(bool v) { m_debug = v;}
     void readSettings(QSettings * settings = 0);
     public slots:
     bool loadMap(const QString & filename,const QString & mapname = QString());
     void activateMap(const QString &,bool enable = true);
     void shortcutActivated();
+    void setForceLTR(bool);
+    void onTextChanged(const QString &);
   private:
     InputMapper * m_mapper;
     ushort m_prev_char;
@@ -38,6 +41,7 @@ class ImLineEdit : public QLineEdit {
     QString m_activeMap;
     QString m_nullMap;
     bool m_debug;
+    bool m_forceLTR;
   protected:
     virtual void keyPressEvent(QKeyEvent *e);
 

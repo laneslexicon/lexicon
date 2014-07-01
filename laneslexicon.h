@@ -51,7 +51,6 @@
 #include "history.h"
 #include "QsLog.h"
 #include "place.h"
-#include "searchwidget.h"
 #include "bookmarkwidget.h"
 #include "scripts.h"
 #include "searchresults.h"
@@ -61,6 +60,7 @@
 #include "notes.h"
 #include "notebrowser.h"
 #include "tabwidget.h"
+#include "namespace.h"
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
@@ -68,6 +68,7 @@ class LanesLexicon : public QMainWindow
 public:
     explicit LanesLexicon(QWidget *parent = 0);
     ~LanesLexicon();
+
     QSize sizeHint() const;
     void readSettings();
     void writeSettings();
@@ -77,8 +78,9 @@ public:
     NoteMaster * notes();
     enum NavMode {ByRoot, ByPage };
     public slots:
-    void gotoPlace(const Place &,bool newTab = false);
+    void gotoPlace(const Place &,int);
     int hasPlace(const Place & p,int searchtype,bool setFocus);
+    void setStatus(const QString &);
     //    void saveNote(Note *);
     private slots:
       void testSlot();
@@ -143,15 +145,17 @@ public:
     void pageSearch();
     void pageClear();
     void syncContents();
-
+    /// from SearchWidget
+    void showSearchNode(const QString &);
  protected:
     void closeEvent(QCloseEvent *);
 private:
     void cleanup();
-    Place showPlace(const Place &,bool newTab = false);
+    Place showPlace(const Place &,int);
     QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
     /// look through all tabs for the given node, -1 if not found, else tab index
     int searchTabs(const QString & node);
+    int m_defaultSearchOptions;
     QString m_configFile;
     QString m_interface;    // "default","minimal"
     QPrinter m_printer;
@@ -280,6 +284,8 @@ private:
     QAction * m_clearAction;
     /// Notes
     NoteMaster * m_notes;
+    ///
+    int getSearchCount();
  signals:
    void nodeActivated(const QString & node,const QString & word);
 };

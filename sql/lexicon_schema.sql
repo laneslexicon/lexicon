@@ -17,4 +17,4 @@ CREATE INDEX 'xref_bword' on xref (bword asc);
 CREATE INDEX 'xref_word' on xref (word asc);
 CREATE INDEX 'bareword_index' on entry (bareword asc);
 CREATE INDEX page_index on entry (page asc);
-CREATE TABLE source (integer id primary key, sourceid integer,description text,version integer);
+CREATE TABLE lexicon (id integer primary key, sourceid integer,description text,createversion text,createdate text,updateversion text,updatedate text,xmlversion text,dbid text);

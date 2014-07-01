@@ -232,7 +232,11 @@ void KeyDef::setLevelValues(int group,int level,QSettings & settings,QSettings &
       }
     }
     if (keys.contains("decoration")) {
-      m_decoration.insert(k,settings.value("decoration").toString());
+      QString d = settings.value("decoration").toString();
+      if (hx.indexIn(d) != -1) {
+        d = QString(QChar(d.toInt(&ok,0)));
+      }
+      m_decoration.insert(k,d);
     }
     /// if value supplied, but no decoration, convert the value to a string
     if (m_values.contains(k) && ! m_decoration.contains(k)) {
