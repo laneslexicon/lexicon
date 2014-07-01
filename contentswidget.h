@@ -29,7 +29,7 @@ class ContentsWidget : public QTreeWidget {
   Place findPrevPlace(const Place &);
   QTreeWidgetItem * findPlace(const Place &) const;
   void ensurePlaceVisible(const Place & p, bool select = false);
-  void addEntries(const QString & root,QTreeWidgetItem *);
+  int addEntries(const QString & root,QTreeWidgetItem *);
   public slots:
     void nodeExpanded(QTreeWidgetItem * item);
     void nodeCollapsed(QTreeWidgetItem * item);

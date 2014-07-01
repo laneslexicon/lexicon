@@ -1,4 +1,7 @@
 #include "contentswidget.h"
+#include "QsLog.h"
+#include "place.h"
+#include "application.h"
 #include <QTextStream>
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   readSettings();
@@ -413,15 +416,22 @@ void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
   Place rootPlace;
   rootPlace.setRoot(p.getRoot());
   item = this->findPlace(rootPlace);
+  if (! item ) {
+    return;
+  }
   /**
    * this is called when restoring tabs so we need to load
    * the head words for each root we are restoring
    */
+  int c;
   if (item) {
-    addEntries(p.getRoot(),item);
+    c = addEntries(p.getRoot(),item);
   }
   else {
     QLOG_WARN() << "Ensure visible error: could not find item" << p.getRoot() << p.getWord();
+    return;
+  }
+  if (c == 0) {
     return;
   }
   item->setExpanded(true);
@@ -442,7 +452,7 @@ void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
 }
 QTreeWidgetItem * ContentsWidget::findPlace(const Place & p) const {
   QModelIndex ix;
-  QTreeWidgetItem * item;
+  QTreeWidgetItem * item = 0;
   QString target;
   int column;
   if (p.isRoot()) {
@@ -458,9 +468,6 @@ QTreeWidgetItem * ContentsWidget::findPlace(const Place & p) const {
   /// TODO multiple items, for supplement ?
   if (items.size() > 0) {
     item = items[0];
-  }
-  else {
-    //    QLOG_DEBUG() << "Not found";
   }
   return item;
 }
@@ -483,24 +490,28 @@ void ContentsWidget::focusOutEvent(QFocusEvent * event) {
  * @param root
  * @param parent
  */
-void ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
+int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
+  int c = 0;
+  qDebug() << Q_FUNC_INFO << root;
   if (parent->childCount() > 0) {
-    return;
+    return c;
   }
   m_entryQuery->bindValue(0,root);
   m_entryQuery->exec();
+
   while(m_entryQuery->next()) {
     //QLOG_DEBUG() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
     QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << m_entryQuery->value("itype").toString() << m_entryQuery->value("word").toString());
     item->setFont(0,m_itypeFont);
     item->setData(0,Qt::UserRole,m_entryQuery->value("nodeId"));//.toString()
     parent->addChild(item);
-
+    c++;
   }
-  if ( ! parent->isExpanded()) {
+  if ((c > 0) && ! parent->isExpanded()) {
     QLOG_DEBUG() << "Expanding parent";
     parent->setExpanded(true);
   }
+  return c;
 }
 void ContentsWidget::nodeExpanded(QTreeWidgetItem * /*item */) {
   QLOG_DEBUG() << Q_FUNC_INFO;
