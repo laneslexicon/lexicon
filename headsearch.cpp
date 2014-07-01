@@ -179,17 +179,7 @@ bool SearchResultsWidget::eventFilter(QObject * target,QEvent * event) {
       }
       break;
     }
-    case Qt::Key_Enter: {
-      QTableWidget *e = qobject_cast<QTableWidget *>(target);
-      if ( e) {
-        QLOG_DEBUG() << "hit enter on table";
-        if (keyEvent->modifiers() && Qt::ControlModifier) {
-          //          m_tree->setFocus();
-          return true;
-        }
-      }
-      break;
-    }
+    case Qt::Key_Enter:
       case Qt::Key_Return:
       case Qt::Key_Space: {
       QTableWidget *e = qobject_cast<QTableWidget *>(target);
@@ -199,9 +189,15 @@ bool SearchResultsWidget::eventFilter(QObject * target,QEvent * event) {
         QTableWidgetItem * item = m_list->currentItem();
         if (item)
           m_list->itemDoubleClicked(item);
-
-        break;
       }
+      break;
+      }
+      case Qt::Key_Tab: {
+      QTableWidget *e = qobject_cast<QTableWidget *>(target);
+      if ( e) {
+        m_text->setFocus();
+      }
+      break;
       }
       case Qt::Key_E: {
       QTableWidget *e = qobject_cast<QTableWidget *>(target);
