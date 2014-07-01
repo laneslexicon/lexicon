@@ -253,7 +253,7 @@ void LanesLexicon::onCloseTab(int ix) {
     delete entry;
     return;
   }
-  SearchResultsWidget * results = qobject_cast<SearchResultsWidget *>(m_tabs->widget(ix));
+  HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(m_tabs->widget(ix));
   if (results) {
       m_tabs->removeTab(ix);
       delete results;
@@ -1966,7 +1966,7 @@ void LanesLexicon::search(int options,const QString & t) {
       if (! UcdScripts::isScript(target,"Arabic")) {
         target = convertString(target);
       }
-      SearchResultsWidget * s = new SearchResultsWidget(this);
+      HeadSearchWidget * s = new HeadSearchWidget(this);
       connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
       s->search(target,options);
       if (s->count() == 0) {

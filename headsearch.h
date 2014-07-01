@@ -22,13 +22,13 @@
 #include <QRegExp>
 class GraphicsEntry;
 class FocusTable;
-class SearchResultsWidget : public QWidget
+class HeadSearchWidget : public QWidget
 {
     Q_OBJECT
 
  public:
-    SearchResultsWidget(const QString & str,int options,QWidget * parent = 0);
-    SearchResultsWidget(QWidget * parent = 0);
+    HeadSearchWidget(const QString & str,int options,QWidget * parent = 0);
+    HeadSearchWidget(QWidget * parent = 0);
    GraphicsEntry * getEntry() { return m_text;}
    int count();
    void search(const QString &,int options);

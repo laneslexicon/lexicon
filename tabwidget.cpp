@@ -17,7 +17,7 @@ void TabWidget::keyPressEvent(QKeyEvent * event) {
         entry->focusPlace();
         return;
       }
-      SearchResultsWidget * search = qobject_cast<SearchResultsWidget *>(this->currentWidget());
+      HeadSearchWidget * search = qobject_cast<HeadSearchWidget *>(this->currentWidget());
       if (search) {
         search->focusTable();
         return;

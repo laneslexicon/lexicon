@@ -5,7 +5,7 @@
 #include "namespace.h"
 #include "laneslexicon.h"
 //extern LanesLexicon * getApp();
-SearchResultsWidget::SearchResultsWidget(QWidget * parent) : QWidget(parent) {
+HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
   settings->beginGroup("Search");
@@ -60,7 +60,7 @@ SearchResultsWidget::SearchResultsWidget(QWidget * parent) : QWidget(parent) {
 
 }
 /// TODO can remove this
-SearchResultsWidget::SearchResultsWidget(const QString & str,int options,QWidget * parent) : QWidget(parent) {
+HeadSearchWidget::HeadSearchWidget(const QString & str,int options,QWidget * parent) : QWidget(parent) {
   m_target = str;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
@@ -106,10 +106,10 @@ SearchResultsWidget::SearchResultsWidget(const QString & str,int options,QWidget
     m_list->itemDoubleClicked(m_list->item(0,0));
 
 }
-int SearchResultsWidget::count() {
+int HeadSearchWidget::count() {
   return m_list->rowCount();
 }
-void SearchResultsWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
+void HeadSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
   /// get the node
   item = item->tableWidget()->item(item->row(),2);
   QString node = item->text();
@@ -132,7 +132,7 @@ void SearchResultsWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem *
     QLOG_DEBUG() << "Invalid place returned for node" << node;
   }
 }
-void SearchResultsWidget::itemDoubleClicked(QTableWidgetItem * item) {
+void HeadSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   /// get the node
   item = item->tableWidget()->item(item->row(),2);
   QString node = item->text();
@@ -156,7 +156,7 @@ void SearchResultsWidget::itemDoubleClicked(QTableWidgetItem * item) {
     QLOG_DEBUG() << "Invalid place returned for node" << node;
   }
 }
-bool SearchResultsWidget::eventFilter(QObject * target,QEvent * event) {
+bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
@@ -214,7 +214,7 @@ bool SearchResultsWidget::eventFilter(QObject * target,QEvent * event) {
   }
   return QWidget::eventFilter(target,event);
 }
-void SearchResultsWidget::search(const QString & target,int options) {
+void HeadSearchWidget::search(const QString & target,int options) {
   QRegExp rx;
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
@@ -364,13 +364,13 @@ void SearchResultsWidget::search(const QString & target,int options) {
   }
 
 }
-void SearchResultsWidget::showFirst() {
+void HeadSearchWidget::showFirst() {
   if (m_list->rowCount() > 0) {
     m_list->selectRow(0);
     m_list->setFocus();
   }
 }
-QString SearchResultsWidget::buildText(int options) {
+QString HeadSearchWidget::buildText(int options) {
   QString t;
   QString p1;
   QString p2;
@@ -396,6 +396,6 @@ QString SearchResultsWidget::buildText(int options) {
 
   return t;
 }
-void SearchResultsWidget::focusTable() {
+void HeadSearchWidget::focusTable() {
   m_list->setFocus();
 }
