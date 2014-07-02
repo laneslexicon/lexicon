@@ -10,6 +10,7 @@
 #define NODE_COLUMN 2
 #define POSITION_COLUMN 3
 #define CONTEXT_COLUMN 4
+extern LanesLexicon * getApp();
 /**
  *
  *
@@ -473,11 +474,13 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   QProgressDialog * pd = 0;
   if (m_showProgressDialog) {
     this->setMaxRecords();
-    pd = new QProgressDialog("Searching...", QString(), 0,m_maxRecordCount, this);
+    pd = new QProgressDialog("Searching...", "Cancel", 0,m_maxRecordCount, getApp());
+    connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
     pd->setWindowModality(Qt::WindowModal);
   }
+  m_cancelSearch = false;
   m_query.exec();
-  while(m_query.next()) {
+  while(m_query.next() && ! m_cancelSearch) {
     readCount++;
     if ((readCount % 1000) == 0) {
       m_progress->setValue(readCount);
@@ -922,4 +925,7 @@ void FullSearchWidget::focusOutEvent(QFocusEvent * event) {
 }
 void FullSearchWidget::focusTable() {
   m_rxlist->setFocus();
+}
+void FullSearchWidget::cancelSearch() {
+  m_cancelSearch = true;
 }

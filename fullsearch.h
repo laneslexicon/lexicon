@@ -49,6 +49,7 @@ class FullSearchWidget : public QWidget
    void itemDoubleClicked(QTableWidgetItem *);
    void hideOptions();
    void findTarget(bool show=false);
+   void cancelSearch();
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);
@@ -92,6 +93,7 @@ class FullSearchWidget : public QWidget
    QString m_currentCSS;
    int m_defaultOptions;
    bool m_showProgressDialog;
+   bool m_cancelSearch;
 /// for Arabic font from QSettings
    QFont m_resultsFont;
  signals:
