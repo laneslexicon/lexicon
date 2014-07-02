@@ -134,6 +134,7 @@ void HeadSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /*
 }
 void HeadSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   /// get the node
+  qDebug() << Q_FUNC_INFO << "row" << item->row();
   item = item->tableWidget()->item(item->row(),2);
   QString node = item->text();
   m_nodeQuery.bindValue(0,node);
@@ -143,13 +144,13 @@ void HeadSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
     QLOG_WARN() << "No record for node" << node;
     return;
   }
-  /// TODO make this a QSettings option or dialog option
+  if (m_text->focusNode(node))
+    return;
+
   Place np;
   np.setNode(node);
-  //  np.setNodeOnly(true);
-  Place p = m_text->getXmlForRoot(np);
-  if (p.isValid()) {
-    //      m_text->highlight(m_target);
+  np = m_text->getXmlForRoot(np);
+  if (np.isValid()) {
     m_text->focusNode(node);
   }
   else {
@@ -178,12 +179,32 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
       }
       break;
     }
-    case Qt::Key_Enter:
-    case Qt::Key_Return:
-    case Qt::Key_Space: {
+    case Qt::Key_Enter: {
+      qDebug() << "key press <ENTER>";
       QTableWidget *e = qobject_cast<QTableWidget *>(target);
       if ( e) {
-        //        if (keyEvent->modifiers() && Qt::ControlModifier) {
+        QTableWidgetItem * item = m_list->currentItem();
+        if (item)
+          m_list->itemDoubleClicked(item);
+      }
+      break;
+    }
+
+    case Qt::Key_Return: {
+      qDebug() << "key press <RETURN>";
+      QTableWidget *e = qobject_cast<QTableWidget *>(target);
+      if ( e) {
+        QTableWidgetItem * item = m_list->currentItem();
+        if (item)
+          m_list->itemDoubleClicked(item);
+      }
+      break;
+    }
+
+    case Qt::Key_Space: {
+      qDebug() << "key press <SPACE>";
+      QTableWidget *e = qobject_cast<QTableWidget *>(target);
+      if ( e) {
         QTableWidgetItem * item = m_list->currentItem();
         if (item)
           m_list->itemDoubleClicked(item);
@@ -366,8 +387,13 @@ void HeadSearchWidget::search(const QString & target,int options) {
 }
 void HeadSearchWidget::showFirst() {
   if (m_list->rowCount() > 0) {
-    m_list->selectRow(0);
-    m_list->setFocus();
+    QTableWidgetItem * item = m_list->item(0,0);
+    this->itemChanged(item,0);
+    QFocusEvent * e = new QFocusEvent(QEvent::FocusOut);
+    QApplication::postEvent(m_list,e);
+    //    m_list->selectRow(0);
+    //    m_list->setFocus();
+
   }
 }
 QString HeadSearchWidget::buildText(int options) {
@@ -398,4 +424,28 @@ QString HeadSearchWidget::buildText(int options) {
 }
 void HeadSearchWidget::focusTable() {
   m_list->setFocus();
+}
+void HeadSearchWidget::focusInEvent(QFocusEvent * event) {
+  qDebug() << Q_FUNC_INFO << event;
+  if (event->reason() == Qt::OtherFocusReason) {
+    if (m_list->rowCount() > 0) {
+      m_list->setFocus();
+
+    }
+    //    else {
+    //      m_findTarget->setFocus();
+    //    }
+  }
+  QWidget::focusInEvent(event);
+}
+void HeadSearchWidget::focusOutEvent(QFocusEvent * event) {
+  qDebug() << Q_FUNC_INFO << event;
+  /*
+  if (event->reason() == Qt::OtherFocusReason) {
+    if (m_rxlist->rowCount() > 0)
+      m_rxlist->setStyleSheet("QTableView { selection-background-color : green}"); //%1}").arg("lightgray"));
+    m_rxlist->repaint();
+  }
+  */
+  QWidget::focusOutEvent(event);
 }

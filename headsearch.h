@@ -37,6 +37,9 @@ class HeadSearchWidget : public QWidget
  public slots:
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);
+ protected:
+   void focusInEvent(QFocusEvent *);
+   void focusOutEvent(QFocusEvent *);
 
  private:
    bool eventFilter(QObject * target,QEvent * event);
