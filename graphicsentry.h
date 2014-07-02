@@ -53,6 +53,7 @@ class GraphicsEntry : public QWidget {
   enum SearchType { RootSearch, WordSearch, NodeSearch };
   //  Place getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString(),bool nodeOnly = false);
     Place getXmlForRoot(const Place &);
+    Place showPlace(const Place &,bool thisPageOnly,int options);
     Place getPage(const Place & );
     //    Place getXmlForPlace(const Place &);
 
@@ -75,7 +76,7 @@ class GraphicsEntry : public QWidget {
     QGraphicsScene * getScene() { return m_scene;}
     int search();
     bool hasNode(const QString &);
-    void focusNode(const QString &);
+    bool focusNode(const QString &);
     void shiftFocus();
     void setCurrentItem(QGraphicsItem *);
   public slots:
@@ -147,7 +148,7 @@ class GraphicsEntry : public QWidget {
     EntryItem * createEntry(const QString & xml);
     //    const XalanCompiledStylesheet * m_compiledXsl;
     //    bool showNode(const QString &,bool thisPageOnly = false);
-    Place showPlace(const Place &,bool thisPageOnly,int options);
+
 
     qreal m_scale;
 

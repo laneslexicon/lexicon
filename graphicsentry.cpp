@@ -334,6 +334,8 @@ void GraphicsEntry::anchorTest() {
     }
   }
 }
+/// TODO fix this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/// TODO how is it supposed to be used ?????????
 Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,int options) {
   /// check if the node is on this page
   QString node = p.getNode();
@@ -1332,9 +1334,9 @@ void GraphicsEntry::shiftFocus() {
   }
   return;
 }
-void GraphicsEntry::focusNode(const QString & node) {
+bool GraphicsEntry::focusNode(const QString & node) {
   if (node.isEmpty()) {
-    return;
+    return true;
   }
   QLOG_DEBUG() << Q_FUNC_INFO << node;
   for(int i=0;i < m_items.size();i++) {
@@ -1346,10 +1348,11 @@ void GraphicsEntry::focusNode(const QString & node) {
       //      m_scene->setFocusItem(m_items[i]);
       //      m_items[i]->setSelected(true);
       this->setCurrentItem(m_items[i]);
-      return;
+      return true;
     }
   }
   qDebug() << "Warning: focusNode failed, cannot find node" << node;
+  return false;
 }
 bool GraphicsEntry::hasNode(const QString & node) {
   if (node.isEmpty()) {
