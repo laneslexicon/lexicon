@@ -1949,17 +1949,23 @@ void LanesLexicon::searchForRoot() {
  *
  *
  */
-void LanesLexicon::search(int options,const QString & t) {
+void LanesLexicon::search(ArabicSearchDialog * d,const QString & t) {
   QString target = t;
+  int options = d->getOptions();
   if (options & Lane::Full) {
       FullSearchWidget * s = new FullSearchWidget;
       s->setOptionsHidden(false);
+      s->hide();
+      s->setSearch(t,options);
+      //      d->showProgress(true);
+      //      connect(s,SIGNAL(setProgressMax(int)),d,SLOT(setProgressMax(int)));
+      //      connect(s,SIGNAL(setProgressValue(int)),d,SLOT(setProgressValue(int)));
+      s->findTarget(true);
+      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
       int c = this->getSearchCount();
       int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Search %1")).arg(c+1));
       m_tabs->setCurrentIndex(i);
-      s->setSearch(t,options);
-      s->findTarget();
-      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+      s->focusTable();
       return;
   }
   if (options & Lane::Head) {
@@ -1991,7 +1997,7 @@ void LanesLexicon::searchForWord() {
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
-      this->search(d->getOptions(),t);
+      this->search(d,t);
     }
   }
   delete d;
@@ -2009,7 +2015,7 @@ void LanesLexicon::searchForEntry() {
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
-      this->search(d->getOptions(),t);
+      this->search(d,t);
     }
   }
   delete d;

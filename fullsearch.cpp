@@ -62,6 +62,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   m_progress = new QProgressBar;
   m_progress->setMaximum(m_maxRecordCount);
+  emit(setProgressMax(m_maxRecordCount));
   m_progress->hide();
   m_resultsText = new QLabel("");
   m_resultsText->hide();
@@ -351,15 +352,22 @@ QString escaped = pattern;
     escaped.append("\"");
 
  */
-void FullSearchWidget::findTarget() {
+void FullSearchWidget::findTarget(bool showProgress) {
   qDebug() << Q_FUNC_INFO;
+  m_showProgressDialog = showProgress;
   int options = m_search->getOptions();
   /// this shows text in progressbar
 #ifdef __APPLE__
   m_progress->setStyle(QStyleFactory::create("Fusion"));
 #endif
   m_progress->setValue(0);
-  m_progress->show();
+  if (! showProgress) {
+    m_progress->show();
+  }
+  else {
+    m_hideOptionsButton->setChecked(true);
+    this->hideOptions();
+  }
   this->regexSearch(m_findTarget->text(),options);
 
   m_progress->hide();
@@ -462,11 +470,21 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   /// Added QEventLoop because under OSX nothing was shown
   /// the loop was finished
   QEventLoop ep;
+  QProgressDialog * pd = 0;
+  if (m_showProgressDialog) {
+    this->setMaxRecords();
+    pd = new QProgressDialog("Searching...", QString(), 0,m_maxRecordCount, this);
+    pd->setWindowModality(Qt::WindowModal);
+  }
   m_query.exec();
   while(m_query.next()) {
     readCount++;
     if ((readCount % 1000) == 0) {
       m_progress->setValue(readCount);
+      if (pd) {
+        pd->setValue(readCount);
+      }
+      //      emit(setProgressValue(readCount));
       ep.processEvents();
     }
 
@@ -510,6 +528,9 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
       }
     }
   }
+  if (pd) {
+    delete pd;
+  }
   m_container->removeItem(m_spacer);
   m_rxlist->show();
 
@@ -523,6 +544,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   m_rxlist->resizeColumnToContents(2);
   m_rxlist->resizeColumnToContents(3);
   m_rxlist->resizeColumnToContents(4);
+  this->show();
 }
 QString FullSearchWidget::buildText(int headCount,int entryCount,int options) {
   QString t;

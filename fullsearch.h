@@ -21,6 +21,7 @@
 #include <QWidget>
 #include <QRegExp>
 #include <QProgressBar>
+#include <QProgressDialog>
 #include <QEventLoop>
 #ifdef __APPLE__
 #include <QStyleFactory>
@@ -47,7 +48,7 @@ class FullSearchWidget : public QWidget
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);
    void hideOptions();
-   void findTarget();
+   void findTarget(bool show=false);
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);
@@ -90,10 +91,13 @@ class FullSearchWidget : public QWidget
    QStringList m_nodes;
    QString m_currentCSS;
    int m_defaultOptions;
+   bool m_showProgressDialog;
 /// for Arabic font from QSettings
    QFont m_resultsFont;
  signals:
    void searchResult(const QString &);
    void showNode(const QString &);
+   void setProgressMax(int);
+   void setProgressValue(int);
 };
 #endif
