@@ -30,6 +30,7 @@ class ImLineEdit;
 class GraphicsEntry;
 class SearchOptions;
 class FocusTable;
+class KeyboardWidget;
 class FullSearchWidget : public QWidget
 {
     Q_OBJECT
@@ -50,11 +51,14 @@ class FullSearchWidget : public QWidget
    void hideOptions();
    void findTarget(bool show=false);
    void cancelSearch();
+   void  showKeyboard();
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);
    //   void eventFilter(QObject *,QEvent *);
  private:
+    KeyboardWidget * m_keyboard;
+    bool m_attached;
    void readSettings();
    QString buildText(int,int,int);
    bool readCssFromFile(const QString &);
@@ -89,6 +93,7 @@ class FullSearchWidget : public QWidget
    GraphicsEntry * m_text;
    QPushButton * m_findButton;
    QPushButton * m_hideOptionsButton;
+   QPushButton * m_keyboardButton;
    QStringList m_nodes;
    QString m_currentCSS;
    int m_defaultOptions;

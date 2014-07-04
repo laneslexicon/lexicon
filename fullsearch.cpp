@@ -7,6 +7,7 @@
 #include "imlineedit.h"
 #include "nodeview.h"
 #include "focustable.h"
+#include "keyboard.h"
 #define NODE_COLUMN 2
 #define POSITION_COLUMN 3
 #define CONTEXT_COLUMN 4
@@ -19,6 +20,7 @@ extern LanesLexicon * getApp();
 FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
   setMaxRecords();
+  m_attached = false;
   QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
@@ -27,11 +29,20 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_hideOptionsButton = new QPushButton(tr("Hid&e options"));
   m_hideOptionsButton->setCheckable(true);
 
+  m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
+  m_keyboardButton->setAutoDefault(false);
+  m_keyboardButton->setCheckable(true);
+
+  m_keyboard = new KeyboardWidget(this);
+
   connect(m_findButton,SIGNAL(clicked()),this,SLOT(findTarget()));
   connect(m_hideOptionsButton,SIGNAL(clicked()),this,SLOT(hideOptions()));
+  connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
+
   QHBoxLayout * targetlayout = new QHBoxLayout;
   targetlayout->addWidget(m_findTarget);
   targetlayout->addWidget(m_findButton);
+  targetlayout->addWidget(m_keyboardButton);
   targetlayout->addWidget(m_hideOptionsButton);
 
   QStringList headers;
@@ -482,7 +493,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   m_query.exec();
   while(m_query.next() && ! m_cancelSearch) {
     readCount++;
-    if ((readCount % 1000) == 0) {
+    if ((readCount % 500) == 0) {
       m_progress->setValue(readCount);
       if (pd) {
         pd->setValue(readCount);
@@ -534,12 +545,14 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   if (pd) {
     delete pd;
   }
-  m_container->removeItem(m_spacer);
-  m_rxlist->show();
+
+
 
   m_resultsText->setText(buildText(headCount,entryCount,options));
   m_resultsText->show();
   if (m_rxlist->rowCount() > 0) {
+    m_container->removeItem(m_spacer);
+    m_rxlist->show();
     m_rxlist->selectRow(0);
     m_rxlist->setFocus();
   }
@@ -928,4 +941,23 @@ void FullSearchWidget::focusTable() {
 }
 void FullSearchWidget::cancelSearch() {
   m_cancelSearch = true;
+}
+void FullSearchWidget::showKeyboard() {
+  m_keyboard->attach(m_findTarget);
+  m_attached = ! m_attached;
+  if (m_attached) {
+    m_keyboardButton->setText(tr("Hide keyboard"));
+    QPoint p = m_findTarget->pos();
+    QPoint gp =  m_findTarget->mapToGlobal(p);
+    QRect r = m_findTarget->frameGeometry();
+
+    int x = gp.x();
+    int y = gp.y() + r.height();
+    qDebug() << "button pos" << x << "height" << y;
+    /// have to position it relative to the toplevel window
+    m_keyboard->move(getApp()->mapFromGlobal(QPoint(x,y)));
+  }
+  else
+    m_keyboardButton->setText(tr("Show keyboard"));
+
 }
