@@ -6,17 +6,7 @@
 #include "laneslexicon.h"
 extern LanesLexicon * getApp();
 HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->beginGroup("Search");
-  QString f = settings->value("Results font",QString()).toString();
-  if (! f.isEmpty()) {
-    m_resultsFont.fromString(f);
-  }
-  settings->endGroup();
-  settings->beginGroup("Debug");
-  m_debug = settings->value("Headsearch",false).toBool();
-  delete settings;
+  readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
 
   QWidget * container = new QWidget;
@@ -318,7 +308,7 @@ void HeadSearchWidget::search(const QString & target,int options) {
       m_list->setItem(row,NODE_COLUMN,item);
     }
   }
-  if ((count % 100) == 0) {
+  if ((count % m_stepCount) == 0) {
     pd->setValue(count);
   }
   m_resultsText->setText(this->buildText(options));
@@ -395,4 +385,16 @@ void HeadSearchWidget::focusOutEvent(QFocusEvent * event) {
 }
 void HeadSearchWidget::cancelSearch() {
   m_cancelSearch = true;
+}
+void HeadSearchWidget::readSettings() {
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->beginGroup("HeadSearch");
+  QString f = settings->value("Results font",QString()).toString();
+  if (! f.isEmpty()) {
+    m_resultsFont.fromString(f);
+  }
+  m_stepCount = settings->value("Step",100).toInt();
+  m_debug = settings->value("Debug",false).toBool();
+  delete settings;
 }

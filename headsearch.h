@@ -44,10 +44,12 @@ class HeadSearchWidget : public QWidget
    void focusOutEvent(QFocusEvent *);
 
  private:
+   void readSettings();
    bool eventFilter(QObject * target,QEvent * event);
    QString buildText(int);
    QRegExp m_currentRx;
    int m_searchOptions;
+   int m_stepCount;
    QSqlQuery m_query;
    QSqlQuery m_nodeQuery;
    QString m_target;
