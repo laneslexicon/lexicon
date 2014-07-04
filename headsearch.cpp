@@ -4,7 +4,7 @@
 #include "focustable.h"
 #include "namespace.h"
 #include "laneslexicon.h"
-//extern LanesLexicon * getApp();
+extern LanesLexicon * getApp();
 HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
@@ -13,17 +13,20 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   if (! f.isEmpty()) {
     m_resultsFont.fromString(f);
   }
+  settings->endGroup();
+  settings->beginGroup("Debug");
+  m_debug = settings->value("Headsearch",false).toBool();
   delete settings;
   QVBoxLayout * layout = new QVBoxLayout;
 
   QWidget * container = new QWidget;
   QVBoxLayout * containerlayout = new QVBoxLayout;
   m_list = new FocusTable;
-  m_list->setColumnCount(4);
+  m_list->setColumnCount(3);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QStringList headers;
-  headers << tr("Root") << tr("Entry") << tr("Node") << tr("Count");
+  headers << tr("Root") << tr("Entry") << tr("Node");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -179,35 +182,18 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
       }
       break;
     }
-    case Qt::Key_Enter: {
-      qDebug() << "key press <ENTER>";
-      QTableWidget *e = qobject_cast<QTableWidget *>(target);
-      if ( e) {
-        QTableWidgetItem * item = m_list->currentItem();
-        if (item)
-          m_list->itemDoubleClicked(item);
-      }
-      break;
-    }
-
-    case Qt::Key_Return: {
-      qDebug() << "key press <RETURN>";
-      QTableWidget *e = qobject_cast<QTableWidget *>(target);
-      if ( e) {
-        QTableWidgetItem * item = m_list->currentItem();
-        if (item)
-          m_list->itemDoubleClicked(item);
-      }
-      break;
-    }
-
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
     case Qt::Key_Space: {
-      qDebug() << "key press <SPACE>";
       QTableWidget *e = qobject_cast<QTableWidget *>(target);
       if ( e) {
         QTableWidgetItem * item = m_list->currentItem();
-        if (item)
+        if (item) {
           m_list->itemDoubleClicked(item);
+          /// Need this - seems <return> handling is different from space
+          /// without out the table keeps focus
+          return true;
+        }
       }
       break;
     }
@@ -251,13 +237,7 @@ void HeadSearchWidget::search(const QString & target,int options) {
   //   select where bareword = ?
   //  part word without diacritics
   //   select where instr(bareword,?) > 0
-  if (options & Lane::Full) {
-    sql = "select id,word,root,entry,node from xref where datasource = 1 ";
-    QLOG_WARN() << Q_FUNC_INFO << "search for Full word - we shouldn't be here";
-  }
-  else {
-    sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 ";
-  }
+  sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 order by nodenum asc";
   QString pattern;
   if (options & Lane::Ignore_Diacritics) {
     QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
@@ -283,67 +263,38 @@ void HeadSearchWidget::search(const QString & target,int options) {
     pattern = m_target;
   }
   rx.setPattern(pattern);
-  /*
-    if (options & Lane::Ignore_Diacritics) {
-    qDebug() << "ignoring diacritics";
-    if (options & Lane::Whole_Word) {
-    qDebug() << "whole word match";
-    sql += "and bareword = ? ";
-    }
-    else {
-    sql += "and instr(bareword,?) > 0";
-    }
-    }
-    else {
-    if (options & Lane::Whole_Word) {
-    qDebug() << "whole word match";
-    sql += "and word = ? ";
-    }
-    else {
-    sql += "and instr(word,?) > 0";
-    }
-    }
-  */
-  if (options & Lane::Full) {
-    sql += " order by root,entry asc";
-  }
-  else {
-    sql += " order by root,nodenum asc";
-  }
-  qDebug() << "search sql" << sql;
   bool ok = false;
-  /// TODO replace select *
-  //   sql = QString("select * from xref where datasource = 1 and word = ? order by root,entry asc");
   if (m_query.prepare(sql)) {
     if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeId = ?")) {
       ok = true;
     }
   }
   if (! ok ) {
-    QLOG_WARN() << "Error prepare SQL";
+    QLOG_WARN() << "Error prepare SQL" << sql;
     return;
   }
   m_list->setRowCount(0);
 #define NODE_COLUMN 2
-  //m_query.bindValue(0,m_target);
-  m_query.exec();
-  QMap<QString,int> nodes;
+  if (m_debug) {
+    m_list->showColumn(NODE_COLUMN);
+  }
+  else {
+    m_list->hideColumn(NODE_COLUMN);
+  }
 
+  m_query.exec();
   QTableWidgetItem * item;
-  /// TODO include count in table ?
   int count = 0;
-  while(m_query.next()) {
+  QProgressDialog *  pd = new QProgressDialog("Searching...", "Cancel", 0,48000, getApp());
+  connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
+  pd->setWindowModality(Qt::WindowModal);
+  m_cancelSearch = false;
+  QString node;
+  QString word;
+  while(m_query.next() & ! m_cancelSearch) {
     count++;
-    QString t;
-    QString word;
-    if (options & Lane::Full) {
-      t = m_query.value("node").toString();
-      word = m_query.value("entry").toString();
-    }
-    else {
-      t = m_query.value("nodeid").toString();
-      word = m_query.value("word").toString();
-    }
+    node = m_query.value("nodeid").toString();
+    word = m_query.value("word").toString();
     /// strip diacritics if required
     if (replaceSearch) {
       if (options & Lane::Ignore_Diacritics)
@@ -362,28 +313,21 @@ void HeadSearchWidget::search(const QString & target,int options) {
       item->setFont(m_resultsFont);
       m_list->setItem(row,1,item);
 
-      item = new QTableWidgetItem(t);
+      item = new QTableWidgetItem(node);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,NODE_COLUMN,item);
-      m_list->setItem(row,3,new QTableWidgetItem("1"));
     }
   }
-  /*
-    for(int i=0; i < m_list->rowCount();i++) {
-    QString t = m_list->item(i,NODE_COLUMN)->text();
-    if (! t.isEmpty() && nodes.contains(t)) {
-    m_list->item(i,3)->setText(QString("%1").arg(nodes.value(t)));
-    }
-    }
-  */
-  //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
+  if ((count % 100) == 0) {
+    pd->setValue(count);
+  }
   m_resultsText->setText(this->buildText(options));
   m_resultsText->show();
   if (m_list->rowCount() > 0) {
     m_list->selectRow(0);
     m_list->setFocus();
   }
-
+  delete pd;
 }
 void HeadSearchWidget::showFirst() {
   if (m_list->rowCount() > 0) {
@@ -448,4 +392,7 @@ void HeadSearchWidget::focusOutEvent(QFocusEvent * event) {
   }
   */
   QWidget::focusOutEvent(event);
+}
+void HeadSearchWidget::cancelSearch() {
+  m_cancelSearch = true;
 }

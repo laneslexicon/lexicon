@@ -20,6 +20,7 @@
 #include <QFont>
 #include <QWidget>
 #include <QRegExp>
+#include <QProgressDialog>
 class GraphicsEntry;
 class FocusTable;
 class HeadSearchWidget : public QWidget
@@ -35,6 +36,7 @@ class HeadSearchWidget : public QWidget
    void showFirst();
    void focusTable();
  public slots:
+   void cancelSearch();
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);
  protected:
@@ -54,6 +56,8 @@ class HeadSearchWidget : public QWidget
    GraphicsEntry * m_text;
 /// for Arabic font from QSettings
    QFont m_resultsFont;
+   bool m_cancelSearch;
+   bool m_debug;
  signals:
    void searchResult(const QString &);
 };
