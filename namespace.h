@@ -8,16 +8,14 @@ enum Tabs {
  enum SearchType {
   Root                = 0x00000004,
   Word                = 0x00000008,
+  Entry               = 0x00000010
  };
  enum Search {
-   Ignore_Diacritics =  0x00000010,
-   Whole_Word        =  0x00000020,
-   Regex             =  0x00000040,
+   Ignore_Diacritics =  0x00000020,
+   Whole_Word        =  0x00000040,
    Buckwalter        =  0x00000080,
    Arabic            =  0x00000100,
-   Head              =  0x00000200,
-   Full              =  0x00000400,
-   Normal            =  0x00000800
- };
+   Normal            =  0x00000200,
+   Regex             =  0x00000400 };
 }
 #endif

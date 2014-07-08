@@ -1104,12 +1104,6 @@ void LanesLexicon::readSettings() {
   m_searchSwitchTab = settings->value("Switch tab",true).toBool();
   m_defaultSearchOptions = 0;
   QString v;
-  v  = settings->value("Where",QString("full")).toString();
-  if (v == "full")
-    m_defaultSearchOptions |= Lane::Full;
-  else
-    m_defaultSearchOptions |= Lane::Head;
-
   v  = settings->value("Type",QString("normal")).toString();
   if (v == "normal")
     m_defaultSearchOptions |= Lane::Normal;
@@ -1949,10 +1943,12 @@ void LanesLexicon::searchForRoot() {
  *
  *
  */
-void LanesLexicon::search(ArabicSearchDialog * d,const QString & t) {
+void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & t) {
+  qDebug() << Q_FUNC_INFO << searchType;
   QString target = t;
   int options = d->getOptions();
-  if (options & Lane::Full) {
+  options |= searchType;
+  if (searchType & Lane::Word) {
       FullSearchWidget * s = new FullSearchWidget;
       s->setOptionsHidden(false);
       s->hide();
@@ -1968,7 +1964,7 @@ void LanesLexicon::search(ArabicSearchDialog * d,const QString & t) {
       s->focusTable();
       return;
   }
-  if (options & Lane::Head) {
+  if (searchType & Lane::Entry) {
       if (! UcdScripts::isScript(target,"Arabic")) {
         target = convertString(target);
       }
@@ -1997,7 +1993,7 @@ void LanesLexicon::searchForWord() {
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
-      this->search(d,t);
+      this->search(Lane::Word,d,t);
     }
   }
   delete d;
@@ -2005,17 +2001,12 @@ void LanesLexicon::searchForWord() {
 
 /// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
-  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
-  int options = m_defaultSearchOptions;
-  if (options & Lane::Full) {
-    options -=  Lane::Full;
-    options |= Lane::Head;
-  }
-  d->setOptions(options);
+  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Entry,this);
+  d->setOptions(m_defaultSearchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
-      this->search(d,t);
+      this->search(Lane::Entry,d,t);
     }
   }
   delete d;

@@ -151,7 +151,7 @@ public:
     void closeEvent(QCloseEvent *);
 private:
     void cleanup();
-    void search(ArabicSearchDialog *,const QString &);
+    void search(int searchType,ArabicSearchDialog *,const QString &);
     Place showPlace(const Place &,int);
     QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
     /// look through all tabs for the given node, -1 if not found, else tab index

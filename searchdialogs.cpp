@@ -5,10 +5,20 @@
 ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
 
-  if (searchType == Lane::Root)
+  switch(searchType) {
+    case Lane::Root :
     setWindowTitle(tr("Search for Root"));
-  else
+    break;
+  case Lane::Entry :
+    setWindowTitle(tr("Search for Entry"));
+    break;
+  case Lane::Word :
     setWindowTitle(tr("Search for Word"));
+    break;
+  default :break;
+  }
+
+
 
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;

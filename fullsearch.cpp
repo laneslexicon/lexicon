@@ -458,10 +458,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
     m_rxlist->hideColumn(2);
     m_rxlist->hideColumn(3);
   }
-  if (options & Lane::Head)
-    m_rxlist->hideColumn(4);
-  else
-    m_rxlist->showColumn(4);
+  m_rxlist->showColumn(4);
 
 
   m_rxlist->setRowCount(0);
@@ -525,7 +522,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
           headCount++;
         }
         headword = m_nodeQuery.value("word").toString();
-        if (options & Lane::Full) {
+
           QString xml = m_nodeQuery.value("xml").toString();
           QTextDocument * doc  = fetchDocument(xml);
           if (doc->characterCount() > 0) {
@@ -535,7 +532,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
             }
             textCount += m_fragments.size();
           }
-        }
+
       }
       else {
         qDebug() << "Error in node Query sql";
@@ -546,21 +543,31 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
     delete pd;
   }
 
-
-
-  m_resultsText->setText(buildText(headCount,entryCount,options));
-  m_resultsText->show();
   if (m_rxlist->rowCount() > 0) {
     m_container->removeItem(m_spacer);
     m_rxlist->show();
     m_rxlist->selectRow(0);
     m_rxlist->setFocus();
   }
+
+
+  m_resultsText->setText(buildText(headCount,entryCount,options));
+  m_resultsText->show();
+
   m_rxlist->resizeColumnToContents(0);
   m_rxlist->resizeColumnToContents(2);
   m_rxlist->resizeColumnToContents(3);
   m_rxlist->resizeColumnToContents(4);
   this->show();
+  /*
+  else {
+    QMessageBox msgBox;
+    msgBox.setObjectName("wordnotfound");
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setText(QString(tr("Word not found")));
+    msgBox.exec();
+  }
+  */
 }
 QString FullSearchWidget::buildText(int headCount,int entryCount,int options) {
   QString t;
@@ -568,44 +575,33 @@ QString FullSearchWidget::buildText(int headCount,int entryCount,int options) {
   QString p2;
   int findCount = headCount + entryCount;
 
-  if (options & Lane::Full) {
-    switch(findCount) {
-    case 0 :
-      p1 = "no items found";
-      break;
-    case 1:
-      p1 = "";
-      break;
-    default:
-        p1 ="s";
-    }
-    if (entryCount == 1) {
-      p2 = "y";
-    }
-    else {
-      p2 = "ies";
-    }
-    /// TODO allow for Arabic font
-    if (findCount == 0) {
-      t = QString(tr("Search for %1, %2")).arg(m_target).arg(p1);
-    }
-    else {
-      t = QString(tr("Search for %1, found %2 item%3 in %4 entr%5"))
-        .arg(m_target)
-        .arg(findCount)
-        .arg(p1)
-        .arg(entryCount)
-        .arg(p2);
-    }
+  switch(findCount) {
+  case 0 :
+    p1 = "no items found";
+    break;
+  case 1:
+    p1 = "";
+    break;
+  default:
+    p1 ="s";
+  }
+  if (entryCount == 1) {
+    p2 = "y";
   }
   else {
-    if (headCount == 1) {
-      p1 = "y";
-    }
-    else {
-      p1 = "ies";
-    }
-    t=  QString(tr("Search for %1, found %2 entr%3")).arg(m_target).arg(headCount).arg(p1);
+    p2 = "ies";
+  }
+  /// TODO allow for Arabic font
+  if (findCount == 0) {
+    t = QString(tr("Search for %1, %2")).arg(m_target).arg(p1);
+  }
+  else {
+    t = QString(tr("Search for %1, found %2 item%3 in %4 entr%5"))
+      .arg(m_target)
+      .arg(findCount)
+      .arg(p1)
+      .arg(entryCount)
+      .arg(p2);
   }
   if (options & Lane::Ignore_Diacritics)
     t += tr(", ignoring diacritics");
@@ -676,13 +672,7 @@ void FullSearchWidget::addRow(const QString & root,const QString & headword, con
  * @return
  */
 QString FullSearchWidget::buildSearchSql(int options) {
-  QString sql;
-  if (options & Lane::Full) {
-    sql = "select id,word,root,entry,node from xref where datasource = 1 ";
-  }
-  else {
-    sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 ";
-  }
+  QString sql = "select id,word,root,entry,node from xref where datasource = 1  order by root,entry asc";
   if (options & Lane::Ignore_Diacritics) {
     if (options & Lane::Whole_Word) {
       sql += "and bareword = ? ";
@@ -698,12 +688,6 @@ QString FullSearchWidget::buildSearchSql(int options) {
     else {
       sql += "and instr(word,?) > 0";
     }
-  }
-  if (options & Lane::Full) {
-    sql += " order by root,entry asc";
-  }
-  else {
-    sql += " order by root,nodenum asc";
   }
   return sql;
 }
@@ -724,12 +708,7 @@ QString FullSearchWidget::buildRxSql(int options) {
   //   select where bareword = ?
   //  part word without diacritics
   //   select where instr(bareword,?) > 0
-  if (options & Lane::Full) {
   sql = "select id,word,root,entry,node from xref where datasource = 1 ";
-  }
-  else {
-    sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 ";
-  }
   return sql;
 }
 QTextDocument * FullSearchWidget::fetchDocument(const QString & xml) {
@@ -791,12 +770,6 @@ void FullSearchWidget::readSettings() {
   m_xsltSource = settings->value("XSLT",QString("node.xslt")).toString();
   m_defaultOptions = 0;
   QString v;
-  v  = settings->value("Where",QString("full")).toString();
-  if (v == "full")
-    m_defaultOptions |= Lane::Full;
-  else
-    m_defaultOptions |= Lane::Head;
-
   v  = settings->value("Type",QString("normal")).toString();
   if (v == "normal")
     m_defaultOptions |= Lane::Normal;

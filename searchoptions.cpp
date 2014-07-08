@@ -11,8 +11,6 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_targetGroup->setObjectName("searchtargetgroup");
   m_typeGroup = new QGroupBox(tr("Search type"));
   m_typeGroup->setObjectName("searchtypegroup");
-  m_contextGroup = new QGroupBox(tr("Search context"));
-  m_contextGroup->setObjectName("searchcontextgroup");
   m_keymapGroup = new QGroupBox(tr("Keymap"));
   m_keymapGroup->setObjectName("keymapgroup");
 
@@ -25,11 +23,6 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_arabicTarget = new QRadioButton(tr("Arabic text"),m_targetGroup);
   m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),m_targetGroup);
 
-  /// Search context
-  QHBoxLayout * contextlayout = new QHBoxLayout;
-  contextlayout->addWidget(m_headWord);
-  contextlayout->addWidget(m_fullText);
-  m_contextGroup->setLayout(contextlayout);
 
 
   /// diacritics/whole word
@@ -67,7 +60,6 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_spacer = new QSpacerItem(0, 20,QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
 
 
-  mainlayout->addWidget(m_contextGroup);
   mainlayout->addWidget(m_typeGroup);
   mainlayout->addLayout(optionslayout);
   mainlayout->addLayout(forcelayout);
@@ -86,8 +78,8 @@ SearchOptions::~SearchOptions() {
 void SearchOptions::showMore(bool show) {
   m_more = show;
 
-  if (m_searchType & Lane::Root) {
-    m_contextGroup->setVisible(false);
+  switch(m_searchType) {
+  case Lane::Root : {
     m_targetGroup->setVisible(false);
     m_ignoreDiacritics->setVisible(false);
     m_wholeWordMatch->setVisible(false);
@@ -95,27 +87,55 @@ void SearchOptions::showMore(bool show) {
     if (m_hasMaps)
       m_keymapGroup->setVisible(show);
 
-    return;
+    break;
   }
+  case Lane::Entry : {
+    if (m_hasMaps)
+      m_keymapGroup->setVisible(show);
 
-  if (m_hasMaps)
-    m_keymapGroup->setVisible(show);
-
-  if (m_regexSearch->isChecked()) {
+    if (m_regexSearch->isChecked()) {
       m_targetGroup->setVisible(m_more);
       m_forceLTR->setVisible(m_more);
       m_arabicTarget->setVisible(m_more);
       m_buckwalterTarget->setVisible(m_more);
       m_ignoreDiacritics->setVisible(false);
       m_wholeWordMatch->setVisible(false);
-  }
-  else {
+    }
+    else {
       m_targetGroup->setVisible(false);
       m_forceLTR->setVisible(false);
       m_arabicTarget->setVisible(false);
       m_buckwalterTarget->setVisible(false);
       m_ignoreDiacritics->setVisible(true);
       m_wholeWordMatch->setVisible(true);
+    }
+    break;
+  }
+  case Lane::Word : {
+    if (m_hasMaps)
+      m_keymapGroup->setVisible(show);
+
+    if (m_regexSearch->isChecked()) {
+      m_targetGroup->setVisible(m_more);
+      m_forceLTR->setVisible(m_more);
+      m_arabicTarget->setVisible(m_more);
+      m_buckwalterTarget->setVisible(m_more);
+      m_ignoreDiacritics->setVisible(false);
+      m_wholeWordMatch->setVisible(false);
+    }
+    else {
+      m_targetGroup->setVisible(false);
+      m_forceLTR->setVisible(false);
+      m_arabicTarget->setVisible(false);
+      m_buckwalterTarget->setVisible(false);
+      m_ignoreDiacritics->setVisible(true);
+      m_wholeWordMatch->setVisible(true);
+    }
+    break;
+  }
+  default :
+    qDebug() << Q_FUNC_INFO << "unknown search type";
+    break;
   }
 }
 
@@ -140,11 +160,6 @@ int SearchOptions::getOptions() {
   if (m_buckwalterTarget->isChecked())
     x |= Lane::Buckwalter;
 
-  if (m_headWord->isChecked())
-    x |= Lane::Head;
-
-  if (m_fullText->isChecked())
-    x |= Lane::Full;
 
 
   return x;
@@ -189,17 +204,6 @@ void SearchOptions::setOptions(int x) {
     v = false;
   m_buckwalterTarget->setChecked(v);
 
-  if (x & Lane::Head)
-    v = true;
-  else
-    v = false;
-  m_headWord->setChecked(v);
-
-  if (x & Lane::Full)
-    v = true;
-  else
-    v = false;
-  m_fullText->setChecked(v);
 
   searchTypeChanged();
 }
