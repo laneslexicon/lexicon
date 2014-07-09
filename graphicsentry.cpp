@@ -225,6 +225,10 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   QWidget::keyPressEvent(event);
 
 }
+void GraphicsEntry::home() {
+  if (! m_focusNode.isEmpty())
+    this->focusNode(m_focusNode);
+}
 void GraphicsEntry::moveFocusDown() {
   EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
   if (item) {

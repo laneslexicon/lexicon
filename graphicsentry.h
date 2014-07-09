@@ -77,6 +77,7 @@ class GraphicsEntry : public QWidget {
     int search();
     bool hasNode(const QString &);
     bool focusNode(const QString &);
+    void home();
     void shiftFocus();
     void setCurrentItem(QGraphicsItem *);
   public slots:
