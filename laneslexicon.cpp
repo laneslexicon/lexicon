@@ -1055,10 +1055,29 @@ void LanesLexicon::on_actionTest() {
     ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word);
     d->exec();
   }
-  FullSearchWidget * w = new FullSearchWidget(this);
-  connect(w,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
-  int c = this->getSearchCount();
-  m_tabs->addTab(w,QString(tr("Search %1")).arg(c+1));;
+  if (0) {
+    FullSearchWidget * w = new FullSearchWidget(this);
+    connect(w,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+    int c = this->getSearchCount();
+    m_tabs->addTab(w,QString(tr("Search %1")).arg(c+1));;
+  }
+  HeadSearchWidget * w = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
+  if (w) {
+    Place p = w->getEntry()->getPlace();
+    if (p.isValid()) {
+      int ix = m_tabs->currentIndex();
+      this->onCloseTab(ix);
+      GraphicsEntry * entry = new GraphicsEntry(this);
+      setSignals(entry);
+      entry->installEventFilter(this);
+      entry->getXmlForRoot(p);
+      m_tabs->insertTab(ix,entry,p.getShortText());
+      m_tabs->setCurrentIndex(ix);
+    }
+    else {
+      qDebug() << "could not clone graphcicsentry";
+    }
+  }
 }
 /**
  * TODO tidy up navMode
@@ -1980,7 +1999,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
         delete s;
       }
       else {
-        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,target);
+        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Entry search for %1")).arg(target));
         m_tabs->setCurrentIndex(i);
         setSignals(s->getEntry());
         s->showFirst();
@@ -2074,6 +2093,7 @@ void LanesLexicon::pagePrint() {
 }
 void LanesLexicon::pageSearch() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  /// TODO this
   if ( entry ) {
     if (entry->search() > 0) {
       m_clearAction->setEnabled(true);
@@ -2085,7 +2105,16 @@ void LanesLexicon::pageClear() {
   if ( entry ) {
     entry->clearHighlights();
     m_clearAction->setEnabled(false);
+    return;
   }
+  HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
+  if (results) {
+    results->getEntry()->clearHighlights();
+    m_clearAction->setEnabled(false);
+    return;
+  }
+
+
 }
 void LanesLexicon::currentTabChanged(int) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
