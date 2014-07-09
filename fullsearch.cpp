@@ -762,12 +762,15 @@ void FullSearchWidget::readSettings() {
   readCssFromFile(css);
   //m_xsltSource = settings->value("XSLT",QString("entry.xslt")).toString();
   settings->endGroup();
-  settings->beginGroup("Search");
+  settings->beginGroup("FullSearch");
   QString f = settings->value("Results font",QString()).toString();
   if (! f.isEmpty()) {
     m_resultsFont.fromString(f);
   }
   m_xsltSource = settings->value("XSLT",QString("node.xslt")).toString();
+  m_debug = settings->value("Debug",false).toBool();
+  settings->endGroup();
+  settings->beginGroup("Search");
   m_defaultOptions = 0;
   QString v;
   v  = settings->value("Type",QString("normal")).toString();
@@ -793,7 +796,6 @@ void FullSearchWidget::readSettings() {
 
   m_fragmentSize = settings->value("Fragment size",40).toInt();
 
-  m_debug = settings->value("Debug",false).toBool();
   delete settings;
 }
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,int options) {
