@@ -278,6 +278,8 @@ void HeadSearchWidget::search(const QString & target,int options) {
   QProgressDialog *  pd = new QProgressDialog("Searching...", "Cancel", 0,48000, getApp());
   connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
   pd->setWindowModality(Qt::WindowModal);
+  //  pd->setMinimumDuration(0);
+  pd->show();
   m_cancelSearch = false;
   QString node;
   QString word;
@@ -307,9 +309,9 @@ void HeadSearchWidget::search(const QString & target,int options) {
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,NODE_COLUMN,item);
     }
-  }
   if ((count % m_stepCount) == 0) {
     pd->setValue(count);
+  }
   }
   m_resultsText->setText(this->buildText(options));
   m_resultsText->show();
