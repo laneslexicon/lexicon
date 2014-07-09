@@ -147,6 +147,7 @@ public:
     void syncContents();
     /// from FullSearchWidget
     void showSearchNode(const QString &);
+    void convertToEntry();
  protected:
     void closeEvent(QCloseEvent *);
 private:
@@ -281,8 +282,9 @@ private:
     QAction * m_printAction;
     QAction * m_localSearchAction;
     // clear the highlights
-
     QAction * m_clearAction;
+    // convert HeadSearch to GraphicsEntry
+    QAction * m_convertToEntryAction;
     /// Notes
     NoteMaster * m_notes;
     ///

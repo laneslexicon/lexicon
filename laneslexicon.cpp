@@ -422,6 +422,9 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == "delete tab") {
     this->onCloseTab(m_tabs->currentIndex());
   }
+  else if (key == "convert to entry") {
+    this->convertToEntry();
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -578,6 +581,7 @@ void LanesLexicon::createActions() {
   m_printAction = createIconAction(imgdir,settings->value("Print",QString()).toString(),tr("Print"));
   m_localSearchAction = createIconAction(imgdir,settings->value("LocalSearch",QString()).toString(),tr("Search page"));
   m_clearAction = createIconAction(imgdir,settings->value("Clear",QString()).toString(),tr("Clear highlights"));
+  m_convertToEntryAction = createIconAction(imgdir,settings->value("SearchToEntry",QString()).toString(),tr("Convert to Entry"));
   m_clearAction->setEnabled(false);
 
   connect(m_zoomInAction,SIGNAL(triggered()),this,SLOT(pageZoomIn()));
@@ -587,6 +591,7 @@ void LanesLexicon::createActions() {
   connect(m_printAction,SIGNAL(triggered()),this,SLOT(pagePrint()));
   connect(m_localSearchAction,SIGNAL(triggered()),this,SLOT(pageSearch()));
   connect(m_clearAction,SIGNAL(triggered()),this,SLOT(pageClear()));
+  connect(m_convertToEntryAction,SIGNAL(triggered()),this,SLOT(convertToEntry()));
 
   delete settings;
 }
@@ -703,6 +708,7 @@ void LanesLexicon::createToolBar() {
   page->addAction(m_printAction);
   page->addAction(m_localSearchAction);
   page->addAction(m_clearAction);
+  page->addAction(m_convertToEntryAction);
   page->setFloatable(true);
 
 }
@@ -2121,8 +2127,16 @@ void LanesLexicon::currentTabChanged(int) {
   if ( entry ) {
     Place p = entry->getPlace();
     m_tree->ensurePlaceVisible(p,true);
+    m_convertToEntryAction->setEnabled(false);
+    return;
   }
-
+  HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
+  if (results) {
+    m_convertToEntryAction->setEnabled(true);
+  }
+  else {
+    m_convertToEntryAction->setEnabled(false);
+  }
 }
 int LanesLexicon::searchTabs(const QString & node) {
   for(int i=0;i < m_tabs->count();i++) {
@@ -2196,4 +2210,23 @@ int LanesLexicon::getSearchCount() {
     }
   }
   return c;
+}
+void LanesLexicon::convertToEntry() {
+  HeadSearchWidget * w = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
+  if (w) {
+    Place p = w->getEntry()->getPlace();
+    if (p.isValid()) {
+      int ix = m_tabs->currentIndex();
+      this->onCloseTab(ix);
+      GraphicsEntry * entry = new GraphicsEntry(this);
+      setSignals(entry);
+      entry->installEventFilter(this);
+      entry->getXmlForRoot(p);
+      m_tabs->insertTab(ix,entry,p.getShortText());
+      m_tabs->setCurrentIndex(ix);
+    }
+    else {
+
+    }
+  }
 }
