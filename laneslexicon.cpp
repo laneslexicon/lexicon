@@ -2224,6 +2224,7 @@ void LanesLexicon::convertToEntry() {
       entry->getXmlForRoot(p);
       m_tabs->insertTab(ix,entry,p.getShortText());
       m_tabs->setCurrentIndex(ix);
+      entry->home();
     }
     else {
 
