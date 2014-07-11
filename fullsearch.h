@@ -42,6 +42,7 @@ class FullSearchWidget : public QWidget
    GraphicsEntry * getEntry() { return m_text;}
    void search(const QString &,int options);
    void regexSearch(const QString &,int options);
+   void textSearch(const QString &,int options);
    void setSearch(const QString & searchFor,int options);
    void setOptionsHidden(bool);
    void focusTable();

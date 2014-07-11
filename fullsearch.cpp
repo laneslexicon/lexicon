@@ -241,97 +241,6 @@ bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
   }
   return QWidget::eventFilter(target,event);
 }
-/*
-void FullSearchWidget::search(const QString & target,int options) {
-  m_target = target;
-  m_searchOptions = options;
-  m_nodes.clear();
-  QString sql;
-  //  whole word with diacritics
-  //   select id,node where word = ?
-  //  part word with diacritics
-  //   select id,node from xref where instr(word,?) > 0;
-  //  whole word without diacritics
-  //   select where bareword = ?
-  //  part word without diacritics
-  //   select where instr(bareword,?) > 0
-  sql = buildSearchSql(options);
-  qDebug() << "search sql" << sql;
-  bool ok = false;
-  /// TODO replace select *
-  //   sql = QString("select * from xref where datasource = 1 and word = ? order by root,entry asc");
-  if (m_query.prepare(sql)) {
-    if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeId = ?")) {
-      ok = true;
-    }
-  }
-  if (! ok ) {
-    QLOG_WARN() << "Error prepare SQL";
-    return;
-  }
-  m_list->setRowCount(0);
-
-  qint64 st = QDateTime::currentMSecsSinceEpoch();
-  m_query.bindValue(0,m_target);
-  m_query.exec();
-  QMap<QString,int> nodes;
-
-  QTableWidgetItem * item;
-  /// TODO include count in table ?
-  int count = 0;
-  while(m_query.next()) {
-    count++;
-    QString t;
-    QString word;
-    QString entry;
-    if (options & Lane::Full) {
-      t = m_query.value("node").toString();
-      word = m_query.value("word").toString();
-    }
-    else {
-      t = m_query.value("nodeid").toString();
-      word = m_query.value("word").toString();
-    }
-    if ( ! m_nodes.contains(t))
-      m_nodes << t;
-    else {
-      nodes[t] = nodes.value(t) + 1;
-    }
-    int row = m_list->rowCount();
-    m_list->insertRow(row);
-    item = new QTableWidgetItem(m_query.value("root").toString());
-    item->setFont(m_resultsFont);
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_list->setItem(row,0,item);
-
-    item = new QTableWidgetItem(word);
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    item->setFont(m_resultsFont);
-    m_list->setItem(row,1,item);
-
-    item = new QTableWidgetItem(t);
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_list->setItem(row,NODE_COLUMN,item);
-
-
-    nodes.insert(t,1);
-    m_list->setItem(row,3,new QTableWidgetItem("1"));
-  }
-  //  emit(searchResult(QString(tr("Found %1 items")).arg(count)));
-  QString t = QString(tr("Search for %1, find count %2 ")).arg(m_target).arg(count);
-  if (m_searchOptions & Lane::Ignore_Diacritics)
-    t += tr(", ignoring diacritics");
-  if (m_searchOptions & Lane::Whole_Word)
-    t += tr(", whole word match");
-  m_resultsText->setText(t);
-  m_resultsText->show();
-  if (m_list->rowCount() > 0)
-    m_list->itemDoubleClicked(m_list->item(0,0));
-
-  qDebug() << "readcount" << count << "time" <<   (QDateTime::currentMSecsSinceEpoch() - st);
-
-}
-*/
 void FullSearchWidget::setSearch(const QString & searchFor,int options) {
   m_target = searchFor;
   m_search->setOptions(options);
@@ -365,7 +274,7 @@ QString escaped = pattern;
 
  */
 void FullSearchWidget::findTarget(bool showProgress) {
-  qDebug() << Q_FUNC_INFO;
+  qDebug() << Q_FUNC_INFO << showProgress;
   m_showProgressDialog = showProgress;
   int options = m_search->getOptions();
   /// this shows text in progressbar
@@ -380,7 +289,14 @@ void FullSearchWidget::findTarget(bool showProgress) {
     m_hideOptionsButton->setChecked(true);
     this->hideOptions();
   }
-  this->regexSearch(m_findTarget->text(),options);
+  QString t = m_findTarget->text();
+  QRegExp rx("[a-z]+");
+  if (rx.indexIn(t,0) != -1) {
+    this->textSearch(t,options);
+  }
+  else {
+    this->regexSearch(m_findTarget->text(),options);
+  }
 
   m_progress->hide();
 
@@ -937,4 +853,145 @@ void FullSearchWidget::showKeyboard() {
   else
     m_keyboardButton->setText(tr("Show keyboard"));
 
+}
+void FullSearchWidget::textSearch(const QString & target,int options) {
+  bool replaceSearch = true;
+  qDebug() << Q_FUNC_INFO;
+  m_target = target;
+  m_searchOptions = options;
+
+
+  QRegExp rx;
+
+  QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+  QString pattern;
+  if (options & Lane::Ignore_Diacritics) {
+    QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+    QStringList cc = target.split("");
+    QString brx = "";
+    for(int i=0;i < cc.size();i++) {
+      pattern += cc[i] + ar;
+    }
+  }
+  else {
+    pattern = target;
+  }
+  if (options & Lane::Whole_Word) {
+      pattern = "\\b" + pattern + "\\b";
+  }
+  m_currentRx.setPattern(pattern);
+
+  pattern.clear();
+  if (options & Lane::Whole_Word) {
+    pattern = "\\b" + m_target + "\\b";
+  }
+  else {
+    pattern = m_target;
+  }
+  rx.setPattern(pattern);
+
+  bool ok = false;
+  if (m_query.prepare("select root,word,nodeid,xml from entry where datasource = 1 order by nodenum asc")) {
+    if (m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {
+      ok = true;
+    }
+  }
+  if (! ok ) {
+    QLOG_WARN() << "Error prepare SQL";
+    return;
+  }
+  if (m_debug) {
+    m_rxlist->showColumn(2);
+    m_rxlist->showColumn(3);
+  }
+  else {
+    m_rxlist->hideColumn(2);
+    m_rxlist->hideColumn(3);
+  }
+  m_rxlist->showColumn(4);
+
+
+  m_rxlist->setRowCount(0);
+  //  m_rxlist->hide();
+#define NODE_COLUMN 2
+
+  //  m_nodquery.bindValue(0,m_target);
+
+
+  int headCount = 0;
+  int textCount = 0;
+  int readCount = 0;
+  int entryCount = 0;
+  QString node;
+  QString root;
+  QString headword;
+
+  /// Added QEventLoop because under OSX nothing was shown
+  /// the loop was finished
+  QEventLoop ep;
+  QProgressDialog * pd = 0;
+  m_progress->setMaximum(49000);
+  if (m_showProgressDialog) {
+    //    this->setMaxRecords();
+    pd = new QProgressDialog("Searching...", "Cancel", 0,49000, getApp());
+    connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
+    pd->setWindowModality(Qt::WindowModal);
+    pd->show();
+  }
+  m_cancelSearch = false;
+  m_query.exec();
+  qint64 st = QDateTime::currentMSecsSinceEpoch();
+  m_rxlist->setUpdatesEnabled(false);
+  while(m_query.next() && ! m_cancelSearch) {
+    readCount++;
+    if ((readCount % 500) == 0) {
+      m_progress->setValue(readCount);
+    }
+    if (pd) {
+        pd->setValue(readCount);
+    }
+    ep.processEvents();
+    QString xml = m_query.value("xml").toString();
+    QTextDocument * doc  = fetchDocument(xml);
+    if (doc->characterCount() > 0) {
+      getTextFragments(doc,target,options);
+      for(int i=0;i < m_fragments.size();i++) {
+        addRow(m_query.value("root").toString(),
+               m_query.value("word").toString(),
+               m_query.value("nodeid").toString(),
+               m_fragments[i],m_positions[i]);
+      }
+      textCount += m_fragments.size();
+    }
+  }
+  m_rxlist->setUpdatesEnabled(true);
+  qint64 et = QDateTime::currentMSecsSinceEpoch();
+  qDebug() << "Search time ms:" << et - st;
+  if (pd) {
+    delete pd;
+  }
+
+  if (m_rxlist->rowCount() > 0) {
+    m_container->removeItem(m_spacer);
+    m_rxlist->show();
+    m_rxlist->selectRow(0);
+    m_rxlist->setFocus();
+  }
+  m_resultsText->setText(QString("Search for %1, returned %2 results").arg(target).arg(m_rxlist->rowCount()));
+  m_resultsText->show();
+
+  m_rxlist->resizeColumnToContents(0);
+  m_rxlist->resizeColumnToContents(2);
+  m_rxlist->resizeColumnToContents(3);
+  m_rxlist->resizeColumnToContents(4);
+  this->show();
+  /*
+  else {
+    QMessageBox msgBox;
+    msgBox.setObjectName("wordnotfound");
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setText(QString(tr("Word not found")));
+    msgBox.exec();
+  }
+  */
 }
