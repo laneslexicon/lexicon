@@ -488,6 +488,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   }
   m_cancelSearch = false;
   m_query.exec();
+
   while(m_query.next() && ! m_cancelSearch) {
     readCount++;
     if ((readCount % 500) == 0) {
@@ -769,6 +770,7 @@ void FullSearchWidget::readSettings() {
   }
   m_xsltSource = settings->value("XSLT",QString("node.xslt")).toString();
   m_debug = settings->value("Debug",false).toBool();
+  m_fragmentSize = settings->value("Fragment size",40).toInt();
   settings->endGroup();
   settings->beginGroup("Search");
   m_defaultOptions = 0;
@@ -794,7 +796,7 @@ void FullSearchWidget::readSettings() {
   else
     m_defaultOptions |= Lane::Buckwalter;
 
-  m_fragmentSize = settings->value("Fragment size",40).toInt();
+
 
   delete settings;
 }
