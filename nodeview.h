@@ -34,6 +34,7 @@ class NodeView : public QDialog {
     QTextCursor m_cursor;
     QSize m_size;
     void setPreferredSize(const QString &);
+    QPushButton * m_findFirstButton;
     QPushButton * m_findNextButton;
     //    QPushButton * m_printButton;
     //    QPushButton * m_tabOpenButton;

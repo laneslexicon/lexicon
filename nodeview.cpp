@@ -15,7 +15,7 @@ NodeView::NodeView(QWidget * parent)
     this->setPreferredSize(sz);
 
   delete settings;
-  m_startPosition = 0;
+  m_startPosition = -1;
   QFont f;
   if (! fontString.isEmpty())
     f.fromString(fontString);
@@ -38,13 +38,13 @@ NodeView::NodeView(QWidget * parent)
 
   QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
 
-  QPushButton * findFirst = new QPushButton(tr("&Find first"));
+  m_findFirstButton = new QPushButton(tr("&Find first"));
   m_findNextButton = new QPushButton(tr("Find &next"));
 
   QPushButton * printButton = new QPushButton(tr("&Print"));
   QPushButton * openButton = new QPushButton(tr("&Open in tab"));
 
-  buttonBox->addButton(findFirst,QDialogButtonBox::ActionRole);
+  buttonBox->addButton(m_findFirstButton,QDialogButtonBox::ActionRole);
   buttonBox->addButton(m_findNextButton,QDialogButtonBox::ActionRole);
   buttonBox->addButton(openButton,QDialogButtonBox::ActionRole);
   buttonBox->addButton(printButton,QDialogButtonBox::ActionRole);
@@ -52,7 +52,7 @@ NodeView::NodeView(QWidget * parent)
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-  connect(findFirst,SIGNAL(clicked()),this, SLOT(findFirst()));
+  connect(m_findFirstButton,SIGNAL(clicked()),this, SLOT(findFirst()));
   connect(m_findNextButton,SIGNAL(clicked()),this, SLOT(findNext()));
   connect(printButton,SIGNAL(clicked()),this,SLOT(print()));
   connect(openButton,SIGNAL(clicked()),this,SLOT(openEntry()));
@@ -111,6 +111,7 @@ void NodeView::setCSS(const QString & css) {
 }
 void NodeView::setHtml(const QString & html) {
   m_findNextButton->setEnabled(false);
+  m_findFirstButton->setEnabled(false);
   m_browser->document()->setHtml(html);
   if (m_pattern.isEmpty())
     return;
@@ -120,7 +121,12 @@ void NodeView::setHtml(const QString & html) {
   if (c.isNull()) {
     return;
   }
-  qDebug() << "Moving to" << m_startPosition;
+  if (m_startPosition == -1) {
+    c.setPosition(0);
+    m_browser->setTextCursor(c);
+    return;
+  }
+  m_findFirstButton->setEnabled(true);
   c.setPosition(m_startPosition);
   c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
   c.select(QTextCursor::WordUnderCursor);
