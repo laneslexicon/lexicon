@@ -70,7 +70,7 @@ class FullSearchWidget : public QWidget
    QStringList m_fragments;
    QList<int> m_positions;
    void addRow(const QString &,const QString &,const QString &,const QString &,int);
-   void getTextFragments(QTextDocument * doc,const QString & target,int options);
+   void getTextFragments(QTextDocument * doc,const QString & target,int options,const QRegExp & rx = QRegExp());
    QString buildSearchSql(int);
    QString buildRxSql(int);
    QTextDocument * fetchDocument(const QString & node);

@@ -369,16 +369,17 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   /// the loop was finished
   QEventLoop ep;
   QProgressDialog * pd = 0;
+  int max = this->getMaxRecords("xref");
   if (m_showProgressDialog) {
-    int max = this->getMaxRecords("xref");
     pd = new QProgressDialog("Searching...", "Cancel", 0,max, getApp());
     connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
     pd->setWindowModality(Qt::WindowModal);
     pd->show();
   }
+  m_progress->setMaximum(max);
   m_cancelSearch = false;
   m_query.exec();
-
+  //  m_rxlist->setUpdatesEnabled(false);
   while(m_query.next() && ! m_cancelSearch) {
     readCount++;
     if ((readCount % 500) == 0) {
@@ -430,6 +431,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
       }
     }
   }
+  //  m_rxlist->setUpdatesEnabled(true);
   if (pd) {
     delete pd;
   }
@@ -690,7 +692,7 @@ void FullSearchWidget::readSettings() {
 
   delete settings;
 }
-void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,int options) {
+void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,int options,const QRegExp & regex) {
   QRegExp rx;
   QString pattern;
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
@@ -715,7 +717,12 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     }
   }
   //  qDebug() << "Pattern" << pattern;
+  if (! regex.isEmpty()) {
+    rx.setPattern(regex.pattern());
+  }
+  else {
   rx.setPattern(pattern);
+  }
 
   m_fragments.clear();
   m_positions.clear();
@@ -920,9 +927,9 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
   /// the loop was finished
   QEventLoop ep;
   QProgressDialog * pd = 0;
-  m_progress->setMaximum(49000);
+  int max = this->getMaxRecords("entry");
+  m_progress->setMaximum(max);
   if (m_showProgressDialog) {
-    int max = this->getMaxRecords("entry");
     pd = new QProgressDialog("Searching...", "Cancel", 0,max, getApp());
     connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
     pd->setWindowModality(Qt::WindowModal);
@@ -944,7 +951,7 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
     QString xml = m_query.value("xml").toString();
     QTextDocument * doc  = fetchDocument(xml);
     if (doc->characterCount() > 0) {
-      getTextFragments(doc,target,options);
+      getTextFragments(doc,target,options,rx);
       for(int i=0;i < m_fragments.size();i++) {
         addRow(m_query.value("root").toString(),
                m_query.value("word").toString(),
