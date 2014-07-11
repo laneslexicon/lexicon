@@ -61,7 +61,7 @@ class FullSearchWidget : public QWidget
     KeyboardWidget * m_keyboard;
     bool m_attached;
    void readSettings();
-   QString buildText(int,int,int,int);
+   QString buildText(int,int,int,int,int);
    bool readCssFromFile(const QString &);
    int getMaxRecords(const QString & tablename);
    QProgressBar * m_progress;
@@ -69,7 +69,7 @@ class FullSearchWidget : public QWidget
    bool eventFilter(QObject * target,QEvent * event);
    QStringList m_fragments;
    QList<int> m_positions;
-   void addRow(const QString &,const QString &,const QString &,const QString &,int);
+   int addRow(const QString &,const QString &,const QString &,const QString &,int);
    void getTextFragments(QTextDocument * doc,const QString & target,int options,const QRegExp & rx = QRegExp());
    QString buildSearchSql(int);
    QString buildRxSql(int);

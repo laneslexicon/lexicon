@@ -99,9 +99,15 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
 FullSearchWidget::~FullSearchWidget() {
   qDebug() << Q_FUNC_INFO;
 }
+
 void FullSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
+  qDebug() << Q_FUNC_INFO << "we should not be here";
+/*  bool isHead = false;
   /// get the node
-  item = item->tableWidget()->item(item->row(),2);
+  item = item->tableWidget()->item(item->row(),NODE_COLUMN);
+  if (item->data(Qt::UserRole).toBool()) {
+    isHead = true;
+  }
   QString node = item->text();
   m_nodeQuery.bindValue(0,node);
   m_nodeQuery.exec();
@@ -121,11 +127,17 @@ void FullSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /*
   else {
     QLOG_DEBUG() << "Invalid place returned for node" << node;
   }
+*/
 }
+
 void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   bool ok;
+  bool isHead = false;
   /// get the node
-  item = item->tableWidget()->item(item->row(),2);
+  item = item->tableWidget()->item(item->row(),NODE_COLUMN);
+  if (item->data(Qt::UserRole).toBool()) {
+    isHead = true;
+  }
   QString node = item->text();
   m_nodeQuery.bindValue(0,node);
   m_nodeQuery.exec();
@@ -149,7 +161,9 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   v->setCSS(m_currentCSS);
   v->setHeader(m_nodeQuery.value("root").toString(),m_nodeQuery.value("word").toString(),node);
   /// has to be call before setHtml otherwise it will select the first occurence
-  v->setStartPosition(pos);
+  if (! isHead ) {
+    v->setStartPosition(pos);
+  }
   v->setHtml(html);
   v->show();
   v->raise();
@@ -353,7 +367,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   m_rxlist->setRowCount(0);
   //  m_rxlist->hide();
 #define NODE_COLUMN 2
-  qint64 st = QDateTime::currentMSecsSinceEpoch();
+
   //  m_nodquery.bindValue(0,m_target);
 
 
@@ -380,6 +394,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   m_cancelSearch = false;
   m_query.exec();
   //  m_rxlist->setUpdatesEnabled(false);
+  qint64 st = QDateTime::currentMSecsSinceEpoch();
   while(m_query.next() && ! m_cancelSearch) {
     ok = false;
     readCount++;
@@ -412,7 +427,9 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
         }
         if (headword.indexOf(rx) != -1) {
           if (options & Lane::Include_Heads) {
-            addRow(root,m_nodeQuery.value("word").toString(),node,"Head word",0);
+            int row = addRow(root,m_nodeQuery.value("word").toString(),node,"Head word",0);
+            QTableWidgetItem * item = m_rxlist->item(row,NODE_COLUMN);
+            item->setData(Qt::UserRole,true);
             headCount++;
           }
         }
@@ -434,6 +451,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
       }
     }
   }
+  qint64 et = QDateTime::currentMSecsSinceEpoch();
   //  m_rxlist->setUpdatesEnabled(true);
   if (pd) {
     delete pd;
@@ -447,7 +465,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   }
 
 
-  m_resultsText->setText(buildText(entryCount,headCount,textCount,options));
+  m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st,options));
   m_resultsText->show();
 
   m_rxlist->resizeColumnToContents(0);
@@ -474,7 +492,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
  *
  * @return
  */
-QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,int options) {
+QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,int ms,int options) {
   QString t;
   QString p1;
   QString p2;
@@ -513,9 +531,18 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
   if (options & Lane::Whole_Word)
     t += tr(", whole word match");
 
+  if (ms != -1) {
+    qreal x = (ms/1000) + 0.5;
+    int y = static_cast<int>(x);
+    t += QString(" (%1 sec").arg(x);
+    if (x != 1) {
+      t += "s";
+    }
+    t += ")";
+  }
   return t;
 }
-void FullSearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos) {
+int FullSearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos) {
   QTableWidgetItem * item;
   int row = m_rxlist->rowCount();
   m_rxlist->insertRow(row);
@@ -567,7 +594,7 @@ void FullSearchWidget::addRow(const QString & root,const QString & headword, con
   else
     m_rxlist->setItem(row,4,new QTableWidgetItem(text));
 
-
+  return row;
 }
 /**
  * build SQL for search using DB style search
@@ -1013,7 +1040,7 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
     m_rxlist->setFocus();
   }
   //  m_resultsText->setText(QString("Search for %1, returned %2 results").arg(target).arg(m_rxlist->rowCount()));
-  m_resultsText->setText(buildText(entryCount,headCount,textCount,options));
+  m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st,options));
   m_resultsText->show();
 
   m_rxlist->resizeColumnToContents(0);
