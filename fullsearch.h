@@ -61,7 +61,7 @@ class FullSearchWidget : public QWidget
     KeyboardWidget * m_keyboard;
     bool m_attached;
    void readSettings();
-   QString buildText(int,int,int);
+   QString buildText(int,int,int,int);
    bool readCssFromFile(const QString &);
    int getMaxRecords(const QString & tablename);
    QProgressBar * m_progress;

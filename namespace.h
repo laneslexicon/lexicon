@@ -16,6 +16,8 @@ enum Tabs {
    Buckwalter        =  0x00000080,
    Arabic            =  0x00000100,
    Normal_Search     =  0x00000200,
-   Regex_Search      =  0x00000400 };
+   Regex_Search      =  0x00000400,
+   Include_Heads     =  0x00000800
+ };
 }
 #endif

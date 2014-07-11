@@ -381,6 +381,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   m_query.exec();
   //  m_rxlist->setUpdatesEnabled(false);
   while(m_query.next() && ! m_cancelSearch) {
+    ok = false;
     readCount++;
     if ((readCount % 500) == 0) {
       m_progress->setValue(readCount);
@@ -410,8 +411,10 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
             headword =  headword.replace(rxclass,QString());
         }
         if (headword.indexOf(rx) != -1) {
-          addRow(root,m_nodeQuery.value("word").toString(),node,"Head word",0);
-          headCount++;
+          if (options & Lane::Include_Heads) {
+            addRow(root,m_nodeQuery.value("word").toString(),node,"Head word",0);
+            headCount++;
+          }
         }
         headword = m_nodeQuery.value("word").toString();
 
@@ -444,7 +447,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   }
 
 
-  m_resultsText->setText(buildText(headCount,entryCount,options));
+  m_resultsText->setText(buildText(entryCount,headCount,textCount,options));
   m_resultsText->show();
 
   m_rxlist->resizeColumnToContents(0);
@@ -462,11 +465,20 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   }
   */
 }
-QString FullSearchWidget::buildText(int headCount,int entryCount,int options) {
+/**
+ *
+ *
+ * @param entryCount the number of unique entries i.e. nodes
+ * @param bodyCount  the number of occurrences within XML
+ * @param options
+ *
+ * @return
+ */
+QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,int options) {
   QString t;
   QString p1;
   QString p2;
-  int findCount = headCount + entryCount;
+  int findCount = bodyCount + headCount;
 
   switch(findCount) {
   case 0 :
@@ -646,10 +658,14 @@ QString FullSearchWidget::transform(const QString & xml) {
   return QString();
 }
 void FullSearchWidget::readSettings() {
+
+  QString v;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
   bool ok;
   settings->setIniCodec("UTF-8");
+  m_defaultOptions = 0;
+
   settings->beginGroup("Entry");
   QString css = settings->value("CSS",QString("entry.css")).toString();
   readCssFromFile(css);
@@ -663,10 +679,12 @@ void FullSearchWidget::readSettings() {
   m_xsltSource = settings->value("XSLT",QString("node.xslt")).toString();
   m_debug = settings->value("Debug",false).toBool();
   m_fragmentSize = settings->value("Fragment size",40).toInt();
+  if (settings->value("Include heads",false).toBool()) {
+    m_defaultOptions |= Lane::Include_Heads;
+  }
   settings->endGroup();
+
   settings->beginGroup("Search");
-  m_defaultOptions = 0;
-  QString v;
   v  = settings->value("Type",QString("normal")).toString();
   if (v == "normal")
     m_defaultOptions |= Lane::Normal_Search;
@@ -940,6 +958,7 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
   qint64 st = QDateTime::currentMSecsSinceEpoch();
   m_rxlist->setUpdatesEnabled(false);
   while(m_query.next() && ! m_cancelSearch) {
+    ok = false;
     readCount++;
     if ((readCount % 500) == 0) {
       m_progress->setValue(readCount);
@@ -948,10 +967,23 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
         pd->setValue(readCount);
     }
     ep.processEvents();
+    QString headword = m_query.value("word").toString();
+    if (headword.indexOf(rx) != -1) {
+      if (options & Lane::Include_Heads) {
+        addRow(m_query.value("root").toString(),
+               m_query.value("word").toString(),
+               m_query.value("nodeid").toString(),
+               "head word",0);
+        headCount++;
+        ok = true;
+      }
+    }
     QString xml = m_query.value("xml").toString();
     QTextDocument * doc  = fetchDocument(xml);
     if (doc->characterCount() > 0) {
       getTextFragments(doc,target,options,rx);
+      if (m_fragments.size() == 0) {
+      }
       for(int i=0;i < m_fragments.size();i++) {
         addRow(m_query.value("root").toString(),
                m_query.value("word").toString(),
@@ -960,8 +992,11 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
       }
       if (m_fragments.size() > 0) {
         textCount += m_fragments.size();
-        headCount++;
+        ok = true;
       }
+    }
+    if (ok) {
+      entryCount++;
     }
   }
   m_rxlist->setUpdatesEnabled(true);
@@ -978,7 +1013,7 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
     m_rxlist->setFocus();
   }
   //  m_resultsText->setText(QString("Search for %1, returned %2 results").arg(target).arg(m_rxlist->rowCount()));
-  m_resultsText->setText(buildText(headCount,textCount,options));
+  m_resultsText->setText(buildText(entryCount,headCount,textCount,options));
   m_resultsText->show();
 
   m_rxlist->resizeColumnToContents(0);

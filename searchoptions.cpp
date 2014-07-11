@@ -23,7 +23,7 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_arabicTarget = new QRadioButton(tr("Arabic text"),m_targetGroup);
   m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),m_targetGroup);
 
-
+  m_includeHeads = new QCheckBox(tr("Include head entries"));
 
   /// diacritics/whole word
   QHBoxLayout * optionslayout = new QHBoxLayout;
@@ -62,6 +62,7 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
 
   mainlayout->addWidget(m_typeGroup);
   mainlayout->addLayout(optionslayout);
+  mainlayout->addWidget(m_includeHeads);
   mainlayout->addLayout(forcelayout);
   mainlayout->addWidget(m_targetGroup);
   if ( ! qobject_cast<FullSearchWidget *>(parent))
@@ -83,6 +84,7 @@ void SearchOptions::showMore(bool show) {
     m_targetGroup->setVisible(false);
     m_ignoreDiacritics->setVisible(false);
     m_wholeWordMatch->setVisible(false);
+    m_includeHeads->setVisible(false);
     m_forceLTR->setVisible(false);
     if (m_hasMaps)
       m_keymapGroup->setVisible(show);
@@ -90,6 +92,7 @@ void SearchOptions::showMore(bool show) {
     break;
   }
   case Lane::Entry : {
+    m_includeHeads->setVisible(false);
     if (m_hasMaps)
       m_keymapGroup->setVisible(show);
 
@@ -114,6 +117,8 @@ void SearchOptions::showMore(bool show) {
   case Lane::Word : {
     if (m_hasMaps)
       m_keymapGroup->setVisible(show);
+
+    m_includeHeads->setVisible(show);
 
     if (m_regexSearch->isChecked()) {
       m_targetGroup->setVisible(m_more);
@@ -160,7 +165,8 @@ int SearchOptions::getOptions() {
   if (m_buckwalterTarget->isChecked())
     x |= Lane::Buckwalter;
 
-
+  if (m_includeHeads->isChecked())
+    x |= Lane::Include_Heads;
 
   return x;
 }
@@ -204,7 +210,12 @@ void SearchOptions::setOptions(int x) {
     v = false;
   m_buckwalterTarget->setChecked(v);
 
-
+  if (x & Lane::Include_Heads)
+    v = true;
+  else
+    v = false;
+  m_includeHeads->setChecked(v);
+  qDebug() << "includ heads" << v;
   searchTypeChanged();
 }
 

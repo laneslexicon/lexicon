@@ -1152,6 +1152,16 @@ void LanesLexicon::readSettings() {
 
   settings->endGroup();
 
+  settings->beginGroup("FullSearch");
+  if (settings->value("Include heads",false).toBool()) {
+    m_defaultSearchOptions |= Lane::Include_Heads;
+
+  }
+  if (m_defaultSearchOptions & Lane::Include_Heads) {
+    qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!";
+  }
+  settings->endGroup();
+
   settings->beginGroup("Debug");
   m_valgrind = settings->value("Valgrind",false).toBool();
   settings->endGroup();
@@ -2014,6 +2024,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
 }
 void LanesLexicon::searchForWord() {
   ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
+  qDebug() << Q_FUNC_INFO << "include heads" << (m_defaultSearchOptions & Lane::Include_Heads);
   d->setOptions(m_defaultSearchOptions);
   if (d->exec()) {
     QString t = d->getText();
