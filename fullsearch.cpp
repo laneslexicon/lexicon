@@ -298,30 +298,36 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   QString sql = "select id,word,root,entry,node,nodenum from xref where datasource = 1 order by nodenum asc";
 
   QString pattern;
-  if (options & Lane::Ignore_Diacritics) {
-    QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
-    QStringList cc = target.split("");
-    QString brx = "";
-    for(int i=0;i < cc.size();i++) {
-      pattern += cc[i] + ar;
+  if (options & Lane::Normal_Search) {
+    if (options & Lane::Ignore_Diacritics) {
+      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+      QStringList cc = target.split("");
+      QString brx = "";
+      for(int i=0;i < cc.size();i++) {
+        pattern += cc[i] + ar;
+      }
     }
-  }
-  else {
-    pattern = target;
-  }
-  if (options & Lane::Whole_Word) {
+    else {
+      pattern = target;
+    }
+    if (options & Lane::Whole_Word) {
       pattern = "\\b" + pattern + "\\b";
-  }
-  m_currentRx.setPattern(pattern);
+    }
+    m_currentRx.setPattern(pattern);
 
-  pattern.clear();
-  if (options & Lane::Whole_Word) {
-    pattern = "\\b" + m_target + "\\b";
+    pattern.clear();
+    if (options & Lane::Whole_Word) {
+      pattern = "\\b" + m_target + "\\b";
+    }
+    else {
+      pattern = m_target;
+    }
+    rx.setPattern(pattern);
   }
   else {
-    pattern = m_target;
+    qDebug() << "regex pattern" << rx.pattern();
+    rx.setPattern(target);
   }
-  rx.setPattern(pattern);
 
   bool ok = false;
   if (m_query.prepare(sql)) {
@@ -710,6 +716,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
   }
   //  qDebug() << "Pattern" << pattern;
   rx.setPattern(pattern);
+
   m_fragments.clear();
   m_positions.clear();
   int position = 0;
@@ -843,31 +850,36 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
 
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
   QString pattern;
-  if (options & Lane::Ignore_Diacritics) {
-    QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
-    QStringList cc = target.split("");
-    QString brx = "";
-    for(int i=0;i < cc.size();i++) {
-      pattern += cc[i] + ar;
+  if (options & Lane::Normal_Search) {
+    if (options & Lane::Ignore_Diacritics) {
+      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+      QStringList cc = target.split("");
+      QString brx = "";
+      for(int i=0;i < cc.size();i++) {
+        pattern += cc[i] + ar;
+      }
     }
-  }
-  else {
-    pattern = target;
-  }
-  if (options & Lane::Whole_Word) {
+    else {
+      pattern = target;
+    }
+    if (options & Lane::Whole_Word) {
       pattern = "\\b" + pattern + "\\b";
-  }
-  m_currentRx.setPattern(pattern);
+    }
+    m_currentRx.setPattern(pattern);
 
-  pattern.clear();
-  if (options & Lane::Whole_Word) {
-    pattern = "\\b" + m_target + "\\b";
+    pattern.clear();
+    if (options & Lane::Whole_Word) {
+      pattern = "\\b" + m_target + "\\b";
+    }
+    else {
+      pattern = m_target;
+    }
+    rx.setPattern(pattern);
   }
   else {
-    pattern = m_target;
+    rx.setPattern(target);
+    qDebug() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
   }
-  rx.setPattern(pattern);
-
   bool ok = false;
   if (m_query.prepare("select root,word,nodeid,xml from entry where datasource = 1 order by nodenum asc")) {
     if (m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {
