@@ -19,7 +19,7 @@ extern LanesLexicon * getApp();
  */
 FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
-  setMaxRecords();
+  //  setMaxRecords();
   m_attached = false;
   QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
@@ -73,8 +73,8 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   //QStyle * style = m_list->style();
   //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   m_progress = new QProgressBar;
-  m_progress->setMaximum(m_maxRecordCount);
-  emit(setProgressMax(m_maxRecordCount));
+  //  m_progress->setMaximum(thism_maxRecordCount);
+  //  emit(setProgressMax(m_maxRecordCount));
   m_progress->hide();
   m_resultsText = new QLabel("");
   m_resultsText->hide();
@@ -397,10 +397,11 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   QEventLoop ep;
   QProgressDialog * pd = 0;
   if (m_showProgressDialog) {
-    this->setMaxRecords();
-    pd = new QProgressDialog("Searching...", "Cancel", 0,m_maxRecordCount, getApp());
+    int max = this->getMaxRecords("xref");
+    pd = new QProgressDialog("Searching...", "Cancel", 0,max, getApp());
     connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
     pd->setWindowModality(Qt::WindowModal);
+    pd->show();
   }
   m_cancelSearch = false;
   m_query.exec();
@@ -510,10 +511,10 @@ QString FullSearchWidget::buildText(int headCount,int entryCount,int options) {
   }
   /// TODO allow for Arabic font
   if (findCount == 0) {
-    t = QString(tr("Search for %1, %2")).arg(m_target).arg(p1);
+    t = QString(tr("Search for \"%1\", %2")).arg(m_target).arg(p1);
   }
   else {
-    t = QString(tr("Search for %1, found %2 item%3 in %4 entr%5"))
+    t = QString(tr("Search for \"%1\", found %2 item%3 in %4 entr%5"))
       .arg(m_target)
       .arg(findCount)
       .arg(p1)
@@ -770,15 +771,25 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     c = doc->find(rx,position);
   }
 }
-void FullSearchWidget::setMaxRecords() {
+int FullSearchWidget::getMaxRecords(const QString & table) {
   bool ok = false;
-  QSqlQuery maxq("select id from xref order by id desc limit 1");
+  QString sql = QString("select id from %1 order by id desc limit 1").arg(table);
+  QSqlQuery maxq(sql);
+  int max;
   if (maxq.exec() && maxq.next())
-    m_maxRecordCount = maxq.value(0).toInt(&ok);
+    max = maxq.value(0).toInt(&ok);
 
-  if (! ok )
-    m_maxRecordCount = 544695;
+  if (! ok ) {
+    if (table == "xref") {
+      max = 544695;
+    }
+    else {
+      max = 49000;
+    }
+  }
+  return max;
 }
+
 /**
  * lines beginning with - are omitted
  *
@@ -932,8 +943,8 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
   QProgressDialog * pd = 0;
   m_progress->setMaximum(49000);
   if (m_showProgressDialog) {
-    //    this->setMaxRecords();
-    pd = new QProgressDialog("Searching...", "Cancel", 0,49000, getApp());
+    int max = this->getMaxRecords("entry");
+    pd = new QProgressDialog("Searching...", "Cancel", 0,max, getApp());
     connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
     pd->setWindowModality(Qt::WindowModal);
     pd->show();
@@ -961,7 +972,10 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
                m_query.value("nodeid").toString(),
                m_fragments[i],m_positions[i]);
       }
-      textCount += m_fragments.size();
+      if (m_fragments.size() > 0) {
+        textCount += m_fragments.size();
+        headCount++;
+      }
     }
   }
   m_rxlist->setUpdatesEnabled(true);
@@ -977,7 +991,8 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
     m_rxlist->selectRow(0);
     m_rxlist->setFocus();
   }
-  m_resultsText->setText(QString("Search for %1, returned %2 results").arg(target).arg(m_rxlist->rowCount()));
+  //  m_resultsText->setText(QString("Search for %1, returned %2 results").arg(target).arg(m_rxlist->rowCount()));
+  m_resultsText->setText(buildText(headCount,textCount,options));
   m_resultsText->show();
 
   m_rxlist->resizeColumnToContents(0);

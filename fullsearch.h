@@ -63,8 +63,7 @@ class FullSearchWidget : public QWidget
    void readSettings();
    QString buildText(int,int,int);
    bool readCssFromFile(const QString &);
-   void setMaxRecords();
-   int m_maxRecordCount;
+   int getMaxRecords(const QString & tablename);
    QProgressBar * m_progress;
    ImLineEdit * m_findTarget;
    bool eventFilter(QObject * target,QEvent * event);
