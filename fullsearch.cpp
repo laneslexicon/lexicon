@@ -51,16 +51,6 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_search = new SearchOptions(Lane::Word,this);
   QWidget * container = new QWidget;
   m_container = new QVBoxLayout;
-  /*
-  m_list = new QTableWidget;
-  m_list->setColumnCount(4);
-  m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_list->setHorizontalHeaderLabels(headers);
-  m_list->horizontalHeader()->setStretchLastSection(true);
-  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_list->installEventFilter(this);
-  */
   m_rxlist = new FocusTable;
   m_rxlist->setColumnCount(5);
   m_rxlist->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -73,8 +63,6 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   //QStyle * style = m_list->style();
   //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   m_progress = new QProgressBar;
-  //  m_progress->setMaximum(thism_maxRecordCount);
-  //  emit(setProgressMax(m_maxRecordCount));
   m_progress->hide();
   m_resultsText = new QLabel("");
   m_resultsText->hide();
@@ -83,9 +71,6 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_spacer = new QSpacerItem(0, 20,QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
   m_container->addWidget(m_progress);
   m_container->addSpacerItem(m_spacer);
-  //  QHBoxLayout * listlayout = new QHBoxLayout;
-  //  listlayout->addWidget(m_list);
-  //  listlayout->addWidget(m_rxlist);
 
   m_container->addWidget(m_rxlist);
   m_container->addWidget(m_resultsText);
@@ -101,19 +86,12 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   splitter->setStretchFactor(0,0);
   splitter->setStretchFactor(1,1);
   layout->addWidget(splitter);
-  //  m_list->adjustSize();//resizeColumnsToContents();
 
   setLayout(layout);
-  //connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
-  //      this,SLOT(itemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
   connect(m_rxlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
 
   initXslt();
-  //  if (m_list->rowCount() > 0)
-  //    m_list->itemDoubleClicked(m_list->item(0,0));
-
-  //  m_list->hide();
   m_search->setOptions(m_defaultOptions);
   m_rxlist->hide();
   this->setFocus();
@@ -177,18 +155,6 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   v->raise();
   v->activateWindow();
   connect(v,SIGNAL(openNode(const QString &)),this,SIGNAL(showNode(const QString &)));
-  /*
-  Place np;
-  np.setNode(node);
-  //  np.setNodeOnly(true);
-  Place p = m_text->getXmlForRoot(np);
-  if (p.isValid()) {
-    m_text->highlight(m_target);
-  }
-  else {
-    QLOG_DEBUG() << "Invalid place returned for node" << node;
-  }
-  */
 }
 bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
   if (event->type() == QEvent::KeyPress) {
@@ -258,6 +224,7 @@ void FullSearchWidget::hideOptions() {
   }
   else {
     m_search->show();
+    m_search->showMore(true);
     m_hideOptionsButton->setText("Hide options");
   }
 }

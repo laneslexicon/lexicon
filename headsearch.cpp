@@ -309,9 +309,9 @@ void HeadSearchWidget::search(const QString & target,int options) {
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,NODE_COLUMN,item);
     }
-  if ((count % m_stepCount) == 0) {
-    pd->setValue(count);
-  }
+    if ((count % m_stepCount) == 0) {
+      pd->setValue(count);
+    }
   }
   m_resultsText->setText(this->buildText(options));
   m_resultsText->show();
