@@ -149,10 +149,10 @@ int SearchOptions::getOptions() {
 
 
   if (m_regexSearch->isChecked())
-    x |= Lane::Regex;
+    x |= Lane::Regex_Search;
 
   if (m_normalSearch->isChecked())
-    x |= Lane::Normal;
+    x |= Lane::Normal_Search;
 
   if (m_arabicTarget->isChecked())
     x |= Lane::Arabic;
@@ -180,13 +180,13 @@ void SearchOptions::setOptions(int x) {
   m_wholeWordMatch->setChecked(v);
 
 
-  if (x & Lane::Regex)
+  if (x & Lane::Regex_Search)
     v = true;
   else
     v = false;
   m_regexSearch->setChecked(v);
 
-  if (x & Lane::Normal)
+  if (x & Lane::Normal_Search)
     v = true;
   else
     v = false;

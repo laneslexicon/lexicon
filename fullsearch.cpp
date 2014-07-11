@@ -661,9 +661,9 @@ void FullSearchWidget::readSettings() {
   QString v;
   v  = settings->value("Type",QString("normal")).toString();
   if (v == "normal")
-    m_defaultOptions |= Lane::Normal;
+    m_defaultOptions |= Lane::Normal_Search;
   else
-    m_defaultOptions |= Lane::Regex;
+    m_defaultOptions |= Lane::Regex_Search;
 
   v = settings->value("Ignore diacritics",QString("yes")).toString();
   if (v == "yes")
@@ -689,7 +689,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
   QString pattern;
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
-  if (options & Lane::Regex) {
+  if (options & Lane::Regex_Search) {
     pattern = target;
   }
   else {

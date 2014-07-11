@@ -1056,7 +1056,7 @@ void LanesLexicon::on_actionTest() {
   SearchOptions * s = new SearchOptions(Lane::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
     m_tabs->addTab(s,"Test");
-    s->setOptions(Lane::Create_Tab | Lane::Regex | Lane::Arabic);
+    s->setOptions(Lane::Create_Tab | Lane::Regex_Search | Lane::Arabic);
     //    s->setOptions(0);
     ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word);
     d->exec();
@@ -1131,9 +1131,9 @@ void LanesLexicon::readSettings() {
   QString v;
   v  = settings->value("Type",QString("normal")).toString();
   if (v == "normal")
-    m_defaultSearchOptions |= Lane::Normal;
+    m_defaultSearchOptions |= Lane::Normal_Search;
   else
-    m_defaultSearchOptions |= Lane::Regex;
+    m_defaultSearchOptions |= Lane::Regex_Search;
 
   v = settings->value("Ignore diacritics",QString("yes")).toString();
   if (v == "yes")
