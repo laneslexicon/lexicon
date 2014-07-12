@@ -24,9 +24,13 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  m_findTarget->readSettings(settings);
+
   m_findButton = new QPushButton(tr("F&ind"));
   m_findButton->setDefault(true);
-  m_hideOptionsButton = new QPushButton(tr("Hid&e options"));
+  m_hideOptionsButton = new QPushButton(tr("Sho&w options"));
   m_hideOptionsButton->setCheckable(true);
 
   m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
@@ -543,8 +547,8 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
   if (ms != -1) {
     qreal x = (ms/1000) + 0.5;
     int y = static_cast<int>(x);
-    t += QString(" (%1 sec").arg(x);
-    if (x != 1) {
+    t += QString(" (%1 sec").arg(y);
+    if (y != 1) {
       t += "s";
     }
     t += ")";

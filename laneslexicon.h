@@ -231,6 +231,9 @@ private:
     void setupHistory(int startPos = -1);
     void createMenus();
     void createStatusBar();
+
+    void enableKeymaps(bool);
+    bool m_keymapsEnabled;
     bool eventFilter(QObject * target, QEvent *);
     bool openDatabase(const QString &);
 

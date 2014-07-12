@@ -425,6 +425,12 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == "convert to entry") {
     this->convertToEntry();
   }
+  else if (key == "keymaps enable") {
+    this->enableKeymaps(true);
+  }
+  else if (key == "keymaps disable") {
+    this->enableKeymaps(false);
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -1053,7 +1059,7 @@ void LanesLexicon::on_actionTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
   if (0) {
-  SearchOptions * s = new SearchOptions(Lane::Word);
+    SearchOptions * s = new SearchOptions(Lane::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
     m_tabs->addTab(s,"Test");
     s->setOptions(Lane::Create_Tab | Lane::Regex_Search | Lane::Arabic);
@@ -1067,21 +1073,29 @@ void LanesLexicon::on_actionTest() {
     int c = this->getSearchCount();
     m_tabs->addTab(w,QString(tr("Search %1")).arg(c+1));;
   }
-  HeadSearchWidget * w = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
-  if (w) {
-    Place p = w->getEntry()->getPlace();
-    if (p.isValid()) {
-      int ix = m_tabs->currentIndex();
-      this->onCloseTab(ix);
-      GraphicsEntry * entry = new GraphicsEntry(this);
-      setSignals(entry);
-      entry->installEventFilter(this);
-      entry->getXmlForRoot(p);
-      m_tabs->insertTab(ix,entry,p.getShortText());
-      m_tabs->setCurrentIndex(ix);
+  foreach (QWidget *widget, QApplication::allWidgets()) {
+    ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
+    if (w) {
+      qDebug() << "Found linedit";
     }
-    else {
-      qDebug() << "could not clone graphcicsentry";
+  }
+  if (0) {
+    HeadSearchWidget * w = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
+    if (w) {
+      Place p = w->getEntry()->getPlace();
+      if (p.isValid()) {
+        int ix = m_tabs->currentIndex();
+        this->onCloseTab(ix);
+        GraphicsEntry * entry = new GraphicsEntry(this);
+        setSignals(entry);
+        entry->installEventFilter(this);
+        entry->getXmlForRoot(p);
+        m_tabs->insertTab(ix,entry,p.getShortText());
+        m_tabs->setCurrentIndex(ix);
+      }
+      else {
+        qDebug() << "could not clone graphcicsentry";
+      }
     }
   }
 }
@@ -1122,6 +1136,8 @@ void LanesLexicon::readSettings() {
 
   m_toolbarIconSize = settings->value("Icon size",QSize(16,16)).toSize();
 
+  m_keymapsEnabled = settings->value("Keymaps",false).toBool();
+
   settings->endGroup();
 
   settings->beginGroup("Search");
@@ -1150,15 +1166,15 @@ void LanesLexicon::readSettings() {
   else
     m_defaultSearchOptions |= Lane::Buckwalter;
 
+  if (m_keymapsEnabled)
+    m_defaultSearchOptions |= Lane::Keymaps_Enabled;
+
   settings->endGroup();
 
   settings->beginGroup("FullSearch");
   if (settings->value("Include heads",false).toBool()) {
     m_defaultSearchOptions |= Lane::Include_Heads;
 
-  }
-  if (m_defaultSearchOptions & Lane::Include_Heads) {
-    qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!";
   }
   settings->endGroup();
 
@@ -1985,8 +2001,8 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   options |= searchType;
   if (searchType & Lane::Word) {
       FullSearchWidget * s = new FullSearchWidget;
-      s->setOptionsHidden(false);
-      s->hide();
+      //      s->setOptionsHidden(true);
+      //      s->hide();
       s->setSearch(t,options);
       //      d->showProgress(true);
       //      connect(s,SIGNAL(setProgressMax(int)),d,SLOT(setProgressMax(int)));
@@ -2241,4 +2257,37 @@ void LanesLexicon::convertToEntry() {
 
     }
   }
+}
+void LanesLexicon::enableKeymaps(bool v) {
+  m_keymapsEnabled = v;
+  qDebug() << Q_FUNC_INFO << v;
+  foreach (QWidget *widget, QApplication::allWidgets()) {
+    ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
+    if (w) {
+      w->setEnabled(v);
+    }
+    else {
+      ImEdit * imedit = qobject_cast<ImEdit *>(widget);
+      if (imedit) {
+        imedit->setEnabled(v);
+      }
+      else {
+        SearchOptions * search = qobject_cast<SearchOptions *>(widget);
+        if (search) {
+          search->setKeymapsEnabled(v);
+        }
+      }
+    }
+  }
+  m_defaultSearchOptions -= Lane::Keymaps_Enabled;
+  if (v) {
+    m_defaultSearchOptions |= Lane::Keymaps_Enabled;
+  }
+  QSettings * settings;
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("System");
+  settings->setValue("Keymaps",v);
+  delete settings;
 }

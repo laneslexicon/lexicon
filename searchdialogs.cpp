@@ -56,6 +56,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->getActiveMap();
+  qDebug() << Q_FUNC_INFO << "active map" << map;
   if (map.isEmpty()) {
     map = m_edit->getNullMap();
   }

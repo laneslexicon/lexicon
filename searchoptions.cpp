@@ -5,6 +5,8 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_more = false;
   m_searchType = searchType;
   m_hasMaps = false;
+  m_keymapsEnabled = false;
+
   QVBoxLayout * mainlayout = new QVBoxLayout;
 
   m_targetGroup = new QGroupBox(tr("Search target"));
@@ -93,8 +95,12 @@ void SearchOptions::showMore(bool show) {
   }
   case Lane::Entry : {
     m_includeHeads->setVisible(false);
-    if (m_hasMaps)
+    if (m_hasMaps && m_keymapsEnabled) {
       m_keymapGroup->setVisible(show);
+    }
+    else {
+      m_keymapGroup->setVisible(false);
+    }
 
     if (m_regexSearch->isChecked()) {
       m_targetGroup->setVisible(m_more);
@@ -115,8 +121,10 @@ void SearchOptions::showMore(bool show) {
     break;
   }
   case Lane::Word : {
-    if (m_hasMaps)
+    if (m_hasMaps && m_keymapsEnabled)
       m_keymapGroup->setVisible(show);
+    else
+      m_keymapGroup->setVisible(false);
 
     m_includeHeads->setVisible(show);
 
@@ -215,7 +223,15 @@ void SearchOptions::setOptions(int x) {
   else
     v = false;
   m_includeHeads->setChecked(v);
-  qDebug() << "includ heads" << v;
+
+  if (x & Lane::Keymaps_Enabled) {
+    m_keymapsEnabled = true;
+
+  }
+  else
+    m_keymapsEnabled = false;
+
+  qDebug() << Q_FUNC_INFO << "Keymaps enabled" << m_keymapsEnabled ;
   searchTypeChanged();
 }
 
@@ -250,4 +266,7 @@ void SearchOptions::keymapChanged() {
     qDebug() << "keymap" << btn->text();
     emit(loadKeymap(btn->text()));
   }
+}
+void SearchOptions::setKeymapsEnabled(bool v) {
+  m_keymapsEnabled = v;
 }
