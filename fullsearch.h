@@ -58,6 +58,8 @@ class FullSearchWidget : public QWidget
    void focusOutEvent(QFocusEvent *);
    //   void eventFilter(QObject *,QEvent *);
  private:
+   QColor m_headBackgroundColor;
+   QString m_headText;
     KeyboardWidget * m_keyboard;
     bool m_attached;
    void readSettings();

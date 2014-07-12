@@ -427,10 +427,19 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
         }
         if (headword.indexOf(rx) != -1) {
           if (options & Lane::Include_Heads) {
-            int row = addRow(root,m_nodeQuery.value("word").toString(),node,"Head word",0);
+            int row = addRow(root,m_nodeQuery.value("word").toString(),node,m_headText,0);
             QTableWidgetItem * item = m_rxlist->item(row,NODE_COLUMN);
             item->setData(Qt::UserRole,true);
             headCount++;
+            if (m_headBackgroundColor.isValid()) {
+              QBrush b(m_headBackgroundColor);
+              for(int i=0;i < m_rxlist->columnCount();i++) {
+                m_rxlist->item(row,i)->setBackground(b);
+              }
+            }
+            else {
+              qDebug() << "invalid color";
+            }
           }
         }
         headword = m_nodeQuery.value("word").toString();
@@ -709,6 +718,9 @@ void FullSearchWidget::readSettings() {
   if (settings->value("Include heads",false).toBool()) {
     m_defaultOptions |= Lane::Include_Heads;
   }
+  v = settings->value("Head word background").toString();
+  m_headBackgroundColor.setNamedColor(v);
+  m_headText = settings->value("Head text").toString();
   settings->endGroup();
 
   settings->beginGroup("Search");
