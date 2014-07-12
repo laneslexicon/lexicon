@@ -6,8 +6,8 @@ ImLineEdit::ImLineEdit(QWidget * parent)
   m_prev_char = 0;
   m_debug = false;
   m_forceLTR = false;
-  m_enabled = true;
-  //  this->setText("كتب");
+  m_keymapsEnabled = true;
+  this->setText("كتب");
   connect(this,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
   //this->setText("abcd");
 }
@@ -29,6 +29,7 @@ bool ImLineEdit::loadMap(const QString & filename,const QString & mapname) {
   return true;
 }
 void ImLineEdit::activateMap(const QString & name,bool activate) {
+  qDebug() << Q_FUNC_INFO << name << activate;
   if (! activate ) {
     m_activeMap.clear();
     return;
@@ -51,15 +52,19 @@ void ImLineEdit::shortcutActivated() {
     m_activeMap.clear();
   }
 }
+/**
+ * NB this deletes settings
+ *
+ * @param settings
+ */
 void ImLineEdit::readSettings(QSettings * settings) {
   if (! settings ) {
     settings = new QSettings;
   }
-
-
   settings->beginGroup("System");
   m_nullMap = settings->value("Null map","None").toString();
-  m_enabled = settings->value("Keymaps",false).toBool();
+  m_keymapsEnabled = settings->value("Keymaps",false).toBool();
+  qDebug() << Q_FUNC_INFO << "keymaps enabled" << m_keymapsEnabled;
   settings->endGroup();
 
   settings->beginGroup("Maps");
@@ -89,15 +94,15 @@ void ImLineEdit::readSettings(QSettings * settings) {
   delete settings;
 }
 void ImLineEdit::setEnabled(bool v) {
-  m_enabled = v;
+  m_keymapsEnabled = v;
 }
 void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
-  //  qDebug() << "keypress" << mapEnabled << mapname;;
+  qDebug() << Q_FUNC_INFO << "keymaps enabled" << m_keymapsEnabled;
   if (event->modifiers() & Qt::ControlModifier) {
     return QLineEdit::keyPressEvent(event);
   }
-  if (! m_enabled )
+  if (!m_keymapsEnabled )
     return QLineEdit::keyPressEvent(event);
 
 
@@ -110,9 +115,11 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
     qDebug() << t;
   }
   if ( m_activeMap.isEmpty()) {
+    qDebug() << Q_FUNC_INFO << "keymaps enabled" << m_keymapsEnabled << "no active map";
     return QLineEdit::keyPressEvent(event);
   }
-  qDebug() << this->text() << this->text().size() << this->cursorPosition();
+  if (m_debug)
+    qDebug() << this->text() << this->text().size() << this->cursorPosition();
 
   if ((m_forceLTR) && (this->cursorPosition() == 1)) {
     if (UcdScripts::getScript(event->key()) == "Unknown") {

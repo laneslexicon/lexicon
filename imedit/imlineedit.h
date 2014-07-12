@@ -44,7 +44,7 @@ class ImLineEdit : public QLineEdit {
     QString m_nullMap;
     bool m_debug;
     bool m_forceLTR;
-    bool m_enabled;
+    bool m_keymapsEnabled;
   protected:
     virtual void keyPressEvent(QKeyEvent *e);
 
