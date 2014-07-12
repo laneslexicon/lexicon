@@ -1,3 +1,5 @@
+#include "scripts.h"
+#include "inputmapper.h"
 #include "imlineedit.h"
 ImLineEdit::ImLineEdit(QWidget * parent)
   : QLineEdit(parent)
@@ -13,6 +15,15 @@ ImLineEdit::ImLineEdit(QWidget * parent)
 }
 ImLineEdit::~ImLineEdit() {
   im_free(m_mapper);
+}
+QStringList ImLineEdit::getMaps() const {
+  return m_mapper->getMaps();
+}
+QString ImLineEdit::getActiveMap() const {
+return m_activeMap;
+}
+QString ImLineEdit::getNullMap() const {
+  return m_nullMap;
 }
 bool ImLineEdit::loadMap(const QString & filename,const QString & mapname) {
   QFile f(filename);

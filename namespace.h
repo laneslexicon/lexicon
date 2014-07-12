@@ -19,5 +19,8 @@ enum Tabs {
    Regex_Search      =  0x00000400,
    Include_Heads     =  0x00000800
  };
+ enum Keymaps {
+   Keymaps_Enabled   =  0x00001000
+ };
 }
 #endif
