@@ -34,6 +34,8 @@ class ImLineEdit : public QLineEdit {
     void shortcutActivated();
     void setForceLTR(bool);
     void onTextChanged(const QString &);
+    public slots:
+      void setEnabled(bool);
   private:
     InputMapper * m_mapper;
     ushort m_prev_char;
@@ -42,6 +44,7 @@ class ImLineEdit : public QLineEdit {
     QString m_nullMap;
     bool m_debug;
     bool m_forceLTR;
+    bool m_enabled;
   protected:
     virtual void keyPressEvent(QKeyEvent *e);
 

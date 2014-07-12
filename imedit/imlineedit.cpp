@@ -6,7 +6,8 @@ ImLineEdit::ImLineEdit(QWidget * parent)
   m_prev_char = 0;
   m_debug = false;
   m_forceLTR = false;
-  this->setText("كتب");
+  m_enabled = true;
+  //  this->setText("كتب");
   connect(this,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
   //this->setText("abcd");
 }
@@ -58,6 +59,7 @@ void ImLineEdit::readSettings(QSettings * settings) {
 
   settings->beginGroup("System");
   m_nullMap = settings->value("Null map","None").toString();
+  m_enabled = settings->value("Keymaps",false).toBool();
   settings->endGroup();
 
   settings->beginGroup("Maps");
@@ -83,7 +85,11 @@ void ImLineEdit::readSettings(QSettings * settings) {
     }
     settings->endGroup();
   }
+
   delete settings;
+}
+void ImLineEdit::setEnabled(bool v) {
+  m_enabled = v;
 }
 void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
@@ -91,6 +97,10 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   if (event->modifiers() & Qt::ControlModifier) {
     return QLineEdit::keyPressEvent(event);
   }
+  if (! m_enabled )
+    return QLineEdit::keyPressEvent(event);
+
+
   if (m_debug) {
     QString t;
     QTextStream out(&t);

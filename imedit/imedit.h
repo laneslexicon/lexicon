@@ -44,6 +44,7 @@ public:
     QString currentScript();
     QString convertString(const QString & source);
  private:
+    bool m_enabled;
     InputMapper * mapper;
     bool mapEnabled;
     ushort prev_char;
@@ -51,7 +52,7 @@ public:
     bool m_debug;
     QString m_activeMap;
     QString m_nullMap;
-
+    bool m_enabled;
 protected:
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void focusOutEvent(QFocusEvent *);
@@ -67,6 +68,7 @@ public slots:
     void actionInsertUnicode();
     void actionDeleteUnicode();
     void setMapname(const QString &);
+    void setEnabled(bool);
  signals:
   void fontChanged();
   void logMessage(const QString &);

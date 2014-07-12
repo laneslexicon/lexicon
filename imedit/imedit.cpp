@@ -6,6 +6,7 @@ ImEdit::ImEdit(QWidget * parent)
   mapper = im_new();
   mapEnabled = true;
   prev_char = 0;
+  m_enabled = true;
 }
 ImEdit::~ImEdit() {
   im_free(mapper);
@@ -64,9 +65,15 @@ void ImEdit::activateMap(const QString & name,bool activate) {
     m_activeMap.clear();
   }
 }
+void ImEdit::setEnabled(bool v) {
+  m_enabled = v;
+}
 void ImEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
   //  qDebug() << "keypress" << mapEnabled << mapname;;
+  if (!m_enabled )
+    return QTextEdit::keyPressEvent(event);
+
   if (event->modifiers() & Qt::ControlModifier) {
     return QTextEdit::keyPressEvent(event);
   }
