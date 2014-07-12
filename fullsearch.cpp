@@ -437,9 +437,6 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
                 m_rxlist->item(row,i)->setBackground(b);
               }
             }
-            else {
-              qDebug() << "invalid color";
-            }
           }
         }
         headword = m_nodeQuery.value("word").toString();
@@ -1009,11 +1006,17 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
     QString headword = m_query.value("word").toString();
     if (headword.indexOf(rx) != -1) {
       if (options & Lane::Include_Heads) {
-        addRow(m_query.value("root").toString(),
+        int row = addRow(m_query.value("root").toString(),
                m_query.value("word").toString(),
                m_query.value("nodeid").toString(),
                "head word",0);
         headCount++;
+        if (m_headBackgroundColor.isValid()) {
+          QBrush b(m_headBackgroundColor);
+          for(int i=0;i < m_rxlist->columnCount();i++) {
+            m_rxlist->item(row,i)->setBackground(b);
+          }
+        }
         ok = true;
       }
     }
