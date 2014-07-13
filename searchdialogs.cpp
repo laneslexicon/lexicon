@@ -105,10 +105,15 @@ void ArabicSearchDialog::showKeyboard() {
   m_attached = ! m_attached;
   if (m_attached) {
     m_keyboardButton->setText(tr("Hide keyboard"));
-    QPoint p = this->pos();
-    int h = this->frameGeometry().height();
-    /// TODO adjust this
-    m_keyboard->move(p.x() - 50,p.y() + h);
+    QPoint p;
+    p = m_keyboard->currentPosition();
+    if (p.isNull()) {
+      p = this->pos();
+      int h = this->frameGeometry().height();
+      p.setX(p.x() - 50);
+      p.setY(p.y() + h);
+    }
+    m_keyboard->move(p);
   }
   else
     m_keyboardButton->setText(tr("Show keyboard"));

@@ -52,7 +52,7 @@ class FullSearchWidget : public QWidget
    void hideOptions();
    void findTarget(bool show=false);
    void cancelSearch();
-   void  showKeyboard();
+   void showKeyboard();
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);

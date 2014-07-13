@@ -893,15 +893,21 @@ void FullSearchWidget::showKeyboard() {
   m_attached = ! m_attached;
   if (m_attached) {
     m_keyboardButton->setText(tr("Hide keyboard"));
-    QPoint p = m_findTarget->pos();
-    QPoint gp =  m_findTarget->mapToGlobal(p);
-    QRect r = m_findTarget->frameGeometry();
-
-    int x = gp.x();
-    int y = gp.y() + r.height();
-    qDebug() << "button pos" << x << "height" << y;
-    /// have to position it relative to the toplevel window
-    m_keyboard->move(getApp()->mapFromGlobal(QPoint(x,y)));
+    QPoint p;
+    QPoint gp;
+    p = m_keyboard->currentPosition();
+    if (p.isNull()) {
+      p = m_findTarget->pos();
+      gp =  m_findTarget->mapToGlobal(p);
+      QRect r = m_findTarget->frameGeometry();
+      int x = gp.x();
+      int y = gp.y() + r.height();
+      m_keyboard->move(getApp()->mapFromGlobal(QPoint(x,y)));
+    }
+    else {
+      gp =  m_findTarget->mapToGlobal(p);
+      m_keyboard->move(p);
+    }
   }
   else
     m_keyboardButton->setText(tr("Show keyboard"));
