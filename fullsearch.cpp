@@ -276,7 +276,7 @@ void FullSearchWidget::findTarget(bool showProgress) {
   }
   QString t = m_findTarget->text();
   QRegExp rx("[a-z]+");
-  if (rx.indexIn(t,0) != -1) {
+  if ((options & Lane::Regex_Search) || (rx.indexIn(t,0) != -1)) {
     this->textSearch(t,options);
   }
   else {
@@ -345,6 +345,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   else {
     qDebug() << "regex pattern" << rx.pattern();
     rx.setPattern(target);
+    m_currentRx = rx;
   }
 
   bool ok = false;
@@ -413,7 +414,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
 
     QString word = m_query.value("word").toString();
     /// strip diacritics if required
-    if (replaceSearch) {
+    if (replaceSearch && (Lane::Normal_Search)) {
       if (options & Lane::Ignore_Diacritics)
         word =  word.replace(rxclass,QString());
     }
@@ -782,7 +783,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     rx.setPattern(regex.pattern());
   }
   else {
-  rx.setPattern(pattern);
+    rx.setPattern(pattern);
   }
 
   m_fragments.clear();
@@ -811,6 +812,9 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     m_fragments << src.mid(sx,ex - sx);
     //    qDebug() << "fragment size" << (ex - sx);  //QString("[%1][%2][%3][%4]").arg(position).arg(sx).arg(ex).arg(src);
     c = doc->find(rx,position);
+  }
+  if (m_positions.size() > 0) {
+    qDebug() << Q_FUNC_INFO << m_positions;
   }
 }
 int FullSearchWidget::getMaxRecords(const QString & table) {
@@ -954,6 +958,7 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
     rx.setPattern(target);
     qDebug() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
   }
+  m_currentRx = rx;
   bool ok = false;
   if (m_query.prepare("select root,word,nodeid,xml from entry where datasource = 1 order by nodenum asc")) {
     if (m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {
@@ -1019,10 +1024,16 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
     QString headword = m_query.value("word").toString();
     if (headword.indexOf(rx) != -1) {
       if (options & Lane::Include_Heads) {
-        addRow(m_query.value("root").toString(),
-               m_query.value("word").toString(),
-               m_query.value("nodeid").toString(),
-               "head word",0);
+        int row = addRow(m_query.value("root").toString(),
+                         m_query.value("word").toString(),
+                         m_query.value("nodeid").toString(),
+                         m_headText,0);
+        if (m_headBackgroundColor.isValid()) {
+          QBrush b(m_headBackgroundColor);
+          for(int i=0;i < m_rxlist->columnCount();i++) {
+            m_rxlist->item(row,i)->setBackground(b);
+          }
+        }
         headCount++;
         ok = true;
       }
