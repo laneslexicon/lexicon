@@ -1,4 +1,6 @@
 #include "imedit.h"
+#include "inputmapper.h"
+#include "scripts.h"
 ImEdit::ImEdit(QWidget * parent)
   : QTextEdit(parent)
 {
@@ -11,6 +13,9 @@ ImEdit::ImEdit(QWidget * parent)
 ImEdit::~ImEdit() {
   im_free(mapper);
 }
+void ImEdit::getMapNames(QStringList & m) {
+      mapper->getMapNames(m);
+}
 QString ImEdit::currentScript() {
   if ( ! mapEnabled ) {
     return QString();
@@ -20,6 +25,7 @@ QString ImEdit::currentScript() {
 QString ImEdit::convertString(const QString & str) {
   bool ok;
   // QString t = im_convert_string(this->mapper,this->mapname,str,&ok);
+  /// TODO why is buckwalter hard-coded here?
   QString t = im_convert_string(this->mapper,"Buckwalter",str,&ok);
   if (ok) {
     return t;
