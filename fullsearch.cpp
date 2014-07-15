@@ -27,6 +27,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
   m_findTarget->readSettings(settings);
+  m_findTarget->activateMap(getApp()->getActiveKeymap(),true);
 
   m_findButton = new QPushButton(tr("F&ind"));
   m_findButton->setDefault(true);
@@ -813,9 +814,9 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     //    qDebug() << "fragment size" << (ex - sx);  //QString("[%1][%2][%3][%4]").arg(position).arg(sx).arg(ex).arg(src);
     c = doc->find(rx,position);
   }
-  if (m_positions.size() > 0) {
-    qDebug() << Q_FUNC_INFO << m_positions;
-  }
+  //  if (m_positions.size() > 0) {
+  //    qDebug() << Q_FUNC_INFO << m_positions;
+  //  }
 }
 int FullSearchWidget::getMaxRecords(const QString & table) {
   bool ok = false;

@@ -848,10 +848,7 @@ void LanesLexicon::createStatusBar() {
 
 
   m_keymapsButton = new QToolButton(this);
-
   QStringList maps =  m_mapper->getMaps();
-  qDebug() << "Maps enabled" << m_keymapsEnabled;
-
   maps << tr("None");
   QMenu * menu = new QMenu;
   for(int i=0;i < maps.size();i++) {
@@ -874,19 +871,42 @@ void LanesLexicon::createStatusBar() {
   statusBar()->addPermanentWidget(m_keymapsButton);
   statusBar()->addPermanentWidget(m_navModeIndicator);
 
+  QString tip;
+  if (m_keymapsEnabled) {
+    tip = QString(tr("Keymaps, enabled"));
+  }
+  else {
+    tip = QString(tr("Keymaps, disabled"));
+  }
+
+  m_keymapsButton->setToolTip(tip);
+
+
   updateStatusBar();
 }
 void LanesLexicon::onKeymapChanged() {
   QAction * action = qobject_cast<QAction *>(sender());
-  if (action) {
-    m_activeMap = action->data().toString();
-    QList<QAction *> actions = m_keymapsButton->menu()->actions();
-    for(int i=0;i < actions.size();i++) {
-      if (actions[i]->data().toString() == m_activeMap) {
-        actions[i]->setChecked(true);
-      }
-      else {
-        actions[i]->setChecked(false);
+  if (! action)
+    return;
+  m_activeMap = action->data().toString();
+  QList<QAction *> actions = m_keymapsButton->menu()->actions();
+  for(int i=0;i < actions.size();i++) {
+    if (actions[i]->data().toString() == m_activeMap) {
+      actions[i]->setChecked(true);
+    }
+    else {
+      actions[i]->setChecked(false);
+    }
+  }
+  foreach (QWidget *widget, QApplication::allWidgets()) {
+    ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
+    if (w) {
+      w->activateMap(m_activeMap,true);
+    }
+    else {
+      ImEdit * imedit = qobject_cast<ImEdit *>(widget);
+      if (imedit) {
+        imedit->activateMap(m_activeMap,true);
       }
     }
   }
@@ -2312,6 +2332,13 @@ void LanesLexicon::enableKeymaps(bool v) {
   m_keymapsEnabled = v;
   qDebug() << Q_FUNC_INFO << v;
   m_keymapsButton->setEnabled(v);
+  QString tip;
+  if (m_keymapsEnabled)
+    tip = QString(tr("Keymaps, enabled"));
+  else
+    tip = QString(tr("Keymaps, disabled"));
+
+  m_keymapsButton->setToolTip(tip);
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {
@@ -2341,4 +2368,7 @@ void LanesLexicon::enableKeymaps(bool v) {
   settings->beginGroup("System");
   settings->setValue("Keymaps",v);
   delete settings;
+}
+QString LanesLexicon::getActiveKeymap() const {
+  return m_activeMap;
 }

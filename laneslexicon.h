@@ -75,6 +75,7 @@ public:
     void writeSettings();
     bool isOk() { return m_ok;}
     QString convertString(const QString &) const;
+    QString getActiveKeymap() const;
     HistoryMaster * history();
     NoteMaster * notes();
     enum NavMode {ByRoot, ByPage };

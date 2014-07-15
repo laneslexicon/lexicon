@@ -25,7 +25,7 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_arabicTarget = new QRadioButton(tr("Arabic text"),m_targetGroup);
   m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),m_targetGroup);
 
-  m_includeHeads = new QCheckBox(tr("Include head entries"));
+  m_includeHeads = new QCheckBox(tr("Include head entries in search results"));
 
   /// diacritics/whole word
   QHBoxLayout * optionslayout = new QHBoxLayout;
@@ -88,15 +88,16 @@ void SearchOptions::showMore(bool show) {
     m_wholeWordMatch->setVisible(false);
     m_includeHeads->setVisible(false);
     m_forceLTR->setVisible(false);
+    m_typeGroup->setVisible(false);
     if (m_hasMaps)
-      m_keymapGroup->setVisible(show);
+      m_keymapGroup->setVisible(false);
 
     break;
   }
   case Lane::Entry : {
     m_includeHeads->setVisible(false);
     if (m_hasMaps && m_keymapsEnabled) {
-      m_keymapGroup->setVisible(show);
+      m_keymapGroup->setVisible(false);
     }
     else {
       m_keymapGroup->setVisible(false);
@@ -122,11 +123,11 @@ void SearchOptions::showMore(bool show) {
   }
   case Lane::Word : {
     if (m_hasMaps && m_keymapsEnabled)
-      m_keymapGroup->setVisible(show);
+      m_keymapGroup->setVisible(false);
     else
       m_keymapGroup->setVisible(false);
 
-    m_includeHeads->setVisible(show);
+    m_includeHeads->setVisible(true);
 
     if (m_regexSearch->isChecked()) {
       m_targetGroup->setVisible(m_more);
