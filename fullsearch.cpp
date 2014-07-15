@@ -275,13 +275,15 @@ void FullSearchWidget::findTarget(bool showProgress) {
     m_hideOptionsButton->setChecked(true);
     this->hideOptions();
   }
+  /// TODO check if only arabic characters
+  ///      and use appropriate
   QString t = m_findTarget->text();
   QRegExp rx("[a-z]+");
   if ((options & Lane::Regex_Search) || (rx.indexIn(t,0) != -1)) {
-    this->textSearch(t,options);
+    this->regexSearch(t,options);
   }
   else {
-    this->regexSearch(m_findTarget->text(),options);
+    this->textSearch(m_findTarget->text(),options);
   }
 
   m_progress->hide();
@@ -303,7 +305,7 @@ void FullSearchWidget::findTarget(bool showProgress) {
  * @param target
  * @param options
  */
-void FullSearchWidget::regexSearch(const QString & target,int options) {
+void FullSearchWidget::textSearch(const QString & target,int options) {
   bool replaceSearch = true;
   qDebug() << Q_FUNC_INFO;
   m_target = target;
@@ -918,7 +920,7 @@ void FullSearchWidget::showKeyboard() {
     m_keyboardButton->setText(tr("Show keyboard"));
 
 }
-void FullSearchWidget::textSearch(const QString & target,int options) {
+void FullSearchWidget::regexSearch(const QString & target,int options) {
   bool replaceSearch = true;
   qDebug() << Q_FUNC_INFO;
   m_target = target;
@@ -1029,13 +1031,14 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
                          m_query.value("word").toString(),
                          m_query.value("nodeid").toString(),
                          m_headText,0);
+        headCount++;
         if (m_headBackgroundColor.isValid()) {
           QBrush b(m_headBackgroundColor);
           for(int i=0;i < m_rxlist->columnCount();i++) {
             m_rxlist->item(row,i)->setBackground(b);
           }
         }
-        headCount++;
+
         ok = true;
       }
     }
