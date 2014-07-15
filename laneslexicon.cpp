@@ -840,13 +840,48 @@ void LanesLexicon::createStatusBar() {
 
 
   m_keymapsButton = new QToolButton(this);
-  m_keymapsButton->setDefaultAction(m_keymapsAction);
 
+  QStringList maps =  m_mapper->getMaps();
+  qDebug() << "Maps enabled" << m_keymapsEnabled;
+
+  maps << tr("None");
+  QMenu * menu = new QMenu;
+  for(int i=0;i < maps.size();i++) {
+    QAction * action  = menu->addAction(maps[i]);
+    action->setCheckable(true);
+    action->setData(maps[i]);
+    if (m_activeMap == maps[i]) {
+      action->setChecked(true);
+    }
+    connect(action,SIGNAL(triggered()),this,SLOT(onKeymapChanged()));
+
+  }
+  if (maps.size() == 1) {
+    m_keymapsButton->setEnabled(false);
+  }
+  m_keymapsButton->setDefaultAction(m_keymapsAction);
+  m_keymapsButton->setMenu(menu);
+  m_keymapsButton->setPopupMode(QToolButton::InstantPopup);
   statusBar()->addPermanentWidget(m_placeIndicator);
   statusBar()->addPermanentWidget(m_keymapsButton);
   statusBar()->addPermanentWidget(m_navModeIndicator);
 
   updateStatusBar();
+}
+void LanesLexicon::onKeymapChanged() {
+  QAction * action = qobject_cast<QAction *>(sender());
+  if (action) {
+    m_activeMap = action->data().toString();
+    QList<QAction *> actions = m_keymapsButton->menu()->actions();
+    for(int i=0;i < actions.size();i++) {
+      if (actions[i]->data().toString() == m_activeMap) {
+        actions[i]->setChecked(true);
+      }
+      else {
+        actions[i]->setChecked(false);
+      }
+    }
+  }
 }
 QSize LanesLexicon::sizeHint() const {
   return QSize(800,600);
@@ -2268,6 +2303,7 @@ void LanesLexicon::convertToEntry() {
 void LanesLexicon::enableKeymaps(bool v) {
   m_keymapsEnabled = v;
   qDebug() << Q_FUNC_INFO << v;
+  m_keymapsButton->setEnabled(v);
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {

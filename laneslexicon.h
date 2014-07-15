@@ -118,6 +118,7 @@ public:
     void on_actionLastPage();
     void on_actionClearHistory();
     void onHistorySelection();
+    void onKeymapChanged();
     void rootClicked(QTreeWidgetItem * , int);
     void entryActivated(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
