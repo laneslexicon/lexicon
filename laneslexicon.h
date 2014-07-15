@@ -161,11 +161,14 @@ private:
     QString m_configFile;
     QString m_interface;    // "default","minimal"
     QPrinter m_printer;
+    ///
     void setupInterface();
     /// 0 - root mode, 1 - page mode
     int m_navMode;
     QLabel * m_navModeIndicator;
     QLabel * m_placeIndicator;
+    QToolButton * m_keymapsButton;
+    QAction * m_keymapsAction;
     void updateStatusBar();
     void updateMenu();
     bool m_ok;

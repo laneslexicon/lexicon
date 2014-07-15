@@ -590,6 +590,8 @@ void LanesLexicon::createActions() {
   m_convertToEntryAction = createIconAction(imgdir,settings->value("SearchToEntry",QString()).toString(),tr("Convert to Entry"));
   m_clearAction->setEnabled(false);
 
+  m_keymapsAction = createIconAction(imgdir,settings->value("Keymaps","keyboard2.png").toString(),tr("Keymaps"));
+
   connect(m_zoomInAction,SIGNAL(triggered()),this,SLOT(pageZoomIn()));
   connect(m_zoomOutAction,SIGNAL(triggered()),this,SLOT(pageZoomOut()));
   connect(m_widenAction,SIGNAL(triggered()),this,SLOT(pageWiden()));
@@ -833,10 +835,15 @@ void LanesLexicon::createMenus() {
 }
 
 void LanesLexicon::createStatusBar() {
-
   m_navModeIndicator = new QLabel("");
   m_placeIndicator = new QLabel("");
+
+
+  m_keymapsButton = new QToolButton(this);
+  m_keymapsButton->setDefaultAction(m_keymapsAction);
+
   statusBar()->addPermanentWidget(m_placeIndicator);
+  statusBar()->addPermanentWidget(m_keymapsButton);
   statusBar()->addPermanentWidget(m_navModeIndicator);
 
   updateStatusBar();
