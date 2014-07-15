@@ -28,6 +28,7 @@
 #include <QTreeView>
 #include <QSqlDatabase>
 #include <QFile>
+#include <QIcon>
 #include <QLabel>
 #include <QDialog>
 #include <QKeySequenceEdit>

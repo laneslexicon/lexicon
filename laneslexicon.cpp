@@ -592,6 +592,14 @@ void LanesLexicon::createActions() {
 
   m_keymapsAction = createIconAction(imgdir,settings->value("Keymaps","keyboard2.png").toString(),tr("Keymaps"));
 
+
+  QFileInfo fi;
+  fi.setFile(imgdir,settings->value("Keymaps-disabled","keyboard2-disabled.png").toString());
+  if ( fi.exists() ) {
+    QIcon ic = m_keymapsAction->icon();
+    ic.addPixmap(fi.absoluteFilePath(),QIcon::Disabled);
+    m_keymapsAction->setIcon(ic);
+  }
   connect(m_zoomInAction,SIGNAL(triggered()),this,SLOT(pageZoomIn()));
   connect(m_zoomOutAction,SIGNAL(triggered()),this,SLOT(pageZoomOut()));
   connect(m_widenAction,SIGNAL(triggered()),this,SLOT(pageWiden()));
