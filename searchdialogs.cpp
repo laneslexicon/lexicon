@@ -61,6 +61,8 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   m_options = new SearchOptions(searchType);
 
+  connect(m_options,SIGNAL(force(bool)),m_edit,SLOT(setForceLTR(bool)));
+
   connect(m_options,SIGNAL(loadKeymap(const QString &)),this,SLOT(loadKeymap(const QString &)));
 
   QStringList maps = m_edit->getMaps();
@@ -154,6 +156,9 @@ int ArabicSearchDialog::getOptions() {
 }
 void ArabicSearchDialog::loadKeymap(const QString & mapname) {
   m_edit->activateMap(mapname,true);
+}
+bool ArabicSearchDialog::getForceLTR() {
+  return m_options->getForceLTR();
 }
 /**
  *

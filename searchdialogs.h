@@ -23,6 +23,7 @@ class ArabicSearchDialog : public QDialog {
   void setPrompt(const QString &);
   void setOptions(int);
   int getOptions();
+  bool getForceLTR() ;
   public slots:
     //    void keymapChanged();
     virtual void showOptions(bool);

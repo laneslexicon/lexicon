@@ -51,7 +51,7 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_forceLTR = new QCheckBox(tr("Force Left to Right on search input"));
   forcelayout->addWidget(m_forceLTR);
   forcelayout->addStretch();
-
+  connect(m_forceLTR,SIGNAL(stateChanged(int)),this,SLOT(onForceLeftToRight(int)));
 
   /// search target
   QHBoxLayout * targetlayout = new QHBoxLayout;
@@ -279,4 +279,13 @@ void SearchOptions::keymapChanged() {
 }
 void SearchOptions::setKeymapsEnabled(bool v) {
   m_keymapsEnabled = v;
+}
+void SearchOptions::onForceLeftToRight(int checked) {
+  if (checked == Qt::Checked)
+    emit(force(true));
+  else
+    emit(force(false));
+}
+bool SearchOptions::getForceLTR() {
+  return m_forceLTR->isChecked();
 }
