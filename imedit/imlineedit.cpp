@@ -75,12 +75,10 @@ void ImLineEdit::readSettings(QSettings * settings) {
   settings->beginGroup("System");
   m_nullMap = settings->value("Null map","None").toString();
   m_keymapsEnabled = settings->value("Keymaps",false).toBool();
-  qDebug() << Q_FUNC_INFO << "keymaps enabled" << m_keymapsEnabled;
   settings->endGroup();
 
   settings->beginGroup("Maps");
   QStringList groups = settings->childGroups();
-  qDebug() << Q_FUNC_INFO << groups;
   for(int i=0;i < groups.size();i++) {
     settings->beginGroup(groups[i]);
     QString file = settings->value("file",QString()).toString();
@@ -109,7 +107,6 @@ void ImLineEdit::setEnabled(bool v) {
 }
 void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
-  qDebug() << Q_FUNC_INFO << "keymaps enabled" << m_keymapsEnabled;
   if (event->modifiers() & Qt::ControlModifier) {
     return QLineEdit::keyPressEvent(event);
   }
