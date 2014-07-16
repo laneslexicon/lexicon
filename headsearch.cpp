@@ -118,12 +118,12 @@ void HeadSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /*
   np.setNode(node);
   //  np.setNodeOnly(true);
   Place p = m_text->getXmlForRoot(np);
-  if (p.isValid()) {
-    m_text->highlight(m_target);
-  }
-  else {
-    QLOG_DEBUG() << "Invalid place returned for node" << node;
-  }
+  //  if (p.isValid()) {
+  //    m_text->highlight(m_target);
+  //  }
+  //  else {
+  //    QLOG_DEBUG() << "Invalid place returned for node" << node;
+  //  }
 }
 void HeadSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   /// get the node
@@ -211,9 +211,12 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
   }
   return QWidget::eventFilter(target,event);
 }
-void HeadSearchWidget::search(const QString & target,int options) {
+void HeadSearchWidget::search(const QString & searchtarget,int options) {
   QRegExp rx;
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+
+  QString target = searchtarget;
+  target.remove(QChar(0x202d));
 
   bool replaceSearch = true;
   m_target = target;
@@ -229,30 +232,37 @@ void HeadSearchWidget::search(const QString & target,int options) {
   //   select where instr(bareword,?) > 0
   sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 order by nodenum asc";
   QString pattern;
-  if (options & Lane::Ignore_Diacritics) {
-    QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
-    QStringList cc = target.split("");
-    QString brx = "";
-    for(int i=0;i < cc.size();i++) {
-      pattern += cc[i] + ar;
+  if (options & Lane::Normal_Search) {
+    if (options & Lane::Ignore_Diacritics) {
+      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+      QStringList cc = target.split("");
+      QString brx = "";
+      for(int i=0;i < cc.size();i++) {
+        pattern += cc[i] + ar;
+      }
     }
-  }
-  else {
-    pattern = target;
-  }
-  if (options & Lane::Whole_Word) {
-    pattern = "\\b" + pattern + "\\b";
-  }
-  m_currentRx.setPattern(pattern);
+    else {
+      pattern = target;
+    }
+    if (options & Lane::Whole_Word) {
+      pattern = "\\b" + pattern + "\\b";
+    }
+    m_currentRx.setPattern(pattern);
 
-  pattern.clear();
-  if (options & Lane::Whole_Word) {
-    pattern = "\\b" + m_target + "\\b";
+    pattern.clear();
+    if (options & Lane::Whole_Word) {
+      pattern = "\\b" + m_target + "\\b";
+    }
+    else {
+      pattern = m_target;
+    }
+    rx.setPattern(pattern);
   }
   else {
-    pattern = m_target;
+    rx.setPattern(target);
   }
-  rx.setPattern(pattern);
+  m_currentRx = rx;
+  qDebug() << "head search" << rx.pattern();
   bool ok = false;
   if (m_query.prepare(sql)) {
     if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeId = ?")) {
@@ -288,9 +298,11 @@ void HeadSearchWidget::search(const QString & target,int options) {
     node = m_query.value("nodeid").toString();
     word = m_query.value("word").toString();
     /// strip diacritics if required
-    if (replaceSearch) {
-      if (options & Lane::Ignore_Diacritics)
-        word =  word.replace(rxclass,QString());
+    if (options & Lane::Normal_Search) {
+      if (replaceSearch) {
+        if (options & Lane::Ignore_Diacritics)
+          word =  word.replace(rxclass,QString());
+      }
     }
     if (word.indexOf(rx) != -1) {
       int row = m_list->rowCount();

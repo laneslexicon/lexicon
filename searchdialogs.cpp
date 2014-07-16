@@ -2,6 +2,8 @@
 #include "QsLog.h"
 #include "namespace.h"
 #include "searchoptions.h"
+#include "laneslexicon.h"
+extern LanesLexicon * getApp();
 ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
 
@@ -25,6 +27,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
   m_edit->readSettings(settings);
+  m_edit->activateMap(getApp()->getActiveKeymap(),true);
   m_prompt->setBuddy(m_edit);
   m_findButton = new QPushButton(tr("&Find"));
   m_findButton->setDefault(true);
@@ -42,6 +45,12 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_buttonBox->addButton(m_findButton, QDialogButtonBox::AcceptRole);
   m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
   m_buttonBox->addButton(m_moreButton, QDialogButtonBox::ActionRole);
+  if (searchType == Lane::Word) {
+    m_moreButton->setVisible(true);
+  }
+  else {
+    m_moreButton->setVisible(false);
+  }
   m_buttonBox->addButton(m_keyboardButton,QDialogButtonBox::ActionRole);
 
   m_findButton->setFocus();
@@ -52,10 +61,13 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   m_options = new SearchOptions(searchType);
 
+  connect(m_options,SIGNAL(force(bool)),m_edit,SLOT(setForceLTR(bool)));
+
   connect(m_options,SIGNAL(loadKeymap(const QString &)),this,SLOT(loadKeymap(const QString &)));
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->getActiveMap();
+  qDebug() << Q_FUNC_INFO << "active map" << map;
   if (map.isEmpty()) {
     map = m_edit->getNullMap();
   }
@@ -97,6 +109,10 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   int h = this->frameGeometry().height();
   //  QLOG_DEBUG() << "search dialog frame geometry" << this->frameGeometry();
   m_keyboard->move(p.x(),p.y() + h);
+
+
+  m_moreButton->setVisible(false);
+
   //  delete settings;
 }
 void ArabicSearchDialog::showKeyboard() {
@@ -104,10 +120,15 @@ void ArabicSearchDialog::showKeyboard() {
   m_attached = ! m_attached;
   if (m_attached) {
     m_keyboardButton->setText(tr("Hide keyboard"));
-    QPoint p = this->pos();
-    int h = this->frameGeometry().height();
-    /// TODO adjust this
-    m_keyboard->move(p.x() - 50,p.y() + h);
+    QPoint p;
+    p = m_keyboard->currentPosition();
+    if (p.isNull()) {
+      p = this->pos();
+      int h = this->frameGeometry().height();
+      p.setX(p.x() - 50);
+      p.setY(p.y() + h);
+    }
+    m_keyboard->move(p);
   }
   else
     m_keyboardButton->setText(tr("Show keyboard"));
@@ -135,6 +156,9 @@ int ArabicSearchDialog::getOptions() {
 }
 void ArabicSearchDialog::loadKeymap(const QString & mapname) {
   m_edit->activateMap(mapname,true);
+}
+bool ArabicSearchDialog::getForceLTR() {
+  return m_options->getForceLTR();
 }
 /**
  *

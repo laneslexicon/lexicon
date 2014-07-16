@@ -1,3 +1,5 @@
+#include "scripts.h"
+#include "inputmapper.h"
 #include "imlineedit.h"
 ImLineEdit::ImLineEdit(QWidget * parent)
   : QLineEdit(parent)
@@ -6,12 +8,22 @@ ImLineEdit::ImLineEdit(QWidget * parent)
   m_prev_char = 0;
   m_debug = false;
   m_forceLTR = false;
+  m_keymapsEnabled = true;
   this->setText("كتب");
   connect(this,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
   //this->setText("abcd");
 }
 ImLineEdit::~ImLineEdit() {
   im_free(m_mapper);
+}
+QStringList ImLineEdit::getMaps() const {
+  return m_mapper->getMaps();
+}
+QString ImLineEdit::getActiveMap() const {
+return m_activeMap;
+}
+QString ImLineEdit::getNullMap() const {
+  return m_nullMap;
 }
 bool ImLineEdit::loadMap(const QString & filename,const QString & mapname) {
   QFile f(filename);
@@ -28,6 +40,7 @@ bool ImLineEdit::loadMap(const QString & filename,const QString & mapname) {
   return true;
 }
 void ImLineEdit::activateMap(const QString & name,bool activate) {
+  qDebug() << Q_FUNC_INFO << name << activate;
   if (! activate ) {
     m_activeMap.clear();
     return;
@@ -50,19 +63,22 @@ void ImLineEdit::shortcutActivated() {
     m_activeMap.clear();
   }
 }
+/**
+ * NB this deletes settings
+ *
+ * @param settings
+ */
 void ImLineEdit::readSettings(QSettings * settings) {
   if (! settings ) {
     settings = new QSettings;
   }
-
-
   settings->beginGroup("System");
   m_nullMap = settings->value("Null map","None").toString();
+  m_keymapsEnabled = settings->value("Keymaps",false).toBool();
   settings->endGroup();
 
   settings->beginGroup("Maps");
   QStringList groups = settings->childGroups();
-  qDebug() << Q_FUNC_INFO << groups;
   for(int i=0;i < groups.size();i++) {
     settings->beginGroup(groups[i]);
     QString file = settings->value("file",QString()).toString();
@@ -83,14 +99,21 @@ void ImLineEdit::readSettings(QSettings * settings) {
     }
     settings->endGroup();
   }
+
   delete settings;
+}
+void ImLineEdit::setEnabled(bool v) {
+  m_keymapsEnabled = v;
 }
 void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
-  //  qDebug() << "keypress" << mapEnabled << mapname;;
   if (event->modifiers() & Qt::ControlModifier) {
     return QLineEdit::keyPressEvent(event);
   }
+  if (!m_keymapsEnabled )
+    return QLineEdit::keyPressEvent(event);
+
+
   if (m_debug) {
     QString t;
     QTextStream out(&t);
@@ -100,9 +123,11 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
     qDebug() << t;
   }
   if ( m_activeMap.isEmpty()) {
+    qDebug() << Q_FUNC_INFO << "keymaps enabled" << m_keymapsEnabled << "no active map";
     return QLineEdit::keyPressEvent(event);
   }
-  qDebug() << this->text() << this->text().size() << this->cursorPosition();
+  if (m_debug)
+    qDebug() << this->text() << this->text().size() << this->cursorPosition();
 
   if ((m_forceLTR) && (this->cursorPosition() == 1)) {
     if (UcdScripts::getScript(event->key()) == "Unknown") {

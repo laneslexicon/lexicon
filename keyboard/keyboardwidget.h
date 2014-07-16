@@ -24,9 +24,12 @@ class KeyboardWidget : public QDialog {
   KeyboardWidget(QWidget * parent = 0);
   void setTarget(QWidget * w) { m_target = w;};
   void loadDefinitions(const QString & targetScript = QString());
+  QPoint currentPosition() const;
+  QWidget * target() const;
  protected:
   QSize sizeHint() const;
   void resizeEvent(QResizeEvent *);
+  void hideEvent(QHideEvent *);
  public slots:
    void virtualKeyPressed(int);
    void loadKeyboard(int);
@@ -37,7 +40,8 @@ class KeyboardWidget : public QDialog {
    QString m_keyboardDirectory;
    QString m_defaultKeyboard;
    bool m_keepAspectRatio;
-
+   QSize m_currentSize;
+   QPoint m_currentPosition;
   QComboBox * m_keyboards;
   KeyboardView * m_view;
   qreal m_scale;

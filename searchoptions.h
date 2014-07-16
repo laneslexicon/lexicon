@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSpacerItem>
+
 class FullSearchWidget;
 class SearchOptions : public QWidget {
   Q_OBJECT
@@ -19,12 +20,16 @@ class SearchOptions : public QWidget {
   void setOptions(int);
   void showMore(bool);
   void addKeymaps(const QString &activeMap,const QStringList & maps);
+  void setKeymapsEnabled(bool v);
+  bool getForceLTR();
  public slots:
   void searchTypeChanged();
   void keymapChanged();
+  void onForceLeftToRight(int);
  private:
   bool m_hasMaps;
   bool m_more;                   // false basic, 1 show more
+  bool m_keymapsEnabled;
   int m_searchType;
   QSpacerItem * m_spacer;
   QGroupBox *  m_targetGroup;
@@ -44,6 +49,6 @@ class SearchOptions : public QWidget {
 
  signals:
   void loadKeymap(const QString &);
-
+  void force(bool);
 };
 #endif

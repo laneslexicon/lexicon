@@ -40,6 +40,7 @@ class FullSearchWidget : public QWidget
     FullSearchWidget(QWidget * parent = 0);
     ~FullSearchWidget();
    GraphicsEntry * getEntry() { return m_text;}
+   void setForceLTR(bool v);
    void search(const QString &,int options);
    void regexSearch(const QString &,int options);
    void textSearch(const QString &,int options);
@@ -52,7 +53,7 @@ class FullSearchWidget : public QWidget
    void hideOptions();
    void findTarget(bool show=false);
    void cancelSearch();
-   void  showKeyboard();
+   void showKeyboard();
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);

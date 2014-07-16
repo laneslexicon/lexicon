@@ -1,6 +1,6 @@
 #ifndef _IMEDIT_H
 #define _IMEDIT_H
-#include "inputmapper.h"
+
 #include <iomanip>
 #include <QTextEdit>
 #include <QTextStream>
@@ -16,11 +16,12 @@
 #include <QFile>
 #include <QVBoxLayout>
 #include <QShortcut>
-#include "scripts.h"
+
 #ifdef WITH_WRAPPED_EDIT
 #include "hermesoptions.h"
 #endif
 extern QString getScript(int);
+class InputMapper;
 class ImEdit : public QTextEdit
 {
     Q_OBJECT
@@ -36,9 +37,7 @@ public:
     void setDebug(bool v) {
       m_debug = v;
     }
-    void getMapNames(QStringList & m) {
-      mapper->getMapNames(m);
-    }
+    void getMapNames(QStringList & m);
     void activateMap(const QString &,bool enable = true);
     void getScriptNames(QStringList &);
     QString currentScript();
@@ -51,7 +50,7 @@ public:
     bool m_debug;
     QString m_activeMap;
     QString m_nullMap;
-
+    bool m_enabled;
 protected:
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void focusOutEvent(QFocusEvent *);
@@ -67,6 +66,7 @@ public slots:
     void actionInsertUnicode();
     void actionDeleteUnicode();
     void setMapname(const QString &);
+    void setEnabled(bool);
  signals:
   void fontChanged();
   void logMessage(const QString &);

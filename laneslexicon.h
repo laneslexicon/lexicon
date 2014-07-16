@@ -28,6 +28,7 @@
 #include <QTreeView>
 #include <QSqlDatabase>
 #include <QFile>
+#include <QIcon>
 #include <QLabel>
 #include <QDialog>
 #include <QKeySequenceEdit>
@@ -74,6 +75,7 @@ public:
     void writeSettings();
     bool isOk() { return m_ok;}
     QString convertString(const QString &) const;
+    QString getActiveKeymap() const;
     HistoryMaster * history();
     NoteMaster * notes();
     enum NavMode {ByRoot, ByPage };
@@ -118,6 +120,7 @@ public:
     void on_actionLastPage();
     void on_actionClearHistory();
     void onHistorySelection();
+    void onKeymapChanged();
     void rootClicked(QTreeWidgetItem * , int);
     void entryActivated(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
@@ -161,11 +164,14 @@ private:
     QString m_configFile;
     QString m_interface;    // "default","minimal"
     QPrinter m_printer;
+    ///
     void setupInterface();
     /// 0 - root mode, 1 - page mode
     int m_navMode;
     QLabel * m_navModeIndicator;
     QLabel * m_placeIndicator;
+    QToolButton * m_keymapsButton;
+    QAction * m_keymapsAction;
     void updateStatusBar();
     void updateMenu();
     bool m_ok;
@@ -231,6 +237,9 @@ private:
     void setupHistory(int startPos = -1);
     void createMenus();
     void createStatusBar();
+
+    void enableKeymaps(bool);
+    bool m_keymapsEnabled;
     bool eventFilter(QObject * target, QEvent *);
     bool openDatabase(const QString &);
 

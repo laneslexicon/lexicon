@@ -33,6 +33,9 @@ KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
   m_keyboards->setCurrentIndex(ix);
 }
 QSize KeyboardWidget::sizeHint() const {
+  if (! m_currentSize.isEmpty())
+    return m_currentSize;
+
   return QSize(800,300);
 }
 void KeyboardWidget::loadDefinitions(const QString & targetScript) {
@@ -72,8 +75,10 @@ void KeyboardWidget::loadKeyboard(int /*ix */) {
   m_view->loadKeyboard(name);
   this->autoScale();
 }
-void KeyboardWidget::resizeEvent(QResizeEvent * /* event */) {
+void KeyboardWidget::resizeEvent(QResizeEvent * event) {
   this->autoScale();
+  //  m_currentSize = event->size();
+  //  qDebug() << "current size" << m_currentSize;
 }
 /**
  *
@@ -102,6 +107,12 @@ void KeyboardWidget::showKeyboard() {
   this->raise();
   this->activateWindow();
 }
+/**
+ * successive calls to attach(QWidget *) with the same widget
+ * attach and then detach (== hide)
+ *
+ * @param w
+ */
 void KeyboardWidget::attach(QWidget * w) {
   if (m_target == w) {
     m_target = 0;
@@ -130,4 +141,15 @@ void KeyboardWidget::readSettings() {
   m_defaultKeyboard = settings.value("default",QString()).toString();
   m_keepAspectRatio = settings.value("keep aspect ratio",false).toBool();
   settings.endGroup();
+}
+QWidget * KeyboardWidget::target() const {
+  return m_target;
+}
+void KeyboardWidget::hideEvent(QHideEvent * event) {
+  m_currentSize = this->size();
+  m_currentPosition = this->pos();
+  QWidget::hideEvent(event);
+}
+QPoint KeyboardWidget::currentPosition() const {
+  return m_currentPosition;
 }

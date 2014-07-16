@@ -24,9 +24,14 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  m_findTarget->readSettings(settings);
+  m_findTarget->activateMap(getApp()->getActiveKeymap(),true);
+
   m_findButton = new QPushButton(tr("F&ind"));
   m_findButton->setDefault(true);
-  m_hideOptionsButton = new QPushButton(tr("Hid&e options"));
+  m_hideOptionsButton = new QPushButton(tr("Sho&w options"));
   m_hideOptionsButton->setCheckable(true);
 
   m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
@@ -49,6 +54,9 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Position") << tr("Context");
 
   m_search = new SearchOptions(Lane::Word,this);
+
+  connect(m_search,SIGNAL(force(bool)),m_findTarget,SLOT(setForceLTR(bool)));
+
   QWidget * container = new QWidget;
   m_container = new QVBoxLayout;
   m_rxlist = new FocusTable;
@@ -270,13 +278,17 @@ void FullSearchWidget::findTarget(bool showProgress) {
     m_hideOptionsButton->setChecked(true);
     this->hideOptions();
   }
+  /// TODO check if only arabic characters
+  ///      and use appropriate
   QString t = m_findTarget->text();
+  t.remove(QChar(0x202d));
+
   QRegExp rx("[a-z]+");
-  if (rx.indexIn(t,0) != -1) {
-    this->textSearch(t,options);
+  if ((options & Lane::Regex_Search) || (rx.indexIn(t,0) != -1)) {
+    this->regexSearch(t,options);
   }
   else {
-    this->regexSearch(m_findTarget->text(),options);
+    this->textSearch(m_findTarget->text(),options);
   }
 
   m_progress->hide();
@@ -298,7 +310,7 @@ void FullSearchWidget::findTarget(bool showProgress) {
  * @param target
  * @param options
  */
-void FullSearchWidget::regexSearch(const QString & target,int options) {
+void FullSearchWidget::textSearch(const QString & target,int options) {
   bool replaceSearch = true;
   qDebug() << Q_FUNC_INFO;
   m_target = target;
@@ -341,6 +353,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   else {
     qDebug() << "regex pattern" << rx.pattern();
     rx.setPattern(target);
+    m_currentRx = rx;
   }
 
   bool ok = false;
@@ -409,7 +422,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
 
     QString word = m_query.value("word").toString();
     /// strip diacritics if required
-    if (replaceSearch) {
+    if (replaceSearch && (Lane::Normal_Search)) {
       if (options & Lane::Ignore_Diacritics)
         word =  word.replace(rxclass,QString());
     }
@@ -540,8 +553,8 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
   if (ms != -1) {
     qreal x = (ms/1000) + 0.5;
     int y = static_cast<int>(x);
-    t += QString(" (%1 sec").arg(x);
-    if (x != 1) {
+    t += QString(" (%1 sec").arg(y);
+    if (y != 1) {
       t += "s";
     }
     t += ")";
@@ -775,7 +788,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     rx.setPattern(regex.pattern());
   }
   else {
-  rx.setPattern(pattern);
+    rx.setPattern(pattern);
   }
 
   m_fragments.clear();
@@ -805,6 +818,9 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     //    qDebug() << "fragment size" << (ex - sx);  //QString("[%1][%2][%3][%4]").arg(position).arg(sx).arg(ex).arg(src);
     c = doc->find(rx,position);
   }
+  //  if (m_positions.size() > 0) {
+  //    qDebug() << Q_FUNC_INFO << m_positions;
+  //  }
 }
 int FullSearchWidget::getMaxRecords(const QString & table) {
   bool ok = false;
@@ -886,21 +902,27 @@ void FullSearchWidget::showKeyboard() {
   m_attached = ! m_attached;
   if (m_attached) {
     m_keyboardButton->setText(tr("Hide keyboard"));
-    QPoint p = m_findTarget->pos();
-    QPoint gp =  m_findTarget->mapToGlobal(p);
-    QRect r = m_findTarget->frameGeometry();
-
-    int x = gp.x();
-    int y = gp.y() + r.height();
-    qDebug() << "button pos" << x << "height" << y;
-    /// have to position it relative to the toplevel window
-    m_keyboard->move(getApp()->mapFromGlobal(QPoint(x,y)));
+    QPoint p;
+    QPoint gp;
+    p = m_keyboard->currentPosition();
+    if (p.isNull()) {
+      p = m_findTarget->pos();
+      gp =  m_findTarget->mapToGlobal(p);
+      QRect r = m_findTarget->frameGeometry();
+      int x = gp.x();
+      int y = gp.y() + r.height();
+      m_keyboard->move(getApp()->mapFromGlobal(QPoint(x,y)));
+    }
+    else {
+      gp =  m_findTarget->mapToGlobal(p);
+      m_keyboard->move(p);
+    }
   }
   else
     m_keyboardButton->setText(tr("Show keyboard"));
 
 }
-void FullSearchWidget::textSearch(const QString & target,int options) {
+void FullSearchWidget::regexSearch(const QString & target,int options) {
   bool replaceSearch = true;
   qDebug() << Q_FUNC_INFO;
   m_target = target;
@@ -941,6 +963,7 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
     rx.setPattern(target);
     qDebug() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
   }
+  m_currentRx = rx;
   bool ok = false;
   if (m_query.prepare("select root,word,nodeid,xml from entry where datasource = 1 order by nodenum asc")) {
     if (m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {
@@ -1007,9 +1030,16 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
     if (headword.indexOf(rx) != -1) {
       if (options & Lane::Include_Heads) {
         int row = addRow(m_query.value("root").toString(),
+                         /*
                m_query.value("word").toString(),
                m_query.value("nodeid").toString(),
                "head word",0);
+               =======*/
+                         m_query.value("word").toString(),
+                         m_query.value("nodeid").toString(),
+                         m_headText,0);
+
+
         headCount++;
         if (m_headBackgroundColor.isValid()) {
           QBrush b(m_headBackgroundColor);
@@ -1073,3 +1103,6 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
   }
   */
 }
+void FullSearchWidget::setForceLTR(bool v) {
+   m_findTarget->setForceLTR(v);
+ }
