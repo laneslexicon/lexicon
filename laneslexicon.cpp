@@ -2074,6 +2074,8 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       //      s->setOptionsHidden(true);
       //      s->hide();
       s->setSearch(t,options);
+      s->setForceLTR(d->getForceLTR());
+
       //      d->showProgress(true);
       //      connect(s,SIGNAL(setProgressMax(int)),d,SLOT(setProgressMax(int)));
       //      connect(s,SIGNAL(setProgressValue(int)),d,SLOT(setProgressValue(int)));

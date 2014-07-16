@@ -54,6 +54,9 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Position") << tr("Context");
 
   m_search = new SearchOptions(Lane::Word,this);
+
+  connect(m_search,SIGNAL(force(bool)),m_findTarget,SLOT(setForceLTR(bool)));
+
   QWidget * container = new QWidget;
   m_container = new QVBoxLayout;
   m_rxlist = new FocusTable;
@@ -278,6 +281,8 @@ void FullSearchWidget::findTarget(bool showProgress) {
   /// TODO check if only arabic characters
   ///      and use appropriate
   QString t = m_findTarget->text();
+  t.remove(QChar(0x202d));
+
   QRegExp rx("[a-z]+");
   if ((options & Lane::Regex_Search) || (rx.indexIn(t,0) != -1)) {
     this->regexSearch(t,options);
@@ -1095,3 +1100,6 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
   }
   */
 }
+void FullSearchWidget::setForceLTR(bool v) {
+   m_findTarget->setForceLTR(v);
+ }
