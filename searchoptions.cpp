@@ -1,6 +1,7 @@
 #include "searchoptions.h"
 #include "fullsearch.h"
 #include "namespace.h"
+#define USE_KEYMAPS 0
 SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) {
   m_more = false;
   m_searchType = searchType;
@@ -13,9 +14,10 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_targetGroup->setObjectName("searchtargetgroup");
   m_typeGroup = new QGroupBox(tr("Search type"));
   m_typeGroup->setObjectName("searchtypegroup");
-  m_keymapGroup = new QGroupBox(tr("Keymap"));
-  m_keymapGroup->setObjectName("keymapgroup");
-
+  if (USE_KEYMAPS) {
+    m_keymapGroup = new QGroupBox(tr("Keymap"));
+    m_keymapGroup->setObjectName("keymapgroup");
+  }
   m_ignoreDiacritics = new QCheckBox(tr("Ignore diacritics"));
   m_wholeWordMatch = new QCheckBox(tr("Whole word match"));
   m_headWord = new QRadioButton(tr("Head word"));
@@ -89,23 +91,26 @@ void SearchOptions::showMore(bool show) {
     m_includeHeads->setVisible(false);
     m_forceLTR->setVisible(false);
     m_typeGroup->setVisible(false);
-    if (m_hasMaps)
-      m_keymapGroup->setVisible(false);
-
+    if (USE_KEYMAPS) {
+      if (m_hasMaps)
+        m_keymapGroup->setVisible(false);
+    }
     break;
   }
   case Lane::Entry : {
     m_includeHeads->setVisible(false);
-    if (m_hasMaps && m_keymapsEnabled) {
-      m_keymapGroup->setVisible(false);
-    }
-    else {
-      m_keymapGroup->setVisible(false);
+    if (USE_KEYMAPS) {
+      if (m_hasMaps && m_keymapsEnabled) {
+        m_keymapGroup->setVisible(false);
+      }
+      else {
+        m_keymapGroup->setVisible(false);
+      }
     }
 
     if (m_regexSearch->isChecked()) {
-      m_targetGroup->setVisible(m_more);
-      m_forceLTR->setVisible(m_more);
+      m_targetGroup->setVisible(false);
+      m_forceLTR->setVisible(true);
       m_arabicTarget->setVisible(m_more);
       m_buckwalterTarget->setVisible(m_more);
       m_ignoreDiacritics->setVisible(false);
@@ -122,16 +127,17 @@ void SearchOptions::showMore(bool show) {
     break;
   }
   case Lane::Word : {
-    if (m_hasMaps && m_keymapsEnabled)
-      m_keymapGroup->setVisible(false);
-    else
-      m_keymapGroup->setVisible(false);
-
+    if (USE_KEYMAPS) {
+      if (m_hasMaps && m_keymapsEnabled)
+        m_keymapGroup->setVisible(false);
+      else
+        m_keymapGroup->setVisible(false);
+    }
     m_includeHeads->setVisible(true);
 
     if (m_regexSearch->isChecked()) {
       m_targetGroup->setVisible(m_more);
-      m_forceLTR->setVisible(m_more);
+      m_forceLTR->setVisible(true);
       m_arabicTarget->setVisible(m_more);
       m_buckwalterTarget->setVisible(m_more);
       m_ignoreDiacritics->setVisible(false);
@@ -232,7 +238,6 @@ void SearchOptions::setOptions(int x) {
   else
     m_keymapsEnabled = false;
 
-  qDebug() << Q_FUNC_INFO << "Keymaps enabled" << m_keymapsEnabled ;
   searchTypeChanged();
 }
 
@@ -240,6 +245,8 @@ void SearchOptions::searchTypeChanged() {
   showMore(m_more);
 }
 void SearchOptions::addKeymaps(const QString & activeMap,const QStringList & maps) {
+  if (!USE_KEYMAPS)
+    return;
   if (maps.size() > 0)
     m_hasMaps = true;
 
@@ -262,6 +269,8 @@ void SearchOptions::addKeymaps(const QString & activeMap,const QStringList & map
   }
 }
 void SearchOptions::keymapChanged() {
+  if (!USE_KEYMAPS)
+    return;
   QRadioButton * btn = qobject_cast<QRadioButton *>(QObject::sender());
   if (btn) {
     qDebug() << "keymap" << btn->text();
