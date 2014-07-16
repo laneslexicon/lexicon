@@ -14,10 +14,19 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
     std::cout << errmsg.toLocal8Bit().data() << std::endl;
     m_ok = false;
   }
+  QDir fonts(resourceDir + "/fonts");
+  if (! fonts.exists()) {
+    qDebug() << "No font directory";
+  }
+  else {
+    scanForFonts(fonts);
+  }
+  /*
   QFontDatabase::addApplicationFont(resourceDir + "/fonts/amiri/amiri-regular.ttf");
   QFontDatabase::addApplicationFont(resourceDir + "/fonts/FiraSans/OTF/FiraSans-Regular.otf");
   if (QFontDatabase::addApplicationFont(resourceDir + "/fonts/FiraSans/OTF/FiraSans-Book.otf") == -1)
     std::cout << "Could not load FiraSans-Book font" << std::endl;
+  */
   addLibraryPath(resourceDir + "/lib");
 
 
@@ -66,4 +75,31 @@ void Lexicon::onFocusChange(QWidget * old, QWidget * now) {
   if (old && now) {
     QLOG_DEBUG() << old->metaObject()->className() << "--->" << now->metaObject()->className();
   }
+}
+void Lexicon::scanForFonts(const QDir & dir)
+{
+  QDir d(dir);
+  QStringList filters;
+  QStringList fonts;
+  filters << "*.otf" << "*.ttf";
+  d.setNameFilters(filters);
+
+  fonts << d.entryList();
+
+   QDirIterator iterator(d.absolutePath(), QDirIterator::Subdirectories);
+   while (iterator.hasNext()) {
+      iterator.next();
+      QDir d(iterator.path());
+      //      d.setNameFilters(filters);
+      if (! iterator.fileInfo().isDir()) {
+        QString f = iterator.filePath(); //<< d.entryList();
+        if (f.endsWith(".ttf") || f.endsWith(".otf")) {
+          fonts << f;
+
+        }
+      }
+   }
+   while(fonts.size() > 0) {
+     QFontDatabase::addApplicationFont(fonts.takeFirst());
+   }
 }

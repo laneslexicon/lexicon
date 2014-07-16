@@ -2,6 +2,7 @@
 #define __MYAPP__H
 #include <QApplication>
 #include <QDir>
+#include <QDirIterator>
 #include <QFileInfo>
 #include <QDebug>
 #include <QSettings>
@@ -19,6 +20,7 @@ public:
   bool isOk() { return m_ok;}
   QString getFontName(const QString &);
   QString getFontSize(const QString &);
+  void scanForFonts(const QDir &);
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:
