@@ -59,6 +59,10 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   if (m_list->rowCount() > 0)
     m_list->itemDoubleClicked(m_list->item(0,0));
 
+  if (m_focusTable)
+    m_list->setFocus();
+  else
+    m_text->setFocus();
 }
 /// TODO can remove this
 HeadSearchWidget::HeadSearchWidget(const QString & str,int options,QWidget * parent) : QWidget(parent) {
@@ -353,6 +357,10 @@ void HeadSearchWidget::showFirst() {
     //    m_list->setFocus();
 
   }
+  if (m_focusTable)
+    m_list->setFocus();
+
+  return;
 }
 QString HeadSearchWidget::buildText(int options) {
   QString t;
@@ -420,6 +428,7 @@ void HeadSearchWidget::readSettings() {
   }
   m_stepCount = settings->value("Step",100).toInt();
   m_debug = settings->value("Debug",false).toBool();
+  m_focusTable = settings->value("Focus table",true).toBool();
   delete settings;
 }
 void HeadSearchWidget::onRemoveResults() {

@@ -49,6 +49,7 @@ class HeadSearchWidget : public QWidget
  private:
    void readSettings();
    bool eventFilter(QObject * target,QEvent * event);
+   bool m_focusTable;
    QString buildText(int);
    QRegExp m_currentRx;
    int m_searchOptions;
