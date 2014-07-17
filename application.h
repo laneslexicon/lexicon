@@ -1,5 +1,5 @@
-#ifndef __MYAPP__H
-#define __MYAPP__H
+#ifndef __LEXICON_H__
+#define __LEXICON_H__
 #include <QApplication>
 #include <QDir>
 #include <QDirIterator>
@@ -18,8 +18,6 @@ public:
   QSettings * getSettings();
   void setConfig(const QString & fileName);
   bool isOk() { return m_ok;}
-  QString getFontName(const QString &);
-  QString getFontSize(const QString &);
   void scanForFonts(const QDir &);
   public slots:
     void onFocusChange(QWidget *,QWidget *);

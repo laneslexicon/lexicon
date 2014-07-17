@@ -21,15 +21,8 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   else {
     scanForFonts(fonts);
   }
-  /*
-  QFontDatabase::addApplicationFont(resourceDir + "/fonts/amiri/amiri-regular.ttf");
-  QFontDatabase::addApplicationFont(resourceDir + "/fonts/FiraSans/OTF/FiraSans-Regular.otf");
-  if (QFontDatabase::addApplicationFont(resourceDir + "/fonts/FiraSans/OTF/FiraSans-Book.otf") == -1)
-    std::cout << "Could not load FiraSans-Book font" << std::endl;
-  */
+
   addLibraryPath(resourceDir + "/lib");
-
-
 
   QCoreApplication::setOrganizationName("Gabanjo");
   QCoreApplication::setOrganizationDomain("theunwalledcity.com");
@@ -53,24 +46,7 @@ QSettings * Lexicon::getSettings() {
   }
   return new QSettings(m_configFile,QSettings::IniFormat);
 }
-QString Lexicon::getFontName(const QString & /* type */) {
-  /*
-  QString k = "name_" + type;
-  if (m_fonts.contains(k)) {
-    return m_fonts.value(k);
-  }
-  */
-  return QString();
-}
-QString Lexicon::getFontSize(const QString & /* type */) {
-  /*
-  QString k = "size_" + type;
-  if (m_fonts.contains(k)) {
-    return m_fonts.value(k);
-  }
-  */
-  return QString();
-}
+
 void Lexicon::onFocusChange(QWidget * old, QWidget * now) {
   if (old && now) {
     QLOG_DEBUG() << old->metaObject()->className() << "--->" << now->metaObject()->className();
