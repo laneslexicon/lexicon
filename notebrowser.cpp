@@ -1,5 +1,9 @@
 #include "notebrowser.h"
 #include "laneslexicon.h"
+#include "graphicsentry.h"
+#include "QsLog.h"
+#include "notes.h"
+
 extern LanesLexicon * getApp();
 #define COL_WITH_ID 1
 #define NOTE_SUBSTR_LENGTH 30

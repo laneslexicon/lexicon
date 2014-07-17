@@ -4,6 +4,8 @@
 #include <QCommandLineOption>
 #include <QCommandLineParser>
 #include <QSplashScreen>
+#include <QImageReader>
+#include <QTimer>
 #include <QPixmap>
 #include "QsLog.h"
 #include "QsLogDest.h"
@@ -128,7 +130,6 @@ int main(int argc, char *argv[])
         m << "*." + QString(formats[i]);
         m << "*." + QString(formats[i]).toUpper();
       }
-      qDebug() << m;
       QStringList images = d.entryList(m);
       int ix = -1;
       if (images.size() > 0) {

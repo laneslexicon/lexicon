@@ -1,6 +1,6 @@
 #include "graphicsentry.h"
 #include "laneslexicon.h"
-
+#include "namespace.h"
 extern LanesLexicon * getApp();
 extern NoteMaster * getNotes();
 ToolButtonData::ToolButtonData(int id) : QToolButton() {

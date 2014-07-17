@@ -1,5 +1,6 @@
 #include "notes.h"
 #include "laneslexicon.h"
+#include "application.h"
 extern LanesLexicon * getApp();
 Note::Note() {
   m_id = -1;

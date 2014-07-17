@@ -19,6 +19,7 @@
 #include <QTableWidget>
 #include <QDebug>
 #include <QModelIndex>
+#include <QKeyEvent>
 #include "QsLog.h"
 #include "notes.h"
 class NoteBrowser : public QWidget {

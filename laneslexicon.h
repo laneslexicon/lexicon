@@ -45,23 +45,17 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QPainter>
-class ArabicSearchDialog;
-#include "application.h"
-#include "inputmapper.h"
-#include "contentswidget.h"
-#include "graphicsentry.h"
-#include "history.h"
-#include "QsLog.h"
 #include "place.h"
-#include "bookmarkwidget.h"
-#include "scripts.h"
-#include "xsltsupport.h"
-#include "menubar.h"
-#include "helpviewer.h"
-#include "notes.h"
-#include "notebrowser.h"
-#include "tabwidget.h"
-#include "namespace.h"
+class ArabicSearchDialog;
+class NoteMaster;
+class HistoryMaster;
+class Place;
+class ArabicSearchDialog;
+class AppMenu;
+class InputMapper;
+class GraphicsEntry;
+class ContentsWidget;
+class TabWidget;
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
