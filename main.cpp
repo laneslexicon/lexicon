@@ -108,6 +108,7 @@ int main(int argc, char *argv[])
     else {
       a.setConfig("default.ini");
     }
+
     int ret;
     SplashScreen * splash = 0;
     QSettings * settings = a.getSettings();
@@ -121,8 +122,14 @@ int main(int argc, char *argv[])
       makeSplash = false;
     }
     if (makeSplash) {
-
-      QStringList images = d.entryList(QStringList() << "*.png" << "*.jpg");
+      QList<QByteArray> formats =  QImageReader::supportedImageFormats();
+      QStringList m;
+      for(int i=0;i < formats.size();i++) {
+        m << "*." + QString(formats[i]);
+        m << "*." + QString(formats[i]).toUpper();
+      }
+      qDebug() << m;
+      QStringList images = d.entryList(m);
       int ix = -1;
       if (images.size() > 0) {
         ix = random_in_range(0,images.size() - 1);
