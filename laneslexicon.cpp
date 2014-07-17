@@ -447,6 +447,9 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == "keymaps disable") {
     this->enableKeymaps(false);
   }
+  else if (key == "search delete") {
+    this->deleteSearch();
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -2109,7 +2112,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       }
       HeadSearchWidget * s = new HeadSearchWidget(this);
       connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
-      connect(s,SIGNAL(deleteSearch(const Place &)),this,SLOT(deleteSearch(const Place &)));
+      connect(s,SIGNAL(deleteSearch()),this,SLOT(deleteSearch()));
       s->search(target,options);
       if (s->count() == 0) {
         QMessageBox msgBox;
@@ -2391,14 +2394,19 @@ void LanesLexicon::enableKeymaps(bool v) {
 QString LanesLexicon::getActiveKeymap() const {
   return m_activeMap;
 }
-void LanesLexicon::deleteSearch(const Place & p) {
-  if (! p.isValid()) {
-    return;
-  }
+void LanesLexicon::deleteSearch() {
+  //  if (! p.isValid()) {
+  //    return;
+  //  }
+  Place p;
   int currentTab = m_tabs->currentIndex();
   HeadSearchWidget * searchwidget = qobject_cast<HeadSearchWidget *>(m_tabs->widget(currentTab));
   if (searchwidget) {
+    p = searchwidget->getPlace();
     delete searchwidget;
+  }
+  else {
+    return;
   }
   GraphicsEntry *  entry = new GraphicsEntry(this);
   setSignals(entry);

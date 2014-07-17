@@ -82,7 +82,7 @@ public:
       void testSlot();
       void showNoteBrowser();
       void shortcut(const QString &);
-      void deleteSearch(const Place &);
+      void deleteSearch();
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
 

@@ -31,6 +31,7 @@ class HeadSearchWidget : public QWidget
  public:
     HeadSearchWidget(const QString & str,int options,QWidget * parent = 0);
     HeadSearchWidget(QWidget * parent = 0);
+    Place getPlace();
    GraphicsEntry * getEntry() { return m_text;}
    int count();
    void search(const QString &,int options);
@@ -65,6 +66,6 @@ class HeadSearchWidget : public QWidget
    QPushButton * m_convertButton;
  signals:
    void searchResult(const QString &);
-   void deleteSearch(const Place &);
+   void deleteSearch();
 };
 #endif

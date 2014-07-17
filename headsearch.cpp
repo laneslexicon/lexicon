@@ -425,5 +425,8 @@ void HeadSearchWidget::readSettings() {
 void HeadSearchWidget::onRemoveResults() {
   Place p = m_text->getPlace();
   qDebug() << Q_FUNC_INFO << p;
-  emit(deleteSearch(p));
+  emit(deleteSearch());
+}
+Place HeadSearchWidget::getPlace() {
+  return m_text->getPlace();
 }
