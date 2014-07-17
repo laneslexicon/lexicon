@@ -22,6 +22,7 @@ class SearchOptions : public QWidget {
   void addKeymaps(const QString &activeMap,const QStringList & maps);
   void setKeymapsEnabled(bool v);
   bool getForceLTR();
+  static QRegExp buildRx(const QString &,int);
  public slots:
   void searchTypeChanged();
   void keymapChanged();

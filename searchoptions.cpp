@@ -316,3 +316,30 @@ void SearchOptions::onForceLeftToRight(int checked) {
 bool SearchOptions::getForceLTR() {
   return m_forceLTR->isChecked();
 }
+QRegExp SearchOptions::buildRx(const QString & searchtarget,int options) {
+  QRegExp rx;
+  QString target = searchtarget;
+
+  QString pattern;
+  if (options & Lane::Normal_Search) {
+    if (options & Lane::Ignore_Diacritics) {
+      /// TODO get from INI
+      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+      QStringList cc = target.split("");
+      for(int i=0;i < cc.size();i++) {
+        pattern += cc[i] + ar;
+      }
+    }
+    else {
+      pattern = target;
+    }
+    if (options & Lane::Whole_Word) {
+      pattern = "\\b" + pattern + "\\b";
+    }
+    rx.setPattern(pattern);
+  }
+  else {
+    rx.setPattern(target);
+  }
+  return rx;
+}
