@@ -315,47 +315,18 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
   qDebug() << Q_FUNC_INFO;
   m_target = target;
   m_searchOptions = options;
-
-
   QRegExp rx;
-
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+
+
+
+
+
 
   QString sql = "select id,word,root,entry,node,nodenum from xref where datasource = 1 order by nodenum asc";
 
   QString pattern;
-  if (options & Lane::Normal_Search) {
-    if (options & Lane::Ignore_Diacritics) {
-      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
-      QStringList cc = target.split("");
-      QString brx = "";
-      for(int i=0;i < cc.size();i++) {
-        pattern += cc[i] + ar;
-      }
-    }
-    else {
-      pattern = target;
-    }
-    if (options & Lane::Whole_Word) {
-      pattern = "\\b" + pattern + "\\b";
-    }
-    m_currentRx.setPattern(pattern);
-
-    pattern.clear();
-    if (options & Lane::Whole_Word) {
-      pattern = "\\b" + m_target + "\\b";
-    }
-    else {
-      pattern = m_target;
-    }
-    rx.setPattern(pattern);
-  }
-  else {
-    qDebug() << "regex pattern" << rx.pattern();
-    rx.setPattern(target);
-    m_currentRx = rx;
-  }
-
+  m_currentRx = rx = SearchOptions::buildRx(target,options);
   bool ok = false;
   if (m_query.prepare(sql)) {
     if (m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {
