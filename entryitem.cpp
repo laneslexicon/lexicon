@@ -332,10 +332,10 @@ void EntryItem::notesAccepted() {
   this->setFocus();
 }
 int EntryItem::find(const QRegExp & rx,int position) {
-  qDebug() << Q_FUNC_INFO << position;
+  //  qDebug() << Q_FUNC_INFO << position;
   QTextCursor c = this->document()->find(rx,position);
-  this->setTextInteractionFlags(Qt::TextEditorInteraction);
-  this->setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | this->flags());
+  //  this->setTextInteractionFlags(Qt::TextEditorInteraction);
+  //  this->setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | this->flags());
   //  int flags = this->textInteractionFlags();
   //  this->setTextInteractionFlags(Qt::TextEditable);
   if (c.isNull()) {

@@ -1367,6 +1367,7 @@ int GraphicsEntry::search() {
     m_currentSearchPosition = m_items[i]->find(rx,0);
     if (m_currentSearchPosition != -1) {
       m_currentSearchIndex = i;
+      this->setCurrentItem(m_items[i]);
     }
   }
   if (m_currentSearchIndex == -1) {
@@ -1396,13 +1397,24 @@ int GraphicsEntry::search() {
   return count;
 }
 void GraphicsEntry::searchNext() {
-  qDebug() << Q_FUNC_INFO;
+  qDebug() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
   int pos = m_currentSearchPosition;
   m_currentSearchPosition = -1;
-  for(int i=m_currentSearchIndex;(i < m_items.size()) && (m_currentSearchPosition == -1);i++) {
+  bool found = false;
+  for(int i=m_currentSearchIndex;(i < m_items.size()) && ! found ;i++) {
     m_currentSearchPosition = m_items[i]->find(m_currentSearchRx,pos);
     if (m_currentSearchPosition != -1) {
+      found = true;
+      if (i > m_currentSearchIndex) {
+        QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
+        c.clearSelection();
+        m_items[m_currentSearchIndex]->setTextCursor(c);
+      }
       m_currentSearchIndex = i;
+      this->setCurrentItem(m_items[i]);
+    }
+    else {
+      pos = 0;
     }
   }
   if (m_currentSearchIndex == -1) {
