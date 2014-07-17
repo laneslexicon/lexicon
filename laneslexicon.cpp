@@ -2132,7 +2132,6 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
 }
 void LanesLexicon::searchForWord() {
   ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
-  qDebug() << Q_FUNC_INFO << "include heads" << (m_defaultSearchOptions & Lane::Include_Heads);
   d->setOptions(m_defaultSearchOptions);
   if (d->exec()) {
     QString t = d->getText();
