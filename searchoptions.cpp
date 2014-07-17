@@ -153,6 +153,33 @@ void SearchOptions::showMore(bool show) {
     }
     break;
   }
+  case Lane::Local_Search : {
+    if (USE_KEYMAPS) {
+      if (m_hasMaps && m_keymapsEnabled)
+        m_keymapGroup->setVisible(false);
+      else
+        m_keymapGroup->setVisible(false);
+    }
+    m_includeHeads->setVisible(false);
+
+    if (m_regexSearch->isChecked()) {
+      m_targetGroup->setVisible(false);
+      m_forceLTR->setVisible(true);
+      m_arabicTarget->setVisible(false);
+      m_buckwalterTarget->setVisible(false);
+      m_ignoreDiacritics->setVisible(false);
+      m_wholeWordMatch->setVisible(false);
+    }
+    else {
+      m_targetGroup->setVisible(false);
+      m_forceLTR->setVisible(false);
+      m_arabicTarget->setVisible(false);
+      m_buckwalterTarget->setVisible(false);
+      m_ignoreDiacritics->setVisible(true);
+      m_wholeWordMatch->setVisible(true);
+    }
+    break;
+  }
   default :
     qDebug() << Q_FUNC_INFO << "unknown search type";
     break;

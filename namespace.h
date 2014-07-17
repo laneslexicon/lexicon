@@ -22,5 +22,9 @@ enum Tabs {
  enum Keymaps {
    Keymaps_Enabled   =  0x00001000
  };
+ enum Other {
+   Local_Search        =  0x00002000,
+ Force_LTR           =  0x00004000
+ };
 }
 #endif

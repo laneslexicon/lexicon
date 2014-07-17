@@ -83,6 +83,7 @@ public:
       void showNoteBrowser();
       void shortcut(const QString &);
       void deleteSearch();
+      void localSearch();
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
 

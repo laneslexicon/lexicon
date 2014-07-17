@@ -17,6 +17,8 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   case Lane::Word :
     setWindowTitle(tr("Search for Word"));
     break;
+  case Lane::Local_Search :
+    setWindowTitle(tr("Search current page"));
   default :break;
   }
 
@@ -115,6 +117,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   //  delete settings;
 }
+
 void ArabicSearchDialog::showKeyboard() {
   m_keyboard->attach(m_edit);
   m_attached = ! m_attached;

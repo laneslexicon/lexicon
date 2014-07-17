@@ -75,6 +75,7 @@ class GraphicsEntry : public QWidget {
     void setTextWidth(int w) { m_textWidth = w;}
     QGraphicsScene * getScene() { return m_scene;}
     int search();
+    void searchNext();
     bool hasNode(const QString &);
     bool focusNode(const QString &);
     void home();
@@ -138,6 +139,7 @@ class GraphicsEntry : public QWidget {
     QString m_widenKey;
     QString m_narrowKey;
     QString m_searchKey;
+    QString m_searchNextKey;
     QString m_clearKey;
     QString m_homeKey;
     int m_widenStep;

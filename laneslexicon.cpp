@@ -450,6 +450,9 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == "search delete") {
     this->deleteSearch();
   }
+  else if (key == "local search") {
+    this->localSearch();
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -2416,4 +2419,10 @@ void LanesLexicon::deleteSearch() {
   entry->home();
   return;
 
+}
+void LanesLexicon::localSearch() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->search();
+  }
 }

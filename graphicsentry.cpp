@@ -1,6 +1,7 @@
 #include "graphicsentry.h"
 #include "laneslexicon.h"
 #include "namespace.h"
+#include "searchdialogs.h"
 extern LanesLexicon * getApp();
 extern NoteMaster * getNotes();
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
@@ -142,8 +143,10 @@ void GraphicsEntry::readSettings() {
     m_widenStep = 50;
   }
   m_searchKey = settings->value("Find",QString()).toString();
+  m_searchNextKey = settings->value("Find next",QString()).toString();
   m_clearKey = settings->value("Clean",QString()).toString();
   m_homeKey = settings->value("Home",QString()).toString();
+
 
   settings->endGroup();
 
@@ -207,6 +210,10 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   }
   if (! m_searchKey.isEmpty() && (event->text() == m_searchKey)) {
     emit(searchPage());
+    return;
+  }
+  if (! m_searchNextKey.isEmpty() && (event->text() == m_searchNextKey)) {
+    emit(searchNext());
     return;
   }
   if (! m_clearKey.isEmpty() && (event->text() == m_clearKey)) {
@@ -1301,7 +1308,48 @@ int GraphicsEntry::search() {
   QString target = "and";
   int count = 0;
   int step = 10;
+  int options = Lane::Local_Search;
   int max = m_items.size() * step;
+  QString v;
+  bool b;
+  qDebug() << Q_FUNC_INFO;
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("LocalSearch");
+  v  = settings->value("Type",QString("normal")).toString();
+  if (v == "normal") {
+    qDebug() << "normal";
+    options |= Lane::Normal_Search;
+  }
+  else {
+    qDebug() << "regex";
+    options |= Lane::Regex_Search;
+  }
+
+  b = settings->value("Ignore diacritics",true).toBool();
+  if (b) {
+    qDebug() << "ignore diacritics";
+    options |= Lane::Ignore_Diacritics;
+  }
+
+  b = settings->value("Whole word",true).toBool();
+  if (b) {
+    qDebug() << "whole word";
+    options |= Lane::Whole_Word;
+  }
+
+  b = settings->value("Force LTR",false).toBool();
+  if (b) {
+    options |= Lane::Force_LTR;
+    qDebug() << "force";
+  }
+
+
+  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Local_Search,this);
+  d->setOptions(options);
+  d->exec();
+  /*
   QProgressDialog progress("Searching...", "Cancel search", 0,  max, this);
   progress.setWindowModality(Qt::WindowModal);
   progress.show();
@@ -1316,7 +1364,11 @@ int GraphicsEntry::search() {
   }
   progress.setValue(max);
   QLOG_DEBUG() << "Found" << count;
+  */
   return count;
+}
+void GraphicsEntry::searchNext() {
+  qDebug() << Q_FUNC_INFO;
 }
 void GraphicsEntry::clearHighlights() {
   for(int i=0;i < m_items.size();i++) {
