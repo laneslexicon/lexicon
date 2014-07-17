@@ -2089,18 +2089,13 @@ void LanesLexicon::searchForRoot() {
 void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & t) {
   qDebug() << Q_FUNC_INFO << searchType;
   QString target = t;
+  target.remove(QChar(0x202d));
   int options = d->getOptions();
   options |= searchType;
   if (searchType & Lane::Word) {
       FullSearchWidget * s = new FullSearchWidget;
-      //      s->setOptionsHidden(true);
-      //      s->hide();
       s->setSearch(t,options);
       s->setForceLTR(d->getForceLTR());
-
-      //      d->showProgress(true);
-      //      connect(s,SIGNAL(setProgressMax(int)),d,SLOT(setProgressMax(int)));
-      //      connect(s,SIGNAL(setProgressValue(int)),d,SLOT(setProgressValue(int)));
       s->findTarget(true);
       connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
       int c = this->getSearchCount();
@@ -2110,9 +2105,9 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       return;
   }
   if (searchType & Lane::Entry) {
-      if (! UcdScripts::isScript(target,"Arabic")) {
-        target = convertString(target);
-      }
+    //      if (! UcdScripts::isScript(target,"Arabic")) {
+    //        target = convertString(target);
+    //      }
       HeadSearchWidget * s = new HeadSearchWidget(this);
       connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
       connect(s,SIGNAL(deleteSearch()),this,SLOT(deleteSearch()));
@@ -2121,7 +2116,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
         QMessageBox msgBox;
         msgBox.setObjectName("wordnotfound");
         msgBox.setTextFormat(Qt::RichText);
-        msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(target));
+        msgBox.setText(QString(tr("Entry not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(target));
         msgBox.exec();
         delete s;
       }
