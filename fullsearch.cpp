@@ -1030,16 +1030,9 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
     if (headword.indexOf(rx) != -1) {
       if (options & Lane::Include_Heads) {
         int row = addRow(m_query.value("root").toString(),
-                         /*
-               m_query.value("word").toString(),
-               m_query.value("nodeid").toString(),
-               "head word",0);
-               =======*/
                          m_query.value("word").toString(),
                          m_query.value("nodeid").toString(),
                          m_headText,0);
-
-
         headCount++;
         if (m_headBackgroundColor.isValid()) {
           QBrush b(m_headBackgroundColor);
