@@ -146,7 +146,9 @@ void ArabicSearchDialog::showOptions(bool v) {
   this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 QString ArabicSearchDialog::getText() {
-  return m_edit->text().trimmed();
+  QString t = m_edit->text().trimmed();
+  t.remove(QChar(0x202d));
+  return t;
 }
 void ArabicSearchDialog::setPrompt(const QString & text) {
   m_prompt->setText(text);
