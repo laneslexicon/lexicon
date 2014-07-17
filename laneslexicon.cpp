@@ -2109,6 +2109,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       }
       HeadSearchWidget * s = new HeadSearchWidget(this);
       connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
+      connect(s,SIGNAL(deleteSearch(const Place &)),this,SLOT(deleteSearch(const Place &)));
       s->search(target,options);
       if (s->count() == 0) {
         QMessageBox msgBox;
@@ -2389,4 +2390,23 @@ void LanesLexicon::enableKeymaps(bool v) {
 }
 QString LanesLexicon::getActiveKeymap() const {
   return m_activeMap;
+}
+void LanesLexicon::deleteSearch(const Place & p) {
+  if (! p.isValid()) {
+    return;
+  }
+  int currentTab = m_tabs->currentIndex();
+  HeadSearchWidget * searchwidget = qobject_cast<HeadSearchWidget *>(m_tabs->widget(currentTab));
+  if (searchwidget) {
+    delete searchwidget;
+  }
+  GraphicsEntry *  entry = new GraphicsEntry(this);
+  setSignals(entry);
+  entry->installEventFilter(this);
+  entry->getXmlForRoot(p);
+  m_tabs->insertTab(currentTab,entry,p.getShortText());
+  m_tabs->setCurrentIndex(currentTab);
+  entry->home();
+  return;
+
 }

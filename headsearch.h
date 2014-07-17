@@ -23,6 +23,7 @@
 #include <QProgressDialog>
 class GraphicsEntry;
 class FocusTable;
+class Place;
 class HeadSearchWidget : public QWidget
 {
     Q_OBJECT
@@ -39,6 +40,7 @@ class HeadSearchWidget : public QWidget
    void cancelSearch();
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);
+   void onRemoveResults();
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);
@@ -60,7 +62,9 @@ class HeadSearchWidget : public QWidget
    QFont m_resultsFont;
    bool m_cancelSearch;
    bool m_debug;
+   QPushButton * m_convertButton;
  signals:
    void searchResult(const QString &);
+   void deleteSearch(const Place &);
 };
 #endif

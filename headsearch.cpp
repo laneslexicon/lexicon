@@ -23,10 +23,18 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->installEventFilter(this);
   //QStyle * style = m_list->style();
   //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
+  QHBoxLayout * resultslayout = new QHBoxLayout;
   m_resultsText = new QLabel("");
   m_resultsText->hide();
+  m_convertButton = new QPushButton("Remove results table");
+  m_convertButton->hide();
+  connect(m_convertButton,SIGNAL(clicked()),this,SLOT(onRemoveResults()));
+  resultslayout->addWidget(m_resultsText);
+  resultslayout->addStretch();
+  resultslayout->addWidget(m_convertButton);
+
   containerlayout->addWidget(m_list);
-  containerlayout->addWidget(m_resultsText);
+  containerlayout->addLayout(resultslayout);
   container->setLayout(containerlayout);
   m_text = new GraphicsEntry;
   m_text->installEventFilter(this);
@@ -327,7 +335,9 @@ void HeadSearchWidget::search(const QString & searchtarget,int options) {
   }
   m_resultsText->setText(this->buildText(options));
   m_resultsText->show();
+
   if (m_list->rowCount() > 0) {
+    m_convertButton->show();
     m_list->selectRow(0);
     m_list->setFocus();
   }
@@ -411,4 +421,9 @@ void HeadSearchWidget::readSettings() {
   m_stepCount = settings->value("Step",100).toInt();
   m_debug = settings->value("Debug",false).toBool();
   delete settings;
+}
+void HeadSearchWidget::onRemoveResults() {
+  Place p = m_text->getPlace();
+  qDebug() << Q_FUNC_INFO << p;
+  emit(deleteSearch(p));
 }
