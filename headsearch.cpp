@@ -4,6 +4,7 @@
 #include "focustable.h"
 #include "namespace.h"
 #include "laneslexicon.h"
+#include "searchoptions.h"
 extern LanesLexicon * getApp();
 HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
@@ -243,6 +244,7 @@ void HeadSearchWidget::search(const QString & searchtarget,int options) {
   //  part word without diacritics
   //   select where instr(bareword,?) > 0
   sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 order by nodenum asc";
+  /*
   QString pattern;
   if (options & Lane::Normal_Search) {
     if (options & Lane::Ignore_Diacritics) {
@@ -273,6 +275,8 @@ void HeadSearchWidget::search(const QString & searchtarget,int options) {
   else {
     rx.setPattern(target);
   }
+  */
+  rx = SearchOptions::buildRx(target,options);
   m_currentRx = rx;
   qDebug() << "head search" << rx.pattern();
   bool ok = false;
