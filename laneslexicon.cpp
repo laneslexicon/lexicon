@@ -2089,7 +2089,7 @@ void LanesLexicon::searchForRoot() {
 void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & t) {
   qDebug() << Q_FUNC_INFO << searchType;
   QString target = t;
-  target.remove(QChar(0x202d));
+
   int options = d->getOptions();
   options |= searchType;
   if (searchType & Lane::Word) {
