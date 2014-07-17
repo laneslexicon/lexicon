@@ -20,8 +20,6 @@
 #include <QDebug>
 #include <QModelIndex>
 #include <QKeyEvent>
-#include "QsLog.h"
-#include "notes.h"
 class NoteBrowser : public QWidget {
   Q_OBJECT
  public:
