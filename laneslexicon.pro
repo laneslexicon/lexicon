@@ -65,7 +65,8 @@ SOURCES += main.cpp\
         application.cpp \
         searchoptions.cpp \
         searchdialogs.cpp \
-        nodeview.cpp
+        nodeview.cpp \
+        splashscreen.cpp
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
@@ -89,4 +90,5 @@ HEADERS  += laneslexicon.h \
             application.h \
             searchoptions.h \
             searchdialogs.h \
-            nodeview.h
+            nodeview.h \
+            splashscreen.h

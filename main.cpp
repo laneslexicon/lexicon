@@ -8,7 +8,24 @@
 #include "QsLog.h"
 #include "QsLogDest.h"
 #include "application.h"
+#include "splashscreen.h"
 #include <iostream>
+int random_in_range (unsigned int min, unsigned int max)
+{
+  int base_random = rand(); /* in [0, RAND_MAX] */
+  if (RAND_MAX == base_random) return random_in_range(min, max);
+  /* now guaranteed to be in [0, RAND_MAX) */
+  int range       = max - min,
+      remainder   = RAND_MAX % range,
+      bucket      = RAND_MAX / range;
+  /* There are range buckets, plus one smaller interval
+     within remainder of RAND_MAX */
+  if (base_random < RAND_MAX - remainder) {
+    return min + base_random/bucket;
+  } else {
+    return random_in_range (min, max);
+  }
+}
 
 LanesLexicon * getApp() {
   foreach(QWidget *widget, qApp->topLevelWidgets()) {
@@ -92,19 +109,52 @@ int main(int argc, char *argv[])
       a.setConfig("default.ini");
     }
     int ret;
-    QPixmap pixmap("images/frontis.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
+    SplashScreen * splash = 0;
+    QSettings * settings = a.getSettings();
+    settings->beginGroup("Splash");
+    int splashDelay = settings->value("Delay",5).toInt();
+    QString splashDir = settings->value("Location","images/splash").toString();
+    bool makeSplash = settings->value("Enabled",true).toBool();
+    delete settings;
+    QDir d(splashDir);
+    if (! d.exists()) {
+      makeSplash = false;
+    }
+    if (makeSplash) {
+
+      QStringList images = d.entryList(QStringList() << "*.png" << "*.jpg");
+      int ix = -1;
+      if (images.size() > 0) {
+        ix = random_in_range(0,images.size() - 1);
+        QString f = d.absolutePath()  + QDir::separator() + images[ix];
+        QPixmap pixmap(f);
+        splash = new SplashScreen(pixmap);
+        splash->show();
+      }
+      else {
+        makeSplash = false;
+      }
+    }
     a.processEvents();
-    LanesLexicon * w = new LanesLexicon;
+    LanesLexicon *  w = new LanesLexicon;
+    /*
+    if (splash) {
+      splash->setWidget(w);
+
+    }
+    */
     if (w->isOk()) {
       w->show();
-      splash.finish(w);
+      if (makeSplash) {
+        splash->setWidget(w);
+        QTimer::singleShot(splashDelay * 1000, splash, SLOT(pausedFinish()));
+      //        splash->finish(w);
+         }
       ret = a.exec();
       //      delete w;
     }
     else {
-      delete w;
+      //delete w;
       a.quit();
       return 0;
     }
