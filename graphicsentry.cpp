@@ -2,6 +2,7 @@
 #include "laneslexicon.h"
 #include "namespace.h"
 #include "searchdialogs.h"
+#include "searchoptions.h"
 extern LanesLexicon * getApp();
 extern NoteMaster * getNotes();
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
@@ -1348,7 +1349,34 @@ int GraphicsEntry::search() {
 
   ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Local_Search,this);
   d->setOptions(options);
-  d->exec();
+  QString t;
+  if (d->exec()) {
+    t = d->getText();
+    if ( t.isEmpty()) {
+      return -1;
+    }
+    options = d->getOptions();
+  }
+  delete d;
+  m_currentSearchPosition = -1;
+  m_currentSearchIndex = -1;
+  QRegExp rx = SearchOptions::buildRx(t,options);
+  m_currentSearchRx = rx;
+  m_currentSearchTarget = t;
+  for(int i=1;(i < m_items.size()) && (m_currentSearchPosition == -1);i++) {
+    m_currentSearchPosition = m_items[i]->find(rx,0);
+    if (m_currentSearchPosition != -1) {
+      m_currentSearchIndex = i;
+    }
+  }
+  if (m_currentSearchIndex == -1) {
+    QMessageBox msgBox;
+    msgBox.setObjectName("wordnotfound");
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
+        msgBox.exec();
+  }
+  qDebug() << Q_FUNC_INFO << "find pos" << m_currentSearchPosition;
   /*
   QProgressDialog progress("Searching...", "Cancel search", 0,  max, this);
   progress.setWindowModality(Qt::WindowModal);
@@ -1369,6 +1397,21 @@ int GraphicsEntry::search() {
 }
 void GraphicsEntry::searchNext() {
   qDebug() << Q_FUNC_INFO;
+  int pos = m_currentSearchPosition;
+  m_currentSearchPosition = -1;
+  for(int i=m_currentSearchIndex;(i < m_items.size()) && (m_currentSearchPosition == -1);i++) {
+    m_currentSearchPosition = m_items[i]->find(m_currentSearchRx,pos);
+    if (m_currentSearchPosition != -1) {
+      m_currentSearchIndex = i;
+    }
+  }
+  if (m_currentSearchIndex == -1) {
+    QMessageBox msgBox;
+    msgBox.setObjectName("wordnotfound");
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(m_currentSearchTarget));
+        msgBox.exec();
+  }
 }
 void GraphicsEntry::clearHighlights() {
   for(int i=0;i < m_items.size();i++) {

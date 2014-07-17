@@ -65,6 +65,7 @@ class EntryItem : public QGraphicsTextItem {
   void setPlace(const Place &);
   void setBackground(QColor & c) { m_backgroundColor = c;}
   void selectAll();
+  int  find(const QRegExp &,int);
   Place getPlace();
   QString getNode() { return m_place.getNode();}
   QString getRoot() { return m_place.getRoot();}

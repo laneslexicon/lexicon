@@ -331,3 +331,23 @@ void EntryItem::notesAccepted() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   this->setFocus();
 }
+int EntryItem::find(const QRegExp & rx,int position) {
+  qDebug() << Q_FUNC_INFO << position;
+  QTextCursor c = this->document()->find(rx,position);
+  this->setTextInteractionFlags(Qt::TextEditorInteraction);
+  this->setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | this->flags());
+  //  int flags = this->textInteractionFlags();
+  //  this->setTextInteractionFlags(Qt::TextEditable);
+  if (c.isNull()) {
+    //qDebug() << "regex not matched" << rx.pattern();
+    return -1;
+  }
+  /// the find positions the cursor at the end, so move back one carh
+  /// and select the word
+  /// then set m_cursor at the next occurence (if any)
+  c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
+  c.select(QTextCursor::WordUnderCursor);
+  //  c.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
+  this->setTextCursor(c);
+  return c.position();
+}

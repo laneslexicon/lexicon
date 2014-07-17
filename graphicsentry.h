@@ -145,6 +145,10 @@ class GraphicsEntry : public QWidget {
     int m_widenStep;
     int m_defaultWidth;
 
+    int m_currentSearchIndex;
+    int m_currentSearchPosition;
+    QRegExp m_currentSearchRx;
+    QString m_currentSearchTarget;
     void moveForward();
     void moveBackward();
     QList<EntryItem *> m_items;
