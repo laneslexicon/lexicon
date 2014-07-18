@@ -231,6 +231,17 @@ void EntryItem::clearHighlights() {
   */
   this->highlight(m_searchText,Qt::white);
 }
+void EntryItem::highlight(int position,Qt::GlobalColor color) {
+  position--;
+  QTextCursor cursor = this->textCursor();
+  cursor.setPosition(position);
+  cursor.movePosition(QTextCursor::StartOfWord,QTextCursor::MoveAnchor);
+  cursor.movePosition(QTextCursor::EndOfWord,QTextCursor::KeepAnchor);
+  QTextCharFormat fmt = cursor.charFormat();
+  fmt.setBackground(color);
+  cursor.setCharFormat(fmt);
+
+}
 /**
  * this is the one that is used by default
  *

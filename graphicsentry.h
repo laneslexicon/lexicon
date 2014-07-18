@@ -76,6 +76,8 @@ class GraphicsEntry : public QWidget {
     QGraphicsScene * getScene() { return m_scene;}
     int search();
     int m_currentSearchOptions;
+    QMap<int,QList<int> > m_searchPositions;
+    void addPosition(int,int);
     void searchNext();
     bool hasNode(const QString &);
     bool focusNode(const QString &);
@@ -103,6 +105,7 @@ class GraphicsEntry : public QWidget {
     void addButtonDecoration();
     void deleteNotes();
     void focusPlace();
+    void clearSelections();
  private:
 
     QString m_focusNode;

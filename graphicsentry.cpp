@@ -1495,7 +1495,7 @@ int GraphicsEntry::search() {
   delete d;
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
-
+  m_searchPositions.clear();
   QRegExp rx = SearchOptions::buildRx(t,options);
   m_currentSearchRx = rx;
   m_currentSearchTarget = t;
@@ -1504,11 +1504,13 @@ int GraphicsEntry::search() {
     m_currentSearchPosition = m_items[i]->find(rx,0);
     if (m_currentSearchPosition != -1) {
       m_currentSearchIndex = i;
-      if (i > 1) {
-        this->setCurrentItem(m_items[i]);
-        m_items[i]->setFocus();
-        //        this->m_items[i]->ensureVisible();
-      }
+      this->addPosition(i,m_currentSearchPosition);
+        if (i > 1) {
+          this->setCurrentItem(m_items[i]);
+          m_items[i]->setFocus();
+          this->addPosition(i,m_currentSearchPosition);
+          //        this->m_items[i]->ensureVisible();
+        }
       //      this->setCurrentItem(m_items[i]);
     }
   }
@@ -1562,6 +1564,9 @@ void GraphicsEntry::searchNext() {
       }
       else {
         m_items[i]->setFocus();
+        if (m_currentSearchOptions & Lane::Sticky_Search) {
+          m_items[i]->highlight(pos);
+        }
         /*
         if (m_items[i]->boundingRect().height() > m_view->height()) {
           qDebug() << "scrolling candidate";
@@ -1574,6 +1579,7 @@ void GraphicsEntry::searchNext() {
         }
         */
       }
+      this->addPosition(i,m_currentSearchPosition);
       m_currentSearchIndex = i;
       //      m_items[i]->ensureVisible();
       //      this->setCurrentItem(m_items[i]);
@@ -1594,5 +1600,23 @@ void GraphicsEntry::searchNext() {
     }
     msgBox.setText(QString(tr("No more occurrences of : <span style=\"%1\">%2</span>")).arg(style).arg(m_currentSearchTarget));
     msgBox.exec();
+  }
+}
+void GraphicsEntry::addPosition(int itemIx,int pos) {
+  QList<int> positions;
+  if (m_searchPositions.contains(itemIx)) {
+    positions = QList<int>(m_searchPositions.value(itemIx));
+  }
+  positions << pos;
+  m_searchPositions.insert(itemIx,positions);
+}
+void GraphicsEntry::clearSelections() {
+  QList<int> keys = QList<int>(m_searchPositions.keys());
+  for(int i=0;i < keys.size();i++) {
+    QList<int> positions = QList<int>(m_searchPositions.value(keys[i]));
+    for(int j=0;j < positions.size();j++) {
+      /// TODO get Qt::white background color from INI
+      m_items[keys[i]]->highlight(positions[j],Qt::white);
+    }
   }
 }

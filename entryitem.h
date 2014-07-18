@@ -76,6 +76,7 @@ class EntryItem : public QGraphicsTextItem {
   QString getOutputHTML() const { return m_html; }
   void setOutputHTML(const QString & html) { m_html = html;}
   QTextCursor highlight(const QString &,Qt::GlobalColor color = Qt::yellow);
+  void highlight(int pos,Qt::GlobalColor color = Qt::yellow);
   QTextCursor highlightRx(const QString &);
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}

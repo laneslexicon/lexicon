@@ -84,6 +84,8 @@ public:
       void shortcut(const QString &);
       void deleteSearch();
       void localSearch();
+      void localSearchNext();
+      void localSearchClear();
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
 

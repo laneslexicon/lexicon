@@ -290,7 +290,7 @@ void LanesLexicon::onCloseTab(int ix) {
 }
 void LanesLexicon::shortcut(const QString & k) {
   QString key = k.toCaseFolded();
-  QLOG_DEBUG() << Q_FUNC_INFO << k;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << k;
   if (key == QString("search root")) {
     searchForRoot();
   }
@@ -452,6 +452,12 @@ void LanesLexicon::shortcut(const QString & k) {
   }
   else if (key == "local search") {
     this->localSearch();
+  }
+  else if (key == "local search next") {
+    this->localSearchNext();
+  }
+  else if (key == "local search clear") {
+    this->localSearchClear();
   }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
@@ -1531,7 +1537,7 @@ void LanesLexicon::on_actionLastRoot() {
   showPlace(p,options);
   m_tree->ensurePlaceVisible(p);
 }
-void LanesLexicon::rootChanged(const QString & root,const QString & node) {
+void LanesLexicon::rootChanged(const QString & root,const QString & /* node */) {
   Place p;
   p.setRoot(root);
   m_tree->ensurePlaceVisible(p,true);
@@ -2153,26 +2159,25 @@ void LanesLexicon::searchForEntry() {
   delete d;
 }
 void LanesLexicon::searchForNode() {
-  int options = 0;
-    NodeSearchDialog * d = new NodeSearchDialog(this);
-    d->setOptions(m_searchNewTab | m_searchSwitchTab);
-    if (d->exec()) {
-      QString t = d->getText();
-      if (! t.isEmpty()) {
-        /// TODO make this an option to always show root
-        /// show only node
-        //        Place p = showNode(t,true);
-        Place p;
-        p.setNode(t);
-        p = showPlace(p,d->getOptions());
-        if (! p.isValid()) {
-          QMessageBox msgBox;
-          msgBox.setText(QString(tr("Node not found: %1")).arg(t));
-          msgBox.exec();
-        }
+  NodeSearchDialog * d = new NodeSearchDialog(this);
+  d->setOptions(m_searchNewTab | m_searchSwitchTab);
+  if (d->exec()) {
+    QString t = d->getText();
+    if (! t.isEmpty()) {
+      /// TODO make this an option to always show root
+      /// show only node
+      //        Place p = showNode(t,true);
+      Place p;
+      p.setNode(t);
+      p = showPlace(p,d->getOptions());
+      if (! p.isValid()) {
+        QMessageBox msgBox;
+        msgBox.setText(QString(tr("Node not found: %1")).arg(t));
+        msgBox.exec();
       }
     }
-    delete d;
+  }
+  delete d;
 }
 void LanesLexicon::pageZoomIn() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
@@ -2419,5 +2424,17 @@ void LanesLexicon::localSearch() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->search();
+  }
+}
+void LanesLexicon::localSearchNext() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->searchNext();
+  }
+}
+void LanesLexicon::localSearchClear() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->clearSelections();
   }
 }
