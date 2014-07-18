@@ -1500,7 +1500,9 @@ int GraphicsEntry::search() {
     if (m_currentSearchPosition != -1) {
       m_currentSearchIndex = i;
       if (i > 1) {
-        this->m_items[i]->ensureVisible();
+        this->setCurrentItem(m_items[i]);
+        m_items[i]->setFocus();
+        //        this->m_items[i]->ensureVisible();
       }
       //      this->setCurrentItem(m_items[i]);
     }
@@ -1516,7 +1518,7 @@ int GraphicsEntry::search() {
   return count;
 }
 void GraphicsEntry::searchNext() {
-  qDebug() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
+  //  qDebug() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
   int pos = m_currentSearchPosition;
   m_currentSearchPosition = -1;
   bool found = false;
@@ -1530,18 +1532,20 @@ void GraphicsEntry::searchNext() {
         m_items[m_currentSearchIndex]->setTextCursor(c);
         //        m_items[i]->ensureVisible();
         this->setCurrentItem(m_items[i]);
+        m_items[i]->setFocus();
         if (m_items[i]->boundingRect().height() > m_view->height()) {
-          qDebug() << "scrolling candidate";
           int charCount = m_items[i]->document()->characterCount();
           qreal h = m_items[i]->boundingRect().height();
           qreal dy = (h * (qreal)m_currentSearchPosition)/(qreal)charCount;
           QPointF p = m_items[i]->scenePos();
-          qDebug() << "dy" << dy;
           p.setY(p.y() + dy);
+          qDebug() << "adjusting pos" << dy;
           m_view->ensureVisible(QRectF(p,QSizeF(10,10)));
         }
       }
       else {
+        m_items[i]->setFocus();
+        /*
         if (m_items[i]->boundingRect().height() > m_view->height()) {
           qDebug() << "scrolling candidate";
           int charCount = m_items[i]->document()->characterCount();
@@ -1549,22 +1553,24 @@ void GraphicsEntry::searchNext() {
           qreal dy = (h * (qreal)m_currentSearchPosition)/(qreal)charCount;
           QPointF p = m_items[i]->scenePos();
           qDebug() << "dy" << dy;
-          //          m_view->ensureVisible(QRectF(p,QSizeF(10,10)));
+          m_view->ensureVisible(QRectF(p,QSizeF(10,10)));
         }
+        */
       }
       m_currentSearchIndex = i;
       //      m_items[i]->ensureVisible();
       //      this->setCurrentItem(m_items[i]);
+      return;
     }
     else {
       pos = 0;
     }
   }
-  if (m_currentSearchIndex == -1) {
+  if (m_currentSearchPosition == -1) {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
     msgBox.setTextFormat(Qt::RichText);
-    msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(m_currentSearchTarget));
+    msgBox.setText(QString(tr("No more occurrences of ord : <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(m_currentSearchTarget));
         msgBox.exec();
   }
 }
