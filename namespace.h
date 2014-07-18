@@ -25,7 +25,7 @@ enum Tabs {
  enum Other {
    Local_Search        =  0x00002000,
    Force_LTR           =  0x00004000,
-   Sticky_select       =  0x00008000
+   Sticky_Search       =  0x00008000
  };
 }
 #endif

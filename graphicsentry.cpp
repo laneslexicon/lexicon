@@ -1484,13 +1484,18 @@ int GraphicsEntry::search() {
     if ( t.isEmpty()) {
       return -1;
     }
-    options = d->getOptions();
+    m_currentSearchOptions = d->getOptions();
+  }
+  else {
+    return -1;
+  }
+  if (m_currentSearchOptions & Lane::Sticky_Search) {
+    qDebug() << "sticky search";
   }
   delete d;
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
-  qDebug() << "Scene height" << m_scene->height();
-  qDebug() << "Viewport height" << m_view->height();
+
   QRegExp rx = SearchOptions::buildRx(t,options);
   m_currentSearchRx = rx;
   m_currentSearchTarget = t;
@@ -1511,8 +1516,13 @@ int GraphicsEntry::search() {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
     msgBox.setTextFormat(Qt::RichText);
-    msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
-        msgBox.exec();
+    QString style;
+    /// TODO get this from INI
+    if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
+        style = "font-family : Amiri;font-size : 18pt";
+    }
+    msgBox.setText(QString(tr("Word not found: <span style=\"%1\">%2</span>")).arg(style).arg(t));
+    msgBox.exec();
   }
   qDebug() << Q_FUNC_INFO << "find pos" << m_currentSearchPosition;
   return count;
@@ -1527,9 +1537,16 @@ void GraphicsEntry::searchNext() {
     if (m_currentSearchPosition != -1) {
       found = true;
       if (i > m_currentSearchIndex) {
-        QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
-        c.clearSelection();
-        m_items[m_currentSearchIndex]->setTextCursor(c);
+        if (m_currentSearchOptions & ! Lane::Sticky_Search) {
+          QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
+          //c.clearSelection();
+          m_items[m_currentSearchIndex]->setTextCursor(c);
+        }
+        else {
+          QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
+          c.clearSelection();
+          m_items[m_currentSearchIndex]->setTextCursor(c);
+        }
         //        m_items[i]->ensureVisible();
         this->setCurrentItem(m_items[i]);
         m_items[i]->setFocus();
@@ -1570,7 +1587,12 @@ void GraphicsEntry::searchNext() {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
     msgBox.setTextFormat(Qt::RichText);
-    msgBox.setText(QString(tr("No more occurrences of ord : <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(m_currentSearchTarget));
-        msgBox.exec();
+    QString style;
+    /// TODO get this from INI
+    if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
+        style = "font-family : Amiri;font-size : 18pt";
+    }
+    msgBox.setText(QString(tr("No more occurrences of : <span style=\"%1\">%2</span>")).arg(style).arg(m_currentSearchTarget));
+    msgBox.exec();
   }
 }

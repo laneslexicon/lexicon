@@ -75,6 +75,7 @@ class GraphicsEntry : public QWidget {
     void setTextWidth(int w) { m_textWidth = w;}
     QGraphicsScene * getScene() { return m_scene;}
     int search();
+    int m_currentSearchOptions;
     void searchNext();
     bool hasNode(const QString &);
     bool focusNode(const QString &);

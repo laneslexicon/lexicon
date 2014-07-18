@@ -40,6 +40,7 @@ class SearchOptions : public QWidget {
   QCheckBox * m_ignoreDiacritics;
   QCheckBox * m_wholeWordMatch;
   QCheckBox * m_includeHeads;
+  QCheckBox * m_stickySearch;
   QRadioButton * m_headWord;
   QRadioButton * m_fullText;
   QCheckBox * m_forceLTR;

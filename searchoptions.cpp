@@ -28,7 +28,7 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),m_targetGroup);
 
   m_includeHeads = new QCheckBox(tr("Include head entries in search results"));
-
+  m_stickySearch = new QCheckBox(tr("Sticky search"));
   /// diacritics/whole word
   QHBoxLayout * optionslayout = new QHBoxLayout;
   optionslayout->addWidget(m_ignoreDiacritics);
@@ -66,6 +66,7 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
 
   mainlayout->addWidget(m_typeGroup);
   mainlayout->addLayout(optionslayout);
+  mainlayout->addWidget(m_stickySearch);
   mainlayout->addWidget(m_includeHeads);
   mainlayout->addLayout(forcelayout);
   mainlayout->addWidget(m_targetGroup);
@@ -85,6 +86,7 @@ void SearchOptions::showMore(bool show) {
 
   switch(m_searchType) {
   case Lane::Root : {
+    m_stickySearch->setVisible(false);
     m_targetGroup->setVisible(false);
     m_ignoreDiacritics->setVisible(false);
     m_wholeWordMatch->setVisible(false);
@@ -107,6 +109,7 @@ void SearchOptions::showMore(bool show) {
         m_keymapGroup->setVisible(false);
       }
     }
+    m_stickySearch->setVisible(false);
 
     if (m_regexSearch->isChecked()) {
       m_targetGroup->setVisible(false);
@@ -133,6 +136,7 @@ void SearchOptions::showMore(bool show) {
       else
         m_keymapGroup->setVisible(false);
     }
+    m_stickySearch->setVisible(false);
     m_includeHeads->setVisible(true);
 
     if (m_regexSearch->isChecked()) {
@@ -154,6 +158,7 @@ void SearchOptions::showMore(bool show) {
     break;
   }
   case Lane::Local_Search : {
+    m_stickySearch->setVisible(true);
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
         m_keymapGroup->setVisible(false);
@@ -210,53 +215,28 @@ int SearchOptions::getOptions() {
   if (m_includeHeads->isChecked())
     x |= Lane::Include_Heads;
 
+  if (m_stickySearch->isChecked())
+    x |= Lane::Sticky_Search;
+
   return x;
 }
 void SearchOptions::setOptions(int x) {
   bool v;
 
-  if (x & Lane::Ignore_Diacritics)
-    v = true;
-  else
-    v = false;
-  m_ignoreDiacritics->setChecked(v);
+  m_ignoreDiacritics->setChecked(x & Lane::Ignore_Diacritics);
 
-  if (x & Lane::Whole_Word)
-    v = true;
-  else
-    v = false;
-  m_wholeWordMatch->setChecked(v);
+  m_wholeWordMatch->setChecked(x & Lane::Whole_Word);
 
 
-  if (x & Lane::Regex_Search)
-    v = true;
-  else
-    v = false;
-  m_regexSearch->setChecked(v);
+  m_regexSearch->setChecked(x & Lane::Regex_Search);
 
-  if (x & Lane::Normal_Search)
-    v = true;
-  else
-    v = false;
-  m_normalSearch->setChecked(v);
+  m_normalSearch->setChecked(x & Lane::Normal_Search);
 
-  if (x & Lane::Arabic)
-    v = true;
-  else
-    v = false;
-  m_arabicTarget->setChecked(v);
+  m_arabicTarget->setChecked(x & Lane::Arabic);
 
-  if (x & Lane::Buckwalter)
-    v = true;
-  else
-    v = false;
-  m_buckwalterTarget->setChecked(v);
+  m_buckwalterTarget->setChecked(x & Lane::Buckwalter);
 
-  if (x & Lane::Include_Heads)
-    v = true;
-  else
-    v = false;
-  m_includeHeads->setChecked(v);
+  m_includeHeads->setChecked(x & Lane::Include_Heads);
 
   if (x & Lane::Keymaps_Enabled) {
     m_keymapsEnabled = true;
@@ -264,6 +244,8 @@ void SearchOptions::setOptions(int x) {
   }
   else
     m_keymapsEnabled = false;
+
+  m_stickySearch->setChecked(x & Lane::Sticky_Search);
 
   searchTypeChanged();
 }
