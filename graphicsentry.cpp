@@ -1528,7 +1528,29 @@ void GraphicsEntry::searchNext() {
         QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
         c.clearSelection();
         m_items[m_currentSearchIndex]->setTextCursor(c);
-        m_items[i]->ensureVisible();
+        //        m_items[i]->ensureVisible();
+        this->setCurrentItem(m_items[i]);
+        if (m_items[i]->boundingRect().height() > m_view->height()) {
+          qDebug() << "scrolling candidate";
+          int charCount = m_items[i]->document()->characterCount();
+          qreal h = m_items[i]->boundingRect().height();
+          qreal dy = (h * (qreal)m_currentSearchPosition)/(qreal)charCount;
+          QPointF p = m_items[i]->scenePos();
+          qDebug() << "dy" << dy;
+          p.setY(p.y() + dy);
+          m_view->ensureVisible(QRectF(p,QSizeF(10,10)));
+        }
+      }
+      else {
+        if (m_items[i]->boundingRect().height() > m_view->height()) {
+          qDebug() << "scrolling candidate";
+          int charCount = m_items[i]->document()->characterCount();
+          qreal h = m_items[i]->boundingRect().height();
+          qreal dy = (h * (qreal)m_currentSearchPosition)/(qreal)charCount;
+          QPointF p = m_items[i]->scenePos();
+          qDebug() << "dy" << dy;
+          //          m_view->ensureVisible(QRectF(p,QSizeF(10,10)));
+        }
       }
       m_currentSearchIndex = i;
       //      m_items[i]->ensureVisible();
