@@ -185,6 +185,7 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
   QPen pen = painter->pen();
   QBrush brush = painter->brush();
   painter->setPen(Qt::NoPen);
+
   if ( ! m_place.isSupplement()) {
     painter->setBrush(Qt::white);
   }
@@ -349,5 +350,9 @@ int EntryItem::find(const QRegExp & rx,int position) {
   c.select(QTextCursor::WordUnderCursor);
   //  c.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
   this->setTextCursor(c);
+  //  qDebug() << "linecount" << this->document()->lineCount() << "text width" << this->textWidth() << this->document()->characterCount();
+  //  qDebug() << "boundingRect" << this->boundingRect();
+
+
   return c.position();
 }

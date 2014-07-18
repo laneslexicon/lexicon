@@ -22,6 +22,7 @@ LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent
   QGraphicsView(scene,parent) {
   setObjectName("lexicongraphicsview");
   setFocusPolicy(Qt::StrongFocus);
+  setAlignment(Qt::AlignLeft|Qt::AlignTop);
 }
 /// TODO get rid of this
 void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
@@ -1305,126 +1306,6 @@ void GraphicsEntry::reposition() {
   }
   m_scene->setSceneRect(QRectF(0,0,maxwidth,m_scene->height()));
 }
-int GraphicsEntry::search() {
-  QString target = "and";
-  int count = 0;
-  int step = 10;
-  int options = Lane::Local_Search;
-  int max = m_items.size() * step;
-  QString v;
-  bool b;
-  qDebug() << Q_FUNC_INFO;
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
-  settings->beginGroup("LocalSearch");
-  v  = settings->value("Type",QString("normal")).toString();
-  if (v == "normal") {
-    qDebug() << "normal";
-    options |= Lane::Normal_Search;
-  }
-  else {
-    qDebug() << "regex";
-    options |= Lane::Regex_Search;
-  }
-
-  b = settings->value("Ignore diacritics",true).toBool();
-  if (b) {
-    qDebug() << "ignore diacritics";
-    options |= Lane::Ignore_Diacritics;
-  }
-
-  b = settings->value("Whole word",true).toBool();
-  if (b) {
-    qDebug() << "whole word";
-    options |= Lane::Whole_Word;
-  }
-
-  b = settings->value("Force LTR",false).toBool();
-  if (b) {
-    options |= Lane::Force_LTR;
-    qDebug() << "force";
-  }
-
-
-  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Local_Search,this);
-  d->setOptions(options);
-  QString t;
-  if (d->exec()) {
-    t = d->getText();
-    if ( t.isEmpty()) {
-      return -1;
-    }
-    options = d->getOptions();
-  }
-  delete d;
-  m_currentSearchPosition = -1;
-  m_currentSearchIndex = -1;
-  QRegExp rx = SearchOptions::buildRx(t,options);
-  m_currentSearchRx = rx;
-  m_currentSearchTarget = t;
-  for(int i=1;(i < m_items.size()) && (m_currentSearchPosition == -1);i++) {
-    m_currentSearchPosition = m_items[i]->find(rx,0);
-    if (m_currentSearchPosition != -1) {
-      m_currentSearchIndex = i;
-      this->setCurrentItem(m_items[i]);
-    }
-  }
-  if (m_currentSearchIndex == -1) {
-    QMessageBox msgBox;
-    msgBox.setObjectName("wordnotfound");
-    msgBox.setTextFormat(Qt::RichText);
-    msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
-        msgBox.exec();
-  }
-  qDebug() << Q_FUNC_INFO << "find pos" << m_currentSearchPosition;
-  /*
-  QProgressDialog progress("Searching...", "Cancel search", 0,  max, this);
-  progress.setWindowModality(Qt::WindowModal);
-  progress.show();
-  for(int i=0;i < m_items.size();i++) {
-    //    QApplication::processEvents();
-    progress.setValue(i * step);
-    m_items[i]->highlight(target,Qt::yellow);
-    count += m_items[i]->findCount();
-    /// TODO check this spelling
-    if (progress.wasCanceled())
-      break;
-  }
-  progress.setValue(max);
-  QLOG_DEBUG() << "Found" << count;
-  */
-  return count;
-}
-void GraphicsEntry::searchNext() {
-  qDebug() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
-  int pos = m_currentSearchPosition;
-  m_currentSearchPosition = -1;
-  bool found = false;
-  for(int i=m_currentSearchIndex;(i < m_items.size()) && ! found ;i++) {
-    m_currentSearchPosition = m_items[i]->find(m_currentSearchRx,pos);
-    if (m_currentSearchPosition != -1) {
-      found = true;
-      if (i > m_currentSearchIndex) {
-        QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
-        c.clearSelection();
-        m_items[m_currentSearchIndex]->setTextCursor(c);
-      }
-      m_currentSearchIndex = i;
-      this->setCurrentItem(m_items[i]);
-    }
-    else {
-      pos = 0;
-    }
-  }
-  if (m_currentSearchIndex == -1) {
-    QMessageBox msgBox;
-    msgBox.setObjectName("wordnotfound");
-    msgBox.setTextFormat(Qt::RichText);
-    msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(m_currentSearchTarget));
-        msgBox.exec();
-  }
-}
 void GraphicsEntry::clearHighlights() {
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->clearHighlights();
@@ -1552,4 +1433,116 @@ void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
   if (entry)
     m_place = entry->getPlace();
 
+}
+int GraphicsEntry::search() {
+  QString target = "and";
+  int count = 0;
+  int step = 10;
+  int options = Lane::Local_Search;
+  int max = m_items.size() * step;
+  QString v;
+  bool b;
+  qDebug() << Q_FUNC_INFO;
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("LocalSearch");
+  v  = settings->value("Type",QString("normal")).toString();
+  if (v == "normal") {
+    qDebug() << "normal";
+    options |= Lane::Normal_Search;
+  }
+  else {
+    qDebug() << "regex";
+    options |= Lane::Regex_Search;
+  }
+
+  b = settings->value("Ignore diacritics",true).toBool();
+  if (b) {
+    qDebug() << "ignore diacritics";
+    options |= Lane::Ignore_Diacritics;
+  }
+
+  b = settings->value("Whole word",true).toBool();
+  if (b) {
+    qDebug() << "whole word";
+    options |= Lane::Whole_Word;
+  }
+
+  b = settings->value("Force LTR",false).toBool();
+  if (b) {
+    options |= Lane::Force_LTR;
+    qDebug() << "force";
+  }
+
+
+  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Local_Search,this);
+  d->setOptions(options);
+  QString t;
+  if (d->exec()) {
+    t = d->getText();
+    if ( t.isEmpty()) {
+      return -1;
+    }
+    options = d->getOptions();
+  }
+  delete d;
+  m_currentSearchPosition = -1;
+  m_currentSearchIndex = -1;
+  qDebug() << "Scene height" << m_scene->height();
+  qDebug() << "Viewport height" << m_view->height();
+  QRegExp rx = SearchOptions::buildRx(t,options);
+  m_currentSearchRx = rx;
+  m_currentSearchTarget = t;
+  this->m_items[0]->ensureVisible();
+  for(int i=1;(i < m_items.size()) && (m_currentSearchPosition == -1);i++) {
+    m_currentSearchPosition = m_items[i]->find(rx,0);
+    if (m_currentSearchPosition != -1) {
+      m_currentSearchIndex = i;
+      if (i > 1) {
+        this->m_items[i]->ensureVisible();
+      }
+      //      this->setCurrentItem(m_items[i]);
+    }
+  }
+  if (m_currentSearchIndex == -1) {
+    QMessageBox msgBox;
+    msgBox.setObjectName("wordnotfound");
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
+        msgBox.exec();
+  }
+  qDebug() << Q_FUNC_INFO << "find pos" << m_currentSearchPosition;
+  return count;
+}
+void GraphicsEntry::searchNext() {
+  qDebug() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
+  int pos = m_currentSearchPosition;
+  m_currentSearchPosition = -1;
+  bool found = false;
+  for(int i=m_currentSearchIndex;(i < m_items.size()) && ! found ;i++) {
+    m_currentSearchPosition = m_items[i]->find(m_currentSearchRx,pos);
+    if (m_currentSearchPosition != -1) {
+      found = true;
+      if (i > m_currentSearchIndex) {
+        QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
+        c.clearSelection();
+        m_items[m_currentSearchIndex]->setTextCursor(c);
+        m_items[i]->ensureVisible();
+      }
+      m_currentSearchIndex = i;
+      //      m_items[i]->ensureVisible();
+      //      this->setCurrentItem(m_items[i]);
+    }
+    else {
+      pos = 0;
+    }
+  }
+  if (m_currentSearchIndex == -1) {
+    QMessageBox msgBox;
+    msgBox.setObjectName("wordnotfound");
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setText(QString(tr("Word not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(m_currentSearchTarget));
+        msgBox.exec();
+  }
 }
