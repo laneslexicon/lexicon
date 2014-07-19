@@ -9,7 +9,7 @@ NodeView::NodeView(QWidget * parent)
   settings->beginGroup("System");
   QString fontString = settings->value("Arabic font").toString();
   settings->endGroup();
-  settings->beginGroup("Search");
+  settings->beginGroup("FullSearch");
   QString sz = settings->value("Viewer size",QString()).toString();
   if (! sz.isEmpty())
     this->setPreferredSize(sz);
@@ -67,7 +67,7 @@ NodeView::~NodeView() {
 }
 void NodeView::setPreferredSize(const QString & szStr) {
   m_size.setWidth(400);
-  m_size.setHeight(300);
+  m_size.setHeight(400);
   QRegExp rx("(\\d+)x(\\d+)");
   if ((rx.indexIn(szStr) != -1) && (rx.captureCount() == 2)) {
     bool ok;
@@ -134,6 +134,7 @@ void NodeView::setHtml(const QString & html) {
   c = m_browser->document()->find(m_pattern,c.position());
   if (! c.isNull())
       m_findNextButton->setEnabled(true);
+
 }
 void NodeView::findFirst() {
   QTextCursor c = m_browser->document()->find(m_pattern,0);
