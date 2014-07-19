@@ -6,6 +6,7 @@ NodeView::NodeView(QWidget * parent)
 
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
   settings->beginGroup("System");
   QString fontString = settings->value("Arabic font").toString();
   settings->endGroup();

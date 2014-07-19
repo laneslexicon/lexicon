@@ -5,7 +5,11 @@
 TabWidget::TabWidget(QWidget * parent) : QTabWidget(parent) {
   setObjectName("entrywidget");
   tabBar()->setObjectName("entrytabs");
+  readSettings();
   connect(this,SIGNAL(tabBarClicked(int)),this,SLOT(onTabBarClicked(int)));
+  if (m_numberTabs) {
+    connect(tabBar(),SIGNAL(tabMoved(int,int)),this,SIGNAL(tabsChanged()));
+  }
 }
 void TabWidget::keyPressEvent(QKeyEvent * event) {
     switch (event->key()) {
@@ -40,6 +44,29 @@ void TabWidget::onTabBarClicked(int ix) {
     entry->focusPlace();
   }
 }
+void TabWidget::tabRemoved(int index) {
+  QTabWidget::tabRemoved(index);
+  if (m_numberTabs) {
+    emit(tabsChanged());
+  }
+}
+void TabWidget::tabInserted(int index) {
+  qDebug() << Q_FUNC_INFO;
+  QTabWidget::tabInserted(index);
+  if (m_numberTabs) {
+    emit(tabsChanged());
+  }
+}
 //    if (event->key() == Qt::Key_Escape) {
 //      QLOG_DEBUG() << Q_FUNC_INFO << "escape";
 //    }
+void TabWidget::readSettings() {
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("TabBar");
+  m_numberTabs = settings->value("Number",true).toBool();
+  setMovable(settings->value("Moveable",true).toBool());
+  delete settings;
+
+}

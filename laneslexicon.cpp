@@ -50,7 +50,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_tree->installEventFilter(this);
   m_tabs = new TabWidget(this);
   m_tabs->setTabsClosable(true);
-
+  connect(m_tabs,SIGNAL(tabsChanged()),this,SLOT(tabsChanged()));
   /// at the end of the history, but we should be able to restore from settings
   /// TODO would we want restore our current position in history?
   m_history = new HistoryMaster(m_historyDbName);
@@ -2457,5 +2457,14 @@ void LanesLexicon::localSearchShow() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->showSelections();
+  }
+}
+void LanesLexicon::tabsChanged() {
+  QRegExp rx("^\\d+");
+  for(int i=0;i < m_tabs->count();i++) {
+    QString t = m_tabs->tabText(i);
+    t.remove(rx);
+    QString title = QString("%1  %2").arg(i+1).arg(t);
+    m_tabs->setTabText(i,title);
   }
 }
