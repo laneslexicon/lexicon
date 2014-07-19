@@ -10,7 +10,7 @@ class TabWidget : public QTabWidget {
   TabWidget(QWidget  * parent = 0);
   public slots:
     void onTabBarClicked(int);
-    //    void tabUserMove()
+    void tabContentsChanged();
  protected:
     void tabRemoved(int index);
     void tabInserted(int index);

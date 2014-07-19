@@ -70,3 +70,8 @@ void TabWidget::readSettings() {
   delete settings;
 
 }
+void TabWidget::tabContentsChanged() {
+  if (m_numberTabs) {
+    emit(tabsChanged());
+  }
+}

@@ -178,13 +178,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
 
 
-  QTextEdit::ExtraSelection es;
-  //  es = testedit->ExtraSelection;
-  QTextCharFormat fmt = es.format;//c.charFormat();
-  qDebug() << fmt.background().color().name();
-  qDebug() << fmt.foreground().color().name();
-  qDebug() << fmt.background().color().rgb();
-  qDebug() << fmt.foreground().color().rgb();
 
   QLOG_DEBUG() << "-----------------------";
   QLOG_DEBUG() << "Initialisation complete";
@@ -269,6 +262,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
 
   connect(entry,SIGNAL(gotoNode(const Place &,int)),this,SLOT(gotoPlace(const Place &,int)));
   //  connect(entry,SIGNAL(saveNote(Note *)),this,SLOT(saveNote(Note *)));
+
 }
 void LanesLexicon::onCloseTab(int ix) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
@@ -1111,6 +1105,7 @@ Place LanesLexicon::showPlace(const Place & p,int options) {
       np = entry->getXmlForRoot(p);
       m_tabs->setTabText(currentTab,np.getShortText());
       entry->setFocus();
+      m_tabs->tabContentsChanged();
     }
     else {
       return p;
