@@ -1977,7 +1977,7 @@ void LanesLexicon::updateStatusBar() {
     m_navModeIndicator->setText(tr("Nav mode: by page"));
     m_navText->setText(tr("Page"));
   }
-
+  m_keymapsButton->setEnabled(m_keymapsEnabled);
 }
 void LanesLexicon::updateMenu() {
   if (m_navMode == LanesLexicon::ByRoot) {
