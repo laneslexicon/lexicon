@@ -104,6 +104,7 @@ GraphicsEntry::~GraphicsEntry() {
   /// TODO xalan cleanup ?
 }
 void GraphicsEntry::readSettings() {
+  QString v;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
   bool ok;
@@ -116,18 +117,12 @@ void GraphicsEntry::readSettings() {
   m_defaultWidth = m_textWidth;
 
   m_entryMargin = settings->value("Margin",10).toInt();
+  /// TODO change this to use color names
+  v  = settings->value("Supplement background color","lightgray").toString();
 
-  QString bg = settings->value("Supplement background color",QString("rgb(255,254,253)")).toString();
-  QRegExp rx("^rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\s*\\)");
-  if (rx.indexIn(bg) != -1) {
-    //    QLOG_DEBUG() << bg << "color" << rx.cap(1) << rx.cap(2) << rx.cap(3);
-    m_supplementBg = QColor::fromRgb(rx.cap(1).toInt(),rx.cap(2).toInt(),rx.cap(3).toInt());
-    if (! m_supplementBg.isValid())  {
+  m_supplementBg = QColor(v);
+  if (! m_supplementBg.isValid())  {
       m_supplementBg = QColor::fromRgb(255,255,255);
-    }
-  }
-  else {
-    m_supplementBg = QColor::fromRgb(255,255,255);
   }
   m_clearScene = settings->value("Clear scene",true).toBool();
   /// these are set to empty to disable the feature

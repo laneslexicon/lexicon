@@ -34,12 +34,10 @@
 #include <QSettings>
 #include <QRegExp>
 #include <QClipboard>
-#include "QsLog.h"
-#include "xsltsupport.h"
-#include "history.h"
+#include <QToolButton>
 #include "place.h"
-#include "notedialog.h"
-#include "notes.h"
+class Note;
+class NoteDialog;
 class ToolButtonData : public QToolButton {
   Q_OBJECT
  public:
@@ -67,12 +65,12 @@ class EntryItem : public QGraphicsTextItem {
   void selectAll();
   int  find(const QRegExp &,int);
   Place getPlace();
-  QString getNode() { return m_place.getNode();}
-  QString getRoot() { return m_place.getRoot();}
-  QString getWord() { return m_place.getWord();}
-  bool isRoot() { return m_place.isRoot();}
-  int getSupplement() { return m_place.getSupplement();}
-  int getPage() { return m_place.getPage();}
+  QString getNode();
+  QString getRoot();
+  QString getWord();
+  bool isRoot();
+  int getSupplement();
+  int getPage();
   QString getOutputHTML() const { return m_html; }
   void setOutputHTML(const QString & html) { m_html = html;}
   QTextCursor highlight(const QString &,Qt::GlobalColor color = Qt::yellow);

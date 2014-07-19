@@ -1,6 +1,12 @@
-#include "entryitem.h"
+#include "QsLog.h"
+#include "xsltsupport.h"
+#include "history.h"
+#include "place.h"
+#include "notedialog.h"
+#include "notes.h"
 #include "laneslexicon.h"
 #include "namespace.h"
+#include "entryitem.h"
 extern LanesLexicon * getApp();
 extern NoteMaster * getNotes();
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
@@ -33,6 +39,24 @@ EntryItem::~EntryItem() {
     delete n;
   }
   /// TODO Check proxywidget are delete automatically
+}
+QString EntryItem::getNode() {
+  return m_place.getNode();
+}
+QString EntryItem::getRoot() {
+  return m_place.getRoot();
+}
+QString EntryItem::getWord() {
+  return m_place.getWord();
+}
+bool EntryItem::isRoot() {
+  return m_place.isRoot();
+}
+int EntryItem::getSupplement() {
+  return m_place.getSupplement();
+}
+int EntryItem::getPage() {
+  return m_place.getPage();
 }
 void EntryItem::setProxy(QGraphicsWidget * widget ) {
   m_noteWidget = widget;

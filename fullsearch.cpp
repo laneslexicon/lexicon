@@ -8,6 +8,7 @@
 #include "nodeview.h"
 #include "focustable.h"
 #include "keyboard.h"
+#include "keyboardwidget.h"
 #define NODE_COLUMN 2
 #define POSITION_COLUMN 3
 #define CONTEXT_COLUMN 4
