@@ -496,7 +496,7 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
     p1 = "";
     break;
   default:
-    p1 ="s";
+    p1 ="es";
   }
   if (entryCount == 1) {
     p2 = "y";
@@ -509,18 +509,22 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
     t = QString(tr("Search for \"%1\", %2")).arg(m_target).arg(p1);
   }
   else {
-    t = QString(tr("Search for \"%1\", found %2 item%3 in %4 entr%5"))
+    t = QString(tr("Search for \"%1\", found %2 match%3 in %4 entr%5"))
       .arg(m_target)
       .arg(findCount)
       .arg(p1)
       .arg(entryCount)
       .arg(p2);
   }
-  if (options & Lane::Ignore_Diacritics)
-    t += tr(", ignoring diacritics");
-  if (options & Lane::Whole_Word)
-    t += tr(", whole word match");
-
+  if (options & Lane::Regex_Search) {
+    t += tr(", regular expression search");
+  }
+  else {
+    if (options & Lane::Ignore_Diacritics)
+      t += tr(", ignoring diacritics");
+    if (options & Lane::Whole_Word)
+      t += tr(", whole word match");
+  }
   if (ms != -1) {
     qreal x = (ms/1000) + 0.5;
     int y = static_cast<int>(x);

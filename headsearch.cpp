@@ -278,7 +278,7 @@ void HeadSearchWidget::search(const QString & searchtarget,int options) {
   */
   rx = SearchOptions::buildRx(target,options);
   m_currentRx = rx;
-  qDebug() << "head search" << rx.pattern();
+
   bool ok = false;
   if (m_query.prepare(sql)) {
     if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeId = ?")) {
@@ -369,27 +369,32 @@ void HeadSearchWidget::showFirst() {
 QString HeadSearchWidget::buildText(int options) {
   QString t;
   QString p1;
-  QString p2;
+
   int findCount = m_list->rowCount();
 
-  t = QString("Search for %1: ").arg(m_target);
+  t = QString("Search for %1 ").arg(m_target);
   switch(findCount) {
   case 0:
     p1 = QString(tr("No items found"));
     break;
   case 1:
-    p1 = QString(tr("1 entry found"));
+    p1 = QString(tr("found 1 match"));
     break;
   default:
-    p1 = QString("%1 entries found").arg(findCount);
+    p1 = QString("found %1 matches").arg(findCount);
     break;
   }
   t += p1;
-  if (m_searchOptions & Lane::Ignore_Diacritics)
-    t += tr(", ignoring diacritics");
-  if (m_searchOptions & Lane::Whole_Word)
-    t += tr(", whole word match");
-
+  if (options & Lane::Regex_Search) {
+    t += tr(", regular expression search");
+  }
+  else {
+    if (m_searchOptions & Lane::Ignore_Diacritics)
+      t += tr(", ignoring diacritics");
+    if (m_searchOptions & Lane::Whole_Word)
+      t += tr(", whole word match");
+  }
+  qDebug() << t;
   return t;
 }
 void HeadSearchWidget::focusTable() {
