@@ -106,6 +106,7 @@ class GraphicsEntry : public QWidget {
     void deleteNotes();
     void focusPlace();
     void clearSelections();
+    void showSelections();
  private:
 
     QString m_focusNode;
@@ -145,6 +146,7 @@ class GraphicsEntry : public QWidget {
     QString m_searchKey;
     QString m_searchNextKey;
     QString m_clearKey;
+    QString m_showKey;
     QString m_homeKey;
     int m_widenStep;
     int m_defaultWidth;

@@ -86,6 +86,7 @@ public:
       void localSearch();
       void localSearchNext();
       void localSearchClear();
+      void localSearchShow();
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
 

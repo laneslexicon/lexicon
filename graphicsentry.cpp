@@ -147,6 +147,7 @@ void GraphicsEntry::readSettings() {
   m_searchKey = settings->value("Find",QString()).toString();
   m_searchNextKey = settings->value("Find next",QString()).toString();
   m_clearKey = settings->value("Clean",QString()).toString();
+  m_showKey = settings->value("Show",QString()).toString();
   m_homeKey = settings->value("Home",QString()).toString();
 
 
@@ -211,15 +212,19 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
     return;
   }
   if (! m_searchKey.isEmpty() && (event->text() == m_searchKey)) {
-    emit(searchPage());
+    emit(search());
     return;
   }
   if (! m_searchNextKey.isEmpty() && (event->text() == m_searchNextKey)) {
-    emit(searchNext());
+    this->searchNext();
     return;
   }
   if (! m_clearKey.isEmpty() && (event->text() == m_clearKey)) {
-    emit(clearPage());
+    this->clearSelections();
+    return;
+  }
+  if (! m_showKey.isEmpty() && (event->text() == m_showKey)) {
+    this->showSelections();
     return;
   }
   if (! m_clearKey.isEmpty() && (event->text() == m_homeKey)) {
@@ -1617,6 +1622,16 @@ void GraphicsEntry::clearSelections() {
     for(int j=0;j < positions.size();j++) {
       /// TODO get Qt::white background color from INI
       m_items[keys[i]]->highlight(positions[j],Qt::white);
+    }
+  }
+}
+void GraphicsEntry::showSelections() {
+  QList<int> keys = QList<int>(m_searchPositions.keys());
+  for(int i=0;i < keys.size();i++) {
+    QList<int> positions = QList<int>(m_searchPositions.value(keys[i]));
+    for(int j=0;j < positions.size();j++) {
+      /// TODO get Qt::white background color from INI
+      m_items[keys[i]]->highlight(positions[j]);
     }
   }
 }

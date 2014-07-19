@@ -359,8 +359,17 @@ int EntryItem::find(const QRegExp & rx,int position) {
   /// then set m_cursor at the next occurence (if any)
   c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
   c.select(QTextCursor::WordUnderCursor);
-  //  c.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
   this->setTextCursor(c);
+  /*
+  QTextCharFormat fmt = QTextEdit::ExtraSelection::format;//c.charFormat();
+  qDebug() << fmt.background().color().name();
+  qDebug() << fmt.foreground().color().name();
+  QTextBlockFormat bfmt = c.blockFormat();
+  qDebug() << bfmt.background().color().name();
+  qDebug() << bfmt.foreground().color().name();
+  */
+  //  c.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
+
   //  qDebug() << "linecount" << this->document()->lineCount() << "text width" << this->textWidth() << this->document()->characterCount();
   //  qDebug() << "boundingRect" << this->boundingRect();
 

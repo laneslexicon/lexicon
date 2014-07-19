@@ -177,6 +177,15 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     QApplication::postEvent(entry,event);
   }
 
+
+  QTextEdit::ExtraSelection es;
+  //  es = testedit->ExtraSelection;
+  QTextCharFormat fmt = es.format;//c.charFormat();
+  qDebug() << fmt.background().color().name();
+  qDebug() << fmt.foreground().color().name();
+  qDebug() << fmt.background().color().rgb();
+  qDebug() << fmt.foreground().color().rgb();
+
   QLOG_DEBUG() << "-----------------------";
   QLOG_DEBUG() << "Initialisation complete";
   QLOG_DEBUG() << "-----------------------";
@@ -450,6 +459,9 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == "search delete") {
     this->deleteSearch();
   }
+  else if (key == "local search find") {
+    this->localSearch();
+  }
   else if (key == "local search") {
     this->localSearch();
   }
@@ -458,6 +470,9 @@ void LanesLexicon::shortcut(const QString & k) {
   }
   else if (key == "local search clear") {
     this->localSearchClear();
+  }
+  else if (key == "local search show") {
+    this->localSearchShow();
   }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
@@ -2436,5 +2451,11 @@ void LanesLexicon::localSearchClear() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->clearSelections();
+  }
+}
+void LanesLexicon::localSearchShow() {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->showSelections();
   }
 }
