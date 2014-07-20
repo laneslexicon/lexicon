@@ -696,6 +696,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QLOG_DEBUG() << "viewport rect" << viewport_rect << "scene rect" << visible_scene_rect;
   QLOG_DEBUG() << visible_scene_rect.width();
   */
+  //  if (m_place.isSupplement()) {
+  //    m_view->setBackgroundBrush(QBrush(m_supplementBg));
+  //  }
   return m_place;
 }
 Place GraphicsEntry::getPage(const Place & p) {
