@@ -5,9 +5,9 @@
 #include <QTextStream>
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   readSettings();
-  setColumnCount(2);
+  setColumnCount(3);
   setHeaderLabels(
-                  QStringList() << tr("Letter/Root") << tr("") );
+                  QStringList() << tr("Letter/Root") << tr("") << tr("Node"));
   setSelectionMode(QAbstractItemView::SingleSelection);
   header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
   this->setStyleSheet(QString("selection-background-color : %1").arg(m_backgroundColor));
@@ -15,6 +15,9 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   connect(this,SIGNAL(itemExpanded(QTreeWidgetItem *)),this,SLOT(nodeExpanded(QTreeWidgetItem *)));
   connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(nodeCollapsed(QTreeWidgetItem *)));
   this->setExpandsOnDoubleClick(false);
+  if (! m_debug)
+    this->hideColumn(2);
+
 }
 ContentsWidget::~ContentsWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -38,6 +41,7 @@ void ContentsWidget::loadContents() {
   QSqlQuery query;
   QFile f;
   QTextStream * out;
+  int rootCount = 0;
   if (m_debug) {
     QFileInfo fi(QDir::tempPath(),QString("roots.txt"));
     f.setFileName(fi.filePath());
@@ -59,7 +63,6 @@ void ContentsWidget::loadContents() {
     QLOG_FATAL() << "Error preparing SQL:" << sql;
     return;
   }
-
   while(query.next()) {
     QString letter = query.value(0).toString();
     QTreeWidgetItem * item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(letter));
@@ -72,29 +75,31 @@ void ContentsWidget::loadContents() {
     QString root;
     while(rootQuery.next()) {
       bool ok = true;
-      root = rootQuery.value(0).toString();
-      //      itype = rootQuery.value(2).toString();
-
-      if (rootQuery.value(1).toInt() == 1) {
-        supp = "*";
-      }
-      else {
-        supp = "";
-      }
-      /// skipping the letter entries from the supplement
-      if ((supp == "*") && (root.size() == 1)) {
-        ok = false;
-      }
-      if (ok) {
-        if (m_debug && f.isOpen()) {
-          *out << root << '\n';
+      if (root != rootQuery.value(0).toString()) {
+        //      itype = rootQuery.value(2).toString();
+        root = rootQuery.value(0).toString();
+        if (rootQuery.value(1).toInt() == 1) {
+          supp = "*";
         }
-        QStringList cols;
-        cols << root << supp;
-        QTreeWidgetItem * rootitem = new QTreeWidgetItem(item,cols);
+        else {
+          supp = "";
+        }
+        /// skipping the letter entries from the supplement
+        if ((supp == "*") && (root.size() == 1)) {
+          ok = false;
+        }
+        if (ok) {
+          if (m_debug && f.isOpen()) {
+            *out << root << '\n';
+          }
+          QStringList cols;
+          cols << root << supp;
+          item->addChild(new QTreeWidgetItem(cols));
+          rootCount++;
+        }
       }
+      addTopLevelItem(item);
     }
-    addTopLevelItem(item);
   }
   if (m_debug) {
     out->flush();
@@ -102,11 +107,11 @@ void ContentsWidget::loadContents() {
     delete out;
   }
   m_entryQuery = new QSqlQuery;
-  bool ok = m_entryQuery->prepare("select word,itype,bword,nodeId from entry where datasource = 1 and root = ? order by nodenum asc");
+  bool ok = m_entryQuery->prepare("select word,itype,bword,nodeId,supplement from entry where datasource = 1 and root = ? order by nodenum asc");
   if ( ! ok ) {
     QLOG_WARN() << "Entry SQL prepare failed" << m_entryQuery->lastError();
   }
-
+  qDebug() << "root count" << rootCount;
 }
 Place ContentsWidget::findNextPlace(const Place & p) {
   QTreeWidgetItem * currentItem;
@@ -492,6 +497,10 @@ void ContentsWidget::focusOutEvent(QFocusEvent * event) {
  */
 int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   int c = 0;
+  QString supplement;
+  QString itype;
+  QString word;
+  QString node;
   qDebug() << Q_FUNC_INFO << root;
   if (parent->childCount() > 0) {
     return c;
@@ -501,7 +510,14 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
 
   while(m_entryQuery->next()) {
     //QLOG_DEBUG() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
-    QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << m_entryQuery->value("itype").toString() << m_entryQuery->value("word").toString());
+    supplement.clear();
+    if (m_entryQuery->value("supplement").toInt() == 1) {
+      supplement = "*";
+    }
+    itype = m_entryQuery->value("itype").toString();
+    word = m_entryQuery->value("word").toString();
+    node = m_entryQuery->value("nodeid").toString();
+    QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << itype << word << supplement << node);
     item->setFont(0,m_itypeFont);
     item->setData(0,Qt::UserRole,m_entryQuery->value("nodeId"));//.toString()
     parent->addChild(item);
