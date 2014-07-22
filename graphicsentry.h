@@ -93,6 +93,7 @@ class GraphicsEntry : public QWidget {
     void onZoomOut();
     void onClearScene();
     void showPerseus(const Place &);
+    void showHtml();
     void updateCurrentPlace(const Place &);
     void selectAll();
     void clearAll();
@@ -116,6 +117,7 @@ class GraphicsEntry : public QWidget {
     bool m_showNodeOnly;
     bool prepareQueries();
     bool m_clearScene;
+    bool m_debug;
     QString lastRoot();
     QString firstRoot();
     void readSettings();

@@ -64,6 +64,12 @@ void EntryItem::setProxy(QGraphicsWidget * widget ) {
 void EntryItem::setNotes(QList<Note *> notes) {
   m_notes = notes;
 }
+void EntryItem::setXml(const QString & xml) {
+  m_xml = xml;
+}
+QString EntryItem::getXml() const {
+  return m_xml;
+}
 bool EntryItem::hasNotes() const {
   if (m_notes.size() > 0)
     return true;
@@ -127,6 +133,10 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     selectAction = menu.addAction(tr("&Select current entry"));
   }
   QAction * perseusAction = menu.addAction("Show &Perseus XML");
+  QAction * htmlAction = 0;
+  if (! m_xml.isEmpty()) {
+     htmlAction = menu.addAction("Show &HTML");
+  }
   Place p = this->getPlace();
   QAction *selectedAction = menu.exec(event->screenPos());
   if (selectedAction == perseusAction) {
@@ -164,6 +174,10 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     p.setNode(jumpAction->data().toString());
     emit(gotoNode(p,Lane::Create_Tab));
 
+  }
+  else if (htmlAction && (selectedAction == htmlAction)) {
+    qDebug() << "Emit html action";
+    emit(showHtml());
   }
   this->setFocus();
 }
@@ -215,8 +229,10 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
   }
   else {
     painter->setBrush(m_backgroundColor);
+    painter->drawRect(this->boundingRect());
   }
   painter->setPen(pen);
+
   QGraphicsTextItem::paint(painter, o, w);
 }
 QTextCursor EntryItem::highlight(const QString & target, Qt::GlobalColor color) {

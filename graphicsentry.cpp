@@ -110,6 +110,7 @@ void GraphicsEntry::readSettings() {
   bool ok;
   settings->setIniCodec("UTF-8");
   settings->beginGroup("Entry");
+  m_debug = settings->value("Debug",false).toBool();
   QString css = settings->value("CSS",QString("entry.css")).toString();
   readCssFromFile(css);
   m_xsltSource = settings->value("XSLT",QString("entry.xslt")).toString();
@@ -122,7 +123,7 @@ void GraphicsEntry::readSettings() {
 
   m_supplementBg = QColor(v);
   if (! m_supplementBg.isValid())  {
-      m_supplementBg = QColor::fromRgb(255,255,255);
+      m_supplementBg = QColor::fromRgb(211,211,211);
   }
   m_clearScene = settings->value("Clear scene",true).toBool();
   /// these are set to empty to disable the feature
@@ -907,6 +908,9 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     gi->document()->setDefaultStyleSheet(m_currentCSS);
     gi->setTextWidth(m_textWidth);
     gi->setHtml(html);
+    if (m_debug) {
+      gi->setXml(xml);
+    }
     /// need this otherwise arabic text will be right justified
     gi->document()->setDefaultTextOption(m_textOption);
     gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -919,6 +923,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
     connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
     connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
+    connect(gi,SIGNAL(showHtml()),this,SLOT(showHtml()));
 
     /// TODO this is no longer used
     connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
@@ -1213,6 +1218,22 @@ void GraphicsEntry::showPerseus(const Place & p) {
   }
   QMessageBox msgBox;
   msgBox.setText(xml);
+  msgBox.exec();
+}
+void GraphicsEntry::showHtml() {
+  qDebug() << Q_FUNC_INFO;
+  EntryItem * item = qobject_cast<EntryItem *>(QObject::sender());
+  if (! item )
+    return;
+
+
+  QString xml = item->getXml();
+  qDebug() << xml;
+  QString html = transform(m_xsltSource,xml);
+
+  QMessageBox msgBox;
+  msgBox.setTextFormat(Qt::PlainText);
+  msgBox.setText(html);
   msgBox.exec();
 }
 void GraphicsEntry::updateCurrentPlace(const Place & p) {

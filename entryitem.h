@@ -79,7 +79,8 @@ class EntryItem : public QGraphicsTextItem {
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
   int findCount() const { return m_searchPositions.size(); }
-
+  void setXml(const QString &);
+  QString getXml() const;
   void setNotesEnabled(bool v) { m_notesEnabled = v;}
   void showNote();
   void addNote();
@@ -97,6 +98,7 @@ class EntryItem : public QGraphicsTextItem {
     void notesAccepted();
  signals:
     void showPerseus(const Place &);
+    void showHtml();
     void placeChanged(const Place &);
     void bookmarkAdd(const QString & id,const Place & p);
     void selectAllItems();
@@ -116,6 +118,7 @@ class EntryItem : public QGraphicsTextItem {
   QColor m_backgroundColor;
   bool m_focusOnHover;
  private:
+  QString m_xml;
   bool m_notesEnabled;
   QGraphicsWidget * m_noteWidget;
   NoteDialog * m_note;
