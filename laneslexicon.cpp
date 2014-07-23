@@ -401,6 +401,9 @@ void LanesLexicon::shortcut(const QString & k) {
       }
     }
   }
+  else if (key == "bookmark add") {
+    this->bookmarkAdd();
+  }
   else if (key.startsWith("bookmark")) {
     bookmarkShortcut(key);
   }
@@ -1898,8 +1901,15 @@ void LanesLexicon::setupBookmarkShortcuts() {
 }
 
 void LanesLexicon::bookmarkAdd() {
-    bool ok;
-  QString text = QInputDialog::getText(this, tr("Bookmark Add)"),
+  bool ok;
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (! entry) {
+    return;
+  }
+  Place p = entry->getPlace();
+  QString title = tr("Add bookmark to ") + p.getShortText();
+
+  QString text = QInputDialog::getText(this, title,
                                          tr("Bookmark ID:"), QLineEdit::Normal,
                                          QString(), &ok);
   if (ok && !text.isEmpty())
@@ -1940,6 +1950,7 @@ void LanesLexicon::bookmarkClear() {
     }
   }
   m_bookmarks.clear();
+  setStatus(tr("Bookmarks cleared"));
 }
 void LanesLexicon::bookmarkRebuildMenu() {
   QLOG_DEBUG() << Q_FUNC_INFO;
