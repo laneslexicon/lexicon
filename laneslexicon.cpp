@@ -1829,20 +1829,34 @@ void LanesLexicon::setupBookmarkShortcuts() {
   QString key = settings->value("Add","Ctrl+B").toString();
   QString ids = settings->value("Id","abcdefghijklmnopqrstuvwxyz").toString();
   for(int i=0;i < ids.size();i++) {
-    QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
+    QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toLower());
+    //    QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toUpper());
     QShortcut * sc = new QShortcut(ks,this);
     sc->setContext(Qt::ApplicationShortcut);
     connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
-    m_bookmarkMap->setMapping(sc,QString("add-%1").arg(ids.at(i)));
+    m_bookmarkMap->setMapping(sc,QString("add-%1").arg(ids.at(i).toLower()));
+  }
+  for(int i=0;i < ids.size();i++) {
+    QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toUpper());
+    QShortcut * sc = new QShortcut(ks,this);
+    sc->setContext(Qt::ApplicationShortcut);
+    connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+    m_bookmarkMap->setMapping(sc,QString("add-%1").arg(ids.at(i).toUpper()));
   }
   m_bookmarkAddAction = new QAction(tr("Add"),this);
 
   key = settings->value("Jump","Ctrl+J").toString();
   for(int i=0;i < ids.size();i++) {
-    QString ks = QString("%1,%2").arg(key).arg(ids.at(i));
+    QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toLower());
     QShortcut * sc = new QShortcut(ks,this);
     connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
-    m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i)));
+    m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i).toLower()));
+  }
+  for(int i=0;i < ids.size();i++) {
+    QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toUpper());
+    QShortcut * sc = new QShortcut(ks,this);
+    connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+    m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i).toUpper()));
   }
   m_bookmarkJumpAction = new QAction(tr("Jump"),this);
 
