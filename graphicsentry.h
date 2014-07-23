@@ -208,7 +208,7 @@ class GraphicsEntry : public QWidget {
     void cssChanged();
     void placeChanged(const Place &);
     void historyPositionChanged(int);
-    void historyAddition();
+    void historyAddition(const Place &);
     void bookmarkAdd(const QString & id,const Place &);
     void clearPage();
     void searchPage();

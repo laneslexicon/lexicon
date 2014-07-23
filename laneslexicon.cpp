@@ -251,7 +251,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(next(const Place &)),this,SLOT(moveNext(const Place &)));
   connect(entry,SIGNAL(prev(const Place &)),this,SLOT(movePrevious(const Place &)));
   connect(entry,SIGNAL(historyPositionChanged(int)),this,SLOT(historyPositionChanged(int)));
-  connect(entry,SIGNAL(historyAddition()),this,SLOT(historyAddition()));
+  connect(entry,SIGNAL(historyAddition(const Place &)),this,SLOT(historyAddition(const Place &)));
   connect(entry,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SLOT(bookmarkAdd(const QString &,const Place &)));
 
   //  connect(entry,SIGNAL(rootChanged(const QString & ,const QString & )),this,SLOT(rootChanged(const QString &, const QString &)));
@@ -773,8 +773,8 @@ void LanesLexicon::createToolBar() {
  * rebuild the dropdown, unchecking everything
  *
  */
-void LanesLexicon::historyAddition() {
-  statusBar()->showMessage(tr("History added"));
+void LanesLexicon::historyAddition(const Place & p) {
+  statusBar()->showMessage(tr("History added:") + p.getShortText());
   setupHistory(-1);
 }
 void LanesLexicon::historyPositionChanged(int pos) {
@@ -791,6 +791,7 @@ void LanesLexicon::setupHistory(int currPos) {
   QLOG_DEBUG() << Q_FUNC_INFO << currPos;
   m_historyPos = currPos;
   QList<HistoryEvent *> events = m_history->getHistory();//10,0,currPos);
+  qDebug() << Q_FUNC_INFO << "event size" << events.size();
   if (events.size() == 0) {
     m_hBackwardBtn->setEnabled(false);
     m_clearHistoryAction->setEnabled(false);
@@ -799,51 +800,50 @@ void LanesLexicon::setupHistory(int currPos) {
     // m_historyMenu->clear();
     m_hBackwardBtn->setEnabled(true);
     m_clearHistoryAction->setEnabled(true);
-    QList<QAction *> actions = m_historyMenu->actions();
-    actions.removeOne(m_clearHistoryAction);
-    for(int i=0;i < actions.size();i++) {
-        m_historyMenu->removeAction(actions[i]);
-        delete actions[i];
-    }
-    QActionGroup * group = new QActionGroup(this);
-    while(events.size() > 0) {
-      HistoryEvent * event = events.takeFirst();
-      Place p = event->getPlace();
-      QString root = p.getRoot();
-      QString word = p.getWord();
-      int id = event->getId();
-
-      QString txt;
-      if (! word.isEmpty()) {
-        txt = QString("%1 %2").arg(id).arg(word);
-      }
-      else {
-        txt = QString("%1 %2").arg(id).arg(root);
-      }
-      QAction * action = group->addAction(txt);
-      action->setCheckable(true);
-      if (id == currPos) {
-        action->setChecked(true);
-      }
-      else {
-        action->setChecked(false);
-      }
-      //      m_historyPos = p.getId();
-      action->setData(QVariant(p));//event->getId());
-      connect(action,SIGNAL(triggered()),this,SLOT(onHistorySelection()));
-      delete event;
-    }
-    m_historyMenu->addActions(group->actions());
-    //    m->addActions(group);
-    m_hBackwardBtn->setEnabled(true);
-    //    m_hBackwardBtn->addActions(group->actions());//setMenu(m);
-    //    m_hBackwardBtn->setMenu(m);
-
   }
-  if (currPos  == -1) {
+  QList<QAction *> actions = m_historyMenu->actions();
+  qDebug() << Q_FUNC_INFO << "history actions size" << actions.size();
+  actions.removeOne(m_clearHistoryAction);
+  for(int i=0;i < actions.size();i++) {
+    m_historyMenu->removeAction(actions[i]);
+    delete actions[i];
+  }
+  if (events.size() == 0) {
     return;
   }
-  return;
+  QActionGroup * group = new QActionGroup(this);
+  while(events.size() > 0) {
+    HistoryEvent * event = events.takeFirst();
+    Place p = event->getPlace();
+    QString root = p.getRoot();
+    QString word = p.getWord();
+    int id = event->getId();
+
+    QString txt;
+    if (! word.isEmpty()) {
+      txt = QString("%1 %2").arg(id).arg(word);
+    }
+    else {
+      txt = QString("%1 %2").arg(id).arg(root);
+    }
+    QAction * action = group->addAction(txt);
+    action->setCheckable(true);
+    if (id == currPos) {
+      action->setChecked(true);
+    }
+    else {
+      action->setChecked(false);
+    }
+    //      m_historyPos = p.getId();
+    action->setData(QVariant(p));//event->getId());
+    connect(action,SIGNAL(triggered()),this,SLOT(onHistorySelection()));
+    delete event;
+  }
+  m_historyMenu->addActions(group->actions());
+    //    m->addActions(group);
+  m_hBackwardBtn->setEnabled(true);
+    //    m_hBackwardBtn->addActions(group->actions());//setMenu(m);
+    //    m_hBackwardBtn->setMenu(m);
 }
 void LanesLexicon::createMenus() {
   m_mainmenu = new AppMenu(this);
@@ -2067,6 +2067,7 @@ void LanesLexicon::onNavModeChanged() {
 }
 void LanesLexicon::on_actionClearHistory() {
   QLOG_DEBUG() << Q_FUNC_INFO <<  m_history->clear();
+  setStatus(tr("History cleared"));
   setupHistory();
 }
 void LanesLexicon::on_actionDocs() {

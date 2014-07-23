@@ -129,7 +129,7 @@ public:
     void rootChanged(const QString & root,const QString & node);
     void placeChanged(const Place &);
     void historyPositionChanged(int);
-    void historyAddition();
+    void historyAddition(const Place &);
 
     void bookmarkShortcut(const QString &);
     void bookmarkAdd();

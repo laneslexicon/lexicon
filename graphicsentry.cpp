@@ -522,7 +522,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     if (dp.getType() == Place::User) {
       getHistory()->add(m_place);
       /// this allows mainwindow to update the history list
-      emit(historyAddition());
+      emit(historyAddition(dp));
     }
   }
 
@@ -1172,6 +1172,7 @@ QString GraphicsEntry::firstRoot() {
     return root;
 }
 void GraphicsEntry::highlight(const QString & target) {
+  qDebug() << Q_FUNC_INFO << "we should not be here";
   int ix = -1;
   QTextCursor cursor;
   for(int i=0;i < m_items.size();i++ ) {
