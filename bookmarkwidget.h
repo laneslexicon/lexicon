@@ -1,13 +1,14 @@
 #ifndef __BOOKMARKWIDGET_H__
 #define __BOOKMARKWIDGET_H__
 #include <QListWidget>
-#include "place.h"
+#include <QKeyEvent>
+
 #include <QMap>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QRegExp>
-#include "QsLog.h"
+class Place;
 class BookmarkWidget : public QDialog {
    Q_OBJECT
  public:
@@ -15,8 +16,11 @@ class BookmarkWidget : public QDialog {
    QString getSelected() { return m_mark;}
    public slots:
      void setPlace();
+     public slots:
+       void jump(QListWidgetItem *);
  private:
    QListWidget * m_list;
    QString  m_mark;
+   bool eventFilter(QObject *,QEvent *);
 };
 #endif
