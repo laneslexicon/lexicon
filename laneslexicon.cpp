@@ -1738,6 +1738,7 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
   p.setType(Place::Bookmark);
   m_bookmarks.insert(id,p);
   addBookmarkMenuItem(id);
+  setStatus(tr("added bookmark (%1) at %2").arg(id).arg(p.getShortText()));
 }
 /**
  * we've added a bookmark so we need to add the jump-<id> shortcut to the
