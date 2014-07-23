@@ -132,7 +132,9 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   else {
     selectAction = menu.addAction(tr("&Select current entry"));
   }
-  QAction * perseusAction = menu.addAction("Show &Perseus XML");
+  QAction * perseusAction = 0;
+  /// TODO make this debug/advanced ?
+  perseusAction = menu.addAction("Show &Perseus XML");
   QAction * htmlAction = 0;
   if (! m_xml.isEmpty()) {
      htmlAction = menu.addAction("Show &HTML");
@@ -144,7 +146,8 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   }
   else if (selectedAction == markAction) {
     bool ok;
-    QString text = QInputDialog::getText(0, tr("Bookmark Add)"),
+    QString title = tr("Add bookmark to ") + p.getShortText();
+    QString text = QInputDialog::getText(0, title,
                                          tr("Bookmark ID:"), QLineEdit::Normal,
                                          QString(), &ok);
     if (ok && !text.isEmpty()) {
@@ -225,6 +228,7 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
   painter->setPen(Qt::NoPen);
 
   if ( ! m_place.isSupplement()) {
+    /// TODO get this from somewhere
     painter->setBrush(Qt::white);
   }
   else {
@@ -232,7 +236,6 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
     painter->drawRect(this->boundingRect());
   }
   painter->setPen(pen);
-
   QGraphicsTextItem::paint(painter, o, w);
 }
 QTextCursor EntryItem::highlight(const QString & target, Qt::GlobalColor color) {
