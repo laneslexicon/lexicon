@@ -5,9 +5,9 @@
 #include <QTextStream>
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   readSettings();
-  setColumnCount(3);
+  setColumnCount(4);
   setHeaderLabels(
-                  QStringList() << tr("Letter/Root") << tr("") << tr("Node"));
+                  QStringList() << tr("Letter/Root") << tr("") << tr("") << tr("Node"));
   setSelectionMode(QAbstractItemView::SingleSelection);
   header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
   this->setStyleSheet(QString("selection-background-color : %1").arg(m_backgroundColor));
@@ -16,7 +16,7 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(nodeCollapsed(QTreeWidgetItem *)));
   this->setExpandsOnDoubleClick(false);
   if (! m_debug)
-    this->hideColumn(2);
+    this->hideColumn(3);
 
 }
 ContentsWidget::~ContentsWidget() {
