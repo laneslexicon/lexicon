@@ -2,6 +2,7 @@
 #include "graphicsentry.h"
 #include "headsearch.h"
 #include "fullsearch.h"
+#include "application.h"
 TabWidget::TabWidget(QWidget * parent) : QTabWidget(parent) {
   setObjectName("entrywidget");
   tabBar()->setObjectName("entrytabs");

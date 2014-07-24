@@ -23,6 +23,7 @@
 #include <QProgressBar>
 #include <QProgressDialog>
 #include <QEventLoop>
+#include <QHeaderView>
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif

@@ -36,14 +36,9 @@
 #include <QSettings>
 #include <QRegExp>
 #include <QClipboard>
-#include "QsLog.h"
-#include "xsltsupport.h"
-#include "history.h"
-#include "place.h"
 #include "entryitem.h"
-#include "application.h"
-#include "notes.h"
 class LaneGraphicsView;
+class Place;
 class GraphicsEntry : public QWidget {
   Q_OBJECT
 

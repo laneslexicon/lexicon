@@ -2088,6 +2088,7 @@ void LanesLexicon::searchForPage() {
       Place p;
       p.setPage(page);
       this->onGoToPage(p);
+      this->syncContents();
     }
 }
 void LanesLexicon::searchForRoot() {

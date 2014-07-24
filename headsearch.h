@@ -21,6 +21,7 @@
 #include <QWidget>
 #include <QRegExp>
 #include <QProgressDialog>
+#include <QHeaderView>
 class GraphicsEntry;
 class FocusTable;
 class Place;

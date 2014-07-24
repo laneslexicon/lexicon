@@ -1,4 +1,12 @@
 #include "graphicsentry.h"
+#include "QsLog.h"
+#include "xsltsupport.h"
+#include "history.h"
+#include "place.h"
+#include "entryitem.h"
+#include "application.h"
+#include "notes.h"
+
 #include "laneslexicon.h"
 #include "namespace.h"
 #include "searchdialogs.h"
@@ -705,8 +713,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
 Place GraphicsEntry::getPage(const Place & p) {
   QList<EntryItem *> items;
   EntryItem * item;
-  QString arRoot;
-  QString str;
+
   EntryItem * focusItem;
   int page = p.getPage();
 
@@ -718,26 +725,14 @@ Place GraphicsEntry::getPage(const Place & p) {
     QLOG_INFO() << "Page not found" << page;
     return p;
   }
+  QString node = m_pageQuery->value("nodeid").toString();
+
   if (m_clearScene) {
     onClearScene();
   }
   QString lastRoot;
-  /*
-  int supplement = m_pageQuery->value(8).toInt();
-  /// add the root item unless nodeOnly is set
-  str = QString("<word type=\"root\" ar=\"%1\" />").arg(root);
-  item  = createEntry(str);
-  rootItem->setRoot(root,true);
-  rootItem->setSupplement(supplement);
-  p.setRoot(root);
-  p.setSupplement(supplement);
-  if (! nodeOnly ) {
-    items << rootItem;
-  }
-  /// by default we will center on the root item
-  centerItem = rootItem;
-  /// now add all the entries for the root
-  */
+
+
   int rootCount = 0;
   int entryCount = 0;
   do   {
@@ -793,21 +788,6 @@ Place GraphicsEntry::getPage(const Place & p) {
 
       entryCount++;
     }
-    /*
-    if (startNode.isEmpty()) {
-      startNode = m_pageQuery->value(7).toString();
-    }
-    else if ( startNode == item->getNode()) {
-      showWord = item->getWord();
-      /// if a node has been passed, then center on the node
-      centerItem = item;
-      p.setNode(startNode);
-      if ( nodeOnly ) {
-        items << item;
-      }
-    }
-    */
-
   } while(m_pageQuery->next());
   if (items.size() == 0) {
     QLOG_INFO() << "No entries found for page" << page;
