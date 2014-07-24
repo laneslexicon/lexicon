@@ -410,7 +410,7 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
   }
 }
 void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
-  //  QLOG_DEBUG() << Q_FUNC_INFO << p << select;
+  QLOG_DEBUG() << Q_FUNC_INFO << p << select;
   QString root = p.getRoot();
   int supplement = p.getSupplement();
   QTreeWidgetItem * item;
@@ -437,6 +437,7 @@ void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
     return;
   }
   if (c == 0) {
+    QLOG_WARN() << "Add entries did not add any entries for" << p;
     return;
   }
   item->setExpanded(true);
@@ -502,8 +503,9 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   QString word;
   QString node;
   qDebug() << Q_FUNC_INFO << root;
+  /// if already expanding return
   if (parent->childCount() > 0) {
-    return c;
+    return -1;
   }
   m_entryQuery->bindValue(0,root);
   m_entryQuery->exec();
