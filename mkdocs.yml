@@ -4,6 +4,8 @@ pages:
 - ['download.md', Download]
 - ['user-guide/using.md', User Guide, 'Introduction']
 - ['user-guide/configuring.md', User Guide, 'Configuration']
+- ['user-guide/bookmarks.md', User Guide, 'Bookmarks']
+- ['user-guide/search.md', User Guide, 'Searching']
 - ['lane/preface.md','Lane','Preface']
 - ['lane/citations.md','Lane','Citations']
 - ['build.md', 'Building', 'Building']
