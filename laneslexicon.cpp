@@ -2121,6 +2121,9 @@ void LanesLexicon::searchForRoot() {
           msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
           msgBox.exec();
         }
+        else {
+          this->syncContents();
+        }
       }
     }
     delete d;
@@ -2308,6 +2311,7 @@ int LanesLexicon::searchTabs(const QString & node) {
   return -1;
 }
 void LanesLexicon::syncContents() {
+  qDebug() << Q_FUNC_INFO;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if ( ! entry )
     return;
