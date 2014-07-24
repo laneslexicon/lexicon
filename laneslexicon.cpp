@@ -85,6 +85,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   setupBookmarkShortcuts();
 
   createActions();
+  setIcons(m_iconTheme);
   createMenus();
   createToolBar();
   createStatusBar();
@@ -538,6 +539,7 @@ void LanesLexicon::loadStyleSheet() {
     qApp->setStyleSheet(css);
   }
 }
+/*
 QAction * LanesLexicon::createIconAction(const QString imgdir,const QString & iconfile,const QString & text) {
   QAction * action;
   QFileInfo fi;
@@ -551,6 +553,7 @@ QAction * LanesLexicon::createIconAction(const QString imgdir,const QString & ic
   }
   return action;
 }
+*/
 void LanesLexicon::createActions() {
   /// TODO get this from QSettings
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
@@ -558,9 +561,7 @@ void LanesLexicon::createActions() {
   settings->setIniCodec("UTF-8");
   settings->beginGroup("Icons");
 
-  QString imgdir = settings->value("Directory","images").toString();
-
-  m_exitAction = createIconAction(imgdir,settings->value("Exit",QString()).toString(),tr("Exit"));
+  m_exitAction = new QAction(tr("Exit"),this);
   connect(m_exitAction,SIGNAL(triggered()),this,SLOT(on_actionExit()));
 
   m_clearHistoryAction = new QAction(tr("Clear"),this);
@@ -570,13 +571,12 @@ void LanesLexicon::createActions() {
   connect(m_testAction,SIGNAL(triggered()),this,SLOT(on_actionTest()));
   /// probably need icons
 
-  m_historyAction = createIconAction(imgdir,settings->value("History",QString()).toString(),tr("History"));
-    //ew QAction(QIcon(imgdir + "/go-previous.png"),tr("Back"),this);
+  m_historyAction = new QAction(tr("History"),this);
 
-  m_navNextAction = createIconAction(imgdir,settings->value("Next",QString()).toString(),tr("Next"));
-  m_navPrevAction = createIconAction(imgdir,settings->value("Back",QString()).toString(),tr("Back"));
-  m_navFirstAction = createIconAction(imgdir,settings->value("First",QString()).toString(),tr("First"));
-  m_navLastAction = createIconAction(imgdir,settings->value("Last",QString()).toString(),tr("Last"));
+  m_navNextAction = new QAction(tr("Next"),this);
+  m_navPrevAction = new QAction(tr("Back"),this);
+  m_navFirstAction = new QAction(tr("First"),this);
+  m_navLastAction = new QAction(tr("Last"),this);
 
   connect(m_navNextAction,SIGNAL(triggered()),this,SLOT(on_actionNavNext()));
   connect(m_navPrevAction,SIGNAL(triggered()),this,SLOT(on_actionNavPrev()));
@@ -584,13 +584,13 @@ void LanesLexicon::createActions() {
   connect(m_navLastAction,SIGNAL(triggered()),this,SLOT(on_actionNavLast()));
 
 
-  m_docAction = createIconAction(imgdir,settings->value("Docs",QString()).toString(),tr("Docs"));
+  m_docAction = new QAction(tr("Docs"),this);
 
-  m_bookmarkAction = createIconAction(imgdir,settings->value("Bookmarks",QString()).toString(),tr("Bookmarks"));
+  m_bookmarkAction = new QAction(tr("Bookmarks"),this);
 
-  m_navigationAction = createIconAction(imgdir,settings->value("Move",QString()).toString(),tr("Move"));
+  m_navigationAction = new QAction(tr("Move"),this);
 
-  m_searchAction = createIconAction(imgdir,settings->value("Search",QString()).toString(),tr("Search"));
+  m_searchAction = new QAction(tr("Search"),this);
 
 
 
@@ -620,26 +620,18 @@ void LanesLexicon::createActions() {
   m_searchNodeAction = new QAction(tr("For &node"),this);
   connect(m_searchNodeAction,SIGNAL(triggered()),this,SLOT(searchForNode()));
 
-  m_zoomInAction = createIconAction(imgdir,settings->value("ZoomIn",QString()).toString(),tr("Zoom in"));
-  m_zoomOutAction = createIconAction(imgdir,settings->value("ZoomOut",QString()).toString(),tr("Zoom out"));
-  m_widenAction = createIconAction(imgdir,settings->value("Widen",QString()).toString(),tr("Widen text"));
-  m_narrowAction = createIconAction(imgdir,settings->value("Narrow",QString()).toString(),tr("Narrow text"));
-  m_printAction = createIconAction(imgdir,settings->value("Print",QString()).toString(),tr("Print"));
-  m_localSearchAction = createIconAction(imgdir,settings->value("LocalSearch",QString()).toString(),tr("Search page"));
-  m_clearAction = createIconAction(imgdir,settings->value("Clear",QString()).toString(),tr("Clear highlights"));
-  m_convertToEntryAction = createIconAction(imgdir,settings->value("SearchToEntry",QString()).toString(),tr("Convert to Entry"));
+  m_zoomInAction = new QAction(tr("Zoom in"),this);
+  m_zoomOutAction =  new QAction(tr("Zoom out"),this);
+  m_widenAction = new QAction(tr("Widen text"),this);
+  m_narrowAction = new QAction(tr("Narrow text"),this);
+  m_printAction = new QAction(tr("Print"),this);
+  m_localSearchAction = new QAction(tr("Search page"),this);
+  m_clearAction = new QAction(tr("Clear"),this);
+  m_convertToEntryAction = new QAction(tr("Convert"),this);
   m_clearAction->setEnabled(false);
 
-  m_keymapsAction = createIconAction(imgdir,settings->value("Keymaps","keyboard2.png").toString(),tr("Keymaps"));
+  m_keymapsAction = new QAction(tr("Keymaps"),this);
 
-
-  QFileInfo fi;
-  fi.setFile(imgdir,settings->value("Keymaps-disabled","keyboard2-disabled.png").toString());
-  if ( fi.exists() ) {
-    QIcon ic = m_keymapsAction->icon();
-    ic.addPixmap(fi.absoluteFilePath(),QIcon::Disabled);
-    m_keymapsAction->setIcon(ic);
-  }
   connect(m_zoomInAction,SIGNAL(triggered()),this,SLOT(pageZoomIn()));
   connect(m_zoomOutAction,SIGNAL(triggered()),this,SLOT(pageZoomOut()));
   connect(m_widenAction,SIGNAL(triggered()),this,SLOT(pageWiden()));
@@ -1224,6 +1216,7 @@ void LanesLexicon::readSettings() {
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
   }
+  m_iconTheme = settings->value("Theme",QString()).toString();
 
   m_saveTabs = settings->value("Save tabs",true).toBool();
   m_restoreTabs = settings->value("Restore tabs",true).toBool();
@@ -2494,4 +2487,135 @@ void LanesLexicon::tabsChanged() {
     QString title = QString("%1  %2").arg(i+1).arg(t);
     m_tabs->setTabText(i,title);
   }
+}
+void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString & iconfile) {
+  qDebug() << action->iconText() << imgdir << iconfile;
+  QDir d(imgdir);
+  QFileInfo fi(d,iconfile);
+  if (! fi.exists()) {
+    qDebug() << "icon not found" << fi.absolutePath();
+    return;
+  }
+  QIcon icon(fi.absoluteFilePath());
+  if (! icon.isNull()) {
+    action->setIcon(icon);
+    qDebug() << "after icon set"  << action->iconText();
+    //    qDebug() << fi.absolutePath();
+  }
+}
+void LanesLexicon::setIcons(const QString & theme) {
+  /// TODO get this from QSettings
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QSettings * settings = app->getSettings();
+  settings->setIniCodec("UTF-8");
+  QStringList groups = settings->childGroups();
+  QString icongroup;
+  if (theme.isEmpty()) {
+    icongroup = "Icons-Default";
+  }
+  else {
+    icongroup = QString("Icons-%1").arg(theme);
+  }
+  if (! groups.contains(icongroup)) {
+    QLOG_WARN() << "theme not found" << theme;
+    delete settings;
+    return;
+  }
+  settings->beginGroup(icongroup);
+  qDebug() << icongroup;
+  qDebug() << settings->childKeys();
+  QString imgdir = settings->value("Directory","images").toString();
+
+  QFileInfo fi(imgdir);
+  if (! fi.exists()) {
+    QLOG_WARN() << "theme directory not found" << imgdir;
+    delete settings;
+    return;
+  }
+  if (! fi.isDir()) {
+    QLOG_WARN() << "theme directory is not a directory" << imgdir;
+    delete settings;
+    return;
+  }
+
+  //  fi.setFile(imgdir,iconfile);
+  //  if ( ! iconfile.isEmpty() && fi.exists() ) {
+  //    action = new QAction(QIcon(fi.absoluteFilePath()),text,this);
+  //  }
+
+  QString iconfile;
+
+  iconfile = settings->value("Exit",QString()).toString();
+  setIcon(m_exitAction,imgdir,iconfile);
+
+  //  m_clearHistoryAction;
+
+  //m_testAction
+
+  iconfile = settings->value("History",QString()).toString();
+  setIcon(m_historyAction,imgdir,iconfile);
+
+
+  iconfile = settings->value("Next",QString()).toString();
+  setIcon(m_navNextAction,imgdir,iconfile);
+
+  iconfile = settings->value("Back",QString()).toString();
+  setIcon(m_navPrevAction,imgdir,iconfile);
+
+  iconfile = settings->value("First",QString()).toString();
+  setIcon(m_navFirstAction,imgdir,iconfile);
+
+  iconfile = settings->value("Last",QString()).toString();
+  setIcon(m_navLastAction,imgdir,iconfile);
+
+  iconfile = settings->value("Docs",QString()).toString();
+  setIcon(m_docAction,imgdir,iconfile);
+
+  iconfile = settings->value("Bookmarks",QString()).toString();
+  setIcon(m_bookmarkAction,imgdir,iconfile);
+
+  iconfile = settings->value("Move",QString()).toString();
+  setIcon(m_navigationAction,imgdir,iconfile);
+
+  iconfile = settings->value("Search",QString()).toString();
+  setIcon(m_searchAction,imgdir,iconfile);
+
+  //  m_navModeRootAction
+  // m_navModePageAction
+
+  // m_searchWordAction = new QAction(tr("For Arabic &word"),this);
+  //m_searchPageAction = new QAction(tr("For &page"),this);
+  //  m_searchRootAction = new QAction(tr("For &root"),this);
+  //m_searchNodeAction = new QAction(tr("For &node"),this);
+
+
+  iconfile = settings->value("ZoomIn",QString()).toString();
+  setIcon(m_zoomInAction,imgdir,iconfile);
+
+  iconfile = settings->value("ZoomOut",QString()).toString();
+  setIcon(m_zoomOutAction,imgdir,iconfile);
+
+  iconfile = settings->value("Widen",QString()).toString();
+  setIcon(m_widenAction,imgdir,iconfile);
+
+  iconfile = settings->value("Narrow",QString()).toString();
+  setIcon(m_narrowAction,imgdir,iconfile);
+
+  iconfile = settings->value("Print",QString()).toString();
+  setIcon(m_printAction,imgdir,iconfile);
+
+  iconfile = settings->value("LocalSearch",QString()).toString();
+  setIcon(m_localSearchAction,imgdir,iconfile);
+
+  //  m_clearAction = createIconAction(imgdir,settings->value("Clear",QString()).toString(),tr("Clear highlights"));
+  //  m_convertToEntryAction = createIconAction(imgdir,settings->value("SearchToEntry",QString()).toString(),tr("Convert to Entry"));
+  //  m_clearAction->setEnabled(false);
+
+  iconfile = settings->value("Keymaps",QString()).toString();
+  setIcon(m_keymapsAction,imgdir,iconfile);
+
+  iconfile = settings->value("Keymaps-disabled",QString()).toString();
+  setIcon(m_keymapsAction,imgdir,iconfile);
+
+  delete settings;
 }

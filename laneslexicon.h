@@ -158,7 +158,7 @@ private:
     void cleanup();
     void search(int searchType,ArabicSearchDialog *,const QString &);
     Place showPlace(const Place &,int);
-    QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
+    //    QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
     /// look through all tabs for the given node, -1 if not found, else tab index
     int searchTabs(const QString & node);
     int m_defaultSearchOptions;
@@ -182,6 +182,7 @@ private:
 
     bool m_treeKeepsFocus;
 
+    QString m_iconTheme;
     QDockWidget * m_treeDock;
     QFont arFont;
 
@@ -234,6 +235,8 @@ private:
     void setSignals(GraphicsEntry *);
     void loadStyleSheet();
     void createActions();
+    void setIcon(QAction *,const QString &,const QString &);
+    void setIcons(const QString & theme = QString());
     void createToolBar();
     void setupHistory(int startPos = -1);
     void createMenus();
