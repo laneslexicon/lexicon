@@ -219,9 +219,10 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
 
   setLayout(mainLayout);
 }
-void NodeSearchDialog::setNewTab(bool v) {
-  m_newTab->setChecked(v);
-}
+
+//void NodeSearchDialog::setNewTab(bool v) {
+//  m_newTab->setChecked(v);
+//}
 QString NodeSearchDialog::getText() const {
   QString t = m_edit->text();
   if (! t.startsWith("n")) {
@@ -229,12 +230,14 @@ QString NodeSearchDialog::getText() const {
   }
   return t;
 }
+/*
 bool NodeSearchDialog::getNewTab() const {
   if (m_newTab->checkState() == Qt::Checked) {
     return true;
   }
   return false;
 }
+*/
 int NodeSearchDialog::getOptions() {
   int options = 0;
 

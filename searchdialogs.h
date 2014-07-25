@@ -48,8 +48,6 @@ class NodeSearchDialog : public QDialog {
  public:
   NodeSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   QString getText() const;
-  bool getNewTab() const;
-  void setNewTab(bool v);
   int getOptions();
   void setOptions(int);
  private:
