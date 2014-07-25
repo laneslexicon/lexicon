@@ -1734,7 +1734,7 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
   p.setType(Place::Bookmark);
   m_bookmarks.insert(id,p);
   addBookmarkMenuItem(id);
-  setStatus(tr("added bookmark (%1) at %2").arg(id).arg(p.getShortText()));
+  setStatus(QString(tr("added bookmark (%1) at %2")).arg(id).arg(p.getShortText()));
 }
 /**
  * we've added a bookmark so we need to add the jump-<id> shortcut to the
@@ -2070,20 +2070,25 @@ void LanesLexicon::on_actionDocs() {
 }
 void LanesLexicon::testSlot() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-
 }
 void LanesLexicon::searchForPage() {
-  bool ok;
-  /// not sure about putting max/mins
-  int page = QInputDialog::getInt(this, tr("Page Search"),
-                                  tr("Page:"), -1,1,3016, 1,&ok);
-  if (! ok || (page == -1)) {
-    return;
+  int page = 0;
+  int options;
+  PageSearchDialog * d = new PageSearchDialog(this);
+  d->setOptions(m_defaultSearchOptions);
+  if (d->exec()) {
+      page = d->getPage();
+      options = d->getOptions();
   }
+  delete d;
+  if (page == 0)
+    return;
+
+
   Place p;
-      p.setPage(page);
-      this->onGoToPage(p);
-      this->syncContents();
+  p.setPage(page);
+  this->onGoToPage(p);
+  this->syncContents();
 
 }
 void LanesLexicon::searchForRoot() {
