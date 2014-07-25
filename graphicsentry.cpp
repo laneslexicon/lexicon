@@ -1004,7 +1004,6 @@ void GraphicsEntry::prependEntries(int startPos) {
       qreal btny;
       btnx = xpos + m_items[i]->boundingRect().width();
       btny = ypos;// + sz.height();
-
       ToolButtonData  * notesBtn = new ToolButtonData(i);
       notesBtn->setIcon(QIcon("notes-0.xpm"));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
@@ -1399,6 +1398,15 @@ void GraphicsEntry::addButtonDecoration() {
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
       connect(notesBtn,SIGNAL(clicked()),this,SLOT(notesButtonPressed()));
+      //      item->setProxy(pushButton);
+      m_items[i]->setProxy(pushButton);
+      /// refresh the entryitems notes list otherwise the context menu
+      //  will not show delete note after the first note is added
+      Place p = item->getPlace();
+      qDebug() << "refresh note list for root" << p.getWord();
+      item->setNotes(getApp()->notes()->find(p.getWord()));
+      QList<Note *> n = getApp()->notes()->find(p.getWord());
+      qDebug() << "note count" << n.size();
     }
   }
 

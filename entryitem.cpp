@@ -62,6 +62,7 @@ void EntryItem::setProxy(QGraphicsWidget * widget ) {
   m_noteWidget = widget;
 }
 void EntryItem::setNotes(QList<Note *> notes) {
+  m_notes.clear();
   m_notes = notes;
 }
 void EntryItem::setXml(const QString & xml) {
@@ -163,7 +164,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   }
   else if (selectedAction == addNoteAction) {
     this->addNote();
-    emit(addButton());
+
   }
   else if (selectedAction == showNoteAction) {
     this->showNote();
@@ -337,9 +338,9 @@ Place EntryItem::getPlace() {
 void EntryItem::addNote() {
   if (m_note == NULL) {
     m_note = new NoteDialog(m_place);
+    connect(m_note,SIGNAL(noteSaved()),this,SIGNAL(addButton()));
   }
   m_note->show();
-
 }
 /**
  * For the moment we are only doing the first note
@@ -363,6 +364,9 @@ void EntryItem::deleteNote() {
     delete m_noteWidget;
     emit(deleteNotes());
     m_noteWidget = NULL;
+  }
+  else {
+    qDebug() << "no note widget to delete";
   }
 }
 QList<Note *> EntryItem::getNotes(bool erase) {
