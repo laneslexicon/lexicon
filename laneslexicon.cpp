@@ -114,9 +114,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   if ( m_useNotes ) {
 
   }
-
-
-  /// TOTDO replace this last visited item
   if (m_restoreTabs) {
     restoreTabs();
   }
@@ -2083,13 +2080,36 @@ void LanesLexicon::searchForPage() {
   delete d;
   if (page == 0)
     return;
+  QString root;
+  QString node;
+  QString sql = QString("select root,nodeid from entry where page = %1").arg(page);
 
-
+  QSqlQuery q(m_db);
+  if (! q.prepare(sql)) {
+    QLOG_WARN() << "Error preparing SQL" << sql;
+    return;
+  }
+  if (q.exec() && q.first()) {
+    root = q.value(0).toString();
+    node = q.value(1).toString();
+  }
+  else {
+    QMessageBox msg;
+    msg.setText(QString(tr("Page %1 not found")).arg(page));
+    msg.exec();
+    return;
+  }
   Place p;
-  p.setPage(page);
-  this->onGoToPage(p);
+  if (m_navMode == Lane::By_Root) {
+    p.setRoot(root);
+    p.setNode(node);
+    this->gotoPlace(p,options);
+  }
+  else {
+    p.setPage(page);
+    this->onGoToPage(p);
+  }
   this->syncContents();
-
 }
 void LanesLexicon::searchForRoot() {
   /// TODO this will show 'ignore diacritics' and 'whole word'
