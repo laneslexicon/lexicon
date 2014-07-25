@@ -1584,6 +1584,7 @@ void LanesLexicon::onGoToPage(const Place & p) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->setPagingForward();
+
     entry->getPage(p);
     //        m_tree->ensurePlaceVisible(np,true);
   }
@@ -1611,7 +1612,6 @@ void LanesLexicon::on_actionPrevPage() {
       page = 1;
     }
     if (page == 1) {
-      QLOG_INFO() << "At first page";
       return;
     }
     p.setPage(page - 1);
@@ -2073,16 +2073,18 @@ void LanesLexicon::testSlot() {
 
 }
 void LanesLexicon::searchForPage() {
-    bool ok;
-    /// not sure about putting max/mins
-    int page = QInputDialog::getInt(this, tr("Page Search"),
-                                    tr("Page:"), -1,1,3016, 1,&ok);
-    if (ok && (page != -1)) {
-      Place p;
+  bool ok;
+  /// not sure about putting max/mins
+  int page = QInputDialog::getInt(this, tr("Page Search"),
+                                  tr("Page:"), -1,1,3016, 1,&ok);
+  if (! ok || (page == -1)) {
+    return;
+  }
+  Place p;
       p.setPage(page);
       this->onGoToPage(p);
       this->syncContents();
-    }
+
 }
 void LanesLexicon::searchForRoot() {
   /// TODO this will show 'ignore diacritics' and 'whole word'
@@ -2194,7 +2196,7 @@ void LanesLexicon::searchForEntry() {
 }
 void LanesLexicon::searchForNode() {
   NodeSearchDialog * d = new NodeSearchDialog(this);
-  d->setOptions(m_searchNewTab | m_searchSwitchTab);
+  d->setOptions(m_defaultSearchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
