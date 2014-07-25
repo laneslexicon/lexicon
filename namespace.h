@@ -23,9 +23,11 @@ enum Tabs {
    Keymaps_Enabled   =  0x00001000
  };
  enum Other {
-   Local_Search        =  0x00002000,
-   Force_LTR           =  0x00004000,
-   Sticky_Search       =  0x00008000
+   Local_Search      =  0x00002000,
+   Force_LTR         =  0x00004000,
+   Sticky_Search     =  0x00008000,
+   By_Root           =  0x00010000,
+   By_Page           =  0x00020000
  };
 }
 #endif

@@ -72,7 +72,6 @@ public:
     QString getActiveKeymap() const;
     HistoryMaster * history();
     NoteMaster * notes();
-    enum NavMode {ByRoot, ByPage };
     public slots:
     void gotoPlace(const Place &,int);
     int hasPlace(const Place & p,int searchtype,bool setFocus);

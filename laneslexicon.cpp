@@ -422,10 +422,10 @@ void LanesLexicon::shortcut(const QString & k) {
     }
   }
   else if (key == "nav root mode") {
-    m_navMode = 0;
+    m_navMode = Lane::By_Root;
   }
   else if (key == "nav page mode") {
-    m_navMode = 1;
+    m_navMode = Lane::By_Page;
   }
   else if (key == "history next") {
     /// increment history pos
@@ -595,15 +595,15 @@ void LanesLexicon::createActions() {
 
 
   m_navModeRootAction = new QAction(tr("By root"),this);
-  m_navModeRootAction->setData(LanesLexicon::ByRoot);
+  m_navModeRootAction->setData(Lane::By_Root);
   m_navModeRootAction->setCheckable(true);
-  if (m_navMode == LanesLexicon::ByRoot) {
+  if (m_navMode == Lane::By_Root) {
     m_navModeRootAction->setChecked(true);
   }
   m_navModePageAction = new QAction(tr("By page"),this);
-  m_navModePageAction->setData(LanesLexicon::ByPage);
+  m_navModePageAction->setData(Lane::By_Page);
   m_navModePageAction->setCheckable(true);
-  if (m_navMode == LanesLexicon::ByPage) {
+  if (m_navMode == Lane::By_Page) {
     m_navModePageAction->setChecked(true);
   }
   connect(m_navModeRootAction,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
@@ -693,7 +693,7 @@ void LanesLexicon::createToolBar() {
   navigation->setObjectName("navigationtoolbar");
   navigation->setIconSize(m_toolbarIconSize);
   m_navText = new QLabel("");
-  if (m_navMode == 0) {
+  if (m_navMode == Lane::By_Root) {
     m_navText->setText(tr("Root"));
   }
   else {
@@ -711,7 +711,7 @@ void LanesLexicon::createToolBar() {
 
   QAction * action = group->addAction(tr("By root"));
   action->setCheckable(true);
-  if (m_navMode == 0) {
+  if (m_navMode == Lane::By_Root) {
     action->setChecked(true);
   }
   else {
@@ -723,7 +723,7 @@ void LanesLexicon::createToolBar() {
   action = group->addAction(tr("By page"));
   action->setCheckable(true);
 
-  if (m_navMode == 1) {
+  if (m_navMode == Lane::By_Page) {
     action->setChecked(true);
   }
   else {
@@ -1230,10 +1230,10 @@ void LanesLexicon::readSettings() {
 
   m_activeMap = settings->value("Default map","Buckwalter").toString();
   if (m_navigationMode.toLower() == "root") {
-    m_navMode = LanesLexicon::ByRoot;
+    m_navMode = Lane::By_Root;
   }
   else {
-    m_navMode = LanesLexicon::ByPage;
+    m_navMode = Lane::By_Page;
   }
   QString title = settings->value("Title",tr("Lane's Arabic-English Lexicon")).toString();
   this->setWindowTitle(title);
@@ -1956,7 +1956,7 @@ void LanesLexicon::bookmarkAdd(const QString & id,const Place & p) {
 }
 
 void LanesLexicon::moveNext(const Place & p) {
-  if (m_navMode == 0) {
+  if (m_navMode == Lane::By_Root) {
     findNextRoot(p.getRoot());
   }
   else {
@@ -1964,7 +1964,7 @@ void LanesLexicon::moveNext(const Place & p) {
   }
 }
 void LanesLexicon::movePrevious(const Place & p) {
-  if (m_navMode == 0) {
+  if (m_navMode == Lane::By_Root) {
     findPrevRoot(p.getRoot());
   }
   else {
@@ -1983,7 +1983,7 @@ void LanesLexicon::updateStatusBar() {
     m_placeIndicator->setText("");
 
   }
-  if (m_navMode == 0) {
+  if (m_navMode == Lane::By_Root) {
     m_navModeIndicator->setText(tr("Nav mode: by root"));
     m_navText->setText(tr("Root"));
   }
@@ -1994,13 +1994,13 @@ void LanesLexicon::updateStatusBar() {
   m_keymapsButton->setEnabled(m_keymapsEnabled);
 }
 void LanesLexicon::updateMenu() {
-  if (m_navMode == LanesLexicon::ByRoot) {
+  if (m_navMode == Lane::By_Root) {
     m_navModeRootAction->setChecked(true);
   }
   else {
     m_navModeRootAction->setChecked(false);
   }
-  if (m_navMode == LanesLexicon::ByPage) {
+  if (m_navMode == Lane::By_Page) {
     m_navModePageAction->setChecked(true);
   }
   else {
@@ -2014,7 +2014,7 @@ void LanesLexicon::updateMenu() {
   }
 }
 void LanesLexicon::on_actionNavNext() {
-  if (m_navMode == 0) {
+  if (m_navMode == Lane::By_Root) {
     on_actionNextRoot();
   }
   else {
@@ -2022,7 +2022,7 @@ void LanesLexicon::on_actionNavNext() {
   }
 }
 void LanesLexicon::on_actionNavPrev()  {
-  if (m_navMode == 0) {
+  if (m_navMode == Lane::By_Root) {
     on_actionPrevRoot();
   }
   else {
@@ -2030,7 +2030,7 @@ void LanesLexicon::on_actionNavPrev()  {
   }
 }
 void LanesLexicon::on_actionNavFirst()   {
-  if (m_navMode == 0) {
+  if (m_navMode == Lane::By_Root) {
     on_actionFirstRoot();
   }
   else {
@@ -2038,7 +2038,7 @@ void LanesLexicon::on_actionNavFirst()   {
   }
 }
 void LanesLexicon::on_actionNavLast()   {
-  if (m_navMode == 0) {
+  if (m_navMode == Lane::By_Root) {
     on_actionLastRoot();
   }
   else {
@@ -2489,22 +2489,18 @@ void LanesLexicon::tabsChanged() {
   }
 }
 void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString & iconfile) {
-  qDebug() << action->iconText() << imgdir << iconfile;
   QDir d(imgdir);
   QFileInfo fi(d,iconfile);
   if (! fi.exists()) {
-    qDebug() << "icon not found" << fi.absolutePath();
+    QLOG_WARN() << "Icon not found" << fi.absolutePath();
     return;
   }
   QIcon icon(fi.absoluteFilePath());
   if (! icon.isNull()) {
     action->setIcon(icon);
-    qDebug() << "after icon set"  << action->iconText();
-    //    qDebug() << fi.absolutePath();
   }
 }
 void LanesLexicon::setIcons(const QString & theme) {
-  /// TODO get this from QSettings
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
   settings->setIniCodec("UTF-8");
@@ -2522,10 +2518,8 @@ void LanesLexicon::setIcons(const QString & theme) {
     return;
   }
   settings->beginGroup(icongroup);
-  qDebug() << icongroup;
-  qDebug() << settings->childKeys();
-  QString imgdir = settings->value("Directory","images").toString();
 
+  QString imgdir = settings->value("Directory","images").toString();
   QFileInfo fi(imgdir);
   if (! fi.exists()) {
     QLOG_WARN() << "theme directory not found" << imgdir;
