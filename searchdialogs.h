@@ -50,6 +50,27 @@ class NodeSearchDialog : public QDialog {
   QString getText() const;
   int getOptions();
   void setOptions(int);
+  public slots:
+  void checkOptions(int x = 0);
+ private:
+  QLabel * m_prompt;
+  QLineEdit * m_edit;
+  QCheckBox * m_newTab;
+  QCheckBox * m_switchFocus;
+  QDialogButtonBox * m_buttonBox;
+  QPushButton * m_findButton;
+  QWidget * m_options;
+};
+class PageSearchDialog : public QDialog {
+  Q_OBJECT
+
+ public:
+  PageSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
+  int getPage() const;
+  int getOptions();
+  void setOptions(int);
+  public slots:
+  void checkOptions(int x = 0);
  private:
   QLabel * m_prompt;
   QLineEdit * m_edit;
