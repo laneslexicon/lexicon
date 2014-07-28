@@ -2,7 +2,7 @@
 #include "QsLog.h"
 #include "place.h"
 #include "application.h"
-#include <QTextStream>
+
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   readSettings();
   setColumnCount(4);
@@ -114,7 +114,7 @@ void ContentsWidget::loadContents() {
   qDebug() << "root count" << rootCount;
 }
 Place ContentsWidget::findNextPlace(const Place & p) {
-  QTreeWidgetItem * currentItem;
+  QTreeWidgetItem * currentItem = 0;
   int tc = topLevelItemCount();
   int topIndex = -1;
   int childIndex = -1;
@@ -187,7 +187,7 @@ Place ContentsWidget::findNextPlace(const Place & p) {
  * @return the next root in sequence
  */
 QString ContentsWidget::findNextRoot(const QString & root) {
-  QTreeWidgetItem * currentItem;
+  QTreeWidgetItem * currentItem = 0;
   int tc = topLevelItemCount();
   int topIndex = -1;
   int childIndex = -1;
@@ -239,7 +239,7 @@ QString ContentsWidget::findNextRoot(const QString & root) {
  * @return the next root in sequence
  */
 QString ContentsWidget::findPrevRoot(const QString & root) {
-  QTreeWidgetItem * currentItem;
+  QTreeWidgetItem * currentItem = 0;
   int tc = topLevelItemCount();
   int topIndex = -1;
   int childIndex = -1;
@@ -295,7 +295,7 @@ QString ContentsWidget::findPrevRoot(const QString & root) {
  * @return the next root in sequence
  */
 Place ContentsWidget::findPrevPlace(const Place & p) {
-  QTreeWidgetItem * currentItem;
+  QTreeWidgetItem * currentItem = 0;
   int tc = topLevelItemCount();
   int topIndex = -1;
   int childIndex = -1;
@@ -399,7 +399,9 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
           }
         }
         else {
-          emit(itemDoubleClicked(item,0));
+          QString root = item->text(ROOT_COLUMN);
+          this->addEntries(root,item);
+          expandItem(item);
         }
       }
     }
@@ -536,4 +538,41 @@ void ContentsWidget::nodeExpanded(QTreeWidgetItem * /*item */) {
 }
 void ContentsWidget::nodeCollapsed(QTreeWidgetItem * /*item */) {
   QLOG_DEBUG() << Q_FUNC_INFO;
+}
+Place ContentsWidget::getCurrentPlace() {
+  Place p;
+  QTreeWidgetItem * item = this->currentItem();
+  if (!item) {
+    return p;
+  }
+  /// at at letter
+  if (item->parent() == 0) {
+    return p;
+  }
+  QString root = item->parent()->text(ROOT_COLUMN);
+  QString word;
+  QString node;
+  QString supplement;
+  for(int i=0; i < item->columnCount();i++) {
+      qDebug() << i << item->text(i);
+  }
+  if ((item->parent() != 0) && (item->parent()->parent() != 0)) {
+    root = item->parent()->text(0);
+    word = item->text(1);
+    node = item->text(3);
+    supplement = item->text(2);
+    p.setNode(node);
+  }
+  else {
+    root = item->text(0);
+    supplement = item->text(1);
+    p.setRoot(root);
+  }
+  if (supplement == "*") {
+    p.setSupplement(1);
+  }
+  else {
+    p.setSupplement(0);
+  }
+  return p;
 }

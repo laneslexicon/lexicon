@@ -469,6 +469,9 @@ void LanesLexicon::shortcut(const QString & k) {
   else if (key == "local search show") {
     this->localSearchShow();
   }
+  else if (key == "sync") {
+    this->sync();
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -2080,6 +2083,7 @@ void LanesLexicon::searchForPage() {
   delete d;
   if (page == 0)
     return;
+
   QString root;
   QString node;
   QString sql = QString("select root,nodeid from entry where page = %1").arg(page);
@@ -2639,4 +2643,25 @@ void LanesLexicon::setIcons(const QString & theme) {
   setIcon(m_keymapsAction,imgdir,iconfile);
 
   delete settings;
+}
+void LanesLexicon::sync() {
+  qDebug() << Q_FUNC_INFO;
+  QWidget * w = QApplication::focusWidget();
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (!entry) {
+    QLOG_WARN() << "Cannot sync to current tab";
+    return;
+  }
+  if (w == m_tree) {
+    Place p = m_tree->getCurrentPlace();
+    if (p.isValid()) {
+      this->showPlace(p,0);
+    }
+  }
+  else {
+    Place p = entry->getPlace();
+    if (p.isValid()) {
+      m_tree->ensurePlaceVisible(p);
+    }
+  }
 }

@@ -17,6 +17,7 @@
 #include "QsLog.h"
 #include "place.h"
 #include "application.h"
+#define ROOT_COLUMN 0
 class ContentsWidget : public QTreeWidget {
   Q_OBJECT;
  public:
@@ -25,6 +26,7 @@ class ContentsWidget : public QTreeWidget {
   void loadContents();
   QString findNextRoot(const QString &);
   QString findPrevRoot(const QString &);
+  Place getCurrentPlace();
   Place findNextPlace(const Place &);
   Place findPrevPlace(const Place &);
   QTreeWidgetItem * findPlace(const Place &) const;

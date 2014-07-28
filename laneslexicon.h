@@ -79,6 +79,7 @@ public:
     //    void saveNote(Note *);
     private slots:
       void testSlot();
+      void sync();
       void showNoteBrowser();
       void shortcut(const QString &);
       void deleteSearch();
