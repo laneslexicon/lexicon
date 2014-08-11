@@ -12,6 +12,22 @@
 #include "application.h"
 #include "splashscreen.h"
 #include <iostream>
+#ifdef __APPLE__
+int RandomUnder(int topPlusOne)
+{
+  srandomdev();
+  unsigned two31 = 1U << 31;
+  unsigned maxUsable = (two31 / topPlusOne) * topPlusOne;
+
+  while(1)
+    {
+      unsigned num = random();
+      if(num < maxUsable)
+        return num % topPlusOne;
+    }
+}
+#endif
+
 int random_in_range (unsigned int min, unsigned int max)
 {
   int base_random = rand(); /* in [0, RAND_MAX] */
@@ -133,7 +149,12 @@ int main(int argc, char *argv[])
       QStringList images = d.entryList(m);
       int ix = -1;
       if (images.size() > 0) {
+
+#ifdef __APPLE__
+        ix = RandomUnder(images.size());
+#else
         ix = random_in_range(0,images.size() - 1);
+#endif
         QString f = d.absolutePath()  + QDir::separator() + images[ix];
         QPixmap pixmap(f);
         splash = new SplashScreen(pixmap);
