@@ -491,6 +491,8 @@ void LanesLexicon::setupShortcuts() {
   QStringList keys = settings->childKeys();
   for(int i=0;i < keys.size();i++) {
     if (keys[i] == "Go Tab") {
+      /// TODO make this a user string of characters
+      /// e.g 123456789abcdef
       for(int j=1;j < 10;j++) {
         QString ks = QString("%1,%2").arg(settings->value(keys[i]).toString()).arg(j);
         QShortcut * sc = new QShortcut(ks,this);
