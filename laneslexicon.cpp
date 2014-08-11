@@ -634,6 +634,9 @@ void LanesLexicon::createActions() {
 
   m_keymapsAction = new QAction(tr("Keymaps"),this);
 
+  m_linkAction = new QAction(tr("Link contents"),this);
+  m_linkAction->setCheckable(true);
+
   connect(m_zoomInAction,SIGNAL(triggered()),this,SLOT(pageZoomIn()));
   connect(m_zoomOutAction,SIGNAL(triggered()),this,SLOT(pageZoomOut()));
   connect(m_widenAction,SIGNAL(triggered()),this,SLOT(pageWiden()));
@@ -901,8 +904,19 @@ void LanesLexicon::createStatusBar() {
   m_keymapsButton->setDefaultAction(m_keymapsAction);
   m_keymapsButton->setMenu(menu);
   m_keymapsButton->setPopupMode(QToolButton::InstantPopup);
+
+
+  m_linkButton = new QToolButton(this);
+  m_linkButton->setDefaultAction(m_linkAction);
+  m_linkButton->setEnabled(m_linkContents);
+
+
+
+  connect(m_linkAction,SIGNAL(triggered()),this,SLOT(onLinkChanged()));
+
   statusBar()->addPermanentWidget(m_placeIndicator);
   statusBar()->addPermanentWidget(m_keymapsButton);
+  statusBar()->addPermanentWidget(m_linkButton);
   statusBar()->addPermanentWidget(m_navModeIndicator);
 
   QString tip;
@@ -943,6 +957,16 @@ void LanesLexicon::onKeymapChanged() {
         imedit->activateMap(m_activeMap,true);
       }
     }
+  }
+}
+void LanesLexicon::onLinkChanged() {
+  m_linkContents = ! m_linkContents;
+  m_linkAction->setChecked(m_linkContents);
+  if (m_linkContents) {
+    m_linkAction->setText(tr("Contents linked"));
+  }
+  else {
+    m_linkAction->setText(tr("Contents not linked"));
   }
 }
 QSize LanesLexicon::sizeHint() const {
@@ -1243,6 +1267,8 @@ void LanesLexicon::readSettings() {
   m_toolbarIconSize = settings->value("Icon size",QSize(16,16)).toSize();
 
   m_keymapsEnabled = settings->value("Keymaps",false).toBool();
+
+  m_linkContents = settings->value("Contents linked",false).toBool();
 
   settings->endGroup();
 
@@ -2643,6 +2669,21 @@ void LanesLexicon::setIcons(const QString & theme) {
 
   iconfile = settings->value("Keymaps-disabled",QString()).toString();
   setIcon(m_keymapsAction,imgdir,iconfile);
+
+  iconfile = settings->value("Link",QString()).toString();
+
+  //setIcon(m_linkAction,imgdir,iconfile);
+
+  QIcon icon;
+
+  fi.setFile(imgdir,iconfile);
+  icon.addPixmap(fi.absoluteFilePath(),QIcon::Normal,QIcon::On);
+
+  fi.setFile(imgdir,settings->value("Unlink",QString()).toString());
+  icon.addPixmap(fi.absoluteFilePath(),QIcon::Normal,QIcon::Off);
+
+  m_linkAction->setIcon(icon);
+  m_linkAction->setChecked(m_linkContents);
 
   delete settings;
 }

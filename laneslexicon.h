@@ -78,6 +78,7 @@ public:
     void setStatus(const QString &);
     //    void saveNote(Note *);
     private slots:
+      void onLinkChanged();
       void testSlot();
       void sync();
       void showNoteBrowser();
@@ -173,6 +174,10 @@ private:
     QLabel * m_placeIndicator;
     QToolButton * m_keymapsButton;
     QAction * m_keymapsAction;
+
+    QToolButton * m_linkButton;
+    QAction * m_linkAction;
+    bool m_linkContents;
     void updateStatusBar();
     void updateMenu();
     bool m_ok;
