@@ -39,6 +39,7 @@ class ContentsWidget : public QTreeWidget {
   void focusInEvent(QFocusEvent *);
   void focusOutEvent(QFocusEvent *);
  private:
+  void toggleExpand();
   void readSettings();
   bool m_debug;
   /// this is the background color of the select item when the window
@@ -47,6 +48,7 @@ class ContentsWidget : public QTreeWidget {
   QSqlQuery * m_entryQuery;
   QString m_moveUp;
   QString m_moveDown;
+  QString m_expand;
   QFont m_itypeFont;
  protected:
   virtual void 	keyPressEvent(QKeyEvent * event);

@@ -35,6 +35,7 @@ void ContentsWidget::readSettings() {
   m_debug = settings->value("Debug",false).toBool();
   m_moveDown = settings->value("Move down","s").toString();
   m_moveUp = settings->value("Move up","w").toString();
+  m_expand = settings->value("Expand"," ").toString();
   delete settings;
 }
 void ContentsWidget::loadContents() {
@@ -372,6 +373,10 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
       return;
     }
   }
+  if (event->text() == m_expand) {
+    this->toggleExpand();
+    return;
+  }
   switch (event->key()) {
   case Qt::Key_Return : {
     QTreeWidgetItem * item = this->currentItem();
@@ -382,10 +387,19 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
     break;
   }
   case Qt::Key_Space: {
+    toggleExpand();
+    break;
+  }
+  default:
+    QTreeWidget::keyPressEvent(event);
+  }
+}
+void ContentsWidget::toggleExpand() {
     QTreeWidgetItem * item = this->currentItem();
     if (item) {
       /// if it is an entry item
       if ((item->parent() != 0)  && (item->parent()->parent() != 0)) {
+        /// TODO make this configurable
         emit(itemActivated(item,0));
       }
       else {
@@ -405,11 +419,6 @@ void ContentsWidget::keyPressEvent(QKeyEvent * event) {
         }
       }
     }
-    break;
-  }
-  default:
-    QTreeWidget::keyPressEvent(event);
-  }
 }
 void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
   QLOG_DEBUG() << Q_FUNC_INFO << p << select;
