@@ -231,7 +231,7 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
     this->showSelections();
     return;
   }
-  if (! m_clearKey.isEmpty() && (event->text() == m_homeKey)) {
+  if (! m_homeKey.isEmpty() && (event->text() == m_homeKey)) {
     if (! m_focusNode.isEmpty()) {
         this->focusNode(m_focusNode);
       }
