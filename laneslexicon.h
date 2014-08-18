@@ -204,6 +204,9 @@ private:
     QString m_historyDbName;
     bool m_historyEnabled;
     bool m_saveTabs;
+    bool m_saveSettings;
+    QString m_startupNode;
+    QString m_startupRoot;
     bool m_restoreTabs;
     bool m_searchNewTab;
     bool m_searchSwitchTab;

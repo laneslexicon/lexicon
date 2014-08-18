@@ -1350,6 +1350,13 @@ bool GraphicsEntry::focusNode(const QString & node) {
   qDebug() << "Warning: focusNode failed, cannot find node" << node;
   return false;
 }
+/**
+ * Will return true if the given node is on this page
+ *
+ * @param node the node to find (nxxxx)
+ *
+ * @return true if found, otherwise false
+ */
 bool GraphicsEntry::hasNode(const QString & node) {
   if (node.isEmpty()) {
     return true;

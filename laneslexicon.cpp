@@ -127,10 +127,18 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     GraphicsEntry * entry = new GraphicsEntry(this);
     entry->installEventFilter(this);
     setSignals(entry);
-    if (! m_firstRoot.isEmpty()) {
-      m_tabs->addTab(entry,tr(""));
-      Place p;
+    Place p;
+    if (! m_startupNode.isEmpty()) {
+      p.setNode(m_startupNode);
+    }
+    else if (! m_startupRoot.isEmpty()) {
+      p.setRoot(m_startupRoot);
+    }
+    else if (! m_firstRoot.isEmpty()) {
       p.setRoot(m_firstRoot);
+    }
+    if (p.isValid()) {
+      m_tabs->addTab(entry,tr(""));
       showPlace(p,false);
       m_tree->ensurePlaceVisible(p);
     }
@@ -1238,12 +1246,16 @@ void LanesLexicon::on_actionTest() {
   }
 }
 /**
- * TODO tidy up navMode
- *
+ * Read settings from INIFILE (by default : "default.ini");
+ * Options can also come from the command line and they override settings
+ * in the ini file
  */
 void LanesLexicon::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QMap<QString,QString> cmdOptions = app->getOptions();
+
+  m_startupNode = cmdOptions.value("node");
+  m_startupRoot = cmdOptions.value("root");
 
   QSettings * settings = app->getSettings();
   settings->setIniCodec("UTF-8");
@@ -1258,8 +1270,16 @@ void LanesLexicon::readSettings() {
   }
   m_iconTheme = settings->value("Theme",QString()).toString();
 
+  m_saveSettings = settings->value("Save settings",true).toBool();
+  if (cmdOptions.contains("nosave")) {
+    m_saveSettings = false;
+  }
   m_saveTabs = settings->value("Save tabs",true).toBool();
+
   m_restoreTabs = settings->value("Restore tabs",true).toBool();
+  if (cmdOptions.contains("notabs")) {
+    m_restoreTabs = false;
+  }
 
   m_saveBookmarks = settings->value("Save bookmarks",true).toBool();
   m_restoreBookmarks = settings->value("Restore bookmarks",true).toBool();
@@ -1372,6 +1392,10 @@ void LanesLexicon::writeSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   settings = app->getSettings();
   settings->setIniCodec("UTF-8");
+
+  if (! m_saveSettings )
+    return;
+
 
   if (m_saveTabs) {
     settings->beginGroup("Tabs");

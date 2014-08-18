@@ -86,11 +86,18 @@ int main(int argc, char *argv[])
     QCommandLineOption fontOption(QStringList() << "f" << "fonts","List your systems Arabic fonts");
     parser.addOption(fontOption);
 
-    QCommandLineOption dbOption(QStringList() <<"d" << "db","use the specified database","db");
+    QCommandLineOption dbOption(QStringList() << "d" << "dbname","use the specified database","db");
     parser.addOption(dbOption);
+
 
     QCommandLineOption langOption(QStringList() <<"l" << "lang","use the specified language","lang");
     parser.addOption(langOption);
+
+    QCommandLineOption nosaveOption(QStringList() << "x" << "no-save","do not save the settings");
+    parser.addOption(nosaveOption);
+
+    QCommandLineOption notabsOption(QStringList() << "t" << "no-tabs","do not restore tabs");
+    parser.addOption(notabsOption);
 
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);
@@ -135,9 +142,26 @@ int main(int argc, char *argv[])
       a.setConfig("default.ini");
     }
     QMap<QString,QString> options;
-    QStringList optionnames = parser.optionNames();
-    for(int i=0;i < optionnames.size();i++) {
-      options.insert(optionnames[i],parser.value(optionnames[i]));
+    if (parser.isSet(nodeOption)) {
+      options.insert(nodeOption.valueName(),parser.value(nodeOption));
+    }
+    if (parser.isSet(rootOption)) {
+      options.insert(rootOption.valueName(),parser.value(rootOption));
+    }
+    if (parser.isSet(configOption)) {
+      options.insert(configOption.valueName(),parser.value(configOption));
+    }
+    if (parser.isSet(dbOption)) {
+      options.insert(dbOption.valueName(),parser.value(dbOption));
+    }
+    if (parser.isSet(langOption)) {
+      options.insert(langOption.valueName(),parser.value(langOption));
+    }
+    if (parser.isSet(nosaveOption)) {
+      options.insert("nosave","");
+    }
+    if (parser.isSet(notabsOption)) {
+      options.insert("notabs","");
     }
     qDebug() << options;
     a.setOptions(options);
