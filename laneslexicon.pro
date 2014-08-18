@@ -35,7 +35,7 @@ DEFINES += USE_XALAN
 INCLUDEPATH += ./qslog
 
 #LIBS +=   -lboost_thread-mt -lboost_system -lboost_filesystem
-
+TRANSLATIONS = laneslexicon_de.ts laneslexicon_fr.ts
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 QMAKE_CXXFLAGS += -Wunused-parameter
@@ -66,7 +66,8 @@ SOURCES += main.cpp\
         searchoptions.cpp \
         searchdialogs.cpp \
         nodeview.cpp \
-        splashscreen.cpp
+        splashscreen.cpp \
+        about.cpp
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
@@ -91,4 +92,5 @@ HEADERS  += laneslexicon.h \
             searchoptions.h \
             searchdialogs.h \
             nodeview.h \
-            splashscreen.h
+            splashscreen.h \
+            about.h

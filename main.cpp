@@ -7,6 +7,7 @@
 #include <QImageReader>
 #include <QTimer>
 #include <QPixmap>
+#include <QLocale>
 #include "QsLog.h"
 #include "QsLogDest.h"
 #include "application.h"
@@ -87,6 +88,9 @@ int main(int argc, char *argv[])
     QCommandLineOption dbOption(QStringList() <<"d" << "db","use the specified database","db");
     parser.addOption(dbOption);
 
+    QCommandLineOption langOption(QStringList() <<"l" << "lang","use the specified language","lang");
+    parser.addOption(langOption);
+
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);
     const QString sLogPath(QDir(a.applicationDirPath()).filePath("log.txt"));
@@ -135,6 +139,23 @@ int main(int argc, char *argv[])
       options.insert(optionnames[i],parser.value(optionnames[i]));
     }
     qDebug() << options;
+    a.setOptions(options);
+    QTranslator translator;
+    QString trfile;
+    if (options.contains("lang")) {
+      trfile = QString("laneslexicon_%1.qm").arg(options.value("lang"));
+    }
+    else {
+      trfile = QString("laneslexicon_%1.qm").arg(QLocale::system().name());
+    }
+    QFileInfo fi(trfile);
+    if (fi.exists()) {
+      translator.load(trfile);
+      a.installTranslator(&translator);
+    }
+    else {
+      qDebug() << "Could not find translation file" << trfile;
+    }
     int ret;
     SplashScreen * splash = 0;
     QSettings * settings = a.getSettings();
