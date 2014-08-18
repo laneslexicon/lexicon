@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QPixmap>
 #include <QLocale>
+#include <QTranslator>
 #include "QsLog.h"
 #include "QsLogDest.h"
 #include "application.h"

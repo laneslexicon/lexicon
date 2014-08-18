@@ -16,6 +16,7 @@ public:
   Lexicon(int & argc, char ** argv);
   QString getConfig() const;
   void setOptions(const QMap<QString,QString> &);
+  QMap<QString,QString> getOptions() const;
   QSettings * getSettings();
   void setConfig(const QString & fileName);
   bool isOk() { return m_ok;}

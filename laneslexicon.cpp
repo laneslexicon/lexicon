@@ -36,10 +36,15 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   if (! openDatabase(m_dbName)) {
     QMessageBox msgBox;
-    msgBox.setText(QString(tr("No database, nothing to show")));
+    msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
+    QString errorMessage(tr("Database not found"));
     QDir d;
     QString currentDir = d.absoluteFilePath(m_dbName);
-    msgBox.setInformativeText(QString("Missing file %1").arg(QDir::cleanPath(currentDir)));
+    QString info = QString("Missing file %1").arg(QDir::cleanPath(currentDir));
+    QString next(tr("This application will terminate"));
+    msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
+                   + info + "</p><p>" + next + "</p></body></html>");
+    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
     msgBox.exec();
     return;
   }
@@ -658,7 +663,7 @@ void LanesLexicon::createToolBar() {
   //  QToolBar * history = addToolBar(tr("History"));
   //  history->setObjectName("historytoolbar");
   m_hBackwardBtn = new QToolButton(mainbar);
-  m_hBackwardBtn->setText("History");
+  m_hBackwardBtn->setText(tr("History"));
   m_hBackwardBtn->setDefaultAction(m_historyAction);
   m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_hBackwardBtn->setEnabled(false);
@@ -751,7 +756,7 @@ void LanesLexicon::createToolBar() {
 
   //  addToolBarBreak();
 
-  QToolBar * page = addToolBar("&Page");
+  QToolBar * page = addToolBar(tr("&Page"));
   page->setObjectName("pagetoolbar");
   page->setIconSize(m_toolbarIconSize);
   page->addAction(m_zoomInAction);
@@ -1010,6 +1015,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   if (item->parent() == 0) {
     return;
   }
+  /// TODO check this
   if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
       options |= Lane::Create_Tab;
   }
@@ -1077,13 +1083,16 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
         /// fetch to node and show it
         Place p;
         p.setNode(node);
+        ///
         /// TODO needs to check whether to open in new tab
+        ///
         options |= Lane::Create_Tab;
         p = showPlace(p,options);
       }
     }
   }
   else {
+    /// TODO fix this
     QLOG_DEBUG() << Q_FUNC_INFO << "No GraphicsEntry page available";
   }
 }
@@ -1234,10 +1243,15 @@ void LanesLexicon::on_actionTest() {
  */
 void LanesLexicon::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QMap<QString,QString> cmdOptions = app->getOptions();
+
   QSettings * settings = app->getSettings();
   settings->setIniCodec("UTF-8");
   settings->beginGroup("System");
   m_dbName = settings->value("Database","lexicon.sqlite").toString();
+  if (cmdOptions.contains("db")) {
+    m_dbName = cmdOptions.value("db");
+  }
   QString ar = settings->value("Arabic font").toString();
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
@@ -2305,6 +2319,7 @@ void LanesLexicon::pagePrint() {
 
       //  printer->setPaperSize(QPrinter::A4);
       //  printer->setOutputFileName();
+      qDebug() << "printer resolution" << m_printer.resolution();
       QPainter painter(&m_printer);
       painter.setRenderHint(QPainter::Antialiasing);
       entry->getScene()->render(&painter);
