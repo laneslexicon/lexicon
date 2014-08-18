@@ -15,6 +15,7 @@ class Lexicon : public QApplication {
 public:
   Lexicon(int & argc, char ** argv);
   QString getConfig() const;
+  void setOptions(const QMap<QString,QString> &);
   QSettings * getSettings();
   void setConfig(const QString & fileName);
   bool isOk() { return m_ok;}
@@ -25,5 +26,6 @@ public:
   QString m_configFile;
   QString m_showFirst;
   bool m_ok;
+  QMap<QString,QString> m_options;
 };
 #endif

@@ -40,6 +40,11 @@ void Lexicon::setConfig(const QString & fileName) {
     m_configFile = fileName;
   }
 }
+
+void Lexicon::setOptions(const QMap<QString,QString> & options) {
+  m_options = options;
+}
+
 QSettings * Lexicon::getSettings() {
   if (m_configFile.isEmpty()) {
     return new QSettings;

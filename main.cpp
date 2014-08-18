@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     QCommandLineOption nodeOption(QStringList() <<"n" << "node","make the given node the initial display","node");
     parser.addOption(nodeOption);
 
-    QCommandLineOption rootOption(QStringList() <<"r" << "root","make the given root the initial display","node");
+    QCommandLineOption rootOption(QStringList() <<"r" << "root","make the given root the initial display","root");
     parser.addOption(rootOption);
 
     QCommandLineOption configOption(QStringList() <<"c" << "config","use the given INI file","config");
@@ -83,6 +83,9 @@ int main(int argc, char *argv[])
 
     QCommandLineOption fontOption(QStringList() << "f" << "fonts","List your systems Arabic fonts");
     parser.addOption(fontOption);
+
+    QCommandLineOption dbOption(QStringList() <<"d" << "db","use the specified database","db");
+    parser.addOption(dbOption);
 
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);
@@ -126,7 +129,12 @@ int main(int argc, char *argv[])
     else {
       a.setConfig("default.ini");
     }
-
+    QMap<QString,QString> options;
+    QStringList optionnames = parser.optionNames();
+    for(int i=0;i < optionnames.size();i++) {
+      options.insert(optionnames[i],parser.value(optionnames[i]));
+    }
+    qDebug() << options;
     int ret;
     SplashScreen * splash = 0;
     QSettings * settings = a.getSettings();
