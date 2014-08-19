@@ -1671,32 +1671,37 @@ void GraphicsEntry::print(QPrinter & printer) {
   QPointF pageEnd = mapped.bottomRight();
   QGraphicsView view(m_scene);
   int pageCount = 0;
+  qDebug() << "paper width/height" << printer.paperRect().width() << printer.paperRect().height() ;
+  qDebug() << "scene width/height" << m_scene->sceneRect().width() << m_scene->sceneRect().height();
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->boundingRect().bottomRight();
     mapped = m_items[i]->mapRectToScene(m_items[i]->boundingRect());
     QRectF rect(pageStart,mapped.bottomRight());
-    qDebug() << i << rect.height();
+    qDebug() << i << rect.width() << rect.height();
+    /// check whether the current item causes a page overflow
     if (rect.height() > pageHeight) {
       /// check if it is too big for the page
+      //      qreal dy = pageHeight - pageStart.y();
       if (mapped.height() > pageHeight) {
-        /// set page end
-      }
-      /// check whether this is the first item
-      if (pageEnd == QPointF()) {
-        /// do something
-        qDebug() << "should not be seeing this";
-      }
-      QRectF rf(pageStart,pageEnd);
-      view.render(&painter,printer.pageRect(),rf.toRect());
-      printer.newPage();
-      QRectF r = m_items[i]->mapRectToScene(m_items[i]->boundingRect());
-      if (mapped.height() > pageHeight) {
-        /// set page start
+
+
       }
       else {
+        /// print up to the last item check whether this is the first item
+        if (pageEnd == QPointF()) {
+          /// do something
+          qDebug() << "should not be seeing this";
+        }
+        QRectF rf(pageStart,pageEnd);
+        qDebug() << "Printing" << pageCount << rf;
+        qDebug() << "viewport width/height" << view.viewport()->rect().width() << view.viewport()->rect().height();
+        m_scene->render(&painter,printer.pageRect(),rf.toRect());
+        //        view.render(&painter,rf.toRect(),rf.toRect());
+        printer.newPage();
+        QRectF r = m_items[i]->mapRectToScene(m_items[i]->boundingRect());
         pageStart = r.topLeft();
+        pageEnd = QPointF();
       }
-      pageEnd = QPointF();
       pageCount++;
     }
     else {
@@ -1711,7 +1716,7 @@ void GraphicsEntry::print(QPrinter & printer) {
     qDebug() << "content height" << rect.height();
     QRectF pageRect = printer.pageRect();
     pageRect.setHeight(rect.height());
-    view.render(&painter,pageRect,rect.toRect());
+    m_scene->render(&painter,pageRect,rect.toRect());
   }
 
 }
