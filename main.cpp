@@ -112,16 +112,10 @@ int main(int argc, char *argv[])
 
    QLOG_INFO() << "Program started";
    QLOG_INFO() << "Built with Qt" << QT_VERSION_STR << "running on" << qVersion();
- // Process the actual command line arguments given by the user
+   // Process the actual command line arguments
     parser.process(a);
 
     const QStringList args = parser.positionalArguments();
-    // source is args.at(0), destination is args.at(1)
-
-
-    //    progOptions.node = parser.value(nodeOption);
-    //    QFontDatabase::addApplicationFont("fonts/amiri/amiri-regular.ttf");
-
 
     if (parser.isSet(fontOption) ) {
       QFontDatabase fdb;
@@ -133,6 +127,8 @@ int main(int argc, char *argv[])
       }
       return 0;
     }
+    /// TODO remove this
+    /// and have Lexicon use the m_options values
     QString configFile;
     if (parser.isSet(configOption)) {
         configFile = parser.value(configOption);
@@ -163,7 +159,7 @@ int main(int argc, char *argv[])
     if (parser.isSet(notabsOption)) {
       options.insert("notabs","");
     }
-    qDebug() << options;
+
     a.setOptions(options);
     QTranslator translator;
     QString trfile;
@@ -179,7 +175,7 @@ int main(int argc, char *argv[])
       a.installTranslator(&translator);
     }
     else {
-      qDebug() << "Could not find translation file" << trfile;
+      QLOG_DEBUG() << "Could not find translation file" << trfile;
     }
     int ret;
     SplashScreen * splash = 0;
@@ -220,12 +216,6 @@ int main(int argc, char *argv[])
     }
     a.processEvents();
     LanesLexicon *  w = new LanesLexicon;
-    /*
-    if (splash) {
-      splash->setWidget(w);
-
-    }
-    */
     if (w->isOk()) {
       w->show();
       if (makeSplash) {
