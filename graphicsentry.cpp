@@ -1668,7 +1668,7 @@ void GraphicsEntry::print(QPrinter & printer) {
   qreal pageHeight = printer.paperRect().height();
   QRectF mapped = m_items[0]->mapRectToScene(m_items[0]->boundingRect());
   QPointF pageStart = mapped.topLeft();
-  QPointF pageEnd;
+  QPointF pageEnd = mapped.bottomRight();
   QGraphicsView view(m_scene);
   int pageCount = 0;
   for(int i=0;i < m_items.size();i++) {
@@ -1677,18 +1677,30 @@ void GraphicsEntry::print(QPrinter & printer) {
     QRectF rect(pageStart,mapped.bottomRight());
     qDebug() << i << rect.height();
     if (rect.height() > pageHeight) {
-      /// print page
-      qDebug() << "page break at" << m_items[i-1]->getNode();
+      /// check if it is too big for the page
+      if (mapped.height() > pageHeight) {
+        /// set page end
+      }
+      /// check whether this is the first item
+      if (pageEnd == QPointF()) {
+        /// do something
+        qDebug() << "should not be seeing this";
+      }
       QRectF rf(pageStart,pageEnd);
       view.render(&painter,printer.pageRect(),rf.toRect());
       printer.newPage();
       QRectF r = m_items[i]->mapRectToScene(m_items[i]->boundingRect());
-      pageStart = r.topLeft();
+      if (mapped.height() > pageHeight) {
+        /// set page start
+      }
+      else {
+        pageStart = r.topLeft();
+      }
       pageEnd = QPointF();
       pageCount++;
     }
     else {
-      pageEnd = rect.bottomRight();
+      pageEnd = mapped.bottomRight();
     }
   }
   if (pageEnd != QPointF()) {
