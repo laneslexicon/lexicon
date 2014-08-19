@@ -1680,14 +1680,34 @@ void GraphicsEntry::print(QPrinter & printer) {
     qDebug() << i << rect.width() << rect.height();
     /// check whether the current item causes a page overflow
     if (rect.height() > pageHeight) {
-      /// check if it is too big for the page
-      //      qreal dy = pageHeight - pageStart.y();
-      if (mapped.height() > pageHeight) {
+      /// check if the current item is too for a page
 
+      if (mapped.height() > pageHeight) {
+        qDebug() << QString("Page overflow at item %1").arg(i);
+        qreal heightToPrint = mapped.height();
+        qreal dy = pageHeight - (pageEnd.y() - pageStart.y());
+        qDebug() << "space on page" << dy;
+        qDebug() << "Page start" << pageStart;
+        qDebug() << "Page end" << pageEnd;
+        QRectF rf(pageStart,pageEnd);
+        rf.adjust(0,0,0,dy);
+        m_scene->render(&painter,printer.pageRect(),rf.toRect());
+        printer.newPage();
+        pageCount++;
+        pageStart = rf.bottomLeft();
+        heightToPrint -= dy;
+        while(heightToPrint > pageHeight) {
+          pageEnd.setY(pageStart.y() + pageHeight);
+          QRectF rf(pageStart,pageEnd);
+          m_scene->render(&painter,printer.pageRect(),rf.toRect());
+          printer.newPage();
+          pageStart = rf.bottomLeft();
+          heightToPrint -= pageHeight;
+        }
 
       }
       else {
-        /// print up to the last item check whether this is the first item
+        /// print up to the last item and print a new page
         if (pageEnd == QPointF()) {
           /// do something
           qDebug() << "should not be seeing this";
@@ -1701,8 +1721,8 @@ void GraphicsEntry::print(QPrinter & printer) {
         QRectF r = m_items[i]->mapRectToScene(m_items[i]->boundingRect());
         pageStart = r.topLeft();
         pageEnd = QPointF();
+        pageCount++;
       }
-      pageCount++;
     }
     else {
       pageEnd = mapped.bottomRight();
