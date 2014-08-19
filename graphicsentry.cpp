@@ -1650,3 +1650,56 @@ void GraphicsEntry::showSelections() {
     }
   }
 }
+/// TODO don't forget horizontal scaling
+void GraphicsEntry::print(QPrinter & printer) {
+  if (m_items.size() < 2) {
+    return;
+  }
+  QString firstNode = m_items[1]->getNode();
+  QString lastNode = m_items[m_items.size() - 1]->getNode();
+  QString fileName = QString("%1-%2.pdf").arg(firstNode).arg(lastNode);
+
+  printer.setOutputFileName(fileName);
+  int pages = m_scene->height()/(printer.paperRect().height() + 1);
+  qDebug() << fileName << pages;
+  qDebug() << "page height" << printer.paperRect().height();
+  QPainter painter(&printer);
+  painter.setRenderHint(QPainter::Antialiasing);
+  qreal pageHeight = printer.paperRect().height();
+  QRectF mapped = m_items[0]->mapRectToScene(m_items[0]->boundingRect());
+  QPointF pageStart = mapped.topLeft();
+  QPointF pageEnd;
+  QGraphicsView view(m_scene);
+  int pageCount = 0;
+  for(int i=0;i < m_items.size();i++) {
+    m_items[i]->boundingRect().bottomRight();
+    mapped = m_items[i]->mapRectToScene(m_items[i]->boundingRect());
+    QRectF rect(pageStart,mapped.bottomRight());
+    qDebug() << i << rect.height();
+    if (rect.height() > pageHeight) {
+      /// print page
+      qDebug() << "page break at" << m_items[i-1]->getNode();
+      QRectF rf(pageStart,pageEnd);
+      view.render(&painter,printer.pageRect(),rf.toRect());
+      printer.newPage();
+      QRectF r = m_items[i]->mapRectToScene(m_items[i]->boundingRect());
+      pageStart = r.topLeft();
+      pageEnd = QPointF();
+      pageCount++;
+    }
+    else {
+      pageEnd = rect.bottomRight();
+    }
+  }
+  if (pageEnd != QPointF()) {
+    qDebug() << "printing what is left";
+    qDebug() << "page start" << pageStart;
+    mapped = m_items[m_items.size() - 1]->mapRectToScene(m_items[m_items.size() - 1]->boundingRect());
+    QRectF rect(pageStart,mapped.bottomRight());
+    qDebug() << "content height" << rect.height();
+    QRectF pageRect = printer.pageRect();
+    pageRect.setHeight(rect.height());
+    view.render(&painter,pageRect,rect.toRect());
+  }
+
+}

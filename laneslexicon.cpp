@@ -2343,10 +2343,11 @@ void LanesLexicon::pagePrint() {
 
       //  printer->setPaperSize(QPrinter::A4);
       //  printer->setOutputFileName();
-      qDebug() << "printer resolution" << m_printer.resolution();
-      QPainter painter(&m_printer);
-      painter.setRenderHint(QPainter::Antialiasing);
-      entry->getScene()->render(&painter);
+      //      qDebug() << "printer resolution" << m_printer.resolution();
+      //      QPainter painter(&m_printer);
+      //      painter.setRenderHint(QPainter::Antialiasing);
+      entry->print(m_printer);
+      //getScene()->render(&painter);
     }
   }
 }

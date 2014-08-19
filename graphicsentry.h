@@ -36,6 +36,7 @@
 #include <QSettings>
 #include <QRegExp>
 #include <QClipboard>
+#include <QPrinter>
 #include "entryitem.h"
 class LaneGraphicsView;
 class Place;
@@ -103,6 +104,7 @@ class GraphicsEntry : public QWidget {
     void focusPlace();
     void clearSelections();
     void showSelections();
+    void print(QPrinter &);
  private:
 
     QString m_focusNode;
