@@ -138,7 +138,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   perseusAction = menu.addAction("Show &Perseus XML");
   QAction * htmlAction = 0;
   if (! m_xml.isEmpty()) {
-     htmlAction = menu.addAction("Show &HTML");
+     htmlAction = menu.addAction("Show &Html");
   }
   Place p = this->getPlace();
   QAction *selectedAction = menu.exec(event->screenPos());

@@ -71,8 +71,8 @@ class EntryItem : public QGraphicsTextItem {
   bool isRoot();
   int getSupplement();
   int getPage();
-  QString getOutputHTML() const { return m_html; }
-  void setOutputHTML(const QString & html) { m_html = html;}
+  QString getOutputHtml() const { return m_html; }
+  void setOutputHtml(const QString & html) { m_html = html;}
   QTextCursor highlight(const QString &,Qt::GlobalColor color = Qt::yellow);
   void highlight(int pos,Qt::GlobalColor color = Qt::yellow);
   QTextCursor highlightRx(const QString &);
@@ -126,6 +126,6 @@ class EntryItem : public QGraphicsTextItem {
   QList<int> m_searchPositions;
   Place m_place;
   QString m_searchText;
-  QString m_html;    /// saves the generated HTML for debug, only set when dumpOutputHTM is true
+  QString m_html;
 };
 #endif

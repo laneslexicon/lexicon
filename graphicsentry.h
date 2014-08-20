@@ -123,8 +123,8 @@ class GraphicsEntry : public QWidget {
     int m_pagingDir;
     int m_entryMargin;
     bool m_dumpXML;
-    bool m_dumpHTML;
-    bool m_dumpOutputHTML;
+    bool m_dumpHtml;
+    bool m_dumpOutputHtml;
     void reposition();
     void appendEntries(int);
     void prependEntries(int);
