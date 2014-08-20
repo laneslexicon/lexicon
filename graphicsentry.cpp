@@ -581,7 +581,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       t += m_rootQuery->value(4).toString();
       t += "</word>";
       if (m_dumpXML) {
-        QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.xml").arg(m_rootQuery->value(7).toString()));
+        QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(m_rootQuery->value(7).toString()));
         QFile f(fi.filePath());
         if (f.open(QIODevice::WriteOnly)) {
           QTextStream out(&f);
@@ -592,7 +592,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       EntryItem * item  = createEntry(t);
       if (item != NULL) {
         if (m_dumpOutputHTML) {
-          QFileInfo fi(QDir::tempPath(),QString("/tmp/%1-out.html").arg(m_rootQuery->value(7).toString()));
+          QFileInfo fi(QDir::tempPath(),QString("%1-out.html").arg(m_rootQuery->value(7).toString()));
           QFile f(fi.filePath());
           if (f.open(QIODevice::WriteOnly)) {
             QTextStream out(&f);
@@ -766,7 +766,7 @@ Place GraphicsEntry::getPage(const Place & p) {
     t += m_pageQuery->value(4).toString();
     t += "</word>";
     if (m_dumpXML) {
-      QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.xml").arg(m_pageQuery->value(7).toString()));
+      QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(m_pageQuery->value(7).toString()));
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {
         QTextStream out(&f);
@@ -777,7 +777,7 @@ Place GraphicsEntry::getPage(const Place & p) {
     item  = createEntry(t);
     if (item != NULL) {
       if (m_dumpOutputHTML) {
-        QFileInfo fi(QDir::tempPath(),QString("/tmp/%1-out.html").arg(m_pageQuery->value(7).toString()));
+        QFileInfo fi(QDir::tempPath(),QString("%1-out.html").arg(m_pageQuery->value(7).toString()));
         QFile f(fi.filePath());
         if (f.open(QIODevice::WriteOnly)) {
           QTextStream out(&f);
@@ -895,6 +895,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     gi->document()->setDefaultStyleSheet(m_currentCSS);
     gi->setTextWidth(m_textWidth);
     gi->setHtml(html);
+    gi->setOutputHTML(html);
     if (m_debug) {
       gi->setXml(xml);
     }
@@ -904,9 +905,9 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     gi->setAcceptHoverEvents(true);
     gi->setBackground(m_supplementBg);
     gi->setNotesEnabled(m_notesEnabled);
-    if (m_dumpOutputHTML) {
-      gi->setOutputHTML(html);
-    }
+    //    if (m_dumpOutputHTML) {
+    //      gi->setOutputHTML(html);
+    //    }
     connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
     connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
     connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
@@ -947,7 +948,7 @@ void GraphicsEntry::appendEntries(int startPos) {
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
     if (m_dumpHTML) {
-      QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
+      QFileInfo fi(QDir::tempPath(),QString("%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {
         QTextStream out(&f);
@@ -996,7 +997,7 @@ void GraphicsEntry::prependEntries(int startPos) {
     }
     r = m_items[i]->boundingRect();
     if (m_dumpHTML) {
-      QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.html").arg(m_items[i]->getNode()));
+      QFileInfo fi(QDir::tempPath(),QString("%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {
         QTextStream out(&f);
