@@ -1447,6 +1447,8 @@ void LanesLexicon::writeSettings() {
 void LanesLexicon::restoreTabs() {
   bool ok;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QMap<QString,QString> cmdOptions = app->getOptions();
+
   QSettings * settings = app->getSettings();
 
   settings->setIniCodec("UTF-8");
@@ -1458,6 +1460,12 @@ void LanesLexicon::restoreTabs() {
   textWidth = settings->value("Text width",400).toInt(&ok);
   if (!ok) {
     textWidth = 400;
+  }
+  if (cmdOptions.contains("textwidth")) {
+    int w = cmdOptions.value("textwidth").toInt(&ok);
+    if (ok) {
+      textWidth = w;
+    }
   }
   settings->endGroup();
   Place wp;
@@ -1482,8 +1490,14 @@ void LanesLexicon::restoreTabs() {
       if (! v.isNull()) {
         p = Place::fromString(v);
       }
-      int tw = settings->value("textwidth",textWidth).toInt(&ok);
-      if (!ok) {
+      int tw;
+      if (! cmdOptions.contains("textwidth")) {
+        tw = settings->value("textwidth",textWidth).toInt(&ok);
+        if (!ok) {
+          tw = textWidth;
+        }
+      }
+      else {
         tw = textWidth;
       }
       if (p.isValid()) {

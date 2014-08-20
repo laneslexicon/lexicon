@@ -99,6 +99,9 @@ int main(int argc, char *argv[])
     QCommandLineOption notabsOption(QStringList() << "t" << "no-tabs","do not restore tabs");
     parser.addOption(notabsOption);
 
+    QCommandLineOption textWidthOption(QStringList() << "w" << "text-width","set textwidth","textwidth");
+    parser.addOption(textWidthOption);
+
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);
     const QString sLogPath(QDir(a.applicationDirPath()).filePath("log.txt"));
@@ -159,8 +162,11 @@ int main(int argc, char *argv[])
     if (parser.isSet(notabsOption)) {
       options.insert("notabs","");
     }
-
+    if (parser.isSet(textWidthOption)) {
+      options.insert(textWidthOption.valueName(),parser.value(textWidthOption));
+    }
     a.setOptions(options);
+    qDebug() << options;
     QTranslator translator;
     QString trfile;
     if (options.contains("lang")) {

@@ -114,6 +114,7 @@ GraphicsEntry::~GraphicsEntry() {
 void GraphicsEntry::readSettings() {
   QString v;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  QMap<QString,QString> cmdOptions = app->getOptions();
   QSettings * settings = app->getSettings();
   bool ok;
   settings->setIniCodec("UTF-8");
@@ -123,6 +124,12 @@ void GraphicsEntry::readSettings() {
   readCssFromFile(css);
   m_xsltSource = settings->value("XSLT",QString("entry.xslt")).toString();
   m_textWidth = settings->value("Text width",300).toInt();
+  if (cmdOptions.contains("textwidth")) {
+    int w = cmdOptions.value("textwidth").toInt(&ok);
+    if (ok) {
+      m_textWidth = w;
+    }
+  }
   m_defaultWidth = m_textWidth;
 
   m_entryMargin = settings->value("Margin",10).toInt();
@@ -1216,7 +1223,7 @@ void GraphicsEntry::showHtml() {
   msgBox.setText(html);
   msgBox.exec();
 }
-void GraphicsEntry::updateCurrentPlace(const Place & p) {
+void GraphicsEntry::updateCurrentPlace(const Place & /* p */) {
   //  m_place = p;
 }
 /**
