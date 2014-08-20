@@ -1267,6 +1267,7 @@ void GraphicsEntry::moveBackward() {
  *
  */
 void GraphicsEntry::onWiden() {
+  /// TODO set width step in INI file
   m_textWidth += 50;
   //  QLOG_DEBUG() << "Scene rect before widen" << m_view->sceneRect() << m_textWidth;
   for(int i=0;i < m_items.size();i++) {
@@ -1467,7 +1468,7 @@ int GraphicsEntry::search() {
   int count = 0;
   int step = 10;
   int options = Lane::Local_Search;
-  int max = m_items.size() * step;
+  // int max = m_items.size() * step;
   QString v;
   bool b;
   qDebug() << Q_FUNC_INFO;
@@ -1658,93 +1659,37 @@ void GraphicsEntry::showSelections() {
     }
   }
 }
-/// TODO don't forget horizontal scaling
+
 void GraphicsEntry::print(QPrinter & printer) {
-  if (m_items.size() < 2) {
-    return;
-  }
   QString firstNode = m_items[1]->getNode();
   QString lastNode = m_items[m_items.size() - 1]->getNode();
   QString fileName = QString("%1-%2.pdf").arg(firstNode).arg(lastNode);
-
   printer.setOutputFileName(fileName);
-  int pages = m_scene->height()/(printer.paperRect().height() + 1);
-  qDebug() << fileName << pages;
-  qDebug() << "page height" << printer.paperRect().height();
-  QPainter painter(&printer);
-  painter.setRenderHint(QPainter::Antialiasing);
-  qreal pageHeight = printer.paperRect().height();
-  QRectF mapped = m_items[0]->mapRectToScene(m_items[0]->boundingRect());
-  QPointF pageStart = mapped.topLeft();
-  QPointF pageEnd = mapped.bottomRight();
-  QGraphicsView view(m_scene);
-  int pageCount = 0;
-  qDebug() << "paper width/height" << printer.paperRect().width() << printer.paperRect().height() ;
-  qDebug() << "scene width/height" << m_scene->sceneRect().width() << m_scene->sceneRect().height();
+  QString html = "";
+
   for(int i=0;i < m_items.size();i++) {
-    m_items[i]->boundingRect().bottomRight();
-    mapped = m_items[i]->mapRectToScene(m_items[i]->boundingRect());
-    QRectF rect(pageStart,mapped.bottomRight());
-    qDebug() << i << rect.width() << rect.height();
-    /// check whether the current item causes a page overflow
-    if (rect.height() > pageHeight) {
-      /// check if the current item is too for a page
-
-      if (mapped.height() > pageHeight) {
-        qDebug() << QString("Page overflow at item %1").arg(i);
-        qreal heightToPrint = mapped.height();
-        qreal dy = pageHeight - (pageEnd.y() - pageStart.y());
-        qDebug() << "space on page" << dy;
-        qDebug() << "Page start" << pageStart;
-        qDebug() << "Page end" << pageEnd;
-        QRectF rf(pageStart,pageEnd);
-        rf.adjust(0,0,0,dy);
-        m_scene->render(&painter,printer.pageRect(),rf.toRect());
-        printer.newPage();
-        pageCount++;
-        pageStart = rf.bottomLeft();
-        heightToPrint -= dy;
-        while(heightToPrint > pageHeight) {
-          pageEnd.setY(pageStart.y() + pageHeight);
-          QRectF rf(pageStart,pageEnd);
-          m_scene->render(&painter,printer.pageRect(),rf.toRect());
-          printer.newPage();
-          pageStart = rf.bottomLeft();
-          heightToPrint -= pageHeight;
-        }
-
-      }
-      else {
-        /// print up to the last item and print a new page
-        if (pageEnd == QPointF()) {
-          /// do something
-          qDebug() << "should not be seeing this";
-        }
-        QRectF rf(pageStart,pageEnd);
-        qDebug() << "Printing" << pageCount << rf;
-        qDebug() << "viewport width/height" << view.viewport()->rect().width() << view.viewport()->rect().height();
-        m_scene->render(&painter,printer.pageRect(),rf.toRect());
-        //        view.render(&painter,rf.toRect(),rf.toRect());
-        printer.newPage();
-        QRectF r = m_items[i]->mapRectToScene(m_items[i]->boundingRect());
-        pageStart = r.topLeft();
-        pageEnd = QPointF();
-        pageCount++;
-      }
+    QString t = m_items[i]->getOutputHTML();
+    t.remove("<html><body>");
+    t.remove("</body></html>");
+    if (i == 0) {
+      t = QString("<p class=\"arabichead\">%1</p><br/>").arg(m_items[0]->getRoot());
+      //    QString x = "<p class=\"rootword main\"><span class=\"arabichead rootword main\">ﺎﺒﻟ</span></p>";
+      //      t = x;
     }
-    else {
-      pageEnd = mapped.bottomRight();
-    }
+    html += t;
   }
-  if (pageEnd != QPointF()) {
-    qDebug() << "printing what is left";
-    qDebug() << "page start" << pageStart;
-    mapped = m_items[m_items.size() - 1]->mapRectToScene(m_items[m_items.size() - 1]->boundingRect());
-    QRectF rect(pageStart,mapped.bottomRight());
-    qDebug() << "content height" << rect.height();
-    QRectF pageRect = printer.pageRect();
-    pageRect.setHeight(rect.height());
-    m_scene->render(&painter,pageRect,rect.toRect());
+  QTextDocument doc;
+
+  doc.setDefaultStyleSheet(m_currentCSS);
+  doc.setHtml("<html><body>" + html + "</body></html>");
+  doc.setDefaultTextOption(m_textOption);
+  doc.print(&printer);
+  QFileInfo fi(QDir::tempPath(),"page.html");
+  QFile f(fi.filePath());
+  if (f.open(QIODevice::WriteOnly)) {
+    QTextStream out(&f);
+    out.setCodec("UTF-8");
+    out << html;
   }
 
 }
