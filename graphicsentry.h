@@ -119,7 +119,7 @@ class GraphicsEntry : public QWidget {
     QString firstRoot();
     void readSettings();
     void writeDefaultSettings();
-    bool readCssFromFile(const QString &name);
+    QString readCssFromFile(const QString &name);
     int m_pagingDir;
     int m_entryMargin;
     bool m_dumpXml;
@@ -186,7 +186,8 @@ class GraphicsEntry : public QWidget {
 
     // read/set from readSettings
 
-    QString m_currentCSS;
+    QString m_currentCss;
+    QString m_printCss;
     QString m_xsltSource;
     int m_textWidth;
     //    XalanTransformer * m_xalan;

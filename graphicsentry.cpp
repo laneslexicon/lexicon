@@ -121,7 +121,17 @@ void GraphicsEntry::readSettings() {
   settings->beginGroup("Entry");
   m_debug = settings->value("Debug",false).toBool();
   QString css = settings->value("CSS",QString("entry.css")).toString();
-  readCssFromFile(css);
+  css = readCssFromFile(css);
+  if (! css.isEmpty()) {
+    m_currentCss = css;
+    emit(cssChanged());
+  }
+  css = settings->value("Print CSS",QString("entry_print.css")).toString();
+  css = readCssFromFile(css);
+  if (! css.isEmpty()) {
+    m_printCss = css;
+  }
+
   m_xsltSource = settings->value("XSLT",QString("entry.xslt")).toString();
   m_textWidth = settings->value("Text width",300).toInt();
   if (cmdOptions.contains("textwidth")) {
@@ -402,27 +412,22 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,int options) {
  * lines beginning with - are omitted
  *
  */
-bool GraphicsEntry::readCssFromFile(const QString & name) {
+QString GraphicsEntry::readCssFromFile(const QString & name) {
+  QString css;
   QFile f(name);
   if (! f.open(QIODevice::ReadOnly)) {
     QLOG_WARN()  << "Cannot open CSS file for reading: " << name
                  << f.errorString();
-    return false;
-
+    return css;
   }
   QTextStream in(&f);
-  QString css;
   while( ! in.atEnd()) {
     if (! css.startsWith("-")) {
       css += in.readLine();
     }
   }
   f.close();
-  if (! css.isEmpty()) {
-    m_currentCSS = css;
-    emit(cssChanged());
-  }
-  return true;
+  return css;
 }
 
 
@@ -892,7 +897,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
       return NULL;
     }
     EntryItem * gi = new EntryItem("");
-    gi->document()->setDefaultStyleSheet(m_currentCSS);
+    gi->document()->setDefaultStyleSheet(m_currentCss);
     gi->setTextWidth(m_textWidth);
     gi->setHtml(html);
     gi->setOutputHtml(html);
@@ -1665,23 +1670,26 @@ void GraphicsEntry::print(QPrinter & printer) {
   QString lastNode = m_items[m_items.size() - 1]->getNode();
   QString fileName = QString("%1-%2.pdf").arg(firstNode).arg(lastNode);
   printer.setOutputFileName(fileName);
-  QString html = "";
+  QString html = "<html><body>";
 
   for(int i=0;i < m_items.size();i++) {
-    QString t = m_items[i]->getOutputHtml();
+    QString t = m_items[i]->getOutputHtml().trimmed();
     t.remove("<html><body>");
     t.remove("</body></html>");
-    if (i == 0) {
-      t = QString("<p class=\"arabichead\">%1</p><br/>").arg(m_items[0]->getRoot());
+    //    if (i == 0) {
+    //      qDebug() << t;
+    //      QString rootHtml = QString("<p class=\"rootword main\"><span class=\"arabichead rootword main\">%1</span></p><br/>").arg(m_items[0]->getRoot());
+
       //    QString x = "<p class=\"rootword main\"><span class=\"arabichead rootword main\">ﺎﺒﻟ</span></p>";
       //      t = x;
-    }
+    //    }
     html += t;
   }
   QTextDocument doc;
 
-  doc.setDefaultStyleSheet(m_currentCSS);
-  doc.setHtml("<html><body>" + html + "</body></html>");
+  doc.setDefaultStyleSheet(m_printCss);
+  qDebug() << m_printCss;
+  doc.setHtml(html + "</body></html>");
   doc.setDefaultTextOption(m_textOption);
   doc.print(&printer);
   QFileInfo fi(QDir::tempPath(),"page.html");
