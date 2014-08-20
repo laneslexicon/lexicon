@@ -165,7 +165,7 @@ void GraphicsEntry::readSettings() {
   settings->endGroup();
 
   settings->beginGroup("Debug");
-  m_dumpXML = settings->value("Dump XML",false).toBool();
+  m_dumpXml = settings->value("Dump XML",false).toBool();
   m_dumpHtml = settings->value("Dump HTML",false).toBool();
   m_dumpOutputHtml = settings->value("Dump output HTML",false).toBool();
   settings->endGroup();
@@ -580,7 +580,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         .arg(m_rootQuery->value(8).toInt());
       t += m_rootQuery->value(4).toString();
       t += "</word>";
-      if (m_dumpXML) {
+      if (m_dumpXml) {
         QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(m_rootQuery->value(7).toString()));
         QFile f(fi.filePath());
         if (f.open(QIODevice::WriteOnly)) {
@@ -765,7 +765,7 @@ Place GraphicsEntry::getPage(const Place & p) {
       .arg(m_pageQuery->value(8).toInt());
     t += m_pageQuery->value(4).toString();
     t += "</word>";
-    if (m_dumpXML) {
+    if (m_dumpXml) {
       QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(m_pageQuery->value(7).toString()));
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {

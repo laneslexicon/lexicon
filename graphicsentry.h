@@ -122,7 +122,7 @@ class GraphicsEntry : public QWidget {
     bool readCssFromFile(const QString &name);
     int m_pagingDir;
     int m_entryMargin;
-    bool m_dumpXML;
+    bool m_dumpXml;
     bool m_dumpHtml;
     bool m_dumpOutputHtml;
     void reposition();
