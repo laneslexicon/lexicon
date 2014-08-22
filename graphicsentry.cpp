@@ -6,7 +6,7 @@
 #include "entryitem.h"
 #include "application.h"
 #include "notes.h"
-
+#include "definedsettings.h"
 #include "laneslexicon.h"
 #include "namespace.h"
 #include "searchdialogs.h"
@@ -119,21 +119,21 @@ void GraphicsEntry::readSettings() {
   bool ok;
   settings->setIniCodec("UTF-8");
   settings->beginGroup("Entry");
-  m_debug = settings->value("Debug",false).toBool();
-  QString css = settings->value("CSS",QString("entry.css")).toString();
+  m_debug = settings->value(ID_ENTRY_DEBUG,false).toBool();
+  QString css = settings->value(ID_ENTRY_CSS,QString("entry.css")).toString();
   css = readCssFromFile(css);
   if (! css.isEmpty()) {
     m_currentCss = css;
     emit(cssChanged());
   }
-  css = settings->value("Print CSS",QString("entry_print.css")).toString();
+  css = settings->value(ID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
   css = readCssFromFile(css);
   if (! css.isEmpty()) {
     m_printCss = css;
   }
 
-  m_xsltSource = settings->value("XSLT",QString("entry.xslt")).toString();
-  m_textWidth = settings->value("Text width",300).toInt();
+  m_xsltSource = settings->value(ID_ENTRY_XSLT,QString("entry.xslt")).toString();
+  m_textWidth = settings->value(ID_ENTRY_TEXT_WIDTH,300).toInt();
   if (cmdOptions.contains("textwidth")) {
     int w = cmdOptions.value("textwidth").toInt(&ok);
     if (ok) {
@@ -142,46 +142,43 @@ void GraphicsEntry::readSettings() {
   }
   m_defaultWidth = m_textWidth;
 
-  m_entryMargin = settings->value("Margin",10).toInt();
+  m_entryMargin = settings->value(ID_ENTRY_MARGIN,10).toInt();
   /// TODO change this to use color names
-  v  = settings->value("Supplement background color","lightgray").toString();
+  v  = settings->value(ID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR,"lightgray").toString();
 
   m_supplementBg = QColor(v);
   if (! m_supplementBg.isValid())  {
       m_supplementBg = QColor::fromRgb(211,211,211);
   }
-  m_clearScene = settings->value("Clear scene",true).toBool();
+  m_clearScene = settings->value(ID_ENTRY_CLEAR_SCENE,true).toBool();
   /// these are set to empty to disable the feature
-  m_moveFocusUpKey = settings->value("Move focus up",QString()).toString();
-  m_moveFocusDownKey = settings->value("Move focus down",QString()).toString();
-  m_moveForwardKey = settings->value("Forward",QString()).toString();
-  m_moveBackwardKey = settings->value("Back",QString()).toString();
-  m_zoomInKey = settings->value("Zoom in",QString()).toString();
-  m_zoomOutKey = settings->value("Zoom out",QString()).toString();
+  m_moveFocusUpKey = settings->value(ID_ENTRY_MOVE_FOCUS_UP,QString()).toString();
+  m_moveFocusDownKey = settings->value(ID_ENTRY_MOVE_FOCUS_DOWN,QString()).toString();
+  m_moveForwardKey = settings->value(ID_ENTRY_FORWARD,QString()).toString();
+  m_moveBackwardKey = settings->value(ID_ENTRY_BACK,QString()).toString();
+  m_zoomInKey = settings->value(ID_ENTRY_ZOOM_IN,QString()).toString();
+  m_zoomOutKey = settings->value(ID_ENTRY_ZOOM_OUT,QString()).toString();
 
-  m_widenKey = settings->value("Widen",QString()).toString();
-  m_narrowKey = settings->value("Narrow",QString()).toString();
-  m_widenStep = settings->value("Step",50).toInt(&ok);
+  m_widenKey = settings->value(ID_ENTRY_WIDEN,QString()).toString();
+  m_narrowKey = settings->value(ID_ENTRY_NARROW,QString()).toString();
+  m_widenStep = settings->value(ID_ENTRY_STEP,50).toInt(&ok);
   if ( ! ok ) {
     m_widenStep = 50;
   }
-  m_searchKey = settings->value("Find",QString()).toString();
-  m_searchNextKey = settings->value("Find next",QString()).toString();
-  m_clearKey = settings->value("Clean",QString()).toString();
-  m_showKey = settings->value("Show",QString()).toString();
-  m_homeKey = settings->value("Home",QString()).toString();
+  m_searchKey = settings->value(ID_ENTRY_FIND,QString()).toString();
+  m_searchNextKey = settings->value(ID_ENTRY_FIND_NEXT,QString()).toString();
+  m_clearKey = settings->value(ID_ENTRY_CLEAN,QString()).toString();
+  m_showKey = settings->value(ID_ENTRY_SHOW,QString()).toString();
+  m_homeKey = settings->value(ID_ENTRY_HOME,QString()).toString();
 
 
-  settings->endGroup();
-
-  settings->beginGroup("Debug");
-  m_dumpXml = settings->value("Dump XML",false).toBool();
-  m_dumpHtml = settings->value("Dump HTML",false).toBool();
-  m_dumpOutputHtml = settings->value("Dump output HTML",false).toBool();
+  m_dumpXml = settings->value(ID_ENTRY_DUMP_XML,false).toBool();
+  m_dumpHtml = settings->value(ID_ENTRY_DUMP_HTML,false).toBool();
+  m_dumpOutputHtml = settings->value(ID_ENTRY_DUMP_OUTPUT_HTML,false).toBool();
   settings->endGroup();
 
   settings->beginGroup("Notes");
-  m_notesEnabled = settings->value("Enabled",true).toBool();
+  m_notesEnabled = settings->value(ID_NOTES_ENABLED,true).toBool();
   settings->endGroup();
   delete settings;
 }
@@ -1673,22 +1670,15 @@ void GraphicsEntry::print(QPrinter & printer) {
   QString html = "<html><body>";
 
   for(int i=0;i < m_items.size();i++) {
+    /// without the trimmed() the printing of the root causes problems
     QString t = m_items[i]->getOutputHtml().trimmed();
     t.remove("<html><body>");
     t.remove("</body></html>");
-    //    if (i == 0) {
-    //      qDebug() << t;
-    //      QString rootHtml = QString("<p class=\"rootword main\"><span class=\"arabichead rootword main\">%1</span></p><br/>").arg(m_items[0]->getRoot());
-
-      //    QString x = "<p class=\"rootword main\"><span class=\"arabichead rootword main\">ﺎﺒﻟ</span></p>";
-      //      t = x;
-    //    }
     html += t;
   }
   QTextDocument doc;
 
   doc.setDefaultStyleSheet(m_printCss);
-  qDebug() << m_printCss;
   doc.setHtml(html + "</body></html>");
   doc.setDefaultTextOption(m_textOption);
   doc.print(&printer);

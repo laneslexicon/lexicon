@@ -13,6 +13,7 @@
 #include "QsLogDest.h"
 #include "application.h"
 #include "splashscreen.h"
+#include "definedsettings.h"
 #include <iostream>
 #ifdef __APPLE__
 int RandomUnder(int topPlusOne)
@@ -187,9 +188,9 @@ int main(int argc, char *argv[])
     SplashScreen * splash = 0;
     QSettings * settings = a.getSettings();
     settings->beginGroup("Splash");
-    int splashDelay = settings->value("Delay",5).toInt();
-    QString splashDir = settings->value("Location","images/splash").toString();
-    bool makeSplash = settings->value("Enabled",true).toBool();
+    int splashDelay = settings->value(ID_SPLASH_DELAY,5).toInt();
+    QString splashDir = settings->value(ID_SPLASH_LOCATION,"images/splash").toString();
+    bool makeSplash = settings->value(ID_SPLASH_ENABLED,true).toBool();
     delete settings;
     QDir d(splashDir);
     if (! d.exists()) {
