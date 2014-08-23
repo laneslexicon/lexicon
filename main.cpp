@@ -188,9 +188,9 @@ int main(int argc, char *argv[])
     SplashScreen * splash = 0;
     QSettings * settings = a.getSettings();
     settings->beginGroup("Splash");
-    int splashDelay = settings->value(ID_SPLASH_DELAY,5).toInt();
-    QString splashDir = settings->value(ID_SPLASH_LOCATION,"images/splash").toString();
-    bool makeSplash = settings->value(ID_SPLASH_ENABLED,true).toBool();
+    int splashDelay = settings->value(SID_SPLASH_DELAY,5).toInt();
+    QString splashDir = settings->value(SID_SPLASH_LOCATION,"images/splash").toString();
+    bool makeSplash = settings->value(SID_SPLASH_ENABLED,true).toBool();
     delete settings;
     QDir d(splashDir);
     if (! d.exists()) {

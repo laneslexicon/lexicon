@@ -178,7 +178,7 @@ void GraphicsEntry::readSettings() {
   settings->endGroup();
 
   settings->beginGroup("Notes");
-  m_notesEnabled = settings->value(ID_NOTES_ENABLED,true).toBool();
+  m_notesEnabled = settings->value(SID_NOTES_ENABLED,true).toBool();
   settings->endGroup();
   delete settings;
 }

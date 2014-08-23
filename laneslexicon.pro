@@ -42,6 +42,7 @@ QMAKE_CXXFLAGS += -Wunused-parameter
 include(qslog/QsLog.pri)
 include(imedit/imedit.pri)
 include(keyboard/keyboard.pri)
+include(options/options.pri)
 SOURCES += main.cpp\
         eventtype.cpp \
         laneslexicon.cpp \
