@@ -119,21 +119,21 @@ void GraphicsEntry::readSettings() {
   bool ok;
   settings->setIniCodec("UTF-8");
   settings->beginGroup("Entry");
-  m_debug = settings->value(ID_ENTRY_DEBUG,false).toBool();
-  QString css = settings->value(ID_ENTRY_CSS,QString("entry.css")).toString();
+  m_debug = settings->value(SID_ENTRY_DEBUG,false).toBool();
+  QString css = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
   css = readCssFromFile(css);
   if (! css.isEmpty()) {
     m_currentCss = css;
     emit(cssChanged());
   }
-  css = settings->value(ID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
+  css = settings->value(SID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
   css = readCssFromFile(css);
   if (! css.isEmpty()) {
     m_printCss = css;
   }
 
-  m_xsltSource = settings->value(ID_ENTRY_XSLT,QString("entry.xslt")).toString();
-  m_textWidth = settings->value(ID_ENTRY_TEXT_WIDTH,300).toInt();
+  m_xsltSource = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
+  m_textWidth = settings->value(SID_ENTRY_TEXT_WIDTH,300).toInt();
   if (cmdOptions.contains("textwidth")) {
     int w = cmdOptions.value("textwidth").toInt(&ok);
     if (ok) {
@@ -142,39 +142,39 @@ void GraphicsEntry::readSettings() {
   }
   m_defaultWidth = m_textWidth;
 
-  m_entryMargin = settings->value(ID_ENTRY_MARGIN,10).toInt();
+  m_entryMargin = settings->value(SID_ENTRY_MARGIN,10).toInt();
   /// TODO change this to use color names
-  v  = settings->value(ID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR,"lightgray").toString();
+  v  = settings->value(SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR,"lightgray").toString();
 
   m_supplementBg = QColor(v);
   if (! m_supplementBg.isValid())  {
       m_supplementBg = QColor::fromRgb(211,211,211);
   }
-  m_clearScene = settings->value(ID_ENTRY_CLEAR_SCENE,true).toBool();
+  m_clearScene = settings->value(SID_ENTRY_CLEAR_SCENE,true).toBool();
   /// these are set to empty to disable the feature
-  m_moveFocusUpKey = settings->value(ID_ENTRY_MOVE_FOCUS_UP,QString()).toString();
-  m_moveFocusDownKey = settings->value(ID_ENTRY_MOVE_FOCUS_DOWN,QString()).toString();
-  m_moveForwardKey = settings->value(ID_ENTRY_FORWARD,QString()).toString();
-  m_moveBackwardKey = settings->value(ID_ENTRY_BACK,QString()).toString();
-  m_zoomInKey = settings->value(ID_ENTRY_ZOOM_IN,QString()).toString();
-  m_zoomOutKey = settings->value(ID_ENTRY_ZOOM_OUT,QString()).toString();
+  m_moveFocusUpKey = settings->value(SID_ENTRY_MOVE_FOCUS_UP,QString()).toString();
+  m_moveFocusDownKey = settings->value(SID_ENTRY_MOVE_FOCUS_DOWN,QString()).toString();
+  m_moveForwardKey = settings->value(SID_ENTRY_FORWARD,QString()).toString();
+  m_moveBackwardKey = settings->value(SID_ENTRY_BACK,QString()).toString();
+  m_zoomInKey = settings->value(SID_ENTRY_ZOOM_IN,QString()).toString();
+  m_zoomOutKey = settings->value(SID_ENTRY_ZOOM_OUT,QString()).toString();
 
-  m_widenKey = settings->value(ID_ENTRY_WIDEN,QString()).toString();
-  m_narrowKey = settings->value(ID_ENTRY_NARROW,QString()).toString();
-  m_widenStep = settings->value(ID_ENTRY_STEP,50).toInt(&ok);
+  m_widenKey = settings->value(SID_ENTRY_WIDEN,QString()).toString();
+  m_narrowKey = settings->value(SID_ENTRY_NARROW,QString()).toString();
+  m_widenStep = settings->value(SID_ENTRY_STEP,50).toInt(&ok);
   if ( ! ok ) {
     m_widenStep = 50;
   }
-  m_searchKey = settings->value(ID_ENTRY_FIND,QString()).toString();
-  m_searchNextKey = settings->value(ID_ENTRY_FIND_NEXT,QString()).toString();
-  m_clearKey = settings->value(ID_ENTRY_CLEAN,QString()).toString();
-  m_showKey = settings->value(ID_ENTRY_SHOW,QString()).toString();
-  m_homeKey = settings->value(ID_ENTRY_HOME,QString()).toString();
+  m_searchKey = settings->value(SID_ENTRY_FIND,QString()).toString();
+  m_searchNextKey = settings->value(SID_ENTRY_FIND_NEXT,QString()).toString();
+  m_clearKey = settings->value(SID_ENTRY_CLEAN,QString()).toString();
+  m_showKey = settings->value(SID_ENTRY_SHOW,QString()).toString();
+  m_homeKey = settings->value(SID_ENTRY_HOME,QString()).toString();
 
 
-  m_dumpXml = settings->value(ID_ENTRY_DUMP_XML,false).toBool();
-  m_dumpHtml = settings->value(ID_ENTRY_DUMP_HTML,false).toBool();
-  m_dumpOutputHtml = settings->value(ID_ENTRY_DUMP_OUTPUT_HTML,false).toBool();
+  m_dumpXml = settings->value(SID_ENTRY_DUMP_XML,false).toBool();
+  m_dumpHtml = settings->value(SID_ENTRY_DUMP_HTML,false).toBool();
+  m_dumpOutputHtml = settings->value(SID_ENTRY_DUMP_OUTPUT_HTML,false).toBool();
   settings->endGroup();
 
   settings->beginGroup("Notes");

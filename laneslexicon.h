@@ -165,7 +165,11 @@ private:
     int m_defaultSearchOptions;
     QString m_configFile;
     QString m_interface;    // "default","minimal"
+
     QPrinter m_printer;
+    QString m_printPdfLocation;
+    bool m_printToPdf;
+    bool m_printerReUse;
     ///
     void setupInterface();
     /// 0 - root mode, 1 - page mode

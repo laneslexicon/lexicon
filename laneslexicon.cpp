@@ -2350,19 +2350,49 @@ void LanesLexicon::pageNarrow() {
 }
 void LanesLexicon::pagePrint() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-  if (entry) {
-    QPrintDialog printDialog(&m_printer, this);
-    if (printDialog.exec() == QDialog::Accepted) {
-      // print ...
+  qDebug() << "Printer is valid" << m_printer.isValid();
+  if (! m_printer.isValid())
+    m_printerReUse = false;
 
-      //  printer->setPaperSize(QPrinter::A4);
-      //  printer->setOutputFileName();
-      //      qDebug() << "printer resolution" << m_printer.resolution();
-      //      QPainter painter(&m_printer);
-      //      painter.setRenderHint(QPainter::Antialiasing);
-      entry->print(m_printer);
-      //getScene()->render(&painter);
+
+  if (!entry)
+    return;
+
+  if ( m_printerReUse ) {
+    entry->print(m_printer);
+    return;
+  }
+  QPrintDialog printDialog(&m_printer, this);
+  if (printDialog.exec() == QDialog::Accepted) {
+    if (m_printer.isValid()) {
+      QMessageBox msgBox;
+      msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
+      QString errorMessage(tr("Do you want to use these settings next time?"));
+
+      QString pdf(tr("If you have selected PDF print, all subsequent prints will be sent to the same directory and named automatically."));
+      QString info(tr("If you select 'Yes', the print options dialog will not appear again and all prints will be sent to the destination you selected with the same options."));
+      QString clear(tr("To clear the saved printer information and cause the print dialog to re-appear, click on the 'Clear printer' button."));
+        msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2>"
+                     + "<p>" + info + "</p>"
+                     + "<p>" + clear + "</p>"
+                     + "<p>" + pdf + "</p>"
+                     + "</body></html>");
+      msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+      msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+      int ret = msgBox.exec();
+      if (ret == QMessageBox::Yes) {
+        m_printerReUse = true;
+        if (m_printer.outputFormat() == QPrinter::PdfFormat) {
+          QFileInfo fi(m_printer.outputFileName());
+          m_printPdfLocation  = fi.absoluteDir().absolutePath();
+          m_printToPdf = true;
+        }
+      }
     }
+    else {
+      qDebug() << "printer is not valid";
+    }
+    entry->print(m_printer);
   }
 }
 void LanesLexicon::pageSearch() {
