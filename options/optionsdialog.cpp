@@ -36,36 +36,33 @@ OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   btn = m_buttons->button(QDialogButtonBox::Save);
   btn->setEnabled(false);
   connect(btn,SIGNAL(clicked()),this,SLOT(saveChanges()));
+  enableButtons();
 }
 void OptionsDialog::applyChanges() {
   OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
   if (tab) {
     tab->writeSettings();
-    /// turn-off the apply/reset buttons
-    this->valueChanged(false);
-    /// check whether to enable save button
     this->enableButtons();
   }
 }
 void OptionsDialog::enableButtons() {
   bool v = false;
+  OptionsWidget * currentTab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
   for(int i=0;i < m_tabs->count();i++) {
-    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
+    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab) {
       if (tab->isModified()) {
         v = true;
+      }
+      if (tab == currentTab) {
+        this->setApplyReset(tab->isModified());
       }
     }
   }
   QPushButton * btn = m_buttons->button(QDialogButtonBox::Save);
   btn->setEnabled(v);
 }
-void OptionsDialog::valueChanged(bool v) {
-  qDebug() << Q_FUNC_INFO;
-  QPushButton * btn = m_buttons->button(QDialogButtonBox::Apply);
-  btn->setEnabled(v);
-  btn = m_buttons->button(QDialogButtonBox::Reset);
-  btn->setEnabled(v);
+void OptionsDialog::valueChanged(bool /* v */) {
   this->enableButtons();
 }
 void OptionsDialog::saveChanges() {
@@ -76,20 +73,21 @@ void OptionsDialog::saveChanges() {
     }
   }
   this->accept();
-
 }
 void OptionsDialog::resetChanges() {
-  qDebug() << Q_FUNC_INFO;
   OptionsWidget * w = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
   if (w) {
     w->readSettings();
-    this->valueChanged(false);
+    this->enableButtons();
   }
 }
 void OptionsDialog::currentChanged(int /* ix */) {
-  OptionsWidget * w = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
-  if (w) {
-    bool v = w->isModified();
-    this->valueChanged(v);
-  }
+  enableButtons();
+}
+void OptionsDialog::setApplyReset(bool v) {
+  qDebug() << Q_FUNC_INFO;
+  QPushButton * btn = m_buttons->button(QDialogButtonBox::Apply);
+  btn->setEnabled(v);
+  btn = m_buttons->button(QDialogButtonBox::Reset);
+  btn->setEnabled(v);
 }
