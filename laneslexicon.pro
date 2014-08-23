@@ -93,4 +93,5 @@ HEADERS  += laneslexicon.h \
             searchdialogs.h \
             nodeview.h \
             splashscreen.h \
-            about.h
+            about.h \
+            definedsettings.h
