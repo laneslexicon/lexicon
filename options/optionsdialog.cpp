@@ -17,6 +17,7 @@ OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
                                      | QDialogButtonBox::Reset
                                      );
 
+  connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(currentChanged(int)));
   connect(m_buttons, SIGNAL(accepted()), this, SLOT(saveChanges()));
   connect(m_buttons, SIGNAL(rejected()), this, SLOT(reject()));
 
@@ -83,5 +84,12 @@ void OptionsDialog::resetChanges() {
   if (w) {
     w->readSettings();
     this->valueChanged(false);
+  }
+}
+void OptionsDialog::currentChanged(int /* ix */) {
+  OptionsWidget * w = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
+  if (w) {
+    bool v = w->isModified();
+    this->valueChanged(v);
   }
 }

@@ -18,6 +18,7 @@ class OptionsDialog : public QDialog {
     void saveChanges();
     void resetChanges();
     void applyChanges();
+    void tabChanged(int);
  private:
     void enableButtons();
   QDialogButtonBox * m_buttons;
