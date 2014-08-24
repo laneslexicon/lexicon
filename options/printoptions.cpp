@@ -2,7 +2,7 @@
 #include "definedsettings.h"
 PrintOptions::PrintOptions(QSettings * settings,QWidget * parent) : OptionsWidget(settings,parent) {
   m_settings = settings;
-  m_section = "Print";
+  m_section = "Printer";
 
   QVBoxLayout * vlayout = new QVBoxLayout;
   QFormLayout * formlayout = new QFormLayout;
@@ -110,17 +110,26 @@ void PrintOptions::onPrintDialog() {
   }
 }
 void PrintOptions::readSettings() {
-  qDebug() << Q_FUNC_INFO;
   if (m_settings == 0) {
     m_settings = new QSettings("default.ini",QSettings::IniFormat);
   }
   m_settings->beginGroup(m_section);
   m_printerName->setText(m_settings->value(SID_PRINTER_NAME).toString());
+  m_orientation->setText(m_settings->value(SID_PRINTER_ORIENTATION).toString());
+  m_resolution->setText(m_settings->value(SID_PRINTER_RESOLUTION).toString());
+  m_paperSize->setText(m_settings->value(SID_PRINTER_PAPER_SIZE).toString());
+  m_copyCount->setText(m_settings->value(SID_PRINTER_COPIES).toString());
+  m_fullPage->setChecked(m_settings->value(SID_PRINTER_FULL_PAGE).toBool());
+  m_alwaysUse->setChecked(m_settings->value(SID_PRINTER_USE).toBool());
+  m_pdfOutput->setChecked(m_settings->value(SID_PRINTER_OUTPUT_PDF).toBool());
+  m_pdfDirectory->setText(m_settings->value(SID_PRINTER_PDF_DIRECTORY).toString());
+  m_pdfAutoName->setChecked(m_settings->value(SID_PRINTER_AUTONAME_PDF).toBool());
+  m_pdfName->setCurrentText(m_settings->value(SID_PRINTER_AUTONAME_METHOD).toString());
+
 
   m_settings->endGroup();
 }
 void PrintOptions::writeSettings() {
-  qDebug() << Q_FUNC_INFO;
   if (m_settings == 0) {
     m_settings = new QSettings("default.ini",QSettings::IniFormat);
   }
@@ -141,10 +150,42 @@ void PrintOptions::writeSettings() {
   m_settings->endGroup();
 }
 bool PrintOptions::isModified()  {
-  bool v;
-  QString s;
-  m_dirty = true;
-
+  m_dirty = false;
+  m_settings->beginGroup(m_section);
+  if (m_printerName->text() != m_settings->value(SID_PRINTER_NAME).toString()) {
+    m_dirty = true;
+  }
+  if (m_orientation->text() != m_settings->value(SID_PRINTER_ORIENTATION).toString()) {
+    m_dirty = true;
+  };
+  if (m_resolution->text() != m_settings->value(SID_PRINTER_RESOLUTION).toString()) {
+    m_dirty = true;
+  }
+  if (m_paperSize->text() != m_settings->value(SID_PRINTER_PAPER_SIZE).toString()) {
+    m_dirty = true;
+  }
+  if (m_copyCount->text() != m_settings->value(SID_PRINTER_COPIES).toString()) {
+    m_dirty = true;
+  }
+  if (m_fullPage->isChecked() != m_settings->value(SID_PRINTER_FULL_PAGE).toBool()) {
+    m_dirty = true;
+  }
+  if (m_alwaysUse->isChecked() != m_settings->value(SID_PRINTER_USE).toBool()) {
+    m_dirty = true;
+  }
+  if (m_pdfOutput->isChecked() != m_settings->value(SID_PRINTER_OUTPUT_PDF).toBool()) {
+    m_dirty = true;
+  }
+  if (m_pdfDirectory->text() != m_settings->value(SID_PRINTER_PDF_DIRECTORY).toString()) {
+    m_dirty = true;
+  }
+  if (m_pdfAutoName->isChecked() != m_settings->value(SID_PRINTER_AUTONAME_PDF).toBool()) {
+    m_dirty = true;
+  }
+  if (m_pdfName->currentText() != m_settings->value(SID_PRINTER_AUTONAME_METHOD).toString()) {
+    m_dirty = true;
+  }
+  m_settings->endGroup();
   return m_dirty;
 }
 void PrintOptions::onDirectory() {

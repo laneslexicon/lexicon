@@ -24,20 +24,6 @@ RootsOptions::RootsOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   m_doubleClick = new QCheckBox;
   m_debug = new QCheckBox;
 
-  /*
-  m_keys.insert(m_collapseAll,SID_SHORTCUT_COLLAPSE_ALL);
-  m_keys.insert(m_collapseLetter,"Collapse letter");
-
-  m_keys.insert(m_singleClick,"Single click");
-  m_keys.insert(m_singleClick,"Double click");
-
-  m_keys.insert(m_moveDown,"Move down");
-  m_keys.insert(m_moveUp,"Move up");
-  m_keys.insert(m_debug,SID_ROOTS_DEBUG);
-
-  connect(m_collapseAll,SIGNAL(editingFinished()),this,SLOT(editingFinished()));
-  connect(m_collapseLetter,SIGNAL(editingFinished()),this,SLOT(editingFinished()));
-  */
   connect(m_singleClick,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
   connect(m_doubleClick,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
   connect(m_debug,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
@@ -46,12 +32,7 @@ RootsOptions::RootsOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   connect(m_moveUp,SIGNAL(textChanged(const QString &)),this,SLOT(textChanged(const QString &)));
   connect(m_expand,SIGNAL(editingFinished()),this,SLOT(editingFinished()));
   connect(m_expand,SIGNAL(textChanged(const QString &)),this,SLOT(textChanged(const QString &)));
-  /*
-  formlayout->addRow(tr("Collapse all"),m_collapseAll);
-  formlayout->addRow(tr("Collapse letter"),m_collapseLetter);
-  formlayout->addRow(tr("Sync to contents"),m_syncToContents);
-  formlayout->addRow(tr("Move focus to contents"),m_focusToContents);
-  */
+
   formlayout->addRow(tr("Move up"),m_moveUp);
   formlayout->addRow(tr("Move down"),m_moveDown);
   formlayout->addRow(tr("Expand/collapse"),m_expand);
@@ -85,7 +66,6 @@ RootsOptions::RootsOptions(QSettings * settings,QWidget * parent) : OptionsWidge
 
 }
 void RootsOptions::readSettings() {
-  qDebug() << Q_FUNC_INFO;
   if (m_settings == 0) {
     m_settings = new QSettings("default.ini",QSettings::IniFormat);
   }
@@ -99,7 +79,6 @@ void RootsOptions::readSettings() {
   m_settings->endGroup();
 }
 void RootsOptions::writeSettings() {
-  qDebug() << Q_FUNC_INFO;
   if (m_settings == 0) {
     m_settings = new QSettings("default.ini",QSettings::IniFormat);
   }
@@ -132,6 +111,5 @@ bool RootsOptions::isModified()  {
     m_dirty = true;
   }
   m_settings->endGroup();
-  qDebug() << Q_FUNC_INFO << m_dirty;
   return m_dirty;
 }

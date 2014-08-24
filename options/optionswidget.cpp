@@ -12,7 +12,7 @@ void OptionsWidget::notifyChange() {
   emit(valueChanged());
 }
 OptionsWidget::~OptionsWidget() {
-  qDebug() << Q_FUNC_INFO;
+
 }
 void OptionsWidget::stateChanged(int /* state */) {
   //  m_dirty = this->isModified();
@@ -24,7 +24,6 @@ void OptionsWidget::editingFinished() {
 }
 void OptionsWidget::textChanged(const QString & /* text */) {
   //  m_dirty = this->isModified();
-  qDebug() << Q_FUNC_INFO << m_dirty;
   emit(modified(m_dirty));
 
 }

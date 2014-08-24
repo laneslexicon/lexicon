@@ -22,7 +22,7 @@ class OptionsDialog : public QDialog {
  private:
     void enableButtons();
     void setApplyReset(bool);
-  QDialogButtonBox * m_buttons;
-  QTabWidget * m_tabs;
+    QDialogButtonBox * m_buttons;
+    QTabWidget * m_tabs;
 };
 #endif

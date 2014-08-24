@@ -85,7 +85,6 @@ void OptionsDialog::currentChanged(int /* ix */) {
   enableButtons();
 }
 void OptionsDialog::setApplyReset(bool v) {
-  qDebug() << Q_FUNC_INFO;
   QPushButton * btn = m_buttons->button(QDialogButtonBox::Apply);
   btn->setEnabled(v);
   btn = m_buttons->button(QDialogButtonBox::Reset);
