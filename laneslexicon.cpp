@@ -1256,8 +1256,8 @@ void LanesLexicon::readSettings() {
 
   m_startupNode = cmdOptions.value("node");
   m_startupRoot = cmdOptions.value("root");
-
-  QSettings * settings = app->getSettings();
+  QScopedPointer<QSettings> settings(app->getSettings());
+  //  QSettings * settings = app->getSettings();
   settings->setIniCodec("UTF-8");
   settings->beginGroup("System");
   m_dbName = settings->value("Database","lexicon.sqlite").toString();
@@ -1385,12 +1385,11 @@ void LanesLexicon::readSettings() {
   }
   settings->endGroup();
   settings->endGroup();
-  delete settings;
+
 }
 void LanesLexicon::writeSettings() {
-  QSettings * settings;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  settings = app->getSettings();
+  QScopedPointer<QSettings> settings(app->getSettings());
   settings->setIniCodec("UTF-8");
 
   if (! m_saveSettings )
@@ -1442,7 +1441,7 @@ void LanesLexicon::writeSettings() {
   settings->beginGroup("Main");
   settings->setValue("State",this->saveState());
   settings->setValue("Geometry", saveGeometry());
-  delete settings;
+  settings->endGroup();
 }
 void LanesLexicon::restoreTabs() {
   bool ok;
