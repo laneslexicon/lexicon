@@ -23,12 +23,13 @@ PrintOptions::PrintOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   connect(m_pdfOutput,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
 
   m_pdfName = new QComboBox(this);
-  QStringList namingMethods;
-  namingMethods << tr("Arabic word");
-  namingMethods << tr("Node name");
-  namingMethods << tr("Date/time");
-  m_pdfName->addItems(namingMethods);
 
+  m_namingMethods << tr("Arabic word");
+  m_namingMethods << tr("Node name");
+  m_namingMethods << tr("Date/time");
+  for(int i=0;i < m_namingMethods.size();i++) {
+    m_pdfName->addItem(m_namingMethods[i],i);
+  }
 
   m_pdfAutoName= new QCheckBox(this);
   connect(m_pdfAutoName,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
@@ -110,6 +111,7 @@ void PrintOptions::onPrintDialog() {
   }
 }
 void PrintOptions::readSettings() {
+  bool ok;
   if (m_settings == 0) {
     m_settings = new QSettings("default.ini",QSettings::IniFormat);
   }
@@ -124,7 +126,11 @@ void PrintOptions::readSettings() {
   m_pdfOutput->setChecked(m_settings->value(SID_PRINTER_OUTPUT_PDF).toBool());
   m_pdfDirectory->setText(m_settings->value(SID_PRINTER_PDF_DIRECTORY).toString());
   m_pdfAutoName->setChecked(m_settings->value(SID_PRINTER_AUTONAME_PDF).toBool());
-  m_pdfName->setCurrentText(m_settings->value(SID_PRINTER_AUTONAME_METHOD).toString());
+  int ix = m_settings->value(SID_PRINTER_AUTONAME_METHOD).toInt(&ok);
+  if (! ok ) {
+    ix = 1;
+  }
+  m_pdfName->setCurrentText(m_namingMethods[ix]);
 
 
   m_settings->endGroup();
@@ -144,7 +150,8 @@ void PrintOptions::writeSettings() {
   m_settings->setValue(SID_PRINTER_OUTPUT_PDF,m_pdfOutput->isChecked());
   m_settings->setValue(SID_PRINTER_PDF_DIRECTORY,m_pdfDirectory->text());
   m_settings->setValue(SID_PRINTER_AUTONAME_PDF,m_pdfAutoName->isChecked());
-  m_settings->setValue(SID_PRINTER_AUTONAME_METHOD,m_pdfName->currentText());
+
+  m_settings->setValue(SID_PRINTER_AUTONAME_METHOD,m_pdfName->currentData().toInt());
   m_settings->sync();
 
   m_settings->endGroup();
@@ -182,7 +189,7 @@ bool PrintOptions::isModified()  {
   if (m_pdfAutoName->isChecked() != m_settings->value(SID_PRINTER_AUTONAME_PDF).toBool()) {
     m_dirty = true;
   }
-  if (m_pdfName->currentText() != m_settings->value(SID_PRINTER_AUTONAME_METHOD).toString()) {
+  if (m_pdfName->currentData().toInt() != m_settings->value(SID_PRINTER_AUTONAME_METHOD).toInt()) {
     m_dirty = true;
   }
   m_settings->endGroup();

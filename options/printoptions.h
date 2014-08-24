@@ -38,5 +38,6 @@ class PrintOptions : public OptionsWidget {
     int m_papersz;
     int m_orientationNum;
     void setupPaperSize();
+    QStringList m_namingMethods;
 };
 #endif
