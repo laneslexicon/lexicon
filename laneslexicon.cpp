@@ -188,8 +188,13 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     event = new QKeyEvent(QEvent::KeyPress, k, Qt::NoModifier,QString(QChar(k)));
     QApplication::postEvent(entry,event);
   }
-
-
+  /*
+  QList<QShortcut *> edits = this->findChildren<QShortcut *>();
+  foreach(QShortcut *  widget,edits) {
+    //    qDebug() << widget->key().toString();
+  }
+  edits.clear()
+  */
 
   QLOG_DEBUG() << "-----------------------";
   QLOG_DEBUG() << "Initialisation complete";
