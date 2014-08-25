@@ -5,123 +5,153 @@ ShortcutOptions::ShortcutOptions(QSettings * settings,QWidget * parent) : Option
   m_settings = settings;
   m_section = "Shortcut";
 
+  QTabWidget * m_tabs = new QTabWidget;
+
   QVBoxLayout * vlayout = new QVBoxLayout;
-  QFormLayout * formlayout1 = new QFormLayout;
-  QFormLayout * formlayout2 = new QFormLayout;
-  QHBoxLayout * hlayout = new QHBoxLayout;
 
   //  m_bookmarkAdd = new QKeySequenceEdit(this);
 
   /// roots
-  m_collapseAll = new QKeySequenceEdit(this);
-  m_collapseLetter = new QKeySequenceEdit(this);
+  m_collapseAll = new QKeySequenceEdit;
+  m_collapseLetter = new QKeySequenceEdit;
 
   /// tabs
-  m_deleteTab = new QKeySequenceEdit(this);
-  m_goTab = new QKeySequenceEdit(this);
+  m_deleteTab = new QKeySequenceEdit;
+  m_goTab = new QKeySequenceEdit;
 
   /// focus
-  m_focusContents = new QKeySequenceEdit(this);
-  m_focusTree = new QKeySequenceEdit(this);
+  m_focusContents = new QKeySequenceEdit;
+  m_focusTree = new QKeySequenceEdit;
 
   /// history
-  m_historyBack = new QKeySequenceEdit(this);
-  m_historyNext = new QKeySequenceEdit(this);
+  m_historyBack = new QKeySequenceEdit;
+  m_historyNext = new QKeySequenceEdit;
 
   /// keymaps
-  m_keymapsEnable = new QKeySequenceEdit(this);
-  m_keymapsDisable = new QKeySequenceEdit(this);
+  m_keymapsEnable = new QKeySequenceEdit;
+  m_keymapsDisable = new QKeySequenceEdit;
 
   /// local search
-  //  m_localSearch = new QKeySequenceEdit(this);
-  m_localSearchClear = new QKeySequenceEdit(this);
-  m_localSearchFind = new QKeySequenceEdit(this);
-  m_localSearchNext = new QKeySequenceEdit(this);
-  m_localSearchShow = new QKeySequenceEdit(this);
+  //  m_localSearch = new QKeySequenceEdit;
+  m_localSearchClear = new QKeySequenceEdit;
+  m_localSearchFind = new QKeySequenceEdit;
+  m_localSearchNext = new QKeySequenceEdit;
+  m_localSearchShow = new QKeySequenceEdit;
 
   /// navigation
-  m_navFirst = new QKeySequenceEdit(this);
-  m_navNext = new QKeySequenceEdit(this);
-  m_navBack = new QKeySequenceEdit(this);
-  m_navLast = new QKeySequenceEdit(this);
-
-  ///  m_pageSearch = new QKeySequenceEdit(this);
-
+  m_navFirst = new QKeySequenceEdit;
+  m_navNext = new QKeySequenceEdit;
+  m_navBack = new QKeySequenceEdit;
+  m_navLast = new QKeySequenceEdit;
 
   /// search
-  //  m_searchDelete = new QKeySequenceEdit(this);  /// TODO what do this do?
-  //  m_searchEntry = new QKeySequenceEdit(this);   /// TODO duplicate of Head
-  m_searchHead = new QKeySequenceEdit(this);
-  m_searchNode = new QKeySequenceEdit(this);
-  m_searchRoot = new QKeySequenceEdit(this);
-  m_searchWord = new QKeySequenceEdit(this);
-  m_searchPage = new QKeySequenceEdit(this);
+  //  m_searchDelete = new QKeySequenceEdit;  /// TODO what do this do?
+  //  m_searchEntry = new QKeySequenceEdit;   /// TODO duplicate of Head
+  m_searchHead = new QKeySequenceEdit;
+  m_searchNode = new QKeySequenceEdit;
+  m_searchRoot = new QKeySequenceEdit;
+  m_searchWord = new QKeySequenceEdit;
+  m_searchPage = new QKeySequenceEdit;
 
   /// select
-  m_selectAll = new QKeySequenceEdit(this);
-  m_selectEntry = new QKeySequenceEdit(this);
+  m_selectAll = new QKeySequenceEdit;
+  m_selectEntry = new QKeySequenceEdit;
 
-  m_showNotes = new QKeySequenceEdit(this);
-  m_sync = new QKeySequenceEdit(this);
-  m_interface = new QKeySequenceEdit(this);
-  m_quit = new QKeySequenceEdit(this);
+  m_showNotes = new QKeySequenceEdit;
+  m_sync = new QKeySequenceEdit;
+  m_interface = new QKeySequenceEdit;
+  m_quit = new QKeySequenceEdit;
 
-
-  formlayout1->addRow(new QLabel(tr("<b>Roots</b>")));
+  QWidget * widget1 = new QWidget;
+  QFormLayout * formlayout1 = new QFormLayout;
   formlayout1->addRow(tr("Collapse all"),m_collapseAll);
   formlayout1->addRow(tr("Collapse letter"),m_collapseLetter);
+  widget1->setLayout(formlayout1);
+  m_tabs->addTab(widget1,tr("Roots"));
 
-
-  formlayout2->addRow(new QLabel(tr("<b>Tabs</b>")));
+  QWidget * widget2 = new QWidget;
+  QFormLayout * formlayout2 = new QFormLayout;
   formlayout2->addRow(tr("Delete"),m_deleteTab);
   formlayout2->addRow(tr("Go to"),m_goTab);
-
-  formlayout1->addRow(new QLabel(tr("<b>Focus</b>")));
-  formlayout1->addRow(tr("Roots"),m_focusTree);
-  formlayout1->addRow(tr("Page"),m_focusContents);
-
-  formlayout2->addRow(new QLabel(tr("<b>History</b>")));
-  formlayout2->addRow(tr("Forward"),m_historyNext);
-  formlayout2->addRow(tr("Backward"),m_historyBack);
-
-  formlayout1->addRow(new QLabel(tr("<b>Select</b>")));
-  formlayout1->addRow(tr("All"),m_selectAll);
-  formlayout1->addRow(tr("Entry"),m_selectEntry);
-
-  formlayout2->addRow(new QLabel(tr("<b>Keymaps</b>")));
-  formlayout2->addRow(tr("Enable"),m_keymapsEnable);
-  formlayout2->addRow(tr("Disable"),m_keymapsDisable);
-
-  formlayout1->addRow(new QLabel(tr("<b>Local Search</b>")));
-  formlayout1->addRow(tr("Clear"),m_localSearchClear);
-  formlayout1->addRow(tr("Find"),m_localSearchFind);
-  formlayout1->addRow(tr("Next"),m_localSearchNext);
-  formlayout1->addRow(tr("Show"),m_localSearchShow);
-
-  formlayout2->addRow(new QLabel(tr("<b>Navigation</b>")));
-  formlayout2->addRow(tr("First"),m_navFirst);
-  formlayout2->addRow(tr("Next"),m_navNext);
-  formlayout2->addRow(tr("Previous"),m_navBack);
-  formlayout2->addRow(tr("Last"),m_navLast);
-
-  formlayout1->addRow(new QLabel(tr("<b>Global Search</b>")));
-  formlayout1->addRow(tr("For Root"),m_searchRoot);
-  formlayout1->addRow(tr("For head word"),m_searchHead);
-  formlayout1->addRow(tr("For Arabic word"),m_searchWord);
-  formlayout1->addRow(tr("For node"),m_searchNode);
-  formlayout1->addRow(tr("For page"),m_searchPage);
+  widget2->setLayout(formlayout2);
+  m_tabs->addTab(widget2,tr("Tabs"));
 
 
-  formlayout2->addRow(new QLabel(tr("<b>Other</b>")));
-  formlayout2->addRow(tr("Show notes"),m_showNotes);
-  formlayout2->addRow(tr("Show sync"),m_sync);
-  formlayout2->addRow(tr("Toggle interface"),m_interface);
-  formlayout2->addRow(tr("Exit"),m_quit);
+  QWidget * widget3 = new QWidget;
+  QFormLayout * formlayout3 = new QFormLayout;
+  formlayout3->addRow(tr("Roots"),m_focusTree);
+  formlayout3->addRow(tr("Page"),m_focusContents);
+  widget3->setLayout(formlayout3);
+  m_tabs->addTab(widget3,tr("Focus"));
 
-  hlayout->addLayout(formlayout1);
-  hlayout->addLayout(formlayout2);
+  QWidget * widget4 = new QWidget;
+  QFormLayout * formlayout4 = new QFormLayout;
+  formlayout4->addRow(new QLabel(tr("<b>History</b>")));
+  formlayout4->addRow(tr("Forward"),m_historyNext);
+  formlayout4->addRow(tr("Backward"),m_historyBack);
+  widget4->setLayout(formlayout4);
+  m_tabs->addTab(widget4,tr("History"));
 
-  vlayout->addLayout(hlayout);
+  QWidget * widget5 = new QWidget;
+  QFormLayout * formlayout5 = new QFormLayout;
+  formlayout5->addRow(new QLabel(tr("<b>Select</b>")));
+  formlayout5->addRow(tr("All"),m_selectAll);
+  formlayout5->addRow(tr("Entry"),m_selectEntry);
+  widget5->setLayout(formlayout5);
+  m_tabs->addTab(widget5,tr("Select"));
+
+  QWidget * widget6 = new QWidget;
+  QFormLayout * formlayout6 = new QFormLayout;
+  formlayout6->addRow(new QLabel(tr("<b>Keymaps</b>")));
+  formlayout6->addRow(tr("Enable"),m_keymapsEnable);
+  formlayout6->addRow(tr("Disable"),m_keymapsDisable);
+  widget6->setLayout(formlayout6);
+  m_tabs->addTab(widget6,tr("Keymaps"));
+
+  QWidget * widget7 = new QWidget;
+  QFormLayout * formlayout7 = new QFormLayout;
+  formlayout7->addRow(tr("For Root"),m_searchRoot);
+  formlayout7->addRow(tr("For head word"),m_searchHead);
+  formlayout7->addRow(tr("For Arabic word"),m_searchWord);
+  formlayout7->addRow(tr("For node"),m_searchNode);
+  formlayout7->addRow(tr("For page"),m_searchPage);
+  widget7->setLayout(formlayout7);
+  m_tabs->addTab(widget7,tr("Global search"));
+
+  QWidget * widget8 = new QWidget;
+  QFormLayout * formlayout8 = new QFormLayout;
+  formlayout8->addRow(tr("Clear"),m_localSearchClear);
+  formlayout8->addRow(tr("Find"),m_localSearchFind);
+  formlayout8->addRow(tr("Next"),m_localSearchNext);
+  formlayout8->addRow(tr("Show"),m_localSearchShow);
+  widget8->setLayout(formlayout8);
+  m_tabs->addTab(widget8,tr("Local search"));
+
+
+  QWidget * widget9 = new QWidget;
+  QFormLayout * formlayout9 = new QFormLayout;
+  formlayout9->addRow(tr("First"),m_navFirst);
+  formlayout9->addRow(tr("Next"),m_navNext);
+  formlayout9->addRow(tr("Previous"),m_navBack);
+  formlayout9->addRow(tr("Last"),m_navLast);
+  widget9->setLayout(formlayout9);
+  m_tabs->addTab(widget9,tr("Navigation"));
+
+
+
+  QWidget * widgeta = new QWidget;
+  QFormLayout * formlayouta = new QFormLayout;
+  formlayouta->addRow(tr("Show notes"),m_showNotes);
+  formlayouta->addRow(tr("Show sync"),m_sync);
+  formlayouta->addRow(tr("Toggle interface"),m_interface);
+  formlayouta->addRow(tr("Exit"),m_quit);
+  widgeta->setLayout(formlayouta);
+  m_tabs->addTab(widgeta,tr("Navigation"));
+
+  //hlayout->addLayout(formlayout1);
+  //hlayout->addLayout(formlayout2);
+
+  vlayout->addWidget(m_tabs);
   m_info = new QLabel;
 
   QStringList html;
@@ -129,6 +159,7 @@ ShortcutOptions::ShortcutOptions(QSettings * settings,QWidget * parent) : Option
 
   m_info->setText(html.join(""));
   vlayout->addWidget(m_info);
+
   setLayout(vlayout);
   readSettings();
   setupConnections();
@@ -153,7 +184,7 @@ void ShortcutOptions::writeSettings() {
 bool ShortcutOptions::isModified()  {
   bool v;
   QString s;
-  m_dirty = false;
+  m_dirty = true;
 
   m_settings->beginGroup(m_section);
   /// tests go in here
