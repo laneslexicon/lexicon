@@ -1663,12 +1663,10 @@ void GraphicsEntry::showSelections() {
 }
 
 QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & method) {
-  qDebug() << Q_FUNC_INFO << method;
   QString base;
   if (method == "node") {
     for(int i=0;(i < m_items.size()) && base.isEmpty();i++) {
       base = m_items[i]->getNode();
-      qDebug() << i << base;
     }
   }
   else if (method == "arabic") {
@@ -1681,7 +1679,6 @@ QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & 
     base = QDateTime::currentDateTime().toString(Qt::ISODate);
   }
   QFileInfo fi(QDir(pdfdir),QString("%1.pdf").arg(base));
-  qDebug() << "name" << fi.absoluteFilePath();
   return fi.absoluteFilePath();
 }
 
