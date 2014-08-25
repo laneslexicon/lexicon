@@ -2,6 +2,7 @@
 #include "optionswidget.h"
 #include "rootsoptions.h"
 #include "printoptions.h"
+#include "shortcutoptions.h"
 OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
@@ -11,6 +12,8 @@ OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   m_tabs->addTab(tree,tr("Contents"));
   PrintOptions * print = new PrintOptions(settings);
   m_tabs->addTab(print,tr("Printer"));
+  ShortcutOptions * shortcut = new ShortcutOptions(settings);
+  m_tabs->addTab(shortcut,tr("Shortcuts"));
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save
                                      | QDialogButtonBox::Cancel
                                      | QDialogButtonBox::Apply

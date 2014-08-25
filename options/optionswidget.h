@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QFormLayout>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 class OptionsWidget : public QWidget {
   Q_OBJECT
