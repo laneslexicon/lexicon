@@ -18,6 +18,8 @@ public:
   void setOptions(const QMap<QString,QString> &);
   QMap<QString,QString> getOptions() const;
   QSettings * getSettings();
+  QVariant getValue(const QString & group,const QString & key);
+  bool     getBool(const QString & group,const QString & key);
   void setConfig(const QString & fileName);
   bool isOk() { return m_ok;}
   void scanForFonts(const QDir &);

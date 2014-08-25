@@ -117,6 +117,7 @@ class GraphicsEntry : public QWidget {
     bool m_debug;
     QString lastRoot();
     QString firstRoot();
+    QString getOutputFilename(const QString &,const QString &);
     void readSettings();
     void writeDefaultSettings();
     QString readCssFromFile(const QString &name);

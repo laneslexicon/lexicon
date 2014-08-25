@@ -54,7 +54,18 @@ QSettings * Lexicon::getSettings() {
   }
   return new QSettings(m_configFile,QSettings::IniFormat);
 }
-
+QVariant Lexicon::getValue(const QString & group,const QString & key) {
+  QSettings s(m_configFile,QSettings::IniFormat);
+  s.setIniCodec("UTF-8");
+  s.beginGroup(group);
+  return s.value(key);
+}
+bool Lexicon::getBool(const QString & group,const QString & key) {
+  QSettings s(m_configFile,QSettings::IniFormat);
+  s.setIniCodec("UTF-8");
+  s.beginGroup(group);
+  return s.value(key).toBool();
+}
 void Lexicon::onFocusChange(QWidget * old, QWidget * now) {
   if (old && now) {
     QLOG_DEBUG() << old->metaObject()->className() << "--->" << now->metaObject()->className();

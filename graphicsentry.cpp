@@ -1662,13 +1662,40 @@ void GraphicsEntry::showSelections() {
   }
 }
 
-void GraphicsEntry::print(QPrinter & printer) {
-  QString firstNode = m_items[1]->getNode();
-  QString lastNode = m_items[m_items.size() - 1]->getNode();
-  QString fileName = QString("%1-%2.pdf").arg(firstNode).arg(lastNode);
-  printer.setOutputFileName(fileName);
-  QString html = "<html><body>";
+QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & method) {
+  qDebug() << Q_FUNC_INFO << method;
+  QString base;
+  if (method == "node") {
+    for(int i=0;(i < m_items.size()) && base.isEmpty();i++) {
+      base = m_items[i]->getNode();
+      qDebug() << i << base;
+    }
+  }
+  else if (method == "arabic") {
+    base = m_place.getRoot();
+  }
+  else {
+    base = QDateTime::currentDateTime().toString(Qt::ISODate);
+  }
+  if (base.isEmpty()) {
+    base = QDateTime::currentDateTime().toString(Qt::ISODate);
+  }
+  QFileInfo fi(QDir(pdfdir),QString("%1.pdf").arg(base));
+  qDebug() << "name" << fi.absoluteFilePath();
+  return fi.absoluteFilePath();
+}
 
+void GraphicsEntry::print(QPrinter & printer) {
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("Printer");
+  bool pdfoutput = settings->value(SID_PRINTER_OUTPUT_PDF).toBool();
+
+  if (pdfoutput) {
+    QString pdfdir = settings->value(SID_PRINTER_PDF_DIRECTORY).toString();
+    QString filename = getOutputFilename(pdfdir,settings->value(SID_PRINTER_AUTONAME_METHOD).toString());
+    printer.setOutputFileName(filename);
+  }
+  QString html = "<html><body>";
   for(int i=0;i < m_items.size();i++) {
     /// without the trimmed() the printing of the root causes problems
     QString t = m_items[i]->getOutputHtml().trimmed();

@@ -19,6 +19,7 @@
 #include "searchdialogs.h"
 #include "fullsearch.h"
 #include "headsearch.h"
+#include "definedsettings.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
@@ -2349,21 +2350,29 @@ void LanesLexicon::pageNarrow() {
 }
 void LanesLexicon::pagePrint() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-  qDebug() << "Printer is valid" << m_printer.isValid();
+  if (!entry)
+    return;
+
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("Printer");
+  m_printerReUse = settings->value(SID_PRINTER_USE).toBool();
+
   if (! m_printer.isValid())
     m_printerReUse = false;
 
-
-  if (!entry)
-    return;
 
   if ( m_printerReUse ) {
     entry->print(m_printer);
     return;
   }
+
   QPrintDialog printDialog(&m_printer, this);
   if (printDialog.exec() == QDialog::Accepted) {
     if (m_printer.isValid()) {
+    entry->print(m_printer);
+    }
+  }
+    /*
       QMessageBox msgBox;
       msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
       QString errorMessage(tr("Do you want to use these settings next time?"));
@@ -2391,8 +2400,9 @@ void LanesLexicon::pagePrint() {
     else {
       qDebug() << "printer is not valid";
     }
-    entry->print(m_printer);
-  }
+  */
+
+
 }
 void LanesLexicon::pageSearch() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
