@@ -45,6 +45,8 @@ class ShortcutOptions : public OptionsWidget {
     QKeySequenceEdit * m_sync;
     QKeySequenceEdit * m_interface;
 
+    QTabWidget * m_tabs;
+    void addTab(const QString &,const QStringList &,QList<QKeySequenceEdit *>);
 
 };
 #endif

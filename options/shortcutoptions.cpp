@@ -5,7 +5,7 @@ ShortcutOptions::ShortcutOptions(QSettings * settings,QWidget * parent) : Option
   m_settings = settings;
   m_section = "Shortcut";
 
-  QTabWidget * m_tabs = new QTabWidget;
+  m_tabs = new QTabWidget;
 
   QVBoxLayout * vlayout = new QVBoxLayout;
 
@@ -62,91 +62,77 @@ ShortcutOptions::ShortcutOptions(QSettings * settings,QWidget * parent) : Option
   m_interface = new QKeySequenceEdit;
   m_quit = new QKeySequenceEdit;
 
-  QWidget * widget1 = new QWidget;
-  QFormLayout * formlayout1 = new QFormLayout;
-  formlayout1->addRow(tr("Collapse all"),m_collapseAll);
-  formlayout1->addRow(tr("Collapse letter"),m_collapseLetter);
-  widget1->setLayout(formlayout1);
-  m_tabs->addTab(widget1,tr("Roots"));
+  QStringList labels;
+  QList<QKeySequenceEdit *> edits;
 
-  QWidget * widget2 = new QWidget;
-  QFormLayout * formlayout2 = new QFormLayout;
-  formlayout2->addRow(tr("Delete"),m_deleteTab);
-  formlayout2->addRow(tr("Go to"),m_goTab);
-  widget2->setLayout(formlayout2);
-  m_tabs->addTab(widget2,tr("Tabs"));
+  labels << tr("Collapse all") << tr("Collapse letter");
+  edits << m_collapseAll << m_collapseLetter;
+  addTab(tr("Roots"),labels,edits);
+  labels.clear();
+  edits.clear();
 
-
-  QWidget * widget3 = new QWidget;
-  QFormLayout * formlayout3 = new QFormLayout;
-  formlayout3->addRow(tr("Roots"),m_focusTree);
-  formlayout3->addRow(tr("Page"),m_focusContents);
-  widget3->setLayout(formlayout3);
-  m_tabs->addTab(widget3,tr("Focus"));
-
-  QWidget * widget4 = new QWidget;
-  QFormLayout * formlayout4 = new QFormLayout;
-  formlayout4->addRow(new QLabel(tr("<b>History</b>")));
-  formlayout4->addRow(tr("Forward"),m_historyNext);
-  formlayout4->addRow(tr("Backward"),m_historyBack);
-  widget4->setLayout(formlayout4);
-  m_tabs->addTab(widget4,tr("History"));
-
-  QWidget * widget5 = new QWidget;
-  QFormLayout * formlayout5 = new QFormLayout;
-  formlayout5->addRow(new QLabel(tr("<b>Select</b>")));
-  formlayout5->addRow(tr("All"),m_selectAll);
-  formlayout5->addRow(tr("Entry"),m_selectEntry);
-  widget5->setLayout(formlayout5);
-  m_tabs->addTab(widget5,tr("Select"));
-
-  QWidget * widget6 = new QWidget;
-  QFormLayout * formlayout6 = new QFormLayout;
-  formlayout6->addRow(new QLabel(tr("<b>Keymaps</b>")));
-  formlayout6->addRow(tr("Enable"),m_keymapsEnable);
-  formlayout6->addRow(tr("Disable"),m_keymapsDisable);
-  widget6->setLayout(formlayout6);
-  m_tabs->addTab(widget6,tr("Keymaps"));
-
-  QWidget * widget7 = new QWidget;
-  QFormLayout * formlayout7 = new QFormLayout;
-  formlayout7->addRow(tr("For Root"),m_searchRoot);
-  formlayout7->addRow(tr("For head word"),m_searchHead);
-  formlayout7->addRow(tr("For Arabic word"),m_searchWord);
-  formlayout7->addRow(tr("For node"),m_searchNode);
-  formlayout7->addRow(tr("For page"),m_searchPage);
-  widget7->setLayout(formlayout7);
-  m_tabs->addTab(widget7,tr("Global search"));
-
-  QWidget * widget8 = new QWidget;
-  QFormLayout * formlayout8 = new QFormLayout;
-  formlayout8->addRow(tr("Clear"),m_localSearchClear);
-  formlayout8->addRow(tr("Find"),m_localSearchFind);
-  formlayout8->addRow(tr("Next"),m_localSearchNext);
-  formlayout8->addRow(tr("Show"),m_localSearchShow);
-  widget8->setLayout(formlayout8);
-  m_tabs->addTab(widget8,tr("Local search"));
+  labels << tr("Delete") << tr("Go to");
+  edits << m_deleteTab << m_goTab;
+  addTab(tr("Tabs"),labels,edits);
+  labels.clear();
+  edits.clear();
 
 
-  QWidget * widget9 = new QWidget;
-  QFormLayout * formlayout9 = new QFormLayout;
-  formlayout9->addRow(tr("First"),m_navFirst);
-  formlayout9->addRow(tr("Next"),m_navNext);
-  formlayout9->addRow(tr("Previous"),m_navBack);
-  formlayout9->addRow(tr("Last"),m_navLast);
-  widget9->setLayout(formlayout9);
-  m_tabs->addTab(widget9,tr("Navigation"));
+  labels << tr("Roots") << tr("Page");
+  edits << m_focusTree << m_focusContents;
+  addTab(tr("Focus"),labels,edits);
+  labels.clear();
+  edits.clear();
+
+
+  labels << tr("Forward") << tr("Backward");
+  edits << m_historyNext << m_historyBack;
+  addTab(tr("History"),labels,edits);
+  labels.clear();
+  edits.clear();
 
 
 
-  QWidget * widgeta = new QWidget;
-  QFormLayout * formlayouta = new QFormLayout;
-  formlayouta->addRow(tr("Show notes"),m_showNotes);
-  formlayouta->addRow(tr("Show sync"),m_sync);
-  formlayouta->addRow(tr("Toggle interface"),m_interface);
-  formlayouta->addRow(tr("Exit"),m_quit);
-  widgeta->setLayout(formlayouta);
-  m_tabs->addTab(widgeta,tr("Navigation"));
+  labels << tr("All") << tr("Entry");
+  edits << m_selectAll << m_selectEntry;
+  addTab(tr("Select"),labels,edits);
+  labels.clear();
+  edits.clear();
+
+
+  labels << tr("Enable") << tr("Disable");
+  edits << m_keymapsEnable << m_keymapsDisable;
+  addTab(tr("Keymaps"),labels,edits);
+  labels.clear();
+  edits.clear();
+
+
+  labels << tr("For Root") << tr("For head word") << tr("For Arabic word");
+  labels << tr("For node") << tr("For page");
+
+  edits << m_searchRoot << m_searchHead << m_searchWord << m_searchNode << m_searchPage;
+  addTab(tr("Global Search"),labels,edits);
+  labels.clear();
+  edits.clear();
+
+  labels << tr("Clear") << tr("Find") << tr("Next") << tr("Show");
+  edits << m_localSearchClear << m_localSearchFind << m_localSearchNext << m_localSearchShow;
+  addTab(tr("Local Search"),labels,edits);
+  labels.clear();
+  edits.clear();
+
+
+  labels << tr("First") << tr("Next") << tr("Previous") << tr("Last");
+  edits << m_navFirst << m_navNext << m_navBack << m_navLast;
+  addTab(tr("Navigation"),labels,edits);
+  labels.clear();
+  edits.clear();
+
+  labels << tr("Show notes") << tr("Show sync") << tr("Toggle interface") << tr("Exit");
+  edits << m_showNotes << m_sync << m_interface << m_quit;
+  addTab(tr("Other"),labels,edits);
+  labels.clear();
+  edits.clear();
 
   //hlayout->addLayout(formlayout1);
   //hlayout->addLayout(formlayout2);
@@ -170,6 +156,7 @@ void ShortcutOptions::readSettings() {
     m_settings = new QSettings("default.ini",QSettings::IniFormat);
   }
   m_settings->beginGroup(m_section);
+  m_collapseAll->setKeySequence(QKeySequence(m_settings->value(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL).toString()));
 
   m_settings->endGroup();
 }
@@ -178,16 +165,28 @@ void ShortcutOptions::writeSettings() {
     m_settings = new QSettings("default.ini",QSettings::IniFormat);
   }
   m_settings->beginGroup(m_section);
-
+  m_settings->setValue(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL,m_collapseAll->keySequence().toString());
   m_settings->endGroup();
 }
 bool ShortcutOptions::isModified()  {
-  bool v;
-  QString s;
-  m_dirty = true;
+  m_dirty = false;
 
   m_settings->beginGroup(m_section);
-  /// tests go in here
+
+  if (m_settings->value(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL).toString() !=
+      m_collapseAll->keySequence().toString()) {
+    m_dirty = true;
+  }
+
   m_settings->endGroup();
   return m_dirty;
+}
+void ShortcutOptions::addTab(const QString & tabtitle,const QStringList & labels,QList<QKeySequenceEdit *> edits) {
+  QWidget * widget = new QWidget;
+  QFormLayout * formlayout = new QFormLayout;
+  for(int i=0;i < labels.size();i++) {
+    formlayout->addRow(labels[i],edits[i]);
+  }
+  widget->setLayout(formlayout);
+  m_tabs->addTab(widget,tabtitle);
 }
