@@ -24,15 +24,6 @@ RootsOptions::RootsOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   m_doubleClick = new QCheckBox;
   m_debug = new QCheckBox;
 
-  connect(m_singleClick,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
-  connect(m_doubleClick,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
-  connect(m_debug,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
-  connect(m_moveDown,SIGNAL(editingFinished()),this,SLOT(editingFinished()));
-  connect(m_moveUp,SIGNAL(editingFinished()),this,SLOT(editingFinished()));
-  connect(m_moveUp,SIGNAL(textChanged(const QString &)),this,SLOT(textChanged(const QString &)));
-  connect(m_expand,SIGNAL(editingFinished()),this,SLOT(editingFinished()));
-  connect(m_expand,SIGNAL(textChanged(const QString &)),this,SLOT(textChanged(const QString &)));
-
   formlayout->addRow(tr("Move up"),m_moveUp);
   formlayout->addRow(tr("Move down"),m_moveDown);
   formlayout->addRow(tr("Expand/collapse"),m_expand);
@@ -63,7 +54,7 @@ RootsOptions::RootsOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   vlayout->addWidget(m_info);
   setLayout(vlayout);
   readSettings();
-
+  setupConnections();
 }
 void RootsOptions::readSettings() {
   if (m_settings == 0) {

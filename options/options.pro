@@ -20,10 +20,12 @@ SOURCES += main.cpp\
         optionswidget.cpp \
 	optionsdialog.cpp \
 	rootsoptions.cpp \
+        shortcutoptions.cpp \
         printoptions.cpp
 
 HEADERS  += mainwindow.h \
         optionswidget.h \
 	optionsdialog.h \
 	rootsoptions.h \
+        shortcutoptions.h \
         printoptions.h

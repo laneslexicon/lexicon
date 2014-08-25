@@ -14,13 +14,9 @@ PrintOptions::PrintOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   connect(m_directoryButton,SIGNAL(clicked()),this,SLOT(onDirectory()));
 
   m_alwaysUse = new QCheckBox(this);
-  connect(m_alwaysUse,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
-
   m_fullPage = new QCheckBox(this);
-  connect(m_fullPage,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
-
   m_pdfOutput = new QCheckBox(this);
-  connect(m_pdfOutput,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
+
 
   m_pdfName = new QComboBox(this);
 
@@ -31,13 +27,8 @@ PrintOptions::PrintOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   m_pdfName->addItem(tr("Arabic word"),m_namingMethods[0]);
   m_pdfName->addItem(tr("Node name"),m_namingMethods[1]);
   m_pdfName->addItem(tr("Date/time"),m_namingMethods[2]);
-  connect(m_pdfName,SIGNAL(currentIndexChanged(int)),this,SLOT(stateChanged(int)));
-
 
   m_pdfAutoName= new QCheckBox(this);
-  connect(m_pdfAutoName,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
-
-
 
   m_copyCount = new QLineEdit(this);
   m_printerName = new QLineEdit(this);
@@ -45,12 +36,6 @@ PrintOptions::PrintOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   m_paperSize = new QLineEdit(this);
   m_orientation = new QLineEdit(this);
   m_pdfDirectory = new QLineEdit(this);
-
-  connect(m_copyCount,SIGNAL(textChanged(const QString &)),this,SLOT(textChanged(const QString &)));
-  connect(m_printerName,SIGNAL(textChanged(const QString &)),this,SLOT(textChanged(const QString &)));
-  connect(m_resolution,SIGNAL(textChanged(const QString &)),this,SLOT(textChanged(const QString &)));
-  connect(m_paperSize,SIGNAL(textChanged(const QString &)),this,SLOT(textChanged(const QString &)));
-  connect(m_orientation,SIGNAL(textChanged(const QString &)),this,SLOT(textChanged(const QString &)));
 
   /// disable since they are set via the PrintDialog
   m_copyCount->setReadOnly(true);
@@ -80,6 +65,7 @@ PrintOptions::PrintOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   setLayout(vlayout);
   setupPaperSize();
   readSettings();
+  setupConnections();
 }
 void PrintOptions::onPrintDialog() {
   QPrintDialog d(&m_printer);

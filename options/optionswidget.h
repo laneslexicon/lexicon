@@ -4,6 +4,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QKeySequenceEdit>
 #include <QLineEdit>
 #include <QFormLayout>
@@ -15,6 +16,7 @@ class OptionsWidget : public QWidget {
   OptionsWidget(QSettings * settings = 0,QWidget * parent = 0);
   ~OptionsWidget();
   virtual bool isModified();
+  virtual void setupConnections();
   public slots:
     virtual void readSettings();
   virtual void stateChanged(int);
