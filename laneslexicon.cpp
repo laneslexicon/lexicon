@@ -351,7 +351,7 @@ void LanesLexicon::shortcut(const QString & k) {
     }
   }
   else if (key == QString("quit")) {
-    on_actionExit();
+    onExit();
   }
   else if (key == QString("toggle interface")) {
     if (m_interface == "minimal") {
@@ -371,28 +371,28 @@ void LanesLexicon::shortcut(const QString & k) {
     }
   }
   else if (key == QString("Root Next").toCaseFolded()) {
-    this->on_actionNextRoot();
+    this->onNextRoot();
   }
   else if (key == QString("Root Prev").toCaseFolded()) {
-    this->on_actionPrevRoot();
+    this->onPrevRoot();
   }
   else if (key == QString("Root First").toCaseFolded()) {
-    this->on_actionFirstRoot();
+    this->onFirstRoot();
   }
   else if (key == QString("Root Last").toCaseFolded()) {
-    this->on_actionLastRoot();
+    this->onLastRoot();
   }
   else if (key == QString("Page Next").toCaseFolded()) {
-    this->on_actionNextPage();
+    this->onNextPage();
   }
   else if (key == QString("Page Prev").toCaseFolded()) {
-    this->on_actionPrevPage();
+    this->onPrevPage();
   }
   else if (key == QString("Page First").toCaseFolded()) {
-    this->on_actionFirstPage();
+    this->onFirstPage();
   }
   else if (key == QString("Page Last").toCaseFolded()) {
-    this->on_actionLastPage();
+    this->onLastPage();
   }
   else if (key == QString("Focus Content").toCaseFolded()) {
     /// if an item has focus, this loses it
@@ -583,13 +583,13 @@ void LanesLexicon::createActions() {
   settings->beginGroup("Icons");
 
   m_exitAction = new QAction(tr("Exit"),this);
-  connect(m_exitAction,SIGNAL(triggered()),this,SLOT(on_actionExit()));
+  connect(m_exitAction,SIGNAL(triggered()),this,SLOT(onExit()));
 
   m_clearHistoryAction = new QAction(tr("Clear"),this);
-  connect(m_clearHistoryAction,SIGNAL(triggered()),this,SLOT(on_actionClearHistory()));
+  connect(m_clearHistoryAction,SIGNAL(triggered()),this,SLOT(onClearHistory()));
 
   m_testAction = new QAction(tr("Test"),this);
-  connect(m_testAction,SIGNAL(triggered()),this,SLOT(on_actionTest()));
+  connect(m_testAction,SIGNAL(triggered()),this,SLOT(onTest()));
   /// probably need icons
 
   m_historyAction = new QAction(tr("History"),this);
@@ -599,10 +599,10 @@ void LanesLexicon::createActions() {
   m_navFirstAction = new QAction(tr("First"),this);
   m_navLastAction = new QAction(tr("Last"),this);
 
-  connect(m_navNextAction,SIGNAL(triggered()),this,SLOT(on_actionNavNext()));
-  connect(m_navPrevAction,SIGNAL(triggered()),this,SLOT(on_actionNavPrev()));
-  connect(m_navFirstAction,SIGNAL(triggered()),this,SLOT(on_actionNavFirst()));
-  connect(m_navLastAction,SIGNAL(triggered()),this,SLOT(on_actionNavLast()));
+  connect(m_navNextAction,SIGNAL(triggered()),this,SLOT(onNavNext()));
+  connect(m_navPrevAction,SIGNAL(triggered()),this,SLOT(onNavPrev()));
+  connect(m_navFirstAction,SIGNAL(triggered()),this,SLOT(onNavFirst()));
+  connect(m_navLastAction,SIGNAL(triggered()),this,SLOT(onNavLast()));
 
 
   m_docAction = new QAction(tr("Docs"),this);
@@ -630,7 +630,7 @@ void LanesLexicon::createActions() {
   connect(m_navModeRootAction,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
   connect(m_navModePageAction,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
 
-  connect(m_docAction,SIGNAL(triggered()),this,SLOT(on_actionDocs()));
+  connect(m_docAction,SIGNAL(triggered()),this,SLOT(onDocs()));
 
   m_searchWordAction = new QAction(tr("For Arabic &word"),this);
   connect(m_searchWordAction,SIGNAL(triggered()),this,SLOT(searchForWord()));
@@ -999,7 +999,7 @@ void LanesLexicon::onHistorySelection() {
   showPlace(p,false);
 
 }
-void LanesLexicon::on_actionExit()
+void LanesLexicon::onExit()
 {
   if (m_db.isOpen()) {
     m_db.close();
@@ -1207,7 +1207,7 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
   }
   return QMainWindow::eventFilter(target,event);
 }
-void LanesLexicon::on_actionTest() {
+void LanesLexicon::onTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
   if (0) {
@@ -1578,7 +1578,7 @@ void LanesLexicon::findPrevRoot(const QString & root) {
  *    tell the GraphicsEntry page to either show the root or fetch it and show it
  *
  */
-void LanesLexicon::on_actionNextRoot() {
+void LanesLexicon::onNextRoot() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     Place p  =  entry->getPlace();
@@ -1596,7 +1596,7 @@ void LanesLexicon::on_actionNextRoot() {
     }
   }
 }
-void LanesLexicon::on_actionPrevRoot() {
+void LanesLexicon::onPrevRoot() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     Place p  =  entry->getPlace();
@@ -1614,14 +1614,14 @@ void LanesLexicon::on_actionPrevRoot() {
     }
   }
 }
-void LanesLexicon::on_actionFirstRoot() {
+void LanesLexicon::onFirstRoot() {
   int options = 0;
   Place p;
   p.setRoot(m_firstRoot);
   showPlace(p,options);
   m_tree->ensurePlaceVisible(p);
 }
-void LanesLexicon::on_actionLastRoot() {
+void LanesLexicon::onLastRoot() {
   int options = 0;
   Place p;
   p.setRoot(m_lastRoot);
@@ -1674,7 +1674,7 @@ void LanesLexicon::onGoToPage(const Place & p) {
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }
-void LanesLexicon::on_actionNextPage() {
+void LanesLexicon::onNextPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     Place p = entry->getPlace();
@@ -1688,7 +1688,7 @@ void LanesLexicon::on_actionNextPage() {
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }
-void LanesLexicon::on_actionPrevPage() {
+void LanesLexicon::onPrevPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     Place p = entry->getPlace();
@@ -1705,7 +1705,7 @@ void LanesLexicon::on_actionPrevPage() {
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }
-void LanesLexicon::on_actionFirstPage() {
+void LanesLexicon::onFirstPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->setPagingForward();
@@ -1715,7 +1715,7 @@ void LanesLexicon::on_actionFirstPage() {
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }
-void LanesLexicon::on_actionLastPage() {
+void LanesLexicon::onLastPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->setPagingForward();
@@ -2045,7 +2045,7 @@ void LanesLexicon::moveNext(const Place & p) {
     findNextRoot(p.getRoot());
   }
   else {
-    on_actionNextPage();
+    onNextPage();
   }
 }
 void LanesLexicon::movePrevious(const Place & p) {
@@ -2053,7 +2053,7 @@ void LanesLexicon::movePrevious(const Place & p) {
     findPrevRoot(p.getRoot());
   }
   else {
-    on_actionPrevPage();
+    onPrevPage();
   }
 }
 void LanesLexicon::setStatus(const QString & txt) {
@@ -2098,36 +2098,36 @@ void LanesLexicon::updateMenu() {
     m_bookmarkRevertAction->setEnabled(false);
   }
 }
-void LanesLexicon::on_actionNavNext() {
+void LanesLexicon::onNavNext() {
   if (m_navMode == Lane::By_Root) {
-    on_actionNextRoot();
+    onNextRoot();
   }
   else {
-    on_actionNextPage();
+    onNextPage();
   }
 }
-void LanesLexicon::on_actionNavPrev()  {
+void LanesLexicon::onNavPrev()  {
   if (m_navMode == Lane::By_Root) {
-    on_actionPrevRoot();
+    onPrevRoot();
   }
   else {
-    on_actionPrevPage();
+    onPrevPage();
   }
 }
-void LanesLexicon::on_actionNavFirst()   {
+void LanesLexicon::onNavFirst()   {
   if (m_navMode == Lane::By_Root) {
-    on_actionFirstRoot();
+    onFirstRoot();
   }
   else {
-    on_actionFirstPage();
+    onFirstPage();
   }
 }
-void LanesLexicon::on_actionNavLast()   {
+void LanesLexicon::onNavLast()   {
   if (m_navMode == Lane::By_Root) {
-    on_actionLastRoot();
+    onLastRoot();
   }
   else {
-    on_actionLastPage();
+    onLastPage();
   }
 }
 void LanesLexicon::onNavModeChanged() {
@@ -2143,12 +2143,12 @@ void LanesLexicon::onNavModeChanged() {
     }
   }
 }
-void LanesLexicon::on_actionClearHistory() {
+void LanesLexicon::onClearHistory() {
   QLOG_DEBUG() << Q_FUNC_INFO <<  m_history->clear();
   setStatus(tr("History cleared"));
   setupHistory();
 }
-void LanesLexicon::on_actionDocs() {
+void LanesLexicon::onDocs() {
   HelpWidget * w = new HelpWidget(this);
    m_tabs->setCurrentIndex(m_tabs->addTab(w,"Docs"));
    return;

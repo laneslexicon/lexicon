@@ -97,18 +97,22 @@ public:
     void movePrevious(const Place &);
     void onCloseTab(int) ;
     void onGoToPage(const Place &);
-    void on_actionExit();
-    void on_actionTest();
+    void onExit();
+    void onTest();
 
-    void on_actionNavNext();
-    void on_actionNavPrev();
-    void on_actionNavFirst();
-    void on_actionNavLast();
-
-    void on_actionNextRoot();
-    void on_actionPrevRoot();
-    void on_actionFirstRoot();
-    void on_actionLastRoot();
+    void onNavModeChanged();
+    void onNavNext();
+    void onNavPrev();
+    void onNavFirst();
+    void onNavLast();
+    void onNextRoot();
+    void onPrevRoot();
+    void onFirstRoot();
+    void onLastRoot();
+    void onNextPage();
+    void onPrevPage();
+    void onFirstPage();
+    void onLastPage();
 
     void searchForWord();
     void searchForPage();
@@ -116,13 +120,11 @@ public:
     void searchForRoot();
     void searchForEntry();
 
-    void on_actionNextPage();
-    void on_actionPrevPage();
-    void on_actionFirstPage();
-    void on_actionLastPage();
-    void on_actionClearHistory();
+    void onClearHistory();
     void onHistorySelection();
+
     void onKeymapChanged();
+
     void rootClicked(QTreeWidgetItem * , int);
     void entryActivated(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
@@ -136,8 +138,8 @@ public:
     void bookmarkAdd();
     void bookmarkAdd(const QString & id,const Place & p);
 
-    void onNavModeChanged();
-    void on_actionDocs();
+
+    void onDocs();
     void bookmarkRebuildMenu();
 
     void currentTabChanged(int);
@@ -178,10 +180,10 @@ private:
     QLabel * m_placeIndicator;
     QToolButton * m_keymapsButton;
     QAction * m_keymapsAction;
-
     QToolButton * m_linkButton;
     QAction * m_linkAction;
     bool m_linkContents;
+
     void updateStatusBar();
     void updateMenu();
     bool m_ok;
