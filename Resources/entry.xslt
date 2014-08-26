@@ -204,6 +204,8 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
             <xsl:when test="name() = 'assumedtropical'">
               <xsl:text>†</xsl:text>
             </xsl:when>
+            <xsl:when test="name() = 'typo'">
+            </xsl:when>
             <xsl:when test="name() = 'foreign' or 'orth'">
               <span class="arabic">
               <xsl:choose>
