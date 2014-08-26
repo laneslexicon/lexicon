@@ -308,28 +308,28 @@ void LanesLexicon::onCloseTab(int ix) {
   }
   m_tabs->removeTab(ix);
 }
-void LanesLexicon::shortcut(const QString & k) {
-  QString key = k.toCaseFolded();
-  //  QLOG_DEBUG() << Q_FUNC_INFO << k;
-  if (key == QString("search root")) {
+void LanesLexicon::shortcut(const QString & key) {
+  QLOG_DEBUG() << Q_FUNC_INFO << key;
+  //  QString key = k.toCaseFolded();
+  if (key == SID_SHORTCUT_SEARCH_ROOT) {
     searchForRoot();
   }
-  else if (key == QString("search node")) {
+  else if (key == SID_SHORTCUT_SEARCH_NODE) {
     searchForNode();
   }
-  else if (key == QString("search word")) {
+  else if (key == SID_SHORTCUT_SEARCH_WORD) {
     searchForWord();
   }
-  else if (key == QString("search entry")) {
+  else if (key == SID_SHORTCUT_SEARCH_HEAD) {
     searchForEntry();
   }
-  else if (key == QString("page search")) {
+  else if (key == SID_SHORTCUT_PAGE_SEARCH) {
     searchForPage();
   }
-  else if (key == QString("contents collapse all")) {
+  else if (key == SID_SHORTCUT_CONTENTS_COLLAPSE_ALL) {
     m_tree->collapseAll();
   }
-  else if (key == QString("contents collapse letter")) {
+  else if (key == SID_SHORTCUT_CONTENTS_COLLAPSE_LETTER) {
     QTreeWidgetItem * item = m_tree->currentItem();
     if (item) {
       /// if item is a root, get the parent (letter)
@@ -350,10 +350,10 @@ void LanesLexicon::shortcut(const QString & k) {
       QLOG_DEBUG() << Q_FUNC_INFO << "No current item";
     }
   }
-  else if (key == QString("quit")) {
+  else if (key == SID_SHORTCUT_QUIT) {
     onExit();
   }
-  else if (key == QString("toggle interface")) {
+  else if (key == SID_SHORTCUT_TOGGLE_INTERFACE) {
     if (m_interface == "minimal") {
       m_interface = "default";
     }
@@ -362,7 +362,7 @@ void LanesLexicon::shortcut(const QString & k) {
     }
     setupInterface();
   }
-  else if (key == QString("Contents Show").toCaseFolded()) {
+  else if (key == SID_SHORTCUT_CONTENTS_SHOW) {
     if (m_treeDock->isVisible()) {
       m_treeDock->hide();
     }
@@ -370,31 +370,19 @@ void LanesLexicon::shortcut(const QString & k) {
       m_treeDock->show();
     }
   }
-  else if (key == QString("Root Next").toCaseFolded()) {
-    this->onNextRoot();
+  else if (key == SID_SHORTCUT_NAV_NEXT) {
+    this->onNavNext();
   }
-  else if (key == QString("Root Prev").toCaseFolded()) {
-    this->onPrevRoot();
+  else if (key == SID_SHORTCUT_NAV_PREV) {
+    this->onNavPrev();
   }
-  else if (key == QString("Root First").toCaseFolded()) {
-    this->onFirstRoot();
+  else if (key == SID_SHORTCUT_NAV_FIRST) {
+    this->onNavFirst();
   }
-  else if (key == QString("Root Last").toCaseFolded()) {
-    this->onLastRoot();
+  else if (key == SID_SHORTCUT_NAV_LAST) {
+    this->onNavLast();
   }
-  else if (key == QString("Page Next").toCaseFolded()) {
-    this->onNextPage();
-  }
-  else if (key == QString("Page Prev").toCaseFolded()) {
-    this->onPrevPage();
-  }
-  else if (key == QString("Page First").toCaseFolded()) {
-    this->onFirstPage();
-  }
-  else if (key == QString("Page Last").toCaseFolded()) {
-    this->onLastPage();
-  }
-  else if (key == QString("Focus Content").toCaseFolded()) {
+  else if (key == SID_SHORTCUT_FOCUS_CONTENT) {
     /// if an item has focus, this loses it
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
     if (entry) {
@@ -404,10 +392,10 @@ void LanesLexicon::shortcut(const QString & k) {
       m_tabs->currentWidget()->setFocus();
     }
   }
-  else if (key == QString("Focus Tree").toCaseFolded()) {
+  else if (key == SID_SHORTCUT_FOCUS_TREE) {
     m_tree->setFocus();
   }
-  else if (key.startsWith(QString("Go Tab").toCaseFolded())) {
+  else if (key.startsWith(SID_SHORTCUT_GO_TAB)) {
     QString nstr = key.right(1);
     bool ok;
     int ix = nstr.toInt(&ok);
@@ -418,74 +406,74 @@ void LanesLexicon::shortcut(const QString & k) {
       }
     }
   }
-  else if (key == "bookmark add") {
+  else if (key == SID_SHORTCUT_BOOKMARK_ADD) {
     this->bookmarkAdd();
   }
   else if (key.startsWith("bookmark")) {
     bookmarkShortcut(key);
   }
-  else if (key == "select entry") {
+  else if (key == SID_SHORTCUT_SELECT_ENTRY) {
 
     GraphicsEntry * page = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
     if (page) {
       page->selectEntry();
     }
   }
-  else if (key == "select all") {
+  else if (key == SID_SHORTCUT_SELECT_ALL) {
     GraphicsEntry * page = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
     if (page) {
       page->selectAll();
     }
   }
-  else if (key == "nav root mode") {
+  else if (key == SID_SHORTCUT_NAV_ROOT_MODE) {
     m_navMode = Lane::By_Root;
   }
-  else if (key == "nav page mode") {
+  else if (key == SID_SHORTCUT_NAV_PAGE_MODE) {
     m_navMode = Lane::By_Page;
   }
-  else if (key == "history next") {
+  else if (key == SID_SHORTCUT_HISTORY_NEXT) {
     /// increment history pos
   }
-  else if (key == "history back") {
+  else if (key == SID_SHORTCUT_HISTORY_BACK) {
     if (m_historyPos > 0) {
       m_historyPos--;
       setupHistory(m_historyPos);
     }
   }
-  else if (key == "sync contents") {
+  else if (key == SID_SHORTCUT_SYNC) {
     syncContents();
   }
-  else if (key == "show notes") {
+  else if (key == SID_SHORTCUT_SHOW_NOTES) {
     showNoteBrowser();
   }
-  else if (key == "delete tab") {
+  else if (key == SID_SHORTCUT_DELETE_TAB) {
     this->onCloseTab(m_tabs->currentIndex());
   }
-  else if (key == "convert to entry") {
+  else if (key == SID_SHORTCUT_CONVERT_TO_ENTRY) {
     this->convertToEntry();
   }
-  else if (key == "keymaps enable") {
+  else if (key == SID_SHORTCUT_KEYMAPS_ENABLE) {
     this->enableKeymaps(true);
   }
-  else if (key == "keymaps disable") {
+  else if (key == SID_SHORTCUT_KEYMAPS_DISABLE) {
     this->enableKeymaps(false);
   }
-  else if (key == "search delete") {
+  else if (key == SID_SHORTCUT_SEARCH_DELETE) {
     this->deleteSearch();
   }
-  else if (key == "local search find") {
+  else if (key == SID_SHORTCUT_LOCAL_SEARCH_FIND) {
     this->localSearch();
   }
-  else if (key == "local search") {
+  else if (key == SID_SHORTCUT_LOCAL_SEARCH) {
     this->localSearch();
   }
-  else if (key == "local search next") {
+  else if (key == SID_SHORTCUT_LOCAL_SEARCH_NEXT) {
     this->localSearchNext();
   }
-  else if (key == "local search clear") {
+  else if (key == SID_SHORTCUT_LOCAL_SEARCH_CLEAR) {
     this->localSearchClear();
   }
-  else if (key == "local search show") {
+  else if (key == SID_SHORTCUT_LOCAL_SEARCH_SHOW) {
     this->localSearchShow();
   }
   else if (key == "sync") {
