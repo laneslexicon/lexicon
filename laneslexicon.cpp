@@ -124,26 +124,30 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     restoreTabs();
   }
   /// TODO if no tabs, show first root. Change this to somethign else ?
-  if (m_tabs->count() ==  0) {
-    GraphicsEntry * entry = new GraphicsEntry(this);
-    entry->installEventFilter(this);
-    setSignals(entry);
     Place p;
+    int ix;
     if (! m_startupNode.isEmpty()) {
       p.setNode(m_startupNode);
+      ix = this->hasPlace(p,GraphicsEntry::NodeSearch,true);
     }
     else if (! m_startupRoot.isEmpty()) {
       p.setRoot(m_startupRoot);
+      ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
     }
-    else if (! m_firstRoot.isEmpty()) {
+    else if ((m_tabs->count() == 0) && ! m_firstRoot.isEmpty()) {
       p.setRoot(m_firstRoot);
+      ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
     }
     if (p.isValid()) {
-      m_tabs->addTab(entry,tr(""));
-      showPlace(p,false);
-      m_tree->ensurePlaceVisible(p);
+      if (ix == -1) {  // not showing in another tab
+        int options = 0;
+        options |= Lane::Create_Tab;
+        options |= Lane::Switch_Tab;
+        showPlace(p,options);
+        m_tree->ensurePlaceVisible(p);
+      }
     }
-  }
+
   if (m_restoreBookmarks) {
     restoreBookmarks();
   }
@@ -2481,7 +2485,7 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
     if (entry) {
-      if (entry->hasPlace(p,searchtype,false) != -1) {
+      if (entry->hasPlace(p,searchtype,setFocus) != -1) {
         if (setFocus) {
           m_tabs->setCurrentIndex(i);
         }
