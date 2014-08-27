@@ -78,6 +78,9 @@
       <xsl:when test="orth/@orig = 'Ba'">
       <span class="infl">&#xfe77;&#160;</span>
       </xsl:when>
+      <xsl:when test="orth/@orig = 'BN'">
+      <span class="infl">&#xfe72;&#160;</span>
+      </xsl:when>
       <xsl:otherwise>
       </xsl:otherwise>
       </xsl:choose>
