@@ -144,9 +144,15 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
         <tr>
           <td width="10%">*</td>
           <td align="center" width="80%">
+            <xsl:for-each select="foreign">
             <span class="arabicquote">
-              <xsl:value-of select="foreign"/>
+              <xsl:value-of select="."/>
             </span>
+            <xsl:if test="position() != last()">
+               <span>&#160;&#160;&#160;*&#160;&#160;&#160;</span>
+              </xsl:if>
+
+            </xsl:for-each>
           </td>
           <td width="10%">*</td>
         </tr>
