@@ -1253,6 +1253,9 @@ void LanesLexicon::readSettings() {
   QMap<QString,QString> cmdOptions = app->getOptions();
 
   m_startupNode = cmdOptions.value("node");
+  if (! m_startupNode.startsWith("n")) {
+    m_startupNode = "n" + m_startupNode;
+  }
   m_startupRoot = cmdOptions.value("root");
   QScopedPointer<QSettings> settings(app->getSettings());
   //  QSettings * settings = app->getSettings();
