@@ -124,29 +124,30 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     restoreTabs();
   }
   /// TODO if no tabs, show first root. Change this to somethign else ?
-    Place p;
-    int ix;
-    if (! m_startupNode.isEmpty()) {
-      p.setNode(m_startupNode);
-      ix = this->hasPlace(p,GraphicsEntry::NodeSearch,true);
+
+  Place p;
+  int ix;
+  if (! m_startupNode.isEmpty()) {
+    p.setNode(m_startupNode);
+    ix = this->hasPlace(p,GraphicsEntry::NodeSearch,true);
+  }
+  else if (! m_startupRoot.isEmpty()) {
+    p.setRoot(m_startupRoot);
+    ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
+  }
+  else if ((m_tabs->count() == 0) && ! m_firstRoot.isEmpty()) {
+    p.setRoot(m_firstRoot);
+    ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
+  }
+  if (p.isValid()) {
+    if (ix == -1) {  // not showing in another tab
+      int options = 0;
+      options |= Lane::Create_Tab;
+      options |= Lane::Switch_Tab;
+      showPlace(p,options);
+      m_tree->ensurePlaceVisible(p);
     }
-    else if (! m_startupRoot.isEmpty()) {
-      p.setRoot(m_startupRoot);
-      ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
-    }
-    else if ((m_tabs->count() == 0) && ! m_firstRoot.isEmpty()) {
-      p.setRoot(m_firstRoot);
-      ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
-    }
-    if (p.isValid()) {
-      if (ix == -1) {  // not showing in another tab
-        int options = 0;
-        options |= Lane::Create_Tab;
-        options |= Lane::Switch_Tab;
-        showPlace(p,options);
-        m_tree->ensurePlaceVisible(p);
-      }
-    }
+  }
 
   if (m_restoreBookmarks) {
     restoreBookmarks();
@@ -183,8 +184,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
    * bit confusing.
    */
   QApplication::setActiveWindow(m_tabs->currentWidget());
+  qDebug() << "Activating current entry";
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-
   if (entry) {
     entry->focusPlace();
     QKeyEvent * event;
@@ -1253,7 +1254,7 @@ void LanesLexicon::readSettings() {
   QMap<QString,QString> cmdOptions = app->getOptions();
 
   m_startupNode = cmdOptions.value("node");
-  if (! m_startupNode.startsWith("n")) {
+  if (! m_startupNode.isEmpty() && ! m_startupNode.startsWith("n")) {
     m_startupNode = "n" + m_startupNode;
   }
   m_startupRoot = cmdOptions.value("root");
@@ -1481,15 +1482,13 @@ void LanesLexicon::restoreTabs() {
       j++;
     }
     else {
-      Place p;
       QString v = settings->value("place",QString()).toString();
       qreal scale = settings->value("zoom",1.0).toReal(&ok);
       if ( !ok ) {
         scale = 1.0;
       }
-      if (! v.isNull()) {
-        p = Place::fromString(v);
-      }
+      Place p = Place::fromString(v);
+      qDebug() << "restoring" << v << p.isValid();
       int tw;
       if (! cmdOptions.contains("textwidth")) {
         tw = settings->value("textwidth",textWidth).toInt(&ok);
