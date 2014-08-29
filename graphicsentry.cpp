@@ -417,13 +417,19 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
                  << f.errorString();
     return css;
   }
+  QFileInfo fi(f);
+
+  qDebug() << Q_FUNC_INFO << fi.absoluteFilePath();
   QTextStream in(&f);
+  QString line;
   while( ! in.atEnd()) {
-    if (! css.startsWith("-")) {
-      css += in.readLine();
+    line = in.readLine();
+    if (! line.startsWith("-")) {
+      css += line;
     }
   }
   f.close();
+  qDebug() << css;
   return css;
 }
 
