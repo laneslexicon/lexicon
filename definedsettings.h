@@ -49,7 +49,7 @@ They should not be translated.
 #define SID_ENTRY_PRINT_CSS "Print Css"
 #define SID_ENTRY_DUMP_HTML "Save Html"
 #define SID_ENTRY_DUMP_XML  "Save Xml"
-#define SID_ENTRY_DUMP_OUTPUT_HTML "Dump output HTML"
+#define SID_ENTRY_DUMP_OUTPUT_HTML "Save output Html"
 
 #define SID_NOTES_ENABLED "Enabled"
 
