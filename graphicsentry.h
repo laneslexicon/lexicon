@@ -64,6 +64,7 @@ class GraphicsEntry : public QWidget {
     void setPagingBackward() {
       m_pagingDir = 1;
     }
+    QString getPageInfo(bool summary);
     qreal getScale() { return m_scale;}
     void setScale(qreal v, bool use = true);
     void highlight(const QString & t);

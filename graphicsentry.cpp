@@ -1681,7 +1681,62 @@ QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & 
   QFileInfo fi(QDir(pdfdir),QString("%1.pdf").arg(base));
   return fi.absoluteFilePath();
 }
+#define ROW(a,b)    "<tr><td width=\"30%\">" + QString(a) + "</td><td width=\"%70\">" + QString(b) + "</td></tr>"
 
+QString GraphicsEntry::getPageInfo(bool summary) {
+  Place firstPlace;
+  QString firstNode;
+  for(int i=0;(i < m_items.size()) && ! firstPlace.isValid();i++) {
+    firstPlace = m_items[i]->getPlace();
+  }
+  for(int i=0;(i < m_items.size()) && firstNode.isEmpty();i++) {
+    firstNode = m_items[i]->getPlace().getNode();
+  }
+  QString html;
+  html += "<table class=\"pageinfo\" style=\"width:100%\">";
+  html += ROW("<b>" + tr("Entry information") + "</b>","");
+  html += ROW("","");
+
+  html += ROW(tr("Root"),QString("<span class=\"arabic\">%1</span>").arg(firstPlace.getRoot()));
+  html += ROW(tr("Volume"),QString("%1").arg(firstPlace.getVol()));
+  html += ROW(tr("First page"),QString("%1").arg(firstPlace.getPage()));
+
+  Place lastPlace;
+  for(int i=m_items.size() - 1;(i >= 0) && ! lastPlace.isValid();i--) {
+    lastPlace = m_items[i]->getPlace();
+  }
+
+  html += ROW(tr("Last page"),QString("%1").arg(lastPlace.getPage()));
+  html += ROW(tr("Nodes"),QString("%1 - %2").arg(firstNode).arg(lastPlace.getNode()));
+  html += ROW(tr("Date"),QDateTime::currentDateTime().toString(Qt::ISODate));
+  QSqlQuery query;
+  if (query.prepare("select createversion,createdate,xmlversion,dbid from lexicon")) {
+    query.exec();
+    if (query.first()) {
+      html += ROW("","");
+      html += ROW("<b>" + tr("System information") + "</b>","");
+      html += ROW("","");
+      html += ROW(tr("Creation date"),query.value("createdate").toString());
+      html += ROW(tr("Script version"),query.value("createversion").toString());
+      html += ROW(tr("Xml version"),query.value("xmlversion").toString());
+      html += ROW(tr("Dbid"),query.value("dbid").toString());
+    }
+  }
+
+  Place p;
+  if (! summary ) {
+    html += ROW("","");
+    html += ROW("<b>" + tr("Node details") + "</b>","");
+    html += ROW("","");
+    for(int i=1; i < m_items.size();i++) {
+      p = m_items[i]->getPlace();
+      html += ROW(p.getNode(),QString("<span class=\"arabic\">%1</span>").arg(p.getWord()));
+    }
+
+  }
+  html += "</table>";
+  return html;
+}
 void GraphicsEntry::print(QPrinter & printer) {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Printer");
@@ -1692,19 +1747,29 @@ void GraphicsEntry::print(QPrinter & printer) {
     QString filename = getOutputFilename(pdfdir,settings->value(SID_PRINTER_AUTONAME_METHOD).toString());
     printer.setOutputFileName(filename);
   }
-  QString html = "<html><body>";
+  QString html; // = "<html><body>";
   for(int i=0;i < m_items.size();i++) {
     /// without the trimmed() the printing of the root causes problems
     QString t = m_items[i]->getOutputHtml().trimmed();
+
     t.remove("<html><body>");
     t.remove("</body></html>");
     html += t;
   }
-  QTextDocument doc;
 
+  QTextDocument doc;
   doc.setDefaultStyleSheet(m_printCss);
-  doc.setHtml(html + "</body></html>");
+  doc.setHtml(html); // + "</body></html>");
   doc.setDefaultTextOption(m_textOption);
+  if (1) {
+    QTextCursor cursor(&doc);
+    cursor.movePosition(QTextCursor::End);
+    QTextBlockFormat format;
+    format.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
+    cursor.insertBlock(format);
+    //    html += "<hr/>";
+    cursor.insertHtml(getPageInfo(false));
+  }
   doc.print(&printer);
   QFileInfo fi(QDir::tempPath(),"page.html");
   QFile f(fi.filePath());
@@ -1713,5 +1778,5 @@ void GraphicsEntry::print(QPrinter & printer) {
     out.setCodec("UTF-8");
     out << html;
   }
-
+  //  doc.setHtml("<html><body>" + getPageInfo(true) + "</body></html>");
 }
