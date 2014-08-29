@@ -417,9 +417,6 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
                  << f.errorString();
     return css;
   }
-  QFileInfo fi(f);
-
-  qDebug() << Q_FUNC_INFO << fi.absoluteFilePath();
   QTextStream in(&f);
   QString line;
   while( ! in.atEnd()) {
@@ -429,7 +426,6 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
     }
   }
   f.close();
-  qDebug() << css;
   return css;
 }
 
