@@ -351,7 +351,7 @@ void EntryItem::showNote() {
     m_note = new NoteDialog(m_notes[0]);
     m_note->setAutosave(::getNotes()->autosave());
     connect(m_note,SIGNAL(rejected()),this,SLOT(notesRejected()));
-    connect(m_note,SIGNAL(accpeted()),this,SLOT(notesAccepted()));
+    connect(m_note,SIGNAL(accepted()),this,SLOT(notesAccepted()));
   }
   m_note->show();
   QLOG_DEBUG() << Q_FUNC_INFO << __LINE__;
