@@ -1764,6 +1764,29 @@ void GraphicsEntry::print(QPrinter & printer) {
   doc.setHtml(html); // + "</body></html>");
   doc.setDefaultTextOption(m_textOption);
   if (1) {
+    QString note;
+    for(int i=0;i < m_items.size();i++) {
+      QList<Note *> notes = m_items[i]->getNotes();
+
+      for(int j=0;j < notes.size();j++) {
+        note += QString("<div class=\"arabic\">%1</div>").arg(notes[j]->getWord());
+        note += QString("<div class=\"note\">%1</div>").arg(notes[j]->getNote());
+        note += "<br/>";
+      }
+      while(notes.size() > 0) {
+        delete notes.takeFirst();
+      }
+    }
+    if (! note.isEmpty()) {
+      QTextCursor cursor(&doc);
+      cursor.movePosition(QTextCursor::End);
+      QTextBlockFormat format;
+      format.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
+      cursor.insertBlock(format);
+      cursor.insertHtml(note);
+    }
+  }
+  if (1) {
     QTextCursor cursor(&doc);
     cursor.movePosition(QTextCursor::End);
     QTextBlockFormat format;
