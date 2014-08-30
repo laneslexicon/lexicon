@@ -2465,14 +2465,6 @@ void LanesLexicon::syncContents() {
   if (p.isValid())
     m_tree->ensurePlaceVisible(p);
 }
-/*
-void LanesLexicon::saveNote(Note * note) {
-  QLOG_DEBUG() << Q_FUNC_INFO << note->getId() << note->getWord();
-  QLOG_DEBUG() << note->getNote();
-  m_notes->save(note);
-  delete note;
-}
-*/
 void LanesLexicon::showNoteBrowser() {
   for(int i=0;i < m_tabs->count();i++) {
     NoteBrowser * notes = qobject_cast<NoteBrowser *>(m_tabs->widget(i));
