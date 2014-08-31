@@ -2,10 +2,11 @@
 #define __NOTES_H__
 #include <QDebug>
 #include <QSettings>
-#include <QMessageBox>
+//#include <QMessageBox>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QFile>
 #include "QsLog.h"
 #include "place.h"
 
@@ -37,9 +38,10 @@ class Note  {
 };
 class NoteMaster {
  public:
-  NoteMaster();
+  NoteMaster(QSettings * settings = 0);
   bool openDb();
   void save(Note *);
+  void close();
   QList<int> deleteNotes(QList<int>);
   void remove(Note *);
   bool autosave() { return m_autosave;}
@@ -48,6 +50,7 @@ class NoteMaster {
   Note * findOne(int);
   QSqlQuery getNoteList(const QString & sql);
  private:
+  QSettings * m_settings;
   QSqlDatabase m_db;
   QSqlQuery addQuery;
   QSqlQuery updateQuery;

@@ -1,7 +1,5 @@
 #include "notes.h"
-#include "laneslexicon.h"
-#include "application.h"
-extern LanesLexicon * getApp();
+
 Note::Note() {
   m_id = -1;
 }
@@ -13,8 +11,10 @@ Note::Note(const Note & other) {
   m_id = other.m_id;
   m_place = other.m_place;
 }
-NoteMaster::NoteMaster() {
+NoteMaster::NoteMaster(QSettings * settings) {
+  m_settings = settings;
   readSettings();
+  delete m_settings;
   if (m_enabled)
     openDb();
 }
@@ -27,28 +27,48 @@ void NoteMaster::remove(Note * n) {
   }
 }
 void NoteMaster::save(Note * n) {
-  if (!m_enabled)
+  bool ok;
+  if (!m_enabled) {
     return;
+  }
+  QLOG_DEBUG() << Q_FUNC_INFO <<  m_db.transaction();
   if (n->getId() == -1) {     // add note
+    QSqlQuery  query(m_db);
+    query.prepare("insert into notes (datasource,word,place,subject,note,created) \
+           values (:datasource,:word,:place,:subject,:note,:created)");
+
     Place p = n->getPlace();
-    addQuery.bindValue(":datasource",p.getSource());
-    addQuery.bindValue(":word",n->getWord());
-    addQuery.bindValue(":place",p.toString());
-    addQuery.bindValue(":subject",n->getSubject());
-    addQuery.bindValue(":note",n->getNote());
-    addQuery.bindValue(":created",QDateTime::currentDateTime().toString());
-    if (! addQuery.exec()) {
-      QLOG_WARN() << "SQL add note error" << addQuery.lastError().text();
+    qDebug() << "Add query" <<      query.isActive();
+    qDebug() << "Update query" <<    updateQuery.isActive();
+    qDebug() << "Delete query" <<    deleteQuery.isActive();
+    qDebug() << "Find query" <<    findQuery.isActive();
+    qDebug() << "FindOne query" <<    findOneQuery.isActive();
+    query.bindValue(":datasource",p.getSource());
+    query.bindValue(":word",n->getWord());
+    query.bindValue(":place",p.toString());
+    query.bindValue(":subject",n->getSubject());
+    query.bindValue(":note",n->getNote());
+    query.bindValue(":created",QDateTime::currentDateTime().toString());
+    qint64 ms = QDateTime::currentMSecsSinceEpoch();
+    ok =  query.exec();
+    qDebug() << "Exec msecs" << (QDateTime::currentMSecsSinceEpoch() - ms);
+    if (! ok ) {
+      QLOG_WARN() << Q_FUNC_INFO << "SQL add note error" << query.lastError().text();
     }
-    return;
+    else {
+      QLOG_DEBUG() << Q_FUNC_INFO << "Save note for place" << p.toString();
+    }
   }
-  updateQuery.bindValue(0,n->getSubject());
-  updateQuery.bindValue(1,n->getNote());
-  updateQuery.bindValue(2,QDateTime::currentDateTime().toString());
-  updateQuery.bindValue(3,n->getId());
-  if (! updateQuery.exec()) {
-    QLOG_WARN() << "SQL update note error" << updateQuery.lastError().text();
+  else {
+    updateQuery.bindValue(0,n->getSubject());
+    updateQuery.bindValue(1,n->getNote());
+    updateQuery.bindValue(2,QDateTime::currentDateTime().toString());
+    updateQuery.bindValue(3,n->getId());
+    if (! updateQuery.exec()) {
+      QLOG_WARN() << "SQL update note error" << updateQuery.lastError().text();
+    }
   }
+  QLOG_DEBUG() << "Commit" << m_db.commit();
   return;
 }
 bool NoteMaster::openDb() {
@@ -70,8 +90,10 @@ bool NoteMaster::openDb() {
   m_db = QSqlDatabase::addDatabase("QSQLITE","notesdb");
   m_db.setDatabaseName(m_dbName);
   if (! m_db.open()) {
+    /*
     QMessageBox::critical(0,QObject::tr("Database Error"),
                           m_db.lastError().text());
+    */
     m_enabled = false;
     return false;
   }
@@ -82,7 +104,7 @@ bool NoteMaster::openDb() {
   addQuery = QSqlQuery(m_db);
   if (! addQuery.prepare("insert into notes (datasource,word,place,subject,note,created) \
            values (:datasource,:word,:place,:subject,:note,:created)")) {
-    QLOG_WARN() << "SQL add prepare error" << addQuery.lastError().text();
+    QLOG_WARN() << Q_FUNC_INFO << "SQL add prepare error" << addQuery.lastError().text();
     m_enabled = false;
     return false;
   }
@@ -124,8 +146,11 @@ bool NoteMaster::openDb() {
  */
 QList<Note *> NoteMaster::find(const QString & word) {
   QList<Note *> notes;
-  if (!m_enabled)
+
+  if (!m_enabled) {
     return notes;
+  }
+  QLOG_DEBUG() << Q_FUNC_INFO;
   findQuery.bindValue(0,word);
   findQuery.exec();
   while(findQuery.next()) {
@@ -139,14 +164,19 @@ QList<Note *> NoteMaster::find(const QString & word) {
     n->setWhen(findQuery.value(5).toString());
     notes << n;
   }
-  if (notes.size() > 0)
+  findQuery.finish();
+  if (notes.size() > 0) {
     QLOG_DEBUG() << Q_FUNC_INFO << word << "find count" << notes.size();
+  }
+  QLOG_DEBUG() << "find query active" << findQuery.isActive();
   return notes;
 }
 Note * NoteMaster::findOne(int id) {
   Note * note = NULL;
-  if (!m_enabled)
+  if (!m_enabled) {
     return note;
+  }
+  QLOG_DEBUG() << Q_FUNC_INFO;
 
   findOneQuery.bindValue(0,id);
   if (findOneQuery.exec()) {
@@ -160,20 +190,23 @@ Note * NoteMaster::findOne(int id) {
     note->setWhen(findOneQuery.value(4).toString());
     note->setAmended(findOneQuery.value(5).toString());
   }
+  findOneQuery.finish();
   return note;
 }
 void NoteMaster::readSettings() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
-  settings->beginGroup("Notes");
-  m_dbName = settings->value("Database","notes.sqlite").toString();
-  m_autosave = settings->value("Autosave",true).toBool();
-  m_enabled = settings->value("Enabled",true).toBool();
+  if (m_settings == 0) {
+    m_settings = new QSettings("default.ini",QSettings::IniFormat);
+  }
+  m_settings->setIniCodec("UTF-8");
+  m_settings->beginGroup("Notes");
+  m_dbName = m_settings->value("Database","notes.sqlite").toString();
+  m_autosave = m_settings->value("Autosave",true).toBool();
+  m_enabled = m_settings->value("Enabled",true).toBool();
 
 }
 // "select id,word,subject,create from notes"
 QSqlQuery NoteMaster::getNoteList(const QString & sql) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlQuery listQuery = QSqlQuery(m_db);
   if (!listQuery.prepare(sql)) {
     QLOG_WARN() << "SQL list error" << listQuery.lastError().text();
@@ -193,4 +226,7 @@ QList<int> NoteMaster::deleteNotes(QList<int> ids) {
     }
   }
   return deletedNotes;
+}
+void NoteMaster::close() {
+  m_db.close();
 }

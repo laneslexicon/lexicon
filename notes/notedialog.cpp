@@ -186,8 +186,8 @@ void NoteDialog::save() {
   m_note->document()->setModified(false);
   m_subjectText = m_subject->text();
   m_noteText = m_note->toPlainText();
-  this->accept();
   emit(noteSaved());
+  this->accept();
 }
 void NoteDialog::print() {
   QPrinter printer;

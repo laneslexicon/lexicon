@@ -66,7 +66,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   m_history->setEnabled(m_historyEnabled);
 
-  m_notes = new NoteMaster();
+  QSettings * settings  = ((qobject_cast<Lexicon *>(qApp))->getSettings());
+  m_notes = new NoteMaster(settings);
 
 
   if (m_docked) {
@@ -162,15 +163,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   setupInterface();
 
-
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
-  settings->beginGroup("Main");
-  this->restoreGeometry(settings->value("Geometry").toByteArray());
-  this->restoreState(settings->value("State").toByteArray());
-  delete settings;
-
+  restoreSavedState();
   /// without this, the QSplashScreen is the active window
 
   //  m_tabs->currentWidget()->setFocus();
@@ -214,6 +207,13 @@ LanesLexicon::~LanesLexicon()
   /// option to save settings ?
   //  cleanup();
 }
+void LanesLexicon::restoreSavedState() {
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("Main");
+  this->restoreGeometry(settings->value("Geometry").toByteArray());
+  this->restoreState(settings->value("State").toByteArray());
+ }
 void LanesLexicon::closeEvent(QCloseEvent * event) {
   cleanup();
   QMainWindow::closeEvent(event);

@@ -103,6 +103,7 @@ void NoteBrowser::loadTable() {
 
   QString sql = QString("select id,word,subject,created,amended,substr(note,1,%1) from notes").arg(NOTE_SUBSTR_LENGTH);
   QSqlQuery q = notes->getNoteList(sql);
+  qDebug() << Q_FUNC_INFO << "!!!!!!!!!!!!!!!!!!!!!!!!";
   while(q.next()) {
     QString word = q.value("word").toString();
     int row = m_list->rowCount();
@@ -140,6 +141,7 @@ void NoteBrowser::loadTable() {
     m_list->itemDoubleClicked(m_list->item(0,0));
     m_list->resizeColumnsToContents();
   }
+  q.finish();
 }
 void NoteBrowser::onCellClicked(int row,int /* column */) {
   QLOG_DEBUG() << Q_FUNC_INFO << row;

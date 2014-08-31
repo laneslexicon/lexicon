@@ -43,6 +43,7 @@ include(qslog/QsLog.pri)
 include(imedit/imedit.pri)
 include(keyboard/keyboard.pri)
 include(options/options.pri)
+include(notes/notes.pri)
 SOURCES += main.cpp\
         eventtype.cpp \
         laneslexicon.cpp \
@@ -52,16 +53,12 @@ SOURCES += main.cpp\
         entryitem.cpp \
         xsltsupport.cpp \
         headsearch.cpp \
-        noteswidget.cpp \
         history.cpp \
         place.cpp \
         fullsearch.cpp \
         focustable.cpp \
         helpviewer.cpp \
         menubar.cpp \
-        notes.cpp \
-        notedialog.cpp \
-        notebrowser.cpp \
         tabwidget.cpp \
         application.cpp \
         searchoptions.cpp \
@@ -77,16 +74,12 @@ HEADERS  += laneslexicon.h \
             entryitem.h \
             xsltsupport.h \
             headsearch.h \
-            noteswidget.h \
             history.h \
             place.h \
             fullsearch.h \
             focustable.h \
             helpviewer.h \
             menubar.h \
-            notes.h \
-            notedialog.h \
-            notebrowser.h \
             tabwidget.h \
             namespace.h \
             application.h \

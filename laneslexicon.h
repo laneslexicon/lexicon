@@ -158,6 +158,7 @@ public:
  protected:
     void closeEvent(QCloseEvent *);
 private:
+    void restoreSavedState();
     void cleanup();
     void search(int searchType,ArabicSearchDialog *,const QString &);
     Place showPlace(const Place &,int);
