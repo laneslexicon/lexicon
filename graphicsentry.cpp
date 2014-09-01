@@ -925,7 +925,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     /// pass through signal for mainwindow to handle
     connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
     connect(gi,SIGNAL(copy()),this,SLOT(copy()));
-    connect(gi,SIGNAL(addButton()),this,SLOT(addButtonDecoration()));
+    connect(gi,SIGNAL(addButton(bool)),this,SLOT(addButtonDecoration(bool)));
     connect(gi,SIGNAL(deleteNotes()),this,SLOT(deleteNotes()));
     return gi;
 }
@@ -1399,11 +1399,14 @@ void GraphicsEntry::notesButtonPressed() {
 
   }
 }
-void GraphicsEntry::addButtonDecoration() {
+void GraphicsEntry::addButtonDecoration(bool ok) {
   EntryItem * item = qobject_cast<EntryItem *>(QObject::sender());
   if ( ! item )
     return;
 
+  if (!ok) {
+    return;
+  }
   for(int i=0;i < m_items.size();i++) {
     if (m_items[i] == item) {
       qreal btnx;
@@ -1423,10 +1426,10 @@ void GraphicsEntry::addButtonDecoration() {
       /// refresh the entryitems notes list otherwise the context menu
       //  will not show delete note after the first note is added
       Place p = item->getPlace();
-      qDebug() << "refresh note list for root" << p.getWord();
+      //      qDebug() << "refresh note list for root" << p.getWord();
       item->setNotes(getApp()->notes()->find(p.getWord()));
-      QList<Note *> n = getApp()->notes()->find(p.getWord());
-      qDebug() << "note count" << n.size();
+      //      QList<Note *> n = getApp()->notes()->find(p.getWord());
+      //      qDebug() << "note count" << n.size();
     }
   }
 

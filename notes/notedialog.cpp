@@ -170,6 +170,7 @@ void NoteDialog::cancel() {
   this->reject();
 }
 void NoteDialog::save() {
+  qDebug() << Q_FUNC_INFO;
   Note * n = new Note();
   n->setPlace(m_place);
   n->setId(m_id);
@@ -177,16 +178,19 @@ void NoteDialog::save() {
   n->setSubject(m_subject->text());
   n->setNote(m_note->toPlainText());
 
-  if (m_attached)
+  if (m_attached) {
     showKeyboard();
+  }
   NoteMaster * notes = getApp()->notes();
-  notes->save(n);
+  bool ok = notes->save(n);
   delete n;
-  m_changed = false;
-  m_note->document()->setModified(false);
-  m_subjectText = m_subject->text();
-  m_noteText = m_note->toPlainText();
-  emit(noteSaved());
+  if (ok) {
+    m_changed = false;
+    m_note->document()->setModified(false);
+    m_subjectText = m_subject->text();
+    m_noteText = m_note->toPlainText();
+    emit(noteSaved(ok));
+  }
   this->accept();
 }
 void NoteDialog::print() {

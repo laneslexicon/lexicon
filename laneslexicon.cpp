@@ -68,7 +68,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   QSettings * settings  = ((qobject_cast<Lexicon *>(qApp))->getSettings());
   m_notes = new NoteMaster(settings);
-
+  delete settings;
 
   if (m_docked) {
     m_treeDock = new QDockWidget("Contents",this);

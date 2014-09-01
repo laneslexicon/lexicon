@@ -338,7 +338,7 @@ Place EntryItem::getPlace() {
 void EntryItem::addNote() {
   if (m_note == NULL) {
     m_note = new NoteDialog(m_place);
-    connect(m_note,SIGNAL(noteSaved()),this,SIGNAL(addButton()));
+    connect(m_note,SIGNAL(noteSaved(bool)),this,SIGNAL(addButton(bool)));
   }
   m_note->show();
 }
@@ -354,7 +354,6 @@ void EntryItem::showNote() {
     connect(m_note,SIGNAL(accepted()),this,SLOT(notesAccepted()));
   }
   m_note->show();
-  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__;
 }
 void EntryItem::deleteNote() {
   QLOG_DEBUG() << Q_FUNC_INFO;

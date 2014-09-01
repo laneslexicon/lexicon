@@ -102,37 +102,36 @@ void NoteBrowser::loadTable() {
   QTableWidgetItem * item;
 
   QString sql = QString("select id,word,subject,created,amended,substr(note,1,%1) from notes").arg(NOTE_SUBSTR_LENGTH);
-  QSqlQuery q = notes->getNoteList(sql);
-  qDebug() << Q_FUNC_INFO << "!!!!!!!!!!!!!!!!!!!!!!!!";
-  while(q.next()) {
-    QString word = q.value("word").toString();
+  QSqlQuery  * q = notes->getNoteList(sql);
+  while(q->next()) {
+    QString word = q->value("word").toString();
     int row = m_list->rowCount();
     m_list->insertRow(row);
-    item = new QTableWidgetItem(q.value("id").toString());
+    item = new QTableWidgetItem(q->value("id").toString());
     m_list->setItem(row,0,item);
 
     item = new QTableWidgetItem(word);
-    item->setData(Qt::UserRole,q.value("id").toInt());
+    item->setData(Qt::UserRole,q->value("id").toInt());
     //      item->setFont(m_resultsFont);
     //      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,COL_WITH_ID,item);
 
     QString when;
-    when = q.value("amended").toString();
+    when = q->value("amended").toString();
     if (when.isEmpty())
-        when = q.value("created").toString();
+        when = q->value("created").toString();
 
     QDateTime d = QDateTime::fromString(when);
     item = new QTableWidgetItem(d.toString( Qt::SystemLocaleShortDate));
     //      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,2,item);
 
-    item = new QTableWidgetItem(q.value("subject").toString());
+    item = new QTableWidgetItem(q->value("subject").toString());
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     //      item->setFont(m_resultsFont);
     m_list->setItem(row,3,item);
 
-    item = new QTableWidgetItem(q.value(5).toString());
+    item = new QTableWidgetItem(q->value(5).toString());
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     //      item->setFont(m_resultsFont);
     m_list->setItem(row,4,item);
@@ -141,7 +140,8 @@ void NoteBrowser::loadTable() {
     m_list->itemDoubleClicked(m_list->item(0,0));
     m_list->resizeColumnsToContents();
   }
-  q.finish();
+  q->finish();
+  delete q;
 }
 void NoteBrowser::onCellClicked(int row,int /* column */) {
   QLOG_DEBUG() << Q_FUNC_INFO << row;

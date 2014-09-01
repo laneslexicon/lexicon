@@ -40,7 +40,7 @@ class NoteMaster {
  public:
   NoteMaster(QSettings * settings = 0);
   bool openDb();
-  void save(Note *);
+  bool save(Note *);
   void close();
   QList<int> deleteNotes(QList<int>);
   void remove(Note *);
@@ -48,15 +48,15 @@ class NoteMaster {
   bool enabled() { return m_enabled; }
   QList<Note *> find(const QString & word);
   Note * findOne(int);
-  QSqlQuery getNoteList(const QString & sql);
+  QSqlQuery * getNoteList(const QString & sql);
  private:
   QSettings * m_settings;
   QSqlDatabase m_db;
-  QSqlQuery addQuery;
-  QSqlQuery updateQuery;
-  QSqlQuery deleteQuery;
-  QSqlQuery findQuery;
-  QSqlQuery findOneQuery;
+  QSqlQuery * addQuery;
+  QSqlQuery * updateQuery;
+  QSqlQuery * deleteQuery;
+  QSqlQuery * findQuery;
+  QSqlQuery * findOneQuery;
   QString m_dbName;
   bool m_autosave;
   bool m_enabled;

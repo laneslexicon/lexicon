@@ -68,6 +68,6 @@ class NoteDialog : public QDialog {
   int m_id;
  signals:
   void saveNote(Note *);
-  void noteSaved();
+  void noteSaved(bool);
 };
 #endif
