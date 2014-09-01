@@ -33,6 +33,7 @@ EntryItem::~EntryItem() {
   if (m_note != NULL) {
     m_note->close();
     delete m_note;
+    m_note = NULL;
   }
   while(m_notes.size() > 0) {
     Note * n = m_notes.takeFirst();
@@ -63,7 +64,8 @@ void EntryItem::setProxy(QGraphicsWidget * widget ) {
 }
 void EntryItem::setNotes(QList<Note *> notes) {
   m_notes.clear();
-  m_notes = notes;
+  NoteMaster * m = ::getNotes();
+  m_notes = m->find(m_place.getWord());
 }
 void EntryItem::setXml(const QString & xml) {
   m_xml = xml;
@@ -357,11 +359,16 @@ void EntryItem::showNote() {
 }
 void EntryItem::deleteNote() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  if (m_noteWidget != NULL) {
+  NoteMaster * m = ::getNotes();
+  for(int i=0;i < m_notes.size();i++) {
+    m->deleteById(m_notes[i]->getId());
+  }
+  m_notes.clear();
+  m_notes = m->find(m_place.getWord());
+  if ((m_notes.size() == 0) && (m_noteWidget != NULL)) {
     QGraphicsScene * scene = m_noteWidget->scene();
     scene->removeItem(m_noteWidget);
     delete m_noteWidget;
-    emit(deleteNotes());
     m_noteWidget = NULL;
   }
   else {

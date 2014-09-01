@@ -101,7 +101,6 @@ class GraphicsEntry : public QWidget {
     void clearHighlights();
     void notesButtonPressed();
     void addButtonDecoration(bool);
-    void deleteNotes();
     void focusPlace();
     void clearSelections();
     void showSelections();

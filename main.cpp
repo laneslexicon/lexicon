@@ -44,7 +44,7 @@ int random_in_range (unsigned int min, unsigned int max)
   if (base_random < RAND_MAX - remainder) {
     return min + base_random/bucket;
   } else {
-    return random_in_range (min, max);
+    return random_in_range(min, max);
   }
 }
 

@@ -43,7 +43,8 @@ class NoteMaster {
   bool save(Note *);
   void close();
   QList<int> deleteNotes(QList<int>);
-  void remove(Note *);
+  bool remove(Note *);
+  bool deleteById(int);
   bool autosave() { return m_autosave;}
   bool enabled() { return m_enabled; }
   QList<Note *> find(const QString & word);

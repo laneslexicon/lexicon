@@ -610,8 +610,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         p.setRoot(root);
         p.setWord(m_rootQuery->value(2).toString());
         p.setPage(m_rootQuery->value(5).toInt());
-        item->setNotes(getApp()->notes()->find(m_rootQuery->value(2).toString()));
         item->setPlace(p);
+        QList<Note *> notes;
+        item->setNotes(notes);//getApp()->notes()->find(m_rootQuery->value(2).toString()));
         items << item;
         /// if we asked for a specific word/node, focus on it
         if (! node.isEmpty() && (item->getNode() == node)) {
@@ -789,12 +790,15 @@ Place GraphicsEntry::getPage(const Place & p) {
           out << item->getOutputHtml();
         }
       }
-      item->setSupplement(supplement);
-      item->setNode(m_pageQuery->value(7).toString());
-      item->setRoot(root);
-      item->setWord(m_pageQuery->value(2).toString());
-      item->setPage(m_pageQuery->value(5).toInt());
-      item->setNotes(getApp()->notes()->find(m_rootQuery->value(2).toString()));
+      Place p;
+      p.setSupplement(supplement);
+      p.setNode(m_rootQuery->value(7).toString());
+      p.setRoot(root);
+      p.setWord(m_rootQuery->value(2).toString());
+      p.setPage(m_rootQuery->value(5).toInt());
+      item->setPlace(p);
+      QList<Note *> notes;
+      item->setNotes(notes);//getApp()->notes()->find(m_rootQuery->value(2).toString()));
       items << item;
 
       entryCount++;
@@ -926,7 +930,6 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
     connect(gi,SIGNAL(copy()),this,SLOT(copy()));
     connect(gi,SIGNAL(addButton(bool)),this,SLOT(addButtonDecoration(bool)));
-    connect(gi,SIGNAL(deleteNotes()),this,SLOT(deleteNotes()));
     return gi;
 }
 /**
@@ -1427,28 +1430,15 @@ void GraphicsEntry::addButtonDecoration(bool ok) {
       //  will not show delete note after the first note is added
       Place p = item->getPlace();
       //      qDebug() << "refresh note list for root" << p.getWord();
-      item->setNotes(getApp()->notes()->find(p.getWord()));
+      QList<Note *> notes;
+      item->setNotes(notes);//getApp()->notes()->find(p.getWord()));
       //      QList<Note *> n = getApp()->notes()->find(p.getWord());
       //      qDebug() << "note count" << n.size();
     }
   }
 
 }
-void GraphicsEntry::deleteNotes() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
-  EntryItem * item = qobject_cast<EntryItem *>(QObject::sender());
-  if ( ! item )
-    return;
 
-  NoteMaster * m = getNotes();
-  QList<Note *> notes = item->getNotes(true);
-  QLOG_DEBUG() << "Delete" << notes.size() << "notes";
-  while(notes.size() > 0) {
-    Note * n = notes.takeFirst();
-    m->remove(n);
-    delete n;
-  }
-}
 void GraphicsEntry::focusPlace() {
   Place p = this->getPlace();
   if (! p.getNode().isEmpty()) {
@@ -1775,9 +1765,6 @@ void GraphicsEntry::print(QPrinter & printer) {
         note += QString("<div class=\"arabic\">%1</div>").arg(notes[j]->getWord());
         note += QString("<div class=\"note\">%1</div>").arg(notes[j]->getNote());
         note += "<br/>";
-      }
-      while(notes.size() > 0) {
-        delete notes.takeFirst();
       }
     }
     if (! note.isEmpty()) {
