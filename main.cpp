@@ -63,6 +63,10 @@ NoteMaster * getNotes() {
   LanesLexicon * app = getApp();
   return app->notes();
 }
+QSettings * getSettings() {
+  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  return app->getSettings();
+}
 int main(int argc, char *argv[])
 {
     Lexicon a(argc, argv);
