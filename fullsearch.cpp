@@ -41,7 +41,6 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_keyboardButton->setCheckable(true);
 
   m_keyboard = new KeyboardWidget(this);
-
   connect(m_findButton,SIGNAL(clicked()),this,SLOT(findTarget()));
   connect(m_hideOptionsButton,SIGNAL(clicked()),this,SLOT(hideOptions()));
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
@@ -100,7 +99,6 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   setLayout(layout);
   connect(m_rxlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
-
   initXslt();
   m_search->setOptions(m_defaultOptions);
   m_rxlist->hide();
@@ -832,9 +830,11 @@ bool FullSearchWidget::readCssFromFile(const QString & name) {
   }
   QTextStream in(&f);
   QString css;
+  QString t;
   while( ! in.atEnd()) {
-    if (! css.startsWith("-")) {
-      css += in.readLine();
+    t = in.readLine();
+    if (! t.startsWith("-")) {
+      css += t;
     }
   }
   f.close();
