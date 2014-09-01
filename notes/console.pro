@@ -18,7 +18,7 @@ OBJECTS_DIR = ./obj
 MOC_DIR = ./moc
 include(../qslog/QsLog.pri)
 
-SOURCES += main.cpp \
+SOURCES += mainconsole.cpp \
            notes.cpp \
            ..\place.cpp \
            task.cpp
