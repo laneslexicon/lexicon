@@ -13,6 +13,28 @@ Note::Note(const Note & other) {
   m_place = other.m_place;
   m_type = other.m_type;
 }
+void Note::setType(int n) {
+  m_type = n;
+}
+int Note::getType() const {
+  return m_type;
+}
+QString Note::getSubject() const {
+  return m_subject;
+}
+QString Note::getWord() const {
+  return m_word;
+}
+QString Note::getNote() const {
+  return m_note;
+}
+Place Note::getPlace() const {
+  return m_place;
+}
+int Note::getId() const {
+  return m_id;
+}
+
 NoteMaster::NoteMaster(QSettings * settings) {
   QLOG_DEBUG() << Q_FUNC_INFO << settings;
   m_settings = settings;
@@ -160,8 +182,8 @@ bool NoteMaster::save(Note * n) {
   }
   if (n->getId() == -1) {     // add note
     QSqlQuery  query(m_db);
-    ok = query.prepare("insert into notes (datasource,word,place,subject,note,created) \
-           values (:datasource,:word,:place,:subject,:note,:created)");
+    ok = query.prepare("insert into notes (datasource,word,place,subject,note,created,type) \
+           values (:datasource,:word,:place,:subject,:note,:created,:type)");
     if (!ok) {
       QLOG_WARN() << "Save prepare note error" << query.lastError().text();
       return false;
@@ -172,6 +194,7 @@ bool NoteMaster::save(Note * n) {
     query.bindValue(":place",p.toString());
     query.bindValue(":subject",n->getSubject());
     query.bindValue(":note",n->getNote());
+    query.bindValue(":type",n->getType());
     query.bindValue(":created",QDateTime::currentDateTime().toString());
     ok =  m_db.transaction();
     if (!ok) {
@@ -235,7 +258,7 @@ QList<Note *> NoteMaster::find(const QString & word) {
   }
   QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlQuery query(m_db);
-  ok = query.prepare("select id,word,place,subject,note,created,amended from notes where word = ?");
+  ok = query.prepare("select id,word,place,subject,note,created,amended,type from notes where word = ?");
   if (!ok) {
     QLOG_WARN() << "SQL find error" << query.lastError().text();
     return notes;
@@ -255,6 +278,7 @@ QList<Note *> NoteMaster::find(const QString & word) {
     n->setSubject(query.value(3).toString());
     n->setNote(query.value(4).toString());
     n->setWhen(query.value(5).toString());
+    n->setType(query.value(6).toInt());
     notes << n;
   }
   //  if (notes.size() > 0) {
@@ -270,7 +294,7 @@ Note * NoteMaster::findOne(int id) {
   }
   QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlQuery query(m_db);
-  ok = query.prepare("select word,place,subject,note,created,amended from notes where id = ?");
+  ok = query.prepare("select word,place,subject,note,created,amended,type from notes where id = ?");
   if (!ok) {
     QLOG_WARN() << "SQL findOne error" << query.lastError().text();
     return note;
@@ -290,6 +314,7 @@ Note * NoteMaster::findOne(int id) {
   note->setNote(query.value(3).toString());
   note->setWhen(query.value(4).toString());
   note->setAmended(query.value(5).toString());
+  note->setType(query.value(6).toInt());
   return note;
 }
 void NoteMaster::readSettings() {

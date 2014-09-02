@@ -7,6 +7,7 @@
 #include "notes.h"
 #include "xsltsupport.h"
 #include "noteview.h"
+#include "place.h"
 extern NoteMaster * getNotes();
 extern QSettings * getSettings();
 #define COL_WITH_ID 1
@@ -27,6 +28,11 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   m_subject = new QLineEdit;
   m_note = new QTextEdit;
 
+  m_type = new QComboBox;
+  m_type->insertItem(0,tr("User"),Note::User);
+  m_type->insertItem(1,tr("System"),Note::Error);
+  m_type->setCurrentIndex(0);
+
   QSizePolicy policy = m_note->sizePolicy();
   policy.setVerticalStretch(1);
   m_note->setSizePolicy(policy);
@@ -43,6 +49,8 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 
   containerlayout->addRow("Subject",m_subject);
   containerlayout->addRow("Note",m_note);
+  containerlayout->addRow("Type",m_type);
+
   containerlayout->addRow(btnlayout);
   container->setLayout(containerlayout);
   container->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -138,6 +146,7 @@ void NoteBrowser::onCellClicked(int row,int /* column */) {
     if (note) {
       m_subject->setText(note->getSubject());
       m_note->setText(note->getNote());
+      m_type->setCurrentIndex(m_type->findData(note->getType()));
     }
   }
   m_deleteButton->setEnabled(true);

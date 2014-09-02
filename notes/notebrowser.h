@@ -13,6 +13,7 @@
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QLabel>
+#include <QComboBox>
 #include <QTextEdit>
 #include <QLineEdit>
 #include <QPushButton>
@@ -21,7 +22,7 @@
 #include <QDebug>
 #include <QModelIndex>
 #include <QKeyEvent>
-#include "place.h"
+class Place;
 class NoteBrowser : public QWidget {
   Q_OBJECT
  public:
@@ -50,6 +51,7 @@ class NoteBrowser : public QWidget {
     QTextEdit * m_note;
     QLineEdit * m_subject;
     QLineEdit * m_tag;
+    QComboBox * m_type;
     QPushButton * m_newBtn;
     QPushButton * m_showBtn;
     QPushButton * m_saveBtn;

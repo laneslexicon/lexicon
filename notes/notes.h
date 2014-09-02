@@ -11,11 +11,11 @@
 #include "place.h"
 
 class Note  {
-  enum Type { User, Error };
+
  public:
   Note(int type = Note::User);
   Note(const Note &);
-
+  enum Type { User, Error };
 
   void setSubject(const QString & text) { m_subject = text;};
   void setPlace(const Place & p) { m_place = p;}
@@ -24,12 +24,13 @@ class Note  {
   void setId(int id) { m_id = id;}
   void setWhen(const QString & t) { m_created = t;}
   void setAmended(const QString & t) { m_amended = t;}
-
-  QString getSubject() { return m_subject; }
-  QString getNote() { return m_note; }
-  QString getWord() { return m_word;}
-  Place getPlace() { return m_place; }
-  int getId() { return m_id;}
+  void setType(int);
+  QString getSubject() const;
+  QString getNote() const;
+  QString getWord() const;
+  Place getPlace() const;
+  int getId() const;
+  int getType() const;
  private:
   QString m_note;
   QString m_subject;

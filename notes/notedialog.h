@@ -9,6 +9,8 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QFormLayout>
+#include <QComboBox>
 #include <QPushButton>
 #include <QSettings>
 #include <QLabel>
@@ -43,6 +45,7 @@ class NoteDialog : public QDialog {
     void cancel();
     void save();
     void print();
+    void onTypeChange(int);
  protected:
   void closeEvent(QCloseEvent *);
  private:
@@ -61,11 +64,13 @@ class NoteDialog : public QDialog {
   QPushButton * m_printButton;
   QDialogButtonBox * m_moreButtonBox;
   QDialogButtonBox * m_buttonBox;
+  QComboBox * m_type;
   Note * m_noteItem;
   QString m_subjectText;
   QString m_noteText;
   QString m_word;
   int m_id;
+  int m_noteType;
  signals:
   void saveNote(Note *);
   void noteSaved(bool);

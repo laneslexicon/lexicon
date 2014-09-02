@@ -1,4 +1,5 @@
 #include "notedialog.h"
+#include "notes.h"
 #ifndef TEST_FRAMEWORK
 #include "laneslexicon.h"
 #endif
@@ -32,17 +33,18 @@ NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
   m_word = note->getWord();
   m_subjectText = note->getSubject();
   m_noteText = note->getNote();
-
+  m_noteType = note->getType();
 
   this->setup();
   /// set values from note
   m_subject->setText(m_subjectText);
   m_note->setText(m_noteText);
+  m_type->setCurrentIndex(m_type->findData(m_noteType));
   m_note->setFocus();
   setWindowTitle(m_subject->text());
 }
 void NoteDialog::setup() {
-  QVBoxLayout * layout = new QVBoxLayout;
+  QFormLayout * layout = new QFormLayout;
   m_subject = new QLineEdit(this);
 
   m_note = new QTextEdit(this);
@@ -72,11 +74,17 @@ void NoteDialog::setup() {
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
   connect(m_printButton,SIGNAL(clicked()),this,SLOT(print()));
 
-
-  layout->addWidget(m_subject);
-  layout->addWidget(m_note);
-  layout->addWidget(m_buttonBox);
-  layout->addWidget(m_moreButtonBox);
+  m_type = new QComboBox;
+  m_type->insertItem(0,tr("User"),Note::User);
+  m_type->insertItem(1,tr("System"),Note::Error);
+  m_type->setCurrentIndex(0);
+  connect(m_type,SIGNAL(onCurrentIndexChanged(int)),this,SLOT(onTypeChange(int)));
+  layout->addRow(tr("Subject"),m_subject);
+  layout->addRow(tr("Note"),m_note);
+  layout->addRow(tr("Type"),m_type);
+  layout->addRow(m_buttonBox);
+  layout->addRow(m_moreButtonBox);
+  //  layout->addWidget(m_moreButtonBox);
   setLayout(layout);
   //  setWindowFlags(Qt::CustomizeWindowHint);
   setSizeGripEnabled(true);
@@ -179,7 +187,7 @@ void NoteDialog::save() {
   n->setWord(m_word);
   n->setSubject(m_subject->text());
   n->setNote(m_note->toPlainText());
-
+  n->setType(m_type->currentData().toInt());
   if (m_attached) {
     showKeyboard();
   }
@@ -191,6 +199,8 @@ void NoteDialog::save() {
     m_note->document()->setModified(false);
     m_subjectText = m_subject->text();
     m_noteText = m_note->toPlainText();
+    m_noteType =  m_type->currentData().toInt();
+
     emit(noteSaved(ok));
   }
   this->accept();
@@ -206,5 +216,14 @@ void NoteDialog::print() {
     //    QPainter painter(&m_printer);
     //    painter.setRenderHint(QPainter::Antialiasing);
     m_note->print(&printer);
+  }
+}
+void NoteDialog::onTypeChange(int ix) {
+  if (ix == -1)
+    return;
+
+  int type = m_type->currentData().toInt();
+  if (type != m_noteType) {
+    m_changed = true;
   }
 }
