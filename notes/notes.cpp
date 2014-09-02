@@ -1,7 +1,8 @@
 #include "notes.h"
 
-Note::Note() {
+Note::Note(int type) {
   m_id = -1;
+  m_type = type;
 }
 Note::Note(const Note & other) {
   m_note = other.m_note;
@@ -10,6 +11,7 @@ Note::Note(const Note & other) {
   m_word = other.m_word;
   m_id = other.m_id;
   m_place = other.m_place;
+  m_type = other.m_type;
 }
 NoteMaster::NoteMaster(QSettings * settings) {
   QLOG_DEBUG() << Q_FUNC_INFO << settings;
@@ -299,7 +301,7 @@ void NoteMaster::readSettings() {
   m_dbName = m_settings->value("Database","notes.sqlite").toString();
   m_autosave = m_settings->value("Autosave",true).toBool();
   m_enabled = m_settings->value("Enabled",true).toBool();
-  qDebug() << m_dbName << m_autosave << m_enabled;
+  m_settings->endGroup();
 }
 // "select id,word,subject,create from notes"
 /// this is used by notebrowser

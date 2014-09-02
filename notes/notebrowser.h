@@ -11,6 +11,7 @@
 #include <QSqlError>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QFormLayout>
 #include <QLabel>
 #include <QTextEdit>
 #include <QLineEdit>
@@ -20,6 +21,7 @@
 #include <QDebug>
 #include <QModelIndex>
 #include <QKeyEvent>
+#include "place.h"
 class NoteBrowser : public QWidget {
   Q_OBJECT
  public:
@@ -34,6 +36,13 @@ class NoteBrowser : public QWidget {
  protected:
     bool eventFilter(QObject *, QEvent *);
  private:
+    void readSettings();
+    void showEntry(const Place &);
+    bool readCssFromFile(const QString &);
+    bool m_debug;
+    QString m_css;
+    QString m_xsltSource;
+    QString transform(const QString & xml);
     void loadTable();
     QMap<int,int> getRowIdMap();
     QTableWidget * m_list;

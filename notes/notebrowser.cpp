@@ -1,24 +1,20 @@
 #include "notebrowser.h"
+#ifndef TEST_FRAMEWORK
 #include "laneslexicon.h"
 #include "graphicsentry.h"
+#endif
 #include "QsLog.h"
 #include "notes.h"
-
-extern LanesLexicon * getApp();
+#include "xsltsupport.h"
+#include "noteview.h"
+extern NoteMaster * getNotes();
+extern QSettings * getSettings();
 #define COL_WITH_ID 1
 #define NOTE_SUBSTR_LENGTH 30
-NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
-  //  LanesLexicon * app = getApp();
-  //  QSettings * settings = app->getSettings();
-  //  settings->beginGroup("Notes");
-  //  QString f = settings->value("Font",QString()).toString();
-//  if (! f.isEmpty()) {
-//    m_resultsFont.fromString(f);
-//  }
-//  delete settings;
 
-//  NoteMaster * notes = app->notes();
+NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   setObjectName("notebrowser");
+  readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QTableWidget;
   m_list->installEventFilter(this);
@@ -85,11 +81,10 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   connect(m_list,SIGNAL(cellClicked(int,int)),this,SLOT(onCellClicked(int,int)));
   connect(m_deleteButton,SIGNAL(clicked()),this,SLOT(onDeleteClicked()));
   connect(m_viewButton,SIGNAL(clicked()),this,SLOT(onViewClicked()));
-
+  initXslt();
 }
 void NoteBrowser::loadTable() {
-  LanesLexicon * app = getApp();
-  NoteMaster * notes = app->notes();
+  NoteMaster * notes = ::getNotes();
   m_list->setColumnCount(5);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -149,8 +144,7 @@ void NoteBrowser::onCellClicked(int row,int /* column */) {
   QTableWidgetItem * item = m_list->item(row,COL_WITH_ID);
   if (item) {
     int id = item->data(Qt::UserRole).toInt();
-    LanesLexicon * app = getApp();
-    NoteMaster * notes = app->notes();
+    NoteMaster * notes = ::getNotes();
     Note * note = notes->findOne(id);
     if (note) {
       m_subject->setText(note->getSubject());
@@ -161,6 +155,12 @@ void NoteBrowser::onCellClicked(int row,int /* column */) {
   m_printButton->setEnabled(true);
   m_viewButton->setEnabled(true);
 }
+/**
+ * returns of map of selected id/row combinations
+ *
+ *
+ * @return
+ */
 QMap<int,int> NoteBrowser::getRowIdMap() {
   QMap<int,int> rowmap;
   QList<QTableWidgetItem *> items = m_list->selectedItems();
@@ -178,8 +178,7 @@ void NoteBrowser::onDeleteClicked() {
   QMap<int,int> rowmap = getRowIdMap();
 
   if (rowmap.size() > 0) {
-    LanesLexicon * app = getApp();
-    NoteMaster * notes = app->notes();
+    NoteMaster * notes = ::getNotes();
     /**
      * get list of deleted ids, get the corresponding rows
      * from row map, sort them, and call removeRow from the highest to lowest
@@ -213,32 +212,127 @@ bool NoteBrowser::eventFilter(QObject * target,QEvent * event) {
   return false;
 }
 void NoteBrowser::onViewClicked() {
+  qDebug() << Q_FUNC_INFO;
+  bool ok = false;
   QMap<int,int> rowmap = getRowIdMap();
 
   if (rowmap.size() == 0)
     return;
 
-  LanesLexicon * app = getApp();
-  NoteMaster * notes = app->notes();
+  NoteMaster * notes = ::getNotes();
   QList<int> ids = rowmap.keys();
 
   for(int i=0;i < ids.size();i++) {
     Note * n = notes->findOne(ids[i]);
     if (n) {
-      Place p = n->getPlace();
-      QString k = p.getNode();
-      QLOG_DEBUG() << "search for" << p.getNode() << "root" << p.getRoot() << "word" << p.getWord();
-      /// search tabs for entry as node then as root
-      int ix = app->hasPlace(p,GraphicsEntry::NodeSearch,true);
-      if (k.isEmpty() || (ix == -1)) {
-          k = p.getRoot();
-          ix = app->hasPlace(p,GraphicsEntry::RootSearch,true);
-          if (k.isEmpty() || (ix == -1)) {
-            app->gotoPlace(p,false);
-            return;
-          }
-      }
-      QLOG_DEBUG() << "found in tab" << ix;
+      showEntry(n->getPlace());
     }
   }
+}
+void NoteBrowser::showEntry(const Place & p) {
+  bool ok = false;
+  QLOG_DEBUG() << Q_FUNC_INFO  << p.getNode() << "root" << p.getRoot() << "word" << p.getWord();
+  QSqlQuery query;
+  if (! p.getNode().isEmpty()) {
+    ok = query.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?");
+    if (ok) {
+      query.bindValue(0,p.getNode());
+      query.exec();
+    }
+  }
+  else if (! p.getWord().isEmpty()) {
+    ok = query.prepare("select root,word,xml from entry where datasource = 1 and word = ?");
+    if (ok) {
+      query.bindValue(0,p.getWord());
+      query.exec();
+    }
+  }
+  if (ok) {
+    query.first();
+    QString html = transform(query.value(2).toString());
+    if (! html.isEmpty()) {
+            NoteView * v = new NoteView(this);
+            v->setWindowTitle(p.getShortText());
+            v->setHeader(query.value(0).toString(),
+                         query.value(1).toString(),
+                         query.value(2).toString());
+
+            v->setCSS(m_css);
+            v->setHtml(html);
+            v->show();
+            v->raise();
+            v->activateWindow();
+    }
+  }
+  else {
+    QLOG_WARN() << "Error preparing node query" << query.lastError().text();
+    return;
+  }
+}
+
+QString NoteBrowser::transform(const QString & xml) {
+  int ok = compileStylesheet(1,m_xsltSource);
+  if (ok == 0) {
+    QString html = xsltTransform(1,xml);
+    if (! html.isEmpty()) {
+      return html;
+    }
+  }
+  /// could be errors in stylesheet or in the xml
+  QStringList errors = getParseErrors();
+  if (ok != 0) {
+    errors.prepend("Errors when processing stylesheet:");
+  }
+  else {
+    errors.prepend("Errors when processing entry:");
+  }
+  QMessageBox msgBox;
+  msgBox.setText(errors.join("\n"));
+  msgBox.exec();
+  clearParseErrors();
+  return QString();
+}
+/// TODO change group
+void NoteBrowser::readSettings() {
+  QSettings * settings = ::getSettings();
+  bool ok;
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("Notes");
+   QString f = settings->value("Font",QString()).toString();
+  if (! f.isEmpty()) {
+    //    m_resultsFont.fromString(f);
+  }
+  settings->endGroup();
+  settings->beginGroup("Entry");
+  QString css = settings->value("CSS",QString("entry.css")).toString();
+  readCssFromFile(css);
+  settings->endGroup();
+  settings->beginGroup("FullSearch");
+  m_xsltSource = settings->value("XSLT",QString("node.xslt")).toString();
+  m_debug = settings->value("Debug",false).toBool();
+  settings->endGroup();
+  delete settings;
+}
+bool NoteBrowser::readCssFromFile(const QString & name) {
+  QFile f(name);
+  if (! f.open(QIODevice::ReadOnly)) {
+    QLOG_WARN()  << "Cannot open CSS file for reading: " << name
+                 << f.errorString();
+    return false;
+
+  }
+  QTextStream in(&f);
+  QString css;
+  QString t;
+  while( ! in.atEnd()) {
+    t = in.readLine();
+    if (! t.startsWith("-")) {
+      css += t;
+    }
+  }
+  f.close();
+  if (! css.isEmpty()) {
+    m_css = css;
+  }
+  return true;
 }

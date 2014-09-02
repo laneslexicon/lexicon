@@ -11,9 +11,12 @@
 #include "place.h"
 
 class Note  {
+  enum Type { User, Error };
  public:
-  Note();
+  Note(int type = Note::User);
   Note(const Note &);
+
+
   void setSubject(const QString & text) { m_subject = text;};
   void setPlace(const Place & p) { m_place = p;}
   void setNote(const QString & n) { m_note = n;}
@@ -35,6 +38,7 @@ class Note  {
   QString m_amended;
   QString m_word;
   int m_id;
+  int m_type;
 };
 class NoteMaster {
  public:

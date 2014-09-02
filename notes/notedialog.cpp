@@ -1,6 +1,8 @@
 #include "notedialog.h"
+#ifndef TEST_FRAMEWORK
 #include "laneslexicon.h"
-extern LanesLexicon * getApp();
+#endif
+extern NoteMaster * getNotes();
 /**
  * This constructor is used when adding a new note
  *
@@ -181,7 +183,7 @@ void NoteDialog::save() {
   if (m_attached) {
     showKeyboard();
   }
-  NoteMaster * notes = getApp()->notes();
+  NoteMaster * notes = ::getNotes();
   bool ok = notes->save(n);
   delete n;
   if (ok) {
