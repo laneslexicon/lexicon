@@ -18,17 +18,6 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QTableWidget;
   m_list->installEventFilter(this);
-  /*
-  m_list->setColumnCount(5);
-  m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  QStringList headers;
-  headers << tr("Mark") << tr("Id") << tr("Word") << tr("Created") << tr("Subject");
-  m_list->setHorizontalHeaderLabels(headers);
-  m_list->horizontalHeader()->setStretchLastSection(true);
-  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  */
-  //  m_list->installEventFilter(this);
   QStyle * style = m_list->style();
   style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   this->setStyle(style);
@@ -73,7 +62,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   /// show the first item in the list
   /// TODO decide who gets focus and select the first row
   /// TODO if table loses focus, change the background selection color
-  loadTable();
+  loadNotes();
   m_deleteButton->setEnabled(false);
   m_printButton->setEnabled(false);
   m_viewButton->setEnabled(false);
@@ -83,7 +72,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   connect(m_viewButton,SIGNAL(clicked()),this,SLOT(onViewClicked()));
   initXslt();
 }
-void NoteBrowser::loadTable() {
+void NoteBrowser::loadNotes() {
   NoteMaster * notes = ::getNotes();
   m_list->setColumnCount(5);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -213,7 +202,6 @@ bool NoteBrowser::eventFilter(QObject * target,QEvent * event) {
 }
 void NoteBrowser::onViewClicked() {
   qDebug() << Q_FUNC_INFO;
-  bool ok = false;
   QMap<int,int> rowmap = getRowIdMap();
 
   if (rowmap.size() == 0)
@@ -255,7 +243,7 @@ void NoteBrowser::showEntry(const Place & p) {
             v->setWindowTitle(p.getShortText());
             v->setHeader(query.value(0).toString(),
                          query.value(1).toString(),
-                         query.value(2).toString());
+                         p.getNode());
 
             v->setCSS(m_css);
             v->setHtml(html);
@@ -295,7 +283,6 @@ QString NoteBrowser::transform(const QString & xml) {
 /// TODO change group
 void NoteBrowser::readSettings() {
   QSettings * settings = ::getSettings();
-  bool ok;
   settings->setIniCodec("UTF-8");
   settings->beginGroup("Notes");
    QString f = settings->value("Font",QString()).toString();

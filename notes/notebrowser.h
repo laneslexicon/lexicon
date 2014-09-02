@@ -33,6 +33,7 @@ class NoteBrowser : public QWidget {
     void onCellClicked(int,int);
     void onDeleteClicked();
     void onViewClicked();
+    void loadNotes();
  protected:
     bool eventFilter(QObject *, QEvent *);
  private:
@@ -43,7 +44,7 @@ class NoteBrowser : public QWidget {
     QString m_css;
     QString m_xsltSource;
     QString transform(const QString & xml);
-    void loadTable();
+
     QMap<int,int> getRowIdMap();
     QTableWidget * m_list;
     QTextEdit * m_note;
