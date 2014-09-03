@@ -283,7 +283,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(searchPage()),this,SLOT(pageSearch()));
 
   connect(entry,SIGNAL(gotoNode(const Place &,int)),this,SLOT(gotoPlace(const Place &,int)));
-  //  connect(entry,SIGNAL(saveNote(Note *)),this,SLOT(saveNote(Note *)));
+  connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
 
 }
 void LanesLexicon::onCloseTab(int ix) {
@@ -2348,6 +2348,9 @@ void LanesLexicon::pageNarrow() {
   }
 }
 void LanesLexicon::pagePrint() {
+  printCurrentPage();
+}
+void LanesLexicon::printCurrentPage(const QString & node) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (!entry)
     return;
@@ -2361,14 +2364,14 @@ void LanesLexicon::pagePrint() {
 
 
   if ( m_printerReUse ) {
-    entry->print(m_printer);
+    entry->print(m_printer,node);
     return;
   }
 
   QPrintDialog printDialog(&m_printer, this);
   if (printDialog.exec() == QDialog::Accepted) {
     if (m_printer.isValid()) {
-    entry->print(m_printer);
+      entry->print(m_printer,node);
     }
   }
     /*
@@ -2791,4 +2794,8 @@ void LanesLexicon::sync() {
       m_tree->ensurePlaceVisible(p);
     }
   }
+}
+void LanesLexicon::printNode(const QString & node) {
+  qDebug() << Q_FUNC_INFO << node;
+  printCurrentPage(node);
 }

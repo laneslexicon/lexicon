@@ -155,9 +155,11 @@ public:
     /// from FullSearchWidget
     void showSearchNode(const QString &);
     void convertToEntry();
+    void printNode(const QString &);
  protected:
     void closeEvent(QCloseEvent *);
 private:
+    void printCurrentPage(const QString & node = QString());
     void restoreSavedState();
     void cleanup();
     void search(int searchType,ArabicSearchDialog *,const QString &);

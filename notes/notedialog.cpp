@@ -78,7 +78,7 @@ void NoteDialog::setup() {
   m_type->insertItem(0,tr("User"),Note::User);
   m_type->insertItem(1,tr("System"),Note::Error);
   m_type->setCurrentIndex(0);
-  connect(m_type,SIGNAL(onCurrentIndexChanged(int)),this,SLOT(onTypeChange(int)));
+  connect(m_type,SIGNAL(currentIndexChanged(int)),this,SLOT(onTypeChange(int)));
   layout->addRow(tr("Subject"),m_subject);
   layout->addRow(tr("Note"),m_note);
   layout->addRow(tr("Type"),m_type);

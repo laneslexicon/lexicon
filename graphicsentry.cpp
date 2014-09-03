@@ -47,7 +47,8 @@ void LaneGraphicsView::focusOutEvent(QFocusEvent * event) {
   QGraphicsView::focusOutEvent(event);
 }
 /**
- *
+ * (the QSqlQuery instances rely on the default connection being to
+ * to the lexicon)
  *
  * @param parent
  */
@@ -930,6 +931,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
     connect(gi,SIGNAL(copy()),this,SLOT(copy()));
     connect(gi,SIGNAL(addButton(bool)),this,SLOT(addButtonDecoration(bool)));
+    connect(gi,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
     return gi;
 }
 /**
@@ -1657,11 +1659,16 @@ void GraphicsEntry::showSelections() {
   }
 }
 
-QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & method) {
+QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & method,const QString & node) {
   QString base;
   if (method == "node") {
-    for(int i=0;(i < m_items.size()) && base.isEmpty();i++) {
-      base = m_items[i]->getNode();
+    if (!node.isEmpty()) {
+      base = node;
+    }
+    else {
+      for(int i=0;(i < m_items.size()) && base.isEmpty();i++) {
+        base = m_items[i]->getNode();
+      }
     }
   }
   else if (method == "arabic") {
@@ -1732,24 +1739,25 @@ QString GraphicsEntry::getPageInfo(bool summary) {
   html += "</table>";
   return html;
 }
-void GraphicsEntry::print(QPrinter & printer) {
+void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Printer");
   bool pdfoutput = settings->value(SID_PRINTER_OUTPUT_PDF).toBool();
 
   if (pdfoutput) {
     QString pdfdir = settings->value(SID_PRINTER_PDF_DIRECTORY).toString();
-    QString filename = getOutputFilename(pdfdir,settings->value(SID_PRINTER_AUTONAME_METHOD).toString());
+    QString filename = getOutputFilename(pdfdir,settings->value(SID_PRINTER_AUTONAME_METHOD).toString(),node);
     printer.setOutputFileName(filename);
   }
   QString html; // = "<html><body>";
   for(int i=0;i < m_items.size();i++) {
+    if (node.isEmpty() || (node == m_items[i]->getPlace().getNode())) {
     /// without the trimmed() the printing of the root causes problems
-    QString t = m_items[i]->getOutputHtml().trimmed();
-
-    t.remove("<html><body>");
-    t.remove("</body></html>");
-    html += t;
+      QString t = m_items[i]->getOutputHtml().trimmed();
+      t.remove("<html><body>");
+      t.remove("</body></html>");
+      html += t;
+    }
   }
 
   QTextDocument doc;
@@ -1759,12 +1767,13 @@ void GraphicsEntry::print(QPrinter & printer) {
   if (1) {
     QString note;
     for(int i=0;i < m_items.size();i++) {
-      QList<Note *> notes = m_items[i]->getNotes();
-
-      for(int j=0;j < notes.size();j++) {
-        note += QString("<div class=\"arabic\">%1</div>").arg(notes[j]->getWord());
-        note += QString("<div class=\"note\">%1</div>").arg(notes[j]->getNote());
-        note += "<br/>";
+      if (node.isEmpty() || (node == m_items[i]->getPlace().getNode())) {
+            QList<Note *> notes = m_items[i]->getNotes();
+            for(int j=0;j < notes.size();j++) {
+              note += QString("<div class=\"arabic\">%1</div>").arg(notes[j]->getWord());
+              note += QString("<div class=\"note\">%1</div>").arg(notes[j]->getNote());
+              note += "<br/>";
+            }
       }
     }
     if (! note.isEmpty()) {
@@ -1776,6 +1785,7 @@ void GraphicsEntry::print(QPrinter & printer) {
       cursor.insertHtml(note);
     }
   }
+  /// TODO
   if (1) {
     QTextCursor cursor(&doc);
     cursor.movePosition(QTextCursor::End);

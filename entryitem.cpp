@@ -87,6 +87,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   QAction *addNoteAction;
   QAction *deleteNoteAction;
   QAction *showNoteAction;
+
   QTextCursor c = textCursor();
   c.setPosition(document()->documentLayout()->hitTest(event->pos(), Qt::FuzzyHit));
   c.select(QTextCursor::WordUnderCursor);
@@ -120,7 +121,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
   QAction *selectAction;// = menu.addAction(tr("Select current &entry"));
   QAction *selectAllAction = menu.addAction(tr("Select &all"));
-
+  QAction *printAction = menu.addAction(tr("&Print"));
 
 
   if (this->textCursor().hasSelection()) {
@@ -184,6 +185,10 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   else if (htmlAction && (selectedAction == htmlAction)) {
     qDebug() << "Emit html action";
     emit(showHtml());
+  }
+  else if (selectedAction == printAction) {
+    qDebug() << "sending printNode signal" << m_place.getNode();
+    emit(printNode(m_place.getNode()));
   }
   this->setFocus();
 }

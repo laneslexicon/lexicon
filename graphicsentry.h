@@ -104,7 +104,7 @@ class GraphicsEntry : public QWidget {
     void focusPlace();
     void clearSelections();
     void showSelections();
-    void print(QPrinter &);
+    void print(QPrinter &,const QString & node = QString());
  private:
 
     QString m_focusNode;
@@ -117,7 +117,7 @@ class GraphicsEntry : public QWidget {
     bool m_debug;
     QString lastRoot();
     QString firstRoot();
-    QString getOutputFilename(const QString &,const QString &);
+    QString getOutputFilename(const QString &,const QString &,const QString & node = QString());
     void readSettings();
     void writeDefaultSettings();
     QString readCssFromFile(const QString &name);
@@ -213,6 +213,7 @@ class GraphicsEntry : public QWidget {
     void searchPage();
     void findCount(int);
     void gotoNode(const Place & p,int);
+    void printNode(const QString &);
 };
 
 class LaneGraphicsView : public QGraphicsView {

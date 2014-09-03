@@ -256,7 +256,6 @@ QList<Note *> NoteMaster::find(const QString & word) {
   if (!m_enabled) {
     return notes;
   }
-  QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlQuery query(m_db);
   ok = query.prepare("select id,word,place,subject,note,created,amended,type from notes where word = ?");
   if (!ok) {
