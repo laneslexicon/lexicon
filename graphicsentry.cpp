@@ -323,11 +323,23 @@ void GraphicsEntry::onClearScene() {
  */
 
 void GraphicsEntry::anchorClicked(const QUrl & link) {
-  QLOG_DEBUG() << link.toDisplayString();
+  QLOG_DEBUG() << Q_FUNC_INFO << link.toDisplayString();
   QLOG_DEBUG() << QApplication::keyboardModifiers();
 }
 void GraphicsEntry::linkActivated(const QString & link) {
   /// turn history on as the user has clicked on something
+  QLOG_DEBUG() << Q_FUNC_INFO << link;
+  QUrl url(link);
+  if (url.hasQuery()) {
+    QString msg = url.query();
+    if (msg.startsWith("text=")) {
+      msg.remove("text=");
+      QMessageBox::information(this, tr("A note from the editor"),
+                               msg,
+                               QMessageBox::Ok);
+      return;
+    }
+  }
   int options = 0;
   getHistory()->on();
   QString node(link);
@@ -350,7 +362,7 @@ void GraphicsEntry::linkHovered(const QString & link) {
   }
   else {
     gi->setCursor(QCursor(Qt::PointingHandCursor));
-    QLOG_DEBUG() << "Link hovered" << link;
+    QLOG_DEBUG() << Q_FUNC_INFO << link;
     QLOG_DEBUG() << QApplication::keyboardModifiers();
   }
 }

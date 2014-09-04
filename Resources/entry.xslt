@@ -192,7 +192,7 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
         </xsl:when>
         <xsl:when test="self::*">
           <!---
-          <xsl:text>Element </xsl:text>
+
           -->
           <xsl:choose>
             <xsl:when test="name() = 'hi'">
@@ -216,7 +216,17 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
             <xsl:when test="name() = 'assumedtropical'">
               <xsl:text>†</xsl:text>
             </xsl:when>
-            <xsl:when test="name() = 'typo'">
+            <xsl:when test="name() = 'note'">
+              <a>
+                <xsl:attribute name="href">
+                  <xsl:text>127.0.0.0/?text=</xsl:text>
+                  <xsl:value-of select="."/>
+                </xsl:attribute>
+                <xsl:attribute name="class">
+                  <xsl:text>systemnote</xsl:text>
+                </xsl:attribute>
+                <xsl:text>[Note]</xsl:text>
+              </a>
             </xsl:when>
             <xsl:when test="name() = 'foreign' or 'orth'">
               <span class="arabic">
@@ -235,6 +245,7 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
               </xsl:choose>
               </span>
             </xsl:when>
+
             <xsl:otherwise>
               <xsl:value-of select="name()"/>
             </xsl:otherwise>
