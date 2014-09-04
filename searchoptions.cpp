@@ -1,6 +1,7 @@
 #include "searchoptions.h"
 #include "fullsearch.h"
 #include "namespace.h"
+#include "scripts.h"
 #define USE_KEYMAPS 0
 SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) {
   m_more = false;
@@ -303,13 +304,24 @@ QRegExp SearchOptions::buildRx(const QString & searchtarget,int options) {
   QString target = searchtarget;
 
   QString pattern;
+
   if (options & Lane::Normal_Search) {
+    /// TODO fix metacharacters and get list from INI
+    QStringList metachars;
+    metachars << "(" << ")" << "[" << "]" << "?" << ".";
+    for(int i=0;i < metachars.size();i++) {
+      target.replace(metachars[i],QString("\\%1").arg(metachars[i]));
+    }
+    qDebug() << Q_FUNC_INFO << "target" << target;
     if (options & Lane::Ignore_Diacritics) {
       /// TODO get from INI
       QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
       QStringList cc = target.split("");
       for(int i=0;i < cc.size();i++) {
-        pattern += cc[i] + ar;
+        pattern += cc[i];
+        if (UcdScripts::isScript(cc[i],"Arabic")) {
+          pattern + ar;
+        }
       }
     }
     else {
