@@ -147,7 +147,10 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
         <tr>
           <td width="10%">*</td>
           <td align="center" width="80%">
-            <xsl:for-each select="foreign">
+            <xsl:for-each select="foreign|orth">
+              <xsl:if test="@type = 'arrow'">
+                ↓
+              </xsl:if>
             <span class="arabicquote">
               <xsl:value-of select="."/>
             </span>
