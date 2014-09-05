@@ -114,10 +114,14 @@ GraphicsEntry::~GraphicsEntry() {
 }
 void GraphicsEntry::readSettings() {
   QString v;
+  bool ok;
+
+
+
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QMap<QString,QString> cmdOptions = app->getOptions();
-  QSettings * settings = app->getSettings();
-  bool ok;
+
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->setIniCodec("UTF-8");
   settings->beginGroup("Entry");
   m_debug = settings->value(SID_ENTRY_DEBUG,false).toBool();
@@ -159,6 +163,7 @@ void GraphicsEntry::readSettings() {
   m_moveBackwardKey = settings->value(SID_ENTRY_BACK,QString()).toString();
   m_zoomInKey = settings->value(SID_ENTRY_ZOOM_IN,QString()).toString();
   m_zoomOutKey = settings->value(SID_ENTRY_ZOOM_OUT,QString()).toString();
+  m_reloadKey = settings->value(SID_ENTRY_RELOAD,QString()).toString();
 
   m_widenKey = settings->value(SID_ENTRY_WIDEN,QString()).toString();
   m_narrowKey = settings->value(SID_ENTRY_NARROW,QString()).toString();
@@ -181,7 +186,6 @@ void GraphicsEntry::readSettings() {
   settings->beginGroup("Notes");
   m_notesEnabled = settings->value(SID_NOTES_ENABLED,true).toBool();
   settings->endGroup();
-  delete settings;
 }
 void GraphicsEntry::writeDefaultSettings() {
 
@@ -197,6 +201,10 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
       }
       w = w->parentWidget();
     }
+  }
+  if (! m_reloadKey.isEmpty() && (event->text() == m_reloadKey)) {
+    onReload();
+    return;
   }
   if (! m_zoomInKey.isEmpty() && (event->text() == m_zoomInKey)) {
     onZoomIn();
@@ -917,9 +925,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     gi->setTextWidth(m_textWidth);
     gi->setHtml(html);
     gi->setOutputHtml(html);
-    if (m_debug) {
-      gi->setXml(xml);
-    }
+    gi->setXml(xml);
     /// need this otherwise arabic text will be right justified
     gi->document()->setDefaultTextOption(m_textOption);
     gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -1044,8 +1050,14 @@ void GraphicsEntry::prependEntries(int startPos) {
     ypos += sz.height() + m_entryMargin;
   }
 }
-QString GraphicsEntry::transform(const QString & xsl,const QString & xml) {
-  int ok = compileStylesheet(0,xsl);
+QString GraphicsEntry::transform(const QString & xsl,const QString & xml,bool forceCompile) {
+  int ok;
+  if (forceCompile) {
+   ok = compileStylesheet(2,xsl);
+  }
+  else {
+   ok = compileStylesheet(0,xsl);
+  }
   if (ok == 0) {
     QString html = xsltTransform(0,xml);
     if (! html.isEmpty()) {
@@ -1237,7 +1249,6 @@ void GraphicsEntry::showHtml() {
 
 
   QString xml = item->getXml();
-  qDebug() << xml;
   QString html = transform(m_xsltSource,xml);
 
   QMessageBox msgBox;
@@ -1816,4 +1827,35 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
     out << html;
   }
   //  doc.setHtml("<html><body>" + getPageInfo(true) + "</body></html>");
+}
+void GraphicsEntry::onReload() {
+  qDebug() << Q_FUNC_INFO;
+  /// TODO reload CSS
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->setIniCodec("UTF-8");
+  settings->beginGroup("Entry");
+  m_debug = settings->value(SID_ENTRY_DEBUG,false).toBool();
+  QString css = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
+  css = readCssFromFile(css);
+  if (! css.isEmpty()) {
+    m_currentCss = css;
+    emit(cssChanged());
+  }
+  css = settings->value(SID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
+  css = readCssFromFile(css);
+  if (! css.isEmpty()) {
+    m_printCss = css;
+  }
+
+  m_xsltSource = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
+
+  QString html;
+  for (int i=0;i < m_items.size();i++) {
+    html = transform(m_xsltSource,m_items[i]->getXml(),true);
+    m_items[i]->document()->clear();
+    m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
+    m_items[i]->setTextWidth(m_textWidth);
+    m_items[i]->setHtml(html);
+    m_items[i]->setOutputHtml(html);
+  }
 }

@@ -88,6 +88,7 @@ class GraphicsEntry : public QWidget {
     void anchorTest();
     void onZoomIn();
     void onZoomOut();
+    void onReload();
     void onClearScene();
     void showPerseus(const Place &);
     void showHtml();
@@ -148,6 +149,7 @@ class GraphicsEntry : public QWidget {
     QString m_clearKey;
     QString m_showKey;
     QString m_homeKey;
+    QString m_reloadKey;
     int m_widenStep;
     int m_defaultWidth;
 
@@ -166,7 +168,7 @@ class GraphicsEntry : public QWidget {
     qreal m_scale;
 
     QTransform m_transform;
-    QString transform(const QString & xsl,const QString & xml);
+    QString transform(const QString & xsl,const QString & xml,bool forceCompile = false);
 
     QTextOption m_textOption;
 #
