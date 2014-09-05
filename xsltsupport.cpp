@@ -71,6 +71,14 @@ int compileStylesheet(int type,const QString & xsl) {
    }
    return 0;
   }
+  if (type == 2) {
+    if (cur != 0) {
+      xsltFreeStylesheet(cur);
+    }
+    /// if errors in xslt they will be xmlParseErrors
+    cur = xsltParseStylesheetFile((const xmlChar *)xsl.toUtf8().data());
+    return xmlParseErrors.size();
+  }
   return 0;
 }
 
