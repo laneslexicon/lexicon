@@ -1640,7 +1640,7 @@ void GraphicsEntry::searchNext() {
       pos = 0;
     }
   }
-  if (m_currentSearchPosition == -1) {
+  if (!m_currentSearchTarget.isEmpty() && (m_currentSearchPosition == -1)) {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
     msgBox.setTextFormat(Qt::RichText);
