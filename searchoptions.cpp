@@ -3,6 +3,51 @@
 #include "namespace.h"
 #include "scripts.h"
 #define USE_KEYMAPS 0
+bool SearchOptions::ignoreDiacritics() {
+  return m_ignoreDiacritics;
+}
+void SearchOptions::setIgnoreDiacritics(bool v) {
+  m_ignoreDiacritics = v;
+}
+bool SearchOptions::wholeWordMatch() {
+  return m_wholeWordMatch;
+}
+void SearchOptions::setWholeWordMatch(bool v) {
+  m_wholeWordMatch = v;
+}
+void SearchOptions::setSearchType(SearchType_t x) {
+  m_type = x;
+}
+int SearchOptions::getSearchType() {
+  return m_type;
+}
+void SearchOptions::setSearchScope(SearchScope_t x) {
+  m_target = x;
+}
+int SearchOptions::getSearchScope() {
+  return m_target;
+}
+bool SearchOptions::sticky() {
+  return m_sticky;
+}
+void SearchOptions::setSticky(bool v) {
+  m_sticky = v;
+}
+
+bool SearchOptions::includeHeads() {
+  return m_includeHeads;
+}
+void SearchOptions::setIncludeHeads(bool v) {
+  m_includeHeads = v;
+}
+
+bool SearchOptions::forceLTR() {
+  return m_forceLTR;
+}
+void SearchOptions::setForceLTR(bool v) {
+  m_forceLTR = v;
+}
+
 SearchOptionsWidget::SearchOptionsWidget(int searchType,QWidget * parent) : QWidget(parent) {
   m_more = false;
   m_searchType = searchType;
@@ -337,6 +382,6 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,int options) {
   return rx;
 }
 void SearchOptionsWidget::getOptions(SearchOptions & opts) {
-  opts.m_ignoreDiacritics = true;
-
+  opts.setIgnoreDiacritics(true);
+  opts.setSearchType(SearchOptions::Normal);
 }

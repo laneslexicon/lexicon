@@ -12,13 +12,34 @@
 class FullSearchWidget;
 class SearchOptions {
  public:
-  enum SearchType { Normal, Regex };
-  enum Scope { Root , Entry, Word };
+  enum SearchType_t { Normal, Regex };
+  enum SearchScope_t { Root , Entry, Word };
+  bool ignoreDiacritics();
+  void setIgnoreDiacritics(bool);
+
+  void setSearchType(SearchType_t);
+  int  getSearchType();
+
+  void setSearchScope(SearchScope_t);
+  int  getSearchScope();
+
+  bool wholeWordMatch();
+  void setWholeWordMatch(bool v);
+
+  bool sticky();
+  void setSticky(bool);
+
+  bool includeHeads();
+  void setIncludeHeads(bool);
+
+  bool forceLTR();
+  void setForceLTR(bool);
+ private:
   bool m_ignoreDiacritics;
   bool m_wholeWordMatch;
-  SearchType  m_type;
+  SearchType_t  m_type;
   bool m_includeHeads;
-  Scope  m_target;
+  SearchScope_t  m_target;
   bool m_forceLTR;
   bool m_sticky;
 };
