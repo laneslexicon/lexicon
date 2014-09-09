@@ -312,7 +312,6 @@ QRegExp SearchOptions::buildRx(const QString & searchtarget,int options) {
     for(int i=0;i < metachars.size();i++) {
       target.replace(metachars[i],QString("\\%1").arg(metachars[i]));
     }
-    qDebug() << Q_FUNC_INFO << "target" << target;
     if (options & Lane::Ignore_Diacritics) {
       /// TODO get from INI
       QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");

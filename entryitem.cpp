@@ -101,7 +101,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     anchor = c.selectedText();
   }
   QMenu menu(m_place.getShortText());
-  menu.setObjectName("entry");
+  menu.setObjectName("entrycontextmenu");
   if ( ! href.isEmpty()) {
     QString t = QString("Goto %1").arg(anchor);
     jumpAction = menu.addAction(t);
