@@ -47,13 +47,36 @@ bool SearchOptions::forceLTR() {
 void SearchOptions::setForceLTR(bool v) {
   m_forceLTR = v;
 }
+bool SearchOptions::newTab() {
+  return m_newTab;
+}
+void SearchOptions::setNewTab(bool v) {
+  m_newTab = v;
+}
+bool SearchOptions::activateTab() {
+  return m_activateTab;
+}
+void SearchOptions::setActivateTab(bool v) {
+  m_activateTab = v;
+}
 
 SearchOptionsWidget::SearchOptionsWidget(int searchType,QWidget * parent) : QWidget(parent) {
   m_more = false;
   m_searchType = searchType;
   m_hasMaps = false;
   m_keymapsEnabled = false;
+  setup(parent);
+}
+SearchOptionsWidget::SearchOptionsWidget(SearchOptions & options,QWidget * parent) : QWidget(parent) {
+  m_more = false;
+  m_options = options;
 
+  m_hasMaps = false;
+  m_keymapsEnabled = false;
+  m_searchType = m_options.getSearchType();
+  setup(parent);
+}
+void SearchOptionsWidget::setup(QWidget * parent) {
   QVBoxLayout * mainlayout = new QVBoxLayout;
 
   m_targetGroup = new QGroupBox(tr("Search target"));
@@ -381,7 +404,10 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,int options) {
   }
   return rx;
 }
-void SearchOptionsWidget::getOptions(SearchOptions & opts) {
+void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   opts.setIgnoreDiacritics(true);
   opts.setSearchType(SearchOptions::Normal);
+}
+void SearchOptionsWidget::setOptions(const SearchOptions & options) {
+  m_options = options;
 }
