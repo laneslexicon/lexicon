@@ -10,14 +10,26 @@
 #include <QSpacerItem>
 
 class FullSearchWidget;
+class SearchOptions {
+ public:
+  enum SearchType { Normal, Regex };
+  enum Scope { Root , Entry, Word };
+  bool m_ignoreDiacritics;
+  bool m_wholeWordMatch;
+  SearchType  m_type;
+  bool m_includeHeads;
+  Scope  m_target;
+  bool m_forceLTR;
+  bool m_sticky;
+};
 class SearchOptionsWidget : public QWidget {
   Q_OBJECT
 
  public:
   SearchOptionsWidget(int searchType,QWidget * parent = 0);
   ~SearchOptionsWidget();
-  enum { Sticky };
   int getOptions();
+  void getOptions(SearchOptions &);
   void setOptions(int);
   void showMore(bool);
   void addKeymaps(const QString &activeMap,const QStringList & maps);

@@ -336,3 +336,7 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,int options) {
   }
   return rx;
 }
+void SearchOptionsWidget::getOptions(SearchOptions & opts) {
+  opts.m_ignoreDiacritics = true;
+
+}
