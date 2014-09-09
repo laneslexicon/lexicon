@@ -276,7 +276,7 @@ void HeadSearchWidget::search(const QString & searchtarget,int options) {
     rx.setPattern(target);
   }
   */
-  rx = SearchOptions::buildRx(target,options);
+  rx = SearchOptionsWidget::buildRx(target,options);
   m_currentRx = rx;
 
   bool ok = false;

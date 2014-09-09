@@ -1547,7 +1547,7 @@ int GraphicsEntry::search() {
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
   m_searchPositions.clear();
-  QRegExp rx = SearchOptions::buildRx(t,options);
+  QRegExp rx = SearchOptionsWidget::buildRx(t,options);
   m_currentSearchRx = rx;
   m_currentSearchTarget = t;
   this->m_items[0]->ensureVisible();

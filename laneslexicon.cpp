@@ -1204,7 +1204,7 @@ void LanesLexicon::onTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
   if (0) {
-    SearchOptions * s = new SearchOptions(Lane::Word);
+    SearchOptionsWidget * s = new SearchOptionsWidget(Lane::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
     m_tabs->addTab(s,"Test");
     s->setOptions(Lane::Create_Tab | Lane::Regex_Search | Lane::Arabic);
@@ -2555,7 +2555,7 @@ void LanesLexicon::enableKeymaps(bool v) {
         imedit->setEnabled(v);
       }
       else {
-        SearchOptions * search = qobject_cast<SearchOptions *>(widget);
+        SearchOptionsWidget * search = qobject_cast<SearchOptionsWidget *>(widget);
         if (search) {
           search->setKeymapsEnabled(v);
         }

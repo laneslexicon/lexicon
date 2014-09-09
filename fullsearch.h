@@ -29,7 +29,7 @@
 #endif
 class ImLineEdit;
 class GraphicsEntry;
-class SearchOptions;
+class SearchOptionsWidget;
 class FocusTable;
 class KeyboardWidget;
 class FullSearchWidget : public QWidget
@@ -80,7 +80,7 @@ class FullSearchWidget : public QWidget
    QTextDocument * fetchDocument(const QString & node);
    QString transform(const QString & xml);
    QTextDocument m_nodeDoc;
-   SearchOptions * m_search;
+   SearchOptionsWidget * m_search;
    bool m_debug;
    int m_fragmentSize;
    int m_searchOptions;

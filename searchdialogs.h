@@ -13,7 +13,7 @@
 #include "imedit.h"
 #include "imlineedit.h"
 #include "keyboardwidget.h"
-class SearchOptions;
+class SearchOptionsWidget;
 class ArabicSearchDialog : public QDialog {
   Q_OBJECT
 
@@ -39,7 +39,7 @@ class ArabicSearchDialog : public QDialog {
     QPushButton * m_moreButton;
     QPushButton * m_findButton;
     QPushButton * m_keyboardButton;
-    SearchOptions  * m_options;
+    SearchOptionsWidget  * m_options;
 };
 
 class NodeSearchDialog : public QDialog {

@@ -61,7 +61,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
 
-  m_options = new SearchOptions(searchType);
+  m_options = new SearchOptionsWidget(searchType);
 
   connect(m_options,SIGNAL(force(bool)),m_edit,SLOT(setForceLTR(bool)));
 

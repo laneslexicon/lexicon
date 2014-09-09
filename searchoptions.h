@@ -10,12 +10,13 @@
 #include <QSpacerItem>
 
 class FullSearchWidget;
-class SearchOptions : public QWidget {
+class SearchOptionsWidget : public QWidget {
   Q_OBJECT
 
  public:
-  SearchOptions(int searchType,QWidget * parent = 0);
-  ~SearchOptions();
+  SearchOptionsWidget(int searchType,QWidget * parent = 0);
+  ~SearchOptionsWidget();
+  enum { Sticky };
   int getOptions();
   void setOptions(int);
   void showMore(bool);

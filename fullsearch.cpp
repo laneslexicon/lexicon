@@ -1,4 +1,4 @@
-#include "fullsearch.h"
+ #include "fullsearch.h"
 #include "searchoptions.h"
 #include "graphicsentry.h"
 #include "application.h"
@@ -54,7 +54,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   QStringList headers;
   headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Position") << tr("Context");
 
-  m_search = new SearchOptions(Lane::Word,this);
+  m_search = new SearchOptionsWidget(Lane::Word,this);
 
   connect(m_search,SIGNAL(force(bool)),m_findTarget,SLOT(setForceLTR(bool)));
 
@@ -326,7 +326,7 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
   QString sql = "select id,word,root,entry,node,nodenum from xref where datasource = 1 order by nodenum asc";
 
   QString pattern;
-  m_currentRx = rx = SearchOptions::buildRx(target,options);
+  m_currentRx = rx = SearchOptionsWidget::buildRx(target,options);
   bool ok = false;
   if (m_query.prepare(sql)) {
     if (m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {

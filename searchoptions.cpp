@@ -3,7 +3,7 @@
 #include "namespace.h"
 #include "scripts.h"
 #define USE_KEYMAPS 0
-SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) {
+SearchOptionsWidget::SearchOptionsWidget(int searchType,QWidget * parent) : QWidget(parent) {
   m_more = false;
   m_searchType = searchType;
   m_hasMaps = false;
@@ -79,10 +79,10 @@ SearchOptions::SearchOptions(int searchType,QWidget * parent) : QWidget(parent) 
   connect(m_normalSearch,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
   connect(m_regexSearch,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
 }
-SearchOptions::~SearchOptions() {
+SearchOptionsWidget::~SearchOptionsWidget() {
   qDebug() << Q_FUNC_INFO;
 }
-void SearchOptions::showMore(bool show) {
+void SearchOptionsWidget::showMore(bool show) {
   m_more = show;
 
   switch(m_searchType) {
@@ -192,7 +192,7 @@ void SearchOptions::showMore(bool show) {
   }
 }
 
-int SearchOptions::getOptions() {
+int SearchOptionsWidget::getOptions() {
   int x = 0;
   if (m_ignoreDiacritics->isChecked())
     x |= Lane::Ignore_Diacritics;
@@ -221,7 +221,7 @@ int SearchOptions::getOptions() {
 
   return x;
 }
-void SearchOptions::setOptions(int x) {
+void SearchOptionsWidget::setOptions(int x) {
   bool v;
 
   m_ignoreDiacritics->setChecked(x & Lane::Ignore_Diacritics);
@@ -251,10 +251,10 @@ void SearchOptions::setOptions(int x) {
   searchTypeChanged();
 }
 
-void SearchOptions::searchTypeChanged() {
+void SearchOptionsWidget::searchTypeChanged() {
   showMore(m_more);
 }
-void SearchOptions::addKeymaps(const QString & activeMap,const QStringList & maps) {
+void SearchOptionsWidget::addKeymaps(const QString & activeMap,const QStringList & maps) {
   if (!USE_KEYMAPS)
     return;
   if (maps.size() > 0)
@@ -278,7 +278,7 @@ void SearchOptions::addKeymaps(const QString & activeMap,const QStringList & map
     layout->addSpacerItem(m_spacer);
   }
 }
-void SearchOptions::keymapChanged() {
+void SearchOptionsWidget::keymapChanged() {
   if (!USE_KEYMAPS)
     return;
   QRadioButton * btn = qobject_cast<QRadioButton *>(QObject::sender());
@@ -287,19 +287,19 @@ void SearchOptions::keymapChanged() {
     emit(loadKeymap(btn->text()));
   }
 }
-void SearchOptions::setKeymapsEnabled(bool v) {
+void SearchOptionsWidget::setKeymapsEnabled(bool v) {
   m_keymapsEnabled = v;
 }
-void SearchOptions::onForceLeftToRight(int checked) {
+void SearchOptionsWidget::onForceLeftToRight(int checked) {
   if (checked == Qt::Checked)
     emit(force(true));
   else
     emit(force(false));
 }
-bool SearchOptions::getForceLTR() {
+bool SearchOptionsWidget::getForceLTR() {
   return m_forceLTR->isChecked();
 }
-QRegExp SearchOptions::buildRx(const QString & searchtarget,int options) {
+QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,int options) {
   QRegExp rx;
   QString target = searchtarget;
 
