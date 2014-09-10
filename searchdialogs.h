@@ -13,17 +13,16 @@
 #include "imedit.h"
 #include "imlineedit.h"
 #include "keyboardwidget.h"
-class SearchOptionsWidget;
+#include "searchoptions.h"
 class ArabicSearchDialog : public QDialog {
   Q_OBJECT
 
  public:
   ArabicSearchDialog(int type,QWidget * parent = 0, Qt::WindowFlags f = 0);
-  enum SearchScope_t { Root, Entry, Word, Page };
   QString getText();
   void setPrompt(const QString &);
-  void setOptions(int);
-  int getOptions();
+  void setOptions(const SearchOptions &);
+  void getOptions(SearchOptions &);
   bool getForceLTR() ;
   public slots:
     //    void keymapChanged();
@@ -49,8 +48,8 @@ class NodeSearchDialog : public QDialog {
  public:
   NodeSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   QString getText() const;
-  int getOptions();
-  void setOptions(int);
+  void getOptions(SearchOptions &);
+  void setOptions(const SearchOptions &);
   public slots:
   void checkOptions(int x = 0);
  private:
@@ -68,8 +67,8 @@ class PageSearchDialog : public QDialog {
  public:
   PageSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   int getPage() const;
-  int getOptions();
-  void setOptions(int);
+  void getOptions(SearchOptions &);
+  void setOptions(const SearchOptions &);
   public slots:
   void checkOptions(int x = 0);
  private:

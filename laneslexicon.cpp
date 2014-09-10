@@ -1209,7 +1209,7 @@ void LanesLexicon::onTest() {
     m_tabs->addTab(s,"Test");
     s->setOptions(Lane::Create_Tab | Lane::Regex_Search | Lane::Arabic);
     //    s->setOptions(0);
-    ArabicSearchDialog * d = new ArabicSearchDialog(ArabicSearchDialog::Word);
+    ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Word);
     d->exec();
   }
   if (0) {
@@ -1309,41 +1309,32 @@ void LanesLexicon::readSettings() {
   settings->endGroup();
 
   settings->beginGroup("Search");
-  m_searchNewTab = settings->value("New tab",true).toBool();
-  m_searchSwitchTab = settings->value("Switch tab",true).toBool();
-  m_defaultSearchOptions = 0;
+
+  m_searchOptions.setNewTab(settings->value("New tab",true).toBool());
+  m_searchOptions.setActivateTab(settings->value("Switch tab",true).toBool());
   QString v;
   v  = settings->value("Type",QString("normal")).toString();
   if (v == "normal")
-    m_defaultSearchOptions |= Lane::Normal_Search;
+    m_searchOptions.setSearchType(SearchOptions::Normal);
   else
-    m_defaultSearchOptions |= Lane::Regex_Search;
+    m_searchOptions.setSearchType(SearchOptions::Regex);
 
-  v = settings->value("Ignore diacritics",QString("yes")).toString();
-  if (v == "yes")
-    m_defaultSearchOptions |= Lane::Ignore_Diacritics;
+  m_searchOptions.setIgnoreDiacritics(settings->value("Ignore diacritics",true).toBool());
+  m_searchOptions.setWholeWordMatch(settings->value("Whole word",false).toBool());
 
-  v = settings->value("Whole word",QString("no")).toString();
-  if (v == "yes")
-    m_defaultSearchOptions |= Lane::Whole_Word;
-
+  /*
   v = settings->value("Target",QString("Arabic")).toString();
-
   if (v == "Arabic")
-    m_defaultSearchOptions |= Lane::Arabic;
+    m_searchOptions |= Lane::Arabic;
   else
-    m_defaultSearchOptions |= Lane::Buckwalter;
-
-  if (m_keymapsEnabled)
-    m_defaultSearchOptions |= Lane::Keymaps_Enabled;
+    m_searchOptions |= Lane::Buckwalter;
+  */
+  m_searchOptions.setKeymaps(m_keymapsEnabled);
 
   settings->endGroup();
 
   settings->beginGroup("FullSearch");
-  if (settings->value("Include heads",false).toBool()) {
-    m_defaultSearchOptions |= Lane::Include_Heads;
-
-  }
+  m_searchOptions.setIncludeHeads(settings->value("Include heads",false).toBool());
   settings->endGroup();
 
   settings->beginGroup("Debug");
@@ -2152,12 +2143,12 @@ void LanesLexicon::testSlot() {
 }
 void LanesLexicon::searchForPage() {
   int page = 0;
-  int options;
+  SearchOptions options;
   PageSearchDialog * d = new PageSearchDialog(this);
-  d->setOptions(m_defaultSearchOptions);
+  d->setOptions(m_searchOptions);
   if (d->exec()) {
       page = d->getPage();
-      options = d->getOptions();
+      d->getOptions(options);
   }
   delete d;
   if (page == 0)
@@ -2186,7 +2177,14 @@ void LanesLexicon::searchForPage() {
   if (m_navMode == Lane::By_Root) {
     p.setRoot(root);
     p.setNode(node);
-    this->gotoPlace(p,options);
+    int taboptions = 0;
+    if (options.newTab()) {
+      taboptions |= Lane::Create_Tab;
+    }
+    if (options.activateTab()) {
+      taboptions |= Lane::Switch_Tab;
+    }
+    this->gotoPlace(p,taboptions);
   }
   else {
     p.setPage(page);
@@ -2197,7 +2195,7 @@ void LanesLexicon::searchForPage() {
 void LanesLexicon::searchForRoot() {
   /// TODO this will show 'ignore diacritics' and 'whole word'
   /// which doesn't make much sense ?
-  ArabicSearchDialog * d = new ArabicSearchDialog(ArabicSearchDialog::Root,this);
+  ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Root,this);
   //    d->setWindowTitle(tr("Search for Root"));
   //    d->setPrompt(tr("Find root"));
   //    d->setNewTab(m_searchNewTab);
@@ -2208,8 +2206,9 @@ void LanesLexicon::searchForRoot() {
         if (! UcdScripts::isScript(t,"Arabic")) {
           t = convertString(t);
         }
-        int opts = d->getOptions();
-        Place p = showPlace(Place(t),(opts & Lane::Create_Tab));
+        SearchOptions opts;
+        d->getOptions(opts);
+        Place p = showPlace(Place(t),opts.newTab());
         if (! p.isValid()) {
           QMessageBox msgBox;
           msgBox.setObjectName("rootnotfound");
@@ -2239,10 +2238,9 @@ void LanesLexicon::searchForRoot() {
 void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & t) {
   qDebug() << Q_FUNC_INFO << searchType;
   QString target = t;
-
-  int options = d->getOptions();
-  options |= searchType;
-  if (searchType & Lane::Word) {
+  SearchOptions options;
+  d->getOptions(options);
+  if (searchType == SearchOptions::Word) {
       FullSearchWidget * s = new FullSearchWidget;
       s->setSearch(t,options);
       s->setForceLTR(d->getForceLTR());
@@ -2254,7 +2252,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       s->focusTable();
       return;
   }
-  if (searchType & Lane::Entry) {
+  if (searchType == SearchOptions::Word) {
     //      if (! UcdScripts::isScript(target,"Arabic")) {
     //        target = convertString(target);
     //      }
@@ -2279,8 +2277,8 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   }
 }
 void LanesLexicon::searchForWord() {
-  ArabicSearchDialog * d = new ArabicSearchDialog(ArabicSearchDialog::Word,this);
-  d->setOptions(m_defaultSearchOptions);
+  ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Word,this);
+  d->setOptions(m_searchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
@@ -2292,8 +2290,8 @@ void LanesLexicon::searchForWord() {
 
 /// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
-  ArabicSearchDialog * d = new ArabicSearchDialog(ArabicSearchDialog::Entry,this);
-  d->setOptions(m_defaultSearchOptions);
+  ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Entry,this);
+  d->setOptions(m_searchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
@@ -2304,7 +2302,7 @@ void LanesLexicon::searchForEntry() {
 }
 void LanesLexicon::searchForNode() {
   NodeSearchDialog * d = new NodeSearchDialog(this);
-  d->setOptions(m_defaultSearchOptions);
+  d->setOptions(m_searchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
@@ -2313,7 +2311,16 @@ void LanesLexicon::searchForNode() {
       //        Place p = showNode(t,true);
       Place p;
       p.setNode(t);
-      p = showPlace(p,d->getOptions());
+      SearchOptions options;
+      int opts = 0;
+
+      if (options.newTab()) {
+        opts |= Lane::Create_Tab;
+      }
+      if (options.activateTab()) {
+        opts |= Lane::Switch_Tab;
+      }
+      p = showPlace(p,opts);
       if (! p.isValid()) {
         QMessageBox msgBox;
         msgBox.setText(QString(tr("Node not found: %1")).arg(t));
@@ -2562,10 +2569,8 @@ void LanesLexicon::enableKeymaps(bool v) {
       }
     }
   }
-  m_defaultSearchOptions -= Lane::Keymaps_Enabled;
-  if (v) {
-    m_defaultSearchOptions |= Lane::Keymaps_Enabled;
-  }
+  m_searchOptions.setKeymaps(v);
+
   QSettings * settings;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   settings = app->getSettings();

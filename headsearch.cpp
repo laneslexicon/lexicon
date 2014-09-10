@@ -5,6 +5,8 @@
 #include "namespace.h"
 #include "laneslexicon.h"
 #include "searchoptions.h"
+/// TODO
+/// some of these functions pass SearchOptions - why can't we use the class member
 extern LanesLexicon * getApp();
 HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
@@ -66,6 +68,7 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
     m_text->setFocus();
 }
 /// TODO can remove this
+/*
 HeadSearchWidget::HeadSearchWidget(const QString & str,int options,QWidget * parent) : QWidget(parent) {
   m_target = str;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
@@ -112,6 +115,7 @@ HeadSearchWidget::HeadSearchWidget(const QString & str,int options,QWidget * par
     m_list->itemDoubleClicked(m_list->item(0,0));
 
 }
+*/
 int HeadSearchWidget::count() {
   return m_list->rowCount();
 }
@@ -224,7 +228,7 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
   }
   return QWidget::eventFilter(target,event);
 }
-void HeadSearchWidget::search(const QString & searchtarget,int options) {
+void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions & options) {
   QRegExp rx;
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
@@ -314,9 +318,9 @@ void HeadSearchWidget::search(const QString & searchtarget,int options) {
     node = m_query.value("nodeid").toString();
     word = m_query.value("word").toString();
     /// strip diacritics if required
-    if (options & Lane::Normal_Search) {
+    if (options.getSearchType() == SearchOptions::Normal) {
       if (replaceSearch) {
-        if (options & Lane::Ignore_Diacritics)
+        if (options.ignoreDiacritics())
           word =  word.replace(rxclass,QString());
       }
     }
@@ -366,7 +370,7 @@ void HeadSearchWidget::showFirst() {
 
   return;
 }
-QString HeadSearchWidget::buildText(int options) {
+QString HeadSearchWidget::buildText(const SearchOptions & options) {
   QString t;
   QString p1;
 
@@ -385,13 +389,13 @@ QString HeadSearchWidget::buildText(int options) {
     break;
   }
   t += p1;
-  if (options & Lane::Regex_Search) {
+  if (options.getSearchType() == SearchOptions::Regex) {
     t += tr(", regular expression search");
   }
   else {
-    if (m_searchOptions & Lane::Ignore_Diacritics)
+    if (m_searchOptions.ignoreDiacritics())
       t += tr(", ignoring diacritics");
-    if (m_searchOptions & Lane::Whole_Word)
+    if (m_searchOptions.wholeWordMatch())
       t += tr(", whole word match");
   }
   qDebug() << t;

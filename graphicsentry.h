@@ -38,6 +38,7 @@
 #include <QClipboard>
 #include <QPrinter>
 #include "entryitem.h"
+#include "searchoptions.h"
 class LaneGraphicsView;
 class Place;
 class GraphicsEntry : public QWidget {
@@ -72,7 +73,7 @@ class GraphicsEntry : public QWidget {
     void setTextWidth(int w) { m_textWidth = w;}
     QGraphicsScene * getScene() { return m_scene;}
     int search();
-    int m_currentSearchOptions;
+    SearchOptions m_currentSearchOptions;
     QMap<int,QList<int> > m_searchPositions;
     void addPosition(int,int);
     void searchNext();

@@ -1489,7 +1489,8 @@ int GraphicsEntry::search() {
   QString target = "and";
   int count = 0;
   int step = 10;
-  int options = Lane::Local_Search;
+  SearchOptions options;
+  options.setSearchScope(SearchOptions::Local);
   // int max = m_items.size() * step;
   QString v;
   bool b;
@@ -1500,34 +1501,17 @@ int GraphicsEntry::search() {
   settings->beginGroup("LocalSearch");
   v  = settings->value("Type",QString("normal")).toString();
   if (v == "normal") {
-    qDebug() << "normal";
-    options |= Lane::Normal_Search;
+    options.setSearchType(SearchOptions::Normal);
   }
   else {
-    qDebug() << "regex";
-    options |= Lane::Regex_Search;
+    options.setSearchType(SearchOptions::Regex);
   }
 
-  b = settings->value("Ignore diacritics",true).toBool();
-  if (b) {
-    qDebug() << "ignore diacritics";
-    options |= Lane::Ignore_Diacritics;
-  }
+  options.setIgnoreDiacritics(settings->value("Ignore diacritics",true).toBool());
+  options.setWholeWordMatch(settings->value("Whole word",true).toBool());
+  options.setForceLTR(settings->value("Force LTR",false).toBool());
 
-  b = settings->value("Whole word",true).toBool();
-  if (b) {
-    qDebug() << "whole word";
-    options |= Lane::Whole_Word;
-  }
-
-  b = settings->value("Force LTR",false).toBool();
-  if (b) {
-    options |= Lane::Force_LTR;
-    qDebug() << "force";
-  }
-
-
-  ArabicSearchDialog * d = new ArabicSearchDialog(ArabicSearchDialog::Page,this);
+  ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Local,this);
   d->setOptions(options);
   QString t;
   if (d->exec()) {
@@ -1535,15 +1519,11 @@ int GraphicsEntry::search() {
     if ( t.isEmpty()) {
       return -1;
     }
-    m_currentSearchOptions = d->getOptions();
+    d->getOptions(m_currentSearchOptions);
   }
   else {
     return -1;
   }
-  if (m_currentSearchOptions & Lane::Sticky_Search) {
-    qDebug() << "sticky search";
-  }
-  delete d;
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
   m_searchPositions.clear();
@@ -1590,7 +1570,7 @@ void GraphicsEntry::searchNext() {
     if (m_currentSearchPosition != -1) {
       found = true;
       if (i > m_currentSearchIndex) {
-        if (m_currentSearchOptions & ! Lane::Sticky_Search) {
+        if (m_currentSearchOptions.sticky()) {
           QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
           //c.clearSelection();
           m_items[m_currentSearchIndex]->setTextCursor(c);
@@ -1615,7 +1595,7 @@ void GraphicsEntry::searchNext() {
       }
       else {
         m_items[i]->setFocus();
-        if (m_currentSearchOptions & Lane::Sticky_Search) {
+        if (m_currentSearchOptions.sticky()) {
           m_items[i]->highlight(pos);
         }
         /*

@@ -27,6 +27,7 @@
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif
+#include "searchoptions.h"
 class ImLineEdit;
 class GraphicsEntry;
 class SearchOptionsWidget;
@@ -42,10 +43,10 @@ class FullSearchWidget : public QWidget
     ~FullSearchWidget();
    GraphicsEntry * getEntry() { return m_text;}
    void setForceLTR(bool v);
-   void search(const QString &,int options);
-   void regexSearch(const QString &,int options);
-   void textSearch(const QString &,int options);
-   void setSearch(const QString & searchFor,int options);
+   void search(const QString &,const SearchOptions &);
+   void regexSearch(const QString &,const SearchOptions &);
+   void textSearch(const QString &,const SearchOptions &);
+   void setSearch(const QString & searchFor,const SearchOptions &);
    void setOptionsHidden(bool);
    void focusTable();
  public slots:
@@ -65,7 +66,7 @@ class FullSearchWidget : public QWidget
     KeyboardWidget * m_keyboard;
     bool m_attached;
    void readSettings();
-   QString buildText(int,int,int,int,int);
+   QString buildText(int,int,int,int);
    bool readCssFromFile(const QString &);
    int getMaxRecords(const QString & tablename);
    QProgressBar * m_progress;
@@ -74,16 +75,16 @@ class FullSearchWidget : public QWidget
    QStringList m_fragments;
    QList<int> m_positions;
    int addRow(const QString &,const QString &,const QString &,const QString &,int);
-   void getTextFragments(QTextDocument * doc,const QString & target,int options,const QRegExp & rx = QRegExp());
-   QString buildSearchSql(int);
-   QString buildRxSql(int);
+   void getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & rx = QRegExp());
+   QString buildSearchSql(const SearchOptions &);
+   QString buildRxSql(const SearchOptions &);
    QTextDocument * fetchDocument(const QString & node);
    QString transform(const QString & xml);
    QTextDocument m_nodeDoc;
    SearchOptionsWidget * m_search;
    bool m_debug;
    int m_fragmentSize;
-   int m_searchOptions;
+   SearchOptions m_searchOptions;
    QSqlQuery m_query;
    QSqlQuery m_nodeQuery;
    QString m_target;
@@ -100,7 +101,7 @@ class FullSearchWidget : public QWidget
    QPushButton * m_keyboardButton;
    QStringList m_nodes;
    QString m_currentCSS;
-   int m_defaultOptions;
+   SearchOptions  m_defaultOptions;
    bool m_showProgressDialog;
    bool m_cancelSearch;
 /// for Arabic font from QSettings

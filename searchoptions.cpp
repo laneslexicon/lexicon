@@ -372,20 +372,20 @@ void SearchOptionsWidget::onForceLeftToRight(int checked) {
 bool SearchOptionsWidget::getForceLTR() {
   return m_forceLTR->isChecked();
 }
-QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,int options) {
+QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const SearchOptions & options) {
   QRegExp rx;
   QString target = searchtarget;
 
   QString pattern;
 
-  if (options & Lane::Normal_Search) {
+  if (options.getSearchType() == SearchOptions::Normal) {
     /// TODO fix metacharacters and get list from INI
     QStringList metachars;
     metachars << "(" << ")" << "[" << "]" << "?" << ".";
     for(int i=0;i < metachars.size();i++) {
       target.replace(metachars[i],QString("\\%1").arg(metachars[i]));
     }
-    if (options & Lane::Ignore_Diacritics) {
+    if (options.ignoreDiacritics()) {
       /// TODO get from INI
       QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
       QStringList cc = target.split("");
@@ -399,7 +399,7 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,int options) {
     else {
       pattern = target;
     }
-    if (options & Lane::Whole_Word) {
+    if (options.wholeWordMatch()) {
       pattern = "\\b" + pattern + "\\b";
     }
     rx.setPattern(pattern);
@@ -430,6 +430,7 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   opts.setIncludeHeads(m_includeHeads->isChecked());
   opts.setSticky(m_stickySearch->isChecked());
 
+  opts.setKeymaps(m_keymapsEnabled);
 }
 void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   m_options = options;

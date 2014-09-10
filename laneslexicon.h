@@ -46,6 +46,7 @@
 #include <QPrintDialog>
 #include <QPainter>
 #include "place.h"
+#include "searchoptions.h"
 class ArabicSearchDialog;
 class NoteMaster;
 class HistoryMaster;
@@ -167,7 +168,7 @@ private:
     //    QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
     /// look through all tabs for the given node, -1 if not found, else tab index
     int searchTabs(const QString & node);
-    int m_defaultSearchOptions;
+    SearchOptions m_defaultSearchOptions;
     QString m_configFile;
     QString m_interface;    // "default","minimal"
 
@@ -268,6 +269,8 @@ private:
     Place m_place;
     Place getCurrentPlace();
     ContentsWidget * m_tree;
+
+    SearchOptions m_searchOptions;
 
     QSqlDatabase m_db;
     QSqlDatabase m_notesDb;

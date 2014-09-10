@@ -22,6 +22,7 @@
 #include <QRegExp>
 #include <QProgressDialog>
 #include <QHeaderView>
+#include "searchoptions.h"
 class GraphicsEntry;
 class FocusTable;
 class Place;
@@ -30,12 +31,12 @@ class HeadSearchWidget : public QWidget
     Q_OBJECT
 
  public:
-    HeadSearchWidget(const QString & str,int options,QWidget * parent = 0);
+    //    HeadSearchWidget(const QString & str,const SearchOptions &,QWidget * parent = 0);
     HeadSearchWidget(QWidget * parent = 0);
     Place getPlace();
    GraphicsEntry * getEntry() { return m_text;}
    int count();
-   void search(const QString &,int options);
+   void search(const QString &,const SearchOptions &);
    void showFirst();
    void focusTable();
  public slots:
@@ -51,9 +52,9 @@ class HeadSearchWidget : public QWidget
    void readSettings();
    bool eventFilter(QObject * target,QEvent * event);
    bool m_focusTable;
-   QString buildText(int);
+   QString buildText(const SearchOptions &);
    QRegExp m_currentRx;
-   int m_searchOptions;
+   SearchOptions m_searchOptions;
    int m_stepCount;
    QSqlQuery m_query;
    QSqlQuery m_nodeQuery;

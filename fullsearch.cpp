@@ -13,6 +13,8 @@
 #define NODE_COLUMN 2
 #define POSITION_COLUMN 3
 #define CONTEXT_COLUMN 4
+/// TODO
+/// some function pass SearchOptions - can we use the class member
 extern LanesLexicon * getApp();
 /**
  *
@@ -54,7 +56,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   QStringList headers;
   headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Position") << tr("Context");
 
-  m_search = new SearchOptionsWidget(Lane::Word,this);
+  m_search = new SearchOptionsWidget(SearchOptions::Word,this);
 
   connect(m_search,SIGNAL(force(bool)),m_findTarget,SLOT(setForceLTR(bool)));
 
@@ -229,7 +231,7 @@ bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
   }
   return QWidget::eventFilter(target,event);
 }
-void FullSearchWidget::setSearch(const QString & searchFor,int options) {
+void FullSearchWidget::setSearch(const QString & searchFor,const SearchOptions & options) {
   m_target = searchFor;
   m_search->setOptions(options);
   m_findTarget->setText(m_target);
@@ -265,7 +267,8 @@ QString escaped = pattern;
 void FullSearchWidget::findTarget(bool showProgress) {
   qDebug() << Q_FUNC_INFO << showProgress;
   m_showProgressDialog = showProgress;
-  int options = m_search->getOptions();
+  SearchOptions options;
+  m_search->getOptions(options);
   /// this shows text in progressbar
 #ifdef __APPLE__
   m_progress->setStyle(QStyleFactory::create("Fusion"));
@@ -284,7 +287,7 @@ void FullSearchWidget::findTarget(bool showProgress) {
   t.remove(QChar(0x202d));
 
   QRegExp rx("[a-z]+");
-  if ((options & Lane::Regex_Search) || (rx.indexIn(t,0) != -1)) {
+  if ((options.getSearchType() == SearchOptions::Regex) || (rx.indexIn(t,0) != -1)) {
     this->regexSearch(t,options);
   }
   else {
@@ -310,7 +313,7 @@ void FullSearchWidget::findTarget(bool showProgress) {
  * @param target
  * @param options
  */
-void FullSearchWidget::textSearch(const QString & target,int options) {
+void FullSearchWidget::textSearch(const QString & target,const SearchOptions & options) {
   bool replaceSearch = true;
   qDebug() << Q_FUNC_INFO;
   m_target = target;
@@ -393,8 +396,8 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
 
     QString word = m_query.value("word").toString();
     /// strip diacritics if required
-    if (replaceSearch && (Lane::Normal_Search)) {
-      if (options & Lane::Ignore_Diacritics)
+    if (replaceSearch && (options.getSearchType() == SearchOptions::Normal)) {
+      if (options.ignoreDiacritics())
         word =  word.replace(rxclass,QString());
     }
     if ((word.indexOf(rx) != -1) && (node != m_query.value("node").toString())) {
@@ -406,11 +409,11 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
         headword = m_nodeQuery.value("word").toString();
         /// strip diacritics if required
         if (replaceSearch) {
-          if (options & Lane::Ignore_Diacritics)
+          if (options.ignoreDiacritics())
             headword =  headword.replace(rxclass,QString());
         }
         if (headword.indexOf(rx) != -1) {
-          if (options & Lane::Include_Heads) {
+          if (options.includeHeads()) {
             int row = addRow(root,m_nodeQuery.value("word").toString(),node,m_headText,0);
             QTableWidgetItem * item = m_rxlist->item(row,NODE_COLUMN);
             item->setData(Qt::UserRole,true);
@@ -455,7 +458,7 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
   }
 
 
-  m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st,options));
+  m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
   m_resultsText->show();
 
   m_rxlist->resizeColumnToContents(0);
@@ -482,7 +485,7 @@ void FullSearchWidget::textSearch(const QString & target,int options) {
  *
  * @return
  */
-QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,int ms,int options) {
+QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,int ms) {
   QString t;
   QString p1;
   QString p2;
@@ -516,13 +519,13 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
       .arg(entryCount)
       .arg(p2);
   }
-  if (options & Lane::Regex_Search) {
+  if (m_searchOptions.getSearchType() == SearchOptions::Regex) {
     t += tr(", regular expression search");
   }
   else {
-    if (options & Lane::Ignore_Diacritics)
+    if (m_searchOptions.ignoreDiacritics())
       t += tr(", ignoring diacritics");
-    if (options & Lane::Whole_Word)
+    if (m_searchOptions.wholeWordMatch())
       t += tr(", whole word match");
   }
   if (ms != -1) {
@@ -597,10 +600,10 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
  *
  * @return
  */
-QString FullSearchWidget::buildSearchSql(int options) {
+QString FullSearchWidget::buildSearchSql(const SearchOptions & options) {
   QString sql = "select id,word,root,entry,node from xref where datasource = 1  order by root,entry asc";
-  if (options & Lane::Ignore_Diacritics) {
-    if (options & Lane::Whole_Word) {
+  if (options.ignoreDiacritics()) {
+    if (options.wholeWordMatch()) {
       sql += "and bareword = ? ";
     }
     else {
@@ -608,7 +611,7 @@ QString FullSearchWidget::buildSearchSql(int options) {
     }
   }
   else {
-    if (options & Lane::Whole_Word) {
+    if (options.wholeWordMatch()) {
       sql += "and word = ? ";
     }
     else {
@@ -624,7 +627,7 @@ QString FullSearchWidget::buildSearchSql(int options) {
  *
  * @return
  */
-QString FullSearchWidget::buildRxSql(int options) {
+QString FullSearchWidget::buildRxSql(const SearchOptions & /* options */) {
   QString sql;
   //  whole word with diacritics
   //   select id,node where word = ?
@@ -685,7 +688,6 @@ void FullSearchWidget::readSettings() {
   QSettings * settings = app->getSettings();
   bool ok;
   settings->setIniCodec("UTF-8");
-  m_defaultOptions = 0;
 
   settings->beginGroup("Entry");
   QString css = settings->value("CSS",QString("entry.css")).toString();
@@ -700,9 +702,9 @@ void FullSearchWidget::readSettings() {
   m_xsltSource = settings->value("XSLT",QString("node.xslt")).toString();
   m_debug = settings->value("Debug",false).toBool();
   m_fragmentSize = settings->value("Fragment size",40).toInt();
-  if (settings->value("Include heads",false).toBool()) {
-    m_defaultOptions |= Lane::Include_Heads;
-  }
+
+  m_defaultOptions.setIncludeHeads(settings->value("Include heads",false).toBool());
+
   v = settings->value("Head word background").toString();
   m_headBackgroundColor.setNamedColor(v);
   m_headText = settings->value("Head text").toString();
@@ -711,18 +713,15 @@ void FullSearchWidget::readSettings() {
   settings->beginGroup("Search");
   v  = settings->value("Type",QString("normal")).toString();
   if (v == "normal")
-    m_defaultOptions |= Lane::Normal_Search;
+    m_defaultOptions.setSearchType(SearchOptions::Normal);
   else
-    m_defaultOptions |= Lane::Regex_Search;
+    m_defaultOptions.setSearchType(SearchOptions::Regex);
 
-  v = settings->value("Ignore diacritics",QString("yes")).toString();
-  if (v == "yes")
-    m_defaultOptions |= Lane::Ignore_Diacritics;
 
-  v = settings->value("Whole word",QString("no")).toString();
-  if (v == "yes")
-    m_defaultOptions |= Lane::Whole_Word;
+  m_defaultOptions.setIgnoreDiacritics(settings->value("Ignore diacritics",true).toBool());
 
+  m_defaultOptions.setWholeWordMatch(settings->value("Whole word",false).toBool());
+  /*
   v = settings->value("Target",QString("Arabic")).toString();
 
   if (v == "Arabic")
@@ -730,20 +729,20 @@ void FullSearchWidget::readSettings() {
   else
     m_defaultOptions |= Lane::Buckwalter;
 
-
+  */
 
   delete settings;
 }
-void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,int options,const QRegExp & regex) {
+void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
   QRegExp rx;
   QString pattern;
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
-  if (options & Lane::Regex_Search) {
+  if (options.getSearchType() == SearchOptions::Regex) {
     pattern = target;
   }
   else {
-    if (options & Lane::Ignore_Diacritics) {
+    if (options.ignoreDiacritics()) {
       QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
       QStringList cc = target.split("");
       QString brx = "";
@@ -754,7 +753,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     else {
       pattern = target;
     }
-    if (options & Lane::Whole_Word) {
+    if (options.wholeWordMatch()) {
       pattern = "\\b" + pattern + "\\b";
     }
   }
@@ -899,7 +898,7 @@ void FullSearchWidget::showKeyboard() {
     m_keyboardButton->setText(tr("Show keyboard"));
 
 }
-void FullSearchWidget::regexSearch(const QString & target,int options) {
+void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & options) {
   bool replaceSearch = true;
   qDebug() << Q_FUNC_INFO;
   m_target = target;
@@ -910,8 +909,8 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
 
   QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
   QString pattern;
-  if (options & Lane::Normal_Search) {
-    if (options & Lane::Ignore_Diacritics) {
+  if (options.getSearchType() == SearchOptions::Normal) {
+    if (options.ignoreDiacritics()) {
       QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
       QStringList cc = target.split("");
       QString brx = "";
@@ -922,13 +921,13 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
     else {
       pattern = target;
     }
-    if (options & Lane::Whole_Word) {
+    if (options.wholeWordMatch()) {
       pattern = "\\b" + pattern + "\\b";
     }
     m_currentRx.setPattern(pattern);
 
     pattern.clear();
-    if (options & Lane::Whole_Word) {
+    if (options.wholeWordMatch()) {
       pattern = "\\b" + m_target + "\\b";
     }
     else {
@@ -1005,7 +1004,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
     ep.processEvents();
     QString headword = m_query.value("word").toString();
     if (headword.indexOf(rx) != -1) {
-      if (options & Lane::Include_Heads) {
+      if (options.includeHeads()) {
         int row = addRow(m_query.value("root").toString(),
                          m_query.value("word").toString(),
                          m_query.value("nodeid").toString(),
@@ -1055,7 +1054,7 @@ void FullSearchWidget::regexSearch(const QString & target,int options) {
     m_rxlist->setFocus();
   }
   //  m_resultsText->setText(QString("Search for %1, returned %2 results").arg(target).arg(m_rxlist->rowCount()));
-  m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st,options));
+  m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
   m_resultsText->show();
 
   m_rxlist->resizeColumnToContents(0);

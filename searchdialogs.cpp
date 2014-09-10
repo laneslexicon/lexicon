@@ -8,16 +8,16 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   QDialog(parent,f) {
 
   switch(searchType) {
-  case ArabicSearchDialog::Root :
+  case SearchOptions::Root :
     setWindowTitle(tr("Search for Root"));
     break;
-  case ArabicSearchDialog::Entry :
+  case SearchOptions::Entry :
     setWindowTitle(tr("Search for Entry"));
     break;
-  case ArabicSearchDialog::Word :
+  case SearchOptions::Word :
     setWindowTitle(tr("Search for Word"));
     break;
-  case ArabicSearchDialog::Page :
+  case SearchOptions::Local :
     setWindowTitle(tr("Search current page"));
   default :break;
   }
@@ -47,7 +47,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_buttonBox->addButton(m_findButton, QDialogButtonBox::AcceptRole);
   m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
   m_buttonBox->addButton(m_moreButton, QDialogButtonBox::ActionRole);
-  if (searchType == Lane::Word) {
+  if (searchType == SearchOptions::Word) {
     m_moreButton->setVisible(true);
   }
   else {
@@ -153,11 +153,11 @@ QString ArabicSearchDialog::getText() {
 void ArabicSearchDialog::setPrompt(const QString & text) {
   m_prompt->setText(text);
 }
-void ArabicSearchDialog::setOptions(int opts) {
+void ArabicSearchDialog::setOptions(const SearchOptions & opts) {
   m_options->setOptions(opts);
 }
-int ArabicSearchDialog::getOptions() {
-  return m_options->getOptions();
+void ArabicSearchDialog::getOptions(SearchOptions & opts) {
+  m_options->getOptions(opts);
 }
 void ArabicSearchDialog::loadKeymap(const QString & mapname) {
   m_edit->activateMap(mapname,true);
@@ -227,20 +227,13 @@ QString NodeSearchDialog::getText() const {
   }
   return t;
 }
-int NodeSearchDialog::getOptions() {
-  int options = 0;
-
-  if (m_newTab->checkState() == Qt::Checked)
-    options |= Lane::Create_Tab;
-
-  if (m_switchFocus->checkState() == Qt::Checked)
-    options |= Lane::Switch_Tab;
-
-  return options;
+void NodeSearchDialog::getOptions(SearchOptions & opts) {
+  opts.setNewTab(m_newTab->checkState() == Qt::Checked);
+  opts.setActivateTab(m_switchFocus->checkState() == Qt::Checked);
 }
-void NodeSearchDialog::setOptions(int options) {
-  m_newTab->setChecked(options & Lane::Create_Tab);
-  m_switchFocus->setChecked(options & Lane::Switch_Tab);
+void NodeSearchDialog::setOptions(const SearchOptions & options) {
+  m_newTab->setChecked(options.newTab());
+  m_switchFocus->setChecked(options.activateTab());
   checkOptions();
 }
 void NodeSearchDialog::checkOptions(int /* state */) {
@@ -306,20 +299,13 @@ int PageSearchDialog::getPage() const {
   }
   return x;
 }
-int PageSearchDialog::getOptions() {
-  int options = 0;
-
-  if (m_newTab->checkState() == Qt::Checked)
-    options |= Lane::Create_Tab;
-
-  if (m_switchFocus->checkState() == Qt::Checked)
-    options |= Lane::Switch_Tab;
-
-  return options;
+void PageSearchDialog::getOptions(SearchOptions & opts) {
+  opts.setNewTab(m_newTab->checkState() == Qt::Checked);
+  opts.setActivateTab(m_switchFocus->checkState() == Qt::Checked);
 }
-void PageSearchDialog::setOptions(int options) {
-  m_newTab->setChecked(options & Lane::Create_Tab);
-  m_switchFocus->setChecked(options & Lane::Switch_Tab);
+void PageSearchDialog::setOptions(const SearchOptions & options) {
+  m_newTab->setChecked(options.newTab());
+  m_switchFocus->setChecked(options.activateTab());
   checkOptions();
 }
 void PageSearchDialog::checkOptions(int /* state */) {
