@@ -7,6 +7,7 @@ extern LanesLexicon * getApp();
 ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
 
+  qDebug() << Q_FUNC_INFO << searchType;
   switch(searchType) {
   case SearchOptions::Root :
     setWindowTitle(tr("Search for Root"));

@@ -66,6 +66,18 @@ void SearchOptions::setKeymaps(bool v) {
   m_keymaps = v;
 }
 SearchOptionsWidget::SearchOptionsWidget(int searchType,QWidget * parent) : QWidget(parent) {
+  if (searchType == SearchOptions::Root) {
+    m_options.setSearchScope(SearchOptions::Root);
+  }
+  if (searchType == SearchOptions::Word) {
+    m_options.setSearchScope(SearchOptions::Word);
+  }
+  if (searchType == SearchOptions::Entry) {
+    m_options.setSearchScope(SearchOptions::Entry);
+  }
+  if (searchType == SearchOptions::Local) {
+    m_options.setSearchScope(SearchOptions::Local);
+  }
   m_more = false;
   m_searchType = searchType;
   m_hasMaps = false;
@@ -151,6 +163,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
 
   connect(m_normalSearch,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
   connect(m_regexSearch,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
+  showMore(false);
 }
 SearchOptionsWidget::~SearchOptionsWidget() {
   qDebug() << Q_FUNC_INFO;
@@ -158,8 +171,9 @@ SearchOptionsWidget::~SearchOptionsWidget() {
 void SearchOptionsWidget::showMore(bool show) {
   m_more = show;
 
-  switch(m_searchType) {
-  case Lane::Root : {
+  int type = m_options.getSearchScope();
+  switch(type) {
+  case SearchOptions::Root : {
     m_stickySearch->setVisible(false);
     m_targetGroup->setVisible(false);
     m_ignoreDiacritics->setVisible(false);
@@ -173,7 +187,7 @@ void SearchOptionsWidget::showMore(bool show) {
     }
     break;
   }
-  case Lane::Entry : {
+  case SearchOptions::Entry : {
     m_includeHeads->setVisible(false);
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled) {
@@ -203,7 +217,7 @@ void SearchOptionsWidget::showMore(bool show) {
     }
     break;
   }
-  case Lane::Word : {
+  case SearchOptions::Word : {
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
         m_keymapGroup->setVisible(false);
@@ -231,7 +245,7 @@ void SearchOptionsWidget::showMore(bool show) {
     }
     break;
   }
-  case Lane::Local_Search : {
+  case SearchOptions::Local : {
     m_stickySearch->setVisible(true);
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
@@ -260,11 +274,11 @@ void SearchOptionsWidget::showMore(bool show) {
     break;
   }
   default :
-    qDebug() << Q_FUNC_INFO << "unknown search type";
+    qDebug() << Q_FUNC_INFO << "unknown search type" << type;
     break;
   }
 }
-
+/*
 int SearchOptionsWidget::getOptions() {
   int x = 0;
   if (m_ignoreDiacritics->isChecked())
@@ -323,7 +337,7 @@ void SearchOptionsWidget::setOptions(int x) {
 
   searchTypeChanged();
 }
-
+*/
 void SearchOptionsWidget::searchTypeChanged() {
   showMore(m_more);
 }

@@ -1207,7 +1207,10 @@ void LanesLexicon::onTest() {
     SearchOptionsWidget * s = new SearchOptionsWidget(Lane::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
     m_tabs->addTab(s,"Test");
-    s->setOptions(Lane::Create_Tab | Lane::Regex_Search | Lane::Arabic);
+    SearchOptions options;
+    options.setNewTab(true);
+    options.setSearchType(SearchOptions::Regex);
+    s->setOptions(options);
     //    s->setOptions(0);
     ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Word);
     d->exec();

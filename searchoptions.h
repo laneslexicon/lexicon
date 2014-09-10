@@ -68,8 +68,8 @@ class SearchOptionsWidget : public QWidget {
   void getOptions(SearchOptions &) const;
   void setOptions(const SearchOptions &);
 
-  int getOptions();
-  void setOptions(int);
+  //  int getOptions();
+  //  void setOptions(int);
   void showMore(bool);
   void addKeymaps(const QString &activeMap,const QStringList & maps);
   void setKeymapsEnabled(bool v);
