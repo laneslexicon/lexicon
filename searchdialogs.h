@@ -19,6 +19,7 @@ class ArabicSearchDialog : public QDialog {
 
  public:
   ArabicSearchDialog(int type,QWidget * parent = 0, Qt::WindowFlags f = 0);
+  enum SearchScope_t { Root, Entry, Word, Page };
   QString getText();
   void setPrompt(const QString &);
   void setOptions(int);

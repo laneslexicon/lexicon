@@ -8,16 +8,16 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   QDialog(parent,f) {
 
   switch(searchType) {
-    case Lane::Root :
+  case ArabicSearchDialog::Root :
     setWindowTitle(tr("Search for Root"));
     break;
-  case Lane::Entry :
+  case ArabicSearchDialog::Entry :
     setWindowTitle(tr("Search for Entry"));
     break;
-  case Lane::Word :
+  case ArabicSearchDialog::Word :
     setWindowTitle(tr("Search for Word"));
     break;
-  case Lane::Local_Search :
+  case ArabicSearchDialog::Page :
     setWindowTitle(tr("Search current page"));
   default :break;
   }

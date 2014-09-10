@@ -1209,7 +1209,7 @@ void LanesLexicon::onTest() {
     m_tabs->addTab(s,"Test");
     s->setOptions(Lane::Create_Tab | Lane::Regex_Search | Lane::Arabic);
     //    s->setOptions(0);
-    ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word);
+    ArabicSearchDialog * d = new ArabicSearchDialog(ArabicSearchDialog::Word);
     d->exec();
   }
   if (0) {
@@ -2197,7 +2197,7 @@ void LanesLexicon::searchForPage() {
 void LanesLexicon::searchForRoot() {
   /// TODO this will show 'ignore diacritics' and 'whole word'
   /// which doesn't make much sense ?
-  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Root,this);
+  ArabicSearchDialog * d = new ArabicSearchDialog(ArabicSearchDialog::Root,this);
   //    d->setWindowTitle(tr("Search for Root"));
   //    d->setPrompt(tr("Find root"));
   //    d->setNewTab(m_searchNewTab);
@@ -2279,7 +2279,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   }
 }
 void LanesLexicon::searchForWord() {
-  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Word,this);
+  ArabicSearchDialog * d = new ArabicSearchDialog(ArabicSearchDialog::Word,this);
   d->setOptions(m_defaultSearchOptions);
   if (d->exec()) {
     QString t = d->getText();
@@ -2292,7 +2292,7 @@ void LanesLexicon::searchForWord() {
 
 /// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
-  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Entry,this);
+  ArabicSearchDialog * d = new ArabicSearchDialog(ArabicSearchDialog::Entry,this);
   d->setOptions(m_defaultSearchOptions);
   if (d->exec()) {
     QString t = d->getText();

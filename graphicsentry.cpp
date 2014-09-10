@@ -1527,7 +1527,7 @@ int GraphicsEntry::search() {
   }
 
 
-  ArabicSearchDialog * d = new ArabicSearchDialog(Lane::Local_Search,this);
+  ArabicSearchDialog * d = new ArabicSearchDialog(ArabicSearchDialog::Page,this);
   d->setOptions(options);
   QString t;
   if (d->exec()) {
