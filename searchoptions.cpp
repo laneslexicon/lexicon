@@ -3,13 +3,13 @@
 #include "namespace.h"
 #include "scripts.h"
 #define USE_KEYMAPS 0
-bool SearchOptions::ignoreDiacritics() {
+bool SearchOptions::ignoreDiacritics() const {
   return m_ignoreDiacritics;
 }
 void SearchOptions::setIgnoreDiacritics(bool v) {
   m_ignoreDiacritics = v;
 }
-bool SearchOptions::wholeWordMatch() {
+bool SearchOptions::wholeWordMatch() const {
   return m_wholeWordMatch;
 }
 void SearchOptions::setWholeWordMatch(bool v) {
@@ -18,48 +18,53 @@ void SearchOptions::setWholeWordMatch(bool v) {
 void SearchOptions::setSearchType(SearchType_t x) {
   m_type = x;
 }
-int SearchOptions::getSearchType() {
+int SearchOptions::getSearchType() const {
   return m_type;
 }
 void SearchOptions::setSearchScope(SearchScope_t x) {
   m_target = x;
 }
-int SearchOptions::getSearchScope() {
+int SearchOptions::getSearchScope() const {
   return m_target;
 }
-bool SearchOptions::sticky() {
+bool SearchOptions::sticky() const {
   return m_sticky;
 }
 void SearchOptions::setSticky(bool v) {
   m_sticky = v;
 }
 
-bool SearchOptions::includeHeads() {
+bool SearchOptions::includeHeads() const {
   return m_includeHeads;
 }
 void SearchOptions::setIncludeHeads(bool v) {
   m_includeHeads = v;
 }
 
-bool SearchOptions::forceLTR() {
+bool SearchOptions::forceLTR() const {
   return m_forceLTR;
 }
 void SearchOptions::setForceLTR(bool v) {
   m_forceLTR = v;
 }
-bool SearchOptions::newTab() {
+bool SearchOptions::newTab() const {
   return m_newTab;
 }
 void SearchOptions::setNewTab(bool v) {
   m_newTab = v;
 }
-bool SearchOptions::activateTab() {
+bool SearchOptions::activateTab() const {
   return m_activateTab;
 }
 void SearchOptions::setActivateTab(bool v) {
   m_activateTab = v;
 }
-
+bool SearchOptions::keymaps() const {
+  return m_keymaps;
+}
+void SearchOptions::setKeymaps(bool v) {
+  m_keymaps = v;
+}
 SearchOptionsWidget::SearchOptionsWidget(int searchType,QWidget * parent) : QWidget(parent) {
   m_more = false;
   m_searchType = searchType;
@@ -407,7 +412,45 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,int options) {
 void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   opts.setIgnoreDiacritics(true);
   opts.setSearchType(SearchOptions::Normal);
+  opts.setIgnoreDiacritics(m_ignoreDiacritics->isChecked());
+  opts.setWholeWordMatch(m_wholeWordMatch->isChecked());
+  if (m_regexSearch->isChecked()) {
+    opts.setSearchType(SearchOptions::Regex);
+  }
+
+  if (m_normalSearch->isChecked())
+    opts.setSearchType(SearchOptions::Normal);
+  /*
+  if (m_arabicTarget->isChecked())
+    x |= Lane::Arabic;
+
+  if (m_buckwalterTarget->isChecked())
+    x |= Lane::Buckwalter;
+  */
+  opts.setIncludeHeads(m_includeHeads->isChecked());
+  opts.setSticky(m_stickySearch->isChecked());
+
 }
 void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   m_options = options;
+  m_ignoreDiacritics->setChecked(options.ignoreDiacritics());
+
+  m_wholeWordMatch->setChecked(options.wholeWordMatch());
+
+  m_regexSearch->setChecked((options.getSearchType() == SearchOptions::Regex));
+  m_normalSearch->setChecked((options.getSearchType() == SearchOptions::Normal));
+
+  /*
+  m_arabicTarget->setChecked(x & Lane::Arabic);
+
+  m_buckwalterTarget->setChecked(x & Lane::Buckwalter);
+  */
+  m_includeHeads->setChecked(options.includeHeads());
+
+
+  m_keymapsEnabled = options.keymaps();
+
+  m_stickySearch->setChecked(options.sticky());
+
+
 }
