@@ -248,38 +248,38 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   //  part word without diacritics
   //   select where instr(bareword,?) > 0
   sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 order by nodenum asc";
-  /*
-  QString pattern;
-  if (options & Lane::Normal_Search) {
-    if (options & Lane::Ignore_Diacritics) {
-      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
-      QStringList cc = target.split("");
-      QString brx = "";
-      for(int i=0;i < cc.size();i++) {
-        pattern += cc[i] + ar;
-      }
-    }
-    else {
-      pattern = target;
-    }
-    if (options & Lane::Whole_Word) {
-      pattern = "\\b" + pattern + "\\b";
-    }
-    m_currentRx.setPattern(pattern);
 
-    pattern.clear();
-    if (options & Lane::Whole_Word) {
-      pattern = "\\b" + m_target + "\\b";
-    }
-    else {
-      pattern = m_target;
-    }
-    rx.setPattern(pattern);
-  }
-  else {
-    rx.setPattern(target);
-  }
-  */
+  QString pattern;
+  // if (options & Lane::Normal_Search) {
+  //   if (options & Lane::Ignore_Diacritics) {
+  //     QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+  //     QStringList cc = target.split("");
+  //     QString brx = "";
+  //     for(int i=0;i < cc.size();i++) {
+  //       pattern += cc[i] + ar;
+  //     }
+  //   }
+  //   else {
+  //     pattern = target;
+  //   }
+  //   if (options & Lane::Whole_Word) {
+  //     pattern = "\\b" + pattern + "\\b";
+  //   }
+  //   m_currentRx.setPattern(pattern);
+
+  //   pattern.clear();
+  //   if (options & Lane::Whole_Word) {
+  //     pattern = "\\b" + m_target + "\\b";
+  //   }
+  //   else {
+  //     pattern = m_target;
+  //   }
+  //   rx.setPattern(pattern);
+  // }
+  // else {
+  //   rx.setPattern(target);
+  // }
+
   rx = SearchOptionsWidget::buildRx(target,options);
   m_currentRx = rx;
 

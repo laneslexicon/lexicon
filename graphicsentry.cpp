@@ -632,7 +632,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         p.setPage(m_rootQuery->value(5).toInt());
         item->setPlace(p);
         QList<Note *> notes;
-        item->setNotes(notes);//getApp()->notes()->find(m_rootQuery->value(2).toString()));
+        item->setNotes();//getApp()->notes()->find(m_rootQuery->value(2).toString()));
         items << item;
         /// if we asked for a specific word/node, focus on it
         if (! node.isEmpty() && (item->getNode() == node)) {
@@ -817,8 +817,7 @@ Place GraphicsEntry::getPage(const Place & p) {
       p.setWord(m_rootQuery->value(2).toString());
       p.setPage(m_rootQuery->value(5).toInt());
       item->setPlace(p);
-      QList<Note *> notes;
-      item->setNotes(notes);//getApp()->notes()->find(m_rootQuery->value(2).toString()));
+      item->setNotes();//getApp()->notes()->find(m_rootQuery->value(2).toString()));
       items << item;
 
       entryCount++;
@@ -1448,16 +1447,9 @@ void GraphicsEntry::addButtonDecoration(bool ok) {
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
       connect(notesBtn,SIGNAL(clicked()),this,SLOT(notesButtonPressed()));
-      //      item->setProxy(pushButton);
       m_items[i]->setProxy(pushButton);
-      /// refresh the entryitems notes list otherwise the context menu
-      //  will not show delete note after the first note is added
       Place p = item->getPlace();
-      //      qDebug() << "refresh note list for root" << p.getWord();
-      QList<Note *> notes;
-      item->setNotes(notes);//getApp()->notes()->find(p.getWord()));
-      //      QList<Note *> n = getApp()->notes()->find(p.getWord());
-      //      qDebug() << "note count" << n.size();
+      item->setNotes();//getApp()->notes()->find(p.getWord()));
     }
   }
 
@@ -1487,12 +1479,12 @@ void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
 int GraphicsEntry::search() {
   QString target = "and";
   int count = 0;
-  int step = 10;
+
   SearchOptions options;
   options.setSearchScope(SearchOptions::Local);
   // int max = m_items.size() * step;
   QString v;
-  bool b;
+
   qDebug() << Q_FUNC_INFO;
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("LocalSearch");

@@ -216,66 +216,6 @@ void SearchOptionsWidget::showMore(bool show) {
     break;
   }
 }
-/*
-int SearchOptionsWidget::getOptions() {
-  int x = 0;
-  if (m_ignoreDiacritics->isChecked())
-    x |= Lane::Ignore_Diacritics;
-
-  if (m_wholeWordMatch->isChecked())
-    x |= Lane::Whole_Word;
-
-
-  if (m_regexSearch->isChecked())
-    x |= Lane::Regex_Search;
-
-  if (m_normalSearch->isChecked())
-    x |= Lane::Normal_Search;
-
-  if (m_arabicTarget->isChecked())
-    x |= Lane::Arabic;
-
-  if (m_buckwalterTarget->isChecked())
-    x |= Lane::Buckwalter;
-
-  if (m_includeHeads->isChecked())
-    x |= Lane::Include_Heads;
-
-  if (m_stickySearch->isChecked())
-    x |= Lane::Sticky_Search;
-
-  return x;
-}
-void SearchOptionsWidget::setOptions(int x) {
-  bool v;
-
-  m_ignoreDiacritics->setChecked(x & Lane::Ignore_Diacritics);
-
-  m_wholeWordMatch->setChecked(x & Lane::Whole_Word);
-
-
-  m_regexSearch->setChecked(x & Lane::Regex_Search);
-
-  m_normalSearch->setChecked(x & Lane::Normal_Search);
-
-  m_arabicTarget->setChecked(x & Lane::Arabic);
-
-  m_buckwalterTarget->setChecked(x & Lane::Buckwalter);
-
-  m_includeHeads->setChecked(x & Lane::Include_Heads);
-
-  if (x & Lane::Keymaps_Enabled) {
-    m_keymapsEnabled = true;
-
-  }
-  else
-    m_keymapsEnabled = false;
-
-  m_stickySearch->setChecked(x & Lane::Sticky_Search);
-
-  searchTypeChanged();
-}
-*/
 void SearchOptionsWidget::searchTypeChanged() {
   showMore(m_more);
 }
@@ -372,13 +312,13 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
 
   if (m_normalSearch->isChecked())
     opts.setSearchType(SearchOptions::Normal);
-  /*
-  if (m_arabicTarget->isChecked())
-    x |= Lane::Arabic;
 
-  if (m_buckwalterTarget->isChecked())
-    x |= Lane::Buckwalter;
-  */
+  // if (m_arabicTarget->isChecked())
+  //   x |= Lane::Arabic;
+
+  // if (m_buckwalterTarget->isChecked())
+  //   x |= Lane::Buckwalter;
+
   opts.setIncludeHeads(m_includeHeads->isChecked());
   opts.setSticky(m_stickySearch->isChecked());
 
@@ -393,11 +333,11 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   m_regexSearch->setChecked((options.getSearchType() == SearchOptions::Regex));
   m_normalSearch->setChecked((options.getSearchType() == SearchOptions::Normal));
 
-  /*
-  m_arabicTarget->setChecked(x & Lane::Arabic);
 
-  m_buckwalterTarget->setChecked(x & Lane::Buckwalter);
-  */
+  // m_arabicTarget->setChecked(x & Lane::Arabic);
+
+  // m_buckwalterTarget->setChecked(x & Lane::Buckwalter);
+
   m_includeHeads->setChecked(options.includeHeads());
 
 

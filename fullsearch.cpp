@@ -109,7 +109,7 @@ FullSearchWidget::~FullSearchWidget() {
   qDebug() << Q_FUNC_INFO;
 }
 
-void FullSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
+void FullSearchWidget::itemChanged(QTableWidgetItem * /* item */,QTableWidgetItem * /* prev */) {
   qDebug() << Q_FUNC_INFO << "we should not be here";
 /*  bool isHead = false;
   /// get the node
@@ -683,7 +683,6 @@ QString FullSearchWidget::transform(const QString & xml) {
 void FullSearchWidget::readSettings() {
 
   QString v;
-  bool ok;
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Entry");
   QString css = settings->value("CSS",QString("entry.css")).toString();
@@ -717,15 +716,15 @@ void FullSearchWidget::readSettings() {
   m_defaultOptions.setIgnoreDiacritics(settings->value("Ignore diacritics",true).toBool());
 
   m_defaultOptions.setWholeWordMatch(settings->value("Whole word",false).toBool());
-  /*
-  v = settings->value("Target",QString("Arabic")).toString();
 
-  if (v == "Arabic")
-    m_defaultOptions |= Lane::Arabic;
-  else
-    m_defaultOptions |= Lane::Buckwalter;
+  // v = settings->value("Target",QString("Arabic")).toString();
 
-  */
+  // if (v == "Arabic")
+  //   m_defaultOptions |= Lane::Arabic;
+  // else
+  //   m_defaultOptions |= Lane::Buckwalter;
+
+
 }
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
   QRegExp rx;
@@ -893,7 +892,6 @@ void FullSearchWidget::showKeyboard() {
 
 }
 void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & options) {
-  bool replaceSearch = true;
   qDebug() << Q_FUNC_INFO;
   m_target = target;
   m_searchOptions = options;

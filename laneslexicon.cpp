@@ -1199,7 +1199,7 @@ void LanesLexicon::onTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
   if (0) {
-    SearchOptionsWidget * s = new SearchOptionsWidget(Lane::Word);
+    SearchOptionsWidget * s = new SearchOptionsWidget(SearchOptions::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
     m_tabs->addTab(s,"Test");
     SearchOptions options;
@@ -1318,13 +1318,13 @@ void LanesLexicon::readSettings() {
   m_searchOptions.setIgnoreDiacritics(settings->value("Ignore diacritics",true).toBool());
   m_searchOptions.setWholeWordMatch(settings->value("Whole word",false).toBool());
 
-  /*
-  v = settings->value("Target",QString("Arabic")).toString();
-  if (v == "Arabic")
-    m_searchOptions |= Lane::Arabic;
-  else
-    m_searchOptions |= Lane::Buckwalter;
-  */
+
+  // v = settings->value("Target",QString("Arabic")).toString();
+  // if (v == "Arabic")
+  //   m_searchOptions |= Lane::Arabic;
+  // else
+  //   m_searchOptions |= Lane::Buckwalter;
+
   m_searchOptions.setKeymaps(m_keymapsEnabled);
 
   settings->endGroup();
@@ -2269,7 +2269,7 @@ void LanesLexicon::searchForWord() {
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
-      this->search(Lane::Word,d,t);
+      this->search(SearchOptions::Word,d,t);
     }
   }
   delete d;
@@ -2282,7 +2282,7 @@ void LanesLexicon::searchForEntry() {
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
-      this->search(Lane::Entry,d,t);
+      this->search(SearchOptions::Entry,d,t);
     }
   }
   delete d;
