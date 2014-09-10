@@ -628,6 +628,8 @@ void LanesLexicon::createActions() {
   connect(m_searchRootAction,SIGNAL(triggered()),this,SLOT(searchForRoot()));
   m_searchNodeAction = new QAction(tr("For &node"),this);
   connect(m_searchNodeAction,SIGNAL(triggered()),this,SLOT(searchForNode()));
+  m_searchEntryAction = new QAction(tr("For &entry"),this);
+  connect(m_searchEntryAction,SIGNAL(triggered()),this,SLOT(searchForEntry()));
 
   m_zoomInAction = new QAction(tr("Zoom in"),this);
   m_zoomOutAction =  new QAction(tr("Zoom out"),this);
@@ -881,6 +883,7 @@ void LanesLexicon::createMenus() {
 
   m_searchMenu = m_mainmenu->addMenu(tr("&Search"));
   m_searchMenu->addAction(m_searchRootAction);
+  m_searchMenu->addAction(m_searchEntryAction);
   m_searchMenu->addAction(m_searchWordAction);
   m_searchMenu->addAction(m_searchPageAction);
   m_searchMenu->addAction(m_searchNodeAction);
@@ -2239,7 +2242,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       s->focusTable();
       return;
   }
-  if (searchType == SearchOptions::Word) {
+  if (searchType == SearchOptions::Entry) {
     //      if (! UcdScripts::isScript(target,"Arabic")) {
     //        target = convertString(target);
     //      }

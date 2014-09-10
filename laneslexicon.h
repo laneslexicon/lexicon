@@ -291,6 +291,7 @@ private:
     QAction * m_searchPageAction;
     QAction * m_searchRootAction;
     QAction * m_searchNodeAction;
+    QAction * m_searchEntryAction;
     /// Navigation
     QAction * m_navNextAction;
     QAction * m_navPrevAction;
