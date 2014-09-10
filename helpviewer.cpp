@@ -154,24 +154,15 @@ void HelpWidget::helpLinkActivated(const QUrl & url)  {
 }
 
 void HelpWidget::writeSettings() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Help");
   settings->setValue("Current page",m_currentUrl);
-  delete settings;
 }
 void HelpWidget::readSettings() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-
-  settings->setIniCodec("UTF-8");
-
-
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Help");
   m_helpCollection = settings->value("Help collection","lanedocs.qhc").toString();
   m_currentUrl = settings->value("Current page").toUrl();
-  delete settings;
 }
 /*
  TRACE_OBJ

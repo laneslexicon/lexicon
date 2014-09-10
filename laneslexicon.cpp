@@ -66,9 +66,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   m_history->setEnabled(m_historyEnabled);
 
-  QSettings * settings  = ((qobject_cast<Lexicon *>(qApp))->getSettings());
+  QSettings * settings  = (qobject_cast<Lexicon *>(qApp))->getSettings();
   m_notes = new NoteMaster(settings);
-  delete settings;
 
   if (m_docked) {
     m_treeDock = new QDockWidget("Contents",this);
@@ -209,7 +208,6 @@ LanesLexicon::~LanesLexicon()
 }
 void LanesLexicon::restoreSavedState() {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->setIniCodec("UTF-8");
   settings->beginGroup("Main");
   this->restoreGeometry(settings->value("Geometry").toByteArray());
   this->restoreState(settings->value("State").toByteArray());
@@ -496,8 +494,7 @@ void LanesLexicon::shortcut(const QString & key) {
  *
  */
 void LanesLexicon::setupShortcuts() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Shortcut");
   m_signalMapper = new QSignalMapper(this);
   QStringList keys = settings->childKeys();
@@ -522,7 +519,6 @@ void LanesLexicon::setupShortcuts() {
   }
   connect(m_signalMapper,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
   settings->endGroup();
-  delete settings;
 }
 
 
@@ -570,9 +566,8 @@ QAction * LanesLexicon::createIconAction(const QString imgdir,const QString & ic
 */
 void LanesLexicon::createActions() {
   /// TODO get this from QSettings
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+
   settings->beginGroup("Icons");
 
   m_exitAction = new QAction(tr("Exit"),this);
@@ -658,7 +653,7 @@ void LanesLexicon::createActions() {
   connect(m_clearAction,SIGNAL(triggered()),this,SLOT(pageClear()));
   connect(m_convertToEntryAction,SIGNAL(triggered()),this,SLOT(convertToEntry()));
 
-  delete settings;
+
 }
 void LanesLexicon::createToolBar() {
   QToolBar * mainbar = addToolBar("Main");
@@ -1262,8 +1257,6 @@ void LanesLexicon::readSettings() {
   }
   m_startupRoot = cmdOptions.value("root");
   QScopedPointer<QSettings> settings(app->getSettings());
-  //  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
   settings->beginGroup("System");
   m_dbName = settings->value("Database","lexicon.sqlite").toString();
   if (cmdOptions.contains("db")) {
@@ -1386,7 +1379,6 @@ void LanesLexicon::readSettings() {
 void LanesLexicon::writeSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QScopedPointer<QSettings> settings(app->getSettings());
-  settings->setIniCodec("UTF-8");
 
   if (! m_saveSettings )
     return;
@@ -1444,9 +1436,8 @@ void LanesLexicon::restoreTabs() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QMap<QString,QString> cmdOptions = app->getOptions();
 
-  QSettings * settings = app->getSettings();
 
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("System");
   int focusTab =  settings->value("Focus tab",0).toInt();
   settings->endGroup();
@@ -1526,7 +1517,6 @@ void LanesLexicon::restoreTabs() {
     //QLOG_DEBUG() << "Synching tab" << focusTab;
     currentTabChanged(focusTab);
   }
-  delete settings;
 }
 
 HistoryMaster * LanesLexicon::history() {
@@ -1867,9 +1857,7 @@ void LanesLexicon::bookmarkJump(const QString & id) {
   updateMenu();
 }
 void LanesLexicon::restoreBookmarks() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Bookmarks");
   QStringList keys = settings->childKeys();
   for(int i=0;i < keys.size();i++) {
@@ -1880,7 +1868,7 @@ void LanesLexicon::restoreBookmarks() {
       addBookmarkMenuItem(keys[i]);
     }
   }
-  delete settings;
+
 }
 void LanesLexicon::setupBookmarkShortcuts() {
   /**
@@ -1889,10 +1877,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
    *
    *  TODO bookmark Icons ?
    */
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Bookmark");
   m_bookmarkMap = new QSignalMapper(this);
   QString key = settings->value("Add","Ctrl+B").toString();
@@ -1963,7 +1948,6 @@ void LanesLexicon::setupBookmarkShortcuts() {
   connect(m_bookmarkMap,SIGNAL(mapped(QString)),this,SLOT(bookmarkShortcut(const QString &)));
 
   connect(m_bookmarkAddAction,SIGNAL(triggered()),this,SLOT(bookmarkAdd()));
-  delete settings;
 }
 
 void LanesLexicon::bookmarkAdd() {
@@ -2574,13 +2558,9 @@ void LanesLexicon::enableKeymaps(bool v) {
   }
   m_searchOptions.setKeymaps(v);
 
-  QSettings * settings;
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("System");
   settings->setValue("Keymaps",v);
-  delete settings;
 }
 QString LanesLexicon::getActiveKeymap() const {
   return m_activeMap;
@@ -2655,9 +2635,7 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
   }
 }
 void LanesLexicon::setIcons(const QString & theme) {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   QStringList groups = settings->childGroups();
   QString icongroup;
   if (theme.isEmpty()) {
@@ -2668,7 +2646,6 @@ void LanesLexicon::setIcons(const QString & theme) {
   }
   if (! groups.contains(icongroup)) {
     QLOG_WARN() << "theme not found" << theme;
-    delete settings;
     return;
   }
   settings->beginGroup(icongroup);
@@ -2677,12 +2654,10 @@ void LanesLexicon::setIcons(const QString & theme) {
   QFileInfo fi(imgdir);
   if (! fi.exists()) {
     QLOG_WARN() << "theme directory not found" << imgdir;
-    delete settings;
     return;
   }
   if (! fi.isDir()) {
     QLOG_WARN() << "theme directory is not a directory" << imgdir;
-    delete settings;
     return;
   }
 
@@ -2780,7 +2755,6 @@ void LanesLexicon::setIcons(const QString & theme) {
   m_linkAction->setIcon(icon);
   m_linkAction->setChecked(m_linkContents);
 
-  delete settings;
 }
 void LanesLexicon::sync() {
   qDebug() << Q_FUNC_INFO;

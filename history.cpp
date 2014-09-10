@@ -195,13 +195,10 @@ HistoryEvent * HistoryMaster::getEvent(int id) {
    return event;
 }
 void HistoryMaster::readSettings() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("History");
   m_historyEnabled = settings->value("Enabled",true).toBool();
   m_size = settings->value("Size",10).toInt();
-  delete settings;
 }
 bool HistoryMaster::clear() {
    if ( ! m_historyEnabled ) {

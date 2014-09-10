@@ -28,8 +28,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
+  QSettings * settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
   m_findTarget->readSettings(settings);
   m_findTarget->activateMap(getApp()->getActiveKeymap(),true);
 
@@ -684,11 +683,8 @@ QString FullSearchWidget::transform(const QString & xml) {
 void FullSearchWidget::readSettings() {
 
   QString v;
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
   bool ok;
-  settings->setIniCodec("UTF-8");
-
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Entry");
   QString css = settings->value("CSS",QString("entry.css")).toString();
   readCssFromFile(css);
@@ -730,8 +726,6 @@ void FullSearchWidget::readSettings() {
     m_defaultOptions |= Lane::Buckwalter;
 
   */
-
-  delete settings;
 }
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
   QRegExp rx;

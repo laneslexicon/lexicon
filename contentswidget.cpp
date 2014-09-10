@@ -25,7 +25,6 @@ ContentsWidget::~ContentsWidget() {
 void ContentsWidget::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
   settings->beginGroup("Roots");
   m_backgroundColor = settings->value("Background","lightgray").toString();
   QString fontString = settings->value("Itype font",QString()).toString();

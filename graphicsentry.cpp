@@ -122,7 +122,6 @@ void GraphicsEntry::readSettings() {
   QMap<QString,QString> cmdOptions = app->getOptions();
 
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->setIniCodec("UTF-8");
   settings->beginGroup("Entry");
   m_debug = settings->value(SID_ENTRY_DEBUG,false).toBool();
   QString css = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
@@ -1495,9 +1494,7 @@ int GraphicsEntry::search() {
   QString v;
   bool b;
   qDebug() << Q_FUNC_INFO;
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("LocalSearch");
   v  = settings->value("Type",QString("normal")).toString();
   if (v == "normal") {
@@ -1557,7 +1554,6 @@ int GraphicsEntry::search() {
     msgBox.setText(QString(tr("Word not found: <span style=\"%1\">%2</span>")).arg(style).arg(t));
     msgBox.exec();
   }
-  qDebug() << Q_FUNC_INFO << "find pos" << m_currentSearchPosition;
   return count;
 }
 void GraphicsEntry::searchNext() {
@@ -1812,7 +1808,6 @@ void GraphicsEntry::onReload() {
   qDebug() << Q_FUNC_INFO;
   /// TODO reload CSS
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->setIniCodec("UTF-8");
   settings->beginGroup("Entry");
   m_debug = settings->value(SID_ENTRY_DEBUG,false).toBool();
   QString css = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();

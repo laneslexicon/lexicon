@@ -52,7 +52,9 @@ QSettings * Lexicon::getSettings() {
   if (m_configFile.isEmpty()) {
     return new QSettings;
   }
-  return new QSettings(m_configFile,QSettings::IniFormat);
+  QSettings * settings = new QSettings(m_configFile,QSettings::IniFormat);
+  settings->setIniCodec("UTF-8");
+  return settings;
 }
 QVariant Lexicon::getValue(const QString & group,const QString & key) {
   QSettings s(m_configFile,QSettings::IniFormat);

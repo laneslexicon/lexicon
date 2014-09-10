@@ -4,9 +4,7 @@
 NodeView::NodeView(QWidget * parent)
   : QDialog(parent) {
 
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("System");
   QString fontString = settings->value("Arabic font").toString();
   settings->endGroup();
@@ -15,7 +13,6 @@ NodeView::NodeView(QWidget * parent)
   if (! sz.isEmpty())
     this->setPreferredSize(sz);
 
-  delete settings;
   m_startPosition = -1;
   QFont f;
   if (! fontString.isEmpty())

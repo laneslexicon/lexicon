@@ -62,14 +62,10 @@ void TabWidget::tabInserted(int index) {
 //      QLOG_DEBUG() << Q_FUNC_INFO << "escape";
 //    }
 void TabWidget::readSettings() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->setIniCodec("UTF-8");
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("TabBar");
   m_numberTabs = settings->value("Number",true).toBool();
   setMovable(settings->value("Moveable",true).toBool());
-  delete settings;
-
 }
 void TabWidget::tabContentsChanged() {
   if (m_numberTabs) {
