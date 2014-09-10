@@ -85,7 +85,7 @@ class EntryItem : public QGraphicsTextItem {
   void showNote();
   void addNote();
   void deleteNote();
-  void setNotes(QList<Note *> notes);
+  void setNotes();
   QList<Note *> getNotes(bool erase = false);
   void destroyNotes();
   bool hasNotes() const;

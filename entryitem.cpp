@@ -62,7 +62,7 @@ int EntryItem::getPage() {
 void EntryItem::setProxy(QGraphicsWidget * widget ) {
   m_noteWidget = widget;
 }
-void EntryItem::setNotes(QList<Note *> notes) {
+void EntryItem::setNotes() {
   m_notes.clear();
   NoteMaster * m = ::getNotes();
   m_notes = m->find(m_place.getWord());
