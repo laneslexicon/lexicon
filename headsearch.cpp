@@ -4,7 +4,7 @@
 #include "focustable.h"
 #include "namespace.h"
 #include "laneslexicon.h"
-#include "searchoptions.h"
+#include "searchoptionswidget.h"
 /// TODO
 /// some of these functions pass SearchOptions - why can't we use the class member
 extern LanesLexicon * getApp();

@@ -1,7 +1,7 @@
 #include "searchdialogs.h"
 #include "QsLog.h"
 #include "namespace.h"
-#include "searchoptions.h"
+#include "searchoptionswidget.h"
 #include "laneslexicon.h"
 extern LanesLexicon * getApp();
 ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::WindowFlags f) :

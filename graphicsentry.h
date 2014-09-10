@@ -38,7 +38,7 @@
 #include <QClipboard>
 #include <QPrinter>
 #include "entryitem.h"
-#include "searchoptions.h"
+#include "searchoptionswidget.h"
 class LaneGraphicsView;
 class Place;
 class GraphicsEntry : public QWidget {

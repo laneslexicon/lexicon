@@ -10,7 +10,7 @@
 #include "laneslexicon.h"
 #include "namespace.h"
 #include "searchdialogs.h"
-#include "searchoptions.h"
+#include "searchoptionswidget.h"
 extern LanesLexicon * getApp();
 extern NoteMaster * getNotes();
 ToolButtonData::ToolButtonData(int id) : QToolButton() {

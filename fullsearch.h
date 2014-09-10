@@ -27,7 +27,7 @@
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif
-#include "searchoptions.h"
+#include "searchoptionswidget.h"
 class ImLineEdit;
 class GraphicsEntry;
 class SearchOptionsWidget;

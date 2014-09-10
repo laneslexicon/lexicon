@@ -13,7 +13,7 @@
 #include "imedit.h"
 #include "imlineedit.h"
 #include "keyboardwidget.h"
-#include "searchoptions.h"
+#include "searchoptionswidget.h"
 class ArabicSearchDialog : public QDialog {
   Q_OBJECT
 

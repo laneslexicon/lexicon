@@ -46,7 +46,7 @@
 #include <QPrintDialog>
 #include <QPainter>
 #include "place.h"
-#include "searchoptions.h"
+#include "searchoptionswidget.h"
 class ArabicSearchDialog;
 class NoteMaster;
 class HistoryMaster;

@@ -22,7 +22,7 @@
 #include <QRegExp>
 #include <QProgressDialog>
 #include <QHeaderView>
-#include "searchoptions.h"
+#include "searchoptionswidget.h"
 class GraphicsEntry;
 class FocusTable;
 class Place;

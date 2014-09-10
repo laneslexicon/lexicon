@@ -1,5 +1,5 @@
  #include "fullsearch.h"
-#include "searchoptions.h"
+#include "searchoptionswidget.h"
 #include "graphicsentry.h"
 #include "application.h"
 #include "namespace.h"

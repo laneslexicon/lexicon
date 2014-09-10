@@ -15,7 +15,7 @@
 #include "tabwidget.h"
 #include "namespace.h"
 #include "laneslexicon.h"
-#include "searchoptions.h"
+#include "searchoptionswidget.h"
 #include "searchdialogs.h"
 #include "fullsearch.h"
 #include "headsearch.h"
