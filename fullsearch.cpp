@@ -182,6 +182,7 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
 bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
+
     switch(keyEvent->key()) {
     case Qt::Key_Tab: {
       m_findTarget->setFocus();
@@ -199,31 +200,24 @@ bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
       }
       break;
     }
-      case Qt::Key_Enter: {
-        QLOG_DEBUG() << "hit enter on table";
-        if (keyEvent->modifiers() && Qt::ControlModifier) {
-          //          m_tree->setFocus();
-          return true;
-        }
-        break;
-      }
+    case Qt::Key_Enter:
     case Qt::Key_Return:
     case Qt::Key_Space: {
-        //        if (keyEvent->modifiers() && Qt::ControlModifier) {
-        QTableWidgetItem * item = m_rxlist->currentItem();
-        if (item)
-          m_rxlist->itemDoubleClicked(item);
+      //        if (keyEvent->modifiers() && Qt::ControlModifier) {
+      QTableWidgetItem * item = m_rxlist->currentItem();
+      if (item)
+        m_rxlist->itemDoubleClicked(item);
 
-        break;
+      break;
+    }
+    case Qt::Key_E: {
+      if (keyEvent->modifiers() && Qt::ControlModifier) {
+        //          if (target == m_tree)
+        //          m_tabs->currentWidget()->setFocus();
+        return true;
       }
-      case Qt::Key_E: {
-        if (keyEvent->modifiers() && Qt::ControlModifier) {
-          //          if (target == m_tree)
-            //          m_tabs->currentWidget()->setFocus();
-          return true;
-        }
-        break;
-      }
+      break;
+    }
     default:
       break;
     }

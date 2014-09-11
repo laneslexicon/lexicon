@@ -34,8 +34,8 @@ class HeadSearchWidget : public QWidget
     //    HeadSearchWidget(const QString & str,const SearchOptions &,QWidget * parent = 0);
     HeadSearchWidget(QWidget * parent = 0);
     Place getPlace();
-   GraphicsEntry * getEntry() { return m_text;}
-   int count();
+    GraphicsEntry * getEntry();
+    int count();
    void search(const QString &,const SearchOptions &);
    void showFirst();
    void focusTable();
@@ -54,14 +54,16 @@ class HeadSearchWidget : public QWidget
    bool m_focusTable;
    QString buildText(const SearchOptions &);
    QRegExp m_currentRx;
+   QString m_diacritics;
    SearchOptions m_searchOptions;
+   QLabel * m_searchTitle;
    int m_stepCount;
    QSqlQuery m_query;
    QSqlQuery m_nodeQuery;
    QString m_target;
    QLabel * m_resultsText;
    FocusTable * m_list;
-   GraphicsEntry * m_text;
+   GraphicsEntry * m_entry;
 /// for Arabic font from QSettings
    QFont m_resultsFont;
    bool m_cancelSearch;

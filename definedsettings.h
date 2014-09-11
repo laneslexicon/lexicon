@@ -130,3 +130,10 @@ They should not be translated.
 #define SID_SHORTCUT_SHOW_NOTES                "Show notes"
 #define SID_SHORTCUT_SYNC                      "Sync"
 #define SID_SHORTCUT_TOGGLE_INTERFACE          "Toggle interface"
+
+#define SID_SEARCH_DIACRITICS                  "Diacritics"
+
+#define SID_HEADSEARCH_RESULTS_FONT            "Results font"
+#define SID_HEADSEARCH_STEP                    "Step"
+#define SID_HEADSEARCH_DEBUG                   "Debug"
+#define SID_HEADSEARCH_FOCUS_TABLE             "Focus table"
