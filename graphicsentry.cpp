@@ -13,6 +13,7 @@
 #include "searchoptionswidget.h"
 extern LanesLexicon * getApp();
 extern NoteMaster * getNotes();
+extern void statusMessage(const QString &);
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
   setObjectName("toolbuttondata");
@@ -1787,14 +1788,18 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
     cursor.insertHtml(getPageInfo(false));
   }
   doc.print(&printer);
-  QFileInfo fi(QDir::tempPath(),"page.html");
-  QFile f(fi.filePath());
-  if (f.open(QIODevice::WriteOnly)) {
-    QTextStream out(&f);
-    out.setCodec("UTF-8");
-    out << html;
+  if (printer.outputFormat() == QPrinter::NativeFormat) {
+    QString name = printer.printerName();
+    if (! name.isEmpty()) {
+      statusMessage(QString(tr("Document printed to %1")).arg(name));
+    }
+    else {
+      statusMessage(QString(tr("Document printed")));
+    }
   }
-  //  doc.setHtml("<html><body>" + getPageInfo(true) + "</body></html>");
+  else {
+    statusMessage(QString(tr("PDF created: %1")).arg(printer.outputFileName()));
+  }
 }
 void GraphicsEntry::onReload() {
   qDebug() << Q_FUNC_INFO;
@@ -1825,4 +1830,5 @@ void GraphicsEntry::onReload() {
     m_items[i]->setHtml(html);
     m_items[i]->setOutputHtml(html);
   }
+  statusMessage(tr("Reloaded page"));
 }

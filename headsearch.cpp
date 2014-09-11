@@ -29,7 +29,7 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   QHBoxLayout * resultslayout = new QHBoxLayout;
   m_resultsText = new QLabel("");
   m_resultsText->hide();
-  m_convertButton = new QPushButton("Remove results table");
+  m_convertButton = new QPushButton("Close");
   m_convertButton->hide();
   connect(m_convertButton,SIGNAL(clicked()),this,SLOT(onRemoveResults()));
   resultslayout->addWidget(m_resultsText);

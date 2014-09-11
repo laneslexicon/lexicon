@@ -55,6 +55,7 @@ LanesLexicon * getApp() {
   }
   return NULL;
 }
+
 HistoryMaster * getHistory() {
   LanesLexicon * app = getApp();
   return app->history();
@@ -66,6 +67,9 @@ NoteMaster * getNotes() {
 QSettings * getSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   return app->getSettings();
+}
+void statusMessage(const QString & t) {
+  getApp()->setStatus(t);
 }
 int main(int argc, char *argv[])
 {
