@@ -3,6 +3,7 @@
 #include "headsearch.h"
 #include "fullsearch.h"
 #include "application.h"
+#include "definedsettings.h"
 TabWidget::TabWidget(QWidget * parent) : QTabWidget(parent) {
   setObjectName("entrywidget");
   tabBar()->setObjectName("entrytabs");
@@ -52,7 +53,6 @@ void TabWidget::tabRemoved(int index) {
   }
 }
 void TabWidget::tabInserted(int index) {
-  qDebug() << Q_FUNC_INFO;
   QTabWidget::tabInserted(index);
   if (m_numberTabs) {
     emit(tabsChanged());
@@ -64,8 +64,8 @@ void TabWidget::tabInserted(int index) {
 void TabWidget::readSettings() {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("TabBar");
-  m_numberTabs = settings->value("Number",true).toBool();
-  setMovable(settings->value("Moveable",true).toBool());
+  m_numberTabs = settings->value(SID_TABBAR_NUMBER,true).toBool();
+  setMovable(settings->value(SID_TABBAR_MOVEABLE,true).toBool());
 }
 void TabWidget::tabContentsChanged() {
   if (m_numberTabs) {

@@ -140,3 +140,6 @@ They should not be translated.
 
 #define SID_ARABIC_FONT_NAME                   "Font"
 #define SID_ARABIC_FONT_SIZE                   "Size"
+
+#define SID_TABBAR_NUMBER                      "Number"
+#define SID_TABBAR_MOVEABLE                    "Moveable"
