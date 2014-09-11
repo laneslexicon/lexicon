@@ -1160,7 +1160,7 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
   if (item) {
     Place p = item->getPlace();
-    m_placeIndicator->setText(p.getText());
+    updateStatusBar();
   }
 
 }
@@ -2032,12 +2032,19 @@ void LanesLexicon::movePrevious(const Place & p) {
   }
 }
 void LanesLexicon::setStatus(const QString & txt) {
+  qDebug() << Q_FUNC_INFO << txt;
   statusBar()->showMessage(txt);
 }
 void LanesLexicon::updateStatusBar() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    m_placeIndicator->setText(entry->getPlace().getText());
+    Place p = entry->getPlace();
+    QString root = qobject_cast<Lexicon *>(qApp)->spanArabic(p.getRoot());
+    QString head = qobject_cast<Lexicon *>(qApp)->spanArabic(p.getWord());
+    QString page = QString(QObject::tr("Vol %1,Page %2")).arg(p.getVol()).arg(p.getPage());
+    QString node = p.getNode();
+    QString html = QString("Root : %1,Entry : %2, %3 (%4)").arg(root).arg(head).arg(page).arg(node);
+    m_placeIndicator->setText(html);
   }
   else {
     m_placeIndicator->setText("");
