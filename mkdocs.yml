@@ -6,6 +6,7 @@ pages:
 - ['user-guide/configuring.md', User Guide, 'Configuration']
 - ['user-guide/bookmarks.md', User Guide, 'Bookmarks']
 - ['user-guide/search.md', User Guide, 'Searching']
+- ['dev-guide/build.md', Development, 'Building']
 - ['lane/preface.md','Lane','Preface']
 - ['lane/notice.md','Lane','Notice']
 - ['lane/postscript.md','Lane','Postscript to the Preface']
