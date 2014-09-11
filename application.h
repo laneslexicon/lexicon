@@ -23,6 +23,7 @@ public:
   void setConfig(const QString & fileName);
   bool isOk() { return m_ok;}
   void scanForFonts(const QDir &);
+  QString spanArabic(const QString &);
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:

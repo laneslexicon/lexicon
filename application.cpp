@@ -1,5 +1,6 @@
 #include "application.h"
 #include "QsLog.h"
+#include "definedsettings.h"
 Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QString resourceDir;
   m_ok = true;
@@ -99,4 +100,22 @@ void Lexicon::scanForFonts(const QDir & dir)
    while(fonts.size() > 0) {
      QFontDatabase::addApplicationFont(fonts.takeFirst());
    }
+}
+QString Lexicon::spanArabic(const QString & ar) {
+  QSettings s(m_configFile,QSettings::IniFormat);
+  s.setIniCodec("UTF-8");
+  s.beginGroup("Arabic");
+  QString fontname = s.value(SID_ARABIC_FONT_NAME,QString()).toString();
+  QString fontsize = s.value(SID_ARABIC_FONT_SIZE,QString()).toString();
+  QString style;
+  if ( ! fontname.isEmpty()) {
+    style = QString("font-family : %1").arg(fontname);
+  }
+  if (! fontsize.isEmpty()) {
+    if (! style.isEmpty()) {
+      style += ";";
+    }
+    style += QString("font-size : %1").arg(fontsize);
+  }
+  return QString("<span style=\"%1\">%2</span>").arg(style).arg(ar);
 }
