@@ -283,7 +283,10 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
       pd->setValue(count);
     }
   }
-  m_searchTitle->setText(QString(tr("Search for: %1")).arg(m_target));
+  //  m_searchTitle->setTextFormat(Qt::RichText);
+  QString ar = qobject_cast<Lexicon *>(qApp)->spanArabic(m_target);
+  QString html =  QString(tr("<p>Search for:%1</p>")).arg(ar);
+  m_searchTitle->setText(html);
   m_searchTitle->show();
   m_resultsText->setText(this->buildText(options));
   m_resultsText->show();
@@ -396,7 +399,7 @@ void HeadSearchWidget::readSettings() {
   for(int i=0;i < d.size();i++) {
     m_diacritics += "\\" + d[i];
   }
-  qDebug() << m_diacritics;
+  settings->endGroup();
   delete settings;
 }
 void HeadSearchWidget::onRemoveResults() {
