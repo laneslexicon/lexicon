@@ -204,7 +204,10 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
 }
 void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions & options) {
   QRegExp rx;
-  QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+
+  //  QRegExp rxclass1("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+
+  QRegExp rxclass(QString("[%1]*").arg(m_diacritics));
 
   QString target = searchtarget;
   target.remove(QChar(0x202d));
