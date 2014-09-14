@@ -283,7 +283,6 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
       pd->setValue(count);
     }
   }
-  //  m_searchTitle->setTextFormat(Qt::RichText);
   QString ar = qobject_cast<Lexicon *>(qApp)->spanArabic(m_target);
   QString html =  QString(tr("<p>Search for:%1</p>")).arg(ar);
   m_searchTitle->setText(html);
