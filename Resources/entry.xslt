@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
+<!--
+  Do not use named character entities such as &nbsp; use the numeric form instead e.g &#160;
+  The XSLT processor will report syntax errors if you use named character entities.
+  -->
 <xsl:stylesheet
     version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" >
@@ -18,16 +22,15 @@
   </html>
   </xsl:template>
 
+  <!--
+   this is not used anymore
+   -->
   <xsl:template match="root">
     <p class="rootword"><span class="arabichead rootword"><xsl:value-of  select="@text"/></span>
     <xsl:if test="@quasi = '1'">
       <span class="quasi">Quasi</span>
     </xsl:if>
     </p>
-<!---
-    <xsl:apply-templates select="word" />
--->
-
   </xsl:template>
 
   <xsl:template match="word">
@@ -69,7 +72,6 @@
 <!---
   These use characters from Arabic Presentation Forms-B to show short vowels u/i/a
   Replace &#xhhhhn; by the e.g u will work.
-  &#160; is a non-breaking space. (XSLT processor objects to named character entities eg &nbsp;
 -->
 
   <xsl:template match="form">
@@ -96,8 +98,9 @@
     </xsl:if>
   </xsl:template>
   <!---
-http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
--->
+      From http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
+      This is used in debugging.
+  -->
   <xsl:template match="entryFree" priority="99">
     <span class="entry">
     <xsl:for-each select="@*|node()">
@@ -129,23 +132,42 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
     </xsl:for-each>
     </span>
   </xsl:template>
+  <!--
+  For the sense separators.
+  Lane uses a long underscore for a "to denote a break in the relations of significations"
+  and a double long underscore to denote "an extraordinary, or a complete, dissociation."
 
+  Type 'a/A' is a complete break, type 'b/B' otherwise
+
+  -->
   <xsl:template match="sense">
-    <xsl:if test="@type='b'">
+    <xsl:if test="(@type='B') or (@type='b')">
       <span class="bseparator"><xsl:text>||</xsl:text> </span>
     </xsl:if>
-    <xsl:if test="@type='a'">
+    <xsl:if test="(@type='A') or (@type='a')">
       <span class="aseparator"><xsl:text>&#x2017;&#x2017;&#x2017;</xsl:text> </span>
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="pb">
+  <!--
+  For page breaks
+  -->
+   <xsl:template match="pb">
     <br/>
     <p class="pagebreak">Page <xsl:value-of select="@n" />
     </p>
   <br/>
   </xsl:template>
 
+  <!--
+      For single or multiline quotes.
+      In the original they appear on separate lines between *'s but occasionally
+      he has
+
+      * <arabic text > * <arabic text> *
+
+      on a single line
+  -->
   <xsl:template match="quote">
     <div class="arabicquoteblock">
     <table align="center" width="100%">
@@ -295,7 +317,6 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
 
 
     </span>
-      <br/>
       <br/>
   </xsl:template>
 </xsl:stylesheet>
