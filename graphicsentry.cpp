@@ -559,7 +559,21 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       return retval;
     }
   }
-
+  int quasi = 0;
+  QSqlQuery quasiQuery;
+  if (quasiQuery.prepare("select quasi from root where word = ? and datasource = 1")) {
+    quasiQuery.bindValue(0,root);
+    quasiQuery.exec();
+    if (quasiQuery.first()) {
+      quasi = quasiQuery.value(0).toInt();
+    }
+    else {
+      QLOG_WARN() << tr("Error quasi query failed") << quasiQuery.lastError().text();
+    }
+  }
+  else {
+      QLOG_WARN() << tr("Error quasi query prepare") << quasiQuery.lastError().text();
+  }
   QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << p << p.getType();
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
@@ -574,9 +588,10 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     return retval;
   }
   /// this will be set to the right word if a node has been supplied
-
   /// add the root item unless nodeOnly is set
-  QString str = QString("<word type=\"root\" ar=\"%1\"></word>").arg(root);
+
+  QString str = QString("<word type=\"root\" ar=\"%1\" quasi=\"%2\"></word>").arg(root).arg(quasi);
+qDebug() << str;
   EntryItem * rootItem  = createEntry(str);
   /// will be null if the XSLT/XML has not parsed correctly
   if (rootItem == NULL) {
@@ -804,7 +819,23 @@ Place GraphicsEntry::getPage(const Place & p) {
     /// if root has changed add root XML
     if (root != lastRoot) {
       if (! lastRoot.isEmpty()) {
-        QString  str = QString("<word type=\"root\" ar=\"%1\" ></word>").arg(root);
+        QSqlQuery quasiQuery;
+        int quasi = 0;
+        if (quasiQuery.prepare("select quasi from root where word = ? and datasource = 1")) {
+          quasiQuery.bindValue(0,root);
+          quasiQuery.exec();
+          if (quasiQuery.first()) {
+            quasi = quasiQuery.value(0).toInt();
+          }
+          else {
+            QLOG_WARN() << tr("Error quasi query failed") << quasiQuery.lastError().text();
+          }
+        }
+        else {
+          QLOG_WARN() << tr("Error quasi query prepare") << quasiQuery.lastError().text();
+        }
+        QString  str = QString("<word type=\"root\" ar=\"%1\" quasi=\"%2\"></word>").arg(root).arg(quasi);
+
         item = createEntry(str);
         if (item != NULL) {
           items  << item;

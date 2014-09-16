@@ -20,6 +20,9 @@
 
   <xsl:template match="root">
     <p class="rootword"><span class="arabichead rootword"><xsl:value-of  select="@text"/></span>
+    <xsl:if test="@quasi = '1'">
+      <span class="quasi">Quasi</span>
+    </xsl:if>
     </p>
 <!---
     <xsl:apply-templates select="word" />
@@ -46,7 +49,10 @@
       <xsl:attribute name="class">arabichead rootword <xsl:value-of select="$entrystyle" /></xsl:attribute>
       <xsl:value-of  select="@ar"/>
       </span>
-    </p>
+      <xsl:if test="@quasi = '1'">
+        <span class="quasi">&#160;&#160;(Quasi root)</span>
+      </xsl:if>
+      </p>
       </xsl:when>
       <xsl:otherwise>
     <span>
