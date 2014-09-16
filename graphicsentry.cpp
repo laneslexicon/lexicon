@@ -334,12 +334,29 @@ void GraphicsEntry::anchorClicked(const QUrl & link) {
   QLOG_DEBUG() << Q_FUNC_INFO << link.toDisplayString();
   QLOG_DEBUG() << QApplication::keyboardModifiers();
 }
+/**
+ * There are three options here:
+ * (1)  a <note> so we tell the user something
+ * (2)  a jump to another root, which is how entries like  xxx see yyy,xxx and yyy etc are handled
+ * (3)  a jump to another word
+ *
+ * @param link
+ */
 void GraphicsEntry::linkActivated(const QString & link) {
-  /// turn history on as the user has clicked on something
   QLOG_DEBUG() << Q_FUNC_INFO << link;
+
+  /// turn history on as the user has clicked on something
+  Place p;
+  int options = 0;
+  if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+    options |= Lane::Create_Tab;
+  }
+
   QUrl url(link);
+  qDebug() << Q_FUNC_INFO << url;
   if (url.hasQuery()) {
     QString msg = url.query();
+    qDebug() << "query" << msg;
     if (msg.startsWith("text=")) {
       msg.remove("text=");
       QMessageBox::information(this, tr("A note from the editor"),
@@ -347,20 +364,33 @@ void GraphicsEntry::linkActivated(const QString & link) {
                                QMessageBox::Ok);
       return;
     }
+    if (msg.startsWith("root=")) {
+      msg.remove("root=");
+      QSqlQuery query;
+      query.prepare("select word from root where bword = ?");
+      query.bindValue(0,msg);
+      query.exec();
+      if (query.first()) {
+        getHistory()->on();
+        p.setRoot(query.value(0).toString());
+        emit(gotoNode(p,options));
+        return;
+      }
+      else {
+        QLOG_WARN() << "Jump to missing root requested" << msg << query.lastError().text();
+      }
+    }
   }
-  int options = 0;
-  getHistory()->on();
-  QString node(link);
-  /// remove the leading #
-  node.remove(0,1);
-  Place p;
-  p.setNode(node);
-  if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
-    options |= Lane::Create_Tab;
+  else {
+    QString node(link);
+    /// remove the leading #
+    node.remove(0,1);
+    p.setNode(node);
+    getHistory()->on();
+    /// TODO replace this
+    /// including move to new tab stuff
+    showPlace(p,false,options);
   }
-  /// TODO replace this
-  /// including move to new tab stuff
-  showPlace(p,false,options);
 }
 void GraphicsEntry::linkHovered(const QString & link) {
   QGraphicsTextItem * gi = static_cast<QGraphicsTextItem *>(QObject::sender());

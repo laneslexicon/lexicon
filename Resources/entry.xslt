@@ -242,6 +242,15 @@ http://stackoverflow.com/questions/14118670/check-type-of-node-in-xsl-template
                   <xsl:value-of select="text()" />
                   </a>
                 </xsl:when>
+                <xsl:when test="@jumptoroot">
+                  <a>
+                    <xsl:attribute name="href">
+                      <xsl:text>127.0.0.0/?root=</xsl:text>
+                      <xsl:value-of select="@jumptoroot"/>
+                    </xsl:attribute>
+                  <xsl:value-of select="text()" />
+                  </a>
+                </xsl:when>
                 <xsl:otherwise>
                   <xsl:value-of select="text()" />
                 </xsl:otherwise>

@@ -1107,6 +1107,8 @@ void LanesLexicon::gotoPlace(const Place & p,int options) {
 }
 Place LanesLexicon::showPlace(const Place & p,int options) {
   Place np;
+
+  QLOG_DEBUG() << Q_FUNC_INFO << p;
   GraphicsEntry * entry;
   if (! p.isValid()) {
     return p;
