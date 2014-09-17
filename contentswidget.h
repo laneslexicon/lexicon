@@ -50,8 +50,6 @@ class ContentsWidget : public QTreeWidget {
   QString m_moveDown;
   QString m_expand;
   QFont m_itypeFont;
-  QFont m_arFont;
-  QString m_arFontString;
  protected:
   virtual void 	keyPressEvent(QKeyEvent * event);
  signals:

@@ -92,6 +92,8 @@ void ContentsWidget::loadContents() {
     QString root;
     while(rootQuery.next()) {
       bool ok = true;
+      // we can have root entries that are in the main text
+      // and the supplement but we only show one entry
       if (root != rootQuery.value(0).toString()) {
         //      itype = rootQuery.value(2).toString();
         root = rootQuery.value(0).toString();
@@ -538,11 +540,14 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   }
   m_entryQuery->bindValue(0,root);
   m_entryQuery->exec();
-
+  bool isSupplementRoot = false;
+  if (parent->text(1) == "*") {
+    isSupplementRoot = true;
+  }
   while(m_entryQuery->next()) {
     //QLOG_DEBUG() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
     supplement.clear();
-    if (m_entryQuery->value("supplement").toInt() == 1) {
+    if (! isSupplementRoot && (m_entryQuery->value("supplement").toInt() == 1)) {
       supplement = "*";
     }
     itype = m_entryQuery->value("itype").toString();
