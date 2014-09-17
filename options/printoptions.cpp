@@ -48,13 +48,15 @@ PrintOptions::PrintOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   hlayout->addWidget(m_pdfDirectory);
   hlayout->addWidget(m_directoryButton);
 
-  formlayout->addRow(tr("Options"),m_dialogButton);
+  formlayout->addRow(new QLabel("<em>" + tr("Printer options") + "</em>"));
+  formlayout->addRow(m_dialogButton);
   formlayout->addRow(tr("Name"),m_printerName);
   formlayout->addRow(tr("Orientation"),m_orientation);
   formlayout->addRow(tr("Paper size"),m_paperSize);
   formlayout->addRow(tr("Resolution"),m_resolution);
   formlayout->addRow(tr("Copies"),m_copyCount);
   formlayout->addRow(tr("Full page"),m_fullPage);
+  formlayout->addRow(new QLabel("<em>" + tr("Usage options") + "</em>"));
   formlayout->addRow(tr("PDF output"),m_pdfOutput);
   formlayout->addRow(tr("PDF directory"),hlayout);
   formlayout->addRow(tr("Auto name PDF"),m_pdfAutoName);
