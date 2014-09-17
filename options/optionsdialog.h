@@ -13,6 +13,7 @@ class OptionsDialog : public QDialog {
 
  public:
   OptionsDialog(QWidget * parent = 0);
+  ~OptionsDialog();
   public slots:
     void valueChanged(bool);
     void saveChanges();
@@ -20,6 +21,7 @@ class OptionsDialog : public QDialog {
     void applyChanges();
     void currentChanged(int);
  private:
+    void writeSettings();
     void enableButtons();
     void setApplyReset(bool);
     QDialogButtonBox * m_buttons;

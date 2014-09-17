@@ -15,6 +15,7 @@ MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 QMAKE_CXXFLAGS += -Wunused-parameter -g
 INCLUDEPATH += ..
+DEFINES += STANDALONE
 SOURCES += main.cpp\
         mainwindow.cpp \
         optionswidget.cpp \

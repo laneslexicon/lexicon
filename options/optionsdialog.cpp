@@ -6,8 +6,13 @@
 OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
+#ifdef STANDALONE
   QSettings * settings = new QSettings("default.ini",QSettings::IniFormat);
   settings->setIniCodec("UTF-8");
+#else
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+#endif
+
   RootsOptions * tree = new RootsOptions(settings);
   m_tabs->addTab(tree,tr("Contents"));
   PrintOptions * print = new PrintOptions(settings);
@@ -40,7 +45,34 @@ OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   btn->setEnabled(false);
   connect(btn,SIGNAL(clicked()),this,SLOT(saveChanges()));
   enableButtons();
+  QString group = settings->group();
+  while(! group.isEmpty()) {
+    settings->endGroup();
+    group = settings->group();
+  }
+  settings->beginGroup("Options");
+  this->restoreGeometry(settings->value("Geometry").toByteArray());
+  //  this->restoreState(settings->value("State").toByteArray());
 }
+OptionsDialog::~OptionsDialog() {
+  writeSettings();
+}
+void OptionsDialog::writeSettings() {
+#ifdef STANDALONE
+  QSettings * settings = new QSettings("default.ini",QSettings::IniFormat);
+  settings->setIniCodec("UTF-8");
+#else
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+#endif
+  settings->beginGroup("Options");
+  //  settings->setValue("State",this->saveState());
+  settings->setValue("Geometry", saveGeometry());
+  settings->endGroup();
+#ifdef STANDALONE
+  delete settings;
+#endif
+}
+
 void OptionsDialog::applyChanges() {
   OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
   if (tab) {
