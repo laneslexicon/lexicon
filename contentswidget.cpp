@@ -3,19 +3,22 @@
 #include "place.h"
 #include "application.h"
 #include "definedsettings.h"
+#define HEAD_SUPPLEMENT_COLUMN 2
 #define NODE_COLUMN 3
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   readSettings();
   setColumnCount(4);
   setHeaderLabels(
-                  QStringList() << tr("Letter/Root") << tr("") << tr("") << tr("Node"));
+                   QStringList() << tr("Letter/Root") << tr("Head") << tr("") << tr("Node"));
   setSelectionMode(QAbstractItemView::SingleSelection);
   header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
+  header()->setSectionResizeMode(HEAD_SUPPLEMENT_COLUMN,QHeaderView::ResizeToContents);
   this->setStyleSheet(QString("selection-background-color : %1").arg(m_backgroundColor));
 
   connect(this,SIGNAL(itemExpanded(QTreeWidgetItem *)),this,SLOT(nodeExpanded(QTreeWidgetItem *)));
   connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(nodeCollapsed(QTreeWidgetItem *)));
   this->setExpandsOnDoubleClick(false);
+
   if (! m_debug)
     this->hideColumn(3);
 
@@ -120,6 +123,7 @@ void ContentsWidget::loadContents() {
     f.close();
     delete out;
   }
+  resizeColumnToContents(HEAD_SUPPLEMENT_COLUMN);
   m_entryQuery = new QSqlQuery;
   bool ok = m_entryQuery->prepare("select word,itype,bword,nodeId,supplement from entry where datasource = 1 and root = ? order by nodenum asc");
   if ( ! ok ) {
@@ -547,6 +551,7 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
     QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << itype << word << supplement << node);
     item->setFont(0,m_itypeFont);
     item->setFont(NODE_COLUMN,m_itypeFont);
+    item->setFont(HEAD_SUPPLEMENT_COLUMN,m_itypeFont);
     item->setData(0,Qt::UserRole,m_entryQuery->value("nodeId"));//.toString()
     parent->addChild(item);
     c++;
