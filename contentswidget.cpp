@@ -2,7 +2,8 @@
 #include "QsLog.h"
 #include "place.h"
 #include "application.h"
-
+#include "definedsettings.h"
+#define NODE_COLUMN 3
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   readSettings();
   setColumnCount(4);
@@ -22,19 +23,32 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
 ContentsWidget::~ContentsWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
+/**
+ * The default font is through the stylesheet entry for QTreeWidget#treeRoots
+ * but we load it from QSettings anyway. The stylesheet entry will override it
+ * if both are set.
+ * For non-Arabic columns (itype,node) set via QSettings
+ *
+ */
 void ContentsWidget::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QSettings * settings = app->getSettings();
   settings->beginGroup("Roots");
-  m_backgroundColor = settings->value("Background","lightgray").toString();
-  QString fontString = settings->value("Itype font",QString()).toString();
+  m_backgroundColor = settings->value(SID_CONTENTS_BACKGROUND,"lightgray").toString();
+  QString fontString = settings->value(SID_CONTENTS_STANDARD_FONT,QString()).toString();
   if ( ! fontString.isEmpty()) {
     m_itypeFont.fromString(fontString);
   }
-  m_debug = settings->value("Debug",false).toBool();
-  m_moveDown = settings->value("Move down","s").toString();
-  m_moveUp = settings->value("Move up","w").toString();
-  m_expand = settings->value("Expand"," ").toString();
+  fontString = settings->value(SID_CONTENTS_ARABIC_FONT,QString()).toString();
+  if ( ! fontString.isEmpty()) {
+    QFont f;
+    f.fromString(fontString);
+    setFont(f);
+  }
+  m_debug = settings->value(SID_CONTENTS_DEBUG,false).toBool();
+  m_moveDown = settings->value(SID_CONTENTS_MOVE_DOWN,"s").toString();
+  m_moveUp = settings->value(SID_CONTENTS_MOVE_UP,"w").toString();
+  m_expand = settings->value(SID_CONTENTS_EXPAND," ").toString();
   delete settings;
 }
 void ContentsWidget::loadContents() {
@@ -112,6 +126,7 @@ void ContentsWidget::loadContents() {
     QLOG_WARN() << "Entry SQL prepare failed" << m_entryQuery->lastError();
   }
   qDebug() << "root count" << rootCount;
+  qDebug() << "font" << this->font().toString();
 }
 Place ContentsWidget::findNextPlace(const Place & p) {
   QTreeWidgetItem * currentItem = 0;
@@ -512,7 +527,7 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   QString itype;
   QString word;
   QString node;
-  qDebug() << Q_FUNC_INFO << root;
+  QLOG_DEBUG() << Q_FUNC_INFO << root;
   /// if already expanding return
   if (parent->childCount() > 0) {
     return -1;
@@ -531,12 +546,12 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
     node = m_entryQuery->value("nodeid").toString();
     QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << itype << word << supplement << node);
     item->setFont(0,m_itypeFont);
+    item->setFont(NODE_COLUMN,m_itypeFont);
     item->setData(0,Qt::UserRole,m_entryQuery->value("nodeId"));//.toString()
     parent->addChild(item);
     c++;
   }
   if ((c > 0) && ! parent->isExpanded()) {
-    QLOG_DEBUG() << "Expanding parent";
     parent->setExpanded(true);
   }
   return c;
@@ -561,9 +576,9 @@ Place ContentsWidget::getCurrentPlace() {
   QString word;
   QString node;
   QString supplement;
-  for(int i=0; i < item->columnCount();i++) {
-      qDebug() << i << item->text(i);
-  }
+  //  for(int i=0; i < item->columnCount();i++) {
+  //      QLOG_DEBUG() << i << item->text(i);
+  //  }
   if ((item->parent() != 0) && (item->parent()->parent() != 0)) {
     root = item->parent()->text(0);
     word = item->text(1);

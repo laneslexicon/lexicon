@@ -143,3 +143,13 @@ They should not be translated.
 
 #define SID_TABBAR_NUMBER                      "Number"
 #define SID_TABBAR_MOVEABLE                    "Moveable"
+
+
+#define SID_CONTENTS_BACKGROUND                "Background"
+#define SID_CONTENTS_DEBUG                     "Debug"
+#define SID_CONTENTS_EXPAND                    "Expand"
+#define SID_CONTENTS_MOVE_DOWN                 "Move down"
+#define SID_CONTENTS_MOVE_UP                   "Move up"
+#define SID_CONTENTS_STANDARD_FONT             "Standard font"
+#define SID_CONTENTS_ARABIC_FONT               "Arabic font"
+#define SID_CONTENTS_KEEP_FOCUS                "Keep focus"
