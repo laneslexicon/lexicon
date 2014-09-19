@@ -39,7 +39,7 @@
 #include <QPrinter>
 #include "entryitem.h"
 #include "searchoptionswidget.h"
-class LaneGraphicsView;
+//class LaneGraphicsView;
 class Place;
 class GraphicsEntry : public QWidget {
   Q_OBJECT
@@ -218,7 +218,7 @@ class GraphicsEntry : public QWidget {
     void gotoNode(const Place & p,int);
     void printNode(const QString &);
 };
-
+/*
 class LaneGraphicsView : public QGraphicsView {
   Q_OBJECT
  public:
@@ -232,4 +232,5 @@ class LaneGraphicsView : public QGraphicsView {
   void nextPage();
   void backPage();
 };
+*/
 #endif

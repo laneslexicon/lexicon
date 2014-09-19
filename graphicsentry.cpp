@@ -11,9 +11,7 @@
 #include "namespace.h"
 #include "searchdialogs.h"
 #include "searchoptionswidget.h"
-extern LanesLexicon * getApp();
-extern NoteMaster * getNotes();
-extern void statusMessage(const QString &);
+#include "externs.h"
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
   setObjectName("toolbuttondata");
@@ -22,11 +20,11 @@ ToolButtonData::~ToolButtonData() {
 
 }
 /**
- *
+ * NOT NEEDED
  *
  * @param scene
  * @param parent
- */
+
 LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
   QGraphicsView(scene,parent) {
   setObjectName("lexicongraphicsview");
@@ -47,6 +45,7 @@ void LaneGraphicsView::focusInEvent(QFocusEvent * event) {
 void LaneGraphicsView::focusOutEvent(QFocusEvent * event) {
   QGraphicsView::focusOutEvent(event);
 }
+*/
 /**
  * (the QSqlQuery instances rely on the default connection being to
  * to the lexicon)
@@ -69,8 +68,10 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_scene = new QGraphicsScene(this);
   //  m_view = new LaneGraphicsView(m_scene,this);
   m_view = new QGraphicsView(m_scene,this);
+
   m_view->setFocusPolicy(Qt::StrongFocus);
   m_view->setSceneRect(m_scene->sceneRect());
+  m_view->setAlignment(Qt::AlignTop);
 
 
 
