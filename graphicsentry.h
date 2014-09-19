@@ -90,6 +90,7 @@ class GraphicsEntry : public QWidget {
     void onZoomIn();
     void onZoomOut();
     void onReload();
+    void onReload(const QString & css,const QString & xslt);
     void onClearScene();
     void showPerseus(const Place &);
     void showHtml();

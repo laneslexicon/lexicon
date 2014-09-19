@@ -1114,13 +1114,13 @@ void GraphicsEntry::prependEntries(int startPos) {
 QString GraphicsEntry::transform(const QString & xsl,const QString & xml,bool forceCompile) {
   int ok;
   if (forceCompile) {
-   ok = compileStylesheet(2,xsl);
+   ok = compileStylesheet(ENTRY_XSLT_RECOMPILE,xsl);
   }
   else {
-   ok = compileStylesheet(0,xsl);
+   ok = compileStylesheet(ENTRY_XSLT,xsl);
   }
   if (ok == 0) {
-    QString html = xsltTransform(0,xml);
+    QString html = xsltTransform(ENTRY_XSLT,xml);
     if (! html.isEmpty()) {
       return html;
     }
@@ -1882,6 +1882,28 @@ void GraphicsEntry::onReload() {
   }
 
   m_xsltSource = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
+
+  QString html;
+  for (int i=0;i < m_items.size();i++) {
+    html = transform(m_xsltSource,m_items[i]->getXml(),true);
+    m_items[i]->document()->clear();
+    m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
+    m_items[i]->setTextWidth(m_textWidth);
+    m_items[i]->setHtml(html);
+    m_items[i]->setOutputHtml(html);
+  }
+  statusMessage(tr("Reloaded page"));
+}
+void GraphicsEntry::onReload(const QString & css,const QString & xslt) {
+  qDebug() << Q_FUNC_INFO;
+  /// TODO reload CSS
+  if (css.isEmpty()) {
+    //    css = m_currentCss;
+
+  }
+  /// TODO what about print CSS
+
+  //  m_xsltSource = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
 
   QString html;
   for (int i=0;i < m_items.size();i++) {

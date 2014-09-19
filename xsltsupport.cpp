@@ -110,18 +110,18 @@ QString xsltTransform(int type,const QString & xml) {
   int sz;
 
   switch(type) {
-  case 0:
-  case 2: {
+  case ENTRY_XSLT:
+  case ENTRY_XSLT_RECOMPILE: {
     res = xsltApplyStylesheet(cur, doc, params);
     xsltSaveResultToString(&buf,&sz, res,cur);
     break;
   }
-  case 1:{
+  case NODE_XSLT:{
     res = xsltApplyStylesheet(curNode, doc, params);
     xsltSaveResultToString(&buf,&sz, res,curNode);
     break;
   }
-  case 3: {
+  case TEST_XSLT: {
     res = xsltApplyStylesheet(curTest, doc, params);
     xsltSaveResultToString(&buf,&sz, res,curNode);
     break;

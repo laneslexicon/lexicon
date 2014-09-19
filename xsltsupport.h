@@ -31,7 +31,7 @@ using XALAN_CPP_NAMESPACE::XalanCompiledStylesheet;
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 #endif
-
+enum xsltcompile_t {ENTRY_XSLT,NODE_XSLT,ENTRY_XSLT_RECOMPILE,TEST_XSLT };
 void initXslt();
 int compileStylesheet(int type,const QString & xsl);
 QString xsltTransform(int type,const QString & xml);
