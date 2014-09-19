@@ -653,9 +653,9 @@ QTextDocument * FullSearchWidget::fetchDocument(const QString & xml) {
   return doc;
 }
 QString FullSearchWidget::transform(const QString & xml) {
-  int ok = compileStylesheet(1,m_xsltSource);
+  int ok = compileStylesheet(NODE_XSLT,m_xsltSource);
   if (ok == 0) {
-    QString html = xsltTransform(1,xml);
+    QString html = xsltTransform(NODE_XSLT,xml);
     if (! html.isEmpty()) {
       return html;
     }
