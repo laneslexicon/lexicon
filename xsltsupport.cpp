@@ -37,6 +37,7 @@ void freeXslt() {
 #ifdef USE_LIBXSLT
 static xsltStylesheetPtr cur;
 static xsltStylesheetPtr curNode;
+static xsltStylesheetPtr curTest;
 QStringList xmlParseErrors;
 void initXslt() {
    static bool m_init = false;
@@ -50,7 +51,12 @@ void initXslt() {
 /**
  * this is called every time, but only actually compiled once
  *
- * @param xsl the name of the stylesheet file
+ * @type  0   use cur as the stylesheet (usually entry.xslt)
+ *        1   use curNode as the stylesheet (usually node.xslt)
+ *        2   reload stylesheet cur (ie reload entry.xslt)
+ *        3   compile stylesheet string to curTest
+ * @xsl   the name of the stylesheet file when type = 0,1,2
+ *        the actual stylesheet when type = 3
  *
  * @return 0 if ok, otherwise the number of errors
  */
@@ -79,6 +85,12 @@ int compileStylesheet(int type,const QString & xsl) {
     cur = xsltParseStylesheetFile((const xmlChar *)xsl.toUtf8().data());
     return xmlParseErrors.size();
   }
+  if (type == 3) {
+    QByteArray ar = xsl.toUtf8();
+    xmlDocPtr xptr = xmlParseMemory(ar.data(), ar.size());
+    curTest = xsltParseStylesheetDoc(xptr);
+    return xmlParseErrors.size();
+  }
   return 0;
 }
 
@@ -96,13 +108,25 @@ QString xsltTransform(int type,const QString & xml) {
 
   xmlChar * buf;
   int sz;
-  if (type == 0) {
+
+  switch(type) {
+  case 0:
+  case 2: {
     res = xsltApplyStylesheet(cur, doc, params);
     xsltSaveResultToString(&buf,&sz, res,cur);
+    break;
   }
-  else {
+  case 1:{
     res = xsltApplyStylesheet(curNode, doc, params);
     xsltSaveResultToString(&buf,&sz, res,curNode);
+    break;
+  }
+  case 3: {
+    res = xsltApplyStylesheet(curTest, doc, params);
+    xsltSaveResultToString(&buf,&sz, res,curNode);
+    break;
+  }
+  default : break;
   }
 //  xsltSaveResultToFile(stdout, res, cur);
 
@@ -119,6 +143,7 @@ QString xsltTransform(int type,const QString & xml) {
 void freeXslt() {
   xsltFreeStylesheet(cur);
   xsltFreeStylesheet(curNode);
+  xsltFreeStylesheet(curTest);
   xsltCleanupGlobals();
   xmlCleanupParser();
 }
