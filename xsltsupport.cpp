@@ -61,15 +61,16 @@ void initXslt() {
  * @return 0 if ok, otherwise the number of errors
  */
 int compileStylesheet(int type,const QString & xsl) {
-  if (type == 0) {
-   if (cur == 0) {
+  switch(type) {
+  case ENTRY_XSLT: {
+    if (cur == 0) {
       /// if errors in xslt they will be xmlParseErrors
       cur = xsltParseStylesheetFile((const xmlChar *)xsl.toUtf8().data());
       return xmlParseErrors.size();
-   }
+    }
    return 0;
   }
-  if (type == 1) {
+  case NODE_XSLT: {
    if (curNode == 0) {
       /// if errors in xslt they will be xmlParseErrors
       curNode = xsltParseStylesheetFile((const xmlChar *)xsl.toUtf8().data());
@@ -77,7 +78,7 @@ int compileStylesheet(int type,const QString & xsl) {
    }
    return 0;
   }
-  if (type == 2) {
+  case ENTRY_XSLT_RECOMPILE : {
     if (cur != 0) {
       xsltFreeStylesheet(cur);
     }
@@ -85,11 +86,13 @@ int compileStylesheet(int type,const QString & xsl) {
     cur = xsltParseStylesheetFile((const xmlChar *)xsl.toUtf8().data());
     return xmlParseErrors.size();
   }
-  if (type == 3) {
+  case TEST_XSLT: {
     QByteArray ar = xsl.toUtf8();
     xmlDocPtr xptr = xmlParseMemory(ar.data(), ar.size());
     curTest = xsltParseStylesheetDoc(xptr);
     return xmlParseErrors.size();
+  }
+  default : { break;}
   }
   return 0;
 }
