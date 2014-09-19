@@ -267,6 +267,7 @@ bool SearchOptionsWidget::getForceLTR() {
 QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const SearchOptions & options) {
   QRegExp rx;
   QString target = searchtarget;
+  QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
   QString pattern;
 
@@ -280,11 +281,12 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const SearchOp
     if (options.ignoreDiacritics()) {
       /// TODO get from INI
       QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+      target = target.replace(rxclass,QString());
       QStringList cc = target.split("");
       for(int i=0;i < cc.size();i++) {
         pattern += cc[i];
         if (UcdScripts::isScript(cc[i],"Arabic")) {
-          pattern + ar;
+          pattern += ar;
         }
       }
     }
@@ -293,6 +295,10 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const SearchOp
     }
     if (options.wholeWordMatch()) {
       pattern = "\\b" + pattern + "\\b";
+    }
+    else if ( ! options.ignoreDiacritics()) {
+      /// TODO add something like [^rxclass]
+      pattern += "[^\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]";
     }
     rx.setPattern(pattern);
   }
