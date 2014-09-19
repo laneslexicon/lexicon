@@ -170,7 +170,7 @@ class GraphicsEntry : public QWidget {
     qreal m_scale;
 
     QTransform m_transform;
-    QString transform(const QString & xsl,const QString & xml,bool forceCompile = false);
+    QString transform(int type,const QString & xsl,const QString & xml);
 
     QTextOption m_textOption;
 #

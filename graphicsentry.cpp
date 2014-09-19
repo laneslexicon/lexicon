@@ -977,7 +977,7 @@ Place GraphicsEntry::getPage(const Place & p) {
  */
 EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     QString html =
-      transform(m_xsltSource,xml);
+      transform(ENTRY_XSLT,m_xsltSource,xml);
     if (html.isEmpty()) {
       return NULL;
     }
@@ -1111,16 +1111,12 @@ void GraphicsEntry::prependEntries(int startPos) {
     ypos += sz.height() + m_entryMargin;
   }
 }
-QString GraphicsEntry::transform(const QString & xsl,const QString & xml,bool forceCompile) {
+QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
-  if (forceCompile) {
-   ok = compileStylesheet(ENTRY_XSLT_RECOMPILE,xsl);
-  }
-  else {
-   ok = compileStylesheet(ENTRY_XSLT,xsl);
-  }
+  ok = compileStylesheet(type,xsl);
+
   if (ok == 0) {
-    QString html = xsltTransform(ENTRY_XSLT,xml);
+    QString html = xsltTransform(type,xml);
     if (! html.isEmpty()) {
       return html;
     }
@@ -1310,7 +1306,7 @@ void GraphicsEntry::showHtml() {
 
 
   QString xml = item->getXml();
-  QString html = transform(m_xsltSource,xml);
+  QString html = transform(ENTRY_XSLT,m_xsltSource,xml);
 
   QMessageBox msgBox;
   msgBox.setTextFormat(Qt::PlainText);
@@ -1885,7 +1881,7 @@ void GraphicsEntry::onReload() {
 
   QString html;
   for (int i=0;i < m_items.size();i++) {
-    html = transform(m_xsltSource,m_items[i]->getXml(),true);
+    html = transform(ENTRY_XSLT_RECOMPILE,m_xsltSource,m_items[i]->getXml());
     m_items[i]->document()->clear();
     m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
     m_items[i]->setTextWidth(m_textWidth);
@@ -1907,7 +1903,7 @@ void GraphicsEntry::onReload(const QString & css,const QString & xslt) {
 
   QString html;
   for (int i=0;i < m_items.size();i++) {
-    html = transform(m_xsltSource,m_items[i]->getXml(),true);
+    html = transform(ENTRY_XSLT_RECOMPILE,m_xsltSource,m_items[i]->getXml());
     m_items[i]->document()->clear();
     m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
     m_items[i]->setTextWidth(m_textWidth);
