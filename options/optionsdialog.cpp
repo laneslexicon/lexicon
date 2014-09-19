@@ -3,6 +3,9 @@
 #include "rootsoptions.h"
 #include "printoptions.h"
 #include "shortcutoptions.h"
+#ifndef STANDALONE
+#include "application.h"
+#endif
 OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
@@ -10,7 +13,7 @@ OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   QSettings * settings = new QSettings("default.ini",QSettings::IniFormat);
   settings->setIniCodec("UTF-8");
 #else
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  QSettings * settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
 #endif
 
   RootsOptions * tree = new RootsOptions(settings);
@@ -52,7 +55,9 @@ OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   }
   settings->beginGroup("Options");
   this->restoreGeometry(settings->value("Geometry").toByteArray());
-  //  this->restoreState(settings->value("State").toByteArray());
+#ifdef STANDALONE
+  delete settings;
+#endif
 }
 OptionsDialog::~OptionsDialog() {
   writeSettings();
@@ -65,7 +70,6 @@ void OptionsDialog::writeSettings() {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
 #endif
   settings->beginGroup("Options");
-  //  settings->setValue("State",this->saveState());
   settings->setValue("Geometry", saveGeometry());
   settings->endGroup();
 #ifdef STANDALONE
