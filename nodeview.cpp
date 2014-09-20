@@ -20,14 +20,14 @@ NodeView::NodeView(QWidget * parent)
   setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
   setSizeGripEnabled(true);
   QVBoxLayout * layout = new QVBoxLayout;
-  m_rlabel = new QLabel("");
+  m_rlabel = new QLabel("",this);
   m_rlabel->setFont(f);
-  m_hlabel = new QLabel("");
+  m_hlabel = new QLabel("",this);
   m_hlabel->setFont(f);
   QHBoxLayout * hlayout = new QHBoxLayout;
-  hlayout->addWidget(new QLabel(tr("Root")));
+  hlayout->addWidget(new QLabel(tr("Root"),this));
   hlayout->addWidget(m_rlabel);
-  hlayout->addWidget(new QLabel(tr("Entry")));
+  hlayout->addWidget(new QLabel(tr("Entry"),this));
   hlayout->addWidget(m_hlabel);
   hlayout->addStretch();
 

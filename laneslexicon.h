@@ -174,6 +174,7 @@ private:
     SearchOptions m_defaultSearchOptions;
     QString m_configFile;
     QString m_interface;    // "default","minimal"
+    QString m_applicationCssFile;
     EntryLayoutDialog * m_entryLayout;
     QPrinter m_printer;
     QString m_printPdfLocation;

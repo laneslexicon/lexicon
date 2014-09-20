@@ -70,7 +70,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   QSettings * settings  = (qobject_cast<Lexicon *>(qApp))->getSettings();
   m_notes = new NoteMaster(settings);
-  delete settings;
+
   if (m_docked) {
     m_treeDock = new QDockWidget("Contents",this);
     m_treeDock->setObjectName("contentsdock");
@@ -534,10 +534,9 @@ void LanesLexicon::setupShortcuts() {
  *
  */
 void LanesLexicon::loadStyleSheet() {
-  /// TODO from variable setting by QSettings
-  QFile f("app.css");
+  QFile f(m_applicationCssFile);
   if ( ! f.open(QIODevice::ReadOnly)) {
-    QLOG_WARN() << "Unable to open stylesheet";
+    QLOG_WARN() << "Unable to open stylesheet" << m_applicationCssFile;
     return;
   }
   QTextStream in(&f);
@@ -705,7 +704,7 @@ void LanesLexicon::createToolBar() {
   QToolBar * navigation = addToolBar(tr("Navigation"));
   navigation->setObjectName("navigationtoolbar");
   navigation->setIconSize(m_toolbarIconSize);
-  m_navText = new QLabel("",this);
+  m_navText = new QLabel("",navigation);
   if (m_navMode == Lane::By_Root) {
     m_navText->setText(tr("Root"));
   }
@@ -889,14 +888,14 @@ void LanesLexicon::createMenus() {
 }
 
 void LanesLexicon::createStatusBar() {
-  m_navModeIndicator = new QLabel("");
-  m_placeIndicator = new QLabel("");
+  m_navModeIndicator = new QLabel("",this);
+  m_placeIndicator = new QLabel("",this);
 
 
   m_keymapsButton = new QToolButton(this);
   QStringList maps =  m_mapper->getMaps();
   maps << tr("None");
-  QMenu * menu = new QMenu;
+  QMenu * menu = new QMenu(this);
   for(int i=0;i < maps.size();i++) {
     QAction * action  = menu->addAction(maps[i]);
     action->setCheckable(true);
@@ -1279,6 +1278,7 @@ void LanesLexicon::readSettings() {
   if (cmdOptions.contains("db")) {
     m_dbName = cmdOptions.value("db");
   }
+  m_applicationCssFile = settings->value("Stylesheet","app.css").toString();
   QString ar = settings->value("Arabic font").toString();
   if (! ar.isEmpty()) {
     arFont.fromString(ar);

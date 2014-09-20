@@ -71,42 +71,6 @@ bool NoteMaster::openDb() {
     m_enabled = false;
     return false;
   }
-  //  else {
-  //    QLOG_DEBUG() << "tables" << m_db.tables();
-  //  }
-  /*
-  addQuery = new QSqlQuery(m_db);
-  if (! addQuery->prepare("insert into notes (datasource,word,place,subject,note,created) \
-           values (:datasource,:word,:place,:subject,:note,:created)")) {
-    QLOG_WARN() << Q_FUNC_INFO << "SQL add prepare error" << addQuery->lastError().text();
-    m_enabled = false;
-    return false;
-  }
-  updateQuery = new QSqlQuery(m_db);
-  if (! updateQuery->prepare("update notes set subject = ?, note = ?, amended = ? where id = ?")) {
-    QLOG_WARN() << "SQL update prepare error" << updateQuery->lastError().text();
-    m_enabled = false;
-    return false;
-  }
-  deleteQuery = new QSqlQuery(m_db);
-  if (! deleteQuery->prepare("delete from  notes  where id = ?")) {
-    QLOG_WARN() << "SQL delete error" << deleteQuery->lastError().text();
-    m_enabled = false;
-    return false;
-  }
-  findQuery = new QSqlQuery(m_db);
-  if (! findQuery->prepare("select id,word,place,subject,note,created,amended from notes where word = ?")) {
-    QLOG_WARN() << "SQL find error" << findQuery->lastError().text();
-    m_enabled = false;
-    return false;
-  }
-  findOneQuery = new QSqlQuery(m_db);
-  if (! findOneQuery->prepare("select word,place,subject,note,created,amended from notes where id = ?")) {
-    QLOG_WARN() << "SQL find error" << findOneQuery->lastError().text();
-    m_enabled = false;
-    return false;
-  }
-  */
   QLOG_DEBUG() << "=====================================";
   QLOG_DEBUG() << "Notes system successfully initialised";
   QLOG_DEBUG() << "=====================================";
