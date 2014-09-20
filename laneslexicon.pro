@@ -66,7 +66,8 @@ SOURCES += main.cpp\
         searchdialogs.cpp \
         nodeview.cpp \
         splashscreen.cpp \
-        about.cpp
+        about.cpp \
+        entrylayoutdialog.cpp
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
@@ -90,4 +91,6 @@ HEADERS  += laneslexicon.h \
             nodeview.h \
             splashscreen.h \
             about.h \
-            definedsettings.h
+            definedsettings.h \
+            externs.h \
+            entrylayoutdialog.h

@@ -20,6 +20,7 @@
 #include "fullsearch.h"
 #include "headsearch.h"
 #include "definedsettings.h"
+#include "entrylayoutdialog.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
@@ -1203,6 +1204,9 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
 void LanesLexicon::onTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
+  EntryLayoutDialog * d = new EntryLayoutDialog(this);
+  connect(d,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
+  d->exec();
   if (0) {
     SearchOptionsWidget * s = new SearchOptionsWidget(SearchOptions::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
@@ -1221,11 +1225,13 @@ void LanesLexicon::onTest() {
     int c = this->getSearchCount();
     m_tabs->addTab(w,QString(tr("Search %1")).arg(c+1));;
   }
+  if (0) {
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {
       qDebug() << "Found linedit";
     }
+  }
   }
   if (0) {
     HeadSearchWidget * w = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
@@ -1246,6 +1252,7 @@ void LanesLexicon::onTest() {
       }
     }
   }
+  qDebug() << Q_FUNC_INFO << "finished";
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");
@@ -2792,4 +2799,13 @@ void LanesLexicon::sync() {
 void LanesLexicon::printNode(const QString & node) {
   qDebug() << Q_FUNC_INFO << node;
   printCurrentPage(node);
+}
+void LanesLexicon::reloadEntry(const QString & css,const QString & xslt) {
+  qDebug() << Q_FUNC_INFO;
+  for(int i=0;i < m_tabs->count();i++) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+    if (entry) {
+      entry->onReload(css,xslt);
+    }
+  }
 }

@@ -480,9 +480,6 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
   f.close();
   return css;
 }
-
-
-
 bool GraphicsEntry::prepareQueries() {
   bool ok;
   m_pageQuery = new QSqlQuery;
@@ -1114,21 +1111,21 @@ void GraphicsEntry::prependEntries(int startPos) {
 QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
   ok = compileStylesheet(type,xsl);
-
+  qDebug() << Q_FUNC_INFO << "post compile" << ok;
   if (ok == 0) {
     QString html = xsltTransform(type,xml);
     if (! html.isEmpty()) {
       return html;
     }
+    else {
+      QLOG_WARN() << "Transform returned no HTML";
+      return QString();
+    }
   }
   /// could be errors in stylesheet or in the xml
   QStringList errors = getParseErrors();
-  if (ok != 0) {
-    errors.prepend("Errors when processing stylesheet:");
-  }
-  else {
-    errors.prepend("Errors when processing entry:");
-  }
+  /// TODO fix this
+  errors.prepend("Errors when processing entry styesheet:");
   QMessageBox msgBox;
   msgBox.setText(errors.join("\n"));
   msgBox.exec();
@@ -1890,22 +1887,32 @@ void GraphicsEntry::onReload() {
   }
   statusMessage(tr("Reloaded page"));
 }
+/**
+ * This reload function should be used when dynamic versions of css/xslt have changed.
+ * It will not reload from file.
+ *
+ * Written to be used by dialog that allows user to amend xslt/css online
+ *
+ * @param css stylesheet to apply. If empty use current CSS
+ * @param xslt proc to use. If empty, force recompile, otherwise use supplied xslt
+ */
 void GraphicsEntry::onReload(const QString & css,const QString & xslt) {
   qDebug() << Q_FUNC_INFO;
-  /// TODO reload CSS
-  if (css.isEmpty()) {
-    //    css = m_currentCss;
-
-  }
-  /// TODO what about print CSS
-
-  //  m_xsltSource = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
-
   QString html;
   for (int i=0;i < m_items.size();i++) {
-    html = transform(ENTRY_XSLT_RECOMPILE,m_xsltSource,m_items[i]->getXml());
+    if (xslt.isEmpty()) {
+      html = transform(ENTRY_XSLT,m_xsltSource,m_items[i]->getXml());
+    }
+    else {
+      html = transform(TEST_XSLT,xslt,m_items[i]->getXml());
+    }
     m_items[i]->document()->clear();
-    m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
+    if (css.isEmpty()) {
+      m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
+    }
+    else {
+      m_items[i]->document()->setDefaultStyleSheet(css);
+    }
     m_items[i]->setTextWidth(m_textWidth);
     m_items[i]->setHtml(html);
     m_items[i]->setOutputHtml(html);

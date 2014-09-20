@@ -37,7 +37,8 @@ void freeXslt() {
 #ifdef USE_LIBXSLT
 static xsltStylesheetPtr cur;
 static xsltStylesheetPtr curNode;
-static xsltStylesheetPtr curTest;
+static xsltStylesheetPtr curTest = NULL;
+xmlDocPtr xsltTest = NULL;
 QStringList xmlParseErrors;
 void initXslt() {
    static bool m_init = false;
@@ -88,11 +89,15 @@ int compileStylesheet(int type,const QString & xsl) {
   }
   case TEST_XSLT: {
     QByteArray ar = xsl.toUtf8();
-    xmlDocPtr xptr = xmlParseMemory(ar.data(), ar.size());
-    curTest = xsltParseStylesheetDoc(xptr);
+    xsltTest = xmlParseMemory((const char *)ar.data(), ar.size());
+    curTest = xsltParseStylesheetDoc(xsltTest);
+    //    xmlFreeDoc(xptr);
     return xmlParseErrors.size();
   }
-  default : { break;}
+  default : {
+    qWarning() << Q_FUNC_INFO << QObject::tr("compile of unknown type requested") << type;
+    break;
+  }
   }
   return 0;
 }
@@ -126,10 +131,13 @@ QString xsltTransform(int type,const QString & xml) {
   }
   case TEST_XSLT: {
     res = xsltApplyStylesheet(curTest, doc, params);
-    xsltSaveResultToString(&buf,&sz, res,curNode);
+    xsltSaveResultToString(&buf,&sz, res,curTest);
     break;
   }
-  default : break;
+  default : {
+    qWarning() << Q_FUNC_INFO << QObject::tr("transform of unknown type requested") << type;
+    break;
+  }
   }
 //  xsltSaveResultToFile(stdout, res, cur);
 

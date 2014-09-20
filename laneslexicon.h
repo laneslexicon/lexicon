@@ -91,6 +91,7 @@ public:
       void localSearchShow();
       void tabsChanged();
 
+      void reloadEntry(const QString &,const QString &);
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
 
