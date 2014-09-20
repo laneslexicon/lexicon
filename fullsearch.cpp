@@ -106,11 +106,11 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   this->setFocus();
 }
 FullSearchWidget::~FullSearchWidget() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 
 void FullSearchWidget::itemChanged(QTableWidgetItem * /* item */,QTableWidgetItem * /* prev */) {
-  qDebug() << Q_FUNC_INFO << "we should not be here";
+  QLOG_DEBUG() << Q_FUNC_INFO << "we should not be here";
 /*  bool isHead = false;
   /// get the node
   item = item->tableWidget()->item(item->row(),NODE_COLUMN);
@@ -258,7 +258,7 @@ QString escaped = pattern;
 
  */
 void FullSearchWidget::findTarget(bool showProgress) {
-  qDebug() << Q_FUNC_INFO << showProgress;
+  QLOG_DEBUG() << Q_FUNC_INFO << showProgress;
   m_showProgressDialog = showProgress;
   SearchOptions options;
   m_search->getOptions(options);
@@ -308,7 +308,7 @@ void FullSearchWidget::findTarget(bool showProgress) {
  */
 void FullSearchWidget::textSearch(const QString & target,const SearchOptions & options) {
   bool replaceSearch = true;
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_target = target;
   m_searchOptions = options;
   QRegExp rx;
@@ -433,7 +433,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
 
       }
       else {
-        qDebug() << "Error in node Query sql";
+        QLOG_DEBUG() << "Error in node Query sql";
       }
     }
   }
@@ -646,7 +646,7 @@ QTextDocument * FullSearchWidget::fetchDocument(const QString & xml) {
   }
   */
   QString html = transform(xml);
-  //  qDebug() <<  html;
+  //  QLOG_DEBUG() <<  html;
   m_nodeDoc.setHtml(html);
   QTextDocument * doc = new QTextDocument;
   doc->setHtml(html);
@@ -744,7 +744,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
       pattern = "\\b" + pattern + "\\b";
     }
   }
-  //  qDebug() << "Pattern" << pattern;
+  //  QLOG_DEBUG() << "Pattern" << pattern;
   if (! regex.isEmpty()) {
     rx.setPattern(regex.pattern());
   }
@@ -762,7 +762,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
   int ex;
   int sz = m_fragmentSize;
   while(! c.isNull()) {
-    //    qDebug() << "cursor pos" << c.position() <<  "offset in string" << src.indexOf(rx,position);
+    //    QLOG_DEBUG() << "cursor pos" << c.position() <<  "offset in string" << src.indexOf(rx,position);
     position = c.position();
     if (position > sz)
       sx = position - sz;
@@ -776,11 +776,11 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     //    f << src.mid(sx,ex - sx);
     m_positions << position;
     m_fragments << src.mid(sx,ex - sx);
-    //    qDebug() << "fragment size" << (ex - sx);  //QString("[%1][%2][%3][%4]").arg(position).arg(sx).arg(ex).arg(src);
+    //    QLOG_DEBUG() << "fragment size" << (ex - sx);  //QString("[%1][%2][%3][%4]").arg(position).arg(sx).arg(ex).arg(src);
     c = doc->find(rx,position);
   }
   //  if (m_positions.size() > 0) {
-  //    qDebug() << Q_FUNC_INFO << m_positions;
+  //    QLOG_DEBUG() << Q_FUNC_INFO << m_positions;
   //  }
 }
 int FullSearchWidget::getMaxRecords(const QString & table) {
@@ -822,7 +822,7 @@ bool FullSearchWidget::readCssFromFile(const QString & name) {
   return true;
 }
 void FullSearchWidget::focusInEvent(QFocusEvent * event) {
-  qDebug() << Q_FUNC_INFO << event;
+  QLOG_DEBUG() << Q_FUNC_INFO << event;
   if (event->reason() == Qt::OtherFocusReason) {
     if (m_rxlist->rowCount() > 0) {
       m_rxlist->setFocus();
@@ -835,7 +835,7 @@ void FullSearchWidget::focusInEvent(QFocusEvent * event) {
   QWidget::focusInEvent(event);
 }
 void FullSearchWidget::focusOutEvent(QFocusEvent * event) {
-  qDebug() << Q_FUNC_INFO << event;
+  QLOG_DEBUG() << Q_FUNC_INFO << event;
   /*
   if (event->reason() == Qt::OtherFocusReason) {
     if (m_rxlist->rowCount() > 0)
@@ -877,7 +877,7 @@ void FullSearchWidget::showKeyboard() {
 
 }
 void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & options) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_target = target;
   m_searchOptions = options;
 
@@ -914,7 +914,7 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   }
   else {
     rx.setPattern(target);
-    qDebug() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
+    QLOG_DEBUG() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
   }
   m_currentRx = rx;
   bool ok = false;
@@ -1019,7 +1019,7 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   }
   m_rxlist->setUpdatesEnabled(true);
   qint64 et = QDateTime::currentMSecsSinceEpoch();
-  qDebug() << "Search time ms:" << et - st;
+  QLOG_DEBUG() << "Search time ms:" << et - st;
   if (pd) {
     delete pd;
   }

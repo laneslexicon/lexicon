@@ -44,6 +44,7 @@ class Note  {
 class NoteMaster {
  public:
   NoteMaster(QSettings * settings = 0);
+  ~NoteMaster();
   bool openDb();
   bool save(Note *);
   void close();
@@ -58,11 +59,13 @@ class NoteMaster {
  private:
   QSettings * m_settings;
   QSqlDatabase m_db;
+  /*
   QSqlQuery * addQuery;
   QSqlQuery * updateQuery;
   QSqlQuery * deleteQuery;
   QSqlQuery * findQuery;
   QSqlQuery * findOneQuery;
+  */
   QString m_dbName;
   bool m_autosave;
   bool m_enabled;

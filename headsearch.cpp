@@ -47,7 +47,7 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   container->setLayout(containerlayout);
   m_entry = new GraphicsEntry;
   m_entry->installEventFilter(this);
-  //  qDebug() << "result count" << count;
+  //  QLOG_DEBUG() << "result count" << count;
   //  this->search(str,options);
   QSplitter * splitter = new QSplitter(Qt::Horizontal);
   splitter->addWidget(container);
@@ -104,7 +104,7 @@ void HeadSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /*
 }
 void HeadSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   /// get the node
-  qDebug() << Q_FUNC_INFO << "row" << item->row();
+  QLOG_DEBUG() << Q_FUNC_INFO << "row" << item->row();
   item = item->tableWidget()->item(item->row(),2);
   QString node = item->text();
   m_nodeQuery.bindValue(0,node);
@@ -135,8 +135,8 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
     switch(keyEvent->key()) {
     case Qt::Key_S: {
       QString down("S");
-      qDebug() << down << *down.unicode() << down.unicode()->unicode();
-      qDebug() << keyEvent->key() << keyEvent->text();
+      QLOG_DEBUG() << down << *down.unicode() << down.unicode()->unicode();
+      QLOG_DEBUG() << keyEvent->key() << keyEvent->text();
       int row = m_list->currentRow();
       row++;
       if (row >= m_list->rowCount()) {
@@ -146,7 +146,7 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
       break;
     }
     case Qt::Key_Escape: {
-      qDebug() << Q_FUNC_INFO << "escape hit" << target;
+      QLOG_DEBUG() << Q_FUNC_INFO << "escape hit" << target;
       GraphicsEntry * e = qobject_cast<GraphicsEntry *>(target);
       if (e) {
         m_list->setFocus();
@@ -354,7 +354,7 @@ void HeadSearchWidget::focusTable() {
   m_list->setFocus();
 }
 void HeadSearchWidget::focusInEvent(QFocusEvent * event) {
-  qDebug() << Q_FUNC_INFO << event;
+  QLOG_DEBUG() << Q_FUNC_INFO << event;
   if (event->reason() == Qt::OtherFocusReason) {
     if (m_list->rowCount() > 0) {
       m_list->setFocus();
@@ -367,7 +367,7 @@ void HeadSearchWidget::focusInEvent(QFocusEvent * event) {
   QWidget::focusInEvent(event);
 }
 void HeadSearchWidget::focusOutEvent(QFocusEvent * event) {
-  qDebug() << Q_FUNC_INFO << event;
+  QLOG_DEBUG() << Q_FUNC_INFO << event;
   /*
   if (event->reason() == Qt::OtherFocusReason) {
     if (m_rxlist->rowCount() > 0)
@@ -403,7 +403,7 @@ void HeadSearchWidget::readSettings() {
 }
 void HeadSearchWidget::onRemoveResults() {
   Place p = m_entry->getPlace();
-  qDebug() << Q_FUNC_INFO << p;
+  QLOG_DEBUG() << Q_FUNC_INFO << p;
   emit(deleteSearch());
 }
 Place HeadSearchWidget::getPlace() {

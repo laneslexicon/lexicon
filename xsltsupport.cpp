@@ -1,4 +1,5 @@
 #include "xsltsupport.h"
+#include "QsLog.h"
 #ifdef USE_XALAN
 static XalanTransformer * m_xalan;
 const XalanCompiledStylesheet * m_compiledXsl;
@@ -98,7 +99,7 @@ int compileStylesheet(int type,const QString & xsl) {
     return xmlParseErrors.size();
   }
   default : {
-    qWarning() << Q_FUNC_INFO << QObject::tr("compile of unknown type requested") << type;
+    QLOG_WARN() << Q_FUNC_INFO << QObject::tr("compile of unknown type requested") << type;
     break;
   }
   }
@@ -138,7 +139,7 @@ QString xsltTransform(int type,const QString & xml) {
     break;
   }
   default : {
-    qWarning() << Q_FUNC_INFO << QObject::tr("transform of unknown type requested") << type;
+    QLOG_WARN() << Q_FUNC_INFO << QObject::tr("transform of unknown type requested") << type;
     break;
   }
   }

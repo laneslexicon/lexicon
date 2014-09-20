@@ -17,7 +17,7 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   }
   QDir fonts(resourceDir + "/fonts");
   if (! fonts.exists()) {
-    qDebug() << "No font directory";
+    QLOG_DEBUG() << "No font directory";
   }
   else {
     scanForFonts(fonts);

@@ -45,7 +45,7 @@ class ContentsWidget : public QTreeWidget {
   /// this is the background color of the select item when the window
   /// does not have focus
   QString m_backgroundColor;
-  QSqlQuery * m_entryQuery;
+  QSqlQuery m_entryQuery;
   QString m_moveUp;
   QString m_moveDown;
   QString m_expand;

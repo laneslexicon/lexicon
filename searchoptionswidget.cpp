@@ -2,6 +2,7 @@
 #include "fullsearch.h"
 #include "namespace.h"
 #include "scripts.h"
+#include "QsLog.h"
 #define USE_KEYMAPS 0
 SearchOptionsWidget::SearchOptionsWidget(int searchType,QWidget * parent) : QWidget(parent) {
   if (searchType == SearchOptions::Root) {
@@ -104,7 +105,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   showMore(false);
 }
 SearchOptionsWidget::~SearchOptionsWidget() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void SearchOptionsWidget::showMore(bool show) {
   m_more = show;
@@ -212,7 +213,7 @@ void SearchOptionsWidget::showMore(bool show) {
     break;
   }
   default :
-    qDebug() << Q_FUNC_INFO << "unknown search type" << type;
+    QLOG_DEBUG() << Q_FUNC_INFO << "unknown search type" << type;
     break;
   }
 }
@@ -248,7 +249,7 @@ void SearchOptionsWidget::keymapChanged() {
     return;
   QRadioButton * btn = qobject_cast<QRadioButton *>(QObject::sender());
   if (btn) {
-    qDebug() << "keymap" << btn->text();
+    QLOG_DEBUG() << "keymap" << btn->text();
     emit(loadKeymap(btn->text()));
   }
 }

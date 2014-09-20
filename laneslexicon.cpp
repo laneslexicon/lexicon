@@ -70,7 +70,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   QSettings * settings  = (qobject_cast<Lexicon *>(qApp))->getSettings();
   m_notes = new NoteMaster(settings);
-
+  delete settings;
   if (m_docked) {
     m_treeDock = new QDockWidget("Contents",this);
     m_treeDock->setObjectName("contentsdock");
@@ -178,7 +178,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
    * bit confusing.
    */
   QApplication::setActiveWindow(m_tabs->currentWidget());
-  qDebug() << "Activating current entry";
+  QLOG_DEBUG() << "Activating current entry";
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->focusPlace();
@@ -190,7 +190,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   /*
   QList<QShortcut *> edits = this->findChildren<QShortcut *>();
   foreach(QShortcut *  widget,edits) {
-    //    qDebug() << widget->key().toString();
+    //    QLOG_DEBUG() << widget->key().toString();
   }
   edits.clear()
   */
@@ -546,6 +546,7 @@ void LanesLexicon::loadStyleSheet() {
   if (! css.isEmpty()) {
     qApp->setStyleSheet(css);
   }
+  f.close();
 }
 /*
 QAction * LanesLexicon::createIconAction(const QString imgdir,const QString & iconfile,const QString & text) {
@@ -704,7 +705,7 @@ void LanesLexicon::createToolBar() {
   QToolBar * navigation = addToolBar(tr("Navigation"));
   navigation->setObjectName("navigationtoolbar");
   navigation->setIconSize(m_toolbarIconSize);
-  m_navText = new QLabel("");
+  m_navText = new QLabel("",this);
   if (m_navMode == Lane::By_Root) {
     m_navText->setText(tr("Root"));
   }
@@ -743,7 +744,7 @@ void LanesLexicon::createToolBar() {
   }
   action->setData(QVariant(1));//event->getId());
   connect(action,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
-  QMenu * m = new QMenu;
+  QMenu * m = new QMenu(this);
   m->addActions(group->actions());
   m_navBtn->setEnabled(true);
   m_navBtn->setMenu(m);
@@ -795,7 +796,7 @@ void LanesLexicon::setupHistory(int currPos) {
   QLOG_DEBUG() << Q_FUNC_INFO << currPos;
   m_historyPos = currPos;
   QList<HistoryEvent *> events = m_history->getHistory();//10,0,currPos);
-  qDebug() << Q_FUNC_INFO << "event size" << events.size();
+  QLOG_DEBUG() << Q_FUNC_INFO << "event size" << events.size();
   if (events.size() == 0) {
     m_hBackwardBtn->setEnabled(false);
     m_clearHistoryAction->setEnabled(false);
@@ -806,7 +807,7 @@ void LanesLexicon::setupHistory(int currPos) {
     m_clearHistoryAction->setEnabled(true);
   }
   QList<QAction *> actions = m_historyMenu->actions();
-  qDebug() << Q_FUNC_INFO << "history actions size" << actions.size();
+  QLOG_DEBUG() << Q_FUNC_INFO << "history actions size" << actions.size();
   actions.removeOne(m_clearHistoryAction);
   for(int i=0;i < actions.size();i++) {
     m_historyMenu->removeAction(actions[i]);
@@ -997,7 +998,8 @@ void LanesLexicon::onExit()
 }
 bool LanesLexicon::openDatabase(const QString & dbname) {
   QFile dbfile(dbname);
-  if (! dbfile.exists()) {
+
+  if (! dbfile.exists() ) {
     QLOG_WARN() << QString(tr("Cannot find database : %1")).arg(dbname);
     return false;
   }
@@ -1232,7 +1234,7 @@ void LanesLexicon::onTest() {
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {
-      qDebug() << "Found linedit";
+      QLOG_DEBUG() << "Found linedit";
     }
   }
   }
@@ -1251,11 +1253,11 @@ void LanesLexicon::onTest() {
         m_tabs->setCurrentIndex(ix);
       }
       else {
-        qDebug() << "could not clone graphcicsentry";
+        QLOG_DEBUG() << "could not clone graphcicsentry";
       }
     }
   }
-  qDebug() << Q_FUNC_INFO << "finished";
+  QLOG_DEBUG() << Q_FUNC_INFO << "finished";
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");
@@ -1488,7 +1490,7 @@ void LanesLexicon::restoreTabs() {
         scale = 1.0;
       }
       Place p = Place::fromString(v);
-      qDebug() << "restoring" << v << p.isValid();
+      QLOG_DEBUG() << "restoring" << v << p.isValid();
       int tw;
       if (! cmdOptions.contains("textwidth")) {
         tw = settings->value("textwidth",textWidth).toInt(&ok);
@@ -2044,7 +2046,7 @@ void LanesLexicon::movePrevious(const Place & p) {
   }
 }
 void LanesLexicon::setStatus(const QString & txt) {
-  qDebug() << Q_FUNC_INFO << txt;
+  QLOG_DEBUG() << Q_FUNC_INFO << txt;
   statusBar()->showMessage(txt);
 }
 void LanesLexicon::updateStatusBar() {
@@ -2245,7 +2247,7 @@ void LanesLexicon::searchForRoot() {
  *
  */
 void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & t) {
-  qDebug() << Q_FUNC_INFO << searchType;
+  QLOG_DEBUG() << Q_FUNC_INFO << searchType;
   QString target = t;
   SearchOptions options;
   d->getOptions(options);
@@ -2416,7 +2418,7 @@ void LanesLexicon::printCurrentPage(const QString & node) {
       }
     }
     else {
-      qDebug() << "printer is not valid";
+      QLOG_DEBUG() << "printer is not valid";
     }
   */
 
@@ -2475,7 +2477,7 @@ int LanesLexicon::searchTabs(const QString & node) {
   return -1;
 }
 void LanesLexicon::syncContents() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if ( ! entry )
     return;
@@ -2551,7 +2553,7 @@ void LanesLexicon::convertToEntry() {
 }
 void LanesLexicon::enableKeymaps(bool v) {
   m_keymapsEnabled = v;
-  qDebug() << Q_FUNC_INFO << v;
+  QLOG_DEBUG() << Q_FUNC_INFO << v;
   m_keymapsButton->setEnabled(v);
   QString tip;
   if (m_keymapsEnabled)
@@ -2779,7 +2781,7 @@ void LanesLexicon::setIcons(const QString & theme) {
 
 }
 void LanesLexicon::sync() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QWidget * w = QApplication::focusWidget();
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (!entry) {
@@ -2800,11 +2802,11 @@ void LanesLexicon::sync() {
   }
 }
 void LanesLexicon::printNode(const QString & node) {
-  qDebug() << Q_FUNC_INFO << node;
+  QLOG_DEBUG() << Q_FUNC_INFO << node;
   printCurrentPage(node);
 }
 void LanesLexicon::reloadEntry(const QString & css,const QString & xslt) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
     if (entry) {
@@ -2813,7 +2815,7 @@ void LanesLexicon::reloadEntry(const QString & css,const QString & xslt) {
   }
 }
 void LanesLexicon::revertEntry() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
     if (entry) {

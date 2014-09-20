@@ -42,6 +42,9 @@ NoteMaster::NoteMaster(QSettings * settings) {
   if (m_enabled)
     openDb();
 }
+NoteMaster::~NoteMaster() {
+  delete m_settings;
+}
 bool NoteMaster::openDb() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   if ( ! m_enabled )

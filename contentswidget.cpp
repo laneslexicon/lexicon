@@ -126,13 +126,9 @@ void ContentsWidget::loadContents() {
     delete out;
   }
   resizeColumnToContents(HEAD_SUPPLEMENT_COLUMN);
-  m_entryQuery = new QSqlQuery;
-  bool ok = m_entryQuery->prepare("select word,itype,bword,nodeId,supplement from entry where datasource = 1 and root = ? order by nodenum asc");
-  if ( ! ok ) {
-    QLOG_WARN() << "Entry SQL prepare failed" << m_entryQuery->lastError();
+  if (m_entryQuery.prepare("select word,itype,bword,nodeId,supplement from entry where datasource = 1 and root = ? order by nodenum asc")) {
+    QLOG_WARN() << "Entry SQL prepare failed" << m_entryQuery.lastError();
   }
-  qDebug() << "root count" << rootCount;
-  qDebug() << "font" << this->font().toString();
 }
 Place ContentsWidget::findNextPlace(const Place & p) {
   QTreeWidgetItem * currentItem = 0;
@@ -538,26 +534,26 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   if (parent->childCount() > 0) {
     return -1;
   }
-  m_entryQuery->bindValue(0,root);
-  m_entryQuery->exec();
+  m_entryQuery.bindValue(0,root);
+  m_entryQuery.exec();
   bool isSupplementRoot = false;
   if (parent->text(1) == "*") {
     isSupplementRoot = true;
   }
-  while(m_entryQuery->next()) {
+  while(m_entryQuery.next()) {
     //QLOG_DEBUG() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
     supplement.clear();
-    if (! isSupplementRoot && (m_entryQuery->value("supplement").toInt() == 1)) {
+    if (! isSupplementRoot && (m_entryQuery.value("supplement").toInt() == 1)) {
       supplement = "*";
     }
-    itype = m_entryQuery->value("itype").toString();
-    word = m_entryQuery->value("word").toString();
-    node = m_entryQuery->value("nodeid").toString();
+    itype = m_entryQuery.value("itype").toString();
+    word = m_entryQuery.value("word").toString();
+    node = m_entryQuery.value("nodeid").toString();
     QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << itype << word << supplement << node);
     item->setFont(0,m_itypeFont);
     item->setFont(NODE_COLUMN,m_itypeFont);
     item->setFont(HEAD_SUPPLEMENT_COLUMN,m_itypeFont);
-    item->setData(0,Qt::UserRole,m_entryQuery->value("nodeId"));//.toString()
+    item->setData(0,Qt::UserRole,m_entryQuery.value("nodeId"));//.toString()
     parent->addChild(item);
     c++;
   }

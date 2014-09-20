@@ -260,7 +260,7 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
         this->focusNode(m_focusNode);
       }
     else {
-      qDebug() << "No home to go to";
+      QLOG_DEBUG() << "No home to go to";
     }
     return;
   }
@@ -354,10 +354,10 @@ void GraphicsEntry::linkActivated(const QString & link) {
   }
 
   QUrl url(link);
-  qDebug() << Q_FUNC_INFO << url;
+  QLOG_DEBUG() << Q_FUNC_INFO << url;
   if (url.hasQuery()) {
     QString msg = url.query();
-    qDebug() << "query" << msg;
+    QLOG_DEBUG() << "query" << msg;
     if (msg.startsWith("text=")) {
       msg.remove("text=");
       QMessageBox::information(this, tr("A note from the editor"),
@@ -442,7 +442,7 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,int options) {
   Place np;
   if (! thisPageOnly ) {
     Place p;
-    qDebug() << "Out of page for node" << node;
+    QLOG_DEBUG() << "Out of page for node" << node;
     p.setNode(node);
     p.setOptions(options);
     emit(gotoNode(p,options));
@@ -525,7 +525,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   //  bool nodeOnly = dp.getNodeOnly();
 
   m_focusNode = node;
-  qDebug() << "Focus node set" << node;
+  QLOG_DEBUG() << "Focus node set" << node;
   Place p = dp;
   /**
    * if we asked for the node, look up the root
@@ -583,7 +583,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// add the root item unless nodeOnly is set
 
   QString str = QString("<word type=\"root\" ar=\"%1\" quasi=\"%2\"></word>").arg(root).arg(quasi);
-qDebug() << str;
+QLOG_DEBUG() << str;
   EntryItem * rootItem  = createEntry(str);
   /// will be null if the XSLT/XML has not parsed correctly
   if (rootItem == NULL) {
@@ -742,7 +742,7 @@ qDebug() << str;
     this->setCurrentItem(centerItem);
   }
   else {
-    qDebug() << Q_FUNC_INFO << "no center item";
+    QLOG_DEBUG() << Q_FUNC_INFO << "no center item";
   }
       //      int h =  m_view->height();
       //      QPointF pt = centerItem->pos();
@@ -1105,7 +1105,7 @@ void GraphicsEntry::prependEntries(int startPos) {
 QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
   ok = compileStylesheet(type,xsl);
-  qDebug() << Q_FUNC_INFO << "post compile" << ok;
+  QLOG_DEBUG() << Q_FUNC_INFO << "post compile" << ok;
   if (ok == 0) {
     QString html = xsltTransform(type,xml);
     if (! html.isEmpty()) {
@@ -1240,7 +1240,7 @@ QString GraphicsEntry::firstRoot() {
     return root;
 }
 void GraphicsEntry::highlight(const QString & target) {
-  qDebug() << Q_FUNC_INFO << "we should not be here";
+  QLOG_DEBUG() << Q_FUNC_INFO << "we should not be here";
   int ix = -1;
   QTextCursor cursor;
   for(int i=0;i < m_items.size();i++ ) {
@@ -1290,7 +1290,7 @@ void GraphicsEntry::showPerseus(const Place & p) {
   msgBox.exec();
 }
 void GraphicsEntry::showHtml() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   EntryItem * item = qobject_cast<EntryItem *>(QObject::sender());
   if (! item )
     return;
@@ -1436,7 +1436,7 @@ bool GraphicsEntry::focusNode(const QString & node) {
       return true;
     }
   }
-  qDebug() << "Warning: focusNode failed, cannot find node" << node;
+  QLOG_DEBUG() << "Warning: focusNode failed, cannot find node" << node;
   return false;
 }
 /**
@@ -1535,7 +1535,7 @@ int GraphicsEntry::search() {
   // int max = m_items.size() * step;
   QString v;
 
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("LocalSearch");
   v  = settings->value("Type",QString("normal")).toString();
@@ -1599,7 +1599,7 @@ int GraphicsEntry::search() {
   return count;
 }
 void GraphicsEntry::searchNext() {
-  //  qDebug() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
   int pos = m_currentSearchPosition;
   m_currentSearchPosition = -1;
   bool found = false;
@@ -1627,7 +1627,7 @@ void GraphicsEntry::searchNext() {
           qreal dy = (h * (qreal)m_currentSearchPosition)/(qreal)charCount;
           QPointF p = m_items[i]->scenePos();
           p.setY(p.y() + dy);
-          qDebug() << "adjusting pos" << dy;
+          QLOG_DEBUG() << "adjusting pos" << dy;
           m_view->ensureVisible(QRectF(p,QSizeF(10,10)));
         }
       }
@@ -1638,12 +1638,12 @@ void GraphicsEntry::searchNext() {
         }
         /*
         if (m_items[i]->boundingRect().height() > m_view->height()) {
-          qDebug() << "scrolling candidate";
+          QLOG_DEBUG() << "scrolling candidate";
           int charCount = m_items[i]->document()->characterCount();
           qreal h = m_items[i]->boundingRect().height();
           qreal dy = (h * (qreal)m_currentSearchPosition)/(qreal)charCount;
           QPointF p = m_items[i]->scenePos();
-          qDebug() << "dy" << dy;
+          QLOG_DEBUG() << "dy" << dy;
           m_view->ensureVisible(QRectF(p,QSizeF(10,10)));
         }
         */
@@ -1851,7 +1851,7 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   }
 }
 void GraphicsEntry::onReload() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   /// TODO reload CSS
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Entry");
@@ -1891,7 +1891,7 @@ void GraphicsEntry::onReload() {
  * @param xslt proc to use. If empty, force recompile, otherwise use supplied xslt
  */
 void GraphicsEntry::onReload(const QString & css,const QString & xslt) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QString html;
   for (int i=0;i < m_items.size();i++) {
     if (xslt.isEmpty()) {

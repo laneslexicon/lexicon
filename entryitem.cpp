@@ -183,11 +183,11 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
 
   }
   else if (htmlAction && (selectedAction == htmlAction)) {
-    qDebug() << "Emit html action";
+    QLOG_DEBUG() << "Emit html action";
     emit(showHtml());
   }
   else if (selectedAction == printAction) {
-    qDebug() << "sending printNode signal" << m_place.getNode();
+    QLOG_DEBUG() << "sending printNode signal" << m_place.getNode();
     emit(printNode(m_place.getNode()));
   }
   this->setFocus();
@@ -377,7 +377,7 @@ void EntryItem::deleteNote() {
     m_noteWidget = NULL;
   }
   else {
-    qDebug() << "no note widget to delete";
+    QLOG_DEBUG() << "no note widget to delete";
   }
 }
 QList<Note *> EntryItem::getNotes(bool erase) {
@@ -402,14 +402,14 @@ void EntryItem::notesAccepted() {
   this->setFocus();
 }
 int EntryItem::find(const QRegExp & rx,int position) {
-  //  qDebug() << Q_FUNC_INFO << position;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << position;
   QTextCursor c = this->document()->find(rx,position);
   //  this->setTextInteractionFlags(Qt::TextEditorInteraction);
   //  this->setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | this->flags());
   //  int flags = this->textInteractionFlags();
   //  this->setTextInteractionFlags(Qt::TextEditable);
   if (c.isNull()) {
-    //qDebug() << "regex not matched" << rx.pattern();
+    //QLOG_DEBUG() << "regex not matched" << rx.pattern();
     return -1;
   }
   /// the find positions the cursor at the end, so move back one carh
@@ -420,16 +420,16 @@ int EntryItem::find(const QRegExp & rx,int position) {
   this->setTextCursor(c);
   /*
   QTextCharFormat fmt = QTextEdit::ExtraSelection::format;//c.charFormat();
-  qDebug() << fmt.background().color().name();
-  qDebug() << fmt.foreground().color().name();
+  QLOG_DEBUG() << fmt.background().color().name();
+  QLOG_DEBUG() << fmt.foreground().color().name();
   QTextBlockFormat bfmt = c.blockFormat();
-  qDebug() << bfmt.background().color().name();
-  qDebug() << bfmt.foreground().color().name();
+  QLOG_DEBUG() << bfmt.background().color().name();
+  QLOG_DEBUG() << bfmt.foreground().color().name();
   */
   //  c.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
 
-  //  qDebug() << "linecount" << this->document()->lineCount() << "text width" << this->textWidth() << this->document()->characterCount();
-  //  qDebug() << "boundingRect" << this->boundingRect();
+  //  QLOG_DEBUG() << "linecount" << this->document()->lineCount() << "text width" << this->textWidth() << this->document()->characterCount();
+  //  QLOG_DEBUG() << "boundingRect" << this->boundingRect();
 
 
   return c.position();

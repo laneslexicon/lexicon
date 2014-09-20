@@ -43,7 +43,7 @@ void BookmarkWidget::setPlace() {
   this->accept();
 }
 void BookmarkWidget::jump(QListWidgetItem * item) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   this->setPlace();
 }
 bool BookmarkWidget::eventFilter(QObject * target ,QEvent * event) {

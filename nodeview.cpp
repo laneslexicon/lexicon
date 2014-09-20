@@ -61,7 +61,7 @@ NodeView::NodeView(QWidget * parent)
   setLayout(layout);
 }
 NodeView::~NodeView() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void NodeView::setPreferredSize(const QString & szStr) {
   m_size.setWidth(400);

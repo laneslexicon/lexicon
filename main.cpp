@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
       options.insert(textWidthOption.valueName(),parser.value(textWidthOption));
     }
     a.setOptions(options);
-    qDebug() << options;
+    QLOG_DEBUG() << options;
     QTranslator translator;
     QString trfile;
     if (options.contains("lang")) {

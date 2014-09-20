@@ -9,7 +9,7 @@
 #include <QFontDatabase>
 #include <QWidget>
 #include <iostream>
-
+#include "QsLog.h"
 class Lexicon : public QApplication {
   Q_OBJECT;
 public:

@@ -7,7 +7,7 @@ extern LanesLexicon * getApp();
 ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
 
-  qDebug() << Q_FUNC_INFO << searchType;
+  QLOG_DEBUG() << Q_FUNC_INFO << searchType;
   switch(searchType) {
   case SearchOptions::Root :
     setWindowTitle(tr("Search for Root"));
@@ -70,7 +70,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->getActiveMap();
-  qDebug() << Q_FUNC_INFO << "active map" << map;
+  QLOG_DEBUG() << Q_FUNC_INFO << "active map" << map;
   if (map.isEmpty()) {
     map = m_edit->getNullMap();
   }

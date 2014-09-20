@@ -43,10 +43,10 @@ EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QDialog(parent) {
   setLayout(layout);
   setModal(false);
   connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(onTabChange(int)));
-  qDebug() << "got here";
+  QLOG_DEBUG() << "got here";
 }
 EntryLayoutDialog::~EntryLayoutDialog()    {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void EntryLayoutDialog::onTabChange(int ix) {
   if (ix == 0) {
