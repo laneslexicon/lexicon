@@ -88,10 +88,13 @@ int compileStylesheet(int type,const QString & xsl) {
     return xmlParseErrors.size();
   }
   case TEST_XSLT: {
+    if (curTest != 0) {
+      xsltFreeStylesheet(curTest);
+    }
     QByteArray ar = xsl.toUtf8();
     xsltTest = xmlParseMemory((const char *)ar.data(), ar.size());
     curTest = xsltParseStylesheetDoc(xsltTest);
-    //    xmlFreeDoc(xptr);
+    //    xmlFreeDoc(xsltTest);
     return xmlParseErrors.size();
   }
   default : {
