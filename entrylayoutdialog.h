@@ -15,6 +15,8 @@
 #include <QDialogButtonBox>
 #include <QAbstractButton>
 #include <QCheckBox>
+#include <QRadioButton>
+#include <QGroupBox>
 class NoteMaster;
 class EntryLayoutDialog : public QDialog {
   Q_OBJECT
@@ -33,6 +35,8 @@ private:
   QDialogButtonBox * m_testButtons;
   QDialogButtonBox * m_stateButtons;
   QCheckBox * m_which;
+  QRadioButton * m_useOne;
+  QRadioButton * m_useTwo;
   QString m_css;
   QString m_xslt;
   QString m_cssFileName;

@@ -5,9 +5,9 @@
 #include "externs.h"
 EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
-  m_tabs = new QTabWidget;
-  m_cssEdit = new QPlainTextEdit;
-  m_xsltEdit = new QPlainTextEdit;
+  m_tabs = new QTabWidget(this);
+  m_cssEdit = new QPlainTextEdit(this);
+  m_xsltEdit = new QPlainTextEdit(this);
 
   m_tabs->addTab(m_cssEdit,"CSS");
   m_tabs->addTab(m_xsltEdit,"XSLT");
@@ -20,12 +20,22 @@ EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QDialog(parent) {
   m_stateButtons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Reset | QDialogButtonBox::Close);
 
   m_which = new QCheckBox("Both");
+
+  m_useOne = new QRadioButton(tr("Use current"));
+  m_useTwo = new QRadioButton(tr("Use both"));
+  QGroupBox * groupbox = new QGroupBox("Usage",this);
+  QHBoxLayout * radiolayout = new QHBoxLayout;
+  radiolayout->addWidget(m_useOne);
+  radiolayout->addWidget(m_useTwo);
+  groupbox->setLayout(radiolayout);
+
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(m_testButtons);
   hlayout->addStretch();
   hlayout->addWidget(m_stateButtons);
   layout->addWidget(m_tabs);
   layout->addWidget(m_which);
+  layout->addWidget(groupbox);
   layout->addLayout(hlayout);
 
   connect(m_testButtons,SIGNAL(clicked(QAbstractButton *)),this,SLOT(onTest(QAbstractButton *)));
@@ -33,6 +43,7 @@ EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QDialog(parent) {
   setLayout(layout);
   setModal(false);
   connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(onTabChange(int)));
+  qDebug() << "got here";
 }
 EntryLayoutDialog::~EntryLayoutDialog()    {
   qDebug() << Q_FUNC_INFO;
