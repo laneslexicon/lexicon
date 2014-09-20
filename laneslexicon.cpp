@@ -33,6 +33,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_ok = false;
   m_history = 0;
   m_revertEnabled = false;
+  m_entryLayout = NULL;
   m_mapper = im_new();
   readSettings();
 
@@ -234,6 +235,9 @@ void LanesLexicon::cleanup() {
   if (m_notesDb.isOpen())
     m_notesDb.close();
 
+  if (m_entryLayout != NULL) {
+    delete m_entryLayout;
+  }
   delete m_tree;
   /// TODO close notes db
   freeXslt();
@@ -1204,9 +1208,15 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
 void LanesLexicon::onTest() {
   //  QKeySequenceEdit * w = new QKeySequenceEdit;
   //  w->show();
-  EntryLayoutDialog * d = new EntryLayoutDialog(this);
-  connect(d,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
-  d->exec();
+  if (m_entryLayout == NULL) {
+    m_entryLayout  = new EntryLayoutDialog(this);
+  }
+  else {
+    m_entryLayout->show();
+  }
+  connect(m_entryLayout,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
+  connect(m_entryLayout,SIGNAL(revert()),this,SLOT(revertEntry()));
+  m_entryLayout->show();
   if (0) {
     SearchOptionsWidget * s = new SearchOptionsWidget(SearchOptions::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
@@ -2806,6 +2816,15 @@ void LanesLexicon::reloadEntry(const QString & css,const QString & xslt) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
     if (entry) {
       entry->onReload(css,xslt);
+    }
+  }
+}
+void LanesLexicon::revertEntry() {
+  qDebug() << Q_FUNC_INFO;
+  for(int i=0;i < m_tabs->count();i++) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+    if (entry) {
+      entry->onReload();
     }
   }
 }

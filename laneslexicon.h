@@ -57,6 +57,7 @@ class InputMapper;
 class GraphicsEntry;
 class ContentsWidget;
 class TabWidget;
+class EntryLayoutDialog;
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
@@ -92,6 +93,7 @@ public:
       void tabsChanged();
 
       void reloadEntry(const QString &,const QString &);
+      void revertEntry();
     void findNextRoot(const QString &);
     void findPrevRoot(const QString &);
 
@@ -172,7 +174,7 @@ private:
     SearchOptions m_defaultSearchOptions;
     QString m_configFile;
     QString m_interface;    // "default","minimal"
-
+    EntryLayoutDialog * m_entryLayout;
     QPrinter m_printer;
     QString m_printPdfLocation;
     bool m_printToPdf;

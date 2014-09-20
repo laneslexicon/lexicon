@@ -6,7 +6,6 @@
 EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   m_tabs = new QTabWidget;
-  qDebug() << Q_FUNC_INFO << "start setup";
   m_cssEdit = new QPlainTextEdit;
   m_xsltEdit = new QPlainTextEdit;
 
@@ -18,17 +17,33 @@ EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QDialog(parent) {
   m_xsltEdit->setPlainText(m_xslt);
 
   m_testButtons = new QDialogButtonBox(QDialogButtonBox::Apply | QDialogButtonBox::Reset);
-  m_stateButtons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Discard | QDialogButtonBox::Close);
+  m_stateButtons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Reset | QDialogButtonBox::Close);
+
+  m_which = new QCheckBox("Both");
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(m_testButtons);
   hlayout->addStretch();
   hlayout->addWidget(m_stateButtons);
   layout->addWidget(m_tabs);
+  layout->addWidget(m_which);
   layout->addLayout(hlayout);
 
   connect(m_testButtons,SIGNAL(clicked(QAbstractButton *)),this,SLOT(onTest(QAbstractButton *)));
+  connect(m_stateButtons,SIGNAL(clicked(QAbstractButton *)),this,SLOT(onState(QAbstractButton *)));
   setLayout(layout);
-  qDebug() << Q_FUNC_INFO << "done setup";
+  setModal(false);
+  connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(onTabChange(int)));
+}
+EntryLayoutDialog::~EntryLayoutDialog()    {
+  qDebug() << Q_FUNC_INFO;
+}
+void EntryLayoutDialog::onTabChange(int ix) {
+  if (ix == 0) {
+    m_which->setText("Use Css only");
+  }
+  else {
+    m_which->setText("Use Xslt only");
+  }
 }
 QSize EntryLayoutDialog::sizeHint() const {
   return QSize(800,600);
@@ -40,23 +55,31 @@ void EntryLayoutDialog::onTest(QAbstractButton * btn) {
     emit(reload(css,xslt));
   }
   else {
-    qDebug() << "reset";
+    emit(revert());
+  }
+}
+void EntryLayoutDialog::onState(QAbstractButton * btn) {
+  if (btn == m_stateButtons->button(QDialogButtonBox::Reset)) {
+    m_cssEdit->setPlainText(m_css);
+    m_xsltEdit->setPlainText(m_xslt);
+  }
+  else if (btn == m_stateButtons->button(QDialogButtonBox::Save)) {
+  }
+  else {
+    ///
+    this->hide();
   }
 }
 
 void EntryLayoutDialog::readSettings() {
-  QString txt;
-  QString v;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QMap<QString,QString> cmdOptions = app->getOptions();
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Entry");
 
-  v = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
-  txt = loadFromFile(0,v);
-  m_css = txt;
-  v = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
-  m_xslt = loadFromFile(1,v);
+  settings->beginGroup("Entry");
+  m_cssFileName = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
+  m_css = loadFromFile(0,m_cssFileName);
+  m_xsltFileName = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
+  m_xslt = loadFromFile(1,m_xsltFileName);
 }
 /**
  *
