@@ -106,20 +106,9 @@ QString EntryLayoutDialog::loadFromFile(int type,const QString & name) {
     return txt;
   }
   QTextStream in(&f);
-  QString line;
   while( ! in.atEnd()) {
-    line = in.readLine();
-    if (line.startsWith("-")) {
-      if (type == 1) {
-        txt += line;
-        txt += "\n";
-      }
-    }
-    else {
-      txt += line;
-      txt += "\n";
-    }
-
+    txt += in.readLine();
+    txt += "\n";
   }
   f.close();
   return txt;

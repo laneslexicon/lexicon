@@ -803,7 +803,6 @@ int FullSearchWidget::getMaxRecords(const QString & table) {
 }
 
 /**
- * lines beginning with - are omitted
  *
  */
 bool FullSearchWidget::readCssFromFile(const QString & name) {
@@ -815,19 +814,11 @@ bool FullSearchWidget::readCssFromFile(const QString & name) {
 
   }
   QTextStream in(&f);
-  QString css;
-  QString t;
-  while( ! in.atEnd()) {
-    t = in.readLine();
-    if (! t.startsWith("-")) {
-      css += t;
-    }
-  }
+  QString css = in.readAll();
   f.close();
   if (! css.isEmpty()) {
     m_currentCSS = css;
   }
-  qDebug() << m_currentCSS;
   return true;
 }
 void FullSearchWidget::focusInEvent(QFocusEvent * event) {

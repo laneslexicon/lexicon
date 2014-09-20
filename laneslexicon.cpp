@@ -540,16 +540,9 @@ void LanesLexicon::loadStyleSheet() {
     QLOG_WARN() << "Unable to open stylesheet";
     return;
   }
-  QString css;
   QTextStream in(&f);
   in.setCodec("UTF-8");
-  QString t;
-  while(! in.atEnd()) {
-    t = in.readLine();
-    if (! t.startsWith("#")) {
-      css += t;
-    }
-  }
+  QString css = in.readAll();
   if (! css.isEmpty()) {
     qApp->setStyleSheet(css);
   }

@@ -458,7 +458,7 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,int options) {
   return np;
 }
 /**
- * lines beginning with - are omitted
+ *
  *
  */
 QString GraphicsEntry::readCssFromFile(const QString & name) {
@@ -470,13 +470,7 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
     return css;
   }
   QTextStream in(&f);
-  QString line;
-  while( ! in.atEnd()) {
-    line = in.readLine();
-    if (! line.startsWith("-")) {
-      css += line;
-    }
-  }
+  css = in.readAll();
   f.close();
   return css;
 }
