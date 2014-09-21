@@ -13,9 +13,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QDialogButtonBox>
-#include <QAbstractButton>
 #include <QCheckBox>
-#include <QRadioButton>
+#include <QTextStream>
 #include <QGroupBox>
 class NoteMaster;
 class EntryLayoutDialog : public QDialog {
@@ -25,18 +24,26 @@ class EntryLayoutDialog : public QDialog {
   EntryLayoutDialog(QWidget * parent = 0);
   ~EntryLayoutDialog();
  public slots:
-  void onTest(QAbstractButton *);
-  void onState(QAbstractButton *);
-  void onTabChange(int);
+  void onApply();
+  void onReset();
+  void onSave();
+  void onRestore();
+  void onClose();
+  void onTextChanged();
 private:
   QTabWidget * m_tabs;
   QPlainTextEdit  * m_cssEdit;
   QPlainTextEdit * m_xsltEdit;
-  QDialogButtonBox * m_testButtons;
-  QDialogButtonBox * m_stateButtons;
-  QCheckBox * m_which;
-  QRadioButton * m_useOne;
-  QRadioButton * m_useTwo;
+  QPushButton * m_applyButton;
+  QPushButton * m_resetButton;
+  QPushButton * m_saveButton;
+  QPushButton * m_restoreButton;
+  QPushButton * m_closeButton;
+  QCheckBox * m_testCssBox;
+  QCheckBox * m_testXsltBox;
+
+  QCheckBox * m_stateCssBox;
+  QCheckBox * m_stateXsltBox;
   QString m_css;
   QString m_xslt;
   QString m_cssFileName;

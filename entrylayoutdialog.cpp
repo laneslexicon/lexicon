@@ -16,70 +16,152 @@ EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QDialog(parent) {
   m_cssEdit->setPlainText(m_css);
   m_xsltEdit->setPlainText(m_xslt);
 
-  m_testButtons = new QDialogButtonBox(QDialogButtonBox::Apply | QDialogButtonBox::Reset);
-  m_stateButtons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Reset | QDialogButtonBox::Close);
 
-  m_which = new QCheckBox("Both");
+  m_applyButton = new QPushButton("Apply",this);
+  m_resetButton = new QPushButton("Reset",this);
+  m_saveButton = new QPushButton("Save",this);
+  m_restoreButton = new QPushButton("Restore",this);
+  m_closeButton = new QPushButton("Close",this);
 
-  m_useOne = new QRadioButton(tr("Use current"));
-  m_useTwo = new QRadioButton(tr("Use both"));
-  QGroupBox * groupbox = new QGroupBox("Usage",this);
-  QHBoxLayout * radiolayout = new QHBoxLayout;
-  radiolayout->addWidget(m_useOne);
-  radiolayout->addWidget(m_useTwo);
-  groupbox->setLayout(radiolayout);
+  m_testCssBox = new QCheckBox(tr("Css"),this);
+  m_testXsltBox = new QCheckBox(tr("Xslt"),this);
+  m_stateCssBox = new QCheckBox(tr("Css"),this);
+  m_stateXsltBox = new QCheckBox(tr("Xslt"),this);
+
+  QGroupBox * groupbox1 = new QGroupBox("Test the Css/Xslt",this);
+  QHBoxLayout * group1layout = new QHBoxLayout;
+
+  QVBoxLayout * boxeslayout1 = new QVBoxLayout;
+  boxeslayout1->addWidget(m_testCssBox);
+  boxeslayout1->addWidget(m_testXsltBox);
+
+  QVBoxLayout * boxeslayout2 = new QVBoxLayout;
+  boxeslayout2->addWidget(m_applyButton);
+  boxeslayout2->addWidget(m_resetButton);
+
+  group1layout->addLayout(boxeslayout1);
+  group1layout->addLayout(boxeslayout2);
+
+  groupbox1->setLayout(group1layout);
+
+  QGroupBox * groupbox2 = new QGroupBox("Save/Restore",this);
+  QHBoxLayout * group2layout = new QHBoxLayout;
+
+  QVBoxLayout * boxeslayout3 = new QVBoxLayout;
+  boxeslayout3->addWidget(m_stateCssBox);
+  boxeslayout3->addWidget(m_stateXsltBox);
+
+  QVBoxLayout * boxeslayout4 = new QVBoxLayout;
+  boxeslayout4->addWidget(m_saveButton);
+  boxeslayout4->addWidget(m_restoreButton);
+
+  group2layout->addLayout(boxeslayout3);
+  group2layout->addLayout(boxeslayout4);
+
+  groupbox2->setLayout(group2layout);
+
+  QVBoxLayout * closelayout = new QVBoxLayout;
+  //  closelayout->addStretch();
+  closelayout->addWidget(m_closeButton);
 
   QHBoxLayout * hlayout = new QHBoxLayout;
-  hlayout->addWidget(m_testButtons);
-  hlayout->addStretch();
-  hlayout->addWidget(m_stateButtons);
+  hlayout->addWidget(groupbox1);
+  hlayout->addWidget(groupbox2);
+  hlayout->addLayout(closelayout);
   layout->addWidget(m_tabs);
-  layout->addWidget(m_which);
-  layout->addWidget(groupbox);
   layout->addLayout(hlayout);
 
-  connect(m_testButtons,SIGNAL(clicked(QAbstractButton *)),this,SLOT(onTest(QAbstractButton *)));
-  connect(m_stateButtons,SIGNAL(clicked(QAbstractButton *)),this,SLOT(onState(QAbstractButton *)));
+
+  m_saveButton->setEnabled(false);
+  m_restoreButton->setEnabled(false);
+  connect(m_applyButton,SIGNAL(clicked()),this,SLOT(onApply()));
+  connect(m_resetButton,SIGNAL(clicked()),this,SLOT(onReset()));
+  connect(m_saveButton,SIGNAL(clicked()),this,SLOT(onSave()));
+  connect(m_restoreButton,SIGNAL(clicked()),this,SLOT(onRestore()));
+  connect(m_closeButton,SIGNAL(clicked()),this,SLOT(onClose()));
+  connect(m_cssEdit,SIGNAL(textChanged()),this,SLOT(onTextChanged()));
+  connect(m_xsltEdit,SIGNAL(textChanged()),this,SLOT(onTextChanged()));
   setLayout(layout);
   setModal(false);
-  connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(onTabChange(int)));
-  QLOG_DEBUG() << "got here";
+
 }
 EntryLayoutDialog::~EntryLayoutDialog()    {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
-void EntryLayoutDialog::onTabChange(int ix) {
-  if (ix == 0) {
-    m_which->setText("Use Css only");
-  }
-  else {
-    m_which->setText("Use Xslt only");
-  }
-}
 QSize EntryLayoutDialog::sizeHint() const {
   return QSize(800,600);
 }
-void EntryLayoutDialog::onTest(QAbstractButton * btn) {
-  if (btn == m_testButtons->button(QDialogButtonBox::Apply)) {
-    QString css = m_cssEdit->toPlainText();
-    QString xslt = m_xsltEdit->toPlainText();
-    emit(reload(css,xslt));
+void EntryLayoutDialog::onTextChanged() {
+  bool buttonState = false;
+  if ((m_css != m_cssEdit->toPlainText()) || (m_xslt != m_xsltEdit->toPlainText())) {// Edit->document()->isModified() || m_xsltEdit->document()->isModified() ) {
+    buttonState = true;
   }
-  else {
-    emit(revert());
-  }
+  m_saveButton->setEnabled(buttonState);
+  m_restoreButton->setEnabled(buttonState);
 }
-void EntryLayoutDialog::onState(QAbstractButton * btn) {
-  if (btn == m_stateButtons->button(QDialogButtonBox::Reset)) {
+void EntryLayoutDialog::onApply() {
+  QString css;
+  QString xslt;
+  if (m_testCssBox->isChecked()) {
+   css = m_cssEdit->toPlainText();
+  }
+  if (m_testXsltBox->isChecked()) {
+    xslt = m_xsltEdit->toPlainText();
+  }
+  emit(reload(css,xslt));
+}
+void EntryLayoutDialog::onReset() {
+    emit(revert());
+}
+
+void EntryLayoutDialog::onRestore() {
+  if (m_testCssBox->isChecked()) {
     m_cssEdit->setPlainText(m_css);
+  }
+  if (m_testXsltBox->isChecked()) {
     m_xsltEdit->setPlainText(m_xslt);
   }
-  else if (btn == m_stateButtons->button(QDialogButtonBox::Save)) {
+}
+void EntryLayoutDialog::onSave() {
+  if (m_css != m_cssEdit->toPlainText()) {
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Css File"),
+                           m_cssFileName,
+                           tr("Css files (*.css)"));
+    if (! fileName.isEmpty()) {
+      QFile f(fileName);
+      if (! f.open(QIODevice::WriteOnly)) {
+        QLOG_WARN() << QString(tr("Cannot open file %1 for writing: %2")).arg(fileName).arg(qPrintable(f.errorString()));
+      }
+      else {
+        QTextStream out(&f);
+        out << m_cssEdit->toPlainText();
+        f.close();
+        m_css = m_cssEdit->toPlainText();
+      }
+    }
   }
-  else {
-    ///
-    this->hide();
+  if (m_xslt != m_xsltEdit->toPlainText()) {
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Xslt File"),
+                           m_cssFileName,
+                           tr("Xslt files (*.xslt)"));
+    if (! fileName.isEmpty()) {
+      QFile f(fileName);
+      if (! f.open(QIODevice::WriteOnly)) {
+        QLOG_WARN() << QString(tr("Cannot open file %1 for writing: %2")).arg(fileName).arg(qPrintable(f.errorString()));
+      }
+      else {
+        QTextStream out(&f);
+        out << m_xsltEdit->toPlainText();
+        f.close();
+        m_xslt = m_xsltEdit->toPlainText();
+      }
+    }
   }
+  onTextChanged();
+}
+void EntryLayoutDialog::onClose() {
+  qDebug() << Q_FUNC_INFO;
+  this->hide();
 }
 
 void EntryLayoutDialog::readSettings() {
