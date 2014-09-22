@@ -1105,7 +1105,6 @@ void GraphicsEntry::prependEntries(int startPos) {
 QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
   ok = compileStylesheet(type,xsl);
-  QLOG_DEBUG() << Q_FUNC_INFO << "post compile" << ok;
   if (ok == 0) {
     QString html = xsltTransform(type,xml);
     if (! html.isEmpty()) {

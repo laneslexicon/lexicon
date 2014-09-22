@@ -4,32 +4,26 @@
 #include "scripts.h"
 #include "QsLog.h"
 #define USE_KEYMAPS 0
-SearchOptionsWidget::SearchOptionsWidget(int searchType,QWidget * parent) : QWidget(parent) {
-  if (searchType == SearchOptions::Root) {
-    m_options.setSearchScope(SearchOptions::Root);
-  }
-  if (searchType == SearchOptions::Word) {
-    m_options.setSearchScope(SearchOptions::Word);
-  }
-  if (searchType == SearchOptions::Entry) {
-    m_options.setSearchScope(SearchOptions::Entry);
-  }
-  if (searchType == SearchOptions::Local) {
-    m_options.setSearchScope(SearchOptions::Local);
-  }
+/**
+ * There are some unused options here that have been left in just in case.
+ * In particular the plan to allow for searches of the Buckwalter text
+ *
+ *
+ */
+SearchOptionsWidget::SearchOptionsWidget(int searchFor,QWidget * parent) : QWidget(parent) {
+  QLOG_DEBUG()  << Q_FUNC_INFO << searchFor;
+  m_options.setSearchScope(searchFor);
   m_more = false;
-  m_searchType = searchType;
   m_hasMaps = false;
   m_keymapsEnabled = false;
   setup(parent);
 }
 SearchOptionsWidget::SearchOptionsWidget(SearchOptions & options,QWidget * parent) : QWidget(parent) {
+  QLOG_DEBUG() << Q_FUNC_INFO << options.getSearchScope();
   m_more = false;
   m_options = options;
-
   m_hasMaps = false;
   m_keymapsEnabled = false;
-  m_searchType = m_options.getSearchType();
   setup(parent);
 }
 void SearchOptionsWidget::setup(QWidget * parent) {
@@ -109,7 +103,6 @@ SearchOptionsWidget::~SearchOptionsWidget() {
 }
 void SearchOptionsWidget::showMore(bool show) {
   m_more = show;
-
   int type = m_options.getSearchScope();
   switch(type) {
   case SearchOptions::Root : {
@@ -141,8 +134,8 @@ void SearchOptionsWidget::showMore(bool show) {
     if (m_regexSearch->isChecked()) {
       m_targetGroup->setVisible(false);
       m_forceLTR->setVisible(true);
-      m_arabicTarget->setVisible(m_more);
-      m_buckwalterTarget->setVisible(m_more);
+      m_arabicTarget->setVisible(false);
+      m_buckwalterTarget->setVisible(false);
       m_ignoreDiacritics->setVisible(false);
       m_wholeWordMatch->setVisible(false);
     }
@@ -167,10 +160,10 @@ void SearchOptionsWidget::showMore(bool show) {
     m_includeHeads->setVisible(true);
 
     if (m_regexSearch->isChecked()) {
-      m_targetGroup->setVisible(m_more);
+      m_targetGroup->setVisible(false);
       m_forceLTR->setVisible(true);
-      m_arabicTarget->setVisible(m_more);
-      m_buckwalterTarget->setVisible(m_more);
+      m_arabicTarget->setVisible(false);
+      m_buckwalterTarget->setVisible(false);
       m_ignoreDiacritics->setVisible(false);
       m_wholeWordMatch->setVisible(false);
     }
@@ -213,7 +206,7 @@ void SearchOptionsWidget::showMore(bool show) {
     break;
   }
   default :
-    QLOG_DEBUG() << Q_FUNC_INFO << "unknown search type" << type;
+    QLOG_WARN() << Q_FUNC_INFO << tr("Unknown search type") << type;
     break;
   }
 }
@@ -309,6 +302,7 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const SearchOp
   return rx;
 }
 void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   opts.setIgnoreDiacritics(true);
   opts.setSearchType(SearchOptions::Normal);
   opts.setIgnoreDiacritics(m_ignoreDiacritics->isChecked());
@@ -330,8 +324,10 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   opts.setSticky(m_stickySearch->isChecked());
 
   opts.setKeymaps(m_keymapsEnabled);
+  opts.setSearchScope(m_options.getSearchScope());
 }
 void SearchOptionsWidget::setOptions(const SearchOptions & options) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_options = options;
   m_ignoreDiacritics->setChecked(options.ignoreDiacritics());
 

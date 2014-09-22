@@ -25,7 +25,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
   //  setMaxRecords();
   m_attached = false;
-  QVBoxLayout * layout = new QVBoxLayout;
+  //QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
   QSettings * settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
@@ -35,7 +35,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_findButton = new QPushButton(tr("F&ind"));
   m_findButton->setDefault(true);
   m_hideOptionsButton = new QPushButton(tr("Sho&w options"));
-  m_hideOptionsButton->setCheckable(true);
+  //  m_hideOptionsButton->setCheckable(true);
 
   m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
   m_keyboardButton->setAutoDefault(false);
@@ -54,12 +54,12 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
 
   QStringList headers;
   headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Position") << tr("Context");
-
-  m_search = new SearchOptionsWidget(SearchOptions::Word,this);
+  m_defaultOptions.setSearchScope(SearchOptions::Word);
+  m_search = new SearchOptionsWidget(m_defaultOptions,this);
 
   connect(m_search,SIGNAL(force(bool)),m_findTarget,SLOT(setForceLTR(bool)));
 
-  QWidget * container = new QWidget;
+  //  QWidget * container = new QWidget;
   m_container = new QVBoxLayout;
   m_rxlist = new FocusTable;
   m_rxlist->setColumnCount(5);
@@ -85,23 +85,12 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_container->addWidget(m_rxlist);
   m_container->addWidget(m_resultsText);
 
-  container->setLayout(m_container);
-
-  m_text = new GraphicsEntry;
-  m_text->hide();
-
-  QSplitter * splitter = new QSplitter(Qt::Vertical);
-  splitter->addWidget(container);
-  splitter->addWidget(m_text);
-  splitter->setStretchFactor(0,0);
-  splitter->setStretchFactor(1,1);
-  layout->addWidget(splitter);
-
-  setLayout(layout);
+  setLayout(m_container);
   connect(m_rxlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
   initXslt();
-  m_search->setOptions(m_defaultOptions);
+  //  m_search->setOptions(m_defaultOptions);
+  m_search->setVisible(false);
   m_rxlist->hide();
   this->setFocus();
 }
@@ -152,7 +141,7 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   m_nodeQuery.exec();
   /// missing node
   if ( ! m_nodeQuery.first()) {
-    QLOG_WARN() << "No record for node" << node;
+    QLOG_WARN() << Q_FUNC_INFO << "No record for node" << node;
     return;
   }
   item = item->tableWidget()->item(item->row(),POSITION_COLUMN);
@@ -230,18 +219,21 @@ void FullSearchWidget::setSearch(const QString & searchFor,const SearchOptions &
   m_findTarget->setText(m_target);
 }
 void FullSearchWidget::setOptionsHidden(bool hide) {
-  m_hideOptionsButton->setChecked(hide);
-  hideOptions();
+  //  m_hideOptionsButton->setChecked(hide);
+  //  hideOptions();
 }
 
 void FullSearchWidget::hideOptions() {
-  if (m_hideOptionsButton->isChecked()) {
+  QLOG_DEBUG() << Q_FUNC_INFO << m_search->isVisible();
+  if ( m_search->isVisible()) {
     m_search->hide();
+    m_search->setVisible(false);
     m_hideOptionsButton->setText("Show options");
   }
   else {
-    m_search->show();
+    m_search->setVisible(true);
     m_search->showMore(true);
+    m_search->show();
     m_hideOptionsButton->setText("Hide options");
   }
 }
@@ -271,8 +263,8 @@ void FullSearchWidget::findTarget(bool showProgress) {
     m_progress->show();
   }
   else {
-    m_hideOptionsButton->setChecked(true);
-    this->hideOptions();
+    //    m_hideOptionsButton->setChecked(true);
+    //    this->hideOptions();
   }
   /// TODO check if only arabic characters
   ///      and use appropriate
@@ -634,19 +626,7 @@ QString FullSearchWidget::buildRxSql(const SearchOptions & /* options */) {
   return sql;
 }
 QTextDocument * FullSearchWidget::fetchDocument(const QString & xml) {
-  /*
-  if (1) {
-    QFileInfo fi(QDir::tempPath(),QString("/tmp/%1.xml").arg(node));
-    QFile f(fi.filePath());
-    if (f.open(QIODevice::WriteOnly)) {
-      QTextStream out(&f);
-      out.setCodec("UTF-8");
-      out << xml;
-    }
-  }
-  */
   QString html = transform(xml);
-  //  QLOG_DEBUG() <<  html;
   m_nodeDoc.setHtml(html);
   QTextDocument * doc = new QTextDocument;
   doc->setHtml(html);
@@ -710,14 +690,6 @@ void FullSearchWidget::readSettings() {
   m_defaultOptions.setIgnoreDiacritics(settings->value("Ignore diacritics",true).toBool());
 
   m_defaultOptions.setWholeWordMatch(settings->value("Whole word",false).toBool());
-
-  // v = settings->value("Target",QString("Arabic")).toString();
-
-  // if (v == "Arabic")
-  //   m_defaultOptions |= Lane::Arabic;
-  // else
-  //   m_defaultOptions |= Lane::Buckwalter;
-
 
 }
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {

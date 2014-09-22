@@ -4,7 +4,7 @@
 class SearchOptions {
  public:
   enum SearchType_t { Normal, Regex };
-  enum SearchScope_t { Root , Entry, Word, Local };
+  enum  { Root , Entry, Word, Local };
 
   bool ignoreDiacritics() const;
   void setIgnoreDiacritics(bool);
@@ -12,7 +12,7 @@ class SearchOptions {
   void setSearchType(SearchType_t);
   int  getSearchType() const;
 
-  void setSearchScope(SearchScope_t);
+  void setSearchScope(int);
   int  getSearchScope() const ;
 
   bool wholeWordMatch() const;
@@ -42,7 +42,7 @@ class SearchOptions {
   bool m_keymaps;
   SearchType_t  m_type;
   bool m_includeHeads;
-  SearchScope_t  m_target;
+  int  m_target;
   bool m_forceLTR;
   bool m_sticky;
   bool m_newTab;

@@ -24,6 +24,7 @@
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
+
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -1224,12 +1225,6 @@ void LanesLexicon::onTest() {
     d->exec();
   }
   if (0) {
-    FullSearchWidget * w = new FullSearchWidget(this);
-    connect(w,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
-    int c = this->getSearchCount();
-    m_tabs->addTab(w,QString(tr("Search %1")).arg(c+1));;
-  }
-  if (0) {
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {
@@ -2252,7 +2247,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   SearchOptions options;
   d->getOptions(options);
   if (searchType == SearchOptions::Word) {
-      FullSearchWidget * s = new FullSearchWidget;
+    FullSearchWidget * s = new FullSearchWidget;
       s->setSearch(t,options);
       s->setForceLTR(d->getForceLTR());
       s->findTarget(true);

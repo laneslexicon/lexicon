@@ -9,6 +9,9 @@
 #include <QVBoxLayout>
 #include <QSpacerItem>
 #include "searchoptions.h"
+#ifndef qStrip
+#define qStrip qDebug()
+#endif
 class FullSearchWidget;
 class SearchOptionsWidget : public QWidget {
   Q_OBJECT
@@ -38,7 +41,6 @@ class SearchOptionsWidget : public QWidget {
   bool m_more;                   // false basic, 1 show more
   bool m_keymapsEnabled;
   SearchOptions m_options;
-  int m_searchType;
   QSpacerItem * m_spacer;
   QGroupBox *  m_targetGroup;
   QGroupBox * m_typeGroup;

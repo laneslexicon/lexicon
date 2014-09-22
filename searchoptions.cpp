@@ -21,7 +21,7 @@ void SearchOptions::setSearchType(SearchType_t x) {
 int SearchOptions::getSearchType() const {
   return m_type;
 }
-void SearchOptions::setSearchScope(SearchScope_t x) {
+void SearchOptions::setSearchScope(int x) {
   m_target = x;
 }
 int SearchOptions::getSearchScope() const {

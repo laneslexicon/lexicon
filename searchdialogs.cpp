@@ -6,7 +6,7 @@
 extern LanesLexicon * getApp();
 ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
-
+  m_searchType = searchType;
   QLOG_DEBUG() << Q_FUNC_INFO << searchType;
   switch(searchType) {
   case SearchOptions::Root :
@@ -20,7 +20,10 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
     break;
   case SearchOptions::Local :
     setWindowTitle(tr("Search current page"));
-  default :break;
+    break;
+  default :
+    setWindowTitle("Unknown search type");
+    break;
   }
 
 
@@ -154,7 +157,8 @@ QString ArabicSearchDialog::getText() {
 void ArabicSearchDialog::setPrompt(const QString & text) {
   m_prompt->setText(text);
 }
-void ArabicSearchDialog::setOptions(const SearchOptions & opts) {
+void ArabicSearchDialog::setOptions(SearchOptions & opts) {
+  opts.setSearchScope(m_searchType);
   m_options->setOptions(opts);
 }
 void ArabicSearchDialog::getOptions(SearchOptions & opts) {
