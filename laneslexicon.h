@@ -305,7 +305,7 @@ private:
     QAction * m_navPrevAction;
     QAction * m_navFirstAction;
     QAction * m_navLastAction;
-    QLabel * m_navText;
+    //    QLabel * m_navText;
     QToolButton * m_navBtn;
     QMenu * m_navMenu;
     QAction * m_navModeRootAction;

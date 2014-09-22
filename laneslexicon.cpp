@@ -705,17 +705,18 @@ void LanesLexicon::createToolBar() {
   QToolBar * navigation = addToolBar(tr("Navigation"));
   navigation->setObjectName("navigationtoolbar");
   navigation->setIconSize(m_toolbarIconSize);
-  m_navText = new QLabel("",navigation);
+  //  m_navText = new QLabel("",navigation);
+  /*
   if (m_navMode == Lane::By_Root) {
     m_navText->setText(tr("Root"));
   }
   else {
     m_navText->setText(tr("Page"));
   }
-
+  */
   QToolButton * m_navBtn = new QToolButton(navigation);
   m_navBtn->setDefaultAction(m_navigationAction);
-  m_navBtn->setText(tr("Move"));
+  m_navBtn->setText(tr("Move by"));
 
 
   /// TODO should we reuse the m_navMode{Root,Page}Action
@@ -2061,11 +2062,11 @@ void LanesLexicon::updateStatusBar() {
   }
   if (m_navMode == Lane::By_Root) {
     m_navModeIndicator->setText(tr("Nav mode: by root"));
-    m_navText->setText(tr("Root"));
+    //    m_navText->setText(tr("Root"));
   }
   else {
     m_navModeIndicator->setText(tr("Nav mode: by page"));
-    m_navText->setText(tr("Page"));
+    //    m_navText->setText(tr("Page"));
   }
   m_keymapsButton->setEnabled(m_keymapsEnabled);
 }
