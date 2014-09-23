@@ -135,6 +135,8 @@ public:
 
     void onEditView();
 
+    void onOptions();
+
     void onSetInterface();
     void rootClicked(QTreeWidgetItem * , int);
     void entryActivated(QTreeWidgetItem * , int);
@@ -183,6 +185,9 @@ private:
 
     QString m_interface;    // "default","minimal"
     QAction * m_minimalAction;
+
+    QAction * m_optionsAction;
+
     QString m_applicationCssFile;
     EntryLayoutDialog * m_entryLayout;
     QPrinter m_printer;

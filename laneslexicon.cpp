@@ -21,6 +21,7 @@
 #include "headsearch.h"
 #include "definedsettings.h"
 #include "entrylayoutdialog.h"
+#include "optionsdialog.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
@@ -587,8 +588,11 @@ void LanesLexicon::createActions() {
 
   m_minimalAction = new QAction(tr("Minimal interface"),this);
   m_minimalAction->setCheckable(true);
-
   connect(m_minimalAction,SIGNAL(triggered()),this,SLOT(onSetInterface()));
+
+  m_optionsAction = new QAction(tr("&Preferences"),this);
+  connect(m_optionsAction,SIGNAL(triggered()),this,SLOT(onOptions()));
+
 
   m_clearHistoryAction = new QAction(tr("Clear"),this);
   connect(m_clearHistoryAction,SIGNAL(triggered()),this,SLOT(onClearHistory()));
@@ -717,14 +721,16 @@ void LanesLexicon::createToolBar() {
   //  QToolBar * docs = addToolBar("&Docs");
   //  docs->setObjectName("docstoolbar");
   m_mainbar->addAction(m_docAction);
+  m_mainbar->addAction(m_optionsAction);
   m_mainbar->setFloatable(true);
   m_mainbar->setIconSize(m_toolbarIconSize);
   //  addToolBarBreak();
 
-  m_navigation = addToolBar(tr("M_Navigation"));
+  m_navigation = addToolBar(tr("Navigation"));
   m_navigation->setObjectName("m_navigationtoolbar");
   m_navigation->setIconSize(m_toolbarIconSize);
   m_navigation->setToolTip(tr("Move root or by page"));
+  m_navigation->setFloatable(true);
   //  m_navText = new QLabel("",m_navigation);
   /*
   if (m_navMode == Lane::By_Root) {
@@ -776,11 +782,11 @@ void LanesLexicon::createToolBar() {
   m_navigation->addAction(m_navPrevAction);
   m_navigation->addAction(m_navLastAction);
   m_navigation->addSeparator();
-  m_navigation->setFloatable(true);
+
 
   //  addToolBarBreak();
 
-  m_entrybar = addToolBar(tr("&Page"));
+  m_entrybar = addToolBar(tr("Page"));
   m_entrybar->setObjectName("pagetoolbar");
   m_entrybar->setIconSize(m_toolbarIconSize);
   m_entrybar->addAction(m_zoomInAction);
@@ -881,6 +887,7 @@ void LanesLexicon::createMenus() {
   QMenu * viewmenu = menuBar()->addMenu(tr("&View"));
 
   viewmenu->addAction(m_minimalAction);
+  viewmenu->addAction(m_optionsAction);
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -930,7 +937,7 @@ void LanesLexicon::createMenus() {
 void LanesLexicon::createStatusBar() {
   m_navModeIndicator = new QLabel("",this);
   m_placeIndicator = new QLabel("",this);
-
+  m_placeIndicator->setObjectName("placeindicator");
 
   m_keymapsButton = new QToolButton(this);
   QStringList maps =  m_mapper->getMaps();
@@ -1200,7 +1207,6 @@ Place LanesLexicon::showPlace(const Place & p,int options) {
 void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /* oldFocus */, Qt::FocusReason /* reason */) {
   EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
   if (item) {
-    Place p = item->getPlace();
     updateStatusBar();
   }
 
@@ -2088,13 +2094,22 @@ void LanesLexicon::setStatus(const QString & txt) {
 }
 void LanesLexicon::updateStatusBar() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  QString headseparator;
   if (entry) {
     Place p = entry->getPlace();
-    QString root = qobject_cast<Lexicon *>(qApp)->spanArabic(p.getRoot());
-    QString head = qobject_cast<Lexicon *>(qApp)->spanArabic(p.getWord());
+    QString root = tr("Root:") + qobject_cast<Lexicon *>(qApp)->spanArabic(p.getRoot());
+    QString head = p.getWord();
+    if (! head.isEmpty()) {
+      head = tr("Entry:") + qobject_cast<Lexicon *>(qApp)->spanArabic(head);
+      headseparator = ",";
+    }
+    qobject_cast<Lexicon *>(qApp)->spanArabic(p.getWord());
     QString page = QString(QObject::tr("Vol %1,Page %2")).arg(p.getVol()).arg(p.getPage());
     QString node = p.getNode();
-    QString html = QString("Root : %1,Entry : %2, %3 (%4)").arg(root).arg(head).arg(page).arg(node);
+    if ( ! node.isEmpty()) {
+      node = "(" + node + ")";
+    }
+    QString html = QString("<body class=\"place\">%1,%2%3 %4 %5</body>").arg(root).arg(head).arg(headseparator).arg(page).arg(node);
     m_placeIndicator->setText(html);
   }
   else {
@@ -2801,11 +2816,12 @@ void LanesLexicon::setIcons(const QString & theme) {
   iconfile = settings->value("Keymaps-disabled",QString()).toString();
   setIcon(m_keymapsAction,imgdir,iconfile);
 
-  iconfile = settings->value("Link",QString()).toString();
-
-  //setIcon(m_linkAction,imgdir,iconfile);
+  iconfile = settings->value("Preferences",QString()).toString();
+  setIcon(m_optionsAction,imgdir,iconfile);
 
   QIcon icon;
+  iconfile = settings->value("Link",QString()).toString();
+
 
   fi.setFile(imgdir,iconfile);
   icon.addPixmap(fi.absoluteFilePath(),QIcon::Normal,QIcon::On);
@@ -2859,4 +2875,9 @@ void LanesLexicon::revertEntry() {
       entry->onReload();
     }
   }
+}
+void LanesLexicon::onOptions() {
+  OptionsDialog * d = new OptionsDialog(this);
+  d->exec();
+  delete d;
 }

@@ -3,7 +3,7 @@ use File::Spec;
 use File::Temp qw(tempfile);
 use Encode;
 use utf8;
-my $homeDir  = "/home/andrewsg/qt5projects/LanesLexicon";
+my $homeDir  = "/home/andrewsg/qt5projects/mansur/gui";
 my $docsDir = "docs";
 my $helpDir = "help";
 my @help = (
