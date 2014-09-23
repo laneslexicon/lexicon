@@ -190,7 +190,7 @@ private:
     bool m_printToPdf;
     bool m_printerReUse;
     ///
-    void setupInterface();
+    //    void setupInterface();
     /// 0 - root mode, 1 - page mode
     int m_navMode;
     QLabel * m_navModeIndicator;

@@ -36,6 +36,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_revertEnabled = false;
   m_entryLayout = NULL;
   m_mapper = im_new();
+
+  createActions();
   readSettings();
 
   if (! openDatabase(m_dbName)) {
@@ -93,7 +95,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   setupShortcuts();
   setupBookmarkShortcuts();
 
-  createActions();
+
   setIcons(m_iconTheme);
   createMenus();
   createToolBar();
@@ -163,15 +165,15 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
 
 
-  setupInterface();
+  onSetInterface();
 
   restoreSavedState();
   /// without this, the QSplashScreen is the active window
 
   //  m_tabs->currentWidget()->setFocus();
 
-  setTabOrder(m_tree,m_tabs);
-  setTabOrder(m_tabs->tabBar(),m_tree);
+  //  setTabOrder(m_tree,m_tabs);
+  //  setTabOrder(m_tabs->tabBar(),m_tree);
   /**
    * if the current widget is a graphics entry , sent it a <space> to simulate
    * the user activating the page (<return> would do). This selects the current item
@@ -179,7 +181,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
    * bit confusing.
    */
   QApplication::setActiveWindow(m_tabs->currentWidget());
-  QLOG_DEBUG() << "Activating current entry";
+
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->focusPlace();
@@ -246,14 +248,17 @@ void LanesLexicon::cleanup() {
   QLOG_DEBUG() << Q_FUNC_INFO << "exit";
 }
 void LanesLexicon::onSetInterface() {
-  bool v = ! m_minimalAction->isChecked();
+  bool v = m_minimalAction->isChecked();
+  qStrip << Q_FUNC_INFO << "minimal inteface" << v;
   QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
   for(int i=0;i < toolbars.size();i++) {
-    toolbars[i]->setVisible(v);
+    toolbars[i]->setVisible(!v);
   }
-  statusBar()->setVisible(v);
-  menuBar()->setVisible(v);
+  statusBar()->setVisible(!v);
+  menuBar()->setVisible(!v);
+  updateMenu();
 }
+/*
 void LanesLexicon::setupInterface() {
   if (m_interface == "minimal") {
     QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
@@ -273,6 +278,7 @@ void LanesLexicon::setupInterface() {
   }
   updateMenu();
 }
+*/
 /**
  * convenience
  *
@@ -1329,7 +1335,8 @@ void LanesLexicon::readSettings() {
   m_restoreBookmarks = settings->value("Restore bookmarks",true).toBool();
 
   m_docked = settings->value("Docked",false).toBool();
-  m_interface = settings->value("Interface","default").toString();
+  m_minimalAction->setChecked(settings->value("Minimal interface",false).toBool());
+
   m_navigationMode = settings->value("Navigation","root").toString();
 
   m_activeMap = settings->value("Default map","Buckwalter").toString();
@@ -1459,6 +1466,7 @@ void LanesLexicon::writeSettings() {
     settings->endGroup();
     settings->beginGroup("System");
     settings->setValue("Focus tab",m_tabs->currentIndex());
+    settings->setValue("Minimal interface",m_minimalAction->isChecked());
     settings->endGroup();
   }
 
