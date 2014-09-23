@@ -245,6 +245,15 @@ void LanesLexicon::cleanup() {
   im_free(m_mapper);
   QLOG_DEBUG() << Q_FUNC_INFO << "exit";
 }
+void LanesLexicon::onSetInterface() {
+  bool v = ! m_minimalAction->isChecked();
+  QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
+  for(int i=0;i < toolbars.size();i++) {
+    toolbars[i]->setVisible(v);
+  }
+  statusBar()->setVisible(v);
+  menuBar()->setVisible(v);
+}
 void LanesLexicon::setupInterface() {
   if (m_interface == "minimal") {
     QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
@@ -363,13 +372,8 @@ void LanesLexicon::shortcut(const QString & key) {
     onExit();
   }
   else if (key == SID_SHORTCUT_TOGGLE_INTERFACE) {
-    if (m_interface == "minimal") {
-      m_interface = "default";
-    }
-    else {
-      m_interface = "minimal";
-    }
-    setupInterface();
+    m_minimalAction->setChecked(! m_minimalAction->isChecked());
+    onSetInterface();
   }
   else if (key == SID_SHORTCUT_CONTENTS_SHOW) {
     if (m_treeDock->isVisible()) {
@@ -572,6 +576,14 @@ void LanesLexicon::createActions() {
   m_exitAction = new QAction(tr("Exit"),this);
   connect(m_exitAction,SIGNAL(triggered()),this,SLOT(onExit()));
 
+  m_editViewAction = new QAction(tr("Edit view"),this);
+  connect(m_editViewAction,SIGNAL(triggered()),this,SLOT(onEditView()));
+
+  m_minimalAction = new QAction(tr("Minimal interface"),this);
+  m_minimalAction->setCheckable(true);
+
+  connect(m_minimalAction,SIGNAL(triggered()),this,SLOT(onSetInterface()));
+
   m_clearHistoryAction = new QAction(tr("Clear"),this);
   connect(m_clearHistoryAction,SIGNAL(triggered()),this,SLOT(onClearHistory()));
 
@@ -657,55 +669,57 @@ void LanesLexicon::createActions() {
 
 }
 void LanesLexicon::createToolBar() {
-  QToolBar * mainbar = addToolBar("Main");
-  mainbar->setObjectName("maintoolbar");
+  QToolBar * m_mainbar = addToolBar("Main");
+  m_mainbar->setObjectName("maintoolbar");
 
-  mainbar->addAction(m_exitAction);
-  mainbar->addAction(m_testAction);
+  m_mainbar->addAction(m_exitAction);
+  m_mainbar->addAction(m_testAction);
 
   //  QToolBar * history = addToolBar(tr("History"));
   //  history->setObjectName("historytoolbar");
-  m_hBackwardBtn = new QToolButton(mainbar);
+  m_hBackwardBtn = new QToolButton(m_mainbar);
   m_hBackwardBtn->setText(tr("History"));
   m_hBackwardBtn->setDefaultAction(m_historyAction);
   m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_hBackwardBtn->setEnabled(false);
   m_hBackwardBtn->setMenu(m_historyMenu);
   m_hBackwardBtn->setFocusPolicy(Qt::ClickFocus);
-  mainbar->addWidget(m_hBackwardBtn);
+  m_mainbar->addWidget(m_hBackwardBtn);
   //  history->addSeparator();
 
   //  QToolBar * bookmarks = addToolBar(tr("Bookmarks"));
   //  bookmarks->setObjectName("bookmarkstoolbar");
-  m_bookmarkBtn = new QToolButton(mainbar);
+  m_bookmarkBtn = new QToolButton(m_mainbar);
   m_bookmarkBtn->setDefaultAction(m_bookmarkAction);
   m_bookmarkBtn->setText(tr("Bookmarks"));
   m_bookmarkBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_bookmarkBtn->setEnabled(true);
   m_bookmarkBtn->setMenu(m_bookmarkMenu);
-  mainbar->addWidget(m_bookmarkBtn);
+  m_mainbar->addWidget(m_bookmarkBtn);
 
   //  QToolBar * search = addToolBar(tr("Search"));
   //  search->setObjectName("searchtoolbar");
-  m_searchButton = new QToolButton(mainbar);
+  m_searchButton = new QToolButton(m_mainbar);
   m_searchButton->setDefaultAction(m_searchAction);
   m_searchButton->setText(tr("Search"));
   m_searchButton->setPopupMode(QToolButton::MenuButtonPopup);
   m_searchButton->setEnabled(true);
   m_searchButton->setMenu(m_searchMenu);
-  mainbar->addWidget(m_searchButton);
+  m_mainbar->addWidget(m_searchButton);
 
 
   //  QToolBar * docs = addToolBar("&Docs");
   //  docs->setObjectName("docstoolbar");
-  mainbar->addAction(m_docAction);
-  mainbar->setFloatable(true);
-  mainbar->setIconSize(m_toolbarIconSize);
+  m_mainbar->addAction(m_docAction);
+  m_mainbar->setFloatable(true);
+  m_mainbar->setIconSize(m_toolbarIconSize);
   //  addToolBarBreak();
-  QToolBar * navigation = addToolBar(tr("Navigation"));
-  navigation->setObjectName("navigationtoolbar");
-  navigation->setIconSize(m_toolbarIconSize);
-  //  m_navText = new QLabel("",navigation);
+
+  m_navigation = addToolBar(tr("M_Navigation"));
+  m_navigation->setObjectName("m_navigationtoolbar");
+  m_navigation->setIconSize(m_toolbarIconSize);
+  m_navigation->setToolTip(tr("Move root or by page"));
+  //  m_navText = new QLabel("",m_navigation);
   /*
   if (m_navMode == Lane::By_Root) {
     m_navText->setText(tr("Root"));
@@ -714,7 +728,7 @@ void LanesLexicon::createToolBar() {
     m_navText->setText(tr("Page"));
   }
   */
-  QToolButton * m_navBtn = new QToolButton(navigation);
+  QToolButton * m_navBtn = new QToolButton(m_navigation);
   m_navBtn->setDefaultAction(m_navigationAction);
   m_navBtn->setText(tr("Move by"));
 
@@ -750,28 +764,28 @@ void LanesLexicon::createToolBar() {
   m_navBtn->setEnabled(true);
   m_navBtn->setMenu(m);
   m_navBtn->setPopupMode(QToolButton::MenuButtonPopup);
-  navigation->addWidget(m_navBtn);
-  navigation->addAction(m_navFirstAction);
-  navigation->addAction(m_navNextAction);
-  navigation->addAction(m_navPrevAction);
-  navigation->addAction(m_navLastAction);
-  navigation->addSeparator();
-  navigation->setFloatable(true);
+  m_navigation->addWidget(m_navBtn);
+  m_navigation->addAction(m_navFirstAction);
+  m_navigation->addAction(m_navNextAction);
+  m_navigation->addAction(m_navPrevAction);
+  m_navigation->addAction(m_navLastAction);
+  m_navigation->addSeparator();
+  m_navigation->setFloatable(true);
 
   //  addToolBarBreak();
 
-  QToolBar * page = addToolBar(tr("&Page"));
-  page->setObjectName("pagetoolbar");
-  page->setIconSize(m_toolbarIconSize);
-  page->addAction(m_zoomInAction);
-  page->addAction(m_zoomOutAction);
-  page->addAction(m_widenAction);
-  page->addAction(m_narrowAction);
-  page->addAction(m_printAction);
-  page->addAction(m_localSearchAction);
-  page->addAction(m_clearAction);
-  page->addAction(m_convertToEntryAction);
-  page->setFloatable(true);
+  m_entrybar = addToolBar(tr("&Page"));
+  m_entrybar->setObjectName("pagetoolbar");
+  m_entrybar->setIconSize(m_toolbarIconSize);
+  m_entrybar->addAction(m_zoomInAction);
+  m_entrybar->addAction(m_zoomOutAction);
+  m_entrybar->addAction(m_widenAction);
+  m_entrybar->addAction(m_narrowAction);
+  m_entrybar->addAction(m_printAction);
+  m_entrybar->addAction(m_localSearchAction);
+  m_entrybar->addAction(m_clearAction);
+  //  m_entrybar->addAction(m_convertToEntryAction);
+  m_entrybar->setFloatable(true);
 
 }
 /**
@@ -858,7 +872,11 @@ void LanesLexicon::createMenus() {
   m_fileMenu->addAction(m_exitAction);
   m_fileMenu->setObjectName("filemenu");
 
-  m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmark"));
+  QMenu * viewmenu = menuBar()->addMenu(tr("&View"));
+
+  viewmenu->addAction(m_minimalAction);
+
+  m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
 
   m_bookmarkMenu->addAction(m_bookmarkListAction);
@@ -887,6 +905,20 @@ void LanesLexicon::createMenus() {
   m_searchMenu->addAction(m_searchWordAction);
   m_searchMenu->addAction(m_searchPageAction);
   m_searchMenu->addAction(m_searchNodeAction);
+
+  QMenu * pagemenu = m_mainmenu->addMenu(tr("&Entry"));
+  pagemenu->setObjectName("entrymenu");
+  pagemenu->addAction(m_zoomInAction);
+  pagemenu->addAction(m_zoomOutAction);
+  pagemenu->addAction(m_widenAction);
+  pagemenu->addAction(m_narrowAction);
+  pagemenu->addAction(m_printAction);
+  pagemenu->addAction(m_localSearchAction);
+  pagemenu->addAction(m_clearAction);
+
+  QMenu * toolsmenu = m_mainmenu->addMenu(tr("&Tools"));
+  toolsmenu->addAction(m_editViewAction);
+
 }
 
 void LanesLexicon::createStatusBar() {
@@ -1201,9 +1233,8 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
   }
   return QMainWindow::eventFilter(target,event);
 }
-void LanesLexicon::onTest() {
-  //  QKeySequenceEdit * w = new QKeySequenceEdit;
-  //  w->show();
+void LanesLexicon::onEditView() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   if (m_entryLayout == NULL) {
     m_entryLayout  = new EntryLayoutDialog(this);
   }
@@ -1213,6 +1244,8 @@ void LanesLexicon::onTest() {
   connect(m_entryLayout,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
   connect(m_entryLayout,SIGNAL(revert()),this,SLOT(revertEntry()));
   m_entryLayout->show();
+}
+void LanesLexicon::onTest() {
   if (0) {
     SearchOptionsWidget * s = new SearchOptionsWidget(SearchOptions::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");

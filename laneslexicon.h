@@ -133,6 +133,9 @@ public:
 
     void onKeymapChanged();
 
+    void onEditView();
+
+    void onSetInterface();
     void rootClicked(QTreeWidgetItem * , int);
     void entryActivated(QTreeWidgetItem * , int);
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
@@ -177,7 +180,9 @@ private:
     int searchTabs(const QString & node);
     SearchOptions m_defaultSearchOptions;
     QString m_configFile;
+
     QString m_interface;    // "default","minimal"
+    QAction * m_minimalAction;
     QString m_applicationCssFile;
     EntryLayoutDialog * m_entryLayout;
     QPrinter m_printer;
@@ -204,6 +209,10 @@ private:
     bool m_useNotes;
 
     bool m_treeKeepsFocus;
+    /// toolbars
+    QToolBar * m_mainbar;
+    QToolBar * m_navigation;
+    QToolBar * m_entrybar;
 
     QString m_iconTheme;
     QDockWidget * m_treeDock;
@@ -287,6 +296,8 @@ private:
     // actions
     QAction * m_exitAction;
     QAction * m_testAction;
+
+    QAction * m_editViewAction;
 
     QAction * m_historyAction;
     QAction * m_bookmarkAction;
