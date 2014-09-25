@@ -62,6 +62,7 @@ class GraphicsEntry;
 class ContentsWidget;
 class TabWidget;
 class EntryLayoutDialog;
+class LogViewer;
 class LanesLexicon : public QMainWindow
 {
     Q_OBJECT
@@ -190,6 +191,8 @@ private:
 
     QString m_applicationCssFile;
     EntryLayoutDialog * m_entryLayout;
+
+    LogViewer * m_logview;
     QPrinter m_printer;
     QString m_printPdfLocation;
     bool m_printToPdf;

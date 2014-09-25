@@ -22,6 +22,7 @@
 #include "definedsettings.h"
 #include "entrylayoutdialog.h"
 #include "optionsdialog.h"
+#include "logviewer.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
@@ -37,7 +38,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_revertEnabled = false;
   m_entryLayout = NULL;
   m_mapper = im_new();
-
+  m_logview = 0;
   createActions();
   readSettings();
 
@@ -260,7 +261,6 @@ void LanesLexicon::cleanup() {
 }
 void LanesLexicon::onSetInterface() {
   bool v = m_minimalAction->isChecked();
-  qStrip << Q_FUNC_INFO << "minimal inteface" << v;
   QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
   for(int i=0;i < toolbars.size();i++) {
     toolbars[i]->setVisible(!v);
@@ -1268,6 +1268,8 @@ void LanesLexicon::onEditView() {
   m_entryLayout->show();
 }
 void LanesLexicon::onTest() {
+  m_logview = new LogViewer(this);
+  m_logview->show();
   if (0) {
     SearchOptionsWidget * s = new SearchOptionsWidget(SearchOptions::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
@@ -1307,7 +1309,6 @@ void LanesLexicon::onTest() {
       }
     }
   }
-  QLOG_DEBUG() << Q_FUNC_INFO << "finished";
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");
@@ -2099,7 +2100,7 @@ void LanesLexicon::movePrevious(const Place & p) {
   }
 }
 void LanesLexicon::setStatus(const QString & txt) {
-  QLOG_DEBUG() << Q_FUNC_INFO << txt;
+  QLOG_INFO() << txt;
   statusBar()->showMessage(txt);
 }
 void LanesLexicon::updateStatusBar() {

@@ -67,7 +67,8 @@ SOURCES += main.cpp\
         nodeview.cpp \
         splashscreen.cpp \
         about.cpp \
-        entrylayoutdialog.cpp
+        entrylayoutdialog.cpp \
+        logviewer.cpp
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
@@ -93,4 +94,5 @@ HEADERS  += laneslexicon.h \
             about.h \
             definedsettings.h \
             externs.h \
-            entrylayoutdialog.h
+            entrylayoutdialog.h \
+            logviewer.h

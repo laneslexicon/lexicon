@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     //      return 0;
     //    }
     QCommandLineParser parser;
-    parser.setApplicationDescription("This is Lane's Arabic-English Lexicon");
+    parser.setApplicationDescription("\nEdward William Lane's Arabic-English Lexicon\n\nAny options specifiying a relative file path, will be relative to the Resources directory.");
     parser.addHelpOption();
     parser.addVersionOption();
 
