@@ -24,7 +24,7 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
 
 }
 ContentsWidget::~ContentsWidget() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
+
 }
 /**
  * The default font is through the stylesheet entry for QTreeWidget#treeRoots
@@ -126,7 +126,7 @@ void ContentsWidget::loadContents() {
     delete out;
   }
   resizeColumnToContents(HEAD_SUPPLEMENT_COLUMN);
-  if (m_entryQuery.prepare("select word,itype,bword,nodeId,supplement from entry where datasource = 1 and root = ? order by nodenum asc")) {
+  if (!m_entryQuery.prepare("select word,itype,bword,nodeId,supplement from entry where datasource = 1 and root = ? order by nodenum asc")) {
     QLOG_WARN() << "Entry SQL prepare failed" << m_entryQuery.lastError();
   }
 }
