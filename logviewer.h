@@ -25,6 +25,7 @@ public:
   QListWidget * m_list;
   QFile m_log;
   int m_maxlines;
+  int m_refreshInterval;
   void addLine(const QString &);
   QPushButton * m_pauseButton;
   QPushButton * m_closeButton;

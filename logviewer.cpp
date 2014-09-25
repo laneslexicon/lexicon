@@ -4,6 +4,7 @@
 #include "application.h"
 #include "definedsettings.h"
 LogViewer::LogViewer(QWidget * parent) : QDialog(parent) {
+  readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QListWidget(this);
   layout->addWidget(m_list);
@@ -23,8 +24,6 @@ LogViewer::LogViewer(QWidget * parent) : QDialog(parent) {
   m_debug = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/debug-run.png");
   setLayout(layout);
   setModal(false);
-  m_log.setFileName("../log.txt");
-  m_maxlines = 100;
   QStringList lines;
   if (m_log.open(QIODevice::ReadOnly)) {
     m_stream.setDevice(&m_log);
@@ -39,14 +38,24 @@ LogViewer::LogViewer(QWidget * parent) : QDialog(parent) {
     }
   }
   else {
-    QLOG_WARN() << "Could not open log file";
+    QString err = QString(tr("LogViewer could not open log file:%1")).arg(m_log.fileName());
+    QLOG_WARN() << err;
+    m_list->addItem(err);
+
   }
   m_timer = new QTimer(this);
   connect(m_timer, SIGNAL(timeout()), this, SLOT(onRefresh()));
   connect(m_pauseButton,SIGNAL(clicked()),this,SLOT(onPause()));
   connect(m_closeButton,SIGNAL(clicked()),this,SLOT(onClose()));
-  m_timer->start(1000);
+  m_timer->start(m_refreshInterval);
 
+}
+void LogViewer::readSettings() {
+   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+   settings->beginGroup("Logging");
+   m_log.setFileName(settings->value(SID_LOGGING_FILE,"../log.txt").toString());
+   m_maxlines = settings->value(SID_LOGGING_VIEWER_MAXLINES,100).toInt();
+   m_refreshInterval = settings->value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
 }
 LogViewer::~LogViewer() {
   QLOG_DEBUG() << Q_FUNC_INFO;
