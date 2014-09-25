@@ -238,11 +238,21 @@ void LanesLexicon::cleanup() {
   }
   if (m_notesDb.isOpen())
     m_notesDb.close();
-
+  /*
   if (m_entryLayout != NULL) {
     delete m_entryLayout;
+    m_entryLayout = 0;
   }
+
+  if (m_logview != NULL) {
+    delete m_logview;
+    m_logview = 0;
+  }
+
+  m_tree->clear();
   delete m_tree;
+  m_tree = 0;
+  */
   /// TODO close notes db
   freeXslt();
   im_free(m_mapper);
