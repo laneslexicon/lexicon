@@ -73,10 +73,7 @@ void statusMessage(const QString & t) {
 }
 int main(int argc, char *argv[])
 {
-    Lexicon a(argc, argv);
-    //    if ( ! a.isOk() ) {
-    //      return 0;
-    //    }
+    Lexicon mansur(argc, argv);
     QCommandLineParser parser;
     parser.setApplicationDescription("\nEdward William Lane's Arabic-English Lexicon\n\nAny options specifiying a relative file path, will be relative to the Resources directory.");
     parser.addHelpOption();
@@ -111,22 +108,8 @@ int main(int argc, char *argv[])
     QCommandLineOption textWidthOption(QStringList() << "w" << "text-width","set textwidth","textwidth");
     parser.addOption(textWidthOption);
 
-    QsLogging::Logger& logger = QsLogging::Logger::instance();
-    logger.setLoggingLevel(QsLogging::TraceLevel);
-    const QString sLogPath(QDir(a.applicationDirPath()).filePath("log.txt"));
-    /// path, rotatation enabled,bytes to rotate after,nbr of old logs to keep
-   QsLogging::DestinationPtr fileDestination(
-      QsLogging::DestinationFactory::MakeFileDestination(sLogPath, true, 512 * 64, 5) );
-   QsLogging::DestinationPtr debugDestination(
-      QsLogging::DestinationFactory::MakeDebugOutputDestination() );
-   logger.addDestination(debugDestination);
-   logger.addDestination(fileDestination);
-
-   QLOG_INFO() << "Program started";
-   QLOG_INFO() << "Built with Qt" << QT_VERSION_STR << "running on" << qVersion();
-   // Process the actual command line arguments
-    parser.process(a);
-
+    // Process the actual command line arguments
+    parser.process(mansur);
     const QStringList args = parser.positionalArguments();
 
     if (parser.isSet(fontOption) ) {
@@ -139,16 +122,8 @@ int main(int argc, char *argv[])
       }
       return 0;
     }
-    /// TODO remove this
-    /// and have Lexicon use the m_options values
-    QString configFile;
-    if (parser.isSet(configOption)) {
-        configFile = parser.value(configOption);
-        a.setConfig(configFile);
-    }
-    else {
-      a.setConfig("default.ini");
-    }
+    /// store the options we were interested in
+    /// and pass them to the Lexicon
     QMap<QString,QString> options;
     if (parser.isSet(nodeOption)) {
       options.insert(nodeOption.valueName(),parser.value(nodeOption));
@@ -174,8 +149,10 @@ int main(int argc, char *argv[])
     if (parser.isSet(textWidthOption)) {
       options.insert(textWidthOption.valueName(),parser.value(textWidthOption));
     }
-    a.setOptions(options);
-    QLOG_DEBUG() << options;
+    mansur.setOptions(options);
+    ///
+    mansur.startLogging();
+
     QTranslator translator;
     QString trfile;
     if (options.contains("lang")) {
@@ -187,14 +164,14 @@ int main(int argc, char *argv[])
     QFileInfo fi(trfile);
     if (fi.exists()) {
       translator.load(trfile);
-      a.installTranslator(&translator);
+      mansur.installTranslator(&translator);
     }
-    else {
-      QLOG_DEBUG() << "Could not find translation file" << trfile;
+    else if (options.contains("lang")) {
+      QLOG_WARN() << QString(QObject::tr("Could not find translation file %1 for language %2")).arg(trfile).arg(options.value("lang"));
     }
     int ret;
     SplashScreen * splash = 0;
-    QSettings * settings = a.getSettings();
+    QSettings * settings = mansur.getSettings();
     settings->beginGroup("Splash");
     int splashDelay = settings->value(SID_SPLASH_DELAY,5).toInt();
     QString splashDir = settings->value(SID_SPLASH_LOCATION,"images/splash").toString();
@@ -229,21 +206,18 @@ int main(int argc, char *argv[])
         makeSplash = false;
       }
     }
-    a.processEvents();
+    mansur.processEvents();
     LanesLexicon *  w = new LanesLexicon;
     if (w->isOk()) {
       w->show();
       if (makeSplash) {
         splash->setWidget(w);
         QTimer::singleShot(splashDelay * 1000, splash, SLOT(pausedFinish()));
-      //        splash->finish(w);
-         }
-      ret = a.exec();
-      //      delete w;
+      }
+      ret = mansur.exec();
     }
     else {
-      //delete w;
-      a.quit();
+      mansur.quit();
       return 0;
     }
     return ret;

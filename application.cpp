@@ -32,6 +32,41 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
 
   connect(this,SIGNAL(focusChanged(QWidget *,QWidget *)),this,SLOT(onFocusChange(QWidget *,QWidget *)));
 }
+void Lexicon::startLogging() {
+  QSettings * settings = getSettings();
+  settings->beginGroup("Logging");
+  QString logfile = settings->value(SID_LOGGING_FILE,"log.txt").toString();
+  int loglevel = settings->value(SID_LOGGING_LEVEL,2).toInt();
+  int maxsize = settings->value(SID_LOGGING_MAXSIZE,64000).toInt();
+  int archiveCount = settings->value(SID_LOGGING_ARCHIVES,4).toInt();
+  bool rotate = settings->value(SID_LOGGING_ROTATE,true).toBool();
+  delete settings;
+
+    QsLogging::Logger& logger = QsLogging::Logger::instance();
+    logger.setLoggingLevel(QsLogging::TraceLevel);
+    switch(loglevel) {
+    case 0  : { logger.setLoggingLevel(QsLogging::TraceLevel) ; break; }
+    case 1  : { logger.setLoggingLevel(QsLogging::DebugLevel) ; break; }
+    case 2  : { logger.setLoggingLevel(QsLogging::InfoLevel) ; break; }
+    case 3  : { logger.setLoggingLevel(QsLogging::WarnLevel) ; break; }
+    case 4  : { logger.setLoggingLevel(QsLogging::ErrorLevel) ; break; }
+    case 5  : { logger.setLoggingLevel(QsLogging::FatalLevel) ; break; }
+    case 6  : { logger.setLoggingLevel(QsLogging::OffLevel) ; break; }
+    default : { logger.setLoggingLevel(QsLogging::InfoLevel) ; break; }
+    }
+    //    const QString sLogPath(QDir(applicationDirPath()).filePath(logfile));
+    const QString sLogPath(QDir::current().filePath(logfile));
+    /// path, rotatation enabled,bytes to rotate after,nbr of old logs to keep
+   QsLogging::DestinationPtr fileDestination(
+      QsLogging::DestinationFactory::MakeFileDestination(sLogPath, rotate, maxsize, archiveCount) );
+   QsLogging::DestinationPtr debugDestination(
+      QsLogging::DestinationFactory::MakeDebugOutputDestination() );
+   logger.addDestination(debugDestination);
+   logger.addDestination(fileDestination);
+
+   QLOG_INFO() << "Program started";
+   QLOG_INFO() << "Built with Qt" << QT_VERSION_STR << "running on" << qVersion();
+}
 QString Lexicon::getConfig() const {
   return m_configFile;
 }
@@ -44,6 +79,12 @@ void Lexicon::setConfig(const QString & fileName) {
 
 void Lexicon::setOptions(const QMap<QString,QString> & options) {
   m_options = options;
+  if (m_options.contains("config")) {
+    m_configFile = m_options.value("config");
+  }
+  else {
+    m_configFile = "default.ini";
+  }
 }
 QMap<QString,QString> Lexicon::getOptions() const  {
   return m_options;
