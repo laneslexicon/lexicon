@@ -4,9 +4,11 @@
 #include "application.h"
 #include "definedsettings.h"
 LogViewer::LogViewer(QWidget * parent) : QDialog(parent) {
+  this->setObjectName("logviewer");
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QListWidget(this);
+  m_list->setObjectName("loglist");
   layout->addWidget(m_list);
 
   m_pauseButton = new QPushButton(tr("Pause auto-update"),this);
