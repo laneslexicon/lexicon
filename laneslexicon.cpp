@@ -456,10 +456,10 @@ void LanesLexicon::shortcut(const QString & key) {
     }
   }
   else if (key == SID_SHORTCUT_NAV_ROOT_MODE) {
-    m_navMode = Lane::By_Root;
+    onNavigationMenuChanged(m_navModeRootAction);
   }
   else if (key == SID_SHORTCUT_NAV_PAGE_MODE) {
-    m_navMode = Lane::By_Page;
+    onNavigationMenuChanged(m_navModePageAction);
   }
   else if (key == SID_SHORTCUT_HISTORY_NEXT) {
     /// increment history pos
@@ -2149,7 +2149,7 @@ void LanesLexicon::updateStatusBar() {
  *  (3) by shortcut
  */
 void LanesLexicon::updateMenu() {
-    if (m_navMode == Lane::By_Root) {
+  if (m_navMode == Lane::By_Root) {
     m_navModeRootAction->setChecked(true);
   }
   else {
@@ -2212,7 +2212,6 @@ void LanesLexicon::onNavigationMenuChanged(QAction * action) {
   }
   ix = m_navBy->findData(mode);
   m_navBy->setCurrentIndex(ix);
-  qStrip << Q_FUNC_INFO << ix;
 }
 void LanesLexicon::onNavigationChanged(int index) {
   QLOG_DEBUG() << Q_FUNC_INFO << index;
