@@ -628,13 +628,14 @@ void LanesLexicon::createActions() {
 
   m_bookmarkAction = new QAction(tr("Bookmarks"),this);
 
-  m_navigationAction = new QAction(tr("Move"),this);
+  //  m_navigationAction = new QAction(tr("Move"),this);
 
   m_searchAction = new QAction(tr("Search"),this);
 
 
-
+  QActionGroup * navactiongroup = new QActionGroup(this);
   m_navModeRootAction = new QAction(tr("By root"),this);
+
   m_navModeRootAction->setData(Lane::By_Root);
   m_navModeRootAction->setCheckable(true);
   if (m_navMode == Lane::By_Root) {
@@ -646,8 +647,11 @@ void LanesLexicon::createActions() {
   if (m_navMode == Lane::By_Page) {
     m_navModePageAction->setChecked(true);
   }
-  connect(m_navModeRootAction,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
-  connect(m_navModePageAction,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
+  navactiongroup->addAction(m_navModeRootAction);
+  navactiongroup->addAction(m_navModePageAction);
+
+  connect(navactiongroup,SIGNAL(triggered(QAction *)),this,SLOT(onNavigationMenuChanged(QAction *)));
+  //  connect(m_navModePageAction,SIGNAL(triggered()),this,SLOT(onNavigationMenuChanged(bool)));
 
   connect(m_docAction,SIGNAL(triggered()),this,SLOT(onDocs()));
 
@@ -1324,6 +1328,7 @@ void LanesLexicon::onTest() {
  * in the ini file
  */
 void LanesLexicon::readSettings() {
+  QString v;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QMap<QString,QString> cmdOptions = app->getOptions();
 
@@ -1362,17 +1367,17 @@ void LanesLexicon::readSettings() {
   m_docked = settings->value("Docked",false).toBool();
   m_minimalAction->setChecked(settings->value("Minimal interface",false).toBool());
 
-  m_navigationMode = settings->value("Navigation","root").toString();
-
   m_activeMap = settings->value("Default map","Buckwalter").toString();
-  if (m_navigationMode.toLower() == "root") {
+
+  v  = settings->value("Navigation","root").toString();
+  if (v.toLower() == "root") {
     m_navMode = Lane::By_Root;
   }
   else {
     m_navMode = Lane::By_Page;
   }
-  QString title = settings->value("Title",tr("Lane's Arabic-English Lexicon")).toString();
-  this->setWindowTitle(title);
+  v = settings->value("Title",tr("Lane's Arabic-English Lexicon")).toString();
+  this->setWindowTitle(v);
 
   m_toolbarIconSize = settings->value("Icon size",QSize(16,16)).toSize();
 
@@ -1386,7 +1391,7 @@ void LanesLexicon::readSettings() {
 
   m_searchOptions.setNewTab(settings->value("New tab",true).toBool());
   m_searchOptions.setActivateTab(settings->value("Switch tab",true).toBool());
-  QString v;
+
   v  = settings->value("Type",QString("normal")).toString();
   if (v == "normal")
     m_searchOptions.setSearchType(SearchOptions::Normal);
@@ -1440,15 +1445,15 @@ void LanesLexicon::readSettings() {
     return;
   }
   settings->beginGroup(m_activeMap);
-  QString filename = settings->value("file",QString()).toString();
-  QFile file(filename);
+  v = settings->value("file",QString()).toString();
+  QFile file(v);
   if ( file.exists() ) {
-    if (! im_load_map_from_json(m_mapper,filename.toUtf8().constData(),m_activeMap.toUtf8().constData())) {
-      QLOG_WARN() << QString(tr("Could not load <%1> from file <%2>")).arg(m_activeMap).arg(filename);
+    if (! im_load_map_from_json(m_mapper,v.toUtf8().constData(),m_activeMap.toUtf8().constData())) {
+      QLOG_WARN() << QString(tr("Could not load <%1> from file <%2>")).arg(m_activeMap).arg(v);
     }
   }
   else {
-    QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(m_activeMap).arg(filename);
+    QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(m_activeMap).arg(v);
   }
   settings->endGroup();
   settings->endGroup();
@@ -2137,8 +2142,13 @@ void LanesLexicon::updateStatusBar() {
   }
   m_keymapsButton->setEnabled(m_keymapsEnabled);
 }
+/**
+ * navigation mode can be changed:
+ *  (1) from the toolbar by changing the dropdown
+ *  (2) from the menubar by
+ *  (3) by shortcut
+ */
 void LanesLexicon::updateMenu() {
-  /*
     if (m_navMode == Lane::By_Root) {
     m_navModeRootAction->setChecked(true);
   }
@@ -2152,7 +2162,6 @@ void LanesLexicon::updateMenu() {
   else {
     m_navModePageAction->setChecked(false);
   }
-  */
   if (m_revertEnabled) {
     m_bookmarkRevertAction->setEnabled(true);
   }
@@ -2192,14 +2201,33 @@ void LanesLexicon::onNavLast()   {
     onLastPage();
   }
 }
+void LanesLexicon::onNavigationMenuChanged(QAction * action) {
+  int ix;
+  int mode;
+  if (action == m_navModeRootAction) {
+      mode = Lane::By_Root;
+  }
+  else {
+      mode = Lane::By_Page;
+  }
+  ix = m_navBy->findData(mode);
+  m_navBy->setCurrentIndex(ix);
+  qStrip << Q_FUNC_INFO << ix;
+}
 void LanesLexicon::onNavigationChanged(int index) {
   QLOG_DEBUG() << Q_FUNC_INFO << index;
   bool ok;
   int m = m_navBy->currentData().toInt(&ok);
   if (ok) {
     m_navMode = m;
-    updateStatusBar();
-    updateMenu();
+    if (m_navMode == Lane::By_Root) {
+      m_navModeRootAction->setChecked(true);
+      m_navModePageAction->setChecked(false);
+    }
+    else {
+      m_navModePageAction->setChecked(true);
+      m_navModeRootAction->setChecked(false);
+    }
   }
 }
 void LanesLexicon::onClearHistory() {
@@ -2784,8 +2812,8 @@ void LanesLexicon::setIcons(const QString & theme) {
   iconfile = settings->value("Bookmarks",QString()).toString();
   setIcon(m_bookmarkAction,imgdir,iconfile);
 
-  iconfile = settings->value("Move",QString()).toString();
-  setIcon(m_navigationAction,imgdir,iconfile);
+  //  iconfile = settings->value("Move",QString()).toString();
+  //  setIcon(m_navigationAction,imgdir,iconfile);
 
   iconfile = settings->value("Search",QString()).toString();
   setIcon(m_searchAction,imgdir,iconfile);

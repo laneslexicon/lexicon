@@ -110,7 +110,8 @@ public:
     void onExit();
     void onTest();
 
-    void onNavigationChanged(int);
+    void onNavigationChanged(int);                 // change navigation via toolbar
+    void onNavigationMenuChanged(QAction *);       // change navigation by menu
     void onNavNext();
     void onNavPrev();
     void onNavFirst();
@@ -246,7 +247,7 @@ private:
     bool m_restoreTabs;
     bool m_searchNewTab;
     bool m_searchSwitchTab;
-    QString m_navigationMode;
+    //    QString m_navigationMode;
     void getFirstAndLast();
     void restoreTabs();
     QSignalMapper * m_signalMapper;
@@ -310,7 +311,7 @@ private:
 
     QAction * m_historyAction;
     QAction * m_bookmarkAction;
-    QAction * m_navigationAction;
+    //    QAction * m_navigationAction;
 
     QAction * m_searchAction;
     QToolButton * m_searchButton;
