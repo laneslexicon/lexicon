@@ -20,7 +20,7 @@
 #include "fullsearch.h"
 #include "headsearch.h"
 #include "definedsettings.h"
-#include "entrylayoutdialog.h"
+#include "entrylayoutwidget.h"
 #include "optionsdialog.h"
 #include "logviewer.h"
 //extern cmdOptions progOptions;

@@ -1,4 +1,4 @@
-#include "entrylayoutdialog.h"
+#include "entrylayoutwidget.h"
 #include "laneslexicon.h"
 #include "application.h"
 #include "definedsettings.h"
