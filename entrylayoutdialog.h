@@ -17,7 +17,7 @@
 #include <QTextStream>
 #include <QGroupBox>
 class NoteMaster;
-class EntryLayoutDialog : public QDialog {
+class EntryLayoutDialog : public QWidget {
   Q_OBJECT
 
  public:
@@ -49,6 +49,7 @@ private:
   QString m_cssFileName;
   QString m_xsltFileName;
   void readSettings();
+  void writeSettings();
   QString loadFromFile(int type,const QString &);
   QSize sizeHint() const;
  signals:

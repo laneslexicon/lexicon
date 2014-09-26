@@ -3,7 +3,7 @@
 #include "application.h"
 #include "definedsettings.h"
 #include "externs.h"
-EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QDialog(parent) {
+EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   m_tabs = new QTabWidget(this);
   m_cssEdit = new QPlainTextEdit(this);
@@ -82,11 +82,12 @@ EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QDialog(parent) {
   connect(m_cssEdit,SIGNAL(textChanged()),this,SLOT(onTextChanged()));
   connect(m_xsltEdit,SIGNAL(textChanged()),this,SLOT(onTextChanged()));
   setLayout(layout);
-  setModal(false);
-
+  //  setModal(false);
+  //  readSettings();
 }
 EntryLayoutDialog::~EntryLayoutDialog()    {
   QLOG_DEBUG() << Q_FUNC_INFO;
+  writeSettings();
 }
 QSize EntryLayoutDialog::sizeHint() const {
   return QSize(800,600);
@@ -173,6 +174,15 @@ void EntryLayoutDialog::readSettings() {
   m_css = loadFromFile(0,m_cssFileName);
   m_xsltFileName = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
   m_xslt = loadFromFile(1,m_xsltFileName);
+  settings->endGroup();
+  settings->beginGroup("EntryLayout");
+  this->restoreGeometry(settings->value("Geometry").toByteArray());
+
+}
+void EntryLayoutDialog::writeSettings() {
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("EntryLayout");
+  settings->setValue("Geometry", saveGeometry());
 }
 /**
  *

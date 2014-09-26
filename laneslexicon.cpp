@@ -253,12 +253,12 @@ void LanesLexicon::cleanup() {
   }
   if (m_notesDb.isOpen())
     m_notesDb.close();
-  /*
+
   if (m_entryLayout != NULL) {
     delete m_entryLayout;
     m_entryLayout = 0;
   }
-  */
+
   if (m_logview != NULL) {
     delete m_logview;
     m_logview = 0;
@@ -1256,7 +1256,7 @@ void LanesLexicon::onEditView() {
     m_entryLayout->show();
     return;
   }
-  m_entryLayout  = new EntryLayoutDialog(this);
+  m_entryLayout  = new EntryLayoutDialog();
   connect(m_entryLayout,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
   connect(m_entryLayout,SIGNAL(revert()),this,SLOT(revertEntry()));
   m_entryLayout->show();
