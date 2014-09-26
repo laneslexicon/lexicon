@@ -11,12 +11,13 @@
 #include <QTimer>
 #include <QPushButton>
 #include <QHBoxLayout>
-class LogViewer : public QDialog {
+class LogViewer : public QWidget {
   Q_OBJECT
 
 public:
   LogViewer(QWidget * parent = 0);
   ~LogViewer();
+  QSize sizeHint() const;
   public slots:
     void onRefresh();
     void onClose();
@@ -36,5 +37,6 @@ public:
   QIcon * m_debug;
   QTimer * m_timer;
   void readSettings();
+  void writeSettings();
 };
 #endif

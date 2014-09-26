@@ -3,7 +3,7 @@
 #include "place.h"
 #include "application.h"
 #include "definedsettings.h"
-LogViewer::LogViewer(QWidget * parent) : QDialog(parent) {
+LogViewer::LogViewer(QWidget * parent) : QWidget(parent) {
   this->setObjectName("logviewer");
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
@@ -20,15 +20,12 @@ LogViewer::LogViewer(QWidget * parent) : QDialog(parent) {
   hlayout->addWidget(m_closeButton);
 
   layout->addLayout(hlayout);
-  m_warning = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-warning.png");
-  m_error = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-error.png");
-  m_info = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-information.png");
-  m_debug = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/debug-run.png");
   setLayout(layout);
-  setModal(false);
+  //  setModal(false);
   QStringList lines;
   if (m_log.open(QIODevice::ReadOnly)) {
     m_stream.setDevice(&m_log);
+    m_stream.setCodec("UTF-8");
     while(! m_stream.atEnd()) {
       lines << m_stream.readLine();
       if (lines.size() > m_maxlines) {
@@ -58,9 +55,29 @@ void LogViewer::readSettings() {
    m_log.setFileName(settings->value(SID_LOGGING_FILE,"../log.txt").toString());
    m_maxlines = settings->value(SID_LOGGING_VIEWER_MAXLINES,100).toInt();
    m_refreshInterval = settings->value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
+   this->restoreGeometry(settings->value("Geometry").toByteArray());
+  settings->endGroup();
+
+   /// TODO get theme etc etc
+  m_warning = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-warning.png");
+  m_error = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-error.png");
+  m_info = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-information.png");
+  m_debug = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/debug-run.png");
+
+
+}
+void LogViewer::writeSettings() {
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("Logging");
+  settings->setValue("Geometry", saveGeometry());
+  settings->endGroup();
+}
+QSize LogViewer::sizeHint() const {
+  return QSize(400,600);
 }
 LogViewer::~LogViewer() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+  writeSettings();
   m_list->clear();
   delete m_warning;
   delete m_error;
