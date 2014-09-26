@@ -86,6 +86,7 @@ public:
     void setStatus(const QString &);
     //    void saveNote(Note *);
     private slots:
+      void onLogViewer();
       void onLinkChanged();
       void testSlot();
       void sync();
@@ -188,7 +189,7 @@ private:
 
     QString m_interface;    // "default","minimal"
     QAction * m_minimalAction;
-
+    QAction * m_logViewerAction;
     QAction * m_optionsAction;
 
     QString m_applicationCssFile;

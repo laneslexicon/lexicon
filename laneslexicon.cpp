@@ -38,7 +38,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_revertEnabled = false;
   m_entryLayout = NULL;
   m_mapper = im_new();
-  m_logview = 0;
+  m_logview = NULL;
   createActions();
   readSettings();
 
@@ -617,6 +617,8 @@ void LanesLexicon::createActions() {
   m_optionsAction = new QAction(tr("&Preferences"),this);
   connect(m_optionsAction,SIGNAL(triggered()),this,SLOT(onOptions()));
 
+  m_logViewerAction = new QAction(tr("View logs"),this);
+  connect(m_logViewerAction,SIGNAL(triggered()),this,SLOT(onLogViewer()));
 
   m_clearHistoryAction = new QAction(tr("Clear"),this);
   connect(m_clearHistoryAction,SIGNAL(triggered()),this,SLOT(onClearHistory()));
@@ -750,6 +752,7 @@ void LanesLexicon::createToolBar() {
   //  docs->setObjectName("docstoolbar");
   m_mainbar->addAction(m_docAction);
   m_mainbar->addAction(m_optionsAction);
+  m_mainbar->addAction(m_logViewerAction);
   m_mainbar->setFloatable(true);
   m_mainbar->setIconSize(m_toolbarIconSize);
   //  addToolBarBreak();
@@ -894,6 +897,7 @@ void LanesLexicon::createMenus() {
   viewmenu->addAction(m_minimalAction);
   viewmenu->addAction(m_optionsAction);
 
+
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
 
@@ -937,6 +941,8 @@ void LanesLexicon::createMenus() {
   pagemenu->addAction(m_clearAction);
 
   QMenu * toolsmenu = m_mainmenu->addMenu(tr("&Tools"));
+  toolsmenu->setObjectName("toolsmenu");
+  toolsmenu->addAction(m_logViewerAction);
   toolsmenu->addAction(m_editViewAction);
 
 }
@@ -1260,6 +1266,12 @@ void LanesLexicon::onEditView() {
   connect(m_entryLayout,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
   connect(m_entryLayout,SIGNAL(revert()),this,SLOT(revertEntry()));
   m_entryLayout->show();
+}
+void LanesLexicon::onLogViewer() {
+  if (m_logview == NULL) {
+    m_logview = new LogViewer();
+  }
+  m_logview->show();
 }
 void LanesLexicon::onTest() {
   m_logview = new LogViewer();
@@ -2826,6 +2838,9 @@ void LanesLexicon::setIcons(const QString & theme) {
 
   iconfile = settings->value("Preferences",QString()).toString();
   setIcon(m_optionsAction,imgdir,iconfile);
+
+  iconfile = settings->value("Logs",QString()).toString();
+  setIcon(m_logViewerAction,imgdir,iconfile);
 
   QIcon icon;
   iconfile = settings->value("Link",QString()).toString();
