@@ -103,6 +103,20 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createToolBar();
   createStatusBar();
 
+  if (m_navMode == Lane::By_Root) {
+    m_navModeRootAction->setChecked(true);
+  }
+  else {
+    m_navModeRootAction->setChecked(false);
+  }
+
+  if (m_navMode == Lane::By_Page) {
+    m_navModePageAction->setChecked(true);
+  }
+  else {
+    m_navModePageAction->setChecked(false);
+  }
+
   if (m_db.isOpen()) {
     setStatus(tr("Ready"));
     if (! m_valgrind ) {
@@ -244,12 +258,12 @@ void LanesLexicon::cleanup() {
     delete m_entryLayout;
     m_entryLayout = 0;
   }
-
+  */
   if (m_logview != NULL) {
     delete m_logview;
     m_logview = 0;
   }
-
+  /*
   m_tree->clear();
   delete m_tree;
   m_tree = 0;
@@ -768,39 +782,6 @@ void LanesLexicon::createToolBar() {
 
   connect(m_navBy,SIGNAL(currentIndexChanged(int)),this,SLOT(onNavigationChanged(int)));
 
-  /// TODO should we reuse the m_navMode{Root,Page}Action
-  /*
-  QActionGroup * group = new QActionGroup(this);
-
-  QAction * action = group->addAction(tr("By root"));
-  action->setCheckable(true);
-  if (m_navMode == Lane::By_Root) {
-    action->setChecked(true);
-  }
-  else {
-    action->setChecked(false);
-  }
-  action->setData(QVariant(0));//event->getId());
-  connect(action,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
-
-  action = group->addAction(tr("By page"));
-  action->setCheckable(true);
-
-  if (m_navMode == Lane::By_Page) {
-    action->setChecked(true);
-  }
-  else {
-    action->setChecked(false);
-  }
-  action->setData(QVariant(1));//event->getId());
-  connect(action,SIGNAL(triggered()),this,SLOT(onNavModeChanged()));
-  QMenu * m = new QMenu(this);
-  m->addActions(group->actions());
-  m_navBtn->setEnabled(true);
-  m_navBtn->setMenu(m);
-  m_navBtn->setPopupMode(QToolButton::MenuButtonPopup);
-  m_navigation->addWidget(m_navBtn);
-  */
   m_navigation->addAction(m_navFirstAction);
   m_navigation->addAction(m_navNextAction);
   m_navigation->addAction(m_navPrevAction);
@@ -937,6 +918,8 @@ void LanesLexicon::createMenus() {
   m_navMenu->addAction(m_navModePageAction);
 
   m_searchMenu = m_mainmenu->addMenu(tr("&Search"));
+  m_searchMenu->setTitle(tr("Search"));
+  m_searchMenu->setObjectName("searchmenu");
   m_searchMenu->addAction(m_searchRootAction);
   m_searchMenu->addAction(m_searchEntryAction);
   m_searchMenu->addAction(m_searchWordAction);
@@ -1269,18 +1252,17 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
 }
 void LanesLexicon::onEditView() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  if (m_entryLayout == NULL) {
-    m_entryLayout  = new EntryLayoutDialog(this);
-  }
-  else {
+  if (m_entryLayout != NULL) {
     m_entryLayout->show();
+    return;
   }
+  m_entryLayout  = new EntryLayoutDialog(this);
   connect(m_entryLayout,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
   connect(m_entryLayout,SIGNAL(revert()),this,SLOT(revertEntry()));
   m_entryLayout->show();
 }
 void LanesLexicon::onTest() {
-  m_logview = new LogViewer(this);
+  m_logview = new LogViewer();
   m_logview->show();
   if (0) {
     SearchOptionsWidget * s = new SearchOptionsWidget(SearchOptions::Word);
@@ -2145,23 +2127,11 @@ void LanesLexicon::updateStatusBar() {
 /**
  * navigation mode can be changed:
  *  (1) from the toolbar by changing the dropdown
- *  (2) from the menubar by
+ *  (2) from the menubar by selecting the mode
  *  (3) by shortcut
  */
 void LanesLexicon::updateMenu() {
-  if (m_navMode == Lane::By_Root) {
-    m_navModeRootAction->setChecked(true);
-  }
-  else {
-    m_navModeRootAction->setChecked(false);
-  }
 
-  if (m_navMode == Lane::By_Page) {
-    m_navModePageAction->setChecked(true);
-  }
-  else {
-    m_navModePageAction->setChecked(false);
-  }
   if (m_revertEnabled) {
     m_bookmarkRevertAction->setEnabled(true);
   }
