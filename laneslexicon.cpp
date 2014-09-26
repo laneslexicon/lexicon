@@ -104,7 +104,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createStatusBar();
 
   if (m_db.isOpen()) {
-    statusBar()->showMessage(tr("Ready"));
+    setStatus(tr("Ready"));
     if (! m_valgrind ) {
       m_tree->loadContents();
       getFirstAndLast();
@@ -737,10 +737,11 @@ void LanesLexicon::createToolBar() {
   //  addToolBarBreak();
 
   m_navigation = addToolBar(tr("Navigation"));
-  m_navigation->setObjectName("m_navigationtoolbar");
+  m_navigation->setObjectName("navigationtoolbar");
   m_navigation->setIconSize(m_toolbarIconSize);
-  m_navigation->setToolTip(tr("Move root or by page"));
   m_navigation->setFloatable(true);
+
+  //  m_navigation->setToolTip(tr("Move root or by page"));
   //  m_navText = new QLabel("",m_navigation);
   /*
   if (m_navMode == Lane::By_Root) {
@@ -750,13 +751,21 @@ void LanesLexicon::createToolBar() {
     m_navText->setText(tr("Page"));
   }
   */
-  QToolButton * m_navBtn = new QToolButton(m_navigation);
-  m_navBtn->setDefaultAction(m_navigationAction);
-  m_navBtn->setText(tr("Move by"));
+  //  QToolButton * m_navBtn = new QToolButton(m_navigation);
+  //  m_navBtn->setDefaultAction(m_navigationAction);
+  //  m_navBtn->setText(tr("Move by"));
 
+  m_navBy = new QComboBox;
+  m_navBy->setObjectName("navigationby");
+  m_navBy->addItem(tr("Move by root"),Lane::By_Root);
+  m_navBy->addItem(tr("Move by page"),Lane::By_Page);
+  m_navboxAction = m_navigation->addWidget(m_navBy);
+  m_navboxAction->setVisible(true);
+
+  connect(m_navBy,SIGNAL(currentIndexChanged(int)),this,SLOT(onNavigationChanged(int)));
 
   /// TODO should we reuse the m_navMode{Root,Page}Action
-
+  /*
   QActionGroup * group = new QActionGroup(this);
 
   QAction * action = group->addAction(tr("By root"));
@@ -787,6 +796,7 @@ void LanesLexicon::createToolBar() {
   m_navBtn->setMenu(m);
   m_navBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_navigation->addWidget(m_navBtn);
+  */
   m_navigation->addAction(m_navFirstAction);
   m_navigation->addAction(m_navNextAction);
   m_navigation->addAction(m_navPrevAction);
@@ -945,7 +955,6 @@ void LanesLexicon::createMenus() {
 }
 
 void LanesLexicon::createStatusBar() {
-  m_navModeIndicator = new QLabel("",this);
   m_placeIndicator = new QLabel("",this);
   m_placeIndicator->setObjectName("placeindicator");
 
@@ -982,7 +991,6 @@ void LanesLexicon::createStatusBar() {
   statusBar()->addPermanentWidget(m_placeIndicator);
   statusBar()->addPermanentWidget(m_keymapsButton);
   statusBar()->addPermanentWidget(m_linkButton);
-  statusBar()->addPermanentWidget(m_navModeIndicator);
 
   QString tip;
   if (m_keymapsEnabled) {
@@ -2127,29 +2135,24 @@ void LanesLexicon::updateStatusBar() {
     m_placeIndicator->setText("");
 
   }
-  if (m_navMode == Lane::By_Root) {
-    m_navModeIndicator->setText(tr("Nav mode: by root"));
-    //    m_navText->setText(tr("Root"));
-  }
-  else {
-    m_navModeIndicator->setText(tr("Nav mode: by page"));
-    //    m_navText->setText(tr("Page"));
-  }
   m_keymapsButton->setEnabled(m_keymapsEnabled);
 }
 void LanesLexicon::updateMenu() {
-  if (m_navMode == Lane::By_Root) {
+  /*
+    if (m_navMode == Lane::By_Root) {
     m_navModeRootAction->setChecked(true);
   }
   else {
     m_navModeRootAction->setChecked(false);
   }
+
   if (m_navMode == Lane::By_Page) {
     m_navModePageAction->setChecked(true);
   }
   else {
     m_navModePageAction->setChecked(false);
   }
+  */
   if (m_revertEnabled) {
     m_bookmarkRevertAction->setEnabled(true);
   }
@@ -2189,17 +2192,14 @@ void LanesLexicon::onNavLast()   {
     onLastPage();
   }
 }
-void LanesLexicon::onNavModeChanged() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
-  QAction * action = qobject_cast<QAction *>(QObject::sender());
-  if (action) {
-    bool ok;
-    int m = action->data().toInt(&ok);
-    if (ok) {
-      m_navMode = m;
-      updateStatusBar();
-      updateMenu();
-    }
+void LanesLexicon::onNavigationChanged(int index) {
+  QLOG_DEBUG() << Q_FUNC_INFO << index;
+  bool ok;
+  int m = m_navBy->currentData().toInt(&ok);
+  if (ok) {
+    m_navMode = m;
+    updateStatusBar();
+    updateMenu();
   }
 }
 void LanesLexicon::onClearHistory() {

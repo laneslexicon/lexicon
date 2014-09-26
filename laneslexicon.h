@@ -7,6 +7,7 @@
 #include <QTreeWidgetItem>
 #include <QGridLayout>
 #include <QFormLayout>
+#include <QComboBox>
 #include <QToolBar>
 #include <QStatusBar>
 #include <QMenu>
@@ -109,7 +110,7 @@ public:
     void onExit();
     void onTest();
 
-    void onNavModeChanged();
+    void onNavigationChanged(int);
     void onNavNext();
     void onNavPrev();
     void onNavFirst();
@@ -201,7 +202,7 @@ private:
     //    void setupInterface();
     /// 0 - root mode, 1 - page mode
     int m_navMode;
-    QLabel * m_navModeIndicator;
+
     QLabel * m_placeIndicator;
     QToolButton * m_keymapsButton;
     QAction * m_keymapsAction;
@@ -326,6 +327,8 @@ private:
     QAction * m_navLastAction;
     //    QLabel * m_navText;
     QToolButton * m_navBtn;
+    QAction * m_navboxAction;
+    QComboBox * m_navBy;
     QMenu * m_navMenu;
     QAction * m_navModeRootAction;
     QAction * m_navModePageAction;
