@@ -1256,7 +1256,7 @@ void LanesLexicon::onEditView() {
     m_entryLayout->show();
     return;
   }
-  m_entryLayout  = new EntryLayoutDialog();
+  m_entryLayout  = new EntryLayoutWidget();
   connect(m_entryLayout,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
   connect(m_entryLayout,SIGNAL(revert()),this,SLOT(revertEntry()));
   m_entryLayout->show();

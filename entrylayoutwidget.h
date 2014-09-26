@@ -17,12 +17,12 @@
 #include <QTextStream>
 #include <QGroupBox>
 class NoteMaster;
-class EntryLayoutDialog : public QWidget {
+class EntryLayoutWidget : public QWidget {
   Q_OBJECT
 
  public:
-  EntryLayoutDialog(QWidget * parent = 0);
-  ~EntryLayoutDialog();
+  EntryLayoutWidget(QWidget * parent = 0);
+  ~EntryLayoutWidget();
  public slots:
   void onApply();
   void onReset();

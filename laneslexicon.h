@@ -62,7 +62,7 @@ class InputMapper;
 class GraphicsEntry;
 class ContentsWidget;
 class TabWidget;
-class EntryLayoutDialog;
+class EntryLayoutWidget;
 class LogViewer;
 class LanesLexicon : public QMainWindow
 {
@@ -192,7 +192,7 @@ private:
     QAction * m_optionsAction;
 
     QString m_applicationCssFile;
-    EntryLayoutDialog * m_entryLayout;
+    EntryLayoutWidget * m_entryLayout;
 
     LogViewer * m_logview;
     QPrinter m_printer;

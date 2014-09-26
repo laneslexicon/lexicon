@@ -3,7 +3,7 @@
 #include "application.h"
 #include "definedsettings.h"
 #include "externs.h"
-EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QWidget(parent) {
+EntryLayoutWidget::EntryLayoutWidget(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   m_tabs = new QTabWidget(this);
   m_cssEdit = new QPlainTextEdit(this);
@@ -85,14 +85,14 @@ EntryLayoutDialog::EntryLayoutDialog(QWidget * parent) : QWidget(parent) {
   //  setModal(false);
   //  readSettings();
 }
-EntryLayoutDialog::~EntryLayoutDialog()    {
+EntryLayoutWidget::~EntryLayoutWidget()    {
   QLOG_DEBUG() << Q_FUNC_INFO;
   writeSettings();
 }
-QSize EntryLayoutDialog::sizeHint() const {
+QSize EntryLayoutWidget::sizeHint() const {
   return QSize(800,600);
 }
-void EntryLayoutDialog::onTextChanged() {
+void EntryLayoutWidget::onTextChanged() {
   bool buttonState = false;
   if ((m_css != m_cssEdit->toPlainText()) || (m_xslt != m_xsltEdit->toPlainText())) {// Edit->document()->isModified() || m_xsltEdit->document()->isModified() ) {
     buttonState = true;
@@ -100,7 +100,7 @@ void EntryLayoutDialog::onTextChanged() {
   m_saveButton->setEnabled(buttonState);
   m_restoreButton->setEnabled(buttonState);
 }
-void EntryLayoutDialog::onApply() {
+void EntryLayoutWidget::onApply() {
   QString css;
   QString xslt;
   if (m_testCssBox->isChecked()) {
@@ -111,11 +111,11 @@ void EntryLayoutDialog::onApply() {
   }
   emit(reload(css,xslt));
 }
-void EntryLayoutDialog::onReset() {
+void EntryLayoutWidget::onReset() {
     emit(revert());
 }
 
-void EntryLayoutDialog::onRestore() {
+void EntryLayoutWidget::onRestore() {
   if (m_testCssBox->isChecked()) {
     m_cssEdit->setPlainText(m_css);
   }
@@ -123,7 +123,7 @@ void EntryLayoutDialog::onRestore() {
     m_xsltEdit->setPlainText(m_xslt);
   }
 }
-void EntryLayoutDialog::onSave() {
+void EntryLayoutWidget::onSave() {
   if (m_css != m_cssEdit->toPlainText()) {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Css File"),
                            m_cssFileName,
@@ -160,12 +160,12 @@ void EntryLayoutDialog::onSave() {
   }
   onTextChanged();
 }
-void EntryLayoutDialog::onClose() {
+void EntryLayoutWidget::onClose() {
   qDebug() << Q_FUNC_INFO;
   this->hide();
 }
 
-void EntryLayoutDialog::readSettings() {
+void EntryLayoutWidget::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
 
@@ -179,7 +179,7 @@ void EntryLayoutDialog::readSettings() {
   this->restoreGeometry(settings->value("Geometry").toByteArray());
 
 }
-void EntryLayoutDialog::writeSettings() {
+void EntryLayoutWidget::writeSettings() {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("EntryLayout");
   settings->setValue("Geometry", saveGeometry());
@@ -193,7 +193,7 @@ void EntryLayoutDialog::writeSettings() {
  * @return
  */
 
-QString EntryLayoutDialog::loadFromFile(int type,const QString & name) {
+QString EntryLayoutWidget::loadFromFile(int type,const QString & name) {
   QString txt;
   QFile f(name);
   if (! f.open(QIODevice::ReadOnly)) {
