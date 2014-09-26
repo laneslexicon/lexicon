@@ -520,6 +520,9 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_LOCAL_SEARCH_SHOW) {
     this->localSearchShow();
   }
+  else if (key == SID_SHORTCUT_SHOW_LOGS) {
+    this->onLogViewer();
+  }
   else if (key == "sync") {
     this->sync();
   }

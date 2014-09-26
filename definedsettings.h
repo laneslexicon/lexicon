@@ -107,6 +107,7 @@ They should not be translated.
 #define SID_SHORTCUT_NAV_NEXT                  "Go next"
 #define SID_SHORTCUT_NAV_PREV                  "Go prev"
 #define SID_SHORTCUT_NAV_LAST                  "Go last"
+
 /*
 #define SID_SHORTCUT_PAGE_FIRST                "Page first"
 #define SID_SHORTCUT_PAGE_LAST                 "Page last"
@@ -130,7 +131,7 @@ They should not be translated.
 #define SID_SHORTCUT_SHOW_NOTES                "Show notes"
 #define SID_SHORTCUT_SYNC                      "Sync"
 #define SID_SHORTCUT_TOGGLE_INTERFACE          "Toggle interface"
-
+#define SID_SHORTCUT_SHOW_LOGS                 "Show logs"
 #define SID_SEARCH_DIACRITICS                  "Diacritics"
 
 #define SID_HEADSEARCH_RESULTS_FONT            "Results font"
