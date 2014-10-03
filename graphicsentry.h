@@ -39,6 +39,9 @@
 #include <QPrinter>
 #include "entryitem.h"
 #include "searchoptionswidget.h"
+#ifndef qStrip
+#define qStrip qDebug()
+#endif
 //class LaneGraphicsView;
 class Place;
 class GraphicsEntry : public QWidget {
@@ -48,13 +51,13 @@ class GraphicsEntry : public QWidget {
   GraphicsEntry(QWidget * parent = 0);
   ~GraphicsEntry();
   enum SearchType { RootSearch, WordSearch, NodeSearch };
-  //  Place getXmlForRoot(const QString &,int supplement = 0,const QString & anchor = QString(),bool nodeOnly = false);
     Place getXmlForRoot(const Place &);
     Place showPlace(const Place &,bool thisPageOnly,int options);
     Place getPage(const Place & );
     //    Place getXmlForPlace(const Place &);
 
-    Place getPlace() const;
+    Place getPlace(int index=-1) const;
+    int getPageNumber(int which=0) const;
     //    int hasRoot(const QString & root,bool focus = true);
     int hasPlace(const Place & ,int searchtype,bool focus = true);
     QString currentRoot() { return m_currentRoot;}
@@ -114,7 +117,6 @@ class GraphicsEntry : public QWidget {
 
     QColor m_supplementBg;
     bool m_notesEnabled;
-    bool m_showNodeOnly;
     bool prepareQueries();
     bool m_clearScene;
     bool m_debug;
@@ -164,7 +166,7 @@ class GraphicsEntry : public QWidget {
     QList<EntryItem *> m_items;
     EntryItem * createEntry(const QString & xml);
     //    const XalanCompiledStylesheet * m_compiledXsl;
-    //    bool showNode(const QString &,bool thisPageOnly = false);
+
 
 
     qreal m_scale;

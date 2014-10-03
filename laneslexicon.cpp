@@ -104,10 +104,11 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createStatusBar();
 
   if (m_navMode == Lane::By_Root) {
-    m_navModeRootAction->setChecked(true);
+    onNavigationMenuChanged(m_navModeRootAction);
+    //    ->setChecked(true);
   }
   else {
-    m_navModeRootAction->setChecked(false);
+    onNavigationMenuChanged(m_navModePageAction);//->setChecked(false);
   }
 
   if (m_navMode == Lane::By_Page) {
@@ -1367,6 +1368,7 @@ void LanesLexicon::readSettings() {
   m_activeMap = settings->value("Default map","Buckwalter").toString();
 
   v  = settings->value("Navigation","root").toString();
+
   if (v.toLower() == "root") {
     m_navMode = Lane::By_Root;
   }
@@ -1494,6 +1496,12 @@ void LanesLexicon::writeSettings() {
     settings->beginGroup("System");
     settings->setValue("Focus tab",m_tabs->currentIndex());
     settings->setValue("Minimal interface",m_minimalAction->isChecked());
+    if (m_navMode == Lane::By_Root) {
+      settings->setValue("Navigation","root");
+    }
+    else {
+      settings->setValue("Navigation","page");
+    }
     settings->endGroup();
   }
 
@@ -1728,7 +1736,6 @@ void LanesLexicon::onGoToPage(const Place & p) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->setPagingForward();
-
     entry->getPage(p);
     //        m_tree->ensurePlaceVisible(np,true);
   }
@@ -1736,32 +1743,41 @@ void LanesLexicon::onGoToPage(const Place & p) {
 void LanesLexicon::onNextPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    Place p = entry->getPlace();
-    int page = p.getPage();
-    if (page == -1) {
-      page = 0;
+    int page = entry->getPageNumber();
+    if (page == m_lastPage) {
+      setStatus(tr("This is the last page"));
+      //      QLOG_INFO() << tr("At last page");
+      return;
     }
-    p.setPage(page + 1);
-    entry->setPagingForward();
-    entry->getPage(p);
-    //        m_tree->ensurePlaceVisible(np,true);
+    if (page == -1) {
+      QLOG_WARN() << "Cannot find current page" << page;
+    }
+    else {
+      Place p = entry->getPlace(1);
+      p.setPage(page + 1);
+      entry->setPagingForward();
+      entry->getPage(p);
+    }
   }
 }
 void LanesLexicon::onPrevPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    Place p = entry->getPlace();
-    int page = p.getPage();
-    if (page < 0) {
-      page = 1;
-    }
-    if (page == 1) {
+    int page = entry->getPageNumber(1); // get the lowest page number
+    if (page == m_firstPage) {
+      //      QLOG_INFO() << tr("At first page");
+      setStatus(tr("This is the first page"));
       return;
     }
-    p.setPage(page - 1);
-    entry->setPagingForward();
-    entry->getPage(p);
-    //        m_tree->ensurePlaceVisible(np,true);
+    if (page == -1) {
+      QLOG_WARN() << "Cannot find current page" << page;
+    }
+    else {
+      Place p = entry->getPlace();
+      p.setPage(page - 1);
+      entry->setPagingForward();
+      entry->getPage(p);
+    }
   }
 }
 void LanesLexicon::onFirstPage() {

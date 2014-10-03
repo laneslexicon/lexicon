@@ -58,7 +58,6 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_textOption.setTextDirection(Qt::LeftToRight);
-  m_showNodeOnly = false;
   //  m_compiledXsl = 0;
   /// 0 = paging forward, items are appended
   /// 1 = paging backward, items are prepended
@@ -301,12 +300,44 @@ void GraphicsEntry::moveFocusUp() {
  *
  * @return
  */
-Place GraphicsEntry::getPlace() const {
+Place GraphicsEntry::getPlace(int index) const {
+  if (index == -1) {
   EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
   if (item)
     return item->getPlace();
+  }
+  else {
+    if (index < m_items.size()) {
+      return m_items[index]->getPlace();
+    }
+  }
 
  return m_place;
+}
+/**
+ * returns the highest page number
+ * @ w = 0, get the highest page
+ *       1, get the lowest
+ * @return
+ */
+int GraphicsEntry::getPageNumber(int w) const {
+  QList<int> pages;
+  for(int i=0;i < m_items.size();i++) {
+    Place p = m_items[i]->getPlace();
+    int x = p.getPage();
+    qStrip << Q_FUNC_INFO << i << p.getNode() << p.getPage();
+    if (x != -1) {
+      pages << x;
+    }
+  }
+  qSort(pages);
+  qStrip << "PAGES" << pages;
+  if (w == 0) {
+    return pages.takeLast();
+  }
+  else {
+    return pages.takeFirst();
+  }
 }
 void GraphicsEntry::focusInEvent(QFocusEvent * event) {
   /// giving focus to the graphicsview so keyboard
@@ -522,7 +553,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QString root = dp.getRoot();
   int supp = dp.getSupplement();
   QString node = dp.getNode();
-  //  bool nodeOnly = dp.getNodeOnly();
+
 
   m_focusNode = node;
   QLOG_DEBUG() << "Focus node set" << node;
@@ -570,24 +601,15 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   if (! m_rootQuery->first()) {
-    if (m_showNodeOnly) {
-      QLOG_WARN() << QString(tr("Root not found for word %1 (node %2)")).arg(p.getWord()).arg(p.getNode());
-    }
-    else {
-      QLOG_WARN() << QString(tr("Root not found %1")).arg(root);
-    }
-    QLOG_DEBUG() << Q_FUNC_INFO << "exiting 4 with place" << retval.toString();
+    QLOG_WARN() << QString(tr("Root not found %1")).arg(root);
     return retval;
   }
-  /// this will be set to the right word if a node has been supplied
-  /// add the root item unless nodeOnly is set
 
   QString str = QString("<word type=\"root\" ar=\"%1\" quasi=\"%2\"></word>").arg(root).arg(quasi);
 QLOG_DEBUG() << str;
   EntryItem * rootItem  = createEntry(str);
   /// will be null if the XSLT/XML has not parsed correctly
   if (rootItem == NULL) {
-    //    QLOG_DEBUG() << Q_FUNC_INFO << "exiting 5 with place";
     return p;
   }
   ///
@@ -611,9 +633,6 @@ QLOG_DEBUG() << str;
   rootItem->setPage(m_rootQuery->value(5).toInt());
 
   items << rootItem;
-  if ( m_showNodeOnly ) {
-    rootItem->hide();
-  }
 
 
   /// by default we will center on the root item
@@ -621,65 +640,48 @@ QLOG_DEBUG() << str;
   /// now add all the entries for the root
   bool ok;
   do  {
-    ok = true;
     supplement = m_rootQuery->value(8).toInt();
-    /**
-     * if we've asked to see the entry for the supplement then just show that
-     *
-     */
-    if ((supp == 1) && (supplement == 0)) {
-      //      ok = false;
+    QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
+      .arg(m_rootQuery->value(3).toString())
+      .arg(m_rootQuery->value(2).toString())
+      .arg(m_rootQuery->value(5).toInt())
+      .arg(m_rootQuery->value(6).toString())
+      .arg(m_rootQuery->value(8).toInt());
+    t += m_rootQuery->value(4).toString();
+    t += "</word>";
+    if (m_dumpXml) {
+      QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(m_rootQuery->value(7).toString()));
+      QFile f(fi.filePath());
+      if (f.open(QIODevice::WriteOnly)) {
+        QTextStream out(&f);
+        out.setCodec("UTF-8");
+        out << t;
+      }
     }
-    //
-    // "select root,broot,word,bword,xml,page,itype,nodeId,supplement from entry where root = ? order by nodenum");
-    //
-    if (ok) {
-      QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
-        .arg(m_rootQuery->value(3).toString())
-        .arg(m_rootQuery->value(2).toString())
-        .arg(m_rootQuery->value(5).toInt())
-        .arg(m_rootQuery->value(6).toString())
-        .arg(m_rootQuery->value(8).toInt());
-      t += m_rootQuery->value(4).toString();
-      t += "</word>";
-      if (m_dumpXml) {
-        QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(m_rootQuery->value(7).toString()));
+    EntryItem * item  = createEntry(t);
+    if (item != NULL) {
+      if (m_dumpOutputHtml) {
+        QFileInfo fi(QDir::tempPath(),QString("%1-out.html").arg(m_rootQuery->value(7).toString()));
         QFile f(fi.filePath());
         if (f.open(QIODevice::WriteOnly)) {
           QTextStream out(&f);
           out.setCodec("UTF-8");
-          out << t;
+          out << item->getOutputHtml();
         }
       }
-      EntryItem * item  = createEntry(t);
-      if (item != NULL) {
-        if (m_dumpOutputHtml) {
-          QFileInfo fi(QDir::tempPath(),QString("%1-out.html").arg(m_rootQuery->value(7).toString()));
-          QFile f(fi.filePath());
-          if (f.open(QIODevice::WriteOnly)) {
-            QTextStream out(&f);
-            out.setCodec("UTF-8");
-            out << item->getOutputHtml();
-          }
-        }
-        Place p;
-        p.setSupplement(supplement);
-        p.setNode(m_rootQuery->value(7).toString());
-        p.setRoot(root);
-        p.setWord(m_rootQuery->value(2).toString());
-        p.setPage(m_rootQuery->value(5).toInt());
-        item->setPlace(p);
-        QList<Note *> notes;
-        item->setNotes();//getApp()->notes()->find(m_rootQuery->value(2).toString()));
-        items << item;
-        /// if we asked for a specific word/node, focus on it
-        if (! node.isEmpty() && (item->getNode() == node)) {
-          centerItem = item;
-        }
-        if (m_showNodeOnly) {
-            item->hide();
-        }
-
+      Place p;
+      p.setSupplement(supplement);
+      p.setNode(m_rootQuery->value(7).toString());
+      p.setRoot(root);
+      p.setWord(m_rootQuery->value(2).toString());
+      p.setPage(m_rootQuery->value(5).toInt());
+      item->setPlace(p);
+      QList<Note *> notes;
+      item->setNotes();//getApp()->notes()->find(m_rootQuery->value(2).toString()));
+      items << item;
+      /// if we asked for a specific word/node, focus on it
+      if (! node.isEmpty() && (item->getNode() == node)) {
+        centerItem = item;
       }
     }
   } while(m_rootQuery->next());
@@ -725,30 +727,12 @@ QLOG_DEBUG() << str;
   /// items added to the scene
   /// TODO check this
   m_view->setSceneRect(m_scene->sceneRect());
-  /// TODO there has to be a better way than this
-  /// TODO if node specified we need to center on it
-  //  if ( node.isEmpty()) {
-    /*
-    QTextCursor cursor(centerItem->document());
-    QTextBlock b = cursor.block();
-    QTextLayout * layout = b.layout();
-    QTextLine line = layout->lineForTextPosition(cursor.position());
-    if (line.isValid()) {
-      QLOG_DEBUG() << Q_FUNC_INFO << "text line pos" << line.position() << line.textLength();
-        m_view->centerOn(line.position());
-    }
-    */
   if (centerItem) {
     this->setCurrentItem(centerItem);
   }
   else {
     QLOG_DEBUG() << Q_FUNC_INFO << "no center item";
   }
-      //      int h =  m_view->height();
-      //      QPointF pt = centerItem->pos();
-      //      pt.setY(pt.y() + h/2 - 10);
-      //      m_view->centerOn(pt);
-      //  }
 
   if (dp.getType() == Place::History) {
       emit(historyPositionChanged(dp.getId()));
@@ -756,8 +740,7 @@ QLOG_DEBUG() << str;
 
   /// we're done
   if (m_place.isSamePlace(centerItem->getPlace())) {
-    //    QLOG_DEBUG() << Q_FUNC_INFO << "exiting 1 with place" << m_place.toString();
-    return m_place;
+      return m_place;
   }
   m_place = centerItem->getPlace();
   m_place.setType(dp.getType());
@@ -788,7 +771,7 @@ Place GraphicsEntry::getPage(const Place & p) {
   int page = p.getPage();
 
 
-
+  //  qStrip << Q_FUNC_INFO << "Page" << page;
   m_pageQuery->bindValue(0,page);
   m_pageQuery->exec();
   if (! m_pageQuery->first()) {
@@ -801,11 +784,13 @@ Place GraphicsEntry::getPage(const Place & p) {
     onClearScene();
   }
   QString lastRoot;
+  // "select root,broot,word,bword,xml,page,itype,nodeId,supplement from entry where datasource =  // 1 and page = ? order by nodenum asc");
 
 
   int rootCount = 0;
   int entryCount = 0;
   do   {
+    qStrip << Q_FUNC_INFO << m_pageQuery->value("nodeid").toString();
     int supplement = m_pageQuery->value(8).toInt();
     QString root = m_pageQuery->value(0).toString();
     /// if root has changed add root XML
@@ -866,10 +851,10 @@ Place GraphicsEntry::getPage(const Place & p) {
       }
       Place p;
       p.setSupplement(supplement);
-      p.setNode(m_rootQuery->value(7).toString());
+      p.setNode(m_pageQuery->value(7).toString());
       p.setRoot(root);
-      p.setWord(m_rootQuery->value(2).toString());
-      p.setPage(m_rootQuery->value(5).toInt());
+      p.setWord(m_pageQuery->value(2).toString());
+      p.setPage(m_pageQuery->value(5).toInt());
       item->setPlace(p);
       item->setNotes();//getApp()->notes()->find(m_rootQuery->value(2).toString()));
       items << item;
@@ -915,31 +900,12 @@ Place GraphicsEntry::getPage(const Place & p) {
   ///
   m_view->setFocus();
   m_transform = m_view->transform();
-
-  //QLOG_DEBUG() << "Scene rect" << m_scene->sceneRect();
-  /// without thus centerOn() does not work properly for
-  /// items added to the scene
-  /// TODO check this
   m_view->setSceneRect(m_scene->sceneRect());
 
   if (m_currentRoot != lastRoot) {
     emit rootChanged(lastRoot,QString());
     m_currentRoot = lastRoot;
   }
-  /// TODO there has to be a better way than this
-  /// TODO if node specified we need to center on it
-
-    /*
-    QTextCursor cursor(centerItem->document());
-    QTextBlock b = cursor.block();
-    QTextLayout * layout = b.layout();
-    QTextLine line = layout->lineForTextPosition(cursor.position());
-    if (line.isValid()) {
-      QLOG_DEBUG() << Q_FUNC_INFO << "text line pos" << line.position() << line.textLength();
-        m_view->centerOn(line.position());
-    }
-    */
-
   m_scene->setFocusItem(focusItem);
   int h =  m_view->height();
   QPointF pt = focusItem->pos();
