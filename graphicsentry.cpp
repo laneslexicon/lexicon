@@ -322,16 +322,15 @@ Place GraphicsEntry::getPlace(int index) const {
  */
 int GraphicsEntry::getPageNumber(int w) const {
   QList<int> pages;
+  int x;
   for(int i=0;i < m_items.size();i++) {
     Place p = m_items[i]->getPlace();
-    int x = p.getPage();
-    qStrip << Q_FUNC_INFO << i << p.getNode() << p.getPage();
+    x = p.getPage();
     if (x != -1) {
       pages << x;
     }
   }
   qSort(pages);
-  qStrip << "PAGES" << pages;
   if (w == 0) {
     return pages.takeLast();
   }
