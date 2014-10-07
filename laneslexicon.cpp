@@ -105,6 +105,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createToolBar();
   createStatusBar();
 
+
   if (m_navMode == Lane::By_Root) {
     onNavigationMenuChanged(m_navModeRootAction);
     //    ->setChecked(true);
@@ -117,7 +118,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     m_navModePageAction->setChecked(true);
   }
   else {
-    m_navModePageAction->setChecked(false);
+    m_navModeRootAction->setChecked(true);
   }
 
   if (m_db.isOpen()) {
@@ -655,7 +656,7 @@ void LanesLexicon::createActions() {
   m_searchAction = new QAction(tr("Search"),this);
 
 
-  QActionGroup * navactiongroup = new QActionGroup(this);
+  m_moveGroup = new QActionGroup(this);
   m_navModeRootAction = new QAction(tr("By root"),this);
 
   m_navModeRootAction->setData(Lane::By_Root);
@@ -669,10 +670,10 @@ void LanesLexicon::createActions() {
   if (m_navMode == Lane::By_Page) {
     m_navModePageAction->setChecked(true);
   }
-  navactiongroup->addAction(m_navModeRootAction);
-  navactiongroup->addAction(m_navModePageAction);
+  m_moveGroup->addAction(m_navModeRootAction);
+  m_moveGroup->addAction(m_navModePageAction);
 
-  connect(navactiongroup,SIGNAL(triggered(QAction *)),this,SLOT(onNavigationMenuChanged(QAction *)));
+  connect(m_moveGroup,SIGNAL(triggered(QAction *)),this,SLOT(onNavigationMenuChanged(QAction *)));
   //  connect(m_navModePageAction,SIGNAL(triggered()),this,SLOT(onNavigationMenuChanged(bool)));
 
   connect(m_docAction,SIGNAL(triggered()),this,SLOT(onDocs()));
@@ -718,7 +719,12 @@ void LanesLexicon::createToolBar() {
   QToolBar * m_mainbar = addToolBar("Main");
   m_mainbar->setObjectName("maintoolbar");
 
-  m_mainbar->addAction(m_exitAction);
+  m_exitButton = new QToolButton(m_mainbar);
+  m_exitButton->setText(tr("Exit"));
+  m_exitButton->setDefaultAction(m_exitAction);
+  m_exitButton->setFocusPolicy(Qt::StrongFocus);
+  m_mainbar->addWidget(m_exitButton);
+
   m_mainbar->addAction(m_testAction);
 
   //  QToolBar * history = addToolBar(tr("History"));
@@ -784,31 +790,20 @@ void LanesLexicon::createToolBar() {
   m_navigation->setIconSize(m_toolbarIconSize);
   m_navigation->setFloatable(true);
 
-  //  QMenu * modeMenu = new QMenu(this);
-  //  modeMenu->addAction(m_navModeRootAction);
-  //  modeMenu->addAction(m_navModePageAction);
-  //  m_navigation->setToolTip(tr("Move root or by page"));
-  //  m_navText = new QLabel("",m_navigation);
-  /*
+  m_navigationModeMenu = new QMenu(m_navigation);
+  m_navigationModeMenu->addAction(m_navModeRootAction);
+  m_navigationModeMenu->addAction(m_navModePageAction);
+  m_navigationButton = new QToolButton(m_navigation);
+  m_navigationButton->setMenu(m_navigationModeMenu);
+  m_navigationButton->setText(tr("Move by"));
+  m_navigationButton->setFocusPolicy(Qt::StrongFocus);
   if (m_navMode == Lane::By_Root) {
-    m_navText->setText(tr("Root"));
+    m_navigationButton->setDefaultAction(m_navModeRootAction);
   }
   else {
-    m_navText->setText(tr("Page"));
+    m_navigationButton->setDefaultAction(m_navModePageAction);
   }
-  */
-  //  QToolButton * m_navBtn = new QToolButton(m_navigation);
-  //  m_navBtn->setDefaultAction(m_navigationAction);
-  //  m_navBtn->setText(tr("Move by"));
-
-  m_navBy = new QComboBox;
-  m_navBy->setObjectName("navigationby");
-  m_navBy->addItem(tr("Move by root"),Lane::By_Root);
-  m_navBy->addItem(tr("Move by page"),Lane::By_Page);
-  m_navboxAction = m_navigation->addWidget(m_navBy);
-  m_navboxAction->setVisible(true);
-
-  connect(m_navBy,SIGNAL(currentIndexChanged(int)),this,SLOT(onNavigationChanged(int)));
+  m_navigation->addWidget(m_navigationButton);
 
   m_navFirstButton = new QToolButton(m_navigation);
   m_navFirstButton->setDefaultAction(m_navFirstAction);
@@ -897,13 +892,14 @@ void LanesLexicon::createToolBar() {
   //  m_entrybar->addAction(m_convertToEntryAction);
   m_entrybar->setFloatable(true);
 
+  setTabOrder(m_exitButton,m_historyButton);
   setTabOrder(m_historyButton,m_bookmarkButton);
   setTabOrder(m_bookmarkButton,m_searchButton);
   setTabOrder(m_searchButton,m_docButton);
   setTabOrder(m_docButton,m_optionsButton);
   setTabOrder(m_optionsButton,m_logButton);
-  setTabOrder(m_logButton,m_navBy);
-  setTabOrder(m_navBy,m_navFirstButton);
+  setTabOrder(m_logButton,m_navigationButton);
+  setTabOrder(m_navigationButton,m_navFirstButton);
   setTabOrder(m_navFirstButton,m_navNextButton);
   setTabOrder(m_navNextButton,m_navPrevButton);
   setTabOrder(m_navPrevButton,m_navLastButton);
@@ -915,6 +911,7 @@ void LanesLexicon::createToolBar() {
   setTabOrder(m_printButton,m_localSearchButton);
 
   if (m_toolbarText) {
+    m_exitButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_historyButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_bookmarkButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_searchButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -940,24 +937,14 @@ void LanesLexicon::createToolBar() {
   connect(m_bookmarkButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
   connect(m_searchButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
   connect(m_historyButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
+  connect(m_navigationButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
 
 }
-void LanesLexicon::onToolButtonTriggered(QAction * action) {
+void LanesLexicon::onToolButtonTriggered(QAction * /* action */) {
+  qStrip << Q_FUNC_INFO;
   QToolButton * button = qobject_cast<QToolButton *>(QObject::sender());
   if (button) {
-    if (button == m_searchButton) {
-      m_searchButton->showMenu();
-    }
-    else if (button == m_bookmarkButton) {
-      m_bookmarkButton->showMenu();
-    }
-    else if (button == m_searchButton) {
-      m_searchButton->showMenu();
-    }
-    else if (button == m_historyButton) {
-      m_historyButton->showMenu();
-    }
-
+    button->showMenu();
   }
 }
 /**
@@ -1397,7 +1384,7 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
         }
         else if (target == m_tabs->tabBar()) {
           qStrip << "Focus given to menu";
-          m_fileMenu->setFocus();
+          m_exitButton->setFocus();
           return true;
         }
         else if (target == m_tree) {
@@ -2379,32 +2366,8 @@ void LanesLexicon::onNavLast()   {
   }
 }
 void LanesLexicon::onNavigationMenuChanged(QAction * action) {
-  int ix;
-  int mode;
-  if (action == m_navModeRootAction) {
-      mode = Lane::By_Root;
-  }
-  else {
-      mode = Lane::By_Page;
-  }
-  ix = m_navBy->findData(mode);
-  m_navBy->setCurrentIndex(ix);
-}
-void LanesLexicon::onNavigationChanged(int index) {
-  QLOG_DEBUG() << Q_FUNC_INFO << index;
-  bool ok;
-  int m = m_navBy->currentData().toInt(&ok);
-  if (ok) {
-    m_navMode = m;
-    if (m_navMode == Lane::By_Root) {
-      m_navModeRootAction->setChecked(true);
-      m_navModePageAction->setChecked(false);
-    }
-    else {
-      m_navModePageAction->setChecked(true);
-      m_navModeRootAction->setChecked(false);
-    }
-  }
+  m_navigationButton->setDefaultAction(action);
+  m_navigationButton->menu()->hide();
 }
 void LanesLexicon::onClearHistory() {
   QLOG_DEBUG() << Q_FUNC_INFO <<  m_history->clear();

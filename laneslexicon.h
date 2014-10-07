@@ -112,7 +112,7 @@ public:
     void onExit();
     void onTest();
 
-    void onNavigationChanged(int);                 // change navigation via toolbar
+
     void onNavigationMenuChanged(QAction *);       // change navigation by menu
     void onNavNext();
     void onNavPrev();
@@ -317,6 +317,7 @@ private:
     //    QAction * m_navigationAction;
 
     QAction * m_searchAction;
+    QToolButton * m_exitButton;
     QToolButton * m_searchButton;
     QToolButton * m_docButton;
     QToolButton * m_optionsButton;
@@ -333,8 +334,10 @@ private:
     QToolButton * m_navNextButton;
     QToolButton * m_navPrevButton;
     QToolButton * m_navigationButton;
+    QActionGroup * m_moveGroup;
     bool m_toolbarText;
     QMenu * m_searchMenu;
+    QMenu * m_navigationModeMenu;
     QAction * m_searchWordAction;
     QAction * m_searchPageAction;
     QAction * m_searchRootAction;
