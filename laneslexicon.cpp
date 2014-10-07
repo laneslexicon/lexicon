@@ -807,10 +807,36 @@ void LanesLexicon::createToolBar() {
 
   connect(m_navBy,SIGNAL(currentIndexChanged(int)),this,SLOT(onNavigationChanged(int)));
 
-  m_navigation->addAction(m_navFirstAction);
-  m_navigation->addAction(m_navNextAction);
-  m_navigation->addAction(m_navPrevAction);
-  m_navigation->addAction(m_navLastAction);
+  m_navFirstButton = new QToolButton(m_navigation);
+  m_navFirstButton->setDefaultAction(m_navFirstAction);
+  m_navFirstButton->setText(tr("First"));
+  m_navFirstButton->setFocusPolicy(Qt::StrongFocus);
+  m_navigation->addWidget(m_navFirstButton);
+
+  m_navNextButton = new QToolButton(m_navigation);
+  m_navNextButton->setDefaultAction(m_navNextAction);
+  m_navNextButton->setText(tr("Next"));
+  m_navNextButton->setFocusPolicy(Qt::StrongFocus);
+  m_navigation->addWidget(m_navNextButton);
+
+  m_navPrevButton = new QToolButton(m_navigation);
+  m_navPrevButton->setDefaultAction(m_navPrevAction);
+  m_navPrevButton->setText(tr("Prev"));
+  m_navPrevButton->setFocusPolicy(Qt::StrongFocus);
+  m_navigation->addWidget(m_navPrevButton);
+
+  m_navLastButton = new QToolButton(m_navigation);
+  m_navLastButton->setDefaultAction(m_navLastAction);
+  m_navLastButton->setText(tr("Last"));
+  m_navLastButton->setFocusPolicy(Qt::StrongFocus);
+  m_navigation->addWidget(m_navLastButton);
+
+
+
+  //  m_navigation->addAction(m_navFirstAction);
+  //  m_navigation->addAction(m_navNextAction);
+  //  m_navigation->addAction(m_navPrevAction);
+  //  m_navigation->addAction(m_navLastAction);
   m_navigation->addSeparator();
 
 
@@ -819,13 +845,58 @@ void LanesLexicon::createToolBar() {
   m_entrybar = addToolBar(tr("Page"));
   m_entrybar->setObjectName("pagetoolbar");
   m_entrybar->setIconSize(m_toolbarIconSize);
-  m_entrybar->addAction(m_zoomInAction);
-  m_entrybar->addAction(m_zoomOutAction);
-  m_entrybar->addAction(m_widenAction);
-  m_entrybar->addAction(m_narrowAction);
-  m_entrybar->addAction(m_printAction);
-  m_entrybar->addAction(m_localSearchAction);
-  m_entrybar->addAction(m_clearAction);
+
+  m_zoomInButton = new QToolButton(m_entrybar);
+  m_zoomInButton->setDefaultAction(m_zoomInAction);
+  m_zoomInButton->setText(tr("Zoom in"));
+  m_zoomInButton->setFocusPolicy(Qt::StrongFocus);
+  m_entrybar->addWidget(m_zoomInButton);
+
+
+  //  m_entrybar->addAction(m_zoomInAction);
+  m_zoomOutButton = new QToolButton(m_entrybar);
+  m_zoomOutButton->setDefaultAction(m_zoomOutAction);
+  m_zoomOutButton->setText(tr("Zoom out"));
+  m_zoomOutButton->setFocusPolicy(Qt::StrongFocus);
+  m_entrybar->addWidget(m_zoomOutButton);
+
+  //  m_entrybar->addAction(m_zoomOutAc!tion);
+  m_widenButton = new QToolButton(m_entrybar);
+  m_widenButton->setDefaultAction(m_widenAction);
+  m_widenButton->setText(tr("Widen"));
+  m_widenButton->setFocusPolicy(Qt::StrongFocus);
+  m_entrybar->addWidget(m_widenButton);
+
+  //  m_entrybar->addAction(m_widenAction);
+  m_narrowButton = new QToolButton(m_entrybar);
+  m_narrowButton->setDefaultAction(m_narrowAction);
+  m_narrowButton->setText(tr("Narrow"));
+  m_narrowButton->setFocusPolicy(Qt::StrongFocus);
+  m_entrybar->addWidget(m_narrowButton);
+
+  //  m_entrybar->addAction(m_narrowAction);
+  m_printButton = new QToolButton(m_entrybar);
+  m_printButton->setDefaultAction(m_printAction);
+  m_printButton->setText(tr("Print"));
+  m_printButton->setFocusPolicy(Qt::StrongFocus);
+  m_entrybar->addWidget(m_printButton);
+
+  //  m_entrybar->addAction(m_printAction);
+  m_localSearchButton = new QToolButton(m_entrybar);
+  m_localSearchButton->setDefaultAction(m_localSearchAction);
+  m_localSearchButton->setText(tr("Search page"));
+  m_localSearchButton->setFocusPolicy(Qt::StrongFocus);
+  m_entrybar->addWidget(m_localSearchButton);
+
+  //  m_entrybar->addAction(m_localSearchAction);
+  m_clearButton = new QToolButton(m_entrybar);
+  m_clearButton->setDefaultAction(m_clearAction);
+  m_clearButton->setText(tr("Clear search"));
+  m_clearButton->setFocusPolicy(Qt::StrongFocus);
+  m_entrybar->addWidget(m_clearButton);
+
+  //  m_entrybar->addAction(m_clearAction);
+
   //  m_entrybar->addAction(m_convertToEntryAction);
   m_entrybar->setFloatable(true);
 
@@ -834,6 +905,37 @@ void LanesLexicon::createToolBar() {
   setTabOrder(m_searchButton,m_docButton);
   setTabOrder(m_docButton,m_optionsButton);
   setTabOrder(m_optionsButton,m_logButton);
+  setTabOrder(m_logButton,m_navBy);
+  setTabOrder(m_navBy,m_navFirstButton);
+  setTabOrder(m_navFirstButton,m_navNextButton);
+  setTabOrder(m_navNextButton,m_navPrevButton);
+  setTabOrder(m_navPrevButton,m_navLastButton);
+  setTabOrder(m_navLastButton,m_zoomInButton);
+  setTabOrder(m_zoomInButton,m_zoomOutButton);
+  setTabOrder(m_zoomOutButton,m_widenButton);
+  setTabOrder(m_widenButton,m_narrowButton);
+  setTabOrder(m_narrowButton,m_printButton);
+  setTabOrder(m_printButton,m_localSearchButton);
+  if (m_toolbarText) {
+    m_historyButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_bookmarkButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_searchButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_docButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_optionsButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_logButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_navFirstButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_navNextButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_navPrevButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_navLastButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_zoomInButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_zoomOutButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_widenButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_narrowButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_printButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_localSearchButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_clearButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+  }
+
   //  setTabOrder(m_mainbar,m_navigation);
   //  setTabOrder(m_navigation,m_entrybar);
 
@@ -1421,6 +1523,7 @@ void LanesLexicon::readSettings() {
     arFont.fromString(ar);
   }
   m_iconTheme = settings->value("Theme",QString()).toString();
+  m_toolbarText = settings->value("Toolbar text",false).toBool();
 
   m_saveSettings = settings->value("Save settings",true).toBool();
   if (cmdOptions.contains("nosave")) {

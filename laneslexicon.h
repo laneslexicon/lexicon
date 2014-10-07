@@ -321,7 +321,18 @@ private:
     QToolButton * m_docButton;
     QToolButton * m_optionsButton;
     QToolButton * m_logButton;
-
+    QToolButton * m_zoomInButton;
+    QToolButton * m_zoomOutButton;
+    QToolButton * m_widenButton;
+    QToolButton * m_narrowButton;
+    QToolButton * m_printButton;
+    QToolButton * m_localSearchButton;
+    QToolButton * m_clearButton;
+    QToolButton * m_navFirstButton;
+    QToolButton * m_navLastButton;
+    QToolButton * m_navNextButton;
+    QToolButton * m_navPrevButton;
+    bool m_toolbarText;
     QMenu * m_searchMenu;
     QAction * m_searchWordAction;
     QAction * m_searchPageAction;
