@@ -6,6 +6,7 @@
 #define HEAD_SUPPLEMENT_COLUMN 2
 #define NODE_COLUMN 3
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
+  setObjectName("treeroots");
   readSettings();
   setColumnCount(4);
   setHeaderLabels(
