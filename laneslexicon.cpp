@@ -1026,19 +1026,25 @@ void LanesLexicon::setupHistory(int currPos) {
 }
 void LanesLexicon::createMenus() {
   m_mainmenu = new AppMenu(this);
+  m_mainmenu->setFocusPolicy(Qt::StrongFocus);
+
   setMenuBar(m_mainmenu);
   m_fileMenu = menuBar()->addMenu(tr("&File"));
-  m_fileMenu->addAction(m_exitAction);
   m_fileMenu->setObjectName("filemenu");
+  m_fileMenu->setFocusPolicy(Qt::StrongFocus);
 
-  QMenu * viewmenu = menuBar()->addMenu(tr("&View"));
+  m_fileMenu->addAction(m_exitAction);
 
-  viewmenu->addAction(m_minimalAction);
-  viewmenu->addAction(m_optionsAction);
+  m_viewMenu = menuBar()->addMenu(tr("&View"));
+  m_viewMenu->setObjectName("viewmenu");
+  m_viewMenu->setFocusPolicy(Qt::StrongFocus);
+  m_viewMenu->addAction(m_minimalAction);
+  m_viewMenu->addAction(m_optionsAction);
 
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
+  m_bookmarkMenu->setFocusPolicy(Qt::StrongFocus);
 
   m_bookmarkMenu->addAction(m_bookmarkListAction);
   m_bookmarkMenu->addAction(m_bookmarkClearAction);
@@ -1050,9 +1056,12 @@ void LanesLexicon::createMenus() {
 
   m_historyMenu = m_mainmenu->addMenu(tr("&History"));
   m_historyMenu->setObjectName("historymenu");
+  m_historyMenu->setFocusPolicy(Qt::StrongFocus);
   m_historyMenu->addAction(m_clearHistoryAction);
+
   m_moveMenu = m_mainmenu->addMenu(tr("&Navigation"));
   m_moveMenu->setObjectName("navigationmenu");
+  m_moveMenu->setFocusPolicy(Qt::StrongFocus);
   m_moveMenu->addAction(m_navFirstAction);
   m_moveMenu->addAction(m_navNextAction);
   m_moveMenu->addAction(m_navPrevAction);
@@ -1061,6 +1070,7 @@ void LanesLexicon::createMenus() {
   m_moveMenu->addAction(m_navModePageAction);
 
   m_searchMenu = m_mainmenu->addMenu(tr("&Search"));
+  m_searchMenu->setFocusPolicy(Qt::StrongFocus);
   m_searchMenu->setTitle(tr("Search"));
   m_searchMenu->setObjectName("searchmenu");
   m_searchMenu->addAction(m_searchRootAction);
@@ -1069,20 +1079,22 @@ void LanesLexicon::createMenus() {
   m_searchMenu->addAction(m_searchPageAction);
   m_searchMenu->addAction(m_searchNodeAction);
 
-  QMenu * pagemenu = m_mainmenu->addMenu(tr("&Entry"));
-  pagemenu->setObjectName("entrymenu");
-  pagemenu->addAction(m_zoomInAction);
-  pagemenu->addAction(m_zoomOutAction);
-  pagemenu->addAction(m_widenAction);
-  pagemenu->addAction(m_narrowAction);
-  pagemenu->addAction(m_printAction);
-  pagemenu->addAction(m_localSearchAction);
-  pagemenu->addAction(m_clearAction);
+  m_pageMenu  = m_mainmenu->addMenu(tr("&Entry"));
+  m_pageMenu->setObjectName("pagemenu");
+  m_pageMenu->setFocusPolicy(Qt::StrongFocus);
+  m_pageMenu->addAction(m_zoomInAction);
+  m_pageMenu->addAction(m_zoomOutAction);
+  m_pageMenu->addAction(m_widenAction);
+  m_pageMenu->addAction(m_narrowAction);
+  m_pageMenu->addAction(m_printAction);
+  m_pageMenu->addAction(m_localSearchAction);
+  m_pageMenu->addAction(m_clearAction);
 
-  QMenu * toolsmenu = m_mainmenu->addMenu(tr("&Tools"));
-  toolsmenu->setObjectName("toolsmenu");
-  toolsmenu->addAction(m_logViewerAction);
-  toolsmenu->addAction(m_editViewAction);
+  m_toolMenu = m_mainmenu->addMenu(tr("&Tools"));
+  m_toolMenu->setFocusPolicy(Qt::StrongFocus);
+  m_toolMenu->setObjectName("toolmenu");
+  m_toolMenu->addAction(m_logViewerAction);
+  m_toolMenu->addAction(m_editViewAction);
 
 
 }

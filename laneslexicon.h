@@ -268,7 +268,17 @@ private:
     QAction * m_bookmarkClearAction;
     QAction * m_bookmarkRevertAction;
     QAction * m_docAction;
-    QMenu   * m_bookmarkMenu;
+
+    QMenu * m_bookmarkMenu;
+    QMenu * m_historyMenu;
+    QMenu * m_fileMenu;
+    QMenu * m_searchMenu;
+    QMenu * m_navigationModeMenu;
+    QMenu * m_moveMenu;
+    QMenu * m_viewMenu;
+    QMenu * m_pageMenu;
+    QMenu * m_toolMenu;
+
     QToolButton * m_bookmarkButton;
     void addBookmarkMenuItem(const QString & id);
     void bookmarkClear();
@@ -278,7 +288,7 @@ private:
 
     void setupShortcuts();
     int m_historyPos;
-    QMenu * m_historyMenu;
+
     void setSignals(GraphicsEntry *);
     void loadStyleSheet();
     void createActions();
@@ -304,7 +314,7 @@ private:
     QSqlDatabase m_db;
     QSqlDatabase m_notesDb;
     TabWidget * m_tabs;
-    QMenu * m_fileMenu;
+
     // actions
     QAction * m_exitAction;
     QAction * m_testAction;
@@ -336,8 +346,8 @@ private:
     QToolButton * m_navigationButton;
     QActionGroup * m_moveGroup;
     bool m_toolbarText;
-    QMenu * m_searchMenu;
-    QMenu * m_navigationModeMenu;
+
+
     QAction * m_searchWordAction;
     QAction * m_searchPageAction;
     QAction * m_searchRootAction;
@@ -352,7 +362,7 @@ private:
     QToolButton * m_navBtn;
     QAction * m_navboxAction;
     QComboBox * m_navBy;
-    QMenu * m_moveMenu;
+
     QAction * m_navModeRootAction;
     QAction * m_navModePageAction;
 
