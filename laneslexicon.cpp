@@ -674,7 +674,6 @@ void LanesLexicon::createActions() {
   m_moveGroup->addAction(m_navModePageAction);
 
   connect(m_moveGroup,SIGNAL(triggered(QAction *)),this,SLOT(onNavigationMenuChanged(QAction *)));
-  //  connect(m_navModePageAction,SIGNAL(triggered()),this,SLOT(onNavigationMenuChanged(bool)));
 
   connect(m_docAction,SIGNAL(triggered()),this,SLOT(onDocs()));
 

@@ -66,21 +66,21 @@ class EntryLayoutWidget;
 class LogViewer;
 class LanesLexicon : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 
-public:
-    explicit LanesLexicon(QWidget *parent = 0);
-    ~LanesLexicon();
+ public:
+  explicit LanesLexicon(QWidget *parent = 0);
+  ~LanesLexicon();
 
-    QSize sizeHint() const;
-    void readSettings();
-    void writeSettings();
-    bool isOk() { return m_ok;}
-    QString convertString(const QString &) const;
-    QString getActiveKeymap() const;
-    HistoryMaster * history();
-    NoteMaster * notes();
-    public slots:
+  QSize sizeHint() const;
+  void readSettings();
+  void writeSettings();
+  bool isOk() { return m_ok;}
+  QString convertString(const QString &) const;
+  QString getActiveKeymap() const;
+  HistoryMaster * history();
+  NoteMaster * notes();
+  public slots:
     void gotoPlace(const Place &,int);
     int hasPlace(const Place & p,int searchtype,bool setFocus);
     void setStatus(const QString &);
@@ -102,291 +102,277 @@ public:
 
       void reloadEntry(const QString &,const QString &);
       void revertEntry();
-    void findNextRoot(const QString &);
-    void findPrevRoot(const QString &);
+      void findNextRoot(const QString &);
+      void findPrevRoot(const QString &);
 
-    void moveNext(const Place &);
-    void movePrevious(const Place &);
-    void onCloseTab(int) ;
-    void onGoToPage(const Place &);
-    void onExit();
-    void onTest();
-
-
-    void onNavigationMenuChanged(QAction *);       // change navigation by menu
-    void onNavNext();
-    void onNavPrev();
-    void onNavFirst();
-    void onNavLast();
-    void onNextRoot();
-    void onPrevRoot();
-    void onFirstRoot();
-    void onLastRoot();
-    void onNextPage();
-    void onPrevPage();
-    void onFirstPage();
-    void onLastPage();
-
-    void searchForWord();
-    void searchForPage();
-    void searchForNode();
-    void searchForRoot();
-    void searchForEntry();
-
-    void onClearHistory();
-    void onHistorySelection();
-
-    void onKeymapChanged();
-
-    void onEditView();
-
-    void onOptions();
-
-    void onSetInterface();
-    void rootClicked(QTreeWidgetItem * , int);
-    void entryActivated(QTreeWidgetItem * , int);
-    void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
-
-    void rootChanged(const QString & root,const QString & node);
-    void placeChanged(const Place &);
-    void historyPositionChanged(int);
-    void historyAddition(const Place &);
-
-    void bookmarkShortcut(const QString &);
-    void bookmarkAdd();
-    void bookmarkAdd(const QString & id,const Place & p);
+      void moveNext(const Place &);
+      void movePrevious(const Place &);
+      void onCloseTab(int) ;
+      void onGoToPage(const Place &);
+      void onExit();
+      void onTest();
 
 
-    void onDocs();
-    void bookmarkRebuildMenu();
+      void onNavigationMenuChanged(QAction *);       // change navigation by menu
+      void onNavNext();
+      void onNavPrev();
+      void onNavFirst();
+      void onNavLast();
+      void onNextRoot();
+      void onPrevRoot();
+      void onFirstRoot();
+      void onLastRoot();
+      void onNextPage();
+      void onPrevPage();
+      void onFirstPage();
+      void onLastPage();
 
-    void currentTabChanged(int);
-    /// these apply to the current graphicsentry
-    void pageZoomIn();
-    void pageZoomOut();
-    void pageWiden();
-    void pageNarrow();
-    void pagePrint();
-    void pageSearch();
-    void pageClear();
-    void syncContents();
-    /// from FullSearchWidget
-    void showSearchNode(const QString &);
-    void convertToEntry();
-    void printNode(const QString &);
+      void searchForWord();
+      void searchForPage();
+      void searchForNode();
+      void searchForRoot();
+      void searchForEntry();
+
+      void onClearHistory();
+      void onHistorySelection();
+
+      void onKeymapChanged();
+
+      void onEditView();
+
+      void onOptions();
+
+      void onSetInterface();
+      void rootClicked(QTreeWidgetItem * , int);
+      void entryActivated(QTreeWidgetItem * , int);
+      void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
+
+      void rootChanged(const QString & root,const QString & node);
+      void placeChanged(const Place &);
+      void historyPositionChanged(int);
+      void historyAddition(const Place &);
+
+      void bookmarkShortcut(const QString &);
+      void bookmarkAdd();
+      void bookmarkAdd(const QString & id,const Place & p);
+
+
+      void onDocs();
+      void bookmarkRebuildMenu();
+
+      void currentTabChanged(int);
+      /// these apply to the current graphicsentry
+      void pageZoomIn();
+      void pageZoomOut();
+      void pageWiden();
+      void pageNarrow();
+      void pagePrint();
+      void pageSearch();
+      void pageClear();
+      void syncContents();
+      /// from FullSearchWidget
+      void showSearchNode(const QString &);
+      void convertToEntry();
+      void printNode(const QString &);
  protected:
-    void closeEvent(QCloseEvent *);
-private:
-    void printCurrentPage(const QString & node = QString());
-    void restoreSavedState();
-    void cleanup();
-    void search(int searchType,ArabicSearchDialog *,const QString &);
-    Place showPlace(const Place &,int);
-    //    QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
-    /// look through all tabs for the given node, -1 if not found, else tab index
-    int searchTabs(const QString & node);
-    SearchOptions m_defaultSearchOptions;
-    QString m_configFile;
+      void closeEvent(QCloseEvent *);
+ private:
+      void printCurrentPage(const QString & node = QString());
+      void restoreSavedState();
+      void cleanup();
+      void search(int searchType,ArabicSearchDialog *,const QString &);
+      Place showPlace(const Place &,int);
+      void updateStatusBar();
+      void updateMenu();
+      int searchTabs(const QString & node);
+      void restoreBookmarks();
+      void setupBookmarkShortcuts();
+      void bookmarkJump(const QString & id);
+      void setupShortcuts();
+      int m_historyPos;
+      void bookmarkClear();
+      void setSignals(GraphicsEntry *);
+      void loadStyleSheet();
+      void createActions();
+      void setIcon(QAction *,const QString &,const QString &);
+      void setIcons(const QString & theme = QString());
+      void createToolBar();
+      void setupHistory(int startPos = -1);
+      void createMenus();
+      void createStatusBar();
 
-    QString m_interface;    // "default","minimal"
-    QAction * m_minimalAction;
-    QAction * m_logViewerAction;
-    QAction * m_optionsAction;
+      void enableKeymaps(bool);
+      bool m_keymapsEnabled;
+      bool eventFilter(QObject * target, QEvent *);
+      bool openDatabase(const QString &);
+      void getFirstAndLast();
+      void restoreTabs();
+      Place getCurrentPlace();
+      int getSearchCount();
+      void addBookmarkMenuItem(const QString & id);
 
-    QString m_applicationCssFile;
-    EntryLayoutWidget * m_entryLayout;
+      //    QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
+      /// look through all tabs for the given node, -1 if not found, else tab index
 
-    LogViewer * m_logview;
-    QPrinter m_printer;
-    QString m_printPdfLocation;
-    bool m_printToPdf;
-    bool m_printerReUse;
-    ///
-    //    void setupInterface();
-    /// 0 - root mode, 1 - page mode
-    int m_navMode;
+      SearchOptions m_defaultSearchOptions;
+      QString m_configFile;
+      QString m_interface;    // "default","minimal"
+      QString m_applicationCssFile;
+      QPrinter m_printer;
+      QString m_printPdfLocation;
+      bool m_printToPdf;
+      bool m_printerReUse;
+      /// 0 - root mode, 1 - page mode
+      int m_navMode;
+      QLabel * m_placeIndicator;
 
-    QLabel * m_placeIndicator;
-    QToolButton * m_keymapsButton;
-    QAction * m_keymapsAction;
-    QToolButton * m_linkButton;
-    QAction * m_linkAction;
-    bool m_linkContents;
-
-    void updateStatusBar();
-    void updateMenu();
-    bool m_ok;
-    bool m_docked;          // whether to use docked widget
-    bool m_valgrind;
-    bool m_useNotes;
-
-    bool m_treeKeepsFocus;
-    /// toolbars
-    QToolBar * m_mainbar;
-    QToolBar * m_navigation;
-    QToolBar * m_entrybar;
-
-    QString m_iconTheme;
-    QDockWidget * m_treeDock;
-    QFont arFont;
-
-    QString m_firstRoot;
-    QString m_lastRoot;
-    int m_firstPage;
-    int m_lastPage;
-
-    /// set by readSettings
-    InputMapper * m_mapper;
-    QString m_activeMap;
-    QString m_dbName;
-    QString m_notesDbName;
-    QString m_historyDbName;
-    bool m_historyEnabled;
-    bool m_saveTabs;
-    bool m_saveSettings;
-    QString m_startupNode;
-    QString m_startupRoot;
-    bool m_restoreTabs;
-    bool m_searchNewTab;
-    bool m_searchSwitchTab;
-    //    QString m_navigationMode;
-    void getFirstAndLast();
-    void restoreTabs();
-    QSignalMapper * m_signalMapper;
-
-    // bookmarks
-    QSignalMapper * m_bookmarkMap;
-    QMap<QString, Place> m_bookmarks;
-    bool m_saveBookmarks;
-    bool m_restoreBookmarks;
-    void restoreBookmarks();
-    void setupBookmarkShortcuts();
-    void bookmarkJump(const QString & id);
-    QAction * m_bookmarkListAction;
-    QAction * m_bookmarkAddAction;
-    QAction * m_bookmarkJumpAction;
-    QAction * m_bookmarkClearAction;
-    QAction * m_bookmarkRevertAction;
-    QAction * m_docAction;
-
-    QMenu * m_bookmarkMenu;
-    QMenu * m_historyMenu;
-    QMenu * m_fileMenu;
-    QMenu * m_searchMenu;
-    QMenu * m_navigationModeMenu;
-    QMenu * m_moveMenu;
-    QMenu * m_viewMenu;
-    QMenu * m_pageMenu;
-    QMenu * m_toolMenu;
-
-    QToolButton * m_bookmarkButton;
-    void addBookmarkMenuItem(const QString & id);
-    void bookmarkClear();
-    AppMenu * m_mainmenu;
-    bool m_revertEnabled;
-    QSize m_toolbarIconSize;
-
-    void setupShortcuts();
-    int m_historyPos;
-
-    void setSignals(GraphicsEntry *);
-    void loadStyleSheet();
-    void createActions();
-    void setIcon(QAction *,const QString &,const QString &);
-    void setIcons(const QString & theme = QString());
-    void createToolBar();
-    void setupHistory(int startPos = -1);
-    void createMenus();
-    void createStatusBar();
-
-    void enableKeymaps(bool);
-    bool m_keymapsEnabled;
-    bool eventFilter(QObject * target, QEvent *);
-    bool openDatabase(const QString &);
+      bool m_linkContents;
 
 
-    Place m_place;
-    Place getCurrentPlace();
-    ContentsWidget * m_tree;
+      bool m_ok;
+      bool m_docked;          // whether to use docked widget
+      bool m_valgrind;
+      bool m_useNotes;
 
-    SearchOptions m_searchOptions;
+      bool m_treeKeepsFocus;
+      /// toolbars
+      QToolBar * m_mainbar;
+      QToolBar * m_navigation;
+      QToolBar * m_entrybar;
 
-    QSqlDatabase m_db;
-    QSqlDatabase m_notesDb;
-    TabWidget * m_tabs;
+      QString m_iconTheme;
 
-    // actions
-    QAction * m_exitAction;
-    QAction * m_testAction;
+      QFont arFont;
 
-    QAction * m_editViewAction;
+      QString m_firstRoot;
+      QString m_lastRoot;
+      int m_firstPage;
+      int m_lastPage;
 
-    QAction * m_historyAction;
-    QAction * m_bookmarkAction;
+      /// set by readSettings
+      InputMapper * m_mapper;
+      QString m_activeMap;
+      QString m_dbName;
+      QString m_notesDbName;
+      QString m_historyDbName;
+      bool m_historyEnabled;
+      bool m_saveTabs;
+      bool m_saveSettings;
+      QString m_startupNode;
+      QString m_startupRoot;
+      bool m_restoreTabs;
+      bool m_searchNewTab;
+      bool m_searchSwitchTab;
+      //    QString m_navigationMode;
+      QSignalMapper * m_signalMapper;
 
-    //    QAction * m_navigationAction;
+      // bookmarks
+      QSignalMapper * m_bookmarkMap;
+      QMap<QString, Place> m_bookmarks;
+      bool m_saveBookmarks;
+      bool m_restoreBookmarks;
 
-    QAction * m_searchAction;
-    QToolButton * m_exitButton;
-    QToolButton * m_searchButton;
-    QToolButton * m_docButton;
-    QToolButton * m_optionsButton;
-    QToolButton * m_logButton;
-    QToolButton * m_zoomInButton;
-    QToolButton * m_zoomOutButton;
-    QToolButton * m_widenButton;
-    QToolButton * m_narrowButton;
-    QToolButton * m_printButton;
-    QToolButton * m_localSearchButton;
-    QToolButton * m_clearButton;
-    QToolButton * m_navFirstButton;
-    QToolButton * m_navLastButton;
-    QToolButton * m_navNextButton;
-    QToolButton * m_navPrevButton;
-    QToolButton * m_navigationButton;
-    QActionGroup * m_moveGroup;
-    bool m_toolbarText;
+      QMenu * m_bookmarkMenu;
+      QMenu * m_historyMenu;
+      QMenu * m_fileMenu;
+      QMenu * m_searchMenu;
+      QMenu * m_navigationModeMenu;
+      QMenu * m_moveMenu;
+      QMenu * m_viewMenu;
+      QMenu * m_pageMenu;
+      QMenu * m_toolMenu;
+      AppMenu * m_mainmenu;
 
 
-    QAction * m_searchWordAction;
-    QAction * m_searchPageAction;
-    QAction * m_searchRootAction;
-    QAction * m_searchNodeAction;
-    QAction * m_searchEntryAction;
-    /// Navigation
-    QAction * m_navNextAction;
-    QAction * m_navPrevAction;
-    QAction * m_navFirstAction;
-    QAction * m_navLastAction;
-    //    QLabel * m_navText;
-    QToolButton * m_navBtn;
-    QAction * m_navboxAction;
-    QComboBox * m_navBy;
 
-    QAction * m_navModeRootAction;
-    QAction * m_navModePageAction;
 
-    // history
-    QAction * m_clearHistoryAction;
-    QToolButton * m_historyButton;
-    HistoryMaster * m_history;
+      bool m_revertEnabled;
+      QSize m_toolbarIconSize;
 
-    // controls for the current graphics entry
-    QAction * m_zoomInAction;
-    QAction * m_zoomOutAction;
-    QAction * m_widenAction;
-    QAction * m_narrowAction;
-    QAction * m_printAction;
-    QAction * m_localSearchAction;
-    // clear the highlights
-    QAction * m_clearAction;
-    // convert HeadSearch to GraphicsEntry
-    QAction * m_convertToEntryAction;
-    /// Notes
-    NoteMaster * m_notes;
-    ///
-    int getSearchCount();
+      Place m_place;
+
+      ContentsWidget * m_tree;
+      TabWidget * m_tabs;
+      QDockWidget * m_treeDock;
+      EntryLayoutWidget * m_entryLayout;
+      LogViewer * m_logview;
+
+      SearchOptions m_searchOptions;
+
+      QSqlDatabase m_db;
+      QSqlDatabase m_notesDb;
+
+
+
+      QToolButton * m_bookmarkButton;
+      QToolButton * m_exitButton;
+      QToolButton * m_searchButton;
+      QToolButton * m_docButton;
+      QToolButton * m_optionsButton;
+      QToolButton * m_logButton;
+      QToolButton * m_zoomInButton;
+      QToolButton * m_zoomOutButton;
+      QToolButton * m_widenButton;
+      QToolButton * m_narrowButton;
+      QToolButton * m_printButton;
+      QToolButton * m_localSearchButton;
+      QToolButton * m_clearButton;
+      QToolButton * m_navFirstButton;
+      QToolButton * m_navLastButton;
+      QToolButton * m_navNextButton;
+      QToolButton * m_navPrevButton;
+      QToolButton * m_navigationButton;
+      QToolButton * m_historyButton;
+      QToolButton * m_keymapsButton;
+      QToolButton * m_linkButton;
+
+      QActionGroup * m_moveGroup;
+
+      bool m_toolbarText;
+
+      QAction * m_minimalAction;
+      QAction * m_logViewerAction;
+      QAction * m_optionsAction;
+      QAction * m_bookmarkListAction;
+      QAction * m_bookmarkAddAction;
+      QAction * m_bookmarkJumpAction;
+      QAction * m_bookmarkClearAction;
+      QAction * m_bookmarkRevertAction;
+      QAction * m_docAction;
+      QAction * m_exitAction;
+      QAction * m_testAction;
+      QAction * m_editViewAction;
+      QAction * m_historyAction;
+      QAction * m_bookmarkAction;
+      QAction * m_searchAction;
+      QAction * m_searchWordAction;
+      QAction * m_searchPageAction;
+      QAction * m_searchRootAction;
+      QAction * m_searchNodeAction;
+      QAction * m_searchEntryAction;
+      QAction * m_navNextAction;
+      QAction * m_navPrevAction;
+      QAction * m_navFirstAction;
+      QAction * m_navLastAction;
+      QAction * m_navModeRootAction;
+      QAction * m_navModePageAction;
+      QAction * m_clearHistoryAction;
+      QAction * m_zoomInAction;
+      QAction * m_zoomOutAction;
+      QAction * m_widenAction;
+      QAction * m_narrowAction;
+      QAction * m_printAction;
+      QAction * m_localSearchAction;
+      QAction * m_clearAction;                     // clear the highlights
+      QAction * m_convertToEntryAction;      // convert HeadSearch to GraphicsEntry
+      QAction * m_keymapsAction;
+      QAction * m_linkAction;
+
+      HistoryMaster * m_history;
+      NoteMaster * m_notes;
+
+
  signals:
-   void nodeActivated(const QString & node,const QString & word);
+      void nodeActivated(const QString & node,const QString & word);
 };
 #endif
