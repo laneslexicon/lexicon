@@ -2,6 +2,7 @@
 #define __TABWIDGET_H__
 #include <QTabWidget>
 #include <QKeyEvent>
+#include <QFocusEvent>
 #include <QDebug>
 
 class TabWidget : public QTabWidget {
@@ -14,10 +15,12 @@ class TabWidget : public QTabWidget {
  protected:
     void tabRemoved(int index);
     void tabInserted(int index);
+    void focusOutEvent(QFocusEvent *);
  private:
     void readSettings();
     void keyPressEvent(QKeyEvent *);
     bool m_numberTabs;
+    bool eventFilter(QObject *,QEvent *);
  signals:
   void tabsChanged();
 };
