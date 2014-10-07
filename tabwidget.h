@@ -20,7 +20,7 @@ class TabWidget : public QTabWidget {
     void readSettings();
     void keyPressEvent(QKeyEvent *);
     bool m_numberTabs;
-    bool eventFilter(QObject *,QEvent *);
+    //    bool eventFilter(QObject *,QEvent *);
  signals:
   void tabsChanged();
 };

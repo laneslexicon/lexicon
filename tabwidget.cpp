@@ -95,6 +95,7 @@ bool TabWidget::eventFilter(QObject * target,QEvent * event) {
       case Qt::Key_Left:
         qStrip << Q_FUNC_INFO << "got left";
         break;
+*/
         /*
       case Qt::Key_T: {
         if (keyEvent->modifiers() && Qt::ControlModifier) {
@@ -112,6 +113,7 @@ bool TabWidget::eventFilter(QObject * target,QEvent * event) {
         break;
       }
         */
+/*
     default:
       break;
     }
