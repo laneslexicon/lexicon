@@ -63,6 +63,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_tree->installEventFilter(this);
   m_tabs = new TabWidget(this);
   m_tabs->setTabsClosable(true);
+  m_tabs->installEventFilter(this);
+  m_tabs->tabBar()->installEventFilter(this);
   connect(m_tabs,SIGNAL(tabsChanged()),this,SLOT(tabsChanged()));
   /// at the end of the history, but we should be able to restore from settings
   /// TODO would we want restore our current position in history?
@@ -218,7 +220,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   QLOG_DEBUG() << "-----------------------";
   QLOG_DEBUG() << "Initialisation complete";
   QLOG_DEBUG() << "-----------------------";
-
+  qStrip << "tabs focus policy" << m_tabs->focusPolicy();
 
 }
 
@@ -811,6 +813,8 @@ void LanesLexicon::createToolBar() {
   //  m_entrybar->addAction(m_convertToEntryAction);
   m_entrybar->setFloatable(true);
 
+  setTabOrder(m_mainbar,m_navigation);
+  setTabOrder(m_navigation,m_entrybar);
 }
 /**
  * when user has done something that adds to history
@@ -1191,6 +1195,7 @@ Place LanesLexicon::showPlace(const Place & p,int options) {
     entry = new GraphicsEntry(this);
     setSignals(entry);
     entry->installEventFilter(this);
+    entry->getView()->installEventFilter(this);
     np = entry->getXmlForRoot(p);
 
     int ix = m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
@@ -1236,9 +1241,30 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
  * @return
  */
 bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
+
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
+    case Qt::Key_Tab: {
+      qStrip << Q_FUNC_INFO << "got tab" << target->objectName() << target->metaObject()->className();
+        if (target == m_tabs) {
+
+        }
+        else if (target == m_tabs->tabBar()) {
+          qStrip << "Focus given to menu";
+          m_fileMenu->setFocus();
+          return true;
+        }
+        else if (target == m_tree) {
+        }
+        else {
+        }
+        break;
+    }
+      case Qt::Key_Left:
+        qStrip << Q_FUNC_INFO << "got left" << target->objectName() << target->metaObject()->className();
+        break;
+        /*
       case Qt::Key_T: {
         if (keyEvent->modifiers() && Qt::ControlModifier) {
           m_tree->setFocus();
@@ -1254,10 +1280,12 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
         }
         break;
       }
+        */
     default:
       break;
     }
   }
+
   return QMainWindow::eventFilter(target,event);
 }
 void LanesLexicon::onEditView() {
@@ -1310,6 +1338,8 @@ void LanesLexicon::onTest() {
         GraphicsEntry * entry = new GraphicsEntry(this);
         setSignals(entry);
         entry->installEventFilter(this);
+        entry->getView()->installEventFilter(this);
+
         entry->getXmlForRoot(p);
         m_tabs->insertTab(ix,entry,p.getShortText());
         m_tabs->setCurrentIndex(ix);
@@ -2632,6 +2662,8 @@ void LanesLexicon::convertToEntry() {
       GraphicsEntry * entry = new GraphicsEntry(this);
       setSignals(entry);
       entry->installEventFilter(this);
+      entry->getView()->installEventFilter(this);
+
       entry->getXmlForRoot(p);
       m_tabs->insertTab(ix,entry,p.getShortText());
       m_tabs->setCurrentIndex(ix);
@@ -2697,6 +2729,8 @@ void LanesLexicon::deleteSearch() {
   GraphicsEntry *  entry = new GraphicsEntry(this);
   setSignals(entry);
   entry->installEventFilter(this);
+  entry->getView()->installEventFilter(this);
+
   entry->getXmlForRoot(p);
   m_tabs->insertTab(currentTab,entry,p.getShortText());
   m_tabs->setCurrentIndex(currentTab);
