@@ -57,6 +57,7 @@ class GraphicsEntry : public QWidget {
     //    Place getXmlForPlace(const Place &);
 
     Place getPlace(int index=-1) const;
+    QGraphicsView * getView() const;
     int getPageNumber(int which=0) const;
     //    int hasRoot(const QString & root,bool focus = true);
     int hasPlace(const Place & ,int searchtype,bool focus = true);

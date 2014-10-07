@@ -65,10 +65,10 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_scale = 1.0;
 
   m_scene = new QGraphicsScene(this);
-  //  m_view = new LaneGraphicsView(m_scene,this);
   m_view = new QGraphicsView(m_scene,this);
 
   m_view->setFocusPolicy(Qt::StrongFocus);
+  //  m_view->setFocusProxy(this);
   m_view->setSceneRect(m_scene->sceneRect());
   m_view->setAlignment(Qt::AlignTop);
 
@@ -112,6 +112,9 @@ GraphicsEntry::~GraphicsEntry() {
   delete m_rootQuery;
   delete m_pageQuery;
   /// TODO xalan cleanup ?
+}
+QGraphicsView * GraphicsEntry::getView() const {
+  return m_view;
 }
 void GraphicsEntry::readSettings() {
   QString v;
@@ -637,7 +640,6 @@ QLOG_DEBUG() << str;
   /// by default we will center on the root item
   centerItem = rootItem;
   /// now add all the entries for the root
-  bool ok;
   do  {
     supplement = m_rootQuery->value(8).toInt();
     QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
