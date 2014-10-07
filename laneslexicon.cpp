@@ -267,17 +267,13 @@ void LanesLexicon::cleanup() {
     delete m_logview;
     m_logview = 0;
   }
-  /*
-  m_tree->clear();
-  delete m_tree;
-  m_tree = 0;
-  */
   /// TODO close notes db
   freeXslt();
   im_free(m_mapper);
   QLOG_DEBUG() << Q_FUNC_INFO << "exit";
 }
-void LanesLexicon::onSetInterface() {
+void LanesLexicon::onSetInterface(bool triggered) {
+  qStrip << Q_FUNC_INFO << "got action for set interface" << triggered;
   bool v = m_minimalAction->isChecked();
   QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
   for(int i=0;i < toolbars.size();i++) {
@@ -286,28 +282,25 @@ void LanesLexicon::onSetInterface() {
   statusBar()->setVisible(!v);
   menuBar()->setVisible(!v);
   updateMenu();
-}
-/*
-void LanesLexicon::setupInterface() {
-  if (m_interface == "minimal") {
-    QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
-    for(int i=0;i < toolbars.size();i++) {
-      toolbars[i]->hide();
-    }
-    statusBar()->hide();
-    menuBar()->hide();
+  if (! triggered || ! v || ! m_interfaceWarning) {
+    return;
   }
-  else  {
-    QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
-    for(int i=0;i < toolbars.size();i++) {
-      toolbars[i]->show();
-    }
-    statusBar()->show();
-    menuBar()->show();
+  QShortcut * sc = qobject_cast<QShortcut *>(m_signalMapper->mapping(QString("Toggle interface")));
+  if (sc) {
+    QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
+    QMessageBox msgBox;
+    msgBox.setCheckBox(noshow);
+    msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
+    QString errorMessage(tr("Warning"));
+    QString info(tr("The toolbars and menubars will not be visible"));
+    QString next = QString(tr("To make them visible again, press %1")).arg(sc->key().toString());
+    msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
+                   + info + "</p><p>" + next + "</p></body></html>");
+    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+    msgBox.exec();
+    m_interfaceWarning = ! noshow->isChecked();
   }
-  updateMenu();
 }
-*/
 /**
  * convenience
  *
@@ -408,7 +401,7 @@ void LanesLexicon::shortcut(const QString & key) {
   }
   else if (key == SID_SHORTCUT_TOGGLE_INTERFACE) {
     m_minimalAction->setChecked(! m_minimalAction->isChecked());
-    onSetInterface();
+    onSetInterface(true);
   }
   else if (key == SID_SHORTCUT_CONTENTS_SHOW) {
     if (m_treeDock->isVisible()) {
@@ -560,6 +553,7 @@ void LanesLexicon::setupShortcuts() {
     else {
       QString k = settings->value(keys[i]).toString();
       QShortcut * sc = new QShortcut(k,this);
+      sc->setObjectName(keys[i]);
       connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
       /// use the setting name as the shortcut 'name'
       m_signalMapper->setMapping(sc,keys[i]);
@@ -619,7 +613,7 @@ void LanesLexicon::createActions() {
 
   m_minimalAction = new QAction(tr("Minimal interface"),this);
   m_minimalAction->setCheckable(true);
-  connect(m_minimalAction,SIGNAL(triggered()),this,SLOT(onSetInterface()));
+  connect(m_minimalAction,SIGNAL(triggered(bool)),this,SLOT(onSetInterface(bool)));
 
   m_optionsAction = new QAction(tr("&Preferences"),this);
   connect(m_optionsAction,SIGNAL(triggered()),this,SLOT(onOptions()));
@@ -726,36 +720,26 @@ void LanesLexicon::createToolBar() {
 
   m_mainbar->addAction(m_testAction);
 
-  //  QToolBar * history = addToolBar(tr("History"));
-  //  history->setObjectName("historytoolbar");
   m_historyButton = new QToolButton(m_mainbar);
   m_historyButton->setText(tr("History"));
   m_historyButton->setDefaultAction(m_historyAction);
-  //  m_historyButton->setPopupMode(QToolButton::MenuButtonPopup);
   m_historyButton->setEnabled(false);
   m_historyButton->setMenu(m_historyMenu);
   m_historyButton->setFocusPolicy(Qt::StrongFocus);
   m_mainbar->addWidget(m_historyButton);
-  //  history->addSeparator();
 
-  //  QToolBar * bookmarks = addToolBar(tr("Bookmarks"));
-  //  bookmarks->setObjectName("bookmarkstoolbar");
   m_bookmarkButton = new QToolButton(m_mainbar);
   m_bookmarkButton->setDefaultAction(m_bookmarkAction);
   m_bookmarkButton->setText(tr("Bookmarks"));
-  //  m_bookmarkButton->setPopupMode(QToolButton::MenuButtonPopup);
   m_bookmarkButton->setFocusPolicy(Qt::StrongFocus);
   m_bookmarkButton->setEnabled(true);
   m_bookmarkButton->setMenu(m_bookmarkMenu);
 
   m_mainbar->addWidget(m_bookmarkButton);
 
-  //  QToolBar * search = addToolBar(tr("Search"));
-  //  search->setObjectName("searchtoolbar");
   m_searchButton = new QToolButton(m_mainbar);
   m_searchButton->setDefaultAction(m_searchAction);
   m_searchButton->setText(tr("Search"));
-  //  m_searchButton->setPopupMode(QToolButton::MenuButtonPopup);
   m_searchButton->setFocusPolicy(Qt::StrongFocus);
   m_searchButton->setEnabled(true);
   m_searchButton->setMenu(m_searchMenu);
@@ -1521,7 +1505,7 @@ void LanesLexicon::readSettings() {
   }
   m_iconTheme = settings->value("Theme",QString()).toString();
   m_toolbarText = settings->value("Toolbar text",false).toBool();
-
+  m_interfaceWarning = settings->value("Show interface warning",true).toBool();
   m_saveSettings = settings->value("Save settings",true).toBool();
   if (cmdOptions.contains("nosave")) {
     m_saveSettings = false;
@@ -1670,6 +1654,7 @@ void LanesLexicon::writeSettings() {
     settings->beginGroup("System");
     settings->setValue("Focus tab",m_tabs->currentIndex());
     settings->setValue("Minimal interface",m_minimalAction->isChecked());
+    settings->setValue("Show interface warning",m_interfaceWarning);
     if (m_navMode == Lane::By_Root) {
       settings->setValue("Navigation","root");
     }

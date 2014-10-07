@@ -142,7 +142,7 @@ class LanesLexicon : public QMainWindow
 
       void onOptions();
 
-      void onSetInterface();
+      void onSetInterface(bool triggered=false);
       void rootClicked(QTreeWidgetItem * , int);
       void entryActivated(QTreeWidgetItem * , int);
       void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
@@ -263,6 +263,7 @@ class LanesLexicon : public QMainWindow
       bool m_restoreTabs;
       bool m_searchNewTab;
       bool m_searchSwitchTab;
+      bool m_interfaceWarning;
       //    QString m_navigationMode;
       QSignalMapper * m_signalMapper;
 
