@@ -86,6 +86,7 @@ public:
     void setStatus(const QString &);
     //    void saveNote(Note *);
     private slots:
+      void onToolButtonTriggered(QAction *);
       void onLogViewer();
       void onLinkChanged();
       void testSlot();
@@ -268,7 +269,7 @@ private:
     QAction * m_bookmarkRevertAction;
     QAction * m_docAction;
     QMenu   * m_bookmarkMenu;
-    QToolButton * m_bookmarkBtn;
+    QToolButton * m_bookmarkButton;
     void addBookmarkMenuItem(const QString & id);
     void bookmarkClear();
     AppMenu * m_mainmenu;
@@ -312,10 +313,15 @@ private:
 
     QAction * m_historyAction;
     QAction * m_bookmarkAction;
+
     //    QAction * m_navigationAction;
 
     QAction * m_searchAction;
     QToolButton * m_searchButton;
+    QToolButton * m_docButton;
+    QToolButton * m_optionsButton;
+    QToolButton * m_logButton;
+
     QMenu * m_searchMenu;
     QAction * m_searchWordAction;
     QAction * m_searchPageAction;
@@ -337,7 +343,7 @@ private:
 
     // history
     QAction * m_clearHistoryAction;
-    QToolButton * m_hBackwardBtn;
+    QToolButton * m_historyButton;
     HistoryMaster * m_history;
 
     // controls for the current graphics entry

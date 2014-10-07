@@ -723,42 +723,58 @@ void LanesLexicon::createToolBar() {
 
   //  QToolBar * history = addToolBar(tr("History"));
   //  history->setObjectName("historytoolbar");
-  m_hBackwardBtn = new QToolButton(m_mainbar);
-  m_hBackwardBtn->setText(tr("History"));
-  m_hBackwardBtn->setDefaultAction(m_historyAction);
-  m_hBackwardBtn->setPopupMode(QToolButton::MenuButtonPopup);
-  m_hBackwardBtn->setEnabled(false);
-  m_hBackwardBtn->setMenu(m_historyMenu);
-  m_hBackwardBtn->setFocusPolicy(Qt::ClickFocus);
-  m_mainbar->addWidget(m_hBackwardBtn);
+  m_historyButton = new QToolButton(m_mainbar);
+  m_historyButton->setText(tr("History"));
+  m_historyButton->setDefaultAction(m_historyAction);
+  //  m_historyButton->setPopupMode(QToolButton::MenuButtonPopup);
+  m_historyButton->setEnabled(false);
+  m_historyButton->setMenu(m_historyMenu);
+  m_historyButton->setFocusPolicy(Qt::StrongFocus);
+  m_mainbar->addWidget(m_historyButton);
   //  history->addSeparator();
 
   //  QToolBar * bookmarks = addToolBar(tr("Bookmarks"));
   //  bookmarks->setObjectName("bookmarkstoolbar");
-  m_bookmarkBtn = new QToolButton(m_mainbar);
-  m_bookmarkBtn->setDefaultAction(m_bookmarkAction);
-  m_bookmarkBtn->setText(tr("Bookmarks"));
-  m_bookmarkBtn->setPopupMode(QToolButton::MenuButtonPopup);
-  m_bookmarkBtn->setEnabled(true);
-  m_bookmarkBtn->setMenu(m_bookmarkMenu);
-  m_mainbar->addWidget(m_bookmarkBtn);
+  m_bookmarkButton = new QToolButton(m_mainbar);
+  m_bookmarkButton->setDefaultAction(m_bookmarkAction);
+  m_bookmarkButton->setText(tr("Bookmarks"));
+  //  m_bookmarkButton->setPopupMode(QToolButton::MenuButtonPopup);
+  m_bookmarkButton->setFocusPolicy(Qt::StrongFocus);
+  m_bookmarkButton->setEnabled(true);
+  m_bookmarkButton->setMenu(m_bookmarkMenu);
+
+  m_mainbar->addWidget(m_bookmarkButton);
 
   //  QToolBar * search = addToolBar(tr("Search"));
   //  search->setObjectName("searchtoolbar");
   m_searchButton = new QToolButton(m_mainbar);
   m_searchButton->setDefaultAction(m_searchAction);
   m_searchButton->setText(tr("Search"));
-  m_searchButton->setPopupMode(QToolButton::MenuButtonPopup);
+  //  m_searchButton->setPopupMode(QToolButton::MenuButtonPopup);
+  m_searchButton->setFocusPolicy(Qt::StrongFocus);
   m_searchButton->setEnabled(true);
   m_searchButton->setMenu(m_searchMenu);
   m_mainbar->addWidget(m_searchButton);
 
 
-  //  QToolBar * docs = addToolBar("&Docs");
-  //  docs->setObjectName("docstoolbar");
-  m_mainbar->addAction(m_docAction);
-  m_mainbar->addAction(m_optionsAction);
-  m_mainbar->addAction(m_logViewerAction);
+  m_docButton = new QToolButton(m_mainbar);
+  m_docButton->setDefaultAction(m_docAction);
+  m_docButton->setText(tr("Help"));
+  m_docButton->setFocusPolicy(Qt::StrongFocus);
+  m_mainbar->addWidget(m_docButton);
+
+  m_optionsButton = new QToolButton(m_mainbar);
+  m_optionsButton->setDefaultAction(m_optionsAction);
+  m_optionsButton->setText(tr("Preferences"));
+  m_optionsButton->setFocusPolicy(Qt::StrongFocus);
+  m_mainbar->addWidget(m_optionsButton);
+
+  m_logButton = new QToolButton(m_mainbar);
+  m_logButton->setDefaultAction(m_logViewerAction);
+  m_logButton->setText(tr("View logs"));
+  m_logButton->setFocusPolicy(Qt::StrongFocus);
+  m_mainbar->addWidget(m_logButton);
+
   m_mainbar->setFloatable(true);
   m_mainbar->setIconSize(m_toolbarIconSize);
   //  addToolBarBreak();
@@ -813,8 +829,36 @@ void LanesLexicon::createToolBar() {
   //  m_entrybar->addAction(m_convertToEntryAction);
   m_entrybar->setFloatable(true);
 
-  setTabOrder(m_mainbar,m_navigation);
-  setTabOrder(m_navigation,m_entrybar);
+  setTabOrder(m_historyButton,m_bookmarkButton);
+  setTabOrder(m_bookmarkButton,m_searchButton);
+  setTabOrder(m_searchButton,m_docButton);
+  setTabOrder(m_docButton,m_optionsButton);
+  setTabOrder(m_optionsButton,m_logButton);
+  //  setTabOrder(m_mainbar,m_navigation);
+  //  setTabOrder(m_navigation,m_entrybar);
+
+  connect(m_bookmarkButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
+  connect(m_searchButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
+  connect(m_historyButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
+
+}
+void LanesLexicon::onToolButtonTriggered(QAction * action) {
+  QToolButton * button = qobject_cast<QToolButton *>(QObject::sender());
+  if (button) {
+    if (button == m_searchButton) {
+      m_searchButton->showMenu();
+    }
+    else if (button == m_bookmarkButton) {
+      m_bookmarkButton->showMenu();
+    }
+    else if (button == m_searchButton) {
+      m_searchButton->showMenu();
+    }
+    else if (button == m_historyButton) {
+      m_historyButton->showMenu();
+    }
+
+  }
 }
 /**
  * when user has done something that adds to history
@@ -841,12 +885,12 @@ void LanesLexicon::setupHistory(int currPos) {
   QList<HistoryEvent *> events = m_history->getHistory();//10,0,currPos);
   QLOG_DEBUG() << Q_FUNC_INFO << "event size" << events.size();
   if (events.size() == 0) {
-    m_hBackwardBtn->setEnabled(false);
+    m_historyButton->setEnabled(false);
     m_clearHistoryAction->setEnabled(false);
   }
   else {
     // m_historyMenu->clear();
-    m_hBackwardBtn->setEnabled(true);
+    m_historyButton->setEnabled(true);
     m_clearHistoryAction->setEnabled(true);
   }
   QList<QAction *> actions = m_historyMenu->actions();
@@ -889,9 +933,9 @@ void LanesLexicon::setupHistory(int currPos) {
   }
   m_historyMenu->addActions(group->actions());
     //    m->addActions(group);
-  m_hBackwardBtn->setEnabled(true);
-    //    m_hBackwardBtn->addActions(group->actions());//setMenu(m);
-    //    m_hBackwardBtn->setMenu(m);
+  m_historyButton->setEnabled(true);
+    //    m_historyButton->addActions(group->actions());//setMenu(m);
+    //    m_historyButton->setMenu(m);
 }
 void LanesLexicon::createMenus() {
   m_mainmenu = new AppMenu(this);
