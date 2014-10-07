@@ -53,7 +53,7 @@ void LogViewer::readSettings() {
    QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
    settings->beginGroup("Logging");
    m_log.setFileName(settings->value(SID_LOGGING_FILE,"../log.txt").toString());
-   m_maxlines = settings->value(SID_LOGGING_VIEWER_MAXLINES,100).toInt();
+   m_maxlines = settings->value(SID_LOGGING_VIEWER_MAXLINES,1000).toInt();
    m_refreshInterval = settings->value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
    this->restoreGeometry(settings->value("Geometry").toByteArray());
   settings->endGroup();
