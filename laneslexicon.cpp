@@ -784,6 +784,9 @@ void LanesLexicon::createToolBar() {
   m_navigation->setIconSize(m_toolbarIconSize);
   m_navigation->setFloatable(true);
 
+  //  QMenu * modeMenu = new QMenu(this);
+  //  modeMenu->addAction(m_navModeRootAction);
+  //  modeMenu->addAction(m_navModePageAction);
   //  m_navigation->setToolTip(tr("Move root or by page"));
   //  m_navText = new QLabel("",m_navigation);
   /*
@@ -831,12 +834,6 @@ void LanesLexicon::createToolBar() {
   m_navLastButton->setFocusPolicy(Qt::StrongFocus);
   m_navigation->addWidget(m_navLastButton);
 
-
-
-  //  m_navigation->addAction(m_navFirstAction);
-  //  m_navigation->addAction(m_navNextAction);
-  //  m_navigation->addAction(m_navPrevAction);
-  //  m_navigation->addAction(m_navLastAction);
   m_navigation->addSeparator();
 
 
@@ -916,6 +913,7 @@ void LanesLexicon::createToolBar() {
   setTabOrder(m_widenButton,m_narrowButton);
   setTabOrder(m_narrowButton,m_printButton);
   setTabOrder(m_printButton,m_localSearchButton);
+
   if (m_toolbarText) {
     m_historyButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_bookmarkButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -1066,14 +1064,14 @@ void LanesLexicon::createMenus() {
   m_historyMenu = m_mainmenu->addMenu(tr("&History"));
   m_historyMenu->setObjectName("historymenu");
   m_historyMenu->addAction(m_clearHistoryAction);
-  m_navMenu = m_mainmenu->addMenu(tr("&Navigation"));
-  m_navMenu->setObjectName("navigationmenu");
-  m_navMenu->addAction(m_navFirstAction);
-  m_navMenu->addAction(m_navNextAction);
-  m_navMenu->addAction(m_navPrevAction);
-  m_navMenu->addAction(m_navLastAction);
-  m_navMenu->addAction(m_navModeRootAction);
-  m_navMenu->addAction(m_navModePageAction);
+  m_moveMenu = m_mainmenu->addMenu(tr("&Navigation"));
+  m_moveMenu->setObjectName("navigationmenu");
+  m_moveMenu->addAction(m_navFirstAction);
+  m_moveMenu->addAction(m_navNextAction);
+  m_moveMenu->addAction(m_navPrevAction);
+  m_moveMenu->addAction(m_navLastAction);
+  m_moveMenu->addAction(m_navModeRootAction);
+  m_moveMenu->addAction(m_navModePageAction);
 
   m_searchMenu = m_mainmenu->addMenu(tr("&Search"));
   m_searchMenu->setTitle(tr("Search"));
@@ -1098,6 +1096,7 @@ void LanesLexicon::createMenus() {
   toolsmenu->setObjectName("toolsmenu");
   toolsmenu->addAction(m_logViewerAction);
   toolsmenu->addAction(m_editViewAction);
+
 
 }
 

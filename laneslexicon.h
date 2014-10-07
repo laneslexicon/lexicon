@@ -332,6 +332,7 @@ private:
     QToolButton * m_navLastButton;
     QToolButton * m_navNextButton;
     QToolButton * m_navPrevButton;
+    QToolButton * m_navigationButton;
     bool m_toolbarText;
     QMenu * m_searchMenu;
     QAction * m_searchWordAction;
@@ -348,7 +349,7 @@ private:
     QToolButton * m_navBtn;
     QAction * m_navboxAction;
     QComboBox * m_navBy;
-    QMenu * m_navMenu;
+    QMenu * m_moveMenu;
     QAction * m_navModeRootAction;
     QAction * m_navModePageAction;
 
