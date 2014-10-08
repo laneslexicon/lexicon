@@ -908,10 +908,6 @@ Place GraphicsEntry::getPage(const Place & p) {
   m_transform = m_view->transform();
   m_view->setSceneRect(m_scene->sceneRect());
 
-  if (m_currentRoot != lastRoot) {
-    emit rootChanged(lastRoot,QString());
-    m_currentRoot = lastRoot;
-  }
   m_scene->setFocusItem(focusItem);
   int h =  m_view->height();
   QPointF pt = focusItem->pos();
@@ -1155,11 +1151,6 @@ int GraphicsEntry::hasPlace(const Place & p,int type,bool setFocus) {
   if ((ix != -1) && setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);
-    //    m_place = p;
-    //    m_showPlace->setPlace(m_place);
-
-    //    m_currentRoot = root;
-    //    emit(rootChanged(root,QString()));
   }
   return ix;
 }

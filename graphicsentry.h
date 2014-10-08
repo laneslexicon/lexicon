@@ -59,8 +59,6 @@ class GraphicsEntry : public QWidget {
     QGraphicsView * getView() const;
     int getPageNumber(int which=0) const;
     int hasPlace(const Place & ,int searchtype,bool focus = true);
-    QString currentRoot() { return m_currentRoot;}
-
     void setPagingForward() {
       m_pagingDir = 0;
     }
@@ -173,7 +171,6 @@ class GraphicsEntry : public QWidget {
     QString m_xsltSource;
     QString m_standardCSS;
     QString m_currentHtml;
-    QString m_currentRoot;
 
     QRegExp m_currentSearchRx;
 
@@ -206,7 +203,6 @@ class GraphicsEntry : public QWidget {
     void closeEvent(QCloseEvent *);
  signals:
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
-    void rootChanged(const QString & root,const QString & node);
     void nextRoot(const QString &);
     void prevRoot(const QString &);
     void next(const Place &);
