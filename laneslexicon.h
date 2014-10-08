@@ -86,7 +86,6 @@ class LanesLexicon : public QMainWindow
     void setStatus(const QString &);
     //    void saveNote(Note *);
     private slots:
-      void onToolButtonTriggered(QAction *);
       void onLogViewer();
       void onLinkChanged();
       void testSlot();

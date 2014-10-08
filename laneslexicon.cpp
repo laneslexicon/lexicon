@@ -726,6 +726,7 @@ void LanesLexicon::createToolBar() {
   m_historyButton->setEnabled(false);
   m_historyButton->setMenu(m_historyMenu);
   m_historyButton->setFocusPolicy(Qt::StrongFocus);
+  m_historyButton->setPopupMode(QToolButton::InstantPopup);
   m_mainbar->addWidget(m_historyButton);
 
   m_bookmarkButton = new QToolButton(m_mainbar);
@@ -734,12 +735,13 @@ void LanesLexicon::createToolBar() {
   m_bookmarkButton->setFocusPolicy(Qt::StrongFocus);
   m_bookmarkButton->setEnabled(true);
   m_bookmarkButton->setMenu(m_bookmarkMenu);
-
+  m_bookmarkButton->setPopupMode(QToolButton::InstantPopup);
   m_mainbar->addWidget(m_bookmarkButton);
 
   m_searchButton = new QToolButton(m_mainbar);
   m_searchButton->setDefaultAction(m_searchAction);
   m_searchButton->setText(tr("Search"));
+  m_searchButton->setPopupMode(QToolButton::InstantPopup);
   m_searchButton->setFocusPolicy(Qt::StrongFocus);
   m_searchButton->setEnabled(true);
   m_searchButton->setMenu(m_searchMenu);
@@ -786,6 +788,7 @@ void LanesLexicon::createToolBar() {
   else {
     m_navigationButton->setDefaultAction(m_navModePageAction);
   }
+  m_navigationButton->setPopupMode(QToolButton::InstantPopup);
   m_navigation->addWidget(m_navigationButton);
 
   m_navFirstButton = new QToolButton(m_navigation);
@@ -917,18 +920,7 @@ void LanesLexicon::createToolBar() {
   //  setTabOrder(m_mainbar,m_navigation);
   //  setTabOrder(m_navigation,m_entrybar);
 
-  connect(m_bookmarkButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
-  connect(m_searchButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
-  connect(m_historyButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
-  connect(m_navigationButton,SIGNAL(triggered(QAction *)),this,SLOT(onToolButtonTriggered(QAction *)));
 
-}
-void LanesLexicon::onToolButtonTriggered(QAction * /* action */) {
-  qStrip << Q_FUNC_INFO;
-  QToolButton * button = qobject_cast<QToolButton *>(QObject::sender());
-  if (button) {
-    button->showMenu();
-  }
 }
 /**
  * when user has done something that adds to history
@@ -2529,6 +2521,7 @@ void LanesLexicon::searchForWord() {
     }
   }
   delete d;
+  m_searchButton->menu()->hide();
 }
 
 /// TODO these needs to search the entry looking for bareword or word
@@ -2572,6 +2565,7 @@ void LanesLexicon::searchForNode() {
     }
   }
   delete d;
+  m_searchButton->menu()->hide();
 }
 void LanesLexicon::pageZoomIn() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
