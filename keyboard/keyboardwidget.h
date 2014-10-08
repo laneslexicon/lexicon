@@ -17,6 +17,7 @@
 #include "keydef.h"
 #include "scripts.h"
 #include "keyboard.h"
+#include "QsLog.h"
 class KeyboardWidget : public QDialog {
   Q_OBJECT;
 
@@ -30,11 +31,13 @@ class KeyboardWidget : public QDialog {
   QSize sizeHint() const;
   void resizeEvent(QResizeEvent *);
   void hideEvent(QHideEvent *);
+  void closeEvent(QCloseEvent * );
  public slots:
    void virtualKeyPressed(int);
    void loadKeyboard(int);
    void showKeyboard();
    void attach(QWidget *);
+   void detach();
  private:
    void readSettings();
    QString m_keyboardDirectory;
@@ -49,8 +52,7 @@ class KeyboardWidget : public QDialog {
   QWidget * m_target;
   QTransform m_transform;
   void autoScale();
-  //  public slots:
-    //  void zoomIn();
-    //  void zoomOut();
+  signals:
+    void closed();
 };
 #endif

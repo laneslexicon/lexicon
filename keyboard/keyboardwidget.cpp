@@ -80,6 +80,11 @@ void KeyboardWidget::resizeEvent(QResizeEvent * event) {
   //  m_currentSize = event->size();
   //  qDebug() << "current size" << m_currentSize;
 }
+void KeyboardWidget::closeEvent(QCloseEvent * event) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  this->hide();
+  emit(closed());
+}
 /**
  *
  *
@@ -104,7 +109,7 @@ void KeyboardWidget::zoomOut() {
 */
 void KeyboardWidget::showKeyboard() {
   this->show();
-  this->raise();
+  //  this->raise();
   this->activateWindow();
 }
 /**
@@ -123,6 +128,11 @@ void KeyboardWidget::attach(QWidget * w) {
     m_target = w;
     showKeyboard();
   }
+}
+void KeyboardWidget::detach() {
+  m_target = 0;
+  this->hide();
+  this->lower();
 }
 void KeyboardWidget::virtualKeyPressed(int k) {
   //  qDebug() << Q_FUNC_INFO << k << QChar(k);
