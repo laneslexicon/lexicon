@@ -620,7 +620,7 @@ KeyMap * im_get_map(InputMapper * im,const QString & mapname) {
   }
   return NULL;
 }
-void im_char_set(InputMapper * m,im_char * ic,QString c, int v,bool consume) {
+void im_char_set(InputMapper * /* m */,im_char * ic,QString c, int v,bool consume) {
   ic->c = c;
   ic->uc = v;
   ic->consume = consume;
@@ -636,7 +636,6 @@ im_char * im_convert(InputMapper * im,const QString & mapname,int curr_char, int
   /// this is case insensitive
   KeyMap * map = im_get_map(im,mapname);
   if (map == NULL) {
-    qDebug() << "map is NULL";
     return ret;
   }
   KeyInput * ki;
@@ -676,7 +675,7 @@ im_char * im_convert(InputMapper * im,const QString & mapname,int curr_char, int
   }
   return ret;
 }
-int im_search(KeyMap * map,KeyInput * ki,KeyEntry * ke,int pchar) {
+int im_search(KeyMap * map,KeyInput * ki,KeyEntry * ke,int /* pchar */) {
   int ret = 0;
 
   // build an array of diacritics

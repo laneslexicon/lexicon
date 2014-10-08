@@ -73,11 +73,12 @@ void ImLineEdit::readSettings(QSettings * settings) {
     settings = new QSettings;
   }
   settings->beginGroup("System");
-  m_nullMap = settings->value("Null map","None").toString();
+  m_nullMap = settings->value("Null map","Native").toString();
   m_keymapsEnabled = settings->value("Keymaps",false).toBool();
   settings->endGroup();
 
   settings->beginGroup("Maps");
+  m_debug = settings->value("Debug",false).toBool();
   QStringList groups = settings->childGroups();
   for(int i=0;i < groups.size();i++) {
     settings->beginGroup(groups[i]);
@@ -122,7 +123,7 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
     out << " " << event->text();
     qDebug() << t;
   }
-  if ( m_activeMap.isEmpty()) {
+  if ( m_debug && m_activeMap.isEmpty()) {
     qDebug() << Q_FUNC_INFO << "keymaps enabled" << m_keymapsEnabled << "no active map";
     return QLineEdit::keyPressEvent(event);
   }
