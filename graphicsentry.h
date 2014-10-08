@@ -54,15 +54,13 @@ class GraphicsEntry : public QWidget {
     Place getXmlForRoot(const Place &);
     Place showPlace(const Place &,bool thisPageOnly,int options);
     Place getPage(const Place & );
-    //    Place getXmlForPlace(const Place &);
-
     Place getPlace(int index=-1) const;
+
     QGraphicsView * getView() const;
     int getPageNumber(int which=0) const;
-    //    int hasRoot(const QString & root,bool focus = true);
     int hasPlace(const Place & ,int searchtype,bool focus = true);
     QString currentRoot() { return m_currentRoot;}
-    /// return the first/last root in the scene
+
     void setPagingForward() {
       m_pagingDir = 0;
     }
@@ -77,13 +75,15 @@ class GraphicsEntry : public QWidget {
     void setTextWidth(int w) { m_textWidth = w;}
     QGraphicsScene * getScene() { return m_scene;}
     int search();
-    SearchOptions m_currentSearchOptions;
-    QMap<int,QList<int> > m_searchPositions;
+
+
     void addPosition(int,int);
     void searchNext();
-    bool hasNode(const QString &);
+    bool hasNode(const QString &) const;
     bool focusNode(const QString &);
     void home();
+    QString getHome() const;
+    void setHome(const QString &);
     void shiftFocus();
     void setCurrentItem(QGraphicsItem *);
   public slots:
@@ -113,91 +113,91 @@ class GraphicsEntry : public QWidget {
     void showSelections();
     void print(QPrinter &,const QString & node = QString());
  private:
-
-    QString m_focusNode;
-
-    QColor m_supplementBg;
-    bool m_notesEnabled;
-    bool prepareQueries();
-    bool m_clearScene;
-    bool m_debug;
     QString lastRoot();
     QString firstRoot();
     QString getOutputFilename(const QString &,const QString &,const QString & node = QString());
     void readSettings();
     void writeDefaultSettings();
     QString readCssFromFile(const QString &name);
-    int m_pagingDir;
-    int m_entryMargin;
-    bool m_dumpXml;
-    bool m_dumpHtml;
-    bool m_dumpOutputHtml;
+    bool prepareQueries();
     void reposition();
     void appendEntries(int);
     void prependEntries(int);
+    void moveFocusUp();
+    void moveFocusDown();
+    void moveForward();
+    void moveBackward();
+    EntryItem * createEntry(const QString & xml);
+    QString transform(int type,const QString & xsl,const QString & xml);
+
+    SearchOptions m_currentSearchOptions;
+
+    QMap<int,QList<int> > m_searchPositions;
+
+    QColor m_supplementBg;
+
+    bool m_notesEnabled;
+    bool m_clearScene;
+    bool m_debug;
+    bool m_dumpXml;
+    bool m_dumpHtml;
+    bool m_dumpOutputHtml;
+
+    int m_pagingDir;
+    int m_entryMargin;
+    int m_widenStep;
+    int m_defaultWidth;
+    int m_currentSearchIndex;
+    int m_currentSearchPosition;
+    int m_textWidth;
 
     QString m_moveFocusUpKey;
     QString m_moveFocusDownKey;
-    void moveFocusUp();
-    void moveFocusDown();
-
     QString m_zoomInKey;
     QString m_zoomOutKey;
-
     QString m_moveForwardKey;
     QString m_moveBackwardKey;
-
     QString m_widenKey;
     QString m_narrowKey;
     QString m_searchKey;
     QString m_searchNextKey;
     QString m_clearKey;
     QString m_showKey;
+    QString m_markKey;
     QString m_homeKey;
     QString m_reloadKey;
-    int m_widenStep;
-    int m_defaultWidth;
-
-    int m_currentSearchIndex;
-    int m_currentSearchPosition;
-    QRegExp m_currentSearchRx;
     QString m_currentSearchTarget;
-    void moveForward();
-    void moveBackward();
+    QString m_focusNode;
+    QString m_currentCss;
+    QString m_printCss;
+    QString m_xsltSource;
+    QString m_standardCSS;
+    QString m_currentHtml;
+    QString m_currentRoot;
+
+    QRegExp m_currentSearchRx;
+
     QList<EntryItem *> m_items;
-    EntryItem * createEntry(const QString & xml);
+
     //    const XalanCompiledStylesheet * m_compiledXsl;
-
-
 
     qreal m_scale;
 
     QTransform m_transform;
-    QString transform(int type,const QString & xsl,const QString & xml);
 
     QTextOption m_textOption;
-#
-  //    LaneGraphicsView * m_view;
- QGraphicsView * m_view;
+
+    QGraphicsView * m_view;
     QGraphicsScene * m_scene;
     QGraphicsTextItem * m_item;
 
     QSqlQuery * m_nodeQuery;
     QSqlQuery * m_rootQuery;
-
     QSqlQuery * m_pageQuery;
-    QString m_standardCSS;
 
-    QString m_currentHtml;
-    QString m_currentRoot;
     Place m_place;
 
-    // read/set from readSettings
 
-    QString m_currentCss;
-    QString m_printCss;
-    QString m_xsltSource;
-    int m_textWidth;
     //    XalanTransformer * m_xalan;
 
  protected:

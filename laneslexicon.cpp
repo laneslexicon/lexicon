@@ -217,12 +217,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   edits.clear()
   */
-
   QLOG_DEBUG() << "-----------------------";
   QLOG_DEBUG() << "Initialisation complete";
   QLOG_DEBUG() << "-----------------------";
-  qStrip << "tabs focus policy" << m_tabs->focusPolicy();
-
 }
 
 LanesLexicon::~LanesLexicon()
@@ -1614,6 +1611,7 @@ void LanesLexicon::readSettings() {
   }
 }
 void LanesLexicon::writeSettings() {
+  QString v;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QScopedPointer<QSettings> settings(app->getSettings());
 
@@ -1633,6 +1631,10 @@ void LanesLexicon::writeSettings() {
         settings->setValue("place",p.toString());
         settings->setValue("zoom",entry->getScale());
         settings->setValue("textwidth",entry->getTextWidth());
+        v = entry->getHome();
+        if (! v.isEmpty()) {
+          settings->setValue("home",v);
+        }
         settings->endGroup();
       }
       else {
@@ -1679,6 +1681,8 @@ void LanesLexicon::writeSettings() {
 }
 void LanesLexicon::restoreTabs() {
   bool ok;
+  QString v;
+  QString home;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QMap<QString,QString> cmdOptions = app->getOptions();
 
@@ -1713,7 +1717,7 @@ void LanesLexicon::restoreTabs() {
       j++;
     }
     else {
-      QString v = settings->value("place",QString()).toString();
+      v = settings->value("place",QString()).toString();
       qreal scale = settings->value("zoom",1.0).toReal(&ok);
       if ( !ok ) {
         scale = 1.0;
@@ -1730,6 +1734,7 @@ void LanesLexicon::restoreTabs() {
       else {
         tw = textWidth;
       }
+      home = settings->value("home",QString()).toString();
       if (p.isValid()) {
         if (focusTab == i) {
           focusTab = j;
@@ -1741,6 +1746,8 @@ void LanesLexicon::restoreTabs() {
         p.setType(Place::RestoreTab);
         entry->getXmlForRoot(p);
         entry->setScale(scale);
+        entry->setHome(home);
+
         //      QLOG_DEBUG() << Q_FUNC_INFO << "adding tab" << p.getShortText();
         m_tabs->addTab(entry,p.getShortText());
         m_tree->ensurePlaceVisible(p,true);
@@ -2428,43 +2435,38 @@ void LanesLexicon::searchForPage() {
   this->syncContents();
 }
 void LanesLexicon::searchForRoot() {
-  /// TODO this will show 'ignore diacritics' and 'whole word'
-  /// which doesn't make much sense ?
   ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Root,this);
-  //    d->setWindowTitle(tr("Search for Root"));
-  //    d->setPrompt(tr("Find root"));
-  //    d->setNewTab(m_searchNewTab);
-    if (d->exec()) {
-      QString t = d->getText();
-      if (! t.isEmpty()) {
-        /// TODO maybe change this to if == Latin
-        if (! UcdScripts::isScript(t,"Arabic")) {
-          t = convertString(t);
-        }
-        SearchOptions opts;
-        d->getOptions(opts);
-        Place p = showPlace(Place(t),opts.newTab());
-        if (! p.isValid()) {
-          QMessageBox msgBox;
-          msgBox.setObjectName("rootnotfound");
-          msgBox.setTextFormat(Qt::RichText);
-          //          msgBox.setStyleSheet(".arabic { font-family : Amiri;font-size : 18px}");
-          /*this works, but affects the english and the arabic:
+  if (d->exec()) {
+    QString t = d->getText();
+    if (! t.isEmpty()) {
+      /// TODO maybe change this to if == Latin
+      if (! UcdScripts::isScript(t,"Arabic")) {
+        t = convertString(t);
+      }
+      SearchOptions opts;
+      d->getOptions(opts);
+      Place p = showPlace(Place(t),opts.newTab());
+      if (! p.isValid()) {
+        QMessageBox msgBox;
+        msgBox.setObjectName("rootnotfound");
+        msgBox.setTextFormat(Qt::RichText);
+        //          msgBox.setStyleSheet(".arabic { font-family : Amiri;font-size : 18px}");
+        /*this works, but affects the english and the arabic:
           msgBox.setStyleSheet("font-family :  Amiri; font-size : 18px");
-          */
-          /// this also works
-          /// msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
-          ///
-          /// TODO get this from INI file
-          msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
-          msgBox.exec();
-        }
-        else {
-          this->syncContents();
-        }
+        */
+        /// this also works
+        /// msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
+        ///
+        /// TODO get this from INI file
+        msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
+        msgBox.exec();
+      }
+      else {
+        this->syncContents();
       }
     }
-    delete d;
+  }
+  delete d;
 }
 /**
  *

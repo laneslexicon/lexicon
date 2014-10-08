@@ -179,6 +179,7 @@ void GraphicsEntry::readSettings() {
   m_clearKey = settings->value(SID_ENTRY_CLEAN,QString()).toString();
   m_showKey = settings->value(SID_ENTRY_SHOW,QString()).toString();
   m_homeKey = settings->value(SID_ENTRY_HOME,QString()).toString();
+  m_markKey = settings->value(SID_ENTRY_MARK,QString()).toString();
 
 
   m_dumpXml = settings->value(SID_ENTRY_DUMP_XML,false).toBool();
@@ -257,21 +258,25 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
     this->showSelections();
     return;
   }
+  if (! m_markKey.isEmpty() && (event->text() == m_markKey)) {
+    m_focusNode = m_place.getNode();
+    return;
+  }
   if (! m_homeKey.isEmpty() && (event->text() == m_homeKey)) {
-    if (! m_focusNode.isEmpty()) {
-        this->focusNode(m_focusNode);
-      }
-    else {
-      QLOG_DEBUG() << "No home to go to";
-    }
+    this->home();
     return;
   }
   QWidget::keyPressEvent(event);
 
 }
 void GraphicsEntry::home() {
-  if (! m_focusNode.isEmpty())
-    this->focusNode(m_focusNode);
+  this->focusNode(m_focusNode);
+}
+QString GraphicsEntry::getHome() const {
+  return m_focusNode;
+}
+void GraphicsEntry::setHome(const QString & node) {
+  m_focusNode = node;
 }
 void GraphicsEntry::moveFocusDown() {
   EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
@@ -1402,7 +1407,7 @@ bool GraphicsEntry::focusNode(const QString & node) {
       return true;
     }
   }
-  QLOG_DEBUG() << "Warning: focusNode failed, cannot find node" << node;
+  QLOG_DEBUG() << "focusNode failed, cannot find node" << node;
   return false;
 }
 /**
@@ -1412,7 +1417,7 @@ bool GraphicsEntry::focusNode(const QString & node) {
  *
  * @return true if found, otherwise false
  */
-bool GraphicsEntry::hasNode(const QString & node) {
+bool GraphicsEntry::hasNode(const QString & node) const {
   if (node.isEmpty()) {
     return true;
   }

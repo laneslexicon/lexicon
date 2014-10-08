@@ -35,6 +35,7 @@ They should not be translated.
 #define SID_ENTRY_FONT_SIZE "Font size"
 #define SID_ENTRY_HOME       "Home"
 #define SID_ENTRY_MARGIN     "Margin"
+#define SID_ENTRY_MARK     "Mark"
 #define SID_ENTRY_MOVE_FOCUS_UP "Move focus up"
 #define SID_ENTRY_MOVE_FOCUS_DOWN "Move focus down"
 #define SID_ENTRY_NARROW  "Narrow"
