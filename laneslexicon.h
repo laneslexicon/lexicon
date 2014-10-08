@@ -214,64 +214,65 @@ class LanesLexicon : public QMainWindow
       /// look through all tabs for the given node, -1 if not found, else tab index
 
       SearchOptions m_defaultSearchOptions;
+      SearchOptions m_searchOptions;
+
       QString m_configFile;
       QString m_interface;    // "default","minimal"
       QString m_applicationCssFile;
-      QPrinter m_printer;
       QString m_printPdfLocation;
-      bool m_printToPdf;
-      bool m_printerReUse;
-      /// 0 - root mode, 1 - page mode
+      QString m_iconTheme;
+      QString m_nullMap;
+      QString m_currentMap;
+      QString m_dbName;
+      QString m_notesDbName;
+      QString m_historyDbName;
+      QString m_startupNode;
+      QString m_startupRoot;
+      QString m_firstRoot;
+      QString m_lastRoot;
+
+      QPrinter m_printer;
+
       int m_navMode;
+      int m_firstPage;
+      int m_lastPage;
+
       QLabel * m_placeIndicator;
 
+      bool m_toolbarText;
       bool m_linkContents;
-
-
+      bool m_printToPdf;
+      bool m_printerReUse;
       bool m_ok;
       bool m_docked;          // whether to use docked widget
       bool m_valgrind;
       bool m_useNotes;
-
-      bool m_treeKeepsFocus;
-      /// toolbars
-      QToolBar * m_mainbar;
-      QToolBar * m_navigation;
-      QToolBar * m_entrybar;
-
-      QString m_iconTheme;
-      QString m_nullMap;
-      QFont arFont;
-
-      QString m_firstRoot;
-      QString m_lastRoot;
-      int m_firstPage;
-      int m_lastPage;
-
-      /// set by readSettings
-      InputMapper * m_mapper;
-      QString m_currentMap;
-      QStringList m_definedMaps;
-      QString m_dbName;
-      QString m_notesDbName;
-      QString m_historyDbName;
       bool m_historyEnabled;
       bool m_saveTabs;
       bool m_saveSettings;
-      QString m_startupNode;
-      QString m_startupRoot;
       bool m_restoreTabs;
       bool m_searchNewTab;
       bool m_searchSwitchTab;
       bool m_interfaceWarning;
-      //    QString m_navigationMode;
-      QSignalMapper * m_signalMapper;
-
-      // bookmarks
-      QSignalMapper * m_bookmarkMap;
-      QMap<QString, Place> m_bookmarks;
+      bool m_treeKeepsFocus;
       bool m_saveBookmarks;
       bool m_restoreBookmarks;
+      bool m_revertEnabled;
+
+      QToolBar * m_mainbar;
+      QToolBar * m_navigation;
+      QToolBar * m_entrybar;
+
+      QFont arFont;
+
+      InputMapper * m_mapper;
+
+      QStringList m_definedMaps;
+
+      QSignalMapper * m_signalMapper;
+      QSignalMapper * m_bookmarkMap;
+
+      QMap<QString, Place> m_bookmarks;
 
       QMenu * m_bookmarkMenu;
       QMenu * m_historyMenu;
@@ -284,10 +285,6 @@ class LanesLexicon : public QMainWindow
       QMenu * m_toolMenu;
       AppMenu * m_mainmenu;
 
-
-
-
-      bool m_revertEnabled;
       QSize m_toolbarIconSize;
 
       Place m_place;
@@ -298,7 +295,7 @@ class LanesLexicon : public QMainWindow
       EntryLayoutWidget * m_entryLayout;
       LogViewer * m_logview;
 
-      SearchOptions m_searchOptions;
+
 
       QSqlDatabase m_db;
       QSqlDatabase m_notesDb;
@@ -329,7 +326,7 @@ class LanesLexicon : public QMainWindow
 
       QActionGroup * m_moveGroup;
 
-      bool m_toolbarText;
+
 
       QAction * m_minimalAction;
       QAction * m_logViewerAction;
