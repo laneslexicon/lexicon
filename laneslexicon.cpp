@@ -1087,14 +1087,14 @@ void LanesLexicon::createStatusBar() {
   m_placeIndicator->setObjectName("placeindicator");
 
   m_keymapsButton = new QToolButton(this);
-  QStringList maps =  m_mapper->getMaps();
-  maps << tr("None");
+  QStringList maps =  m_definedMaps;//m_mapper->getMaps();
+  maps << m_nullMap;
   QMenu * menu = new QMenu(this);
   for(int i=0;i < maps.size();i++) {
     QAction * action  = menu->addAction(maps[i]);
     action->setCheckable(true);
     action->setData(maps[i]);
-    if (m_activeMap == maps[i]) {
+    if (m_currentMap == maps[i]) {
       action->setChecked(true);
     }
     connect(action,SIGNAL(triggered()),this,SLOT(onKeymapChanged()));
@@ -1137,10 +1137,11 @@ void LanesLexicon::onKeymapChanged() {
   QAction * action = qobject_cast<QAction *>(sender());
   if (! action)
     return;
-  m_activeMap = action->data().toString();
+  m_currentMap = action->data().toString();
+  QLOG_DEBUG() << Q_FUNC_INFO << "map set to" << m_currentMap;
   QList<QAction *> actions = m_keymapsButton->menu()->actions();
   for(int i=0;i < actions.size();i++) {
-    if (actions[i]->data().toString() == m_activeMap) {
+    if (actions[i]->data().toString() == m_currentMap) {
       actions[i]->setChecked(true);
     }
     else {
@@ -1150,12 +1151,12 @@ void LanesLexicon::onKeymapChanged() {
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {
-      w->activateMap(m_activeMap,true);
+      w->activateMap(m_currentMap,true);
     }
     else {
       ImEdit * imedit = qobject_cast<ImEdit *>(widget);
       if (imedit) {
-        imedit->activateMap(m_activeMap,true);
+        imedit->activateMap(m_currentMap,true);
       }
     }
   }
@@ -1505,6 +1506,9 @@ void LanesLexicon::readSettings() {
   }
   m_iconTheme = settings->value("Theme",QString()).toString();
   m_toolbarText = settings->value("Toolbar text",false).toBool();
+  m_nullMap = settings->value("Null map","Native").toString();
+  m_currentMap = settings->value("Current map","Native").toString();
+
   m_interfaceWarning = settings->value("Show interface warning",true).toBool();
   m_saveSettings = settings->value("Save settings",true).toBool();
   if (cmdOptions.contains("nosave")) {
@@ -1522,8 +1526,6 @@ void LanesLexicon::readSettings() {
 
   m_docked = settings->value("Docked",false).toBool();
   m_minimalAction->setChecked(settings->value("Minimal interface",false).toBool());
-
-  m_activeMap = settings->value("Default map","Buckwalter").toString();
 
   v  = settings->value("Navigation","root").toString();
 
@@ -1597,24 +1599,27 @@ void LanesLexicon::readSettings() {
 
   settings->beginGroup("Maps");
   QStringList groups = settings->childGroups();
-  if ( ! groups.contains(m_activeMap) ) {
-    QLOG_WARN() << QString(tr("Default map <%1> not found in settings")).arg(m_activeMap);
-    return;
-  }
-  settings->beginGroup(m_activeMap);
-  v = settings->value("file",QString()).toString();
-  QFile file(v);
-  if ( file.exists() ) {
-    if (! im_load_map_from_json(m_mapper,v.toUtf8().constData(),m_activeMap.toUtf8().constData())) {
-      QLOG_WARN() << QString(tr("Could not load <%1> from file <%2>")).arg(m_activeMap).arg(v);
+  for(int i=0; i < groups.size();i++) {
+    settings->beginGroup(groups[i]);
+    v = settings->value("file",QString()).toString();
+    QFile file(v);
+    if ( file.exists() ) {
+      if (! im_load_map_from_json(m_mapper,v.toUtf8().constData(),groups[i].toUtf8().constData())) {
+        QLOG_WARN() << QString(tr("Could not load <%1> from file <%2>")).arg(groups[i]).arg(v);
+      }
+      else {
+        m_definedMaps << groups[i];
+          }
     }
-  }
-  else {
-    QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(m_activeMap).arg(v);
+    else {
+      QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(groups[i]).arg(v);
+    }
+    settings->endGroup();
   }
   settings->endGroup();
-  settings->endGroup();
-
+  if ((m_currentMap != m_nullMap) && ! m_definedMaps.contains(m_currentMap) ) {
+    QLOG_WARN() << QString(tr("Default map <%1> not found in settings")).arg(m_currentMap);
+  }
 }
 void LanesLexicon::writeSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
@@ -1655,6 +1660,7 @@ void LanesLexicon::writeSettings() {
     settings->setValue("Focus tab",m_tabs->currentIndex());
     settings->setValue("Minimal interface",m_minimalAction->isChecked());
     settings->setValue("Show interface warning",m_interfaceWarning);
+    settings->setValue("Current map",m_currentMap);
     if (m_navMode == Lane::By_Root) {
       settings->setValue("Navigation","root");
     }
@@ -1967,16 +1973,16 @@ void LanesLexicon::onLastPage() {
  * @return the equivalent arabic string
  */
 QString LanesLexicon::convertString(const QString & s) const {
-  if ( m_activeMap.isEmpty()) {
+  if ( m_currentMap.isEmpty()) {
     return s;
   }
   if (UcdScripts::isScript(s,"Arabic")) {
     return s;
   }
   bool ok;
-  QString t = im_convert_string(m_mapper,m_activeMap,s,&ok);
+  QString t = im_convert_string(m_mapper,m_currentMap,s,&ok);
   if ( ! ok ) {
-    QLOG_INFO() << QString(tr("Error converting <%1> with map <%2>")).arg(s).arg(m_activeMap);
+    QLOG_INFO() << QString(tr("Error converting <%1> with map <%2>")).arg(s).arg(m_currentMap);
   }
   return t;
 }
@@ -2815,7 +2821,7 @@ void LanesLexicon::enableKeymaps(bool v) {
   settings->setValue("Keymaps",v);
 }
 QString LanesLexicon::getActiveKeymap() const {
-  return m_activeMap;
+  return m_currentMap;
 }
 void LanesLexicon::deleteSearch() {
   //  if (! p.isValid()) {

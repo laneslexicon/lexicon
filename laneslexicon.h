@@ -241,7 +241,7 @@ class LanesLexicon : public QMainWindow
       QToolBar * m_entrybar;
 
       QString m_iconTheme;
-
+      QString m_nullMap;
       QFont arFont;
 
       QString m_firstRoot;
@@ -251,7 +251,8 @@ class LanesLexicon : public QMainWindow
 
       /// set by readSettings
       InputMapper * m_mapper;
-      QString m_activeMap;
+      QString m_currentMap;
+      QStringList m_definedMaps;
       QString m_dbName;
       QString m_notesDbName;
       QString m_historyDbName;
