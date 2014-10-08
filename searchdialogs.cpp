@@ -118,15 +118,18 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
 
   m_moreButton->setVisible(false);
-
+  connect(m_keyboard,SIGNAL(closed()),this,SLOT(keyboardClosed()));
   //  delete settings;
 }
-
+void ArabicSearchDialog::keyboardClosed() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  showKeyboard();
+}
 void ArabicSearchDialog::showKeyboard() {
   m_keyboard->attach(m_edit);
   m_attached = ! m_attached;
   if (m_attached) {
-    m_keyboardButton->setText(tr("Hide keyboard"));
+    m_keyboardButton->setText(tr("Hide &keyboard"));
     QPoint p;
     p = m_keyboard->currentPosition();
     if (p.isNull()) {
@@ -138,7 +141,7 @@ void ArabicSearchDialog::showKeyboard() {
     m_keyboard->move(p);
   }
   else
-    m_keyboardButton->setText(tr("Show keyboard"));
+    m_keyboardButton->setText(tr("Show &keyboard"));
 
 }
 void ArabicSearchDialog::showOptions(bool v) {
