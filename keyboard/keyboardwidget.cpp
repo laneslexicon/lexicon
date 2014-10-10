@@ -20,6 +20,10 @@ KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
   layout->addWidget(m_keyboards);
   layout->addWidget(m_view);
   setLayout(layout);
+  QAction * closeAction = new QAction(this);
+  closeAction->setShortcut(QKeySequence("Alt+K"));
+  this->addAction(closeAction);
+  connect(closeAction,SIGNAL(triggered()),this,SIGNAL(closed()));
 
   m_transform = m_view->transform();
   //  m_view->loadKeyboard("keyboards/arabic1.ini");
@@ -31,6 +35,9 @@ KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
 
   int ix = m_keyboards->findText(m_defaultKeyboard);
   m_keyboards->setCurrentIndex(ix);
+}
+bool KeyboardWidget::isAttached() {
+  return  (m_target != 0);
 }
 QSize KeyboardWidget::sizeHint() const {
   if (! m_currentSize.isEmpty())
@@ -75,7 +82,7 @@ void KeyboardWidget::loadKeyboard(int /*ix */) {
   m_view->loadKeyboard(name);
   this->autoScale();
 }
-void KeyboardWidget::resizeEvent(QResizeEvent * event) {
+void KeyboardWidget::resizeEvent(QResizeEvent * /* event */) {
   this->autoScale();
   //  m_currentSize = event->size();
   //  qDebug() << "current size" << m_currentSize;
@@ -119,6 +126,10 @@ void KeyboardWidget::showKeyboard() {
  * @param w
  */
 void KeyboardWidget::attach(QWidget * w) {
+  m_target = w;
+  showKeyboard();
+  emit(attached());
+  /*
   if (m_target == w) {
     m_target = 0;
     this->hide();
@@ -126,13 +137,16 @@ void KeyboardWidget::attach(QWidget * w) {
   }
   else {
     m_target = w;
+    setFocusProxy(m_target);
     showKeyboard();
   }
+  */
 }
 void KeyboardWidget::detach() {
   m_target = 0;
   this->hide();
   this->lower();
+  emit(detached());
 }
 void KeyboardWidget::virtualKeyPressed(int k) {
   //  qDebug() << Q_FUNC_INFO << k << QChar(k);

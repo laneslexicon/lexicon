@@ -27,7 +27,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   }
 
 
-
+  m_count = 0;
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
@@ -82,7 +82,6 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   connect(m_moreButton, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
 
-
   QVBoxLayout * leftlayout = new QVBoxLayout;
 
   QHBoxLayout * inputlayout = new QHBoxLayout;
@@ -108,27 +107,24 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_options->showMore(false);
 
   m_edit->setFocus();
+
   m_attached = false;
   m_keyboard = new KeyboardWidget(this);
-  QPoint p = this->pos();
-  //  QLOG_DEBUG() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
+
+ QPoint p = this->pos();
   int h = this->frameGeometry().height();
+  //  QLOG_DEBUG() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
   //  QLOG_DEBUG() << "search dialog frame geometry" << this->frameGeometry();
   m_keyboard->move(p.x(),p.y() + h);
-
-
-  m_moreButton->setVisible(false);
   connect(m_keyboard,SIGNAL(closed()),this,SLOT(keyboardClosed()));
-  //  delete settings;
+  m_moreButton->setVisible(false);
 }
 void ArabicSearchDialog::keyboardClosed() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
   showKeyboard();
 }
 void ArabicSearchDialog::showKeyboard() {
-  m_keyboard->attach(m_edit);
-  m_attached = ! m_attached;
-  if (m_attached) {
+  if (! m_attached) {
+    m_keyboard->attach(m_edit);
     m_keyboardButton->setText(tr("Hide &keyboard"));
     QPoint p;
     p = m_keyboard->currentPosition();
@@ -139,10 +135,13 @@ void ArabicSearchDialog::showKeyboard() {
       p.setY(p.y() + h);
     }
     m_keyboard->move(p);
+    m_attached = true;
   }
-  else
+  else {
+    m_keyboard->detach();
     m_keyboardButton->setText(tr("Show &keyboard"));
-
+    m_attached = false;
+  }
 }
 void ArabicSearchDialog::showOptions(bool v) {
   m_options->showMore(v);
@@ -175,7 +174,7 @@ bool ArabicSearchDialog::getForceLTR() {
 }
 /**
  *
- *
+ *pp
  * @param parent
  * @param f
  */

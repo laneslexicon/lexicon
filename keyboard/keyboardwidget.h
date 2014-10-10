@@ -14,6 +14,7 @@
 #include <QTextDocument>
 #include <QGridLayout>
 #include <QPair>
+#include <QAction>
 #include "keydef.h"
 #include "scripts.h"
 #include "keyboard.h"
@@ -25,6 +26,7 @@ class KeyboardWidget : public QDialog {
   KeyboardWidget(QWidget * parent = 0);
   void setTarget(QWidget * w) { m_target = w;};
   void loadDefinitions(const QString & targetScript = QString());
+  bool isAttached();
   QPoint currentPosition() const;
   QWidget * target() const;
  protected:
@@ -54,5 +56,7 @@ class KeyboardWidget : public QDialog {
   void autoScale();
   signals:
     void closed();
+    void attached();
+    void detached();
 };
 #endif

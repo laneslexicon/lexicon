@@ -25,13 +25,13 @@ class ArabicSearchDialog : public QDialog {
   void getOptions(SearchOptions &);
   bool getForceLTR() ;
   public slots:
-    //    void keymapChanged();
     virtual void showOptions(bool);
     void showKeyboard();
     void loadKeymap(const QString &);
     void keyboardClosed();
  protected:
     int m_searchType;
+    int m_count;
     KeyboardWidget * m_keyboard;
     bool m_attached;
     QLabel * m_prompt;
