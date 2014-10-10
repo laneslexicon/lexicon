@@ -29,6 +29,7 @@ class KeyboardWidget : public QDialog {
   bool isAttached();
   QPoint currentPosition() const;
   QWidget * target() const;
+  void setCloseShortcut(const QString &);
  protected:
   QSize sizeHint() const;
   void resizeEvent(QResizeEvent *);

@@ -110,7 +110,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   m_attached = false;
   m_keyboard = new KeyboardWidget(this);
-
+  m_keyboard->setCloseShortcut(m_keyboardButton->shortcut().toString());
  QPoint p = this->pos();
   int h = this->frameGeometry().height();
   //  QLOG_DEBUG() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());

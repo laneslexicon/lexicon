@@ -20,10 +20,6 @@ KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
   layout->addWidget(m_keyboards);
   layout->addWidget(m_view);
   setLayout(layout);
-  QAction * closeAction = new QAction(this);
-  closeAction->setShortcut(QKeySequence("Alt+K"));
-  this->addAction(closeAction);
-  connect(closeAction,SIGNAL(triggered()),this,SIGNAL(closed()));
 
   m_transform = m_view->transform();
   //  m_view->loadKeyboard("keyboards/arabic1.ini");
@@ -36,6 +32,13 @@ KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
   int ix = m_keyboards->findText(m_defaultKeyboard);
   m_keyboards->setCurrentIndex(ix);
 }
+void KeyboardWidget::setCloseShortcut(const QString & keys) {
+  QAction * closeAction = new QAction(this);
+  closeAction->setShortcut(QKeySequence(keys));
+  this->addAction(closeAction);
+  connect(closeAction,SIGNAL(triggered()),this,SIGNAL(closed()));
+}
+
 bool KeyboardWidget::isAttached() {
   return  (m_target != 0);
 }
