@@ -323,6 +323,17 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
 
 }
+void LanesLexicon::onCloseOtherTabs() {
+  m_tabs->setUpdatesEnabled(false);
+  QString label = m_tabs->tabText(m_tabs->currentIndex());
+  QWidget * w = m_tabs->currentWidget();
+  m_tabs->removeTab(m_tabs->currentIndex());
+  while(m_tabs->count() > 0) {
+    this->onCloseTab(0);
+  }
+  m_tabs->addTab(w,label);
+  m_tabs->setUpdatesEnabled(true);
+}
 void LanesLexicon::onCloseTab(int ix) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
   if (entry) {
@@ -485,6 +496,9 @@ void LanesLexicon::shortcut(const QString & key) {
   }
   else if (key == SID_SHORTCUT_DELETE_TAB) {
     this->onCloseTab(m_tabs->currentIndex());
+  }
+  else if (key == SID_SHORTCUT_DELETE_OTHER_TABS) {
+    this->onCloseOtherTabs();
   }
   else if (key == SID_SHORTCUT_CONVERT_TO_ENTRY) {
     this->convertToEntry();
@@ -1722,7 +1736,6 @@ void LanesLexicon::restoreTabs() {
         scale = 1.0;
       }
       Place p = Place::fromString(v);
-      QLOG_DEBUG() << "restoring" << v << p.isValid();
       int tw;
       if (! cmdOptions.contains("textwidth")) {
         tw = settings->value("textwidth",textWidth).toInt(&ok);

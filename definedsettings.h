@@ -90,6 +90,7 @@ They should not be translated.
 #define SID_SHORTCUT_CONTENTS_SHOW             "Contents show"
 #define SID_SHORTCUT_CONVERT_TO_ENTRY          "Convert to entry"
 #define SID_SHORTCUT_DELETE_TAB                "Delete tab"
+#define SID_SHORTCUT_DELETE_OTHER_TABS         "Delete other tabs"
 #define SID_SHORTCUT_FOCUS_CONTENT             "Focus content"
 #define SID_SHORTCUT_FOCUS_TREE                "Focus tree"
 #define SID_SHORTCUT_GO_TAB                    "Go Tab"

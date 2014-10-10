@@ -107,6 +107,7 @@ class LanesLexicon : public QMainWindow
       void moveNext(const Place &);
       void movePrevious(const Place &);
       void onCloseTab(int) ;
+      void onCloseOtherTabs() ;
       void onGoToPage(const Place &);
       void onExit();
       void onTest();
