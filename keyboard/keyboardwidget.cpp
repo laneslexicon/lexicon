@@ -32,13 +32,21 @@ KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
   int ix = m_keyboards->findText(m_defaultKeyboard);
   m_keyboards->setCurrentIndex(ix);
 }
-void KeyboardWidget::setCloseShortcut(const QString & keys) {
+void KeyboardWidget::addShortcut(const QString & keys) {
   QAction * closeAction = new QAction(this);
   closeAction->setShortcut(QKeySequence(keys));
   this->addAction(closeAction);
-  connect(closeAction,SIGNAL(triggered()),this,SIGNAL(closed()));
+  connect(closeAction,SIGNAL(triggered()),this,SLOT(onKeyboardShortcut()));
+  //  emit(keyboardShortcut());
 }
-
+void KeyboardWidget::onKeyboardShortcut() {
+  qDebug() << Q_FUNC_INFO;
+  QAction * action = qobject_cast<QAction *>(sender());
+  if (action) {
+    qDebug() << Q_FUNC_INFO << action->shortcut().toString();
+    emit(keyboardShortcut(action->shortcut().toString()));
+    }
+}
 bool KeyboardWidget::isAttached() {
   return  (m_target != 0);
 }
@@ -56,7 +64,6 @@ void KeyboardWidget::loadDefinitions(const QString & targetScript) {
     if (files[i].endsWith(".ini")) {
       QString name;
       QString file = d.absolutePath() + QDir::separator() + files[i];
-      qDebug() << "file" << file;
       ok = false;
       QSettings settings(file,QSettings::IniFormat);
       settings.setIniCodec("UTF-8");
@@ -90,8 +97,7 @@ void KeyboardWidget::resizeEvent(QResizeEvent * /* event */) {
   //  m_currentSize = event->size();
   //  qDebug() << "current size" << m_currentSize;
 }
-void KeyboardWidget::closeEvent(QCloseEvent * event) {
-  QLOG_DEBUG() << Q_FUNC_INFO;
+void KeyboardWidget::closeEvent(QCloseEvent * /* event */) {
   this->hide();
   emit(closed());
 }

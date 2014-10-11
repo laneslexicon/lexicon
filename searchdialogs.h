@@ -29,6 +29,7 @@ class ArabicSearchDialog : public QDialog {
     void showKeyboard();
     void loadKeymap(const QString &);
     void keyboardClosed();
+    void onKeyboardShortcut(const QString &);
  protected:
     int m_searchType;
     int m_count;

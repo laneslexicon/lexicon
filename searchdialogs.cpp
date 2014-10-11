@@ -49,7 +49,9 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   m_buttonBox = new QDialogButtonBox(Qt::Vertical);
   m_buttonBox->addButton(m_findButton, QDialogButtonBox::AcceptRole);
-  m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
+  //  m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
+  QPushButton * button = m_buttonBox->addButton(QDialogButtonBox::Cancel);
+  button->setText(tr("&Cancel"));
   m_buttonBox->addButton(m_moreButton, QDialogButtonBox::ActionRole);
   if (searchType == SearchOptions::Word) {
     m_moreButton->setVisible(true);
@@ -73,7 +75,6 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->getActiveMap();
-  QLOG_DEBUG() << Q_FUNC_INFO << "active map" << map;
   if (map.isEmpty()) {
     map = m_edit->getNullMap();
   }
@@ -110,15 +111,44 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   m_attached = false;
   m_keyboard = new KeyboardWidget(this);
-  m_keyboard->setCloseShortcut(m_keyboardButton->shortcut().toString());
+  QList<QAbstractButton *> buttons = m_buttonBox->buttons();
+  for(int i=0;i < buttons.size();i++) {
+    QString k = buttons[i]->shortcut().toString();
+    if (! k.isEmpty()) {
+      m_keyboard->addShortcut(k);
+    }
+  }
  QPoint p = this->pos();
   int h = this->frameGeometry().height();
   //  QLOG_DEBUG() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
   //  QLOG_DEBUG() << "search dialog frame geometry" << this->frameGeometry();
   m_keyboard->move(p.x(),p.y() + h);
   connect(m_keyboard,SIGNAL(closed()),this,SLOT(keyboardClosed()));
+  connect(m_keyboard,SIGNAL(keyboardShortcut(const QString &)),this,SLOT(onKeyboardShortcut(const QString &)));
   m_moreButton->setVisible(false);
 }
+void ArabicSearchDialog::onKeyboardShortcut(const QString & key) {
+  qDebug() << Q_FUNC_INFO << key;
+  if (key == m_keyboardButton->shortcut().toString()) {
+      showKeyboard();
+      return;
+    }
+  QPushButton * button = m_buttonBox->button(QDialogButtonBox::Cancel);
+  if (button) {
+    if (button->shortcut().toString() == key) {
+      button->animateClick();
+      return;
+    }
+  }
+  if (key == m_findButton->shortcut().toString()) {
+    m_findButton->animateClick();
+    return;
+  }
+  if (key == m_moreButton->shortcut().toString()) {
+    m_moreButton->animateClick();
+  }
+}
+
 void ArabicSearchDialog::keyboardClosed() {
   showKeyboard();
 }

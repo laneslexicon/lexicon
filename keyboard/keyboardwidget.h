@@ -29,7 +29,7 @@ class KeyboardWidget : public QDialog {
   bool isAttached();
   QPoint currentPosition() const;
   QWidget * target() const;
-  void setCloseShortcut(const QString &);
+  void addShortcut(const QString &);
  protected:
   QSize sizeHint() const;
   void resizeEvent(QResizeEvent *);
@@ -41,6 +41,7 @@ class KeyboardWidget : public QDialog {
    void showKeyboard();
    void attach(QWidget *);
    void detach();
+   void onKeyboardShortcut();
  private:
    void readSettings();
    QString m_keyboardDirectory;
@@ -59,5 +60,6 @@ class KeyboardWidget : public QDialog {
     void closed();
     void attached();
     void detached();
+    void keyboardShortcut(const QString &);
 };
 #endif
