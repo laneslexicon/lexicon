@@ -108,6 +108,9 @@ int main(int argc, char *argv[])
     QCommandLineOption textWidthOption(QStringList() << "w" << "text-width","set textwidth","textwidth");
     parser.addOption(textWidthOption);
 
+    QCommandLineOption nosplashOption(QStringList() << "s" << "no-splash","do not show splash screen");
+    parser.addOption(nosplashOption);
+
     // Process the actual command line arguments
     parser.process(mansur);
     const QStringList args = parser.positionalArguments();
@@ -179,6 +182,9 @@ int main(int argc, char *argv[])
     delete settings;
     QDir d(splashDir);
     if (! d.exists()) {
+      makeSplash = false;
+    }
+    if (parser.isSet(nosplashOption)) {
       makeSplash = false;
     }
     if (makeSplash) {
