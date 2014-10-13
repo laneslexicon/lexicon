@@ -66,7 +66,8 @@ SOURCES += main.cpp\
         splashscreen.cpp \
         about.cpp \
         entrylayoutwidget.cpp \
-        logviewer.cpp
+        logviewer.cpp \
+        version.cpp
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \

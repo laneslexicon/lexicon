@@ -63,7 +63,7 @@ QWidget * AboutDialog::buildTechTab() {
   layout->addRow(tr("Db ID"),edit);
 
   edit = new QLineEdit;
-  edit->setText(BUILD_VERSION);
+  edit->setText(buildVersion());
   edit->setReadOnly(true);
   layout->addRow(tr("Build version"),edit);
 

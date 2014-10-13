@@ -29,7 +29,7 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QCoreApplication::setOrganizationName("Gabanjo");
   QCoreApplication::setOrganizationDomain("theunwalledcity.com");
   QCoreApplication::setApplicationName("Lanes Lexicon");
-  QCoreApplication::setApplicationVersion(BUILD_VERSION);
+  QCoreApplication::setApplicationVersion(buildVersion());
 
   connect(this,SIGNAL(focusChanged(QWidget *,QWidget *)),this,SLOT(onFocusChange(QWidget *,QWidget *)));
 }
