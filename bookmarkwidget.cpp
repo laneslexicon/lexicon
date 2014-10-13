@@ -14,11 +14,13 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
       QListWidgetItem * item = new QListWidgetItem(t,m_list);
   }
   QPushButton * jumpButton = new QPushButton(tr("&Jump to"));
+  QPushButton * cancelButton = new QPushButton(tr("&Cancel"));
   if (keys.size() == 0) {
     jumpButton->setEnabled(false);
   }
-  QDialogButtonBox *   buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
+  QDialogButtonBox *   buttonBox = new QDialogButtonBox();//QDialogButtonBox::Cancel);
   buttonBox->addButton(jumpButton,QDialogButtonBox::AcceptRole);
+  buttonBox->addButton(cancelButton,QDialogButtonBox::RejectRole);
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(setPlace()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(m_list,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(jump(QListWidgetItem *)));
