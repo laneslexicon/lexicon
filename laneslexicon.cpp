@@ -23,6 +23,7 @@
 #include "entrylayoutwidget.h"
 #include "optionsdialog.h"
 #include "logviewer.h"
+#include "about.h"
 //extern cmdOptions progOptions;
 extern QSettings * getSettings();
 extern void testfocus();
@@ -651,8 +652,8 @@ void LanesLexicon::createActions() {
   connect(m_navLastAction,SIGNAL(triggered()),this,SLOT(onNavLast()));
 
 
-  m_docAction = new QAction(tr("Docs"),this);
-
+  m_docAction = new QAction(tr("Documentation"),this);
+  m_aboutAction = new QAction(tr("About"),this);
   m_bookmarkAction = new QAction(tr("Bookmarks"),this);
 
   //  m_navigationAction = new QAction(tr("Move"),this);
@@ -680,6 +681,7 @@ void LanesLexicon::createActions() {
   connect(m_moveGroup,SIGNAL(triggered(QAction *)),this,SLOT(onNavigationMenuChanged(QAction *)));
 
   connect(m_docAction,SIGNAL(triggered()),this,SLOT(onDocs()));
+  connect(m_aboutAction,SIGNAL(triggered()),this,SLOT(onAbout()));
 
   m_searchWordAction = new QAction(tr("For Arabic &word"),this);
   connect(m_searchWordAction,SIGNAL(triggered()),this,SLOT(searchForWord()));
@@ -1081,6 +1083,11 @@ void LanesLexicon::createMenus() {
   m_toolMenu->addAction(m_logViewerAction);
   m_toolMenu->addAction(m_editViewAction);
 
+  m_helpMenu = m_mainmenu->addMenu(tr("&Help"));
+  m_helpMenu->setFocusPolicy(Qt::StrongFocus);
+  m_helpMenu->setObjectName("helpmenu");
+  m_helpMenu->addAction(m_aboutAction);
+  m_helpMenu->addAction(m_docAction);
 
 }
 
@@ -2392,6 +2399,10 @@ void LanesLexicon::onDocs() {
    m_tabs->setCurrentIndex(m_tabs->addTab(w,"Docs"));
    return;
 }
+void LanesLexicon::onAbout() {
+  AboutDialog d;
+  d.exec();
+}
 void LanesLexicon::testSlot() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
@@ -2961,6 +2972,9 @@ void LanesLexicon::setIcons(const QString & theme) {
 
   iconfile = settings->value("Docs",QString()).toString();
   setIcon(m_docAction,imgdir,iconfile);
+
+  iconfile = settings->value("About",QString()).toString();
+  setIcon(m_aboutAction,imgdir,iconfile);
 
   iconfile = settings->value("Bookmarks",QString()).toString();
   setIcon(m_bookmarkAction,imgdir,iconfile);

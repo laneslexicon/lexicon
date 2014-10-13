@@ -158,6 +158,7 @@ class LanesLexicon : public QMainWindow
 
 
       void onDocs();
+      void onAbout();
       void bookmarkRebuildMenu();
 
       void currentTabChanged(int);
@@ -284,6 +285,7 @@ class LanesLexicon : public QMainWindow
       QMenu * m_viewMenu;
       QMenu * m_pageMenu;
       QMenu * m_toolMenu;
+      QMenu * m_helpMenu;
       AppMenu * m_mainmenu;
 
       QSize m_toolbarIconSize;
@@ -366,6 +368,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_convertToEntryAction;      // convert HeadSearch to GraphicsEntry
       QAction * m_keymapsAction;
       QAction * m_linkAction;
+      QAction * m_aboutAction;
 
       HistoryMaster * m_history;
       NoteMaster * m_notes;
