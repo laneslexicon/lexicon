@@ -93,4 +93,5 @@ HEADERS  += laneslexicon.h \
             definedsettings.h \
             externs.h \
             entrylayoutwidget.h \
-            logviewer.h
+            logviewer.h \
+            version.h
