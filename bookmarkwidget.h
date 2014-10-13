@@ -2,7 +2,7 @@
 #define __BOOKMARKWIDGET_H__
 #include <QListWidget>
 #include <QKeyEvent>
-
+#include <QPushButton>
 #include <QMap>
 #include <QDialog>
 #include <QDialogButtonBox>
