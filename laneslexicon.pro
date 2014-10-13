@@ -11,7 +11,8 @@ CONFIG   += libxslt
 QMAKE_CXXFLAGS += -g
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+#VERSION=$$system("./git-version.sh")
+#message($$VERSION)
 TARGET = laneslexicon
 TEMPLATE = app
 libxslt {
@@ -25,7 +26,6 @@ win32 {
 }
 DEFINES += USE_LIBXSLT
 }
-
 xalan {
 INCLUDEPATH += /usr/include/xalanc/PlatformSupport
 INCLUDEPATH += /usr/include/xalanc/XalanTransformer
