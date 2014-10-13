@@ -1,6 +1,7 @@
 #include "application.h"
 #include "QsLog.h"
 #include "definedsettings.h"
+#include "version.h"
 Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QString resourceDir;
   m_ok = true;
@@ -28,7 +29,7 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QCoreApplication::setOrganizationName("Gabanjo");
   QCoreApplication::setOrganizationDomain("theunwalledcity.com");
   QCoreApplication::setApplicationName("Lanes Lexicon");
-  QCoreApplication::setApplicationVersion("0.1");
+  QCoreApplication::setApplicationVersion(BUILD_VERSION);
 
   connect(this,SIGNAL(focusChanged(QWidget *,QWidget *)),this,SLOT(onFocusChange(QWidget *,QWidget *)));
 }

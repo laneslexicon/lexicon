@@ -78,7 +78,6 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("\nEdward William Lane's Arabic-English Lexicon\n\nAny options specifiying a relative file path, will be relative to the Resources directory.");
     parser.addHelpOption();
     parser.addVersionOption();
-
      // An option with a value
     QCommandLineOption nodeOption(QStringList() <<"n" << "node","make the given node the initial display","node");
     parser.addOption(nodeOption);

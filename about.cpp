@@ -1,4 +1,5 @@
 #include "about.h"
+#include "version.h"
 AboutDialog::AboutDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   QTabWidget * tabs = new QTabWidget(this);
@@ -61,6 +62,11 @@ QWidget * AboutDialog::buildTechTab() {
   edit->setReadOnly(true);
   layout->addRow(tr("Db ID"),edit);
 
-  w->setLayout(layout);
+  edit = new QLineEdit;
+  edit->setText(BUILD_VERSION);
+  edit->setReadOnly(true);
+  layout->addRow(tr("Build version"),edit);
+
+   w->setLayout(layout);
   return w;
 }
