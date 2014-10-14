@@ -1,8 +1,13 @@
 #include "shortcutoptions.h"
 #include "definedsettings.h"
 #include "QsLog.h"
-ShortcutOptions::ShortcutOptions(QSettings * settings,QWidget * parent) : OptionsWidget(settings,parent) {
-  m_settings = settings;
+ShortcutOptions::ShortcutOptions(QWidget * parent) : OptionsWidget(parent) {
+#ifdef STANDALONE
+  m_settings = new QSettings("default.ini",QSettings::IniFormat);
+  m_settings->setIniCodec("UTF-8");
+#else
+  m_settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
+#endif
   m_section = "Shortcut";
 
   m_tabs = new QTabWidget;
@@ -72,7 +77,7 @@ void ShortcutOptions::readSettings() {
     QWidget * w = m_tabs->widget(i);
     QList<QKeySequenceEdit *> edits = w->findChildren<QKeySequenceEdit *>();
     foreach(QKeySequenceEdit *  widget,edits) {
-      key = widget->toolTip();
+      key = widget->objectName();
       value = m_settings->value(key,QString()).toString();
       m_values.insert(key,value);
       if (! value.isEmpty()) {
@@ -99,7 +104,7 @@ bool ShortcutOptions::isModified()  {
     QWidget * w = m_tabs->widget(i);
     QList<QKeySequenceEdit *> edits = w->findChildren<QKeySequenceEdit *>();
     foreach(QKeySequenceEdit *  widget,edits) {
-      key = widget->toolTip();
+      key = widget->objectName();
       value = widget->keySequence().toString();
       if (value != m_values.value(key)) {
         m_dirty = true;
@@ -113,7 +118,7 @@ void ShortcutOptions::addTab(const QString & title,const QStringList & keys) {
   QFormLayout * formlayout = new QFormLayout;
   for(int i=0; i < keys.size();i++) {
     QKeySequenceEdit * edit = new QKeySequenceEdit;
-    edit->setToolTip(keys[i]);
+    edit->setObjectName(keys[i]);
     formlayout->addRow(new QLabel(keys[i]),edit);
   }
   widget->setLayout(formlayout);

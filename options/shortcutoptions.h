@@ -6,7 +6,7 @@ class ShortcutOptions : public OptionsWidget {
   Q_OBJECT
 
  public:
-  ShortcutOptions(QSettings * settings = 0,QWidget * parent = 0);
+  ShortcutOptions(QWidget * parent = 0);
   public slots:
     void writeSettings();
     void readSettings();

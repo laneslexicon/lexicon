@@ -3,6 +3,10 @@ OptionsWidget::OptionsWidget(QSettings * settings,QWidget * parent) : QWidget(pa
   m_dirty = false;
   m_settings = settings;
 }
+OptionsWidget::OptionsWidget(QWidget * parent) : QWidget(parent) {
+  m_dirty = false;
+  m_settings = 0;
+}
 void OptionsWidget::readSettings() {
 }
 void OptionsWidget::writeSettings() {
@@ -12,7 +16,9 @@ void OptionsWidget::notifyChange() {
   emit(valueChanged());
 }
 OptionsWidget::~OptionsWidget() {
-
+  if (m_settings != 0) {
+    delete m_settings;
+  }
 }
 void OptionsWidget::stateChanged(int /* state */) {
   //  m_dirty = this->isModified();

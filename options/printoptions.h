@@ -12,7 +12,7 @@ class PrintOptions : public OptionsWidget {
   Q_OBJECT
 
  public:
-  PrintOptions(QSettings * settings = 0,QWidget * parent = 0);
+  PrintOptions(QWidget * parent = 0);
   bool isModified();
   public slots:
     void writeSettings();

@@ -3,6 +3,8 @@
 #include "rootsoptions.h"
 #include "printoptions.h"
 #include "shortcutoptions.h"
+#include "diacriticsoptions.h"
+#include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
 #endif
@@ -16,12 +18,16 @@ OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   QSettings * settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
 #endif
 
-  RootsOptions * tree = new RootsOptions(settings);
+  RootsOptions * tree = new RootsOptions(this);
   m_tabs->addTab(tree,tr("Contents"));
-  PrintOptions * print = new PrintOptions(settings);
+  PrintOptions * print = new PrintOptions(this);
   m_tabs->addTab(print,tr("Printer"));
-  ShortcutOptions * shortcut = new ShortcutOptions(settings);
+  ShortcutOptions * shortcut = new ShortcutOptions(this);
   m_tabs->addTab(shortcut,tr("Shortcuts"));
+
+  DiacriticsOptions * diacritics = new DiacriticsOptions(this);
+  m_tabs->addTab(diacritics,tr("Diacritics"));
+
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save
                                      | QDialogButtonBox::Cancel
                                      | QDialogButtonBox::Apply
@@ -55,9 +61,6 @@ OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   }
   settings->beginGroup("Options");
   this->restoreGeometry(settings->value("Geometry").toByteArray());
-#ifdef STANDALONE
-  delete settings;
-#endif
 }
 OptionsDialog::~OptionsDialog() {
   writeSettings();
@@ -99,7 +102,9 @@ void OptionsDialog::enableButtons() {
     }
   }
   QPushButton * btn = m_buttons->button(QDialogButtonBox::Save);
-  btn->setEnabled(v);
+  if (btn) {
+    btn->setEnabled(v);
+  }
 }
 void OptionsDialog::valueChanged(bool /* v */) {
   this->enableButtons();

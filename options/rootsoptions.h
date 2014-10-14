@@ -7,17 +7,13 @@ class RootsOptions : public OptionsWidget {
   Q_OBJECT
 
  public:
-  RootsOptions(QSettings * settings = 0,QWidget * parent = 0);
+  RootsOptions(QWidget * parent = 0);
   public slots:
     void writeSettings();
     void readSettings();
     bool isModified();
     void onSetFont();
  private:
-
-    //    QKeySequenceEdit * m_collapseAll;
-    //    QKeySequenceEdit * m_collapseLetter;
-    //    QKeySequenceEdit * m_syncToContents;
     QPushButton * m_standardButton;
     QPushButton * m_arabicButton;
     QLineEdit * m_moveDown;

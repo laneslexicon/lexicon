@@ -1,7 +1,12 @@
 #include "printoptions.h"
 #include "definedsettings.h"
-PrintOptions::PrintOptions(QSettings * settings,QWidget * parent) : OptionsWidget(settings,parent) {
-  m_settings = settings;
+PrintOptions::PrintOptions(QWidget * parent) : OptionsWidget(parent) {
+#ifdef STANDALONE
+  m_settings = new QSettings("default.ini",QSettings::IniFormat);
+  m_settings->setIniCodec("UTF-8");
+#else
+  m_settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
+#endif
   m_section = "Printer";
 
   QVBoxLayout * vlayout = new QVBoxLayout;
@@ -102,9 +107,6 @@ void PrintOptions::onPrintDialog() {
   }
 }
 void PrintOptions::readSettings() {
-  if (m_settings == 0) {
-    m_settings = new QSettings("default.ini",QSettings::IniFormat);
-  }
   m_settings->beginGroup(m_section);
   m_printerName->setText(m_settings->value(SID_PRINTER_NAME).toString());
   m_orientation->setText(m_settings->value(SID_PRINTER_ORIENTATION).toString());
@@ -126,9 +128,6 @@ void PrintOptions::readSettings() {
   m_settings->endGroup();
 }
 void PrintOptions::writeSettings() {
-  if (m_settings == 0) {
-    m_settings = new QSettings("default.ini",QSettings::IniFormat);
-  }
   m_settings->beginGroup(m_section);
   m_settings->setValue(SID_PRINTER_NAME,m_printerName->text());
   m_settings->setValue(SID_PRINTER_ORIENTATION,m_orientation->text());

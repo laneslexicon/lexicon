@@ -1,8 +1,13 @@
 #include "rootsoptions.h"
 #include "definedsettings.h"
-
-RootsOptions::RootsOptions(QSettings * settings,QWidget * parent) : OptionsWidget(settings,parent) {
-  m_settings = settings;
+#include "QsLog.h"
+RootsOptions::RootsOptions(QWidget * parent) : OptionsWidget(parent) {
+#ifdef STANDALONE
+  m_settings = new QSettings("default.ini",QSettings::IniFormat);
+  m_settings->setIniCodec("UTF-8");
+#else
+  m_settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
+#endif
   m_section = "Roots";
 
   QVBoxLayout * vlayout = new QVBoxLayout;
@@ -71,9 +76,6 @@ RootsOptions::RootsOptions(QSettings * settings,QWidget * parent) : OptionsWidge
   setupConnections();
 }
 void RootsOptions::readSettings() {
-  if (m_settings == 0) {
-    m_settings = new QSettings("default.ini",QSettings::IniFormat);
-  }
   m_settings->beginGroup(m_section);
 
   m_debug->setChecked(m_settings->value(SID_CONTENTS_DEBUG).toBool());
@@ -86,11 +88,7 @@ void RootsOptions::readSettings() {
   m_settings->endGroup();
 }
 void RootsOptions::writeSettings() {
-  if (m_settings == 0) {
-    m_settings = new QSettings("default.ini",QSettings::IniFormat);
-  }
   m_settings->beginGroup(m_section);
-
   m_settings->setValue(SID_CONTENTS_DEBUG,m_debug->isChecked());
   m_settings->setValue(SID_CONTENTS_MOVE_UP,m_moveUp->text());
   m_settings->setValue(SID_CONTENTS_MOVE_DOWN,m_moveDown->text());
@@ -107,6 +105,7 @@ bool RootsOptions::isModified()  {
   m_dirty = false;
 
   m_settings->beginGroup(m_section);
+
   v = m_settings->value(SID_CONTENTS_DEBUG).toBool();
   if (m_debug->isChecked() != v) {
     m_dirty = true;
@@ -142,5 +141,4 @@ void RootsOptions::onSetFont() {
   else {
     m_arabicFont->setText(font.toString());
   }
-
 }

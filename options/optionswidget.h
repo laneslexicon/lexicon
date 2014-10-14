@@ -15,6 +15,7 @@ class OptionsWidget : public QWidget {
   Q_OBJECT
  public:
   OptionsWidget(QSettings * settings = 0,QWidget * parent = 0);
+  OptionsWidget(QWidget * parent = 0);
   ~OptionsWidget();
   virtual bool isModified();
   virtual void setupConnections();
