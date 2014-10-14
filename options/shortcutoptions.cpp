@@ -1,6 +1,6 @@
 #include "shortcutoptions.h"
 #include "definedsettings.h"
-
+#include "QsLog.h"
 ShortcutOptions::ShortcutOptions(QSettings * settings,QWidget * parent) : OptionsWidget(settings,parent) {
   m_settings = settings;
   m_section = "Shortcut";
@@ -9,130 +9,40 @@ ShortcutOptions::ShortcutOptions(QSettings * settings,QWidget * parent) : Option
 
   QVBoxLayout * vlayout = new QVBoxLayout;
 
-  //  m_bookmarkAdd = new QKeySequenceEdit(this);
+  QStringList keys;
+  keys << SID_SHORTCUT_CONTENTS_COLLAPSE_ALL << SID_SHORTCUT_CONTENTS_COLLAPSE_LETTER;
+  addTab("Contents",keys);
+  keys.clear();
 
-  /// roots
-  m_collapseAll = new QKeySequenceEdit;
-  m_collapseLetter = new QKeySequenceEdit;
+  keys << SID_SHORTCUT_DELETE_TAB << SID_SHORTCUT_DELETE_OTHER_TABS << SID_SHORTCUT_GO_TAB;
+  addTab("Tabs",keys);
+  keys.clear();
 
-  /// tabs
-  m_deleteTab = new QKeySequenceEdit;
-  m_goTab = new QKeySequenceEdit;
+  keys << SID_SHORTCUT_HISTORY_BACK << SID_SHORTCUT_HISTORY_NEXT << SID_SHORTCUT_HISTORY_CLEAR;
+  addTab("History",keys);
+  keys.clear();
 
-  /// focus
-  m_focusContents = new QKeySequenceEdit;
-  m_focusTree = new QKeySequenceEdit;
+  keys << SID_SHORTCUT_NAV_FIRST << SID_SHORTCUT_NAV_NEXT << SID_SHORTCUT_NAV_PREV << SID_SHORTCUT_NAV_LAST << SID_SHORTCUT_NAV_ROOT_MODE << SID_SHORTCUT_NAV_PAGE_MODE;
+  addTab("Navigation",keys);
+  keys.clear();
 
-  /// history
-  m_historyBack = new QKeySequenceEdit;
-  m_historyNext = new QKeySequenceEdit;
+  keys << SID_SHORTCUT_KEYMAPS_ENABLE << SID_SHORTCUT_KEYMAPS_DISABLE;
+  addTab(tr("Keymaps"),keys);
+  keys.clear();
 
-  /// keymaps
-  m_keymapsEnable = new QKeySequenceEdit;
-  m_keymapsDisable = new QKeySequenceEdit;
+  keys << SID_SHORTCUT_SEARCH_ROOT << SID_SHORTCUT_SEARCH_HEAD << SID_SHORTCUT_SEARCH_WORD << SID_SHORTCUT_SEARCH_NODE << SID_SHORTCUT_SEARCH_PAGE;
+  addTab(tr("Global Search"),keys);
+  keys.clear();
 
-  /// local search
-  //  m_localSearch = new QKeySequenceEdit;
-  m_localSearchClear = new QKeySequenceEdit;
-  m_localSearchFind = new QKeySequenceEdit;
-  m_localSearchNext = new QKeySequenceEdit;
-  m_localSearchShow = new QKeySequenceEdit;
+  keys << SID_SHORTCUT_LOCAL_SEARCH_FIND << SID_SHORTCUT_LOCAL_SEARCH_NEXT << SID_SHORTCUT_LOCAL_SEARCH_SHOW << SID_SHORTCUT_LOCAL_SEARCH_CLEAR;
+  addTab(tr("Local Search"),keys);
+  keys.clear();
 
-  /// navigation
-  m_navFirst = new QKeySequenceEdit;
-  m_navNext = new QKeySequenceEdit;
-  m_navBack = new QKeySequenceEdit;
-  m_navLast = new QKeySequenceEdit;
-
-  /// search
-  //  m_searchDelete = new QKeySequenceEdit;  /// TODO what do this do?
-  //  m_searchEntry = new QKeySequenceEdit;   /// TODO duplicate of Head
-  m_searchHead = new QKeySequenceEdit;
-  m_searchNode = new QKeySequenceEdit;
-  m_searchRoot = new QKeySequenceEdit;
-  m_searchWord = new QKeySequenceEdit;
-  m_searchPage = new QKeySequenceEdit;
-
-  /// select
-  m_selectAll = new QKeySequenceEdit;
-  m_selectEntry = new QKeySequenceEdit;
-
-  m_showNotes = new QKeySequenceEdit;
-  m_sync = new QKeySequenceEdit;
-  m_interface = new QKeySequenceEdit;
-  m_quit = new QKeySequenceEdit;
-
-  QStringList labels;
-  QList<QKeySequenceEdit *> edits;
-
-  labels << tr("Collapse all") << tr("Collapse letter");
-  edits << m_collapseAll << m_collapseLetter;
-  addTab(tr("Roots"),labels,edits);
-  labels.clear();
-  edits.clear();
-
-  labels << tr("Delete") << tr("Go to");
-  edits << m_deleteTab << m_goTab;
-  addTab(tr("Tabs"),labels,edits);
-  labels.clear();
-  edits.clear();
+  keys << SID_SHORTCUT_TOGGLE_INTERFACE << SID_SHORTCUT_SHOW_LOGS << SID_SHORTCUT_QUIT << SID_SHORTCUT_SYNC << SID_SHORTCUT_SYNC_PAGE_WITH_CONTENTS << SID_SHORTCUT_SYNC_CONTENTS_WITH_PAGE << SID_SHORTCUT_SHOW_NOTES;
+  addTab("Other",keys);
+  keys.clear();
 
 
-  labels << tr("Roots") << tr("Page");
-  edits << m_focusTree << m_focusContents;
-  addTab(tr("Focus"),labels,edits);
-  labels.clear();
-  edits.clear();
-
-
-  labels << tr("Forward") << tr("Backward");
-  edits << m_historyNext << m_historyBack;
-  addTab(tr("History"),labels,edits);
-  labels.clear();
-  edits.clear();
-
-
-
-  labels << tr("All") << tr("Entry");
-  edits << m_selectAll << m_selectEntry;
-  addTab(tr("Select"),labels,edits);
-  labels.clear();
-  edits.clear();
-
-
-  labels << tr("Enable") << tr("Disable");
-  edits << m_keymapsEnable << m_keymapsDisable;
-  addTab(tr("Keymaps"),labels,edits);
-  labels.clear();
-  edits.clear();
-
-
-  labels << tr("For Root") << tr("For head word") << tr("For Arabic word");
-  labels << tr("For node") << tr("For page");
-
-  edits << m_searchRoot << m_searchHead << m_searchWord << m_searchNode << m_searchPage;
-  addTab(tr("Global Search"),labels,edits);
-  labels.clear();
-  edits.clear();
-
-  labels << tr("Clear") << tr("Find") << tr("Next") << tr("Show");
-  edits << m_localSearchClear << m_localSearchFind << m_localSearchNext << m_localSearchShow;
-  addTab(tr("Local Search"),labels,edits);
-  labels.clear();
-  edits.clear();
-
-
-  labels << tr("First") << tr("Next") << tr("Previous") << tr("Last");
-  edits << m_navFirst << m_navNext << m_navBack << m_navLast;
-  addTab(tr("Navigation"),labels,edits);
-  labels.clear();
-  edits.clear();
-
-  labels << tr("Show notes") << tr("Show sync") << tr("Toggle interface") << tr("Exit");
-  edits << m_showNotes << m_sync << m_interface << m_quit;
-  addTab(tr("Other"),labels,edits);
-  labels.clear();
-  edits.clear();
 
   //hlayout->addLayout(formlayout1);
   //hlayout->addLayout(formlayout2);
@@ -152,12 +62,24 @@ ShortcutOptions::ShortcutOptions(QSettings * settings,QWidget * parent) : Option
 }
 
 void ShortcutOptions::readSettings() {
+  QString key;
+  QString value;
   if (m_settings == 0) {
     m_settings = new QSettings("default.ini",QSettings::IniFormat);
   }
   m_settings->beginGroup(m_section);
-  m_collapseAll->setKeySequence(QKeySequence(m_settings->value(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL).toString()));
-
+  for(int i=0;i < m_tabs->count();i++) {
+    QWidget * w = m_tabs->widget(i);
+    QList<QKeySequenceEdit *> edits = w->findChildren<QKeySequenceEdit *>();
+    foreach(QKeySequenceEdit *  widget,edits) {
+      key = widget->toolTip();
+      value = m_settings->value(key,QString()).toString();
+      m_values.insert(key,value);
+      if (! value.isEmpty()) {
+        widget->setKeySequence(QKeySequence(value));
+      }
+    }
+  }
   m_settings->endGroup();
 }
 void ShortcutOptions::writeSettings() {
@@ -165,28 +87,35 @@ void ShortcutOptions::writeSettings() {
     m_settings = new QSettings("default.ini",QSettings::IniFormat);
   }
   m_settings->beginGroup(m_section);
-  m_settings->setValue(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL,m_collapseAll->keySequence().toString());
+  //  m_settings->setValue(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL,m_collapseAll->keySequence().toString());
   m_settings->endGroup();
 }
 bool ShortcutOptions::isModified()  {
+  QString key;
+  QString value;
   m_dirty = false;
 
-  m_settings->beginGroup(m_section);
-
-  if (m_settings->value(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL).toString() !=
-      m_collapseAll->keySequence().toString()) {
-    m_dirty = true;
+  for(int i=0;i < m_tabs->count();i++) {
+    QWidget * w = m_tabs->widget(i);
+    QList<QKeySequenceEdit *> edits = w->findChildren<QKeySequenceEdit *>();
+    foreach(QKeySequenceEdit *  widget,edits) {
+      key = widget->toolTip();
+      value = widget->keySequence().toString();
+      if (value != m_values.value(key)) {
+        m_dirty = true;
+      }
+    }
   }
-
-  m_settings->endGroup();
   return m_dirty;
 }
-void ShortcutOptions::addTab(const QString & tabtitle,const QStringList & labels,QList<QKeySequenceEdit *> edits) {
+void ShortcutOptions::addTab(const QString & title,const QStringList & keys) {
   QWidget * widget = new QWidget;
   QFormLayout * formlayout = new QFormLayout;
-  for(int i=0;i < labels.size();i++) {
-    formlayout->addRow(labels[i],edits[i]);
+  for(int i=0; i < keys.size();i++) {
+    QKeySequenceEdit * edit = new QKeySequenceEdit;
+    edit->setToolTip(keys[i]);
+    formlayout->addRow(new QLabel(keys[i]),edit);
   }
   widget->setLayout(formlayout);
-  m_tabs->addTab(widget,tabtitle);
+  m_tabs->addTab(widget,title);
 }
