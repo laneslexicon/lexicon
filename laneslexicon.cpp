@@ -766,6 +766,12 @@ void LanesLexicon::createToolBar() {
   m_docButton->setFocusPolicy(Qt::StrongFocus);
   m_mainbar->addWidget(m_docButton);
 
+  m_aboutButton = new QToolButton(m_mainbar);
+  m_aboutButton->setDefaultAction(m_aboutAction);
+  m_aboutButton->setText(tr("About"));
+  m_aboutButton->setFocusPolicy(Qt::StrongFocus);
+  m_mainbar->addWidget(m_aboutButton);
+
   m_optionsButton = new QToolButton(m_mainbar);
   m_optionsButton->setDefaultAction(m_optionsAction);
   m_optionsButton->setText(tr("Preferences"));
@@ -894,7 +900,8 @@ void LanesLexicon::createToolBar() {
   setTabOrder(m_historyButton,m_bookmarkButton);
   setTabOrder(m_bookmarkButton,m_searchButton);
   setTabOrder(m_searchButton,m_docButton);
-  setTabOrder(m_docButton,m_optionsButton);
+  setTabOrder(m_docButton,m_aboutButton);
+  setTabOrder(m_aboutButton,m_optionsButton);
   setTabOrder(m_optionsButton,m_logButton);
   setTabOrder(m_logButton,m_navigationButton);
   setTabOrder(m_navigationButton,m_navFirstButton);

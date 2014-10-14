@@ -309,6 +309,7 @@ class LanesLexicon : public QMainWindow
       QToolButton * m_exitButton;
       QToolButton * m_searchButton;
       QToolButton * m_docButton;
+      QToolButton * m_aboutButton;
       QToolButton * m_optionsButton;
       QToolButton * m_logButton;
       QToolButton * m_zoomInButton;
