@@ -146,8 +146,9 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   }
   item = item->tableWidget()->item(item->row(),POSITION_COLUMN);
   int pos =  item->text().toInt(&ok);
-  if ( !ok )
+  if ( !ok )  {
     pos = 0;
+  }
   /// TODO make this a QSettings option or dialog option
   QString xml = m_nodeQuery.value("xml").toString();
   QString html = this->transform(xml);
@@ -218,11 +219,6 @@ void FullSearchWidget::setSearch(const QString & searchFor,const SearchOptions &
   m_search->setOptions(options);
   m_findTarget->setText(m_target);
 }
-void FullSearchWidget::setOptionsHidden(bool hide) {
-  //  m_hideOptionsButton->setChecked(hide);
-  //  hideOptions();
-}
-
 void FullSearchWidget::hideOptions() {
   QLOG_DEBUG() << Q_FUNC_INFO << m_search->isVisible();
   if ( m_search->isVisible()) {
@@ -578,45 +574,6 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
 
   return row;
 }
-/**
- * build SQL for search using DB style search
- *
- * @param options
- *
- * @return
- */
-QString FullSearchWidget::buildSearchSql(const SearchOptions & options) {
-  QString sql = "select id,word,root,entry,node from xref where datasource = 1  order by root,entry asc";
-  if (options.ignoreDiacritics()) {
-    if (options.wholeWordMatch()) {
-      sql += "and bareword = ? ";
-    }
-    else {
-      sql += "and instr(bareword,?) > 0";
-    }
-  }
-  else {
-    if (options.wholeWordMatch()) {
-      sql += "and word = ? ";
-    }
-    else {
-      sql += "and instr(word,?) > 0";
-    }
-  }
-  return sql;
-}
-/**
- * build SQL for search using regex
- *
- * @param options
- *
- * @return
- */
-QString FullSearchWidget::buildRxSql(const SearchOptions & /* options */) {
-  QString sql;
-  sql = "select id,word,root,entry,node from xref where datasource = 1 ";
-  return sql;
-}
 QTextDocument * FullSearchWidget::fetchDocument(const QString & xml) {
   QString html = transform(xml);
   m_nodeDoc.setHtml(html);
@@ -647,7 +604,6 @@ QString FullSearchWidget::transform(const QString & xml) {
   return QString();
 }
 void FullSearchWidget::readSettings() {
-  bool ok;
   QString v;
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Entry");
