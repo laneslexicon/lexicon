@@ -981,6 +981,8 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     connect(gi,SIGNAL(copy()),this,SLOT(copy()));
     connect(gi,SIGNAL(addButton(bool)),this,SLOT(addButtonDecoration(bool)));
     connect(gi,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
+    connect(gi,SIGNAL(printPage()),this,SIGNAL(printPage()));
+
     return gi;
 }
 /**

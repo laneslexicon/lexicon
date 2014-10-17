@@ -322,6 +322,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
 
   connect(entry,SIGNAL(gotoNode(const Place &,int)),this,SLOT(gotoPlace(const Place &,int)));
   connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
+  connect(entry,SIGNAL(printPage()),this,SLOT(pagePrint()));
 
 }
 void LanesLexicon::onCloseOtherTabs() {

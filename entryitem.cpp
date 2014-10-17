@@ -102,6 +102,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   }
   QMenu menu(m_place.getShortText());
   menu.setObjectName("entrycontextmenu");
+  menu.addSection(tr("Current entry"));
   if ( ! href.isEmpty()) {
     QString t = QString("Goto %1").arg(anchor);
     jumpAction = menu.addAction(t);
@@ -109,28 +110,24 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   }
   if (m_notesEnabled) {
     if (this->hasNotes()) {
-      showNoteAction = menu.addAction(tr("&Show note"));
+      showNoteAction = menu.addAction(tr("Sho&w note"));
       deleteNoteAction = menu.addAction(tr("&Delete note"));
     }
     else {
       addNoteAction = menu.addAction(tr("Add &note"));
     }
   }
-  QAction *markAction = menu.addAction(tr("Add &bookmark"));
+  QAction *markAction = menu.addAction(tr("&Bookmark"));
   //  QAction *searchAction = menu.addAction("Find");
   //  connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
-  QAction *selectAction;// = menu.addAction(tr("Select current &entry"));
-  QAction *selectAllAction = menu.addAction(tr("Select &all"));
+  QAction *selectAction;// = menu.addAction(tr("&Select"));
   QAction *printAction = menu.addAction(tr("&Print"));
-
 
   if (this->textCursor().hasSelection()) {
     QAction *copyAction = menu.addAction("&Copy");
     connect(copyAction,SIGNAL(triggered()),this,SIGNAL(copy()));
-    QAction *clearCurrentAction = menu.addAction(tr("Clear current &entry selection"));
+    QAction *clearCurrentAction = menu.addAction(tr("Clear &selection"));
     connect(clearCurrentAction,SIGNAL(triggered()),this,SLOT(clearSelection()));
-    QAction *clearAllAction = menu.addAction(tr("Clear all selected &items"));
-    connect(clearAllAction,SIGNAL(triggered()),this,SIGNAL(clearAllItems()));
 
   }
   else {
@@ -138,10 +135,18 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   }
   QAction * perseusAction = 0;
   /// TODO make this debug/advanced ?
-  perseusAction = menu.addAction("Show &Perseus XML");
+  perseusAction = menu.addAction("Show &XML");
   QAction * htmlAction = 0;
   if (! m_xml.isEmpty()) {
      htmlAction = menu.addAction("Show &Html");
+  }
+  menu.addSection(tr("All entries"));
+  QAction *selectAllAction = menu.addAction(tr("S&elect"));
+  QAction *printAllAction = menu.addAction(tr("Pri&nt"));
+  connect(printAllAction,SIGNAL(triggered()),this,SIGNAL(printPage()));
+  if (this->textCursor().hasSelection()) {
+    QAction *clearAllAction = menu.addAction(tr("C&lear selections"));
+    connect(clearAllAction,SIGNAL(triggered()),this,SIGNAL(clearAllItems()));
   }
   Place p = this->getPlace();
   QAction *selectedAction = menu.exec(event->screenPos());
@@ -176,7 +181,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     this->deleteNote();
   }
   else if ((jumpAction != NULL) && (selectedAction == jumpAction)) {
-    QLOG_DEBUG() << "GOTO" << jumpAction->data();
+    //    QLOG_DEBUG() << "bookmark goto" << jumpAction->data();
     Place p;
     p.setNode(jumpAction->data().toString());
     emit(gotoNode(p,Lane::Create_Tab));

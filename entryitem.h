@@ -107,6 +107,7 @@ class EntryItem : public QGraphicsTextItem {
     void gotoNode(const Place & p, int);
     void addButton(bool);
     void printNode(const QString & node);
+    void printPage();
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);

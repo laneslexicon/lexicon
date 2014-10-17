@@ -218,6 +218,7 @@ class GraphicsEntry : public QWidget {
     void findCount(int);
     void gotoNode(const Place & p,int);
     void printNode(const QString &);
+    void printPage();
 };
 /*
 class LaneGraphicsView : public QGraphicsView {
