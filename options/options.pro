@@ -14,6 +14,7 @@ TEMPLATE = app
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 QMAKE_CXXFLAGS += -Wunused-parameter -g
+include(../qslog/QsLog.pri)
 INCLUDEPATH += ..
 DEFINES += STANDALONE
 SOURCES += main.cpp\
@@ -22,11 +23,13 @@ SOURCES += main.cpp\
 	optionsdialog.cpp \
 	rootsoptions.cpp \
         shortcutoptions.cpp \
-        printoptions.cpp
+        printoptions.cpp \
+        diacriticsoptions.cpp
 
 HEADERS  += mainwindow.h \
         optionswidget.h \
 	optionsdialog.h \
 	rootsoptions.h \
         shortcutoptions.h \
-        printoptions.h
+        printoptions.h \
+        diacriticsoptions.h

@@ -1,6 +1,9 @@
 #include "shortcutoptions.h"
 #include "definedsettings.h"
 #include "QsLog.h"
+#ifndef STANDALONE
+#include "application.h"
+#endif
 ShortcutOptions::ShortcutOptions(QWidget * parent) : OptionsWidget(parent) {
 #ifdef STANDALONE
   m_settings = new QSettings("default.ini",QSettings::IniFormat);

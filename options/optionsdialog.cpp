@@ -40,6 +40,7 @@ OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
 
   connect(tree,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
   connect(print,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
+  connect(diacritics,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
 
   vlayout->addWidget(m_tabs);
   vlayout->addWidget(m_buttons);

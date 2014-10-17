@@ -1,5 +1,8 @@
 #include "printoptions.h"
 #include "definedsettings.h"
+#ifndef STANDALONE
+#include "application.h"
+#endif
 PrintOptions::PrintOptions(QWidget * parent) : OptionsWidget(parent) {
 #ifdef STANDALONE
   m_settings = new QSettings("default.ini",QSettings::IniFormat);
