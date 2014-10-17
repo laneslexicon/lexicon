@@ -292,7 +292,8 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const SearchOp
     }
     else if ( ! options.ignoreDiacritics()) {
       /// TODO add something like [^rxclass]
-      pattern += "[^\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]";
+      //      pattern += "[^\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]";
+      //      qDebug() << Q_FUNC_INFO << target << pattern;
     }
     rx.setPattern(pattern);
   }
