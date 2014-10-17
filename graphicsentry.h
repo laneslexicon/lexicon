@@ -171,6 +171,7 @@ class GraphicsEntry : public QWidget {
     QString m_xsltSource;
     QString m_standardCSS;
     QString m_currentHtml;
+    QString m_pattern;
 
     QRegExp m_currentSearchRx;
 

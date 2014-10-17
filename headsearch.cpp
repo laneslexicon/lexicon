@@ -207,7 +207,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
 
   //  QRegExp rxclass1("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
-  QRegExp rxclass(QString("[%1]*").arg(m_diacritics));
+  QRegExp rxclass(m_diacritics);
 
   QString target = searchtarget;
   target.remove(QChar(0x202d));
@@ -218,7 +218,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   QString sql;
   sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 order by nodenum asc";
 
-  rx = SearchOptionsWidget::buildRx(target,options);
+  rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   m_currentRx = rx;
 
   bool ok = false;
@@ -392,13 +392,18 @@ void HeadSearchWidget::readSettings() {
   m_debug = settings->value(SID_HEADSEARCH_DEBUG,false).toBool();
   m_focusTable = settings->value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool();
   settings->endGroup();
-  settings->beginGroup("Search");
-  QStringList d = settings->value(SID_SEARCH_DIACRITICS,QStringList()).toStringList();
-
-  for(int i=0;i < d.size();i++) {
-    m_diacritics += "\\" + d[i];
+  settings->beginGroup("Diacritics");
+  QStringList keys = settings->childKeys();
+  QStringList points;
+  for(int i=0;i < keys.size();i++) {
+    if (keys[i].startsWith("Char")) {
+      f = settings->value(keys[i],QString()).toString();
+      points << f;
+    }
   }
+  m_diacritics = QString("[\\x%1]*").arg(points.join("\\x"));
   settings->endGroup();
+
   delete settings;
 }
 void HeadSearchWidget::onRemoveResults() {

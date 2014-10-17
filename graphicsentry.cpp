@@ -119,9 +119,6 @@ QGraphicsView * GraphicsEntry::getView() const {
 void GraphicsEntry::readSettings() {
   QString v;
   bool ok;
-
-
-
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QMap<QString,QString> cmdOptions = app->getOptions();
 
@@ -190,6 +187,20 @@ void GraphicsEntry::readSettings() {
   settings->beginGroup("Notes");
   m_notesEnabled = settings->value(SID_NOTES_ENABLED,true).toBool();
   settings->endGroup();
+
+  settings->beginGroup("Diacritics");
+  QStringList keys = settings->childKeys();
+  QStringList points;
+  for(int i=0;i < keys.size();i++) {
+    if (keys[i].startsWith("Char")) {
+      v = settings->value(keys[i],QString()).toString();
+      points << v;
+    }
+  }
+  m_pattern = QString("[\\x%1]*").arg(points.join("\\x"));
+
+  settings->endGroup();
+
 }
 void GraphicsEntry::writeDefaultSettings() {
 
@@ -1528,7 +1539,7 @@ int GraphicsEntry::search() {
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
   m_searchPositions.clear();
-  QRegExp rx = SearchOptionsWidget::buildRx(t,options);
+  QRegExp rx = SearchOptionsWidget::buildRx(t,m_pattern,options);
   m_currentSearchRx = rx;
   m_currentSearchTarget = t;
   this->m_items[0]->ensureVisible();

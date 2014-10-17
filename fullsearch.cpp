@@ -304,7 +304,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   m_target = target;
   m_searchOptions = options;
   QRegExp rx;
-  QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+  QRegExp rxclass(m_pattern);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
 
 
@@ -314,7 +314,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   QString sql = "select id,word,root,entry,node,nodenum from xref where datasource = 1 order by nodenum asc";
 
   QString pattern;
-  m_currentRx = rx = SearchOptionsWidget::buildRx(target,options);
+  m_currentRx = rx = SearchOptionsWidget::buildRx(target,m_pattern,options);
   bool ok = false;
   if (m_query.prepare(sql)) {
     if (m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {
@@ -614,14 +614,6 @@ QString FullSearchWidget::buildSearchSql(const SearchOptions & options) {
  */
 QString FullSearchWidget::buildRxSql(const SearchOptions & /* options */) {
   QString sql;
-  //  whole word with diacritics
-  //   select id,node where word = ?
-  //  part word with diacritics
-  //   select id,node from xref where instr(word,?) > 0;
-  //  whole word without diacritics
-  //   select where bareword = ?
-  //  part word without diacritics
-  //   select where instr(bareword,?) > 0
   sql = "select id,word,root,entry,node from xref where datasource = 1 ";
   return sql;
 }
@@ -655,7 +647,7 @@ QString FullSearchWidget::transform(const QString & xml) {
   return QString();
 }
 void FullSearchWidget::readSettings() {
-
+  bool ok;
   QString v;
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Entry");
@@ -690,19 +682,32 @@ void FullSearchWidget::readSettings() {
   m_defaultOptions.setIgnoreDiacritics(settings->value("Ignore diacritics",true).toBool());
 
   m_defaultOptions.setWholeWordMatch(settings->value("Whole word",false).toBool());
+  settings->endGroup();
+  settings->beginGroup("Diacritics");
+  QStringList keys = settings->childKeys();
+  QStringList points;
+  for(int i=0;i < keys.size();i++) {
+    if (keys[i].startsWith("Char")) {
+      v = settings->value(keys[i],QString()).toString();
+      points << v;
+    }
+  }
+  m_pattern = QString("[\\x%1]*").arg(points.join("\\x"));
+
+  settings->endGroup();
 
 }
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
   QRegExp rx;
   QString pattern;
-  QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+  QRegExp rxclass(m_pattern); //"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
   if (options.getSearchType() == SearchOptions::Regex) {
     pattern = target;
   }
   else {
     if (options.ignoreDiacritics()) {
-      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+      QString ar(m_pattern);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
       QStringList cc = target.split("");
       QString brx = "";
       for(int i=0;i < cc.size();i++) {
@@ -856,11 +861,11 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
 
   QRegExp rx;
 
-  QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+  QRegExp rxclass(m_pattern);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
   QString pattern;
   if (options.getSearchType() == SearchOptions::Normal) {
     if (options.ignoreDiacritics()) {
-      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+      QString ar(m_pattern);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
       QStringList cc = target.split("");
       QString brx = "";
       for(int i=0;i < cc.size();i++) {

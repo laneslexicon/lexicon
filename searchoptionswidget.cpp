@@ -258,10 +258,10 @@ void SearchOptionsWidget::onForceLeftToRight(int checked) {
 bool SearchOptionsWidget::getForceLTR() {
   return m_forceLTR->isChecked();
 }
-QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const SearchOptions & options) {
+QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString & diacritics,const SearchOptions & options) {
   QRegExp rx;
   QString target = searchtarget;
-  QRegExp rxclass("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+  QRegExp rxclass(diacritics);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
   QString pattern;
 
@@ -274,13 +274,13 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const SearchOp
     }
     if (options.ignoreDiacritics()) {
       /// TODO get from INI
-      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+      //      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
       target = target.replace(rxclass,QString());
       QStringList cc = target.split("");
       for(int i=0;i < cc.size();i++) {
         pattern += cc[i];
         if (UcdScripts::isScript(cc[i],"Arabic")) {
-          pattern += ar;
+          pattern += diacritics;
         }
       }
     }

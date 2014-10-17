@@ -101,6 +101,7 @@ class FullSearchWidget : public QWidget
    QPushButton * m_keyboardButton;
    QStringList m_nodes;
    QString m_currentCSS;
+   QString m_pattern;
    SearchOptions  m_defaultOptions;
    bool m_showProgressDialog;
    bool m_cancelSearch;
