@@ -2098,6 +2098,9 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
   if (id == "-here-") {
     return;
   }
+  if (id.length() > 1) {
+    return;
+  }
   QString ks = QString("jump-%1").arg(id);
   QShortcut * sc = qobject_cast<QShortcut *>(m_bookmarkMap->mapping(ks));
   if (sc) {
@@ -2154,6 +2157,7 @@ void LanesLexicon::restoreBookmarks() {
     if (p.isValid()) {
       m_bookmarks.insert(keys[i],p);
       addBookmarkMenuItem(keys[i]);
+
     }
   }
 
@@ -2297,7 +2301,7 @@ void LanesLexicon::bookmarkAdd(const QString & id,const Place & p) {
   //  p.setType(Place::Bookmark);
   m_bookmarks.insert(id,p);
   addBookmarkMenuItem(id);
-
+  setStatus(QString(tr("Added bookmark:%1")).arg(id));
 }
 
 void LanesLexicon::moveNext(const Place & p) {
