@@ -67,7 +67,8 @@ SOURCES += main.cpp\
         about.cpp \
         entrylayoutwidget.cpp \
         logviewer.cpp \
-        version.cpp
+        version.cpp \
+        htmldelegate.cpp
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
@@ -95,4 +96,5 @@ HEADERS  += laneslexicon.h \
             externs.h \
             entrylayoutwidget.h \
             logviewer.h \
-            version.h
+            version.h \
+            htmldelegate.h
