@@ -143,6 +143,65 @@ void Lexicon::scanForFonts(const QDir & dir)
      QFontDatabase::addApplicationFont(fonts.takeFirst());
    }
 }
+QString Lexicon::scanAndSpan(const QString & str,const QString & css) {
+  QString teststr("You say, كَتَبَ إِلَىَّ يَسْتَبْطِئُنِى He wrote وَجَدَ هَ          and thats it");
+  QString ar = str;
+  //  ar = teststr;
+  bool inArabic = false;
+  QString html;
+  for(int i=0;i < ar.size();i++) {
+    QChar c = ar.at(i);
+    if ((c.unicode() >= 0x600) && (c.unicode() <= 0x6ff)) {
+      if (! inArabic) {
+        html.append(QString("<span class=\"%1\">").arg(css));
+      }
+      html.append(c);
+      inArabic = true;
+    }
+    else if (c.isPunct() || c.isNumber()) {
+      html.append(c);
+    }
+    else if (c.isSpace()) {
+      if (inArabic) {
+        bool arabicBlock = true;
+        for(int j=i+1;arabicBlock && (j < ar.size());j++) {
+          QChar sp = ar.at(j);
+          if ( sp.isLetter() ) {
+            if ((sp.unicode() >= 0x600) && (sp.unicode() <= 0x6ff)) {
+              j = ar.size();
+            }
+            else {
+              arabicBlock = false;
+            }
+          }
+        }
+        if (! arabicBlock ) {
+          html.append("</span>");
+          html.append(c);
+          inArabic = false;
+        }
+        else {
+          html.append(c);
+        }
+      }
+      else {
+        html.append(c);
+      }
+    }
+    else {
+           if (inArabic) {
+                   html.append("</span>");
+                   inArabic = false;
+                 }
+      html.append(c);
+    }
+  }
+  if (inArabic) {
+    html.append("</span>");
+  }
+  return html;
+}
+
 QString Lexicon::spanArabic(const QString & ar) {
   QSettings s(m_configFile,QSettings::IniFormat);
   s.setIniCodec("UTF-8");

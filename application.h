@@ -24,6 +24,7 @@ public:
   bool isOk() { return m_ok;}
   void scanForFonts(const QDir &);
   QString spanArabic(const QString &);
+  QString scanAndSpan(const QString &,const QString & css = QString("ar"));
   void startLogging();
   public slots:
     void onFocusChange(QWidget *,QWidget *);
