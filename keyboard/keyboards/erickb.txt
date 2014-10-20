@@ -27,7 +27,7 @@ START_KEYS
 #
 # row
 #
-2,1,<TAB>,Tab
+2,1,<Tab>,Tab
 2,2,ق:ڤ
 2,3,ش:0x2e
 2,4,ع:ى
