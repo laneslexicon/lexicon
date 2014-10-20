@@ -60,7 +60,7 @@ START_KEYS
 ########
 ### row 4
 ########
-4,1,<Shift>,Shift,[sticky=true,type=level2]
+4,1,,Shift,[sticky=true,type=level2]
 4,2,ز:ظ
 4,3,خ:آ
 4,4,ء:أ
@@ -71,7 +71,7 @@ START_KEYS
 4,9,،:0xfd3e
 4,10,۔:0xfd3f
 4,11,0x5c:؟
-4,12,<Shift>,Shift,[span=3]
+4,12,,Shift,[span=3]
 #####
 5,1,0x20,[span=3]
 5,4,0x20,Space,[span=9]
