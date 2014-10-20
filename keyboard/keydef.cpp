@@ -257,6 +257,10 @@ void KeyDef::setLevelValues(int group,int level,QSettings & settings,QSettings &
     m_decoration.insert(k,settings.value("decoration").toString());
   }
 }
+/**
+ *
+ *
+ */
 KeyboardDef::KeyboardDef() {
 }
 KeyboardDef::~KeyboardDef() {
@@ -312,14 +316,16 @@ double KeyboardDef::cols() {
   return maxCol;
 }
 /**
+ * This uses two ini files.
+ *  1. A system wide one, keyboard.ini, that contains* the character codes for tab,backspace etc *  2. The keyboard layout itself
  *
+ * The keyboard.ini file should always be in the applications working directory
  *
  * @param name absolute path to settings file
  */
 void KeyboardDef::load(const QString & name) {
-  /// TODO make this configurable from the passed settings file
-  QString sname = QDir::current().absolutePath() + QDir::separator() + "keyboards" + QDir::separator() + "special.ini";
-  QSettings sp(sname,QSettings::IniFormat);
+  QSettings sp("keyboard.ini",QSettings::IniFormat);
+  sp.beginGroup("CharacterCodes");
   QSettings settings(name,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   QStringList groups = settings.childGroups();
