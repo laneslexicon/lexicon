@@ -57,13 +57,70 @@ void LogViewer::readSettings() {
    m_refreshInterval = settings->value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
    this->restoreGeometry(settings->value("Geometry").toByteArray());
   settings->endGroup();
+  settings->beginGroup("System");
+  QString theme = settings->value("Theme",QString()).toString();
+  QString section;
+  if (theme.isEmpty()) {
+    section = "Icons-Default";
+  }
+  else {
+    section = QString("Icons-%1").arg(theme);
+  }
+  settings->endGroup();
+  settings->beginGroup(section);
+  QString imgdir = settings->value("Directory","images").toString();
+  QFileInfo fi(imgdir);
+  if (! fi.exists()) {
+    QLOG_WARN() << QString(tr("Theme directory not found:%1")).arg(imgdir);
+    return;
+  }
+  if (! fi.isDir()) {
+    QLOG_WARN() << QString(tr("Theme directory is not a directory:%1")).arg(imgdir);
+    return;
+  }
+  QString filename;
+  QDir d(imgdir);
+  filename = settings->value("Warning",QString()).toString();
+  fi.setFile(d,filename);
+  if (! fi.exists()) {
+    QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
+  }
+  else {
+    m_warning = new QIcon(fi.absoluteFilePath());
+    qDebug() << "setting" << fi.absoluteFilePath();
+  }
+  filename = settings->value("Error",QString()).toString();
+  fi.setFile(d,filename);
+  if (! fi.exists()) {
+    QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
+  }
+  else {
+    m_error = new QIcon(fi.absoluteFilePath());
+  }
+  filename = settings->value("Info",QString()).toString();
+  fi.setFile(d,filename);
+  if (! fi.exists()) {
+    QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
+  }
+  else {
+    m_info = new QIcon(fi.absoluteFilePath());
+  }
+  filename = settings->value("Debug",QString()).toString();
+  fi.setFile(d,filename);
+  if (! fi.exists()) {
+    QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
+  }
+  else {
+    m_debug = new QIcon(fi.absoluteFilePath());
+  }
 
    /// TODO get theme etc etc
+  /*
   m_warning = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-warning.png");
   m_error = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-error.png");
   m_info = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-information.png");
   m_debug = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/debug-run.png");
-
+  */
 
 }
 void LogViewer::writeSettings() {
