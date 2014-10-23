@@ -94,6 +94,7 @@ class FullSearchWidget : public QWidget
     QString m_xsltSource;
     QString m_currentCSS;
     QString m_pattern;
+    QString m_spanStyle;
     QLabel * m_resultsText;
     QSpacerItem * m_spacer;
     QVBoxLayout * m_container;

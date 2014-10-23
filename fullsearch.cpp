@@ -10,6 +10,7 @@
 #include "keyboard.h"
 #include "keyboardwidget.h"
 #include "xsltsupport.h"
+#include "htmldelegate.h"
 #define NODE_COLUMN 2
 #define POSITION_COLUMN 3
 #define CONTEXT_COLUMN 4
@@ -70,6 +71,13 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_rxlist->horizontalHeader()->setStretchLastSection(true);
   m_rxlist->setSelectionMode(QAbstractItemView::SingleSelection);
   m_rxlist->installEventFilter(this);
+  HtmlDelegate * d = new HtmlDelegate(m_rxlist);
+  if ( ! m_spanStyle.isEmpty()) {
+    d->setStyleSheet(m_spanStyle);
+  }
+  //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
+  m_rxlist->setItemDelegateForColumn(4,d);
+
   //QStyle * style = m_list->style();
   //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   m_progress = new QProgressBar;
@@ -409,12 +417,13 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
         }
         headword = m_nodeQuery.value("word").toString();
 
-          QString xml = m_nodeQuery.value("xml").toString();
+        QString xml = m_nodeQuery.value("xml").toString();
           QTextDocument * doc  = fetchDocument(xml);
           if (doc->characterCount() > 0) {
             getTextFragments(doc,target,options);
             for(int i=0;i < m_fragments.size();i++) {
-              addRow(root,headword,node,m_fragments[i],m_positions[i]);
+              QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
+              addRow(root,headword,node,html,m_positions[i]);
             }
             textCount += m_fragments.size();
           }
@@ -651,6 +660,8 @@ void FullSearchWidget::readSettings() {
   m_pattern = QString("[\\x%1]*").arg(points.join("\\x"));
 
   settings->endGroup();
+  settings->beginGroup("Embedded");
+  m_spanStyle = settings->value("fullsearch",QString()).toString();
 
 }
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
