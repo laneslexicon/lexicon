@@ -5,19 +5,20 @@
 #include "application.h"
 BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * parent)
   : QDialog(parent) {
+  readSettings();
   setWindowTitle(tr("Current Bookmarks"));
   QStringList keys = marks.keys();
   keys.removeOne("-here-");
-  m_list = new QTableWidget(keys.size(),2);
+  m_list = new QTableWidget(keys.size(),4);
   m_list->setObjectName("bookmarklist");
-  HtmlDelegate * d = new HtmlDelegate(m_list);
-  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
-  m_list->setItemDelegate(d);
+  //  HtmlDelegate * d = new HtmlDelegate(m_list);
+  //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
+  //  m_list->setItemDelegate(d);
 
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
 
-  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Place"));
+  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Entry") << tr("Vol/Page"));
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QTableWidgetItem * item;
@@ -25,9 +26,15 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
     item = new QTableWidgetItem(QString("%1").arg(keys[i]));
       m_list->setItem(i,0,item);
       Place p = marks.value(keys[i]);
-      QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(p.getText());
-      item = new QTableWidgetItem(html);//p.getText());
+      //      QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(p.getText());
+      item = new QTableWidgetItem(p.getRoot());//p.getText());
+      item->setFont(m_arFont);
       m_list->setItem(i,1,item);
+      item = new QTableWidgetItem(p.getWord());//p.getText());
+      item->setFont(m_arFont);
+      m_list->setItem(i,2,item);
+      item = new QTableWidgetItem(QString(tr("V%1/%2")).arg(p.getVol()).arg(p.getPage()));
+      m_list->setItem(i,3,item);
   }
   if (keys.size() > 0) {
     m_list->selectRow(0);
@@ -84,4 +91,15 @@ bool BookmarkWidget::eventFilter(QObject * target ,QEvent * event) {
 }
 QSize BookmarkWidget::sizeHint() const {
   return QSize(600,300);
+}
+void BookmarkWidget::readSettings() {
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("Bookmark");
+  settings->beginGroup("List");
+  QString fontString = settings->value("Arabic font").toString();
+  if ( ! fontString.isEmpty()) {
+    m_arFont.fromString(fontString);
+  }
+  settings->endGroup();
+  settings->endGroup();
 }
