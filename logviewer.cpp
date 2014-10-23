@@ -11,8 +11,8 @@ LogViewer::LogViewer(QWidget * parent) : QWidget(parent) {
   m_list->setObjectName("loglist");
   layout->addWidget(m_list);
 
-  m_pauseButton = new QPushButton(tr("Pause auto-update"),this);
-  m_closeButton = new QPushButton(tr("Close"),this);
+  m_pauseButton = new QPushButton(tr("&Pause auto-update"),this);
+  m_closeButton = new QPushButton(tr("&Close"),this);
 
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addStretch();
@@ -50,12 +50,12 @@ LogViewer::LogViewer(QWidget * parent) : QWidget(parent) {
 
 }
 void LogViewer::readSettings() {
-   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-   settings->beginGroup("Logging");
-   m_log.setFileName(settings->value(SID_LOGGING_FILE,"../log.txt").toString());
-   m_maxlines = settings->value(SID_LOGGING_VIEWER_MAXLINES,1000).toInt();
-   m_refreshInterval = settings->value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
-   this->restoreGeometry(settings->value("Geometry").toByteArray());
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("Logging");
+  m_log.setFileName(settings->value(SID_LOGGING_FILE,"../log.txt").toString());
+  m_maxlines = settings->value(SID_LOGGING_VIEWER_MAXLINES,1000).toInt();
+  m_refreshInterval = settings->value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
+  this->restoreGeometry(settings->value("Geometry").toByteArray());
   settings->endGroup();
   settings->beginGroup("System");
   QString theme = settings->value("Theme",QString()).toString();
@@ -87,7 +87,6 @@ void LogViewer::readSettings() {
   }
   else {
     m_warning = new QIcon(fi.absoluteFilePath());
-    qDebug() << "setting" << fi.absoluteFilePath();
   }
   filename = settings->value("Error",QString()).toString();
   fi.setFile(d,filename);
@@ -113,15 +112,6 @@ void LogViewer::readSettings() {
   else {
     m_debug = new QIcon(fi.absoluteFilePath());
   }
-
-   /// TODO get theme etc etc
-  /*
-  m_warning = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-warning.png");
-  m_error = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-error.png");
-  m_info = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/dialog-information.png");
-  m_debug = new QIcon("/home/andrewsg/qt5projects/mansur/gui/Resources/images/oxygen/16/debug-run.png");
-  */
-
 }
 void LogViewer::writeSettings() {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
@@ -133,7 +123,6 @@ QSize LogViewer::sizeHint() const {
   return QSize(400,600);
 }
 LogViewer::~LogViewer() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
   writeSettings();
   m_list->clear();
   delete m_warning;
