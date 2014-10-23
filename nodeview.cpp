@@ -34,26 +34,34 @@ NodeView::NodeView(QWidget * parent)
   m_browser = new QTextBrowser;
   //  m_browser->setHtml(html);
 
-  QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
+  QDialogButtonBox * buttonBox = new QDialogButtonBox();
+
+  QPushButton * button = new QPushButton(tr("&Cancel"));
+  buttonBox->addButton(button,QDialogButtonBox::RejectRole);
 
   m_findFirstButton = new QPushButton(tr("&Find first"));
-  m_findNextButton = new QPushButton(tr("Find &next"));
-
-  QPushButton * printButton = new QPushButton(tr("&Print"));
-  QPushButton * openButton = new QPushButton(tr("&Open in tab"));
-
   buttonBox->addButton(m_findFirstButton,QDialogButtonBox::ActionRole);
+  connect(m_findFirstButton,SIGNAL(clicked()),this, SLOT(findFirst()));
+
+  m_findNextButton = new QPushButton(tr("Find &next"));
   buttonBox->addButton(m_findNextButton,QDialogButtonBox::ActionRole);
-  buttonBox->addButton(openButton,QDialogButtonBox::ActionRole);
-  buttonBox->addButton(printButton,QDialogButtonBox::ActionRole);
+  connect(m_findNextButton,SIGNAL(clicked()),this, SLOT(findNext()));
+
+  button = new QPushButton(tr("&Print"));
+  connect(button,SIGNAL(clicked()),this,SLOT(print()));
+  buttonBox->addButton(button,QDialogButtonBox::ActionRole);
+
+  button = new QPushButton(tr("&Open in tab"));
+  buttonBox->addButton(button,QDialogButtonBox::ActionRole);
+  connect(button,SIGNAL(clicked()),this,SLOT(openEntry()));
 
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-  connect(m_findFirstButton,SIGNAL(clicked()),this, SLOT(findFirst()));
-  connect(m_findNextButton,SIGNAL(clicked()),this, SLOT(findNext()));
-  connect(printButton,SIGNAL(clicked()),this,SLOT(print()));
-  connect(openButton,SIGNAL(clicked()),this,SLOT(openEntry()));
+
+
+
+
 
   layout->addLayout(hlayout);
   layout->addWidget(m_browser);
@@ -81,7 +89,7 @@ void NodeView::setPreferredSize(const QString & szStr) {
 }
 
 void NodeView::print() {
-
+  qDebug() << Q_FUNC_INFO;
 }
 void NodeView::openEntry() {
   emit(openNode(m_node));
