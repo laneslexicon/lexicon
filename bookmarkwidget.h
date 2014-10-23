@@ -1,6 +1,9 @@
 #ifndef __BOOKMARKWIDGET_H__
 #define __BOOKMARKWIDGET_H__
 #include <QListWidget>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QHeaderView>
 #include <QKeyEvent>
 #include <QPushButton>
 #include <QMap>
@@ -14,12 +17,13 @@ class BookmarkWidget : public QDialog {
  public:
    BookmarkWidget(const QMap<QString,Place> & marks,QWidget * parent = 0);
    QString getSelected() { return m_mark;}
+   QSize sizeHint() const;
    public slots:
      void setPlace();
      public slots:
-       void jump(QListWidgetItem *);
+       void jump(QTableWidgetItem *);
  private:
-   QListWidget * m_list;
+   QTableWidget * m_list;
    QString  m_mark;
    bool eventFilter(QObject *,QEvent *);
 };
