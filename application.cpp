@@ -218,7 +218,9 @@ QString Lexicon::spanArabic(const QString & ar,const QString & spanstyle) {
     if (! style.isEmpty()) {
       return QString("<span style=\"%1\">%2</span>").arg(style).arg(ar);
     }
+    s.endGroup();
   }
+
   s.beginGroup("Arabic");
   QString fontname = s.value(SID_ARABIC_FONT_NAME,QString()).toString();
   QString fontsize = s.value(SID_ARABIC_FONT_SIZE,QString()).toString();
