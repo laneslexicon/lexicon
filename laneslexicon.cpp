@@ -2124,12 +2124,10 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
   else {
     QLOG_DEBUG() << Q_FUNC_INFO << "fetch mapping failed " << m_bookmarkMap->mapping(id) << id;
   }
-  //  connect(m_bookmarkMap,SIGNAL(mapped(QString())triggered()),m_bookmarkMap,SLOT(map()));
-  //  m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i)));
-
 }
 void LanesLexicon::bookmarkJump(const QString & id) {
   int options = 0;
+  QLOG_DEBUG() << Q_FUNC_INFO << id;
   if ( ! m_bookmarks.contains(id) ) {
     QLOG_WARN() << QString(tr("Unknown bookmark jump activated: %1")).arg(id);
     return;
@@ -2485,15 +2483,8 @@ void LanesLexicon::searchForRoot() {
         QMessageBox msgBox;
         msgBox.setObjectName("rootnotfound");
         msgBox.setTextFormat(Qt::RichText);
-        //          msgBox.setStyleSheet(".arabic { font-family : Amiri;font-size : 18px}");
-        /*this works, but affects the english and the arabic:
-          msgBox.setStyleSheet("font-family :  Amiri; font-size : 18px");
-        */
-        /// this also works
-        /// msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
-        ///
-        /// TODO get this from INI file
-        msgBox.setText(QString(tr("Root not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(t));
+        QString html = (qobject_cast<Lexicon *>(qApp))->spanArabic(t,"rootnotfound");
+        msgBox.setText(QString(tr("Root not found:%1")).arg(html));
         msgBox.exec();
       }
       else {
@@ -2936,7 +2927,7 @@ void LanesLexicon::setIcons(const QString & theme) {
     icongroup = QString("Icons-%1").arg(theme);
   }
   if (! groups.contains(icongroup)) {
-    QLOG_WARN() << "theme not found" << theme;
+    QLOG_WARN() << QString(tr("Theme not found:%1")).arg(theme);
     return;
   }
   settings->beginGroup(icongroup);
