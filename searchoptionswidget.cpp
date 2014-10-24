@@ -28,6 +28,7 @@ SearchOptionsWidget::SearchOptionsWidget(SearchOptions & options,QWidget * paren
 }
 void SearchOptionsWidget::setup(QWidget * parent) {
   QVBoxLayout * mainlayout = new QVBoxLayout;
+  QGridLayout * gridlayout = new QGridLayout;
 
   m_targetGroup = new QGroupBox(tr("Search target"));
   m_targetGroup->setObjectName("searchtargetgroup");
@@ -43,56 +44,69 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   m_fullText = new QRadioButton(tr("Full text"));
   m_normalSearch = new QRadioButton(tr("Normal"),m_typeGroup);
   m_regexSearch = new QRadioButton(tr("Regular expression"),m_typeGroup);
-  m_arabicTarget = new QRadioButton(tr("Arabic text"),m_targetGroup);
-  m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),m_targetGroup);
 
-  m_includeHeads = new QCheckBox(tr("Include head entries in search results"));
-  m_stickySearch = new QCheckBox(tr("Sticky search"));
-  /// diacritics/whole word
-  QHBoxLayout * optionslayout = new QHBoxLayout;
-  optionslayout->addWidget(m_ignoreDiacritics);
-  optionslayout->addWidget(m_wholeWordMatch);
-  //  hlayout2->setContentsMargins(5,0,0,0);
-
-  QHBoxLayout * tablayout = new QHBoxLayout;
-  m_newTab = new QCheckBox(tr("Show result in new tab"));
-  m_makeActive = new QCheckBox(tr("Got to new tab"));
-  tablayout->addWidget(m_newTab);
-  tablayout->addWidget(m_makeActive);
-
-  /// search type
   QHBoxLayout * typelayout = new QHBoxLayout;
   typelayout->addWidget(m_normalSearch);
   typelayout->addWidget(m_regexSearch);
+  m_typeGroup->setLayout(typelayout);
+
+  m_arabicTarget = new QRadioButton(tr("Arabic text"),m_targetGroup);
+  m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),m_targetGroup);
+
+  m_includeHeads = new QCheckBox(tr("Include head entries in results"));
+  m_stickySearch = new QCheckBox(tr("Sticky search"));
+  /// diacritics/whole word
+  //QHBoxLayout * optionslayout = new QHBoxLayout;
+  //  optionslayout->addWidget(m_ignoreDiacritics);
+  //  optionslayout->addWidget(m_wholeWordMatch);
+  //  hlayout2->setContentsMargins(5,0,0,0);
+
+  //  QHBoxLayout * tablayout = new QHBoxLayout;
+  m_newTab = new QCheckBox(tr("Show result in new tab"));
+  m_makeActive = new QCheckBox(tr("Got to new tab"));
+
+
+  /// search type
+  //QHBoxLayout * typelayout = new QHBoxLayout;
   //  layout->setContentsMargins(5,0,0,0);
   m_typeGroup->setLayout(typelayout);
 
 
 /// force LTR
-  QHBoxLayout * forcelayout = new QHBoxLayout;
-  m_forceLTR = new QCheckBox(tr("Force Left to Right on search input"));
-  forcelayout->addWidget(m_forceLTR);
-  forcelayout->addStretch();
+//QHBoxLayout * forcelayout = new QHBoxLayout;
+  m_forceLTR = new QCheckBox(tr("Force Left to Right on input"));
+  //forcelayout->addWidget(m_forceLTR);
+  //forcelayout->addStretch();
   connect(m_forceLTR,SIGNAL(stateChanged(int)),this,SLOT(onForceLeftToRight(int)));
 
   /// search target
-  QHBoxLayout * targetlayout = new QHBoxLayout;
-  targetlayout->addWidget(m_arabicTarget);
-  targetlayout->addWidget(m_buckwalterTarget);
+  //QHBoxLayout * targetlayout = new QHBoxLayout;
+  //  targetlayout->addWidget(m_arabicTarget);
+  //  targetlayout->addWidget(m_buckwalterTarget);
   //  layout->setContentsMargins(5,0,0,0);
-  m_targetGroup->setLayout(targetlayout);
+  //  m_targetGroup->setLayout(targetlayout);
 
 
   m_spacer = new QSpacerItem(0, 20,QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
 
-
-  mainlayout->addWidget(m_typeGroup);
-  mainlayout->addLayout(optionslayout);
-  mainlayout->addWidget(m_stickySearch);
-  mainlayout->addWidget(m_includeHeads);
-  mainlayout->addLayout(forcelayout);
-  mainlayout->addWidget(m_targetGroup);
-  mainlayout->addLayout(tablayout);
+  //  gridlayout->addWidget(m_normalSearch,0,0);
+  //  gridlayout->addWidget(m_regexSearch,0,1);
+  gridlayout->addWidget(m_typeGroup,0,0,2,2);
+  gridlayout->addWidget(m_ignoreDiacritics,2,0);
+  gridlayout->addWidget(m_wholeWordMatch,2,1);
+  gridlayout->addWidget(m_includeHeads,3,0);
+  gridlayout->addWidget(m_forceLTR,3,1);
+  gridlayout->addWidget(m_newTab,4,0);
+  gridlayout->addWidget(m_makeActive,4,1);
+  gridlayout->addWidget(m_arabicTarget,5,0);
+  gridlayout->addWidget(m_buckwalterTarget,5,1);
+  //  mainlayout->addWidget(m_typeGroup);
+  //  mainlayout->addLayout(optionslayout);
+  //  mainlayout->addWidget(m_stickySearch);
+  //  mainlayout->addWidget(m_includeHeads);
+  //  mainlayout->addLayout(forcelayout);
+  //  mainlayout->addWidget(m_targetGroup);
+  mainlayout->addLayout(gridlayout);
   if ( ! qobject_cast<FullSearchWidget *>(parent))
     mainlayout->addSpacerItem(m_spacer);
 
@@ -114,15 +128,19 @@ SearchOptionsWidget::~SearchOptionsWidget() {
 void SearchOptionsWidget::showMore(bool /* show */) {
   //  m_more = show;
   int type = m_options.getSearchScope();
-  switch(type) {
+  m_arabicTarget->hide();
+  m_buckwalterTarget->hide();
+  m_stickySearch->hide();
+    switch(type) {
   case SearchOptions::Root : {
-    m_stickySearch->setVisible(false);
-    m_targetGroup->setVisible(false);
-    m_ignoreDiacritics->setVisible(false);
-    m_wholeWordMatch->setVisible(false);
-    m_includeHeads->setVisible(false);
-    m_forceLTR->setVisible(false);
-    m_typeGroup->setVisible(false);
+    m_ignoreDiacritics->hide();
+    m_wholeWordMatch->hide();
+    m_typeGroup->hide();
+    m_includeHeads->hide();
+    m_forceLTR->hide();
+    m_normalSearch->hide();
+    m_regexSearch->hide();
+    m_typeGroup->hide();
     if (USE_KEYMAPS) {
       if (m_hasMaps)
         m_keymapGroup->setVisible(false);
@@ -131,7 +149,10 @@ void SearchOptionsWidget::showMore(bool /* show */) {
   }
   case SearchOptions::Entry : {
     m_includeHeads->setVisible(false);
-    if (USE_KEYMAPS) {
+    m_normalSearch->show();
+    m_regexSearch->show();
+    m_typeGroup->show();
+      if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled) {
         m_keymapGroup->setVisible(false);
       }
@@ -139,56 +160,42 @@ void SearchOptionsWidget::showMore(bool /* show */) {
         m_keymapGroup->setVisible(false);
       }
     }
-    m_stickySearch->setVisible(false);
-
     if (m_regexSearch->isChecked()) {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(true);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(false);
-      m_wholeWordMatch->setVisible(false);
+      m_forceLTR->show();
+      m_ignoreDiacritics->hide();
+      m_wholeWordMatch->hide();
     }
     else {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(false);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(true);
-      m_wholeWordMatch->setVisible(true);
+      m_forceLTR->hide();
+      m_ignoreDiacritics->show();
+      m_wholeWordMatch->show();
     }
     break;
   }
   case SearchOptions::Word : {
+    m_typeGroup->show();
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
         m_keymapGroup->setVisible(false);
       else
         m_keymapGroup->setVisible(false);
     }
-    m_stickySearch->setVisible(false);
-    m_includeHeads->setVisible(true);
-
+    m_includeHeads->show();
     if (m_regexSearch->isChecked()) {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(true);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(false);
-      m_wholeWordMatch->setVisible(false);
+      m_forceLTR->show();
+      m_ignoreDiacritics->hide();
+      m_wholeWordMatch->hide();
     }
     else {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(false);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(true);
-      m_wholeWordMatch->setVisible(true);
+      m_forceLTR->hide();
+      m_ignoreDiacritics->show();
+      m_wholeWordMatch->show();
     }
     break;
   }
   case SearchOptions::Local : {
-    m_stickySearch->setVisible(true);
+    //    m_stickySearch->setVisible(true);
+    m_typeGroup->show();
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
         m_keymapGroup->setVisible(false);
@@ -198,20 +205,14 @@ void SearchOptionsWidget::showMore(bool /* show */) {
     m_includeHeads->setVisible(false);
 
     if (m_regexSearch->isChecked()) {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(true);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(false);
-      m_wholeWordMatch->setVisible(false);
+      m_forceLTR->show();
+      m_ignoreDiacritics->hide();
+      m_wholeWordMatch->hide();
     }
     else {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(false);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(true);
-      m_wholeWordMatch->setVisible(true);
+      m_forceLTR->hide();
+      m_ignoreDiacritics->show();
+      m_wholeWordMatch->show();
     }
     break;
   }
