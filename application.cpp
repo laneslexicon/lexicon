@@ -201,10 +201,24 @@ QString Lexicon::scanAndSpan(const QString & str,const QString & css) {
   }
   return html;
 }
-
-QString Lexicon::spanArabic(const QString & ar) {
+/**
+ * If 'which' is empty get the default settings
+ *
+ * @param ar
+ * @param which
+ *
+ * @return
+ */
+QString Lexicon::spanArabic(const QString & ar,const QString & spanstyle) {
   QSettings s(m_configFile,QSettings::IniFormat);
   s.setIniCodec("UTF-8");
+  if ( ! spanstyle.isEmpty() ) {
+    s.beginGroup("SpannedArabic");
+    QString style = s.value(spanstyle,QString()).toString();
+    if (! style.isEmpty()) {
+      return QString("<span style=\"%1\">%2</span>").arg(style).arg(ar);
+    }
+  }
   s.beginGroup("Arabic");
   QString fontname = s.value(SID_ARABIC_FONT_NAME,QString()).toString();
   QString fontsize = s.value(SID_ARABIC_FONT_SIZE,QString()).toString();
