@@ -18,3 +18,5 @@ echo "QString buildVersion() {"  >> $version
 echo "     return  \"$projectversion-$revisioncount\";" >> $version
 echo "}" >> $version
 
+
+If there is no version.cpp file, the project file (laneslexicon.pro) will copy dummy_verson.cpp as version.cpp.

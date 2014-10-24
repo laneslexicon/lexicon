@@ -13,6 +13,9 @@ QMAKE_CXXFLAGS += -g
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = laneslexicon
 TEMPLATE = app
+! exists ("version.cpp") {
+   system(cp dummy_version.cpp version.cpp)
+}
 libxslt {
 ! win32 {
   INCLUDEPATH += /usr/include/libxml2 /usr/local/include/libxml2
