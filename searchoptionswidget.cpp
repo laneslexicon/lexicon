@@ -54,8 +54,11 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   optionslayout->addWidget(m_wholeWordMatch);
   //  hlayout2->setContentsMargins(5,0,0,0);
 
-
-
+  QHBoxLayout * tablayout = new QHBoxLayout;
+  m_newTab = new QCheckBox(tr("Show result in new tab"));
+  m_makeActive = new QCheckBox(tr("Got to new tab"));
+  tablayout->addWidget(m_newTab);
+  tablayout->addWidget(m_makeActive);
 
   /// search type
   QHBoxLayout * typelayout = new QHBoxLayout;
@@ -89,6 +92,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   mainlayout->addWidget(m_includeHeads);
   mainlayout->addLayout(forcelayout);
   mainlayout->addWidget(m_targetGroup);
+  mainlayout->addLayout(tablayout);
   if ( ! qobject_cast<FullSearchWidget *>(parent))
     mainlayout->addSpacerItem(m_spacer);
 
@@ -101,8 +105,14 @@ void SearchOptionsWidget::setup(QWidget * parent) {
 SearchOptionsWidget::~SearchOptionsWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
-void SearchOptionsWidget::showMore(bool show) {
-  m_more = show;
+/**
+ * This was originally written to have a 'More' button to show/hide
+ * additional options. All options are now shown
+ *
+ *
+ */
+void SearchOptionsWidget::showMore(bool /* show */) {
+  //  m_more = show;
   int type = m_options.getSearchScope();
   switch(type) {
   case SearchOptions::Root : {

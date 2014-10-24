@@ -50,6 +50,8 @@ class SearchOptionsWidget : public QWidget {
   QCheckBox * m_wholeWordMatch;
   QCheckBox * m_includeHeads;
   QCheckBox * m_stickySearch;
+  QCheckBox * m_newTab;
+  QCheckBox * m_makeActive;
   QRadioButton * m_headWord;
   QRadioButton * m_fullText;
   QCheckBox * m_forceLTR;
