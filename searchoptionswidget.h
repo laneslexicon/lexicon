@@ -35,6 +35,7 @@ class SearchOptionsWidget : public QWidget {
   void searchTypeChanged();
   void keymapChanged();
   void onForceLeftToRight(int);
+  void onNewTab(int);
  private:
   void setup(QWidget * parent);
   bool m_hasMaps;

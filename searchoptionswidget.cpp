@@ -55,42 +55,15 @@ void SearchOptionsWidget::setup(QWidget * parent) {
 
   m_includeHeads = new QCheckBox(tr("Include head entries in results"));
   m_stickySearch = new QCheckBox(tr("Sticky search"));
-  /// diacritics/whole word
-  //QHBoxLayout * optionslayout = new QHBoxLayout;
-  //  optionslayout->addWidget(m_ignoreDiacritics);
-  //  optionslayout->addWidget(m_wholeWordMatch);
-  //  hlayout2->setContentsMargins(5,0,0,0);
-
-  //  QHBoxLayout * tablayout = new QHBoxLayout;
   m_newTab = new QCheckBox(tr("Show result in new tab"));
   m_makeActive = new QCheckBox(tr("Got to new tab"));
+  connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(onNewTab(int)));
 
-
-  /// search type
-  //QHBoxLayout * typelayout = new QHBoxLayout;
-  //  layout->setContentsMargins(5,0,0,0);
-  m_typeGroup->setLayout(typelayout);
-
-
-/// force LTR
-//QHBoxLayout * forcelayout = new QHBoxLayout;
   m_forceLTR = new QCheckBox(tr("Force Left to Right on input"));
-  //forcelayout->addWidget(m_forceLTR);
-  //forcelayout->addStretch();
   connect(m_forceLTR,SIGNAL(stateChanged(int)),this,SLOT(onForceLeftToRight(int)));
-
-  /// search target
-  //QHBoxLayout * targetlayout = new QHBoxLayout;
-  //  targetlayout->addWidget(m_arabicTarget);
-  //  targetlayout->addWidget(m_buckwalterTarget);
-  //  layout->setContentsMargins(5,0,0,0);
-  //  m_targetGroup->setLayout(targetlayout);
-
 
   m_spacer = new QSpacerItem(0, 20,QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
 
-  //  gridlayout->addWidget(m_normalSearch,0,0);
-  //  gridlayout->addWidget(m_regexSearch,0,1);
   gridlayout->addWidget(m_typeGroup,0,0,2,2);
   gridlayout->addWidget(m_ignoreDiacritics,2,0);
   gridlayout->addWidget(m_wholeWordMatch,2,1);
@@ -100,12 +73,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   gridlayout->addWidget(m_makeActive,4,1);
   gridlayout->addWidget(m_arabicTarget,5,0);
   gridlayout->addWidget(m_buckwalterTarget,5,1);
-  //  mainlayout->addWidget(m_typeGroup);
-  //  mainlayout->addLayout(optionslayout);
-  //  mainlayout->addWidget(m_stickySearch);
-  //  mainlayout->addWidget(m_includeHeads);
-  //  mainlayout->addLayout(forcelayout);
-  //  mainlayout->addWidget(m_targetGroup);
+
   mainlayout->addLayout(gridlayout);
   if ( ! qobject_cast<FullSearchWidget *>(parent))
     mainlayout->addSpacerItem(m_spacer);
@@ -269,9 +237,19 @@ void SearchOptionsWidget::onForceLeftToRight(int checked) {
 bool SearchOptionsWidget::getForceLTR() {
   return m_forceLTR->isChecked();
 }
+void SearchOptionsWidget::onNewTab(int checked) {
+  if (checked == Qt::Checked) {
+    m_makeActive->setEnabled(true);
+  }
+  else {
+    m_makeActive->setEnabled(false);
+  }
+
+}
 QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString & diacritics,const SearchOptions & options) {
   QRegExp rx;
   QString target = searchtarget;
+  /// TODO get from INI
   QRegExp rxclass(diacritics);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
   QString pattern;
@@ -337,6 +315,9 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
 
   opts.setKeymaps(m_keymapsEnabled);
   opts.setSearchScope(m_options.getSearchScope());
+
+  opts.setNewTab(m_newTab->isChecked());
+  opts.setActivateTab(m_makeActive->isChecked());
 }
 void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -349,6 +330,9 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   m_normalSearch->setChecked((options.getSearchType() == SearchOptions::Normal));
 
 
+  m_newTab->setChecked(options.newTab());
+  m_makeActive->setChecked(options.activateTab());
+  m_makeActive->setEnabled(options.newTab());
   // m_arabicTarget->setChecked(x & Lane::Arabic);
 
   // m_buckwalterTarget->setChecked(x & Lane::Buckwalter);
