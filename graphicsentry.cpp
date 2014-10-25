@@ -254,7 +254,7 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
     return;
   }
   if (! m_searchKey.isEmpty() && (event->text() == m_searchKey)) {
-    emit(search());
+    this->search();
     return;
   }
   if (! m_searchNextKey.isEmpty() && (event->text() == m_searchNextKey)) {
@@ -1501,6 +1501,12 @@ void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
     m_place = entry->getPlace();
 
 }
+/**
+ * This uses different default search options from the other search routines
+ *
+ *
+ * @return
+ */
 int GraphicsEntry::search() {
   QString target = "and";
   int count = 0;
@@ -1548,12 +1554,14 @@ int GraphicsEntry::search() {
   for(int i=1;(i < m_items.size()) && (m_currentSearchPosition == -1);i++) {
     m_currentSearchPosition = m_items[i]->find(rx,0);
     if (m_currentSearchPosition != -1) {
+      count++;
       m_currentSearchIndex = i;
       this->addPosition(i,m_currentSearchPosition);
         if (i > 1) {
           this->setCurrentItem(m_items[i]);
           m_items[i]->setFocus();
           this->addPosition(i,m_currentSearchPosition);
+
           //        this->m_items[i]->ensureVisible();
         }
       //      this->setCurrentItem(m_items[i]);
@@ -1574,7 +1582,7 @@ int GraphicsEntry::search() {
   return count;
 }
 void GraphicsEntry::searchNext() {
-  //  QLOG_DEBUG() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
+  QLOG_DEBUG() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
   int pos = m_currentSearchPosition;
   m_currentSearchPosition = -1;
   bool found = false;
@@ -1801,7 +1809,7 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
       cursor.insertHtml(note);
     }
   }
-  /// TODO
+  /// TODO this needs to be dependant on something
   if (1) {
     QTextCursor cursor(&doc);
     cursor.movePosition(QTextCursor::End);

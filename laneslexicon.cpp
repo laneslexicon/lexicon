@@ -2682,9 +2682,9 @@ void LanesLexicon::printCurrentPage(const QString & node) {
 }
 void LanesLexicon::pageSearch() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-  /// TODO this
   if ( entry ) {
-    if (entry->search() > 0) {
+    entry->setFocus();
+    if (entry->search()) {
       m_clearAction->setEnabled(true);
     }
   }
