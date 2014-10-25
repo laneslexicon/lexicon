@@ -229,6 +229,7 @@ void FullSearchWidget::setSearch(const QString & searchFor,const SearchOptions &
 }
 void FullSearchWidget::hideOptions() {
   QLOG_DEBUG() << Q_FUNC_INFO << m_search->isVisible();
+  m_search->hideTabOptions();
   if ( m_search->isVisible()) {
     m_search->hide();
     m_search->setVisible(false);

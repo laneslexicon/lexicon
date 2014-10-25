@@ -359,3 +359,7 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
 
 
 }
+void SearchOptionsWidget::hideTabOptions(bool visible) {
+  m_newTab->setVisible(visible);
+  m_makeActive->setVisible(false);
+}

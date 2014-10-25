@@ -23,7 +23,7 @@ class SearchOptionsWidget : public QWidget {
 
   void getOptions(SearchOptions &) const;
   void setOptions(const SearchOptions &);
-
+  void hideTabOptions(bool visible = false);
   //  int getOptions();
   //  void setOptions(int);
   void showMore(bool);
