@@ -409,12 +409,7 @@ void EntryItem::notesAccepted() {
 int EntryItem::find(const QRegExp & rx,int position) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << position;
   QTextCursor c = this->document()->find(rx,position);
-  //  this->setTextInteractionFlags(Qt::TextEditorInteraction);
-  //  this->setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | this->flags());
-  //  int flags = this->textInteractionFlags();
-  //  this->setTextInteractionFlags(Qt::TextEditable);
   if (c.isNull()) {
-    //QLOG_DEBUG() << "regex not matched" << rx.pattern();
     return -1;
   }
   /// the find positions the cursor at the end, so move back one carh
