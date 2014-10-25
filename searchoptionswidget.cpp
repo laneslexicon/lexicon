@@ -54,7 +54,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),m_targetGroup);
 
   m_includeHeads = new QCheckBox(tr("Include head entries in results"));
-  m_stickySearch = new QCheckBox(tr("Sticky search"));
+  m_stickySearch = new QCheckBox(tr("Highlight all"));
   m_newTab = new QCheckBox(tr("Show result in new tab"));
   m_makeActive = new QCheckBox(tr("Got to new tab"));
   connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(onNewTab(int)));
@@ -63,16 +63,23 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   connect(m_forceLTR,SIGNAL(stateChanged(int)),this,SLOT(onForceLeftToRight(int)));
 
   m_spacer = new QSpacerItem(0, 20,QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
-
-  gridlayout->addWidget(m_typeGroup,0,0,2,2);
-  gridlayout->addWidget(m_ignoreDiacritics,2,0);
-  gridlayout->addWidget(m_wholeWordMatch,2,1);
-  gridlayout->addWidget(m_includeHeads,3,0);
-  gridlayout->addWidget(m_forceLTR,3,1);
-  gridlayout->addWidget(m_newTab,4,0);
-  gridlayout->addWidget(m_makeActive,4,1);
-  gridlayout->addWidget(m_arabicTarget,5,0);
-  gridlayout->addWidget(m_buckwalterTarget,5,1);
+  int row = 0;
+  gridlayout->addWidget(m_typeGroup,row,0,2,2);
+  row += 2;
+  gridlayout->addWidget(m_ignoreDiacritics,row,0);
+  gridlayout->addWidget(m_wholeWordMatch,row,1);
+  row++;
+  gridlayout->addWidget(m_forceLTR,row,0);
+  row++;
+  gridlayout->addWidget(m_includeHeads,row,0);
+  row++;
+  gridlayout->addWidget(m_stickySearch,row,0);
+  row++;
+  gridlayout->addWidget(m_newTab,row,0);
+  gridlayout->addWidget(m_makeActive,row,1);
+  row++;
+  gridlayout->addWidget(m_arabicTarget,row,0);
+  gridlayout->addWidget(m_buckwalterTarget,row,1);
 
   mainlayout->addLayout(gridlayout);
   if ( ! qobject_cast<FullSearchWidget *>(parent))
@@ -162,7 +169,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
     break;
   }
   case SearchOptions::Local : {
-    //    m_stickySearch->setVisible(true);
+    m_stickySearch->show();
     m_typeGroup->show();
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
