@@ -30,7 +30,7 @@ class SearchOptionsWidget : public QWidget {
   void addKeymaps(const QString &activeMap,const QStringList & maps);
   void setKeymapsEnabled(bool v);
   bool getForceLTR();
-  static QRegExp buildRx(const QString & target,const QString & diacritics,const SearchOptions &);
+  static QRegExp buildRx(const QString & target,const QString & diacritics,const SearchOptions &,const QString & metacharacters = QString("()[].?"));
  public slots:
   void searchTypeChanged();
   void keymapChanged();

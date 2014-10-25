@@ -253,30 +253,40 @@ void SearchOptionsWidget::onNewTab(int checked) {
   }
 
 }
-QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString & diacritics,const SearchOptions & options) {
+/**
+ * Ignore diacritics is done by removing all diacritics from the search pattern
+ * and for every Arabic letter in the pattern append *[:diacritics:]
+ *
+ * @param searchtarget
+ * @param diacritics
+ * @param options
+ * @param metacharacters
+ *
+ * @return
+ */
+QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString & diacritics,const SearchOptions & options, const QString & metacharacters) {
   QRegExp rx;
   QString target = searchtarget;
-  /// TODO get from INI
-  QRegExp rxclass(diacritics);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+  QRegExp rxclass(diacritics);
 
   QString pattern;
 
   if (options.getSearchType() == SearchOptions::Normal) {
-    /// TODO fix metacharacters and get list from INI
-    QStringList metachars;
-    metachars << "(" << ")" << "[" << "]" << "?" << ".";
+    /// escape the metacharacters that will cause the regex to fail
+    QStringList metachars = metacharacters.split("",QString::SkipEmptyParts);
     for(int i=0;i < metachars.size();i++) {
       target.replace(metachars[i],QString("\\%1").arg(metachars[i]));
     }
     if (options.ignoreDiacritics()) {
-      /// TODO get from INI
-      //      QString ar("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
       target = target.replace(rxclass,QString());
-      QStringList cc = target.split("");
-      for(int i=0;i < cc.size();i++) {
-        pattern += cc[i];
-        if (UcdScripts::isScript(cc[i],"Arabic")) {
-          pattern += diacritics;
+      for(int i=0;i < target.size();i++) {
+        QChar sp = target.at(i);
+        pattern += QString(sp);
+        if ( sp.isLetter() ) {
+          /// if it's in the Arabic block, append to allow for optional diacritics
+          if ((sp.unicode() >= 0x600) && (sp.unicode() <= 0x6ff)) {
+            pattern += diacritics;
+          }
         }
       }
     }
@@ -286,16 +296,12 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString 
     if (options.wholeWordMatch()) {
       pattern = "\\b" + pattern + "\\b";
     }
-    else if ( ! options.ignoreDiacritics()) {
-      /// TODO add something like [^rxclass]
-      //      pattern += "[^\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]";
-      //      qDebug() << Q_FUNC_INFO << target << pattern;
-    }
     rx.setPattern(pattern);
   }
   else {
     rx.setPattern(target);
   }
+  qDebug() << Q_FUNC_INFO << rx.pattern();
   return rx;
 }
 void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
