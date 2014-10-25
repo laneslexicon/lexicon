@@ -1551,23 +1551,44 @@ int GraphicsEntry::search() {
   m_currentSearchRx = rx;
   m_currentSearchTarget = t;
   this->m_items[0]->ensureVisible();
-  for(int i=1;(i < m_items.size()) && (m_currentSearchPosition == -1);i++) {
-    m_currentSearchPosition = m_items[i]->find(rx,0);
-    if (m_currentSearchPosition != -1) {
-      count++;
-      m_currentSearchIndex = i;
-      this->addPosition(i,m_currentSearchPosition);
+  int pos = 0;
+  if (m_currentSearchOptions.showAll()) {
+    for(int i=1;i < m_items.size();i++) {
+      pos = 0;
+      while(pos != -1) {
+        m_currentSearchPosition = m_items[i]->find(rx,pos);
+        if (m_currentSearchPosition != -1) {
+          m_items[i]->highlight(pos);
+          count++;
+          this->addPosition(i,m_currentSearchPosition);
+        }
+        pos = m_currentSearchPosition;
+      }
+    }
+    /// position at the first one, so the find next stuff works anyway
+    if (count > 0) {
+      QList<int> keys = QList<int>(m_searchPositions.keys());
+      QList<int> positions = QList<int>(m_searchPositions.value(keys[0]));
+      m_currentSearchIndex = keys[0];
+      m_currentSearchPosition = positions[0];
+    }
+  }
+  else {
+    for(int i=1;(i < m_items.size()) && (m_currentSearchPosition == -1);i++) {
+      m_currentSearchPosition = m_items[i]->find(rx,0);
+      if (m_currentSearchPosition != -1) {
+        count++;
+        m_currentSearchIndex = i;
+        this->addPosition(i,m_currentSearchPosition);
         if (i > 1) {
           this->setCurrentItem(m_items[i]);
           m_items[i]->setFocus();
           this->addPosition(i,m_currentSearchPosition);
-
-          //        this->m_items[i]->ensureVisible();
         }
-      //      this->setCurrentItem(m_items[i]);
+      }
     }
   }
-  if (m_currentSearchIndex == -1) {
+  if (count  == 0) {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
     msgBox.setTextFormat(Qt::RichText);
@@ -1590,9 +1611,7 @@ void GraphicsEntry::searchNext() {
   int pos = m_currentSearchPosition;
   m_currentSearchPosition = -1;
   bool found = false;
-  //  qStrip << "highlight last search";
   m_items[m_currentSearchIndex]->highlight(pos);
-  //  qStrip << "end hightligh";
   for(int i=m_currentSearchIndex;(i < m_items.size()) && ! found ;i++) {
     m_currentSearchPosition = m_items[i]->find(m_currentSearchRx,pos);
     if (m_currentSearchPosition != -1) {
