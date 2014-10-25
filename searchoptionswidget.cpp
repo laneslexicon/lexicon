@@ -331,6 +331,7 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
 
   opts.setNewTab(m_newTab->isChecked());
   opts.setActivateTab(m_makeActive->isChecked());
+  opts.setShowAll(m_showAllSearch->isChecked());
 }
 void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   QLOG_DEBUG() << Q_FUNC_INFO;
