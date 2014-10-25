@@ -54,7 +54,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),m_targetGroup);
 
   m_includeHeads = new QCheckBox(tr("Include head entries in results"));
-  m_stickySearch = new QCheckBox(tr("Highlight all"));
+  m_showAllSearch = new QCheckBox(tr("Highlight all"));
   m_newTab = new QCheckBox(tr("Show result in new tab"));
   m_makeActive = new QCheckBox(tr("Got to new tab"));
   connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(onNewTab(int)));
@@ -73,7 +73,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   row++;
   gridlayout->addWidget(m_includeHeads,row,0);
   row++;
-  gridlayout->addWidget(m_stickySearch,row,0);
+  gridlayout->addWidget(m_showAllSearch,row,0);
   row++;
   gridlayout->addWidget(m_newTab,row,0);
   gridlayout->addWidget(m_makeActive,row,1);
@@ -105,7 +105,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
   int type = m_options.getSearchScope();
   m_arabicTarget->hide();
   m_buckwalterTarget->hide();
-  m_stickySearch->hide();
+  m_showAllSearch->hide();
     switch(type) {
   case SearchOptions::Root : {
     m_ignoreDiacritics->hide();
@@ -169,7 +169,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
     break;
   }
   case SearchOptions::Local : {
-    m_stickySearch->show();
+    m_showAllSearch->show();
     m_typeGroup->show();
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
@@ -318,7 +318,7 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   //   x |= Lane::Buckwalter;
 
   opts.setIncludeHeads(m_includeHeads->isChecked());
-  opts.setSticky(m_stickySearch->isChecked());
+  opts.setShowAll(m_showAllSearch->isChecked());
 
   opts.setKeymaps(m_keymapsEnabled);
   opts.setSearchScope(m_options.getSearchScope());
@@ -349,7 +349,7 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
 
   m_keymapsEnabled = options.keymaps();
 
-  m_stickySearch->setChecked(options.sticky());
+  m_showAllSearch->setChecked(options.showAll());
 
 
 }
