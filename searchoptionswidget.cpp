@@ -28,6 +28,7 @@ SearchOptionsWidget::SearchOptionsWidget(SearchOptions & options,QWidget * paren
 }
 void SearchOptionsWidget::setup(QWidget * parent) {
   QVBoxLayout * mainlayout = new QVBoxLayout;
+  QGridLayout * gridlayout = new QGridLayout;
 
   m_targetGroup = new QGroupBox(tr("Search target"));
   m_targetGroup->setObjectName("searchtargetgroup");
@@ -43,52 +44,44 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   m_fullText = new QRadioButton(tr("Full text"));
   m_normalSearch = new QRadioButton(tr("Normal"),m_typeGroup);
   m_regexSearch = new QRadioButton(tr("Regular expression"),m_typeGroup);
-  m_arabicTarget = new QRadioButton(tr("Arabic text"),m_targetGroup);
-  m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),m_targetGroup);
 
-  m_includeHeads = new QCheckBox(tr("Include head entries in search results"));
-  m_stickySearch = new QCheckBox(tr("Sticky search"));
-  /// diacritics/whole word
-  QHBoxLayout * optionslayout = new QHBoxLayout;
-  optionslayout->addWidget(m_ignoreDiacritics);
-  optionslayout->addWidget(m_wholeWordMatch);
-  //  hlayout2->setContentsMargins(5,0,0,0);
-
-
-
-
-  /// search type
   QHBoxLayout * typelayout = new QHBoxLayout;
   typelayout->addWidget(m_normalSearch);
   typelayout->addWidget(m_regexSearch);
-  //  layout->setContentsMargins(5,0,0,0);
   m_typeGroup->setLayout(typelayout);
 
+  m_arabicTarget = new QRadioButton(tr("Arabic text"),m_targetGroup);
+  m_buckwalterTarget = new QRadioButton(tr("Buckwalter transliteration"),m_targetGroup);
 
-/// force LTR
-  QHBoxLayout * forcelayout = new QHBoxLayout;
-  m_forceLTR = new QCheckBox(tr("Force Left to Right on search input"));
-  forcelayout->addWidget(m_forceLTR);
-  forcelayout->addStretch();
+  m_includeHeads = new QCheckBox(tr("Include head entries in results"));
+  m_showAllSearch = new QCheckBox(tr("Highlight all"));
+  m_newTab = new QCheckBox(tr("Show result in new tab"));
+  m_makeActive = new QCheckBox(tr("Got to new tab"));
+  connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(onNewTab(int)));
+
+  m_forceLTR = new QCheckBox(tr("Force Left to Right on input"));
   connect(m_forceLTR,SIGNAL(stateChanged(int)),this,SLOT(onForceLeftToRight(int)));
 
-  /// search target
-  QHBoxLayout * targetlayout = new QHBoxLayout;
-  targetlayout->addWidget(m_arabicTarget);
-  targetlayout->addWidget(m_buckwalterTarget);
-  //  layout->setContentsMargins(5,0,0,0);
-  m_targetGroup->setLayout(targetlayout);
-
-
   m_spacer = new QSpacerItem(0, 20,QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
+  int row = 0;
+  gridlayout->addWidget(m_typeGroup,row,0,2,2);
+  row += 2;
+  gridlayout->addWidget(m_ignoreDiacritics,row,0);
+  gridlayout->addWidget(m_wholeWordMatch,row,1);
+  row++;
+  gridlayout->addWidget(m_forceLTR,row,0);
+  row++;
+  gridlayout->addWidget(m_includeHeads,row,0);
+  row++;
+  gridlayout->addWidget(m_showAllSearch,row,0);
+  row++;
+  gridlayout->addWidget(m_newTab,row,0);
+  gridlayout->addWidget(m_makeActive,row,1);
+  row++;
+  gridlayout->addWidget(m_arabicTarget,row,0);
+  gridlayout->addWidget(m_buckwalterTarget,row,1);
 
-
-  mainlayout->addWidget(m_typeGroup);
-  mainlayout->addLayout(optionslayout);
-  mainlayout->addWidget(m_stickySearch);
-  mainlayout->addWidget(m_includeHeads);
-  mainlayout->addLayout(forcelayout);
-  mainlayout->addWidget(m_targetGroup);
+  mainlayout->addLayout(gridlayout);
   if ( ! qobject_cast<FullSearchWidget *>(parent))
     mainlayout->addSpacerItem(m_spacer);
 
@@ -101,18 +94,28 @@ void SearchOptionsWidget::setup(QWidget * parent) {
 SearchOptionsWidget::~SearchOptionsWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
-void SearchOptionsWidget::showMore(bool show) {
-  m_more = show;
+/**
+ * This was originally written to have a 'More' button to show/hide
+ * additional options. All options are now shown
+ *
+ *
+ */
+void SearchOptionsWidget::showMore(bool /* show */) {
+  //  m_more = show;
   int type = m_options.getSearchScope();
-  switch(type) {
+  m_arabicTarget->hide();
+  m_buckwalterTarget->hide();
+  m_showAllSearch->hide();
+    switch(type) {
   case SearchOptions::Root : {
-    m_stickySearch->setVisible(false);
-    m_targetGroup->setVisible(false);
-    m_ignoreDiacritics->setVisible(false);
-    m_wholeWordMatch->setVisible(false);
-    m_includeHeads->setVisible(false);
-    m_forceLTR->setVisible(false);
-    m_typeGroup->setVisible(false);
+    m_ignoreDiacritics->hide();
+    m_wholeWordMatch->hide();
+    m_typeGroup->hide();
+    m_includeHeads->hide();
+    m_forceLTR->hide();
+    m_normalSearch->hide();
+    m_regexSearch->hide();
+    m_typeGroup->hide();
     if (USE_KEYMAPS) {
       if (m_hasMaps)
         m_keymapGroup->setVisible(false);
@@ -121,7 +124,10 @@ void SearchOptionsWidget::showMore(bool show) {
   }
   case SearchOptions::Entry : {
     m_includeHeads->setVisible(false);
-    if (USE_KEYMAPS) {
+    m_normalSearch->show();
+    m_regexSearch->show();
+    m_typeGroup->show();
+      if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled) {
         m_keymapGroup->setVisible(false);
       }
@@ -129,56 +135,42 @@ void SearchOptionsWidget::showMore(bool show) {
         m_keymapGroup->setVisible(false);
       }
     }
-    m_stickySearch->setVisible(false);
-
     if (m_regexSearch->isChecked()) {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(true);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(false);
-      m_wholeWordMatch->setVisible(false);
+      m_forceLTR->show();
+      m_ignoreDiacritics->hide();
+      m_wholeWordMatch->hide();
     }
     else {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(false);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(true);
-      m_wholeWordMatch->setVisible(true);
+      m_forceLTR->hide();
+      m_ignoreDiacritics->show();
+      m_wholeWordMatch->show();
     }
     break;
   }
   case SearchOptions::Word : {
+    m_typeGroup->show();
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
         m_keymapGroup->setVisible(false);
       else
         m_keymapGroup->setVisible(false);
     }
-    m_stickySearch->setVisible(false);
-    m_includeHeads->setVisible(true);
-
+    m_includeHeads->show();
     if (m_regexSearch->isChecked()) {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(true);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(false);
-      m_wholeWordMatch->setVisible(false);
+      m_forceLTR->show();
+      m_ignoreDiacritics->hide();
+      m_wholeWordMatch->hide();
     }
     else {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(false);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(true);
-      m_wholeWordMatch->setVisible(true);
+      m_forceLTR->hide();
+      m_ignoreDiacritics->show();
+      m_wholeWordMatch->show();
     }
     break;
   }
   case SearchOptions::Local : {
-    m_stickySearch->setVisible(true);
+    m_showAllSearch->show();
+    m_typeGroup->show();
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
         m_keymapGroup->setVisible(false);
@@ -188,20 +180,14 @@ void SearchOptionsWidget::showMore(bool show) {
     m_includeHeads->setVisible(false);
 
     if (m_regexSearch->isChecked()) {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(true);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(false);
-      m_wholeWordMatch->setVisible(false);
+      m_forceLTR->show();
+      m_ignoreDiacritics->hide();
+      m_wholeWordMatch->hide();
     }
     else {
-      m_targetGroup->setVisible(false);
-      m_forceLTR->setVisible(false);
-      m_arabicTarget->setVisible(false);
-      m_buckwalterTarget->setVisible(false);
-      m_ignoreDiacritics->setVisible(true);
-      m_wholeWordMatch->setVisible(true);
+      m_forceLTR->hide();
+      m_ignoreDiacritics->show();
+      m_wholeWordMatch->show();
     }
     break;
   }
@@ -258,9 +244,19 @@ void SearchOptionsWidget::onForceLeftToRight(int checked) {
 bool SearchOptionsWidget::getForceLTR() {
   return m_forceLTR->isChecked();
 }
+void SearchOptionsWidget::onNewTab(int checked) {
+  if (checked == Qt::Checked) {
+    m_makeActive->setEnabled(true);
+  }
+  else {
+    m_makeActive->setEnabled(false);
+  }
+
+}
 QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString & diacritics,const SearchOptions & options) {
   QRegExp rx;
   QString target = searchtarget;
+  /// TODO get from INI
   QRegExp rxclass(diacritics);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
 
   QString pattern;
@@ -322,10 +318,13 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   //   x |= Lane::Buckwalter;
 
   opts.setIncludeHeads(m_includeHeads->isChecked());
-  opts.setSticky(m_stickySearch->isChecked());
+  opts.setShowAll(m_showAllSearch->isChecked());
 
   opts.setKeymaps(m_keymapsEnabled);
   opts.setSearchScope(m_options.getSearchScope());
+
+  opts.setNewTab(m_newTab->isChecked());
+  opts.setActivateTab(m_makeActive->isChecked());
 }
 void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -338,6 +337,9 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   m_normalSearch->setChecked((options.getSearchType() == SearchOptions::Normal));
 
 
+  m_newTab->setChecked(options.newTab());
+  m_makeActive->setChecked(options.activateTab());
+  m_makeActive->setEnabled(options.newTab());
   // m_arabicTarget->setChecked(x & Lane::Arabic);
 
   // m_buckwalterTarget->setChecked(x & Lane::Buckwalter);
@@ -347,7 +349,7 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
 
   m_keymapsEnabled = options.keymaps();
 
-  m_stickySearch->setChecked(options.sticky());
+  m_showAllSearch->setChecked(options.showAll());
 
 
 }

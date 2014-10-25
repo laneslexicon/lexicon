@@ -18,8 +18,8 @@ class SearchOptions {
   bool wholeWordMatch() const;
   void setWholeWordMatch(bool v);
 
-  bool sticky() const;
-  void setSticky(bool);
+  bool showAll() const;
+  void setShowAll(bool);
 
   bool includeHeads() const;
   void setIncludeHeads(bool);
@@ -44,7 +44,7 @@ class SearchOptions {
   bool m_includeHeads;
   int  m_target;
   bool m_forceLTR;
-  bool m_sticky;
+  bool m_showAll;
   bool m_newTab;
   bool m_activateTab;
 };

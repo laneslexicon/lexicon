@@ -35,6 +35,7 @@ class SearchOptionsWidget : public QWidget {
   void searchTypeChanged();
   void keymapChanged();
   void onForceLeftToRight(int);
+  void onNewTab(int);
  private:
   void setup(QWidget * parent);
   bool m_hasMaps;
@@ -49,7 +50,9 @@ class SearchOptionsWidget : public QWidget {
   QCheckBox * m_ignoreDiacritics;
   QCheckBox * m_wholeWordMatch;
   QCheckBox * m_includeHeads;
-  QCheckBox * m_stickySearch;
+  QCheckBox * m_showAllSearch;
+  QCheckBox * m_newTab;
+  QCheckBox * m_makeActive;
   QRadioButton * m_headWord;
   QRadioButton * m_fullText;
   QCheckBox * m_forceLTR;

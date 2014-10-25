@@ -27,11 +27,11 @@ void SearchOptions::setSearchScope(int x) {
 int SearchOptions::getSearchScope() const {
   return m_target;
 }
-bool SearchOptions::sticky() const {
-  return m_sticky;
+bool SearchOptions::showAll() const {
+  return m_showAll;
 }
-void SearchOptions::setSticky(bool v) {
-  m_sticky = v;
+void SearchOptions::setShowAll(bool v) {
+  m_showAll = v;
 }
 
 bool SearchOptions::includeHeads() const {

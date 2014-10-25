@@ -2469,6 +2469,7 @@ void LanesLexicon::searchForPage() {
 }
 void LanesLexicon::searchForRoot() {
   ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Root,this);
+  d->setOptions(m_searchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
@@ -2488,6 +2489,7 @@ void LanesLexicon::searchForRoot() {
         msgBox.exec();
       }
       else {
+        /// TODO make dependent
         this->syncContents();
       }
     }

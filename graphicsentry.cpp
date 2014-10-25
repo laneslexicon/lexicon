@@ -1566,9 +1566,9 @@ int GraphicsEntry::search() {
     QString style;
     /// TODO get this from INI
     if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
-        style = "font-family : Amiri;font-size : 18pt";
+        t = (qobject_cast<Lexicon *>(qApp))->spanArabic(t,"wordnotfound");
     }
-    msgBox.setText(QString(tr("Word not found: <span style=\"%1\">%2</span>")).arg(style).arg(t));
+    msgBox.setText(QString(tr("Word not found: %1")).arg(t));
     msgBox.exec();
   }
   return count;
@@ -1583,7 +1583,7 @@ void GraphicsEntry::searchNext() {
     if (m_currentSearchPosition != -1) {
       found = true;
       if (i > m_currentSearchIndex) {
-        if (m_currentSearchOptions.sticky()) {
+        if (m_currentSearchOptions.showAll()) {
           QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
           //c.clearSelection();
           m_items[m_currentSearchIndex]->setTextCursor(c);
@@ -1608,7 +1608,7 @@ void GraphicsEntry::searchNext() {
       }
       else {
         m_items[i]->setFocus();
-        if (m_currentSearchOptions.sticky()) {
+        if (m_currentSearchOptions.showAll()) {
           m_items[i]->highlight(pos);
         }
         /*
