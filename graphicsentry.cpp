@@ -1581,11 +1581,18 @@ int GraphicsEntry::search() {
   }
   return count;
 }
+/**
+ * m_currentSearchIndex points to the current search EntryItem
+ * m_currentSearchPosition is the current position within the current EntryItem
+ */
 void GraphicsEntry::searchNext() {
   QLOG_DEBUG() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
   int pos = m_currentSearchPosition;
   m_currentSearchPosition = -1;
   bool found = false;
+  //  qStrip << "highlight last search";
+  m_items[m_currentSearchIndex]->highlight(pos);
+  //  qStrip << "end hightligh";
   for(int i=m_currentSearchIndex;(i < m_items.size()) && ! found ;i++) {
     m_currentSearchPosition = m_items[i]->find(m_currentSearchRx,pos);
     if (m_currentSearchPosition != -1) {
@@ -1601,7 +1608,6 @@ void GraphicsEntry::searchNext() {
           c.clearSelection();
           m_items[m_currentSearchIndex]->setTextCursor(c);
         }
-        //        m_items[i]->ensureVisible();
         this->setCurrentItem(m_items[i]);
         m_items[i]->setFocus();
         if (m_items[i]->boundingRect().height() > m_view->height()) {
@@ -1616,9 +1622,6 @@ void GraphicsEntry::searchNext() {
       }
       else {
         m_items[i]->setFocus();
-        if (m_currentSearchOptions.showAll()) {
-          m_items[i]->highlight(pos);
-        }
         /*
         if (m_items[i]->boundingRect().height() > m_view->height()) {
           QLOG_DEBUG() << "scrolling candidate";
