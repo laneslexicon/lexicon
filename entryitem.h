@@ -35,6 +35,7 @@
 #include <QRegExp>
 #include <QClipboard>
 #include <QToolButton>
+#include <QMap>
 #include "place.h"
 class Note;
 class NoteDialog;
@@ -121,10 +122,13 @@ class EntryItem : public QGraphicsTextItem {
  private:
   QString m_xml;
   bool m_notesEnabled;
+  bool m_highlights;
   QGraphicsWidget * m_noteWidget;
   NoteDialog * m_note;
   QList<Note *> m_notes;
   QList<int> m_searchPositions;
+  QList<int> m_backgrounds;
+  QColor m_defaultBackground;
   Place m_place;
   QString m_searchText;
   QString m_html;

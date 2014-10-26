@@ -262,7 +262,7 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
     return;
   }
   if (! m_clearKey.isEmpty() && (event->text() == m_clearKey)) {
-    this->clearSelections();
+    this->clearHighlights();
     return;
   }
   if (! m_showKey.isEmpty() && (event->text() == m_showKey)) {
@@ -1545,7 +1545,7 @@ int GraphicsEntry::search() {
   else {
     return -1;
   }
-  this->clearSelections();
+  this->clearHighlights();
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
   m_searchPositions.clear();
@@ -1690,16 +1690,6 @@ void GraphicsEntry::addPosition(int itemIx,int pos) {
   }
   positions << pos;
   m_searchPositions.insert(itemIx,positions);
-}
-void GraphicsEntry::clearSelections() {
-  QList<int> keys = QList<int>(m_searchPositions.keys());
-  for(int i=0;i < keys.size();i++) {
-    QList<int> positions = QList<int>(m_searchPositions.value(keys[i]));
-    for(int j=0;j < positions.size();j++) {
-      /// TODO get Qt::white background color from INI
-      m_items[keys[i]]->highlight(positions[j],Qt::white);
-    }
-  }
 }
 void GraphicsEntry::showSelections() {
   QList<int> keys = QList<int>(m_searchPositions.keys());

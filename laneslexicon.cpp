@@ -2898,7 +2898,7 @@ void LanesLexicon::localSearchNext() {
 void LanesLexicon::localSearchClear() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    entry->clearSelections();
+    entry->clearHighlights();
   }
 }
 void LanesLexicon::localSearchShow() {

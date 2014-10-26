@@ -107,7 +107,6 @@ class GraphicsEntry : public QWidget {
     void notesButtonPressed();
     void addButtonDecoration(bool);
     void focusPlace();
-    void clearSelections();
     void showSelections();
     void print(QPrinter &,const QString & node = QString());
  private:

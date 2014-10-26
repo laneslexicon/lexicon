@@ -248,6 +248,9 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
     painter->setBrush(m_backgroundColor);
     painter->drawRect(this->boundingRect());
   }
+  if (! m_defaultBackground.isValid()) {
+    m_defaultBackground = painter->background().color();
+  }
   painter->setPen(pen);
   QGraphicsTextItem::paint(painter, o, w);
 }
@@ -268,7 +271,8 @@ QTextCursor EntryItem::highlight(const QString & target, Qt::GlobalColor color) 
     cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
     cursor.setPosition(pos, QTextCursor::KeepAnchor);
     QTextCharFormat fmt = cursor.charFormat();
-    fmt.setBackground(color);
+    //    fmt.setBackground(color);
+    m_highlights = true;
     cursor.setCharFormat(fmt);
     cursor = doc->find(target,pos,QTextDocument::FindWholeWords);
   }
@@ -285,7 +289,22 @@ void EntryItem::clearHighlights() {
   c.setCharFormat(fmt);
   c.clearSelection();
   */
-  this->highlight(m_searchText,Qt::white);
+  //  this->highlight(m_searchText,Qt::white);
+  //  m_highlights = false;
+  qDebug() << Q_FUNC_INFO << m_backgrounds.size();
+  QTextCursor c = this->textCursor();
+  for(int i=0;i < m_backgrounds.size();i++) {
+    c.setPosition(m_backgrounds[i]);
+    //    c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
+    c.select(QTextCursor::WordUnderCursor);
+    QTextCharFormat fmt = c.charFormat();
+    //    QColor color;
+    //    color.setNamedColor(iter.value());
+    fmt.setBackground(m_defaultBackground);//iter.value());
+    c.setCharFormat(fmt);
+    this->setTextCursor(c);
+  }
+  m_backgrounds.clear();
 }
 void EntryItem::highlight(int position,Qt::GlobalColor color) {
   position--;
@@ -294,9 +313,9 @@ void EntryItem::highlight(int position,Qt::GlobalColor color) {
   cursor.movePosition(QTextCursor::StartOfWord,QTextCursor::MoveAnchor);
   cursor.movePosition(QTextCursor::EndOfWord,QTextCursor::KeepAnchor);
   QTextCharFormat fmt = cursor.charFormat();
-  fmt.setBackground(color);
-  cursor.setCharFormat(fmt);
-
+  //  fmt.setBackground(color);
+  //  cursor.setCharFormat(fmt);
+  m_highlights = true;
 }
 /**
  * this is the one that is used by default
@@ -316,15 +335,16 @@ QTextCursor EntryItem::highlightRx(const QString & target) {
   /// and then made the default
   rx.setPattern("\\b" + target + "\\b");
   /// TODO get from QSettings
-  fmt.setBackground(Qt::yellow);
+  //  fmt.setBackground(Qt::yellow);
   cursor = doc->find(rx,QTextDocument::FindWholeWords);
   firstPos = cursor;
   while(! cursor.isNull()) {
     pos =  cursor.position();
     cursor.setPosition(pos - target.size(), QTextCursor::MoveAnchor);
     cursor.setPosition(pos, QTextCursor::KeepAnchor);
-    cursor.setCharFormat(fmt);
+    //    cursor.setCharFormat(fmt);
     cursor = doc->find(target,pos,QTextDocument::FindWholeWords);
+    m_highlights = true;
   }
   return firstPos;
 }
@@ -416,8 +436,13 @@ int EntryItem::find(const QRegExp & rx,int position) {
   /// and select the word
   /// then set m_cursor at the next occurence (if any)
   c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
+  QTextCharFormat fmt = c.charFormat();
+  m_backgrounds << c.position();
   c.select(QTextCursor::WordUnderCursor);
+  fmt.setBackground(Qt::yellow);
+  c.setCharFormat(fmt);
   this->setTextCursor(c);
+
   /*
   QTextCharFormat fmt = QTextEdit::ExtraSelection::format;//c.charFormat();
   QLOG_DEBUG() << fmt.background().color().name();
