@@ -1511,6 +1511,7 @@ int GraphicsEntry::search() {
   QString target = "and";
   int count = 0;
 
+  this->clearSelections();
   SearchOptions options;
   options.setSearchScope(SearchOptions::Local);
   // int max = m_items.size() * step;
