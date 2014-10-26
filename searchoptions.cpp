@@ -3,6 +3,18 @@
 #include "namespace.h"
 #include "scripts.h"
 #define USE_KEYMAPS 0
+SearchOptions::SearchOptions() {
+  m_ignoreDiacritics = true;
+  m_wholeWordMatch = false;
+  m_keymaps = false;
+  m_type = SearchOptions::Normal;
+  m_includeHeads = false;
+  m_target = 0;
+  m_forceLTR = false;
+  m_showAll = false;
+  m_newTab = false;
+  m_activateTab = false;
+}
 bool SearchOptions::ignoreDiacritics() const {
   return m_ignoreDiacritics;
 }
