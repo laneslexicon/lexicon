@@ -270,6 +270,17 @@ void EntryItem::showHighlights() {
     this->setTextCursor(c);
   }
 }
+void EntryItem::showHighlight(int index) {
+  QTextCursor c = this->textCursor();
+  if ((index >= 0) && (index < m_highlights.size())) {
+    c.setPosition(m_highlights[index]);
+    c.select(QTextCursor::WordUnderCursor);
+    QTextCharFormat fmt = c.charFormat();
+    fmt.setBackground(Qt::yellow);
+    c.setCharFormat(fmt);
+    this->setTextCursor(c);
+  }
+}
 void EntryItem::clearHighlights() {
   QTextCursor c = this->textCursor();
   for(int i=0;i < m_highlights.size();i++) {
@@ -360,7 +371,7 @@ void EntryItem::notesAccepted() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   this->setFocus();
 }
-int EntryItem::find(const QRegExp & rx,int position) {
+int EntryItem::find(const QRegExp & rx,int position,bool highlight) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << position;
   QTextCursor c = this->document()->find(rx,position);
   if (c.isNull()) {
@@ -372,11 +383,12 @@ int EntryItem::find(const QRegExp & rx,int position) {
   c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
   QTextCharFormat fmt = c.charFormat();
   m_highlights << c.position();
-  c.select(QTextCursor::WordUnderCursor);
-  fmt.setBackground(Qt::yellow);
-  c.setCharFormat(fmt);
+  if (highlight) {
+    c.select(QTextCursor::WordUnderCursor);
+    fmt.setBackground(Qt::yellow);
+    c.setCharFormat(fmt);
+  }
   this->setTextCursor(c);
-
   /*
   QTextCharFormat fmt = QTextEdit::ExtraSelection::format;//c.charFormat();
   QLOG_DEBUG() << fmt.background().color().name();

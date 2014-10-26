@@ -1560,7 +1560,6 @@ int GraphicsEntry::search() {
       while(pos != -1) {
         m_currentSearchPosition = m_items[i]->find(rx,pos);
         if (m_currentSearchPosition != -1) {
-          //          m_items[i]->highlight(pos);
           count++;
           this->addPosition(i,m_currentSearchPosition);
         }
@@ -1617,7 +1616,6 @@ void GraphicsEntry::searchNext() {
   int pos = m_currentSearchPosition;
   m_currentSearchPosition = -1;
   bool found = false;
-  //  m_items[m_currentSearchIndex]->highlight(pos);
   for(int i=m_currentSearchIndex;(i < m_items.size()) && ! found ;i++) {
     m_currentSearchPosition = m_items[i]->find(m_currentSearchRx,pos);
     if (m_currentSearchPosition != -1) {

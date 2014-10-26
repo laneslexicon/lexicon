@@ -64,7 +64,7 @@ class EntryItem : public QGraphicsTextItem {
   void setPlace(const Place &);
   void setBackground(QColor & c) { m_backgroundColor = c;}
   void selectAll();
-  int  find(const QRegExp &,int);
+  int  find(const QRegExp &,int,bool highlight = true);
   Place getPlace();
   QString getNode();
   QString getRoot();
@@ -76,7 +76,7 @@ class EntryItem : public QGraphicsTextItem {
   void setOutputHtml(const QString & html) { m_html = html;}
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
-  int findCount() const { return m_searchPositions.size(); }
+  int findCount() const { return m_highlights.size(); }
   void setXml(const QString &);
   QString getXml() const;
   void setNotesEnabled(bool v) { m_notesEnabled = v;}
@@ -90,6 +90,7 @@ class EntryItem : public QGraphicsTextItem {
   bool hasHighlights();
   void clearHighlights();
   void showHighlights();
+  void showHighlight(int);
   public slots:
     void searchItem();
     void clearSelection();
