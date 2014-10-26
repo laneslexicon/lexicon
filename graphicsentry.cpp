@@ -1511,7 +1511,7 @@ int GraphicsEntry::search() {
   QString target = "and";
   int count = 0;
 
-  this->clearSelections();
+
   SearchOptions options;
   options.setSearchScope(SearchOptions::Local);
   // int max = m_items.size() * step;
@@ -1545,6 +1545,7 @@ int GraphicsEntry::search() {
   else {
     return -1;
   }
+  this->clearSelections();
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
   m_searchPositions.clear();
@@ -1601,6 +1602,10 @@ int GraphicsEntry::search() {
     msgBox.setText(QString(tr("Word not found: %1")).arg(t));
     msgBox.exec();
   }
+  if ((count > 0) && (! m_currentSearchOptions.showAll())) {
+    emit(searchStart());
+  }
+
   return count;
 }
 /**
@@ -1701,7 +1706,6 @@ void GraphicsEntry::showSelections() {
   for(int i=0;i < keys.size();i++) {
     QList<int> positions = QList<int>(m_searchPositions.value(keys[i]));
     for(int j=0;j < positions.size();j++) {
-      /// TODO get Qt::white background color from INI
       m_items[keys[i]]->highlight(positions[j]);
     }
   }

@@ -171,6 +171,7 @@ class LanesLexicon : public QMainWindow
       void pageSearch();
       void pageClear();
       void pageSearchComplete();
+      void pageSearchStart();
       void syncContents();
       /// from FullSearchWidget
       void showSearchNode(const QString &);

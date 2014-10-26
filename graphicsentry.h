@@ -219,6 +219,7 @@ class GraphicsEntry : public QWidget {
     void gotoNode(const Place & p,int);
     void printNode(const QString &);
     void printPage();
+    void searchStart();
     void searchEnd();
 };
 /*

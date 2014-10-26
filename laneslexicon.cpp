@@ -324,6 +324,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
   connect(entry,SIGNAL(printPage()),this,SLOT(pagePrint()));
   connect(entry,SIGNAL(searchEnd()),this,SLOT(pageSearchComplete()));
+  connect(entry,SIGNAL(searchStart()),this,SLOT(pageSearchStart()));
 }
 void LanesLexicon::onCloseOtherTabs() {
   m_tabs->setUpdatesEnabled(false);
@@ -2695,14 +2696,7 @@ void LanesLexicon::pageSearch() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if ( entry ) {
     entry->setFocus();
-    if (entry->search()) {
-      m_clearAction->setEnabled(true);
-      m_localSearchNextAction->setEnabled(true);
-    }
-    else {
-      m_clearAction->setEnabled(false);
-      m_localSearchNextAction->setEnabled(false);
-    }
+    entry->search();
   }
 }
 void LanesLexicon::pageClear() {
@@ -3118,4 +3112,8 @@ void LanesLexicon::onOptions() {
 }
 void LanesLexicon::pageSearchComplete() {
   m_localSearchNextAction->setEnabled(false);
+}
+void LanesLexicon::pageSearchStart() {
+  m_clearAction->setEnabled(true);
+  m_localSearchNextAction->setEnabled(true);
 }
