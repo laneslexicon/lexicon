@@ -323,7 +323,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(gotoNode(const Place &,int)),this,SLOT(gotoPlace(const Place &,int)));
   connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
   connect(entry,SIGNAL(printPage()),this,SLOT(pagePrint()));
-
+  connect(entry,SIGNAL(searchEnd()),this,SLOT(pageSearchComplete()));
 }
 void LanesLexicon::onCloseOtherTabs() {
   m_tabs->setUpdatesEnabled(false);
@@ -701,6 +701,8 @@ void LanesLexicon::createActions() {
   m_narrowAction = new QAction(tr("Narrow text"),this);
   m_printAction = new QAction(tr("Print"),this);
   m_localSearchAction = new QAction(tr("Search page"),this);
+  m_localSearchNextAction = new QAction(tr("Search next"),this);
+  m_localSearchNextAction->setEnabled(false);
   m_clearAction = new QAction(tr("Clear"),this);
   m_convertToEntryAction = new QAction(tr("Convert"),this);
   m_clearAction->setEnabled(false);
@@ -716,6 +718,7 @@ void LanesLexicon::createActions() {
   connect(m_narrowAction,SIGNAL(triggered()),this,SLOT(pageNarrow()));
   connect(m_printAction,SIGNAL(triggered()),this,SLOT(pagePrint()));
   connect(m_localSearchAction,SIGNAL(triggered()),this,SLOT(pageSearch()));
+  connect(m_localSearchNextAction,SIGNAL(triggered()),this,SLOT(localSearchNext()));
   connect(m_clearAction,SIGNAL(triggered()),this,SLOT(pageClear()));
   connect(m_convertToEntryAction,SIGNAL(triggered()),this,SLOT(convertToEntry()));
 
@@ -885,6 +888,12 @@ void LanesLexicon::createToolBar() {
   m_localSearchButton->setFocusPolicy(Qt::StrongFocus);
   m_entrybar->addWidget(m_localSearchButton);
 
+  m_localSearchNextButton = new QToolButton(m_entrybar);
+  m_localSearchNextButton->setDefaultAction(m_localSearchNextAction);
+  m_localSearchNextButton->setText(tr("Search next page"));
+  m_localSearchNextButton->setFocusPolicy(Qt::StrongFocus);
+  m_entrybar->addWidget(m_localSearchNextButton);
+
   //  m_entrybar->addAction(m_localSearchAction);
   m_clearButton = new QToolButton(m_entrybar);
   m_clearButton->setDefaultAction(m_clearAction);
@@ -915,6 +924,7 @@ void LanesLexicon::createToolBar() {
   setTabOrder(m_widenButton,m_narrowButton);
   setTabOrder(m_narrowButton,m_printButton);
   setTabOrder(m_printButton,m_localSearchButton);
+  setTabOrder(m_localSearchButton,m_localSearchNextButton);
 
   if (m_toolbarText) {
     m_exitButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -1083,6 +1093,7 @@ void LanesLexicon::createMenus() {
   m_pageMenu->addAction(m_narrowAction);
   m_pageMenu->addAction(m_printAction);
   m_pageMenu->addAction(m_localSearchAction);
+  m_pageMenu->addAction(m_localSearchNextAction);
   m_pageMenu->addAction(m_clearAction);
 
   m_toolMenu = m_mainmenu->addMenu(tr("&Tools"));
@@ -2686,6 +2697,11 @@ void LanesLexicon::pageSearch() {
     entry->setFocus();
     if (entry->search()) {
       m_clearAction->setEnabled(true);
+      m_localSearchNextAction->setEnabled(true);
+    }
+    else {
+      m_clearAction->setEnabled(false);
+      m_localSearchNextAction->setEnabled(false);
     }
   }
 }
@@ -3014,12 +3030,17 @@ void LanesLexicon::setIcons(const QString & theme) {
   iconfile = settings->value("Print",QString()).toString();
   setIcon(m_printAction,imgdir,iconfile);
 
-  iconfile = settings->value("LocalSearch",QString()).toString();
+  iconfile = settings->value("Local search",QString()).toString();
   setIcon(m_localSearchAction,imgdir,iconfile);
 
-  //  m_clearAction = createIconAction(imgdir,settings->value("Clear",QString()).toString(),tr("Clear highlights"));
+  iconfile = settings->value("Local search next",QString()).toString();
+  setIcon(m_localSearchNextAction,imgdir,iconfile);
+
+  iconfile = settings->value("Clear",QString()).toString();
+  setIcon(m_clearAction,imgdir,iconfile);
+  m_clearAction->setEnabled(false);
+
   //  m_convertToEntryAction = createIconAction(imgdir,settings->value("SearchToEntry",QString()).toString(),tr("Convert to Entry"));
-  //  m_clearAction->setEnabled(false);
 
   iconfile = settings->value("Keymaps",QString()).toString();
   setIcon(m_keymapsAction,imgdir,iconfile);
@@ -3094,4 +3115,7 @@ void LanesLexicon::onOptions() {
   OptionsDialog * d = new OptionsDialog(this);
   d->exec();
   delete d;
+}
+void LanesLexicon::pageSearchComplete() {
+  m_localSearchNextAction->setEnabled(false);
 }

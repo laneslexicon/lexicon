@@ -1674,6 +1674,7 @@ void GraphicsEntry::searchNext() {
     }
     msgBox.setText(QString(tr("No more occurrences of : <span style=\"%1\">%2</span>")).arg(style).arg(m_currentSearchTarget));
     msgBox.exec();
+    emit(searchEnd());
   }
 }
 void GraphicsEntry::addPosition(int itemIx,int pos) {

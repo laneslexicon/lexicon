@@ -170,6 +170,7 @@ class LanesLexicon : public QMainWindow
       void pagePrint();
       void pageSearch();
       void pageClear();
+      void pageSearchComplete();
       void syncContents();
       /// from FullSearchWidget
       void showSearchNode(const QString &);
@@ -318,6 +319,7 @@ class LanesLexicon : public QMainWindow
       QToolButton * m_narrowButton;
       QToolButton * m_printButton;
       QToolButton * m_localSearchButton;
+      QToolButton * m_localSearchNextButton;
       QToolButton * m_clearButton;
       QToolButton * m_navFirstButton;
       QToolButton * m_navLastButton;
@@ -365,6 +367,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_narrowAction;
       QAction * m_printAction;
       QAction * m_localSearchAction;
+      QAction * m_localSearchNextAction;
       QAction * m_clearAction;                     // clear the highlights
       QAction * m_convertToEntryAction;      // convert HeadSearch to GraphicsEntry
       QAction * m_keymapsAction;
