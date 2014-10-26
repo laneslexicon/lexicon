@@ -323,8 +323,9 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(gotoNode(const Place &,int)),this,SLOT(gotoPlace(const Place &,int)));
   connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
   connect(entry,SIGNAL(printPage()),this,SLOT(pagePrint()));
-  connect(entry,SIGNAL(searchEnd()),this,SLOT(pageSearchComplete()));
-  connect(entry,SIGNAL(searchStart()),this,SLOT(pageSearchStart()));
+  connect(entry,SIGNAL(searchFinished()),this,SLOT(pageSearchComplete()));
+  connect(entry,SIGNAL(searchStarted()),this,SLOT(pageSearchStart()));
+  connect(entry,SIGNAL(searchFoundNext()),this,SLOT(pageSearchStart()));
 }
 void LanesLexicon::onCloseOtherTabs() {
   m_tabs->setUpdatesEnabled(false);

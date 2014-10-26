@@ -1220,7 +1220,7 @@ void GraphicsEntry::highlight(const QString & target) {
   QTextCursor cursor;
   for(int i=0;i < m_items.size();i++ ) {
     EntryItem * item = m_items[i];
-    QTextCursor c = item->highlightRx(target);
+    QTextCursor c;// = item->highlightRx(target);
     /// get the cursor for the first match
     if (! c.isNull() && (ix == -1)) {
       cursor = c;
@@ -1560,7 +1560,7 @@ int GraphicsEntry::search() {
       while(pos != -1) {
         m_currentSearchPosition = m_items[i]->find(rx,pos);
         if (m_currentSearchPosition != -1) {
-          m_items[i]->highlight(pos);
+          //          m_items[i]->highlight(pos);
           count++;
           this->addPosition(i,m_currentSearchPosition);
         }
@@ -1603,7 +1603,7 @@ int GraphicsEntry::search() {
     msgBox.exec();
   }
   if ((count > 0) && (! m_currentSearchOptions.showAll())) {
-    emit(searchStart());
+    emit(searchStarted());
   }
 
   return count;
@@ -1617,7 +1617,7 @@ void GraphicsEntry::searchNext() {
   int pos = m_currentSearchPosition;
   m_currentSearchPosition = -1;
   bool found = false;
-  m_items[m_currentSearchIndex]->highlight(pos);
+  //  m_items[m_currentSearchIndex]->highlight(pos);
   for(int i=m_currentSearchIndex;(i < m_items.size()) && ! found ;i++) {
     m_currentSearchPosition = m_items[i]->find(m_currentSearchRx,pos);
     if (m_currentSearchPosition != -1) {
@@ -1661,6 +1661,7 @@ void GraphicsEntry::searchNext() {
       }
       this->addPosition(i,m_currentSearchPosition);
       m_currentSearchIndex = i;
+      emit(searchFoundNext());
       //      m_items[i]->ensureVisible();
       //      this->setCurrentItem(m_items[i]);
       return;
@@ -1669,7 +1670,7 @@ void GraphicsEntry::searchNext() {
       pos = 0;
     }
   }
-  if (!m_currentSearchTarget.isEmpty() && (m_currentSearchPosition == -1)) {
+  if (m_currentSearchPosition == -1) {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
     msgBox.setTextFormat(Qt::RichText);
@@ -1680,7 +1681,10 @@ void GraphicsEntry::searchNext() {
     }
     msgBox.setText(QString(tr("No more occurrences of : <span style=\"%1\">%2</span>")).arg(style).arg(m_currentSearchTarget));
     msgBox.exec();
-    emit(searchEnd());
+    emit(searchFinished());
+  }
+  else {
+    emit(searchFoundNext());
   }
 }
 void GraphicsEntry::addPosition(int itemIx,int pos) {
@@ -1692,6 +1696,10 @@ void GraphicsEntry::addPosition(int itemIx,int pos) {
   m_searchPositions.insert(itemIx,positions);
 }
 void GraphicsEntry::showSelections() {
+  for(int i=0;i < m_items.size();i++) {
+    m_items[i]->showHighlights();
+  }
+  /*
   QList<int> keys = QList<int>(m_searchPositions.keys());
   for(int i=0;i < keys.size();i++) {
     QList<int> positions = QList<int>(m_searchPositions.value(keys[i]));
@@ -1699,6 +1707,7 @@ void GraphicsEntry::showSelections() {
       m_items[keys[i]]->highlight(positions[j]);
     }
   }
+  */
 }
 
 QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & method,const QString & node) {

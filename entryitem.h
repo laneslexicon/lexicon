@@ -74,9 +74,6 @@ class EntryItem : public QGraphicsTextItem {
   int getPage();
   QString getOutputHtml() const { return m_html; }
   void setOutputHtml(const QString & html) { m_html = html;}
-  QTextCursor highlight(const QString &,Qt::GlobalColor color = Qt::yellow);
-  void highlight(int pos,Qt::GlobalColor color = Qt::yellow);
-  QTextCursor highlightRx(const QString &);
   void setFocusOnHover(bool v) { m_focusOnHover = v;};
   bool  getFocusOnHover() const { return m_focusOnHover;}
   int findCount() const { return m_searchPositions.size(); }
@@ -90,8 +87,9 @@ class EntryItem : public QGraphicsTextItem {
   QList<Note *> getNotes(bool erase = false);
   void destroyNotes();
   bool hasNotes() const;
-
+  bool hasHighlights();
   void clearHighlights();
+  void showHighlights();
   public slots:
     void searchItem();
     void clearSelection();
@@ -122,12 +120,11 @@ class EntryItem : public QGraphicsTextItem {
  private:
   QString m_xml;
   bool m_notesEnabled;
-  bool m_highlights;
   QGraphicsWidget * m_noteWidget;
   NoteDialog * m_note;
   QList<Note *> m_notes;
   QList<int> m_searchPositions;
-  QList<int> m_backgrounds;
+  QList<int> m_highlights;
   QColor m_defaultBackground;
   Place m_place;
   QString m_searchText;
