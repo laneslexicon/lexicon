@@ -272,12 +272,19 @@ void EntryItem::showHighlights() {
 }
 void EntryItem::showHighlight(int index) {
   QTextCursor c = this->textCursor();
+  QString t;
   if ((index >= 0) && (index < m_highlights.size())) {
     c.setPosition(m_highlights[index]);
-    c.select(QTextCursor::WordUnderCursor);
+    t = m_finds.value(m_highlights[index]);
+    qDebug() << Q_FUNC_INFO << c.position() << t.size();
+    qDebug() << m_finds;
+    qDebug() << m_highlights;
+    c.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,t.size());
+    //    c.select(QTextCursor::WordUnderCursor);
     QTextCharFormat fmt = c.charFormat();
     fmt.setBackground(Qt::yellow);
     c.setCharFormat(fmt);
+    c.clearSelection();
     this->setTextCursor(c);
   }
 }
@@ -292,6 +299,7 @@ void EntryItem::clearHighlights() {
     this->setTextCursor(c);
   }
   m_highlights.clear();
+  m_finds.clear();
 }
 void EntryItem::setWord(const QString & word) {
   m_place.setWord(word);
@@ -372,23 +380,26 @@ void EntryItem::notesAccepted() {
   this->setFocus();
 }
 int EntryItem::find(const QRegExp & rx,int position,bool highlight) {
-  //  QLOG_DEBUG() << Q_FUNC_INFO << position;
+  //QLOG_DEBUG() << Q_FUNC_INFO << position;
   QTextCursor c = this->document()->find(rx,position);
   if (c.isNull()) {
     return -1;
   }
+  QString t = c.selectedText();
   /// the find positions the cursor at the end, so move back one carh
   /// and select the word
   /// then set m_cursor at the next occurence (if any)
   c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
   QTextCharFormat fmt = c.charFormat();
   m_highlights << c.position();
+  m_finds.insert(c.position(),t);
   if (highlight) {
-    c.select(QTextCursor::WordUnderCursor);
+    //    c.select(QTextCursor::WordUnderCursor);
     fmt.setBackground(Qt::yellow);
     c.setCharFormat(fmt);
   }
   this->setTextCursor(c);
+
   /*
   QTextCharFormat fmt = QTextEdit::ExtraSelection::format;//c.charFormat();
   QLOG_DEBUG() << fmt.background().color().name();

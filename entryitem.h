@@ -126,6 +126,7 @@ class EntryItem : public QGraphicsTextItem {
   QList<Note *> m_notes;
   QList<int> m_searchPositions;
   QList<int> m_highlights;
+  QMap<int,QString> m_finds;
   QColor m_defaultBackground;
   Place m_place;
   QString m_searchText;

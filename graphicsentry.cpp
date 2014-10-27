@@ -1548,47 +1548,41 @@ int GraphicsEntry::search() {
   this->clearHighlights();
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
-  m_searchPositions.clear();
+  m_searchItemIndexes.clear();
   QRegExp rx = SearchOptionsWidget::buildRx(t,m_pattern,options);
   m_currentSearchRx = rx;
   m_currentSearchTarget = t;
   this->m_items[0]->ensureVisible();
   int pos = 0;
-  if (m_currentSearchOptions.showAll()) {
-    for(int i=1;i < m_items.size();i++) {
-      pos = 0;
-      while(pos != -1) {
-        m_currentSearchPosition = m_items[i]->find(rx,pos);
-        if (m_currentSearchPosition != -1) {
-          count++;
-          this->addPosition(i,m_currentSearchPosition);
-        }
-        pos = m_currentSearchPosition;
-      }
-    }
-    /// position at the first one, so the find next stuff works anyway
-    if (count > 0) {
-      QList<int> keys = QList<int>(m_searchPositions.keys());
-      QList<int> positions = QList<int>(m_searchPositions.value(keys[0]));
-      m_currentSearchIndex = keys[0];
-      m_currentSearchPosition = positions[0];
-    }
-  }
-  else {
-    for(int i=1;(i < m_items.size()) && (m_currentSearchPosition == -1);i++) {
-      m_currentSearchPosition = m_items[i]->find(rx,0);
+  bool found;
+  qDebug() << "beginning ssearch";
+  for(int i=1;i < m_items.size();i++) {
+    pos = 0;
+    found = false;
+    while(pos != -1) {
+      pos++;
+      m_currentSearchPosition = m_items[i]->find(rx,pos,m_currentSearchOptions.showAll());
       if (m_currentSearchPosition != -1) {
+        found = true;
         count++;
-        m_currentSearchIndex = i;
-        this->addPosition(i,m_currentSearchPosition);
-        if (i > 1) {
-          this->setCurrentItem(m_items[i]);
-          m_items[i]->setFocus();
-          this->addPosition(i,m_currentSearchPosition);
-        }
+        //        this->addPosition(i,m_currentSearchPosition);
       }
+      pos = m_currentSearchPosition;
+    }
+    if (found) {
+      m_searchItemIndexes << i;
     }
   }
+  qDebug() << Q_FUNC_INFO << m_searchItemIndexes;
+    /// position at the first one, so the find next stuff works anyway
+  if (m_searchItemIndexes.size() > 0) {
+      m_searchItemPtr = 0;
+      m_searchIndex = 0;
+      int ix = m_searchItemIndexes[m_searchItemPtr];
+      m_items[ix]->showHighlight(m_searchIndex);
+      qDebug() << Q_FUNC_INFO << "search count at 0" << m_items[ix]->findCount();
+
+    }
   if (count  == 0) {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
@@ -1612,28 +1606,35 @@ int GraphicsEntry::search() {
  * m_currentSearchPosition is the current position within the current EntryItem
  */
 void GraphicsEntry::searchNext() {
-  QLOG_DEBUG() << Q_FUNC_INFO << m_currentSearchIndex << m_currentSearchPosition;
-  int pos = m_currentSearchPosition;
-  m_currentSearchPosition = -1;
-  bool found = false;
-  for(int i=m_currentSearchIndex;(i < m_items.size()) && ! found ;i++) {
-    m_currentSearchPosition = m_items[i]->find(m_currentSearchRx,pos);
-    if (m_currentSearchPosition != -1) {
-      found = true;
-      if (i > m_currentSearchIndex) {
-        if (m_currentSearchOptions.showAll()) {
-          QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
-          //c.clearSelection();
-          m_items[m_currentSearchIndex]->setTextCursor(c);
-        }
-        else {
-          QTextCursor c = m_items[m_currentSearchIndex]->textCursor();
-          c.clearSelection();
-          m_items[m_currentSearchIndex]->setTextCursor(c);
-        }
-        this->setCurrentItem(m_items[i]);
-        m_items[i]->setFocus();
-        if (m_items[i]->boundingRect().height() > m_view->height()) {
+  QLOG_DEBUG() << Q_FUNC_INFO << m_searchItemPtr << m_searchIndex;
+  int pos = m_searchItemIndexes[m_searchItemPtr];
+  int findCount = m_items[pos]->findCount();
+  m_items[pos]->showHighlight(m_searchIndex);
+  qDebug() << Q_FUNC_INFO << "finds at" << pos << findCount;
+  m_searchIndex++;
+  if (m_searchIndex >= findCount) {
+    m_searchItemPtr++;
+    m_searchIndex = 0;
+  }
+  if (m_searchItemPtr >= m_searchItemIndexes.size()) {
+    QMessageBox msgBox;
+    msgBox.setObjectName("wordnotfound");
+    msgBox.setTextFormat(Qt::RichText);
+    QString style;
+    /// TODO get this from INI
+    if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
+        style = "font-family : Amiri;font-size : 18pt";
+    }
+    msgBox.setText(QString(tr("No more occurrences of : <span style=\"%1\">%2</span>")).arg(style).arg(m_currentSearchTarget));
+    msgBox.exec();
+    emit(searchFinished());
+    return;
+  }
+  int i = m_searchItemIndexes[m_searchItemPtr];
+  m_items[i]->showHighlight(m_searchIndex);
+  this->setCurrentItem(m_items[i]);
+  m_items[i]->setFocus();
+  if (m_items[i]->boundingRect().height() > m_view->height()) {
           int charCount = m_items[i]->document()->characterCount();
           qreal h = m_items[i]->boundingRect().height();
           qreal dy = (h * (qreal)m_currentSearchPosition)/(qreal)charCount;
@@ -1641,9 +1642,8 @@ void GraphicsEntry::searchNext() {
           p.setY(p.y() + dy);
           QLOG_DEBUG() << "adjusting pos" << dy;
           m_view->ensureVisible(QRectF(p,QSizeF(10,10)));
-        }
-      }
-      else {
+  }
+  else {
         m_items[i]->setFocus();
         /*
         if (m_items[i]->boundingRect().height() > m_view->height()) {
@@ -1656,42 +1656,20 @@ void GraphicsEntry::searchNext() {
           m_view->ensureVisible(QRectF(p,QSizeF(10,10)));
         }
         */
-      }
-      this->addPosition(i,m_currentSearchPosition);
-      m_currentSearchIndex = i;
-      emit(searchFoundNext());
-      //      m_items[i]->ensureVisible();
-      //      this->setCurrentItem(m_items[i]);
-      return;
-    }
-    else {
-      pos = 0;
-    }
   }
-  if (m_currentSearchPosition == -1) {
-    QMessageBox msgBox;
-    msgBox.setObjectName("wordnotfound");
-    msgBox.setTextFormat(Qt::RichText);
-    QString style;
-    /// TODO get this from INI
-    if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
-        style = "font-family : Amiri;font-size : 18pt";
-    }
-    msgBox.setText(QString(tr("No more occurrences of : <span style=\"%1\">%2</span>")).arg(style).arg(m_currentSearchTarget));
-    msgBox.exec();
-    emit(searchFinished());
-  }
-  else {
-    emit(searchFoundNext());
-  }
+  emit(searchFoundNext());
+  return;
 }
+
 void GraphicsEntry::addPosition(int itemIx,int pos) {
+  /*
   QList<int> positions;
   if (m_searchPositions.contains(itemIx)) {
     positions = QList<int>(m_searchPositions.value(itemIx));
   }
   positions << pos;
   m_searchPositions.insert(itemIx,positions);
+  */
 }
 void GraphicsEntry::showSelections() {
   for(int i=0;i < m_items.size();i++) {

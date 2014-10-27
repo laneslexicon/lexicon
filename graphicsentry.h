@@ -129,8 +129,9 @@ class GraphicsEntry : public QWidget {
 
     SearchOptions m_currentSearchOptions;
 
-    QMap<int,QList<int> > m_searchPositions;
-
+    QList<int> m_searchItemIndexes;
+    int m_searchItemPtr;
+    int m_searchIndex;
     QColor m_supplementBg;
 
     bool m_notesEnabled;
