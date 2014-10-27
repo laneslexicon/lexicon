@@ -1521,6 +1521,7 @@ int GraphicsEntry::search() {
       return -1;
     }
     d->getOptions(options);
+    m_currentSearchOptions = options;
   }
   else {
     return -1;
@@ -1585,8 +1586,12 @@ int GraphicsEntry::search() {
       this->centerOnSearchResult(m_searchItemIndexes[m_searchItemPtr],0);
       emit(searchStarted());
     }
+    else {
+      m_currentFind = m_findCount;
+      statusMessage(QString("Find count: %1").arg(m_findCount));
+      emit(searchFinished());
+    }
   }
-
   return count;
 }
 /**
@@ -1619,14 +1624,18 @@ void GraphicsEntry::searchNext() {
   int i = m_searchItemIndexes[m_searchItemPtr];
   this->centerOnSearchResult(i,m_searchIndex);
   emit(searchFoundNext());
-  qDebug() << m_findCount << m_highlightCount;
   return;
 }
 void GraphicsEntry::centerOnSearchResult(int itemIndex,int ix) {
   int pos = m_items[itemIndex]->showHighlight(ix);
   m_highlightCount++;
   m_currentFind++;
-  statusMessage(QString("Showing %1 of %2").arg(m_currentFind).arg(m_findCount));
+  if (m_currentSearchOptions.showAll()) {
+    statusMessage(QString("Find count: %1").arg(m_findCount));
+  }
+  else {
+    statusMessage(QString("Showing %1 of %2").arg(m_currentFind).arg(m_findCount));
+  }
   m_items[itemIndex]->ensureVisible();
   if (m_items[itemIndex]->boundingRect().height() > m_view->height()) {
     int charCount = m_items[itemIndex]->document()->characterCount();

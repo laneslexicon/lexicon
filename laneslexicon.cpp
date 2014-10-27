@@ -3112,7 +3112,6 @@ void LanesLexicon::onOptions() {
   delete d;
 }
 void LanesLexicon::pageSearchComplete() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());
   if (!entry) {
     return;
@@ -3122,7 +3121,6 @@ void LanesLexicon::pageSearchComplete() {
 
 }
 void LanesLexicon::pageSearchStart() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());
   if (!entry) {
     return;
