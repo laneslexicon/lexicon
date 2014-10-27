@@ -1381,6 +1381,7 @@ void GraphicsEntry::clearHighlights() {
   }
   if (item) {
     m_view->ensureVisible(item);
+    m_scene->setFocusItem(item);
   }
 }
 void GraphicsEntry::shiftFocus() {
@@ -1649,6 +1650,8 @@ void GraphicsEntry::searchNext() {
     return;
   }
   int i = m_searchItemIndexes[m_searchItemPtr];
+  this->centerOnSearchResult(i,m_searchIndex);
+  /*
   pos = m_items[i]->showHighlight(m_searchIndex);
   this->setCurrentItem(m_items[i]);
   qDebug() << Q_FUNC_INFO << m_items[i]->boundingRect().height() << m_view->height();
@@ -1664,6 +1667,7 @@ void GraphicsEntry::searchNext() {
   else {
         m_items[i]->setFocus();
   }
+  */
   emit(searchFoundNext());
   return;
 }
@@ -1671,11 +1675,11 @@ void GraphicsEntry::centerOnSearchResult(int itemIndex,int ix) {
   int pos = m_items[itemIndex]->showHighlight(ix);
   m_items[itemIndex]->ensureVisible();
   if (m_items[itemIndex]->boundingRect().height() > m_view->height()) {
-    qDebug() << Q_FUNC_INFO << m_items[ix]->boundingRect().height() << m_view->height();
+    qDebug() << Q_FUNC_INFO << m_items[itemIndex]->boundingRect().height() << m_view->height();
     int charCount = m_items[itemIndex]->document()->characterCount();
     qreal h = m_items[itemIndex]->boundingRect().height();
     qreal dy = (h * (qreal)pos)/(qreal)charCount;
-    QPointF p = m_items[ix]->scenePos();
+    QPointF p = m_items[itemIndex]->scenePos();
     qDebug() << "Character count" << charCount;
     qDebug() << "Position" << pos;
     qDebug() << "Scene pos of item" << p;
@@ -1685,7 +1689,7 @@ void GraphicsEntry::centerOnSearchResult(int itemIndex,int ix) {
     m_view->centerOn(p);//ensureVisible(QRectF(p,QSizeF(30,130)));
   }
 }
-void GraphicsEntry::addPosition(int itemIx,int pos) {
+void GraphicsEntry::addPosition(int /* itemIx */,int /* pos */) {
   /*
   QList<int> positions;
   if (m_searchPositions.contains(itemIx)) {
