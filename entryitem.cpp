@@ -403,18 +403,17 @@ int EntryItem::find(const QRegExp & rx,int position,bool highlight) {
     return -1;
   }
   QString t = c.selectedText();
-  /// the find positions the cursor at the end, so move back one carh
-  /// and select the word
-  /// then set m_cursor at the next occurence (if any)
   c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
-  QTextCharFormat fmt = c.charFormat();
   m_highlights << c.position();
   m_finds.insert(c.position(),t);
+  c.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,t.size());
+  QTextCharFormat fmt = c.charFormat();
   if (highlight) {
     //    c.select(QTextCursor::WordUnderCursor);
     fmt.setBackground(Qt::yellow);
     c.setCharFormat(fmt);
   }
+  c.clearSelection();
   this->setTextCursor(c);
 
   /*
