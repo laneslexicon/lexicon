@@ -3112,9 +3112,21 @@ void LanesLexicon::onOptions() {
   delete d;
 }
 void LanesLexicon::pageSearchComplete() {
-  m_localSearchNextAction->setEnabled(false);
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());
+  if (!entry) {
+    return;
+  }
+  m_localSearchNextAction->setEnabled(entry->hasMoreFinds());
+  m_clearAction->setEnabled(entry->hasHighlights());
+
 }
 void LanesLexicon::pageSearchStart() {
-  m_clearAction->setEnabled(true);
-  m_localSearchNextAction->setEnabled(true);
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());
+  if (!entry) {
+    return;
+  }
+  m_localSearchNextAction->setEnabled(entry->hasMoreFinds());
+  m_clearAction->setEnabled(entry->hasHighlights());
 }

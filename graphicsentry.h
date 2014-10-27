@@ -73,7 +73,10 @@ class GraphicsEntry : public QWidget {
     QGraphicsScene * getScene() { return m_scene;}
     int search();
     int getFindCount() const;
-
+    //    int getCurrentFind() const;
+    //    int getHighlightCount() const;
+    bool hasHighlights() const;
+    bool hasMoreFinds() const;
     void searchNext();
     bool hasNode(const QString &) const;
     bool focusNode(const QString &);
@@ -110,6 +113,7 @@ class GraphicsEntry : public QWidget {
  private:
     int m_findCount;
     int m_highlightCount;
+    int m_currentFind;
     void centerOnSearchResult(int,int);
     QString lastRoot();
     QString firstRoot();

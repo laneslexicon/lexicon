@@ -1357,6 +1357,7 @@ void GraphicsEntry::clearHighlights(bool keepResults) {
   }
   m_view->horizontalScrollBar()->setValue(pos_x);
   m_view->verticalScrollBar()->setValue(pos_y);
+  m_highlightCount = 0;
 }
 void GraphicsEntry::shiftFocus() {
   QGraphicsItem * item = m_scene->focusItem();
@@ -1526,6 +1527,7 @@ int GraphicsEntry::search() {
   }
   m_findCount = 0;
   m_highlightCount = 0;
+  m_currentFind = 0;
   this->clearHighlights(false);
   m_searchItemPtr = 0;
   m_searchIndex = 0;
@@ -1561,7 +1563,8 @@ int GraphicsEntry::search() {
       m_searchItemIndexes << i;
     }
   }
-  statusMessage(QString(tr("Find count: %1")).arg(count));
+  m_findCount = count;
+
   if (count  == 0) {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
@@ -1583,7 +1586,7 @@ int GraphicsEntry::search() {
       emit(searchStarted());
     }
   }
-  m_findCount = count;
+
   return count;
 }
 /**
@@ -1622,6 +1625,8 @@ void GraphicsEntry::searchNext() {
 void GraphicsEntry::centerOnSearchResult(int itemIndex,int ix) {
   int pos = m_items[itemIndex]->showHighlight(ix);
   m_highlightCount++;
+  m_currentFind++;
+  statusMessage(QString("Showing %1 of %2").arg(m_currentFind).arg(m_findCount));
   m_items[itemIndex]->ensureVisible();
   if (m_items[itemIndex]->boundingRect().height() > m_view->height()) {
     int charCount = m_items[itemIndex]->document()->characterCount();
@@ -1646,6 +1651,21 @@ void GraphicsEntry::showSelections() {
 }
 int GraphicsEntry::getFindCount() const {
   return m_findCount;
+}
+/*
+int GraphicsEntry::getHighlightCount() const {
+  return m_highlightCount;
+}
+int GraphicsEntry::getCurrentFind() const {
+  return m_currentFind;
+}
+*/
+bool GraphicsEntry::hasMoreFinds() const {
+
+  return (m_currentFind < m_findCount);
+}
+bool GraphicsEntry::hasHighlights() const {
+  return (m_highlightCount > 0);
 }
 QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & method,const QString & node) {
   QString base;
