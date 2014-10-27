@@ -90,7 +90,7 @@ class EntryItem : public QGraphicsTextItem {
   bool hasHighlights();
   void clearHighlights();
   void showHighlights();
-  void showHighlight(int);
+  int showHighlight(int);
   public slots:
     void searchItem();
     void clearSelection();

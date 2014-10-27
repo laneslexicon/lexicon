@@ -242,7 +242,7 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
 
   if ( ! m_place.isSupplement()) {
     /// TODO get this from somewhere
-    painter->setBrush(Qt::white);
+    //    painter->setBrush(Qt::white);
   }
   else {
     painter->setBrush(m_backgroundColor);
@@ -270,15 +270,17 @@ void EntryItem::showHighlights() {
     this->setTextCursor(c);
   }
 }
-void EntryItem::showHighlight(int index) {
+int EntryItem::showHighlight(int index) {
   QTextCursor c = this->textCursor();
   QString t;
   if ((index >= 0) && (index < m_highlights.size())) {
     c.setPosition(m_highlights[index]);
     t = m_finds.value(m_highlights[index]);
+    /*
     qDebug() << Q_FUNC_INFO << c.position() << t.size();
     qDebug() << m_finds;
     qDebug() << m_highlights;
+    */
     c.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,t.size());
     //    c.select(QTextCursor::WordUnderCursor);
     QTextCharFormat fmt = c.charFormat();
@@ -286,16 +288,22 @@ void EntryItem::showHighlight(int index) {
     c.setCharFormat(fmt);
     c.clearSelection();
     this->setTextCursor(c);
+    return m_highlights[index];
   }
+  return -1;
 }
 void EntryItem::clearHighlights() {
+  QString t;
   QTextCursor c = this->textCursor();
   for(int i=0;i < m_highlights.size();i++) {
     c.setPosition(m_highlights[i]);
-    c.select(QTextCursor::WordUnderCursor);
+    t = m_finds.value(m_highlights[i]);
+    //    c.select(QTextCursor::WordUnderCursor);
+    c.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,t.size());
     QTextCharFormat fmt = c.charFormat();
     fmt.setBackground(m_defaultBackground);
     c.setCharFormat(fmt);
+    c.clearSelection();
     this->setTextCursor(c);
   }
   m_highlights.clear();
