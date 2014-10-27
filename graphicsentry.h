@@ -72,7 +72,7 @@ class GraphicsEntry : public QWidget {
     void setTextWidth(int w) { m_textWidth = w;}
     QGraphicsScene * getScene() { return m_scene;}
     int search();
-
+    int getFindCount() const;
 
     void searchNext();
     bool hasNode(const QString &) const;
@@ -108,6 +108,8 @@ class GraphicsEntry : public QWidget {
     void showSelections();
     void print(QPrinter &,const QString & node = QString());
  private:
+    int m_findCount;
+    int m_highlightCount;
     void centerOnSearchResult(int,int);
     QString lastRoot();
     QString firstRoot();

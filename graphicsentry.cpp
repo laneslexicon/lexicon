@@ -1524,6 +1524,8 @@ int GraphicsEntry::search() {
   else {
     return -1;
   }
+  m_findCount = 0;
+  m_highlightCount = 0;
   this->clearHighlights(false);
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
@@ -1536,12 +1538,13 @@ int GraphicsEntry::search() {
   //  this->m_items[0]->ensureVisible();
   int pos = 0;
   bool found;
+  qDebug() << "Show all" << options.showAll();
   for(int i=1;i < m_items.size();i++) {
     pos = 0;
     found = false;
     while(pos != -1) {
       pos++;
-      m_currentSearchPosition = m_items[i]->find(rx,pos,m_currentSearchOptions.showAll());
+      m_currentSearchPosition = m_items[i]->find(rx,pos,options.showAll());
       if (m_currentSearchPosition != -1) {
         found = true;
         count++;
@@ -1577,7 +1580,7 @@ int GraphicsEntry::search() {
   if ((count > 0) && (! m_currentSearchOptions.showAll())) {
     emit(searchStarted());
   }
-
+  m_findCount = count;
   return count;
 }
 /**
@@ -1588,7 +1591,6 @@ void GraphicsEntry::searchNext() {
   QLOG_DEBUG() << Q_FUNC_INFO << m_searchItemPtr << m_searchIndex;
   int pos = m_searchItemIndexes[m_searchItemPtr];
   int findCount = m_items[pos]->findCount();
-  m_items[pos]->showHighlight(m_searchIndex);
   m_searchIndex++;
   if (m_searchIndex >= findCount) {
     m_searchItemPtr++;
@@ -1622,13 +1624,14 @@ void GraphicsEntry::centerOnSearchResult(int itemIndex,int ix) {
     qreal h = m_items[itemIndex]->boundingRect().height();
     qreal dy = (h * (qreal)pos)/(qreal)charCount;
     QPointF p = m_items[itemIndex]->scenePos();
+    /*
     qDebug() << "Character count" << charCount;
     qDebug() << "Position" << pos;
     qDebug() << "Scene pos of item" << p;
     QLOG_DEBUG() << "adjusting pos" << dy;
+    */
     p.setY(p.y() + dy);
-    qDebug() << "point" << p;
-    m_view->centerOn(p);//ensureVisible(QRectF(p,QSizeF(30,130)));
+    m_view->centerOn(p);
   }
 }
 void GraphicsEntry::showSelections() {
@@ -1636,7 +1639,9 @@ void GraphicsEntry::showSelections() {
     m_items[i]->showHighlights();
   }
 }
-
+int GraphicsEntry::getFindCount() const {
+  return m_findCount;
+}
 QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & method,const QString & node) {
   QString base;
   if (method == "node") {
