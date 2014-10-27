@@ -1375,8 +1375,12 @@ void GraphicsEntry::reposition() {
   m_scene->setSceneRect(QRectF(0,0,maxwidth,m_scene->height()));
 }
 void GraphicsEntry::clearHighlights() {
+  QGraphicsItem * item = m_scene->focusItem();
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->clearHighlights();
+  }
+  if (item) {
+    m_view->ensureVisible(item);
   }
 }
 void GraphicsEntry::shiftFocus() {
@@ -1540,7 +1544,7 @@ int GraphicsEntry::search() {
     if ( t.isEmpty()) {
       return -1;
     }
-    d->getOptions(m_currentSearchOptions);
+    d->getOptions(options);
   }
   else {
     return -1;
@@ -1550,6 +1554,7 @@ int GraphicsEntry::search() {
   m_currentSearchIndex = -1;
   m_searchItemIndexes.clear();
   QRegExp rx = SearchOptionsWidget::buildRx(t,m_pattern,options);
+  QLOG_DEBUG() << "Search pattern" << rx.pattern();
   m_currentSearchRx = rx;
   m_currentSearchTarget = t;
   this->m_items[0]->ensureVisible();
@@ -1573,8 +1578,9 @@ int GraphicsEntry::search() {
       m_searchItemIndexes << i;
     }
   }
-  qDebug() << Q_FUNC_INFO << m_searchItemIndexes;
-    /// position at the first one, so the find next stuff works anyway
+  statusMessage(QString(tr("Found : %1")).arg(count));
+
+  /// position at the first one, so the find next stuff works anyway
   if (m_searchItemIndexes.size() > 0) {
       m_searchItemPtr = 0;
       m_searchIndex = 0;
@@ -1583,6 +1589,15 @@ int GraphicsEntry::search() {
       qDebug() << Q_FUNC_INFO << "search count at 0" << m_items[ix]->findCount();
       qDebug() << Q_FUNC_INFO << m_items[ix]->boundingRect().height() << m_view->height();
       m_items[ix]->ensureVisible();
+      if (m_items[ix]->boundingRect().height() > m_view->height()) {
+          int charCount = m_items[ix]->document()->characterCount();
+          qreal h = m_items[ix]->boundingRect().height();
+          qreal dy = (h * (qreal)pos)/(qreal)charCount;
+          QPointF p = m_items[ix]->scenePos();
+          p.setY(p.y() + dy);
+          QLOG_DEBUG() << "adjusting pos" << dy;
+          m_view->centerOn(p);//ensureVisible(QRectF(p,QSizeF(30,130)));
+      }
     }
   if (count  == 0) {
     QMessageBox msgBox;

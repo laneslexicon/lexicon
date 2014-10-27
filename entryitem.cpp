@@ -238,16 +238,6 @@ void EntryItem::copy() {
 void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWidget *w) {
   QPen pen = painter->pen();
   QBrush brush = painter->brush();
-  painter->setPen(Qt::NoPen);
-
-  if ( ! m_place.isSupplement()) {
-    /// TODO get this from somewhere
-    //    painter->setBrush(Qt::white);
-  }
-  else {
-    painter->setBrush(m_backgroundColor);
-    painter->drawRect(this->boundingRect());
-  }
   if (! m_defaultBackground.isValid()) {
     if (m_place.isSupplement()) {
       m_defaultBackground = m_backgroundColor;
@@ -255,6 +245,18 @@ void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWi
     else {
       m_defaultBackground = painter->background().color();
     }
+  }
+  painter->setPen(Qt::NoPen);
+
+  if ( ! m_place.isSupplement()) {
+    /// TODO get this from somewhere
+    painter->setBrush(Qt::white);
+  }
+  else {
+    if (m_backgroundColor.isValid()) {
+      painter->setBrush(m_backgroundColor);
+    }
+    painter->drawRect(this->boundingRect());
   }
   painter->setPen(pen);
   QGraphicsTextItem::paint(painter, o, w);
@@ -301,7 +303,12 @@ void EntryItem::clearHighlights() {
     //    c.select(QTextCursor::WordUnderCursor);
     c.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,t.size());
     QTextCharFormat fmt = c.charFormat();
-    fmt.setBackground(m_defaultBackground);
+    /// problem is we are clear highlights for items we have painted yet
+    /// so the defautlBackground is not set and so is black
+    if (m_defaultBackground.isValid()) {
+      fmt.setBackground(m_defaultBackground);
+    }
+    //    fmt.setBackground(Qt::white);//m_defaultBackground);
     c.setCharFormat(fmt);
     c.clearSelection();
     this->setTextCursor(c);
