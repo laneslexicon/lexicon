@@ -1527,6 +1527,9 @@ int GraphicsEntry::search() {
   m_findCount = 0;
   m_highlightCount = 0;
   this->clearHighlights(false);
+  m_searchItemPtr = 0;
+  m_searchIndex = 0;
+  /// TODO remove these
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
   m_searchItemIndexes.clear();
@@ -1548,6 +1551,9 @@ int GraphicsEntry::search() {
       if (m_currentSearchPosition != -1) {
         found = true;
         count++;
+        if (options.showAll()) {
+          m_highlightCount++;
+        }
       }
       pos = m_currentSearchPosition;
     }
@@ -1556,12 +1562,6 @@ int GraphicsEntry::search() {
     }
   }
   statusMessage(QString(tr("Find count: %1")).arg(count));
-  /// position at the first one, so the find next stuff works anyway
-  if (m_searchItemIndexes.size() > 0) {
-    m_searchItemPtr = 0;
-    m_searchIndex = 0;
-    this->centerOnSearchResult(m_searchItemIndexes[m_searchItemPtr],0);
-  }
   if (count  == 0) {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
@@ -1577,8 +1577,11 @@ int GraphicsEntry::search() {
       m_scene->setFocusItem(focusItem);
     }
   }
-  if ((count > 0) && (! m_currentSearchOptions.showAll())) {
-    emit(searchStarted());
+  else {
+    if (! m_currentSearchOptions.showAll()) {
+      this->centerOnSearchResult(m_searchItemIndexes[m_searchItemPtr],0);
+      emit(searchStarted());
+    }
   }
   m_findCount = count;
   return count;
@@ -1588,7 +1591,7 @@ int GraphicsEntry::search() {
  * m_currentSearchPosition is the current position within the current EntryItem
  */
 void GraphicsEntry::searchNext() {
-  QLOG_DEBUG() << Q_FUNC_INFO << m_searchItemPtr << m_searchIndex;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << m_searchItemPtr << m_searchIndex;
   int pos = m_searchItemIndexes[m_searchItemPtr];
   int findCount = m_items[pos]->findCount();
   m_searchIndex++;
@@ -1613,18 +1616,20 @@ void GraphicsEntry::searchNext() {
   int i = m_searchItemIndexes[m_searchItemPtr];
   this->centerOnSearchResult(i,m_searchIndex);
   emit(searchFoundNext());
+  qDebug() << m_findCount << m_highlightCount;
   return;
 }
 void GraphicsEntry::centerOnSearchResult(int itemIndex,int ix) {
   int pos = m_items[itemIndex]->showHighlight(ix);
+  m_highlightCount++;
   m_items[itemIndex]->ensureVisible();
   if (m_items[itemIndex]->boundingRect().height() > m_view->height()) {
-    qDebug() << Q_FUNC_INFO << m_items[itemIndex]->boundingRect().height() << m_view->height();
     int charCount = m_items[itemIndex]->document()->characterCount();
     qreal h = m_items[itemIndex]->boundingRect().height();
     qreal dy = (h * (qreal)pos)/(qreal)charCount;
     QPointF p = m_items[itemIndex]->scenePos();
     /*
+    qDebug() << m_items[itemIndex]->boundingRect().height() << m_view->height();
     qDebug() << "Character count" << charCount;
     qDebug() << "Position" << pos;
     qDebug() << "Scene pos of item" << p;
