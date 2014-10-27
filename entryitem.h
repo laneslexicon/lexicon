@@ -88,7 +88,7 @@ class EntryItem : public QGraphicsTextItem {
   void destroyNotes();
   bool hasNotes() const;
   bool hasHighlights();
-  void clearHighlights();
+  void clearHighlights(bool keepResults = true);
   void showHighlights();
   int showHighlight(int);
   public slots:

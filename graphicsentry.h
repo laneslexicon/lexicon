@@ -68,14 +68,12 @@ class GraphicsEntry : public QWidget {
     QString getPageInfo(bool summary);
     qreal getScale() { return m_scale;}
     void setScale(qreal v, bool use = true);
-    void highlight(const QString & t);
     int getTextWidth() const { return m_textWidth; }
     void setTextWidth(int w) { m_textWidth = w;}
     QGraphicsScene * getScene() { return m_scene;}
     int search();
 
 
-    void addPosition(int,int);
     void searchNext();
     bool hasNode(const QString &) const;
     bool focusNode(const QString &);
@@ -103,7 +101,7 @@ class GraphicsEntry : public QWidget {
     void copy();
     void onWiden();
     void onNarrow();
-    void clearHighlights();
+    void clearHighlights(bool keepResults = true);
     void notesButtonPressed();
     void addButtonDecoration(bool);
     void focusPlace();

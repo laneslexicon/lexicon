@@ -25,26 +25,26 @@ ToolButtonData::~ToolButtonData() {
  * @param scene
  * @param parent
 
-LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
-  QGraphicsView(scene,parent) {
-  setObjectName("lexicongraphicsview");
-  setFocusPolicy(Qt::StrongFocus);
-  setAlignment(Qt::AlignLeft|Qt::AlignTop);
-}
-/// TODO get rid of this
-void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
-  QGraphicsView::scrollContentsBy(dx,dy);
-}
-void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
+ LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
+ QGraphicsView(scene,parent) {
+ setObjectName("lexicongraphicsview");
+ setFocusPolicy(Qt::StrongFocus);
+ setAlignment(Qt::AlignLeft|Qt::AlignTop);
+ }
+ /// TODO get rid of this
+ void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
+ QGraphicsView::scrollContentsBy(dx,dy);
+ }
+ void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
 
-  QGraphicsView::keyPressEvent(event);
-}
-void LaneGraphicsView::focusInEvent(QFocusEvent * event) {
-  QGraphicsView::focusInEvent(event);
-}
-void LaneGraphicsView::focusOutEvent(QFocusEvent * event) {
-  QGraphicsView::focusOutEvent(event);
-}
+ QGraphicsView::keyPressEvent(event);
+ }
+ void LaneGraphicsView::focusInEvent(QFocusEvent * event) {
+ QGraphicsView::focusInEvent(event);
+ }
+ void LaneGraphicsView::focusOutEvent(QFocusEvent * event) {
+ QGraphicsView::focusOutEvent(event);
+ }
 */
 /**
  * (the QSqlQuery instances rely on the default connection being to
@@ -153,7 +153,7 @@ void GraphicsEntry::readSettings() {
 
   m_supplementBg = QColor(v);
   if (! m_supplementBg.isValid())  {
-      m_supplementBg = QColor::fromRgb(211,211,211);
+    m_supplementBg = QColor::fromRgb(211,211,211);
   }
   m_clearScene = settings->value(SID_ENTRY_CLEAR_SCENE,true).toBool();
   /// these are set to empty to disable the feature
@@ -321,9 +321,9 @@ void GraphicsEntry::moveFocusUp() {
  */
 Place GraphicsEntry::getPlace(int index) const {
   if (index == -1) {
-  EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
-  if (item)
-    return item->getPlace();
+    EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
+    if (item)
+      return item->getPlace();
   }
   else {
     if (index < m_items.size()) {
@@ -331,7 +331,7 @@ Place GraphicsEntry::getPlace(int index) const {
     }
   }
 
- return m_place;
+  return m_place;
 }
 /**
  * returns the highest page number
@@ -480,10 +480,10 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,int options) {
     EntryItem * item = m_items[i];
     if (item->getNode() == node) {
       m_scene->setFocusItem(item);
-       m_view->centerOn(item);
-       /// update the place
-       m_place = item->getPlace();
-       return m_place;
+      m_view->centerOn(item);
+      /// update the place
+      m_place = item->getPlace();
+      return m_place;
     }
   }
   /// trying out of page jump
@@ -496,12 +496,12 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,int options) {
     p.setOptions(options);
     emit(gotoNode(p,options));
     /*
-    np = getXmlForRoot(p);
-    /// is this right ?
-    if (np != p) {
+      np = getXmlForRoot(p);
+      /// is this right ?
+      if (np != p) {
       emit(placeChanged(np));
       m_place = np;
-    }
+      }
     */
   }
   return np;
@@ -543,17 +543,17 @@ bool GraphicsEntry::prepareQueries() {
   return ok;
 }
 /*
-Place GraphicsEntry::getXmlForPlace(const Place & p) {
+  Place GraphicsEntry::getXmlForPlace(const Place & p) {
   Place np = getXmlForRoot(p);
   if (np.isValid()) {
-    if (np.getRoot() != m_place.getRoot()) {
-      emit(placeChanged(np));
-    }
-    m_place = np;
-    //    m_showPlace->setPlace(m_place);
+  if (np.getRoot() != m_place.getRoot()) {
+  emit(placeChanged(np));
+  }
+  m_place = np;
+  //    m_showPlace->setPlace(m_place);
   }
   return np;
-}
+  }
 */
 /**
  * TODO if this is called as part of search for node it does not return
@@ -613,7 +613,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
   }
   else {
-      QLOG_WARN() << tr("Error quasi query prepare") << quasiQuery.lastError().text();
+    QLOG_WARN() << tr("Error quasi query prepare") << quasiQuery.lastError().text();
   }
   QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << p << p.getType();
   m_rootQuery->bindValue(0,root);
@@ -624,7 +624,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   }
 
   QString str = QString("<word type=\"root\" ar=\"%1\" quasi=\"%2\"></word>").arg(root).arg(quasi);
-QLOG_DEBUG() << str;
+  QLOG_DEBUG() << str;
   EntryItem * rootItem  = createEntry(str);
   /// will be null if the XSLT/XML has not parsed correctly
   if (rootItem == NULL) {
@@ -725,7 +725,7 @@ QLOG_DEBUG() << str;
     prependEntries(x);
   }
   else {
-   /// get the position of the last item in the scene
+    /// get the position of the last item in the scene
     int itemCount = m_items.size();
     while(items.size() > 0) {
       EntryItem * item = items.takeFirst();
@@ -752,12 +752,12 @@ QLOG_DEBUG() << str;
   }
 
   if (dp.getType() == Place::History) {
-      emit(historyPositionChanged(dp.getId()));
+    emit(historyPositionChanged(dp.getId()));
   }
 
   /// we're done
   if (m_place.isSamePlace(centerItem->getPlace())) {
-      return m_place;
+    return m_place;
   }
   m_place = centerItem->getPlace();
   m_place.setType(dp.getType());
@@ -765,15 +765,15 @@ QLOG_DEBUG() << str;
   //  QLOG_DEBUG() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
   //  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
   /*
-  QLOG_DEBUG() << "At exit" << m_view->sceneRect();
-  QLOG_DEBUG() << "Widget" << this->geometry();
-  QLOG_DEBUG() << "gview" << m_view->geometry();
-  QLOG_DEBUG() << "viewport geometry" << m_view->viewport()->geometry();
-  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
-  QRect viewport_rect(0, 0, m_view->viewport()->width(), m_view->viewport()->height());
-  QRectF visible_scene_rect = m_view->mapToScene(viewport_rect).boundingRect();
-  QLOG_DEBUG() << "viewport rect" << viewport_rect << "scene rect" << visible_scene_rect;
-  QLOG_DEBUG() << visible_scene_rect.width();
+    QLOG_DEBUG() << "At exit" << m_view->sceneRect();
+    QLOG_DEBUG() << "Widget" << this->geometry();
+    QLOG_DEBUG() << "gview" << m_view->geometry();
+    QLOG_DEBUG() << "viewport geometry" << m_view->viewport()->geometry();
+    m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
+    QRect viewport_rect(0, 0, m_view->viewport()->width(), m_view->viewport()->height());
+    QRectF visible_scene_rect = m_view->mapToScene(viewport_rect).boundingRect();
+    QLOG_DEBUG() << "viewport rect" << viewport_rect << "scene rect" << visible_scene_rect;
+    QLOG_DEBUG() << visible_scene_rect.width();
   */
   //  if (m_place.isSupplement()) {
   //    m_view->setBackgroundBrush(QBrush(m_supplementBg));
@@ -903,7 +903,7 @@ Place GraphicsEntry::getPage(const Place & p) {
     focusItem = m_items[x];
   }
   else {
-   /// get the position of the last item in the scene
+    /// get the position of the last item in the scene
     int itemCount = m_items.size();
     while(items.size() > 0) {
       EntryItem * item = items.takeFirst();
@@ -946,44 +946,44 @@ Place GraphicsEntry::getPage(const Place & p) {
  * @return
  */
 EntryItem * GraphicsEntry::createEntry(const QString & xml) {
-    QString html =
-      transform(ENTRY_XSLT,m_xsltSource,xml);
-    if (html.isEmpty()) {
-      return NULL;
-    }
-    EntryItem * gi = new EntryItem("");
-    gi->document()->setDefaultStyleSheet(m_currentCss);
-    gi->setTextWidth(m_textWidth);
-    gi->setHtml(html);
-    gi->setOutputHtml(html);
-    gi->setXml(xml);
-    /// need this otherwise arabic text will be right justified
-    gi->document()->setDefaultTextOption(m_textOption);
-    gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    gi->setAcceptHoverEvents(true);
-    gi->setBackground(m_supplementBg);
-    gi->setNotesEnabled(m_notesEnabled);
-    //    if (m_dumpOutputHtml) {
-    //      gi->setOutputHtml(html);
-    //    }
-    connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
-    connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
-    connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
-    connect(gi,SIGNAL(showHtml()),this,SLOT(showHtml()));
+  QString html =
+    transform(ENTRY_XSLT,m_xsltSource,xml);
+  if (html.isEmpty()) {
+    return NULL;
+  }
+  EntryItem * gi = new EntryItem("");
+  gi->document()->setDefaultStyleSheet(m_currentCss);
+  gi->setTextWidth(m_textWidth);
+  gi->setHtml(html);
+  gi->setOutputHtml(html);
+  gi->setXml(xml);
+  /// need this otherwise arabic text will be right justified
+  gi->document()->setDefaultTextOption(m_textOption);
+  gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
+  gi->setAcceptHoverEvents(true);
+  gi->setBackground(m_supplementBg);
+  gi->setNotesEnabled(m_notesEnabled);
+  //    if (m_dumpOutputHtml) {
+  //      gi->setOutputHtml(html);
+  //    }
+  connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
+  connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
+  connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
+  connect(gi,SIGNAL(showHtml()),this,SLOT(showHtml()));
 
-    /// TODO this is no longer used
-    connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
-    connect(gi,SIGNAL(selectAllItems()),this,SLOT(selectAll()));
-    connect(gi,SIGNAL(clearAllItems()),this,SLOT(clearAll()));
-    connect(gi,SIGNAL(gotoNode(const Place &,int)),this,SIGNAL(gotoNode(const Place &,int)));
-    /// pass through signal for mainwindow to handle
-    connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
-    connect(gi,SIGNAL(copy()),this,SLOT(copy()));
-    connect(gi,SIGNAL(addButton(bool)),this,SLOT(addButtonDecoration(bool)));
-    connect(gi,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
-    connect(gi,SIGNAL(printPage()),this,SIGNAL(printPage()));
+  /// TODO this is no longer used
+  connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
+  connect(gi,SIGNAL(selectAllItems()),this,SLOT(selectAll()));
+  connect(gi,SIGNAL(clearAllItems()),this,SLOT(clearAll()));
+  connect(gi,SIGNAL(gotoNode(const Place &,int)),this,SIGNAL(gotoNode(const Place &,int)));
+  /// pass through signal for mainwindow to handle
+  connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
+  connect(gi,SIGNAL(copy()),this,SLOT(copy()));
+  connect(gi,SIGNAL(addButton(bool)),this,SLOT(addButtonDecoration(bool)));
+  connect(gi,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
+  connect(gi,SIGNAL(printPage()),this,SIGNAL(printPage()));
 
-    return gi;
+  return gi;
 }
 /**
  * add the graphics items in m_items to the scene starting with the item
@@ -1140,8 +1140,8 @@ int GraphicsEntry::hasPlace(const Place & p,int type,bool setFocus) {
   for(int i=0;i < max;i++) {
     if (type == GraphicsEntry::NodeSearch) {
       if (m_items[i]->getNode() == p.getNode()) {
-          ix = i;
-          i = max;
+        ix = i;
+        i = max;
       }
     }
     else if (type == GraphicsEntry::RootSearch) {
@@ -1168,23 +1168,23 @@ int GraphicsEntry::hasPlace(const Place & p,int type,bool setFocus) {
   return ix;
 }
 QString GraphicsEntry::lastRoot() {
-    /// find the last root item
-    int ix = m_items.size() - 1;
-    QString root;
-    while((ix >= 0) && root.isEmpty()) {
-      if (m_items[ix]->isRoot()) {
-        root = m_items[ix]->getRoot();
-      }
-      ix--;
+  /// find the last root item
+  int ix = m_items.size() - 1;
+  QString root;
+  while((ix >= 0) && root.isEmpty()) {
+    if (m_items[ix]->isRoot()) {
+      root = m_items[ix]->getRoot();
     }
-    if (root.isEmpty()) {
-      QLOG_DEBUG() << "Cannot find root on current page";
-    }
-    else {
-      QLOG_DEBUG() << "emit nextRoo" << root;
-      emit nextRoot(root);
-    }
-    return root;
+    ix--;
+  }
+  if (root.isEmpty()) {
+    QLOG_DEBUG() << "Cannot find root on current page";
+  }
+  else {
+    QLOG_DEBUG() << "emit nextRoo" << root;
+    emit nextRoot(root);
+  }
+  return root;
 }
 /**
  * find the first root in the current scene
@@ -1199,55 +1199,26 @@ QString GraphicsEntry::firstRoot() {
   int ix = 0;
   int max = m_items.size();
   QString root;
-    while((ix < max) && root.isEmpty()) {
-      if (m_items[ix]->isRoot()) {
-        root = m_items[ix]->getRoot();
-      }
-      ix++;
+  while((ix < max) && root.isEmpty()) {
+    if (m_items[ix]->isRoot()) {
+      root = m_items[ix]->getRoot();
     }
-    if (root.isEmpty()) {
-      QLOG_DEBUG() << "Cannot find root on current page";
-    }
-    else {
-      QLOG_DEBUG() << "emit prevRoot" << root;
-      emit prevRoot(root);
-    }
-    return root;
-}
-void GraphicsEntry::highlight(const QString & target) {
-  QLOG_DEBUG() << Q_FUNC_INFO << "we should not be here";
-  int ix = -1;
-  QTextCursor cursor;
-  for(int i=0;i < m_items.size();i++ ) {
-    EntryItem * item = m_items[i];
-    QTextCursor c;// = item->highlightRx(target);
-    /// get the cursor for the first match
-    if (! c.isNull() && (ix == -1)) {
-      cursor = c;
-      ix = i;
-    }
+    ix++;
   }
-  //  QLOG_DEBUG() << Q_FUNC_INFO << "item" << ix << "pos" << cursor.position() << cursor.hasSelection();
-  /// unselect the text otherwise it will be in the select color
-  /// center the view on the word
-  if (ix != -1) {
-    if ( ! cursor.isNull()) {
-      cursor.clearSelection();
-      QTextBlock b = cursor.block();
-      QTextLayout * layout = b.layout();
-      QTextLine line = layout->lineForTextPosition(cursor.position());
-      if (line.isValid()) {
-        //        QLOG_DEBUG() << "text line pos" << line.position() << line.textLength();
-        m_view->centerOn(line.position());
-      }
-    }
-    m_items[ix]->setTextCursor(cursor);
+  if (root.isEmpty()) {
+    QLOG_DEBUG() << "Cannot find root on current page";
   }
+  else {
+    emit prevRoot(root);
+  }
+  return root;
 }
 void GraphicsEntry::showPerseus(const Place & p) {
   QString node = p.getNode();
   if ( node.isEmpty()) {
-    /// TODO
+    QMessageBox msgBox;
+    msgBox.setText(tr("No XML found"));
+    msgBox.exec();
     return;
   }
   m_nodeQuery->bindValue(0,node);
@@ -1255,7 +1226,6 @@ void GraphicsEntry::showPerseus(const Place & p) {
   QString xml;
   if (m_nodeQuery->first()) {
     xml = m_nodeQuery->value("xml").toString();
-    QLOG_DEBUG() << xml;
   }
   else {
     xml = "No XML for " + node;
@@ -1291,7 +1261,7 @@ void GraphicsEntry::copy() {
   QClipboard *clipboard = QApplication::clipboard();
 
   for(int i=0;i < m_items.size();i++) {
-   txt += m_items[i]->textCursor().selectedText();
+    txt += m_items[i]->textCursor().selectedText();
   }
   clipboard->setText(txt);
 }
@@ -1326,7 +1296,7 @@ void GraphicsEntry::onWiden() {
   m_textWidth += 50;
   //  QLOG_DEBUG() << "Scene rect before widen" << m_view->sceneRect() << m_textWidth;
   for(int i=0;i < m_items.size();i++) {
-      m_items[i]->setTextWidth(m_textWidth);
+    m_items[i]->setTextWidth(m_textWidth);
   }
   reposition();
   m_view->setSceneRect(m_scene->sceneRect());
@@ -1344,7 +1314,7 @@ void GraphicsEntry::onNarrow() {
   m_textWidth -= 50;
   //  QLOG_DEBUG() << "Scene rect before narrow" << m_view->sceneRect() << m_textWidth;
   for(int i=0;i < m_items.size();i++) {
-      m_items[i]->setTextWidth(m_textWidth);
+    m_items[i]->setTextWidth(m_textWidth);
   }
   reposition();
   m_view->setSceneRect(m_scene->sceneRect());
@@ -1374,15 +1344,19 @@ void GraphicsEntry::reposition() {
   }
   m_scene->setSceneRect(QRectF(0,0,maxwidth,m_scene->height()));
 }
-void GraphicsEntry::clearHighlights() {
+void GraphicsEntry::clearHighlights(bool keepResults) {
+  int pos_x = m_view->horizontalScrollBar()->value();
+  int pos_y = m_view->verticalScrollBar()->value();
   QGraphicsItem * item = m_scene->focusItem();
   for(int i=0;i < m_items.size();i++) {
-    m_items[i]->clearHighlights();
+    m_items[i]->clearHighlights(keepResults);
   }
   if (item) {
     m_view->ensureVisible(item);
     m_scene->setFocusItem(item);
   }
+  m_view->horizontalScrollBar()->setValue(pos_x);
+  m_view->verticalScrollBar()->setValue(pos_y);
 }
 void GraphicsEntry::shiftFocus() {
   QGraphicsItem * item = m_scene->focusItem();
@@ -1550,7 +1524,7 @@ int GraphicsEntry::search() {
   else {
     return -1;
   }
-  this->clearHighlights();
+  this->clearHighlights(false);
   m_currentSearchPosition = -1;
   m_currentSearchIndex = -1;
   m_searchItemIndexes.clear();
@@ -1558,7 +1532,8 @@ int GraphicsEntry::search() {
   QLOG_DEBUG() << "Search pattern" << rx.pattern();
   m_currentSearchRx = rx;
   m_currentSearchTarget = t;
-  this->m_items[0]->ensureVisible();
+  QGraphicsItem * focusItem = m_scene->focusItem();
+  //  this->m_items[0]->ensureVisible();
   int pos = 0;
   bool found;
   for(int i=1;i < m_items.size();i++) {
@@ -1580,29 +1555,10 @@ int GraphicsEntry::search() {
   statusMessage(QString(tr("Find count: %1")).arg(count));
   /// position at the first one, so the find next stuff works anyway
   if (m_searchItemIndexes.size() > 0) {
-      m_searchItemPtr = 0;
-      m_searchIndex = 0;
-      this->centerOnSearchResult(m_searchItemIndexes[m_searchItemPtr],0);
-      /*
-      int ix = m_searchItemIndexes[m_searchItemPtr];
-      pos = m_items[ix]->showHighlight(m_searchIndex);
-      m_items[ix]->ensureVisible();
-      if (m_items[ix]->boundingRect().height() > m_view->height()) {
-        qDebug() << Q_FUNC_INFO << m_items[ix]->boundingRect().height() << m_view->height();
-        int charCount = m_items[ix]->document()->characterCount();
-          qreal h = m_items[ix]->boundingRect().height();
-          qreal dy = (h * (qreal)pos)/(qreal)charCount;
-          QPointF p = m_items[ix]->scenePos();
-          qDebug() << "Character count" << charCount;
-          qDebug() << "Position" << pos;
-          qDebug() << "Scene pos of item" << p;
-          QLOG_DEBUG() << "adjusting pos" << dy;
-          p.setY(p.y() + dy);
-          qDebug() << "point" << p;
-          m_view->centerOn(p);//ensureVisible(QRectF(p,QSizeF(30,130)));
-      }
-      */
-    }
+    m_searchItemPtr = 0;
+    m_searchIndex = 0;
+    this->centerOnSearchResult(m_searchItemIndexes[m_searchItemPtr],0);
+  }
   if (count  == 0) {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
@@ -1610,10 +1566,13 @@ int GraphicsEntry::search() {
     QString style;
     /// TODO get this from INI
     if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
-        t = (qobject_cast<Lexicon *>(qApp))->spanArabic(t,"wordnotfound");
+      t = (qobject_cast<Lexicon *>(qApp))->spanArabic(t,"wordnotfound");
     }
     msgBox.setText(QString(tr("Word not found: %1")).arg(t));
     msgBox.exec();
+    if (focusItem) {
+      m_scene->setFocusItem(focusItem);
+    }
   }
   if ((count > 0) && (! m_currentSearchOptions.showAll())) {
     emit(searchStarted());
@@ -1642,7 +1601,7 @@ void GraphicsEntry::searchNext() {
     QString style;
     /// TODO get this from INI
     if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
-        style = "font-family : Amiri;font-size : 18pt";
+      style = "font-family : Amiri;font-size : 18pt";
     }
     msgBox.setText(QString(tr("No more occurrences of : <span style=\"%1\">%2</span>")).arg(style).arg(m_currentSearchTarget));
     msgBox.exec();
@@ -1651,23 +1610,6 @@ void GraphicsEntry::searchNext() {
   }
   int i = m_searchItemIndexes[m_searchItemPtr];
   this->centerOnSearchResult(i,m_searchIndex);
-  /*
-  pos = m_items[i]->showHighlight(m_searchIndex);
-  this->setCurrentItem(m_items[i]);
-  qDebug() << Q_FUNC_INFO << m_items[i]->boundingRect().height() << m_view->height();
-  if (m_items[i]->boundingRect().height() > m_view->height()) {
-          int charCount = m_items[i]->document()->characterCount();
-          qreal h = m_items[i]->boundingRect().height();
-          qreal dy = (h * (qreal)pos)/(qreal)charCount;
-          QPointF p = m_items[i]->scenePos();
-          p.setY(p.y() + dy);
-          QLOG_DEBUG() << "adjusting pos" << dy;
-          m_view->centerOn(p);//ensureVisible(QRectF(p,QSizeF(30,130)));
-  }
-  else {
-        m_items[i]->setFocus();
-  }
-  */
   emit(searchFoundNext());
   return;
 }
@@ -1689,29 +1631,10 @@ void GraphicsEntry::centerOnSearchResult(int itemIndex,int ix) {
     m_view->centerOn(p);//ensureVisible(QRectF(p,QSizeF(30,130)));
   }
 }
-void GraphicsEntry::addPosition(int /* itemIx */,int /* pos */) {
-  /*
-  QList<int> positions;
-  if (m_searchPositions.contains(itemIx)) {
-    positions = QList<int>(m_searchPositions.value(itemIx));
-  }
-  positions << pos;
-  m_searchPositions.insert(itemIx,positions);
-  */
-}
 void GraphicsEntry::showSelections() {
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->showHighlights();
   }
-  /*
-  QList<int> keys = QList<int>(m_searchPositions.keys());
-  for(int i=0;i < keys.size();i++) {
-    QList<int> positions = QList<int>(m_searchPositions.value(keys[i]));
-    for(int j=0;j < positions.size();j++) {
-      m_items[keys[i]]->highlight(positions[j]);
-    }
-  }
-  */
 }
 
 QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & method,const QString & node) {
@@ -1807,7 +1730,7 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   QString html; // = "<html><body>";
   for(int i=0;i < m_items.size();i++) {
     if (node.isEmpty() || (node == m_items[i]->getPlace().getNode())) {
-    /// without the trimmed() the printing of the root causes problems
+      /// without the trimmed() the printing of the root causes problems
       QString t = m_items[i]->getOutputHtml().trimmed();
       t.remove("<html><body>");
       t.remove("</body></html>");
@@ -1823,12 +1746,12 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
     QString note;
     for(int i=0;i < m_items.size();i++) {
       if (node.isEmpty() || (node == m_items[i]->getPlace().getNode())) {
-            QList<Note *> notes = m_items[i]->getNotes();
-            for(int j=0;j < notes.size();j++) {
-              note += QString("<div class=\"arabic\">%1</div>").arg(notes[j]->getWord());
-              note += QString("<div class=\"note\">%1</div>").arg(notes[j]->getNote());
-              note += "<br/>";
-            }
+        QList<Note *> notes = m_items[i]->getNotes();
+        for(int j=0;j < notes.size();j++) {
+          note += QString("<div class=\"arabic\">%1</div>").arg(notes[j]->getWord());
+          note += QString("<div class=\"note\">%1</div>").arg(notes[j]->getNote());
+          note += "<br/>";
+        }
       }
     }
     if (! note.isEmpty()) {

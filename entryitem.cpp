@@ -294,7 +294,7 @@ int EntryItem::showHighlight(int index) {
   }
   return -1;
 }
-void EntryItem::clearHighlights() {
+void EntryItem::clearHighlights(bool keepResults) {
   QString t;
   QTextCursor c = this->textCursor();
   for(int i=0;i < m_highlights.size();i++) {
@@ -313,8 +313,10 @@ void EntryItem::clearHighlights() {
     c.clearSelection();
     this->setTextCursor(c);
   }
-  m_highlights.clear();
-  m_finds.clear();
+  if (! keepResults ) {
+    m_highlights.clear();
+    m_finds.clear();
+  }
 }
 void EntryItem::setWord(const QString & word) {
   m_place.setWord(word);
