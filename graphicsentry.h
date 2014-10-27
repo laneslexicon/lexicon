@@ -110,6 +110,7 @@ class GraphicsEntry : public QWidget {
     void showSelections();
     void print(QPrinter &,const QString & node = QString());
  private:
+    void centerOnSearchResult(int,int);
     QString lastRoot();
     QString firstRoot();
     QString getOutputFilename(const QString &,const QString &,const QString & node = QString());
