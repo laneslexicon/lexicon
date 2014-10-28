@@ -1678,9 +1678,21 @@ QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & 
       base = node;
     }
     else {
-      for(int i=0;(i < m_items.size()) && base.isEmpty();i++) {
+      QString first;
+      QString last;
+      for(int i=0;(i < m_items.size()) && first.isEmpty();i++) {
         base = m_items[i]->getNode();
+        if (! base.isEmpty()) {
+          first = base;
+        }
       }
+      for(int i=m_items.size() - 1;(i >= 0) && last.isEmpty();i--) {
+        base = m_items[i]->getNode();
+        if (! base.isEmpty()) {
+          last = base;
+        }
+      }
+      base = QString("%1-%2").arg(first).arg(last);
     }
   }
   else if (method == "arabic") {
@@ -1751,6 +1763,12 @@ QString GraphicsEntry::getPageInfo(bool summary) {
   html += "</table>";
   return html;
 }
+/**
+ * If node is empty, print all the nodes
+ *
+ * @param printer
+ * @param node
+ */
 void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Printer");
@@ -1758,7 +1776,8 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
 
   if (pdfoutput) {
     QString pdfdir = settings->value(SID_PRINTER_PDF_DIRECTORY).toString();
-    QString filename = getOutputFilename(pdfdir,settings->value(SID_PRINTER_AUTONAME_METHOD).toString(),node);
+    QString filename;
+    filename = getOutputFilename(pdfdir,settings->value(SID_PRINTER_AUTONAME_METHOD).toString(),node);
     printer.setOutputFileName(filename);
   }
   QString html; // = "<html><body>";
