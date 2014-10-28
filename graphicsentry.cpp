@@ -1598,17 +1598,17 @@ int GraphicsEntry::search() {
 void GraphicsEntry::searchNext() {
   //  QLOG_DEBUG() << Q_FUNC_INFO << m_searchItemPtr << m_searchIndex;
   int pos;
-  if ((m_searchItemPtr >= 0) && (m_searchItemPtr < m_searchItemIndexes.size())) {
-    pos = m_searchItemIndexes[m_searchItemPtr];
-  }
-  else {
+  if (m_currentSearchTarget.isEmpty()) {
     return;
   }
-  int findCount = m_items[pos]->findCount();
-  m_searchIndex++;
-  if (m_searchIndex >= findCount) {
-    m_searchItemPtr++;
-    m_searchIndex = 0;
+  if ((m_searchItemPtr >= 0) && (m_searchItemPtr < m_searchItemIndexes.size())) {
+    pos = m_searchItemIndexes[m_searchItemPtr];
+    int findCount = m_items[pos]->findCount();
+    m_searchIndex++;
+    if (m_searchIndex >= findCount) {
+      m_searchItemPtr++;
+      m_searchIndex = 0;
+    }
   }
   if (m_searchItemPtr >= m_searchItemIndexes.size()) {
     QMessageBox msgBox;
@@ -1616,7 +1616,10 @@ void GraphicsEntry::searchNext() {
     msgBox.setTextFormat(Qt::RichText);
     QString t;
     if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
-      t = (qobject_cast<Lexicon *>(qApp))->spanArabic(t,"wordnotfound");
+      t = (qobject_cast<Lexicon *>(qApp))->spanArabic(m_currentSearchTarget,"wordnotfound");
+    }
+    else {
+      t = m_currentSearchTarget;
     }
     msgBox.setText(QString(tr("No more occurrences of : %1")).arg(t));
     msgBox.exec();
