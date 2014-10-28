@@ -2721,9 +2721,13 @@ void LanesLexicon::currentTabChanged(int) {
   if ( entry ) {
     Place p = entry->getPlace();
     m_tree->ensurePlaceVisible(p,true);
-    m_convertToEntryAction->setEnabled(false);
+    m_entrybar->setEnabled(true);
+    m_localSearchNextAction->setEnabled(entry->hasMoreFinds());
+    m_clearAction->setEnabled(entry->hasHighlights());
     return;
   }
+  m_entrybar->setEnabled(false);
+  /*
   HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
   if (results) {
     m_convertToEntryAction->setEnabled(true);
@@ -2731,6 +2735,7 @@ void LanesLexicon::currentTabChanged(int) {
   else {
     m_convertToEntryAction->setEnabled(false);
   }
+  */
 }
 int LanesLexicon::searchTabs(const QString & node) {
   for(int i=0;i < m_tabs->count();i++) {
@@ -2915,6 +2920,17 @@ void LanesLexicon::tabsChanged() {
     t.remove(rx);
     QString title = QString("%1  %2").arg(i+1).arg(t);
     m_tabs->setTabText(i,title);
+  }
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    m_entrybar->setEnabled(true);
+    m_localSearchNextAction->setEnabled(entry->hasMoreFinds());
+    m_clearAction->setEnabled(entry->hasHighlights());
+  }
+  else {
+    /// TODO can we disable the toolbar group?
+    qStrip << Q_FUNC_INFO << "trying to disable the toolbar";
+    m_entrybar->setEnabled(false);
   }
 }
 void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString & iconfile) {
