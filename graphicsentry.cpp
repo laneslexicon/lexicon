@@ -71,7 +71,8 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   //  m_view->setFocusProxy(this);
   m_view->setSceneRect(m_scene->sceneRect());
   m_view->setAlignment(Qt::AlignTop);
-
+  m_highlightCount = 0;
+  m_findCount = 0;
 
 
   //  connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
