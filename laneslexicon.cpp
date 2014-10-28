@@ -2721,21 +2721,16 @@ void LanesLexicon::currentTabChanged(int) {
   if ( entry ) {
     Place p = entry->getPlace();
     m_tree->ensurePlaceVisible(p,true);
-    m_entrybar->setEnabled(true);
-    m_localSearchNextAction->setEnabled(entry->hasMoreFinds());
-    m_clearAction->setEnabled(entry->hasHighlights());
+    this->enableForPage(true);
     return;
   }
-  m_entrybar->setEnabled(false);
-  /*
   HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
   if (results) {
-    m_convertToEntryAction->setEnabled(true);
+    this->enableForPage(true);
+    return;
   }
-  else {
-    m_convertToEntryAction->setEnabled(false);
-  }
-  */
+  this->enableForPage(false);
+
 }
 int LanesLexicon::searchTabs(const QString & node) {
   for(int i=0;i < m_tabs->count();i++) {
@@ -2923,14 +2918,10 @@ void LanesLexicon::tabsChanged() {
   }
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
-    m_entrybar->setEnabled(true);
-    m_localSearchNextAction->setEnabled(entry->hasMoreFinds());
-    m_clearAction->setEnabled(entry->hasHighlights());
+    this->enableForPage(true);
   }
   else {
-    /// TODO can we disable the toolbar group?
-    qStrip << Q_FUNC_INFO << "trying to disable the toolbar";
-    m_entrybar->setEnabled(false);
+    this->enableForPage(false);
   }
 }
 void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString & iconfile) {
@@ -3143,4 +3134,18 @@ void LanesLexicon::pageSearchStart() {
   }
   m_localSearchNextAction->setEnabled(entry->hasMoreFinds());
   m_clearAction->setEnabled(entry->hasHighlights());
+}
+void LanesLexicon::enableForPage(bool v) {
+  m_entrybar->setEnabled(v);
+  m_navigation->setEnabled(v);
+  if (v) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+    if (entry) {
+      m_localSearchNextAction->setEnabled(entry->hasMoreFinds());
+      m_clearAction->setEnabled(entry->hasHighlights());
+    }
+
+  }
+  m_pageMenu->setEnabled(v);
+  m_moveMenu->setEnabled(v);
 }
