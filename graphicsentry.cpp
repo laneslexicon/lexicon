@@ -569,7 +569,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   EntryItem * centerItem;
 
   QString root = dp.getRoot();
-  int supp = dp.getSupplement();
   QString node = dp.getNode();
 
 
@@ -1533,8 +1532,7 @@ int GraphicsEntry::search() {
   m_searchItemPtr = 0;
   m_searchIndex = 0;
   /// TODO remove these
-  m_currentSearchPosition = -1;
-  m_currentSearchIndex = -1;
+
   m_searchItemIndexes.clear();
   QRegExp rx = SearchOptionsWidget::buildRx(t,m_pattern,options);
   QLOG_DEBUG() << "Search pattern" << rx.pattern();
@@ -1544,21 +1542,21 @@ int GraphicsEntry::search() {
   //  this->m_items[0]->ensureVisible();
   int pos = 0;
   bool found;
-  qDebug() << "Show all" << options.showAll();
   for(int i=1;i < m_items.size();i++) {
     pos = 0;
     found = false;
+    QPair<int,int> x;
     while(pos != -1) {
-      pos++;
-      m_currentSearchPosition = m_items[i]->find(rx,pos,options.showAll());
-      if (m_currentSearchPosition != -1) {
+      pos += x.second;
+      x = m_items[i]->find(rx,pos,options.showAll());
+      if (x.first != -1) {
         found = true;
         count++;
         if (options.showAll()) {
           m_highlightCount++;
         }
       }
-      pos = m_currentSearchPosition;
+      pos = x.first;
     }
     if (found) {
       m_searchItemIndexes << i;
@@ -1570,8 +1568,6 @@ int GraphicsEntry::search() {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
     msgBox.setTextFormat(Qt::RichText);
-    QString style;
-    /// TODO get this from INI
     if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
       t = (qobject_cast<Lexicon *>(qApp))->spanArabic(t,"wordnotfound");
     }
@@ -1611,12 +1607,11 @@ void GraphicsEntry::searchNext() {
     QMessageBox msgBox;
     msgBox.setObjectName("wordnotfound");
     msgBox.setTextFormat(Qt::RichText);
-    QString style;
-    /// TODO get this from INI
+    QString t;
     if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
-      style = "font-family : Amiri;font-size : 18pt";
+      t = (qobject_cast<Lexicon *>(qApp))->spanArabic(t,"wordnotfound");
     }
-    msgBox.setText(QString(tr("No more occurrences of : <span style=\"%1\">%2</span>")).arg(style).arg(m_currentSearchTarget));
+    msgBox.setText(QString(tr("No more occurrences of : %1")).arg(t));
     msgBox.exec();
     emit(searchFinished());
     return;

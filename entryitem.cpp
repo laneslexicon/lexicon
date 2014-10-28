@@ -396,11 +396,11 @@ void EntryItem::notesAccepted() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   this->setFocus();
 }
-int EntryItem::find(const QRegExp & rx,int position,bool highlight) {
+QPair<int,int> EntryItem::find(const QRegExp & rx,int position,bool highlight) {
   //QLOG_DEBUG() << Q_FUNC_INFO << position;
   QTextCursor c = this->document()->find(rx,position);
   if (c.isNull()) {
-    return -1;
+    return qMakePair(-1,-1);
   }
   QString t = c.selectedText();
   c.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor);
@@ -430,7 +430,7 @@ int EntryItem::find(const QRegExp & rx,int position,bool highlight) {
   //  QLOG_DEBUG() << "boundingRect" << this->boundingRect();
 
 
-  return c.position();
+  return qMakePair(c.position(),t.size());
 }
 bool EntryItem::hasHighlights() {
   return (m_highlights.size() > 0);

@@ -37,6 +37,7 @@
 #include <QRegExp>
 #include <QClipboard>
 #include <QPrinter>
+#include <QPair>
 #include "entryitem.h"
 #include "searchoptionswidget.h"
 #ifndef qStrip
@@ -150,8 +151,6 @@ class GraphicsEntry : public QWidget {
     int m_entryMargin;
     int m_widenStep;
     int m_defaultWidth;
-    int m_currentSearchIndex;
-    int m_currentSearchPosition;
     int m_textWidth;
 
     QString m_moveFocusUpKey;
