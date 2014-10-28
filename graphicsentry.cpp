@@ -1596,7 +1596,13 @@ int GraphicsEntry::search() {
  */
 void GraphicsEntry::searchNext() {
   //  QLOG_DEBUG() << Q_FUNC_INFO << m_searchItemPtr << m_searchIndex;
-  int pos = m_searchItemIndexes[m_searchItemPtr];
+  int pos;
+  if ((m_searchItemPtr >= 0) && (m_searchItemPtr < m_searchItemIndexes.size())) {
+    pos = m_searchItemIndexes[m_searchItemPtr];
+  }
+  else {
+    return;
+  }
   int findCount = m_items[pos]->findCount();
   m_searchIndex++;
   if (m_searchIndex >= findCount) {
