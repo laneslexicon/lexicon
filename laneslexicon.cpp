@@ -2589,17 +2589,23 @@ void LanesLexicon::searchForEntry() {
   delete d;
 }
 void LanesLexicon::searchForNode() {
+  int ix;
   NodeSearchDialog * d = new NodeSearchDialog(this);
   d->setOptions(m_searchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
-      /// TODO make this an option to always show root
-      /// show only node
-      //        Place p = showNode(t,true);
+      SearchOptions options;
+      d->getOptions(options);
       Place p;
       p.setNode(t);
-      SearchOptions options;
+      ix = this->hasPlace(p,GraphicsEntry::NodeSearch,false);
+      if (ix != -1) {
+        p.setType(Place::SwitchTab);
+        m_tabs->setCurrentIndex(ix);
+        return;
+      }
+
       int opts = 0;
 
       if (options.newTab()) {
