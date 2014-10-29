@@ -2481,6 +2481,7 @@ void LanesLexicon::searchForPage() {
   this->syncContents();
 }
 void LanesLexicon::searchForRoot() {
+  int ix;
   ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Root,this);
   d->setOptions(m_searchOptions);
   if (d->exec()) {
@@ -2492,7 +2493,15 @@ void LanesLexicon::searchForRoot() {
       }
       SearchOptions opts;
       d->getOptions(opts);
-      Place p = showPlace(Place(t),opts.newTab());
+      Place p;
+      p.setRoot(t);
+      ix = this->hasPlace(p,GraphicsEntry::RootSearch,false);
+      if (ix != -1) {
+        p.setType(Place::SwitchTab);
+        m_tabs->setCurrentIndex(ix);
+        return;
+      }
+      p = showPlace(Place(t),opts.newTab());
       if (! p.isValid()) {
         QMessageBox msgBox;
         msgBox.setObjectName("rootnotfound");

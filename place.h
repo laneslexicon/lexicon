@@ -66,7 +66,7 @@ class Place    {
   bool operator != (const Place & p) {
     return ! ((m_root == p.m_root) && (m_word == p.m_word) && (m_node == p.m_node));
   }
-  enum Type { User, History, Bookmark, RestoreTab };
+  enum Type { User, History, Bookmark, RestoreTab, SwitchTab };
 
   void setType(int t) { m_type = t;}
   int getType() const { return m_type;}
