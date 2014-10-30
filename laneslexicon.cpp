@@ -2444,11 +2444,13 @@ void LanesLexicon::searchForPage() {
 
   QString root;
   QString node;
-  QString sql = QString("select root,nodeid from entry where page = %1").arg(page);
+  QString sql;
+  sql = QString("select root,nodeid from entry where page = %1 order by nodenum asc").arg(page);
 
   QSqlQuery q(m_db);
   if (! q.prepare(sql)) {
-    QLOG_WARN() << "Error preparing SQL" << sql;
+    QLOG_WARN() << QString(tr("Error preparing page search SQL :%1"));
+    QLOG_WARN() << q.lastError().text();
     return;
   }
   if (q.exec() && q.first()) {
@@ -2465,6 +2467,13 @@ void LanesLexicon::searchForPage() {
   if (m_navMode == Lane::By_Root) {
     p.setRoot(root);
     p.setNode(node);
+    /// if we have the node on another page,go there
+    int ix = this->hasPlace(p,GraphicsEntry::NodeSearch,false);
+    if (ix != -1) {
+      p.setType(Place::SwitchTab);
+      m_tabs->setCurrentIndex(ix);
+      return;
+    }
     int taboptions = 0;
     if (options.newTab()) {
       taboptions |= Lane::Create_Tab;
