@@ -71,6 +71,9 @@ QSettings * getSettings() {
 void statusMessage(const QString & t) {
   getApp()->setStatus(t);
 }
+void viewLogsMessage() {
+  getApp()->setStatus(QObject::tr("An error occurred, please see the log files for details."));
+}
 int main(int argc, char *argv[])
 {
     Lexicon mansur(argc, argv);

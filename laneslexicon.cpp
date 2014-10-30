@@ -24,10 +24,7 @@
 #include "optionsdialog.h"
 #include "logviewer.h"
 #include "about.h"
-//extern cmdOptions progOptions;
-extern QSettings * getSettings();
-extern void testfocus();
-
+#include "externs.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -2449,8 +2446,9 @@ void LanesLexicon::searchForPage() {
 
   QSqlQuery q(m_db);
   if (! q.prepare(sql)) {
-    QLOG_WARN() << QString(tr("Error preparing page search SQL :%1"));
+    QLOG_WARN() << QString(tr("Error preparing page search SQL :%1")).arg(sql);
     QLOG_WARN() << q.lastError().text();
+    viewLogsMessage();
     return;
   }
   if (q.exec() && q.first()) {
