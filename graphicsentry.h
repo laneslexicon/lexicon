@@ -51,7 +51,7 @@ class GraphicsEntry : public QWidget {
  public:
   GraphicsEntry(QWidget * parent = 0);
   ~GraphicsEntry();
-  enum SearchType { RootSearch, WordSearch, NodeSearch };
+  enum SearchType { RootSearch, WordSearch, NodeSearch, PageSearch };
     Place getXmlForRoot(const Place &);
     Place showPlace(const Place &,bool thisPageOnly,int options);
     Place getPage(const Place & );

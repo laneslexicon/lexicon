@@ -1138,29 +1138,36 @@ int GraphicsEntry::hasPlace(const Place & p,int type,bool setFocus) {
   int supp = p.getSupplement();
   QString root = p.getRoot();
   for(int i=0;i < max;i++) {
-    if (type == GraphicsEntry::NodeSearch) {
+    switch(type) {
+    case GraphicsEntry::NodeSearch:
       if (m_items[i]->getNode() == p.getNode()) {
         ix = i;
         i = max;
       }
-    }
-    else if (type == GraphicsEntry::RootSearch) {
+      break;
+    case GraphicsEntry::RootSearch:
       if (m_items[i]->isRoot() &&
           ((m_items[i]->getRoot() == root) &&
            (m_items[i]->getSupplement() == supp))) {
         ix = i;
         i = max;
       }
-    }
-    else if (type == GraphicsEntry::WordSearch) {
+      break;
+    case GraphicsEntry::PageSearch:
+      if (m_items[i]->getPage() == p.getPage()) {
+        ix = i;
+        i = max;
+      }
+      break;
+    case GraphicsEntry::WordSearch:
       /// TODO word search
-    }
-    else {
-      QLOG_WARN() << "Unknown search type for place" << p;
-    }
+      break;
 
+    default :
+      QLOG_WARN() << QString("Unknown search type %1 for place %2").arg(type).arg(p.toString());
+      break;
+    }
   }
-  //  QLOG_DEBUG() << Q_FUNC_INFO << p << ix;
   if ((ix != -1) && setFocus) {
     m_scene->setFocusItem(m_items[ix]);
     m_view->ensureVisible(m_items[ix]);
