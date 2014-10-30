@@ -99,7 +99,7 @@ QString Place::toString() const {
     .arg(m_root)
     .arg(m_node)
     .arg(m_word)
-    .arg(m_type)
+    .arg(m_action)
     .arg(m_page)
     .arg(m_vol)
     .arg(m_id)
@@ -124,7 +124,7 @@ Place Place::fromString(const QString & str) {
   if (sz > 3)
     p.setWord(x[3]);
   if (sz > 4)
-    p.setType(x[4].toInt(&ok));
+    p.setAction(x[4].toInt(&ok));
   if (sz > 5)
     p.setPage(x[5].toInt(&ok));
   if (sz > 6)

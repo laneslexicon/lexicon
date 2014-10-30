@@ -30,7 +30,7 @@ class Place    {
     m_page = -1;
     m_vol = -1;
     m_id = -1;
-    m_type = Place::User;
+    m_action = Place::User;
     m_datasource = 1;
     m_options = 0;
   }
@@ -39,7 +39,7 @@ class Place    {
     m_page = -1;
     m_vol = -1;
     m_id = -1;
-    m_type = Place::User;
+    m_action = Place::User;
     m_datasource = 1;
     m_options = 0;
   }
@@ -49,7 +49,7 @@ class Place    {
     m_page = -1;
     m_vol = -1;
     m_id = -1;
-    m_type = Place::User;
+    m_action = Place::User;
     m_datasource = 1;
     m_options = 0;
   }
@@ -66,10 +66,10 @@ class Place    {
   bool operator != (const Place & p) {
     return ! ((m_root == p.m_root) && (m_word == p.m_word) && (m_node == p.m_node));
   }
-  enum Type { User, History, Bookmark, RestoreTab, SwitchTab };
+  enum Action { User, History, Bookmark, RestoreTab, SwitchTab };
 
-  void setType(int t) { m_type = t;}
-  int getType() const { return m_type;}
+  void setAction(int t) { m_action = t;}
+  int getAction() const { return m_action;}
   int getSource() const { return m_datasource; }
   void setSource(int x) { m_datasource = x;}
   int getOptions() const { return m_options; }
@@ -82,7 +82,7 @@ class Place    {
                         << p.getSupplement() << ","
                         << p.getVol() << ","
                         << p.getPage() << ","
-                        << p.getType() << ","
+                        << p.getAction() << ","
                         << p.getId() << "," << "\n"
                         << p.getRoot() << ","
                         << p.getWord() << ","
@@ -146,7 +146,7 @@ class Place    {
   QString m_root;
   QString m_node;
   QString m_word;
-  int m_type;
+  int m_action;
   int m_page;
   int m_vol;
   int m_id;

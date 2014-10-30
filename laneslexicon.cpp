@@ -1205,7 +1205,7 @@ void LanesLexicon::onHistorySelection() {
   QAction * action = static_cast<QAction *>(QObject::sender());
   QVariant v = action->data();
   Place p = v.value<Place>();
-  p.setType(Place::History);
+  p.setAction(Place::History);
   showPlace(p,false);
 
 }
@@ -1251,7 +1251,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
       p = 1;
     }
     Place m(root,p);
-    m.setType(Place::User);
+    m.setAction(Place::User);
     showPlace(m,options);
   }
   else {
@@ -1780,7 +1780,7 @@ void LanesLexicon::restoreTabs() {
         GraphicsEntry * entry = new GraphicsEntry(this);
         entry->setTextWidth(tw);
         setSignals(entry);
-        p.setType(Place::RestoreTab);
+        p.setAction(Place::RestoreTab);
         entry->getXmlForRoot(p);
         entry->setScale(scale);
         entry->setHome(home);
@@ -1797,7 +1797,7 @@ void LanesLexicon::restoreTabs() {
     settings->endGroup();
   }
   settings->endGroup();
-  wp.setType(Place::RestoreTab);
+  wp.setAction(Place::RestoreTab);
   if (focusTab < m_tabs->count()) {
     m_tabs->setCurrentIndex(focusTab);
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
@@ -2092,7 +2092,7 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
     QLOG_WARN() << QString(tr("No place to bookmark"));
     return;
   }
-  p.setType(Place::Bookmark);
+  p.setAction(Place::Bookmark);
   m_bookmarks.insert(id,p);
   addBookmarkMenuItem(id);
   setStatus(QString(tr("added bookmark (%1) at %2")).arg(id).arg(p.getShortText()));
@@ -2149,7 +2149,7 @@ void LanesLexicon::bookmarkJump(const QString & id) {
   }
   /// get the current place and save it so we can jump back
   Place cp = this->getCurrentPlace();
-  cp.setType(Place::Bookmark);
+  cp.setAction(Place::Bookmark);
   m_bookmarks.insert("-here-",cp);
   showPlace(p,options);
   m_revertEnabled = true;
@@ -2306,7 +2306,7 @@ void LanesLexicon::bookmarkRebuildMenu() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void LanesLexicon::bookmarkAdd(const QString & id,const Place & p) {
-  //  p.setType(Place::Bookmark);
+  //  p.setAction(Place::Bookmark);
   m_bookmarks.insert(id,p);
   addBookmarkMenuItem(id);
   setStatus(QString(tr("Added bookmark:%1")).arg(id));
@@ -2468,7 +2468,7 @@ void LanesLexicon::searchForPage() {
     /// if we have the node on another page,go there
     int ix = this->hasPlace(p,GraphicsEntry::NodeSearch,false);
     if (ix != -1) {
-      p.setType(Place::SwitchTab);
+      p.setAction(Place::SwitchTab);
       m_tabs->setCurrentIndex(ix);
       return;
     }
@@ -2504,7 +2504,7 @@ void LanesLexicon::searchForRoot() {
       p.setRoot(t);
       ix = this->hasPlace(p,GraphicsEntry::RootSearch,false);
       if (ix != -1) {
-        p.setType(Place::SwitchTab);
+        p.setAction(Place::SwitchTab);
         m_tabs->setCurrentIndex(ix);
         return;
       }
@@ -2608,7 +2608,7 @@ void LanesLexicon::searchForNode() {
       p.setNode(t);
       ix = this->hasPlace(p,GraphicsEntry::NodeSearch,false);
       if (ix != -1) {
-        p.setType(Place::SwitchTab);
+        p.setAction(Place::SwitchTab);
         m_tabs->setCurrentIndex(ix);
         return;
       }

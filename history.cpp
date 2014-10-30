@@ -135,7 +135,7 @@ bool HistoryMaster::add(const Place & p) {
     return false;
   }
   /// don't add history event
-  if (p.getType() == Place::History) {
+  if (p.getAction() == Place::History) {
     return false;
   }
   /// don't add two adjecent identical places

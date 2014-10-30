@@ -615,7 +615,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   else {
     QLOG_WARN() << tr("Error quasi query prepare") << quasiQuery.lastError().text();
   }
-  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << p << p.getType();
+  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << p << p.getAction();
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   if (! m_rootQuery->first()) {
@@ -636,7 +636,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (getHistory()->isOn()) {
     //    QLOG_DEBUG() << "History old place" << m_place;
     //    QLOG_DEBUG() << "New place" << dp;
-    if (dp.getType() == Place::User) {
+    if (dp.getAction() == Place::User) {
       getHistory()->add(m_place);
       /// this allows mainwindow to update the history list
       emit(historyAddition(dp));
@@ -751,7 +751,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     QLOG_DEBUG() << Q_FUNC_INFO << "no center item";
   }
 
-  if (dp.getType() == Place::History) {
+  if (dp.getAction() == Place::History) {
     emit(historyPositionChanged(dp.getId()));
   }
 
@@ -760,7 +760,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     return m_place;
   }
   m_place = centerItem->getPlace();
-  m_place.setType(dp.getType());
+  m_place.setAction(dp.getAction());
 
   //  QLOG_DEBUG() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
   //  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
