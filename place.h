@@ -55,6 +55,9 @@ class Place    {
   }
   ~Place() {
   }
+  static Place fromRoot(const QString &);
+  static Place fromNode(const QString &);
+  static Place fromPage(int);
   QString getText(bool pageOnlyMode = false) const;
   QString getShortText() const;
   QString toString() const;
@@ -66,14 +69,21 @@ class Place    {
   bool operator != (const Place & p) {
     return ! ((m_root == p.m_root) && (m_word == p.m_word) && (m_node == p.m_node));
   }
-  enum Action { User, History, Bookmark, RestoreTab, SwitchTab };
+  enum Action { User, History, Bookmark, RestoreTab, SwitchTab, Link };
+  enum Type { Undefined, Root , Node , Page };
 
   void setAction(int t) { m_action = t;}
   int getAction() const { return m_action;}
+
+  void setType(int t) { m_type = t;}
+  int getType() const { return m_type;}
+
   int getSource() const { return m_datasource; }
   void setSource(int x) { m_datasource = x;}
+
   int getOptions() const { return m_options; }
   void setOptions(int x) { m_options = x;}
+
  inline friend QDebug operator<<(QDebug debug, const Place& p)
 {
 	debug.nospace() << "Place("
@@ -146,6 +156,7 @@ class Place    {
   QString m_root;
   QString m_node;
   QString m_word;
+  int m_type;
   int m_action;
   int m_page;
   int m_vol;
