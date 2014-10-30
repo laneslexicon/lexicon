@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     QCommandLineOption nosaveOption(QStringList() << "x" << "no-save","do not save the settings");
     parser.addOption(nosaveOption);
 
-    QCommandLineOption notabsOption(QStringList() << "t" << "no-tabs","do not restore tabs");
+    QCommandLineOption notabsOption(QStringList() << "t" << "no-restore","do not restore tabs");
     parser.addOption(notabsOption);
 
     QCommandLineOption textWidthOption(QStringList() << "w" << "text-width","set textwidth","textwidth");
