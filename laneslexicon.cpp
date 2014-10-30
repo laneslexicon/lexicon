@@ -1282,43 +1282,42 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   if ((item->parent() == 0) || (item->parent()->parent() == 0)) {
     return;
   }
- QString node = item->data(0,Qt::UserRole).toString();
- QLOG_DEBUG() << "node" << node;
- if ( node.isEmpty() )
-   return;
+  QString node = item->data(0,Qt::UserRole).toString();
+  if ( node.isEmpty() ) {
+    return;
+  }
+  /// if we are not showing a graphicsentry, create a new tab
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-  if (entry) {
-    if (entry->hasNode(node)) {
-      entry->focusNode(node);
-    }
-    else {
-      /// node not in the current tab
-      int ix = this->searchTabs(node);
-      if (ix != -1) {
-        /// we found it in another tab, so switch to that one
-        m_tabs->setCurrentIndex(ix);
-        GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-        if (entry) {
-          if (entry->hasNode(node)) {
-            entry->focusNode(node);
-          }
-        }
-      }
-      else {
-        /// fetch to node and show it
-        Place p;
-        p.setNode(node);
-        ///
-        /// TODO needs to check whether to open in new tab
-        ///
-        options |= Lane::Create_Tab;
-        p = showPlace(p,options);
-      }
-    }
+  if (! entry) {
+    Place p = Place::fromNode(node);
+    options |= Lane::Create_Tab;
+    m_place = showPlace(p,options);
+    return;
+  }
+  if (entry->hasNode(node)) {
+    entry->focusNode(node);
   }
   else {
-    /// TODO fix this
-    QLOG_DEBUG() << Q_FUNC_INFO << "No GraphicsEntry page available";
+    /// node not in the current tab
+    int ix = this->searchTabs(node);
+    if (ix != -1) {
+      /// we found it in another tab, so switch to that one
+      m_tabs->setCurrentIndex(ix);
+      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+      if (entry) {
+        if (entry->hasNode(node)) {
+          entry->focusNode(node);
+        }
+      }
+    }
+    else {
+      Place p = Place::fromNode(node);
+      if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+        options |= Lane::Create_Tab;
+      }
+      m_place = showPlace(p,options);
+      return;
+    }
   }
 }
 
@@ -1352,7 +1351,6 @@ Place LanesLexicon::showPlace(const Place & p,int options) {
     entry->installEventFilter(this);
     entry->getView()->installEventFilter(this);
     np = entry->getXmlForRoot(p);
-
     int ix = m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
     if (options & Lane::Switch_Tab) {
       m_tabs->setCurrentIndex(ix);
@@ -2941,6 +2939,9 @@ void LanesLexicon::tabsChanged() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     this->enableForPage(true);
+    if (m_linkContents) {
+      this->syncContents();
+    }
   }
   else {
     this->enableForPage(false);
