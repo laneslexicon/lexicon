@@ -96,7 +96,8 @@ class Place    {
                         << p.getId() << "," << "\n"
                         << p.getRoot() << ","
                         << p.getWord() << ","
-                        << p.getOptions()
+                        << p.getOptions() << ","
+                        << p.getType()
                         << ")";
 	return debug.space();
 }
