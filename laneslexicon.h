@@ -264,7 +264,7 @@ class LanesLexicon : public QMainWindow
       bool m_saveBookmarks;
       bool m_restoreBookmarks;
       bool m_revertEnabled;
-
+      bool m_debug;
       QToolBar * m_mainbar;
       QToolBar * m_navigation;
       QToolBar * m_entrybar;

@@ -113,6 +113,9 @@ int main(int argc, char *argv[])
     QCommandLineOption nosplashOption(QStringList() << "s" << "no-splash","do not show splash screen");
     parser.addOption(nosplashOption);
 
+    QCommandLineOption debugOption(QStringList() << "b" << "debug","set debug option");
+    parser.addOption(debugOption);
+
     // Process the actual command line arguments
     parser.process(mansur);
     const QStringList args = parser.positionalArguments();
@@ -150,6 +153,9 @@ int main(int argc, char *argv[])
     }
     if (parser.isSet(notabsOption)) {
       options.insert("notabs","");
+    }
+    if (parser.isSet(debugOption)) {
+      options.insert("debug","");
     }
     if (parser.isSet(textWidthOption)) {
       options.insert(textWidthOption.valueName(),parser.value(textWidthOption));

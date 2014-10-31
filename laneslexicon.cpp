@@ -733,7 +733,9 @@ void LanesLexicon::createToolBar() {
   m_exitButton->setFocusPolicy(Qt::StrongFocus);
   m_mainbar->addWidget(m_exitButton);
 
-  m_mainbar->addAction(m_testAction);
+  if (m_debug) {
+    m_mainbar->addAction(m_testAction);
+  }
 
   m_historyButton = new QToolButton(m_mainbar);
   m_historyButton->setText(tr("History"));
@@ -1544,6 +1546,10 @@ void LanesLexicon::readSettings() {
   m_restoreTabs = settings->value("Restore tabs",true).toBool();
   if (cmdOptions.contains("notabs")) {
     m_restoreTabs = false;
+  }
+  m_debug = settings->value("Debug",false).toBool();
+  if (cmdOptions.contains("debug")) {
+    m_debug = true;
   }
 
   m_saveBookmarks = settings->value("Save bookmarks",true).toBool();
