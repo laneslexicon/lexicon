@@ -54,7 +54,14 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   targetlayout->addWidget(m_hideOptionsButton);
 
   QStringList headers;
-  headers << tr("Root") << tr("Entry") <<  tr("Node") << tr("Position") << tr("Context");
+  headers << tr("Root") << tr("Entry") <<  tr("Node");
+  if (m_singleRow) {
+    headers << tr("Occurs");
+  }
+  else {
+    headers << tr("Position");
+  }
+  headers << tr("Context");
   m_defaultOptions.setSearchScope(SearchOptions::Word);
   m_search = new SearchOptionsWidget(m_defaultOptions,this);
 
@@ -153,10 +160,18 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
     return;
   }
   item = item->tableWidget()->item(item->row(),POSITION_COLUMN);
-  int pos =  item->text().toInt(&ok);
-  if ( !ok )  {
-    pos = 0;
+  int pos;
+  if (m_singleRow) {
+    pos = m_positions[0];
   }
+  else {
+    ok = true;
+    pos =  item->text().toInt(&ok);
+    if ( !ok )  {
+      pos = 0;
+    }
+  }
+  qDebug() << m_positions;
   /// TODO make this a QSettings option or dialog option
   QString xml = m_nodeQuery.value("xml").toString();
   QString html = this->transform(xml);
@@ -172,6 +187,7 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
     v->setStartPosition(pos);
   }
   v->setHtml(html);
+  v->findFirst();
   v->show();
   v->raise();
   v->activateWindow();
@@ -309,11 +325,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   m_target = target;
   m_searchOptions = options;
   QRegExp rx;
-  QRegExp rxclass(m_diacritics);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
-
-
-
-
+  QRegExp rxclass(m_diacritics);
 
 
   QString sql = "select id,word,root,entry,node,nodenum from xref where datasource = 1 order by nodenum asc";
@@ -419,16 +431,23 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
         headword = m_nodeQuery.value("word").toString();
 
         QString xml = m_nodeQuery.value("xml").toString();
-          QTextDocument * doc  = fetchDocument(xml);
+        QTextDocument * doc  = fetchDocument(xml);
           if (doc->characterCount() > 0) {
             getTextFragments(doc,target,options);
-            for(int i=0;i < m_fragments.size();i++) {
-              QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
-              addRow(root,headword,node,html,m_positions[i]);
+            if (m_fragments.size() > 0) {
+              if (m_singleRow) {
+                QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[0]);
+                addRow(root,headword,node,html,m_fragments.size());
+              }
+              else {
+                for(int i=0;i < m_fragments.size();i++) {
+                  QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
+                  addRow(root,headword,node,html,m_positions[i]);
+                }
+              }
+              textCount += m_fragments.size();
             }
-            textCount += m_fragments.size();
           }
-
       }
       else {
         QLOG_DEBUG() << "Error in node Query sql";
@@ -622,6 +641,7 @@ void FullSearchWidget::readSettings() {
   //m_xsltSource = settings->value("XSLT",QString("entry.xslt")).toString();
   settings->endGroup();
   settings->beginGroup("FullSearch");
+  m_singleRow = settings->value("One row",true).toBool();
   QString f = settings->value("Results font",QString()).toString();
   if (! f.isEmpty()) {
     m_resultsFont.fromString(f);
@@ -668,14 +688,14 @@ void FullSearchWidget::readSettings() {
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
   QRegExp rx;
   QString pattern;
-  QRegExp rxclass(m_diacritics); //"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+  QRegExp rxclass(m_diacritics);
 
   if (options.getSearchType() == SearchOptions::Regex) {
     pattern = target;
   }
   else {
     if (options.ignoreDiacritics()) {
-      QString ar(m_diacritics);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+      QString ar(m_diacritics);
       QStringList cc = target.split("");
       QString brx = "";
       for(int i=0;i < cc.size();i++) {

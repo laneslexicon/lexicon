@@ -77,6 +77,7 @@ class FullSearchWidget : public QWidget
     bool m_debug;
     bool m_showProgressDialog;
     bool m_cancelSearch;
+    bool m_singleRow;
     QProgressBar * m_progress;
     QTextDocument m_nodeDoc;
     ImLineEdit * m_findTarget;
