@@ -31,6 +31,7 @@ class NodeView : public QDialog {
     void print();
     void openEntry();
  private:
+    void getPositions();
     QTextCursor m_cursor;
     QSize m_size;
     void setPreferredSize(const QString &);
@@ -47,6 +48,8 @@ class NodeView : public QDialog {
     int m_startPosition;
     QRegExp m_pattern;
     QString m_css;
+    QList<int> m_positions;
+    int m_positionIndex;
  signals:
     void openNode(const QString & node);
 };

@@ -11,12 +11,12 @@
 #include "keyboardwidget.h"
 #include "xsltsupport.h"
 #include "htmldelegate.h"
+#include "externs.h"
 #define NODE_COLUMN 2
 #define POSITION_COLUMN 3
 #define CONTEXT_COLUMN 4
 /// TODO
 /// some function pass SearchOptions - can we use the class member
-extern LanesLexicon * getApp();
 /**
  *
  *
@@ -160,10 +160,14 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
     return;
   }
   item = item->tableWidget()->item(item->row(),POSITION_COLUMN);
-  int pos;
-  if (m_singleRow) {
-    pos = m_positions[0];
+  if (!item) {
+    return;
   }
+  int pos = item->data(Qt::UserRole).toInt();
+  if (m_singleRow) {
+    pos = 0;
+  }
+  /*
   else {
     ok = true;
     pos =  item->text().toInt(&ok);
@@ -171,7 +175,7 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
       pos = 0;
     }
   }
-  qDebug() << m_positions;
+    */
   /// TODO make this a QSettings option or dialog option
   QString xml = m_nodeQuery.value("xml").toString();
   QString html = this->transform(xml);
@@ -441,8 +445,10 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
-                  QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
-                  addRow(root,headword,node,html,m_positions[i]);
+                  if (m_fragments[i].size() > 0) {
+                    QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
+                    addRow(root,headword,node,html,i);
+                  }
                 }
               }
               textCount += m_fragments.size();
@@ -551,6 +557,7 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
 }
 int FullSearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos) {
   QTableWidgetItem * item;
+
   int row = m_rxlist->rowCount();
   m_rxlist->insertRow(row);
   item = new QTableWidgetItem(root);
@@ -567,39 +574,30 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
   m_rxlist->setItem(row,NODE_COLUMN,item);
 
-  item = new QTableWidgetItem(QString("%1").arg(pos));
+  qDebug() << Q_FUNC_INFO << m_positions << pos;
+  int c = pos;
+  ///
+  /// for header row, m_positions.size() == 0
+  ///
+  if (!m_singleRow) {
+      c = 0;
+      if ((pos >= 0) && (pos < m_positions.size())) {
+        c = m_positions[pos];
+      }
+  }
+  item = new QTableWidgetItem(QString("%1").arg(c));
+  item->setData(Qt::UserRole,pos);
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-  m_rxlist->setItem(row,3,item);
+  m_rxlist->setItem(row,POSITION_COLUMN,item);
 
   if (text.size() > 0) {
-
-    /// For QLineEdit
-    /// force left justification, since the text could begin with arabic or english. From:
-    /// https://stackoverflow.com/questions/10998105/qt-how-to-change-the-direction-of-placeholder-in-a-qlineedit
-    ///
-    ///
-    if (0) {
-      QLineEdit * e = new QLineEdit(text);
-      e->setReadOnly(true);
-      QKeyEvent ke(QEvent::KeyPress, Qt::Key_Direction_L, 0);
-      QApplication::sendEvent(e, &ke);
-      m_rxlist->setCellWidget(row,CONTEXT_COLUMN,e);
-    }
-    if (0) {
-      QTextEdit * d = new QTextEdit(this);
-      d->setHtml("<html><body>" + text + "</body></html>");
-      d->setReadOnly(true);
-      d->setMaximumHeight(30);
-      m_rxlist->setCellWidget(row,CONTEXT_COLUMN,d);
-    }
-    if (1) {
-      item = new QTableWidgetItem(text);
-      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-      m_rxlist->setItem(row,CONTEXT_COLUMN,item);
-    }
+    item = new QTableWidgetItem(text);
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_rxlist->setItem(row,CONTEXT_COLUMN,item);
   }
-  else
-    m_rxlist->setItem(row,4,new QTableWidgetItem(text));
+  else {
+    m_rxlist->setItem(row,CONTEXT_COLUMN,new QTableWidgetItem(text));
+  }
 
   return row;
 }
