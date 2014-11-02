@@ -331,19 +331,23 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   QRegExp rx;
   QRegExp rxclass(m_diacritics);
 
-
-  QString sql = "select id,word,root,entry,node,nodenum from xref where datasource = 1 order by nodenum asc";
-
   QString pattern;
   m_currentRx = rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   bool ok = false;
+  QString sql("select id,word,root,entry,node,nodenum from xref where datasource = 1 order by nodenum asc");
   if (m_query.prepare(sql)) {
-    if (m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {
-      ok = true;
+    sql = "select root,word,xml from entry where datasource = 1 and nodeId = ?";
+    if (! m_nodeQuery.prepare(sql)) {
+      QLOG_WARN() << QString("SQL prepare error %1 : %2")
+        .arg(sql)
+        .arg(m_nodeQuery.lastError().text());
+      return;
     }
   }
-  if (! ok ) {
-    QLOG_WARN() << "Error prepare SQL";
+  else {
+    QLOG_WARN() << QString("SQL prepare error %1 : %2")
+      .arg(sql)
+      .arg(m_query.lastError().text());
     return;
   }
   if (m_debug) {
@@ -866,33 +870,29 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
       pattern = target;
     }
     if (options.wholeWordMatch()) {
-      pattern = "\\b" + pattern + "\\b";
-    }
-    m_currentRx.setPattern(pattern);
-
-    pattern.clear();
-    if (options.wholeWordMatch()) {
       pattern = "\\b" + m_target + "\\b";
-    }
-    else {
-      pattern = m_target;
     }
     rx.setPattern(pattern);
   }
   else {
     rx.setPattern(target);
-
   }
   QLOG_DEBUG() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
   m_currentRx = rx;
-  bool ok = false;
-  if (m_query.prepare("select root,word,nodeid,xml from entry where datasource = 1 order by nodenum asc")) {
-    if (m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {
-      ok = true;
+  QString sql("select root,word,nodeid,xml from entry where datasource = 1 order by nodenum asc");
+  if (m_query.prepare(sql)) {
+    sql = "select root,word,xml from entry where datasource = 1 and nodeId = ?";
+    if (! m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {
+      QLOG_WARN() << QString("SQL prepare error %1 : %2")
+        .arg(sql)
+        .arg(m_nodeQuery.lastError().text());
+      return;
     }
   }
-  if (! ok ) {
-    QLOG_WARN() << "Error prepare SQL";
+  else {
+    QLOG_WARN() << QString("SQL prepare error %1 : %2")
+      .arg(sql)
+      .arg(m_query.lastError().text());
     return;
   }
   if (m_debug) {
@@ -904,11 +904,8 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
     m_rxlist->hideColumn(3);
   }
   m_rxlist->showColumn(4);
-
-
   m_rxlist->setRowCount(0);
   //  m_rxlist->hide();
-#define NODE_COLUMN 2
 
   //  m_nodquery.bindValue(0,m_target);
 
@@ -938,7 +935,6 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   qint64 st = QDateTime::currentMSecsSinceEpoch();
   m_rxlist->setUpdatesEnabled(false);
   while(m_query.next() && ! m_cancelSearch) {
-    ok = false;
     readCount++;
     if ((readCount % 500) == 0) {
       m_progress->setValue(readCount);
@@ -960,7 +956,6 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
             m_rxlist->item(row,i)->setBackground(b);
           }
         }
-        ok = true;
       }
     }
     QString xml = m_query.value("xml").toString();
