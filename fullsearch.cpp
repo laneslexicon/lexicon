@@ -144,7 +144,6 @@ void FullSearchWidget::itemChanged(QTableWidgetItem * /* item */,QTableWidgetIte
 }
 
 void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
-  bool ok;
   bool isHead = false;
   /// get the node
   item = item->tableWidget()->item(item->row(),NODE_COLUMN);
@@ -167,15 +166,6 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   if (m_singleRow) {
     pos = 0;
   }
-  /*
-  else {
-    ok = true;
-    pos =  item->text().toInt(&ok);
-    if ( !ok )  {
-      pos = 0;
-    }
-  }
-    */
   /// TODO make this a QSettings option or dialog option
   QString xml = m_nodeQuery.value("xml").toString();
   QString html = this->transform(xml);
@@ -333,7 +323,6 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
 
   QString pattern;
   m_currentRx = rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
-  bool ok = false;
   QString sql("select id,word,root,entry,node,nodenum from xref where datasource = 1 order by nodenum asc");
   if (m_query.prepare(sql)) {
     sql = "select root,word,xml from entry where datasource = 1 and nodeId = ?";
@@ -351,23 +340,12 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     return;
   }
   if (m_debug) {
-    m_rxlist->showColumn(2);
-    m_rxlist->showColumn(3);
+    m_rxlist->showColumn(NODE_COLUMN);
   }
   else {
-    m_rxlist->hideColumn(2);
-    m_rxlist->hideColumn(3);
+    m_rxlist->hideColumn(NODE_COLUMN);
   }
-  m_rxlist->showColumn(4);
-
-
   m_rxlist->setRowCount(0);
-  //  m_rxlist->hide();
-#define NODE_COLUMN 2
-
-  //  m_nodquery.bindValue(0,m_target);
-
-
   int headCount = 0;
   int textCount = 0;
   int readCount = 0;
@@ -393,7 +371,6 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   //  m_rxlist->setUpdatesEnabled(false);
   qint64 st = QDateTime::currentMSecsSinceEpoch();
   while(m_query.next() && ! m_cancelSearch) {
-    ok = false;
     readCount++;
     if ((readCount % 500) == 0) {
       m_progress->setValue(readCount);
