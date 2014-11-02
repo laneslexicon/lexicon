@@ -574,7 +574,6 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
   m_rxlist->setItem(row,NODE_COLUMN,item);
 
-  qDebug() << Q_FUNC_INFO << m_positions << pos;
   int c = pos;
   ///
   /// for header row, m_positions.size() == 0
@@ -847,15 +846,20 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
 
   QRegExp rx;
 
-  QRegExp rxclass(m_diacritics);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
+  QRegExp rxclass(m_diacritics);
   QString pattern;
   if (options.getSearchType() == SearchOptions::Normal) {
     if (options.ignoreDiacritics()) {
-      QString ar(m_diacritics);//"[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
-      QStringList cc = target.split("");
-      QString brx = "";
-      for(int i=0;i < cc.size();i++) {
-        pattern += cc[i] + ar;
+      m_target = m_target.replace(QRegExp(rxclass),QString());
+      for(int i=0;i < target.size();i++) {
+        QChar sp = m_target.at(i);
+        pattern += QString(sp);
+        if ( sp.isLetter() ) {
+          /// if it's in the Arabic block, append to allow for optional diacritics
+          if ((sp.unicode() >= 0x600) && (sp.unicode() <= 0x6ff)) {
+            pattern += m_diacritics;
+          }
+        }
       }
     }
     else {
@@ -877,8 +881,9 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   }
   else {
     rx.setPattern(target);
-    QLOG_DEBUG() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
+
   }
+  QLOG_DEBUG() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
   m_currentRx = rx;
   bool ok = false;
   if (m_query.prepare("select root,word,nodeid,xml from entry where datasource = 1 order by nodenum asc")) {
@@ -942,13 +947,12 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
         pd->setValue(readCount);
     }
     ep.processEvents();
-    QString headword = m_query.value("word").toString();
+    headword = m_query.value("word").toString();
+    root = m_query.value("root").toString();
+    node = m_query.value("nodeid").toString();
     if (headword.indexOf(rx) != -1) {
       if (options.includeHeads()) {
-        int row = addRow(m_query.value("root").toString(),
-                         m_query.value("word").toString(),
-                         m_query.value("nodeid").toString(),
-                         m_headText,0);
+        int row = addRow(root,headword,node,m_headText,0);
         headCount++;
         if (m_headBackgroundColor.isValid()) {
           QBrush b(m_headBackgroundColor);
@@ -962,23 +966,25 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
     QString xml = m_query.value("xml").toString();
     QTextDocument * doc  = fetchDocument(xml);
     if (doc->characterCount() > 0) {
-      getTextFragments(doc,target,options,rx);
-      if (m_fragments.size() == 0) {
-      }
-      for(int i=0;i < m_fragments.size();i++) {
-        addRow(m_query.value("root").toString(),
-               m_query.value("word").toString(),
-               m_query.value("nodeid").toString(),
-               m_fragments[i],m_positions[i]);
-      }
-      if (m_fragments.size() > 0) {
-        textCount += m_fragments.size();
-        ok = true;
-      }
+            getTextFragments(doc,target,options);
+            if (m_fragments.size() > 0) {
+              entryCount++;
+              if (m_singleRow) {
+                QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[0]);
+                addRow(root,headword,node,html,m_fragments.size());
+              }
+              else {
+                for(int i=0;i < m_fragments.size();i++) {
+                  if (m_fragments[i].size() > 0) {
+                    QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
+                    addRow(root,headword,node,html,i);
+                  }
+                }
+              }
+              textCount += m_fragments.size();
+            }
     }
-    if (ok) {
-      entryCount++;
-    }
+
   }
   m_rxlist->setUpdatesEnabled(true);
   qint64 et = QDateTime::currentMSecsSinceEpoch();
