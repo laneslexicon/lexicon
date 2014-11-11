@@ -571,22 +571,15 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
 
   QString root = dp.getRoot();
   QString node = dp.getNode();
-
-
-  m_focusNode = node;
-  QLOG_DEBUG() << "Focus node set" << node;
   Place p = dp;
   /**
-   * if we asked for the node, look up the root
+   * if we don't have the root, but have the node, find the root
    *
    */
-
   if (root.isEmpty() && ! node.isEmpty() ) {
     m_nodeQuery->bindValue(0,node);
     m_nodeQuery->exec();
     if (m_nodeQuery->first()) {
-      //QString xml = m_nodeQuery->value("xml").toString();
-      //    QLOG_DEBUG() << "got " << xml;
       root = m_nodeQuery->value("root").toString();
       supplement = m_nodeQuery->value("supplement").toInt();
       p.setNode(node);
@@ -595,8 +588,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       p.setSupplement(supplement);
     }
     else {
-      QLOG_WARN() << "Node not found" << node;
-      //      QLOG_DEBUG() << Q_FUNC_INFO << "exiting 3 with place" << retval.toString();
+      QLOG_WARN() << QString(tr("Requested node not found : %1")).arg(node);
       return retval;
     }
   }
@@ -608,14 +600,10 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     if (quasiQuery.first()) {
       quasi = quasiQuery.value(0).toInt();
     }
-    else {
-      QLOG_WARN() << tr("Error quasi query failed") << quasiQuery.lastError().text();
-    }
   }
   else {
-    QLOG_WARN() << tr("Error quasi query prepare") << quasiQuery.lastError().text();
+    QLOG_WARN() << QString(tr("Error preparing quasi query:%1")).arg(quasiQuery.lastError().text());
   }
-  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << p << p.getAction();
   m_rootQuery->bindValue(0,root);
   m_rootQuery->exec();
   if (! m_rootQuery->first()) {
@@ -624,13 +612,13 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   }
 
   QString str = QString("<word type=\"root\" ar=\"%1\" quasi=\"%2\"></word>").arg(root).arg(quasi);
-  QLOG_DEBUG() << str;
+
   EntryItem * rootItem  = createEntry(str);
   /// will be null if the XSLT/XML has not parsed correctly
   if (rootItem == NULL) {
     return p;
   }
-  ///
+  /// TODO fix this
   /// write a history record because we are leaving this page
   ///
   if (getHistory()->isOn()) {
@@ -652,9 +640,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
 
   items << rootItem;
 
-
   /// by default we will center on the root item
   centerItem = rootItem;
+
   /// now add all the entries for the root
   do  {
     supplement = m_rootQuery->value(8).toInt();
@@ -699,6 +687,8 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       /// if we asked for a specific word/node, focus on it
       if (! node.isEmpty() && (item->getNode() == node)) {
         centerItem = item;
+        /// this is used by the 'home' key to reset focus
+        m_focusNode = node;
       }
     }
   } while(m_rootQuery->next());
@@ -707,10 +697,13 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (items.size() == 1) {
   }
   /**
-   * we have all the new items to show.
-   * If we are going forward, add them to the end
-   *  "  "  "   "    backwards, prepend them in reverse order
+   * Now that we have all the entries, add them to the list and
+   * and calculate their positions
    *
+   * NOTE: paging direction is now always forward. This code was written
+   *       to allow for a single page/tab to have more than one root + entries
+   *       with entries either being prepended or append depending on whether the
+   *       the user is going forward or backward.
    */
 
   if (m_pagingDir == 1) {
