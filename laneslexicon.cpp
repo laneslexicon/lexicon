@@ -2742,7 +2742,8 @@ void LanesLexicon::pageClear() {
 
 
 }
-void LanesLexicon::currentTabChanged(int) {
+void LanesLexicon::currentTabChanged(int ix) {
+  QLOG_DEBUG() << Q_FUNC_INFO << ix;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if ( entry ) {
     Place p = entry->getPlace();

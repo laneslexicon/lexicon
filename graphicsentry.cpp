@@ -315,23 +315,24 @@ void GraphicsEntry::moveFocusUp() {
   }
 }
 /**
- * Returns either the Place of the focus item (i.e the node) or, if no item has focus,
- * the Place of page (i.e the root)
- *
+ * If no index is given:
+ * Returns:
+ *    either the Place of the current scene focus item
+ *    the Place of home node
+ *    the place for the current page
  * @return
  */
 Place GraphicsEntry::getPlace(int index) const {
-  if (index == -1) {
-    EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
-    if (item)
+  if ((index >= 0) && (index < m_items.size())) {
+      return m_items[index]->getPlace();
+  }
+  EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
+  if (item) {
       return item->getPlace();
   }
-  else {
-    if (index < m_items.size()) {
-      return m_items[index]->getPlace();
-    }
+  if (! m_focusNode.isEmpty()) {
+    return Place::fromNode(m_focusNode);
   }
-
   return m_place;
 }
 /**
@@ -740,18 +741,11 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (centerItem) {
     this->setCurrentItem(centerItem);
   }
-  else {
-    QLOG_DEBUG() << Q_FUNC_INFO << "no center item";
-  }
 
   if (dp.getAction() == Place::History) {
     emit(historyPositionChanged(dp.getId()));
   }
 
-  /// we're done
-  if (m_place.isSamePlace(centerItem->getPlace())) {
-    return m_place;
-  }
   m_place = centerItem->getPlace();
   m_place.setAction(dp.getAction());
 
@@ -1360,9 +1354,9 @@ void GraphicsEntry::clearHighlights(bool keepResults) {
   m_highlightCount = 0;
 }
 void GraphicsEntry::shiftFocus() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QGraphicsItem * item = m_scene->focusItem();
-  //  EntryItem * ei = qobject_cast<EntryItem *>(item);
-  if ( ! item  && (m_items.size() > 0)) {
+  if ( !item  && (m_items.size() > 0)) {
     item = m_items[0];
   }
   if (item) {
@@ -1463,7 +1457,6 @@ void GraphicsEntry::addButtonDecoration(bool ok) {
 void GraphicsEntry::focusPlace() {
   Place p = this->getPlace();
   if (! p.getNode().isEmpty()) {
-    QLOG_DEBUG() << Q_FUNC_INFO << p.getNode();
     this->focusNode(p.getNode());
     return;
   }
@@ -1473,6 +1466,7 @@ void GraphicsEntry::focusPlace() {
   }
 }
 void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_view->setFocus();
   m_view->ensureVisible(item);
   m_scene->setFocusItem(item);

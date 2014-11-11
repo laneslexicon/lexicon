@@ -1,3 +1,4 @@
+#include "QsLog.h"
 #include "tabwidget.h"
 #include "graphicsentry.h"
 #include "headsearch.h"
@@ -49,11 +50,14 @@ void TabWidget::keyPressEvent(QKeyEvent * event) {
       return;
     }
 }
-void TabWidget::onTabBarClicked(int ix) {
+void TabWidget::onTabBarClicked(int /* ix */) {
+  /*
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(this->widget(ix));
   if (entry) {
+    QLOG_DEBUG() << "showing place for tab" << ix;
     entry->focusPlace();
   }
+  */
 }
 void TabWidget::tabRemoved(int index) {
   QTabWidget::tabRemoved(index);
