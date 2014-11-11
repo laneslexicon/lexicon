@@ -330,9 +330,9 @@ Place GraphicsEntry::getPlace(int index) const {
   if (item) {
       return item->getPlace();
   }
-  if (! m_focusNode.isEmpty()) {
-    return Place::fromNode(m_focusNode);
-  }
+  //  if (! m_focusNode.isEmpty()) {
+  //    return Place::fromNode(m_focusNode);
+  //  }
   return m_place;
 }
 /**
