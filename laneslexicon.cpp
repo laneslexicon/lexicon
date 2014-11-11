@@ -1326,6 +1326,52 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
 void LanesLexicon::gotoPlace(const Place & p,int options) {
   showPlace(p,options);
 }
+Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
+  Place np;
+
+  QLOG_DEBUG() << Q_FUNC_INFO << p;
+  GraphicsEntry * entry;
+  if (! p.isValid()) {
+    return p;
+  }
+  /// if we don't have a tab or the current tab is not a graphicsentry
+  /// force new tab creation
+  int currentTab = m_tabs->currentIndex();
+  if (currentTab == -1) {
+    createTab = true;
+  }
+  else {
+    /// if current widget not graphicsentry, set createtab
+    entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
+    if (! entry ) {
+      createTab = true;
+    }
+  }
+  if (createTab) {
+    /// turn history on as the user has clicked on something
+    /// and the root is not already shown
+    entry = new GraphicsEntry(this);
+    setSignals(entry);
+    entry->installEventFilter(this);
+    entry->getView()->installEventFilter(this);
+    np = entry->getXmlForRoot(p);
+    int ix = m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
+    if (activateTab) {
+      m_tabs->setCurrentIndex(ix);
+    }
+    return np;
+  }
+  if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
+      np = entry->getXmlForRoot(p);
+      m_tabs->setTabText(currentTab,np.getShortText());
+      entry->setFocus();
+      m_tabs->tabContentsChanged();
+    }
+    else {
+      return p;
+    }
+ return np;
+}
 Place LanesLexicon::showPlace(const Place & p,int options) {
   Place np;
 
@@ -2512,7 +2558,7 @@ void LanesLexicon::searchForRoot() {
         m_tabs->setCurrentIndex(ix);
         return;
       }
-      p = showPlace(Place(t),opts.newTab());
+      p = showPlace(Place(t),opts.newTab(),opts.activateTab());
       if (! p.isValid()) {
         QMessageBox msgBox;
         msgBox.setObjectName("rootnotfound");
@@ -2616,16 +2662,7 @@ void LanesLexicon::searchForNode() {
         m_tabs->setCurrentIndex(ix);
         return;
       }
-
-      int opts = 0;
-
-      if (options.newTab()) {
-        opts |= Lane::Create_Tab;
-      }
-      if (options.activateTab()) {
-        opts |= Lane::Switch_Tab;
-      }
-      p = showPlace(p,opts);
+      p = showPlace(p,options.newTab(),options.activateTab());
       if (! p.isValid()) {
         QMessageBox msgBox;
         msgBox.setText(QString(tr("Node not found: %1")).arg(t));
