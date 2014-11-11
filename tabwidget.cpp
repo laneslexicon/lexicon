@@ -17,14 +17,6 @@ TabWidget::TabWidget(QWidget * parent) : QTabWidget(parent) {
 }
 void TabWidget::keyPressEvent(QKeyEvent * event) {
     switch (event->key()) {
-      /*
-    case Qt::Key_Tab: {
-      qDebug() << Q_FUNC_INFO << "tab pressed";
-    }
-    case Qt::Key_Right: {
-      qDebug() << Q_FUNC_INFO << "right pressed";
-    }
-      */
     case Qt::Key_Enter :
     case Qt::Key_Space :
     case Qt::Key_Return : {
@@ -71,9 +63,6 @@ void TabWidget::tabInserted(int index) {
     emit(tabsChanged());
   }
 }
-//    if (event->key() == Qt::Key_Escape) {
-//      QLOG_DEBUG() << Q_FUNC_INFO << "escape";
-//    }
 void TabWidget::readSettings() {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("TabBar");
@@ -88,41 +77,3 @@ void TabWidget::tabContentsChanged() {
 void TabWidget::focusOutEvent(QFocusEvent * /* event */) {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
-/*
-bool TabWidget::eventFilter(QObject * target,QEvent * event) {
-    if (event->type() == QEvent::KeyPress) {
-    QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
-    switch(keyEvent->key()) {
-      case Qt::Key_Tab:
-        qStrip << Q_FUNC_INFO << "got tab";
-        break;
-      case Qt::Key_Left:
-        qStrip << Q_FUNC_INFO << "got left";
-        break;
-*/
-        /*
-      case Qt::Key_T: {
-        if (keyEvent->modifiers() && Qt::ControlModifier) {
-          m_tree->setFocus();
-          return true;
-        }
-        break;
-      }
-      case Qt::Key_E: {
-        if (keyEvent->modifiers() && Qt::ControlModifier) {
-          if (target == m_tree)
-          m_tabs->currentWidget()->setFocus();
-          return true;
-        }
-        break;
-      }
-        */
-/*
-    default:
-      break;
-    }
-  }
-
-  return QTabWidget::eventFilter(target,event);
-}
-*/
