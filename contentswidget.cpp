@@ -56,39 +56,32 @@ void ContentsWidget::readSettings() {
   delete settings;
 }
 void ContentsWidget::loadContents() {
-  QSqlQuery query;
-  QFile f;
-  QTextStream * out;
-  int rootCount = 0;
-  if (m_debug) {
-    QFileInfo fi(QDir::tempPath(),QString("roots.txt"));
-    f.setFileName(fi.filePath());
-    if (f.open(QIODevice::WriteOnly)) {
-      out = new QTextStream(&f);
-      out->setCodec("UTF-8");
-    }
+  QSqlQuery letterQuery;
+
+
+  if (! m_entryQuery.prepare("select word,itype,bword,nodeId,supplement from entry where datasource = 1 and root = ? order by nodenum asc")) {
+    QLOG_WARN() << QString(tr("Entry SQL prepare failed:%1")).arg(m_entryQuery.lastError().text());
   }
+
+
   QString sql = "select distinct letter from root where datasource = 1 order by letter";
-  if ( ! query.prepare(sql)) {
-    QLOG_FATAL() << "Error preparing SQL:" << sql;
+  if ( ! letterQuery.prepare(sql)) {
+    QLOG_WARN() << QString(tr("Error preparing letter query SQL:%1")).arg(letterQuery.lastError().text());
     return;
   }
-  query.exec();
+  letterQuery.exec();
 
   QSqlQuery rootQuery;
   sql = "select word,supplement from root where letter = ? and datasource = 1 order by word,supplement";
   if (! rootQuery.prepare(sql)) {
-    QLOG_FATAL() << "Error preparing SQL:" << sql;
+    QLOG_WARN() << QString(tr("Error preparing root query SQL:%1")).arg(rootQuery.lastError().text());
     return;
   }
-  while(query.next()) {
-    QString letter = query.value(0).toString();
+  while(letterQuery.next()) {
+    QString letter = letterQuery.value(0).toString();
     QTreeWidgetItem * item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(letter));
     rootQuery.bindValue(0,letter);
     rootQuery.exec();
-    //    if (! rootQuery.first()) {
-    //      QLOG_DEBUG() << rootQuery.lastError().text();
-    //    }
     QString supp;
     QString root;
     while(rootQuery.next()) {
@@ -109,27 +102,16 @@ void ContentsWidget::loadContents() {
           ok = false;
         }
         if (ok) {
-          if (m_debug && f.isOpen()) {
-            *out << root << '\n';
-          }
           QStringList cols;
           cols << root << supp;
           item->addChild(new QTreeWidgetItem(cols));
-          rootCount++;
+          //          rootCount++;
         }
       }
       addTopLevelItem(item);
     }
   }
-  if (m_debug) {
-    out->flush();
-    f.close();
-    delete out;
-  }
   resizeColumnToContents(HEAD_SUPPLEMENT_COLUMN);
-  if (!m_entryQuery.prepare("select word,itype,bword,nodeId,supplement from entry where datasource = 1 and root = ? order by nodenum asc")) {
-    QLOG_WARN() << "Entry SQL prepare failed" << m_entryQuery.lastError();
-  }
 }
 Place ContentsWidget::findNextPlace(const Place & p) {
   QTreeWidgetItem * currentItem = 0;
