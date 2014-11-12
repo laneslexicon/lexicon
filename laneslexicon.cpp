@@ -1366,49 +1366,12 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
  return np;
 }
 Place LanesLexicon::showPlace(const Place & p,int options) {
-  Place np;
-
   QLOG_DEBUG() << Q_FUNC_INFO << p;
-  GraphicsEntry * entry;
-  if (! p.isValid()) {
-    return p;
-  }
-  int currentTab = m_tabs->currentIndex();
-  if (currentTab == -1) {
-    options |= Lane::Create_Tab;
-  }
-  else {
-    /// if current widget not graphicsentry, set createtab
-    entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
-    if (! entry ) {
-      options |= Lane::Create_Tab;
-    }
-  }
-  if (options & Lane::Create_Tab) {
-    /// turn history on as the user has clicked on something
-    /// and the root is not already shown
-    entry = new GraphicsEntry(this);
-    setSignals(entry);
-    entry->installEventFilter(this);
-    entry->getView()->installEventFilter(this);
-    np = entry->getXmlForRoot(p);
-    int ix = m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
-    if (options & Lane::Switch_Tab) {
-      m_tabs->setCurrentIndex(ix);
-    }
-  }
-  else {
-    if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
-      np = entry->getXmlForRoot(p);
-      m_tabs->setTabText(currentTab,np.getShortText());
-      entry->setFocus();
-      m_tabs->tabContentsChanged();
-    }
-    else {
-      return p;
-    }
-  }
- return np;
+  bool createTab = false;
+  bool activateTab = true;
+  createTab = options && Lane::Create_Tab;
+  activateTab = options && Lane::Switch_Tab;
+  return showPlace(p,createTab,activateTab);
 }
 /**
  * when user clicks on item reason Qt::MouseFocusReason
