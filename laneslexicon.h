@@ -81,7 +81,6 @@ class LanesLexicon : public QMainWindow
   HistoryMaster * history();
   NoteMaster * notes();
   public slots:
-    void gotoPlace(const Place &,int);
     int hasPlace(const Place & p,int searchtype,bool setFocus);
     void setStatus(const QString &);
     //    void saveNote(Note *);

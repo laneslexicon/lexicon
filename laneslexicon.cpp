@@ -164,10 +164,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   if (p.isValid()) {
     if (ix == -1) {  // not showing in another tab
-      int options = 0;
-      options |= Lane::Create_Tab;
-      options |= Lane::Switch_Tab;
-      showPlace(p,options);
+      showPlace(p,false,true);
       m_tree->ensurePlaceVisible(p);
     }
   }
@@ -317,7 +314,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(clearPage()),this,SLOT(pageClear()));
   connect(entry,SIGNAL(searchPage()),this,SLOT(pageSearch()));
 
-  connect(entry,SIGNAL(gotoNode(const Place &,int)),this,SLOT(gotoPlace(const Place &,int)));
+  connect(entry,SIGNAL(gotoNode(const Place &,int)),this,SLOT(showPlace(const Place &,int)));
   connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
   connect(entry,SIGNAL(printPage()),this,SLOT(pagePrint()));
   connect(entry,SIGNAL(searchFinished()),this,SLOT(pageSearchComplete()));
@@ -1208,7 +1205,7 @@ void LanesLexicon::onHistorySelection() {
   QVariant v = action->data();
   Place p = v.value<Place>();
   p.setAction(Place::History);
-  showPlace(p,false);
+  showPlace(p,false,true);
 
 }
 void LanesLexicon::onExit()
@@ -1233,7 +1230,6 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
   return m_db.open();
 }
 void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
-  int options = 0;
   QString root = item->text(0);
   QString supp = item->text(1);
   int p = 0;
@@ -1243,8 +1239,9 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     return;
   }
   /// TODO check this
+  bool newTab = false;
   if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-      options |= Lane::Create_Tab;
+    newTab = true;
   }
   /// check whether root or head word
   if  (item->parent()->parent() == 0) {
@@ -1254,7 +1251,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     }
     Place m(root,p);
     m.setAction(Place::User);
-    showPlace(m,options);
+    showPlace(m,newTab,true);
   }
   else {
     /// double clicked on head word, highlight it
@@ -1278,7 +1275,6 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
  * @param col
  */
 void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
-  int options = 0;
   /// ignore clicks on the root or the letter
   QLOG_DEBUG() << Q_FUNC_INFO;
   if ((item->parent() == 0) || (item->parent()->parent() == 0)) {
@@ -1292,8 +1288,7 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (! entry) {
     Place p = Place::fromNode(node);
-    options |= Lane::Create_Tab;
-    m_place = showPlace(p,options);
+    m_place = showPlace(p,true,true);
     return;
   }
   if (entry->hasNode(node)) {
@@ -1314,18 +1309,16 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
     }
     else {
       Place p = Place::fromNode(node);
+      bool newTab = false;
       if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
-        options |= Lane::Create_Tab;
+        newTab = true;
       }
-      m_place = showPlace(p,options);
+      m_place = showPlace(p,newTab,true);
       return;
     }
   }
 }
 
-void LanesLexicon::gotoPlace(const Place & p,int options) {
-  showPlace(p,options);
-}
 Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
   Place np;
 
@@ -1933,17 +1926,15 @@ void LanesLexicon::onPrevRoot() {
   }
 }
 void LanesLexicon::onFirstRoot() {
-  int options = 0;
   Place p;
   p.setRoot(m_firstRoot);
-  showPlace(p,options);
+  showPlace(p,false,true);
   m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::onLastRoot() {
-  int options = 0;
   Place p;
   p.setRoot(m_lastRoot);
-  showPlace(p,options);
+  showPlace(p,false,true);
   m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::rootChanged(const QString & root,const QString & /* node */) {
@@ -2094,13 +2085,12 @@ Place LanesLexicon::getCurrentPlace() {
  * @param key
  */
 void LanesLexicon::bookmarkShortcut(const QString & key) {
-  int options = 0;
   if (m_revertEnabled && (key == "revert")) {
     if (! m_bookmarks.contains("-here-")) {
       return;
     }
     Place p = m_bookmarks.value("-here-");
-    showPlace(p,options);
+    showPlace(p,false,true);
     m_revertEnabled = false;
     return;
   }
@@ -2186,7 +2176,6 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
   }
 }
 void LanesLexicon::bookmarkJump(const QString & id) {
-  int options = 0;
   QLOG_DEBUG() << Q_FUNC_INFO << id;
   if ( ! m_bookmarks.contains(id) ) {
     QLOG_WARN() << QString(tr("Unknown bookmark jump activated: %1")).arg(id);
@@ -2201,7 +2190,7 @@ void LanesLexicon::bookmarkJump(const QString & id) {
   Place cp = this->getCurrentPlace();
   cp.setAction(Place::Bookmark);
   m_bookmarks.insert("-here-",cp);
-  showPlace(p,options);
+  showPlace(p,false,true);
   m_revertEnabled = true;
   updateMenu();
 }
@@ -2529,7 +2518,7 @@ void LanesLexicon::searchForPage() {
     if (options.activateTab()) {
       taboptions |= Lane::Switch_Tab;
     }
-    this->gotoPlace(p,taboptions);
+    this->showPlace(p,taboptions);
   }
   else {
     p.setPage(page);
@@ -2850,7 +2839,7 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
 void LanesLexicon::showSearchNode(const QString & node) {
   Place p;
   p.setNode(node);
-  this->gotoPlace(p,Lane::Create_Tab);
+  this->showPlace(p,Lane::Create_Tab);
 }
 int LanesLexicon::getSearchCount() {
   int c = 0;
@@ -3148,7 +3137,7 @@ void LanesLexicon::sync() {
   if (w == m_tree) {
     Place p = m_tree->getCurrentPlace();
     if (p.isValid()) {
-      this->showPlace(p,0);
+      this->showPlace(p,false,true);
     }
   }
   else {
