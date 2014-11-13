@@ -3,6 +3,8 @@
 #include "place.h"
 #include "application.h"
 #include "definedsettings.h"
+#define ROOT_COLUMN 0
+#define WORD_COLUMN 1
 #define HEAD_SUPPLEMENT_COLUMN 2
 #define NODE_COLUMN 3
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
@@ -62,7 +64,6 @@ void ContentsWidget::loadContents() {
   if (! m_entryQuery.prepare("select word,itype,bword,nodeId,supplement from entry where datasource = 1 and root = ? order by nodenum asc")) {
     QLOG_WARN() << QString(tr("Entry SQL prepare failed:%1")).arg(m_entryQuery.lastError().text());
   }
-
 
   QString sql = "select distinct letter from root where datasource = 1 order by letter";
   if ( ! letterQuery.prepare(sql)) {
@@ -187,47 +188,18 @@ Place ContentsWidget::findNextPlace(const Place & p) {
  * @return the next root in sequence
  */
 QString ContentsWidget::findNextRoot(const QString & root) {
-  QTreeWidgetItem * currentItem = 0;
-  int tc = topLevelItemCount();
-  int topIndex = -1;
-  int childIndex = -1;
-  bool found = false;
-  /// TODO replace by code using findItems
-
-  for(int i = 0;(i < tc) && ! found;i++) {
-    QTreeWidgetItem * topItem = topLevelItem(i);
-    int kidCount = topItem->childCount();
-    for(int j=0;(j < kidCount) && ! found ;j++) {
-      QTreeWidgetItem * child = topItem->child(j);
-      if (child->text(0) == root) {
-        currentItem = child;
-        topIndex = i;
-        if (j == (kidCount - 1)) {
-          topIndex++;
-          childIndex = 0;
-        }
-        else {
-          childIndex = j + 1;
-        }
-        found = true;
-      }
+  QList<QTreeWidgetItem *> items = this->findItems(root,Qt::MatchRecursive,ROOT_COLUMN);
+  if (items.size() > 0) {
+    QTreeWidgetItem * nextItem = this->itemBelow(items[0]);
+    if (nextItem) {
+      items[0]->setSelected(false);
+      nextItem->setSelected(true);
+      return nextItem->text(ROOT_COLUMN);
+    }
+    else {
+      emit(atEnd());
     }
   }
-  if (topIndex == tc) {
-    emit(atEnd());
-    return QString();
-  }
-  /// overkill, but would only matter if there were letters without any roots
-  for(int i = topIndex;i < tc; i++) {
-      QTreeWidgetItem * item = topLevelItem(i);
-      int kidCount = item->childCount();
-      if (childIndex < kidCount) {
-        QTreeWidgetItem * nextItem = item->child(childIndex);
-        currentItem->setSelected(false);
-        nextItem->setSelected(true);
-        return nextItem->text(0);
-      }
-    }
   return QString();
 }
 /**
@@ -239,51 +211,18 @@ QString ContentsWidget::findNextRoot(const QString & root) {
  * @return the next root in sequence
  */
 QString ContentsWidget::findPrevRoot(const QString & root) {
-  QTreeWidgetItem * currentItem = 0;
-  int tc = topLevelItemCount();
-  int topIndex = -1;
-  int childIndex = -1;
-  bool found = false;
-  /// TODO replace by code using findItems
-
-  for(int i = 0;(i < tc) && ! found;i++) {
-    QTreeWidgetItem * topItem = topLevelItem(i);
-    int kidCount = topItem->childCount();
-    for(int j=0;(j < kidCount) && ! found ;j++) {
-      QTreeWidgetItem * child = topItem->child(j);
-      if (child->text(0) == root) {
-        currentItem = child;
-        /// if first child, we want the last root of the prev letter
-        topIndex = i;
-        if (j == 0) {
-          topIndex--;
-          childIndex = -1;
-        }
-        else {
-          childIndex = j - 1;
-        }
-        found = true;
-      }
+  QList<QTreeWidgetItem *> items = this->findItems(root,Qt::MatchRecursive,ROOT_COLUMN);
+  if (items.size() > 0) {
+    QTreeWidgetItem * nextItem = this->itemAbove(items[0]);
+    if (nextItem) {
+      items[0]->setSelected(false);
+      nextItem->setSelected(true);
+      return nextItem->text(ROOT_COLUMN);
+    }
+    else {
+      emit(atStart());
     }
   }
-  if (topIndex == -1) {
-    emit(atStart());
-    return QString();
-  }
-  /// overkill, but would only matter if there were letters without any roots
-  for(int i = topIndex;i >= 0; i--) {
-      QTreeWidgetItem * item = topLevelItem(i);
-      int kidCount = item->childCount();
-      if (kidCount > childIndex) {
-        if (childIndex == -1) {
-          childIndex = kidCount - 1;
-        }
-        QTreeWidgetItem * nextItem = item->child(childIndex);
-        currentItem->setSelected(false);
-        nextItem->setSelected(true);
-        return nextItem->text(0);
-      }
-    }
   return QString();
 }
 /**
@@ -472,11 +411,11 @@ QTreeWidgetItem * ContentsWidget::findPlace(const Place & p) const {
   QString target;
   int column;
   if (p.isRoot()) {
-    column = 0;
+    column = ROOT_COLUMN;
     target = p.getRoot();
   }
   else {
-    column = 1;
+    column = WORD_COLUMN;
     target = p.getWord();
   }
   //  QLOG_DEBUG() << Q_FUNC_INFO << target;
