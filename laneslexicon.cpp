@@ -1821,11 +1821,11 @@ HistoryMaster * LanesLexicon::history() {
 NoteMaster * LanesLexicon::notes() {
   return m_notes;
 }
-/**
- * this needs to be fixed to return supplement as well
- *
+/******************************************************************************
+ * find Next/Prev Root are invoked when the user navigates forward or backward
+ * from a graphicsentry page
  * @param root
- */
+ ******************************************************************************/
 void LanesLexicon::findNextRoot(const QString & root) {
   GraphicsEntry * entry = dynamic_cast<GraphicsEntry *>(QObject::sender());
   QString nroot = m_tree->findNextRoot(root);
@@ -1844,14 +1844,18 @@ void LanesLexicon::findPrevRoot(const QString & root) {
     entry->getXmlForRoot(Place(nroot));
   }
 }
-/**
- * user clicks on next root button
+/**********************************************************************************
+ * The next four functions are invoked by clicking on the toolbar/menu navigation
+ * icons.
+ * If the current page is not a graphicsentry nothing happens.
+ *
+ * user clicks on next root button on the toolbar/menu
  *  - fetch the current root from GraphicsEntry page
  *  - query the ContentsWidget for the next root
  *  - if found
  *    tell the GraphicsEntry page to either show the root or fetch it and show it
  *
- */
+ **********************************************************************************/
 void LanesLexicon::onNextRoot() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
@@ -1900,6 +1904,10 @@ void LanesLexicon::onLastRoot() {
   showPlace(p,false,true);
   m_tree->ensurePlaceVisible(p);
 }
+/********************************************************************************
+ *
+ *
+ ********************************************************************************/
 void LanesLexicon::rootChanged(const QString & root,const QString & /* node */) {
   Place p;
   p.setRoot(root);
@@ -1916,11 +1924,16 @@ void LanesLexicon::placeChanged(const Place & p) {
 
   m_tree->ensurePlaceVisible(p,true);
 }
+/***************************************************************************************************
+ *
+ * Sets up the first and last root and apgevariables, m_firstRoot,m_firstPage etc
+ *
+ ****************************************************************************************************/
 void LanesLexicon::getFirstAndLast() {
   QSqlQuery query;
   bool ok = query.prepare("select root,page from entry where datasource = 1 order by nodenum limit 5;");
   if (! ok ) {
-    QLOG_DEBUG() << "first root SQL prepare failed";
+    QLOG_DEBUG() << QString(tr("First root SQL prepare failed: %1")).arg(query.lastError().text());
   }
   query.exec();
   if (query.first()) {
@@ -1929,7 +1942,7 @@ void LanesLexicon::getFirstAndLast() {
   }
   ok = query.prepare("select root,page from entry where datasource = 1 order by nodenum desc limit 5;");
   if (! ok ) {
-    QLOG_DEBUG() << "last root SQL prepare failed";
+    QLOG_DEBUG() << QString(tr("Lastt root SQL prepare failed: %1")).arg(query.lastError().text());
   }
   query.exec();
   if (query.first()) {
@@ -1945,6 +1958,12 @@ void LanesLexicon::onGoToPage(const Place & p) {
     //        m_tree->ensurePlaceVisible(np,true);
   }
 }
+/**********************************************************************
+ *
+ * the next four functions are invoked by clicking on the toolbar/menu
+ * navigation icons when in page mode
+ *
+ **********************************************************************/
 void LanesLexicon::onNextPage() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
@@ -2006,7 +2025,7 @@ void LanesLexicon::onLastPage() {
   }
 }
 /**
- * Converts supplied param to Arabic using the default map
+ * Converts supplied Buckwalter string param to Arabic using the default map
  * unrecognised characters are left in place
  * @param s
  *

@@ -1466,7 +1466,6 @@ void GraphicsEntry::focusPlace() {
   }
 }
 void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
-  QLOG_DEBUG() << Q_FUNC_INFO;
   m_view->setFocus();
   m_view->ensureVisible(item);
   m_scene->setFocusItem(item);
