@@ -1236,6 +1236,8 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   QLOG_DEBUG() << Q_FUNC_INFO << root << supp;
   /// check that the user has not clicked on a letter
   if (item->parent() == 0) {
+    Place m = Place::fromRoot(item->text(0));
+    showPlace(m,false,true);
     return;
   }
   /// TODO check this
