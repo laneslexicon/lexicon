@@ -81,6 +81,7 @@ void ContentsWidget::loadContents() {
   while(letterQuery.next()) {
     QString letter = letterQuery.value(0).toString();
     QTreeWidgetItem * item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(letter));
+    item->setData(0,Qt::UserRole,"letter");
     rootQuery.bindValue(0,letter);
     rootQuery.exec();
     QString supp;
@@ -89,6 +90,7 @@ void ContentsWidget::loadContents() {
       bool ok = true;
       // we can have root entries that are in the main text
       // and the supplement but we only show one entry
+      // merging the children
       if (root != rootQuery.value(0).toString()) {
         //      itype = rootQuery.value(2).toString();
         root = rootQuery.value(0).toString();
@@ -102,10 +104,15 @@ void ContentsWidget::loadContents() {
         if ((supp == "*") && (root.size() == 1)) {
           ok = false;
         }
+        if (root == letter) {
+          ok = false;
+        }
         if (ok) {
           QStringList cols;
           cols << root << supp;
-          item->addChild(new QTreeWidgetItem(cols));
+          QTreeWidgetItem * rootItem = new QTreeWidgetItem(cols);
+          rootItem->setData(0,Qt::UserRole,"root");
+          item->addChild(rootItem);
           //          rootCount++;
         }
       }
@@ -115,68 +122,9 @@ void ContentsWidget::loadContents() {
   resizeColumnToContents(HEAD_SUPPLEMENT_COLUMN);
 }
 Place ContentsWidget::findNextPlace(const Place & p) {
-  QTreeWidgetItem * currentItem = 0;
-  int tc = topLevelItemCount();
-  int topIndex = -1;
-  int childIndex = -1;
-  bool found = false;
-
-  QString root = p.getRoot();
-  int supp = p.getSupplement();
-  QString suppTest;
   Place np;
-  if (supp == 1) {
-    suppTest = "*";
-  }
-  /// TODO replace by code using findItems
-  QLOG_DEBUG() << Q_FUNC_INFO << root << supp;
-  for(int i = 0;(i < tc) && ! found;i++) {
-    QTreeWidgetItem * topItem = topLevelItem(i);
-    int kidCount = topItem->childCount();
-    for(int j=0;(j < kidCount) && ! found ;j++) {
-      QTreeWidgetItem * child = topItem->child(j);
-      //      QLOG_DEBUG() << child->text(0) << child->text(1);
-      if ((child->text(0) == root) && (child->text(1) == suppTest)) {
-        currentItem = child;
-        topIndex = i;
-        if (j == (kidCount - 1)) {
-          topIndex++;
-          childIndex = 0;
-        }
-        else {
-          childIndex = j + 1;
-        }
-        found = true;
-      }
-    }
-  }
-  if ((topIndex == -1) || (childIndex == -1 )) {
-    QLOG_WARN() << "Root not found" << root;
-    return np;
-  }
-  if (topIndex == tc) {
-    emit(atEnd());
-    return np;
-  }
-  /// overkill, but would only matter if there were letters without any roots
-  for(int i = topIndex;i < tc; i++) {
-      QTreeWidgetItem * item = topLevelItem(i);
-      int kidCount = item->childCount();
-      if (childIndex < kidCount) {
-        QTreeWidgetItem * nextItem = item->child(childIndex);
-        currentItem->setSelected(false);
-        nextItem->setSelected(true);
-        if (nextItem->text(1) == "*") {
-          supp = 1;
-        }
-        else {
-          supp = 0;
-        }
-        np.setRoot(nextItem->text(0));
-        np.setSupplement(supp);
-        return np;
-      }
-    }
+  QString nextRoot = this->findNextRoot(p.getRoot());
+  np.setRoot(nextRoot);
   return np;
 }
 /**
@@ -189,12 +137,28 @@ Place ContentsWidget::findNextPlace(const Place & p) {
  */
 QString ContentsWidget::findNextRoot(const QString & root) {
   QList<QTreeWidgetItem *> items = this->findItems(root,Qt::MatchRecursive,ROOT_COLUMN);
-  if (items.size() > 0) {
-    QTreeWidgetItem * nextItem = this->itemBelow(items[0]);
-    if (nextItem) {
-      items[0]->setSelected(false);
-      nextItem->setSelected(true);
-      return nextItem->text(ROOT_COLUMN);
+  if (items.size() == 0) {
+    return QString();
+  }
+  QTreeWidgetItem * currentItem = items[0];
+  QString itemType = currentItem->data(0,Qt::UserRole).toString();
+  if (itemType == "letter") {
+    if (currentItem->childCount() > 0) {
+      return currentItem->child(0)->text(0);
+    }
+    return QString();
+  }
+  if (itemType == "root") {
+    QTreeWidgetItem * letter = currentItem->parent();
+    int ix = letter->indexOfChild(currentItem);
+    ix++;
+    if (ix < letter->childCount()) {
+      return letter->child(ix)->text(0);
+    }
+    ix = indexOfTopLevelItem(letter);
+    ix++;
+    if (ix < topLevelItemCount()) {
+      return topLevelItem(ix)->text(0);
     }
     else {
       emit(atEnd());
@@ -212,12 +176,37 @@ QString ContentsWidget::findNextRoot(const QString & root) {
  */
 QString ContentsWidget::findPrevRoot(const QString & root) {
   QList<QTreeWidgetItem *> items = this->findItems(root,Qt::MatchRecursive,ROOT_COLUMN);
-  if (items.size() > 0) {
-    QTreeWidgetItem * nextItem = this->itemAbove(items[0]);
-    if (nextItem) {
-      items[0]->setSelected(false);
-      nextItem->setSelected(true);
-      return nextItem->text(ROOT_COLUMN);
+  if (items.size() == 0) {
+    return QString();
+  }
+  QTreeWidgetItem * currentItem = items[0];
+  QString itemType = currentItem->data(0,Qt::UserRole).toString();
+  if (itemType == "letter") {
+    int ix = indexOfTopLevelItem(currentItem);
+    ix--;
+    if (ix < 0) {
+      emit(atStart());
+      return QString();
+    }
+    currentItem = topLevelItem(ix);
+    if (currentItem->childCount() > 0) {
+      currentItem = currentItem->child(currentItem->childCount() - 1);
+      return currentItem->text(0);
+    }
+    else {
+      return QString();
+    }
+  }
+  if (itemType == "root") {
+    QTreeWidgetItem * letter = currentItem->parent();
+    int ix = letter->indexOfChild(currentItem);
+    ix--;
+    if (ix >= 0) {
+      return letter->child(ix)->text(0);
+    }
+    ix = indexOfTopLevelItem(letter);
+    if (ix >= 0) {
+      return topLevelItem(ix)->text(0);
     }
     else {
       emit(atStart());
@@ -234,66 +223,9 @@ QString ContentsWidget::findPrevRoot(const QString & root) {
  * @return the next root in sequence
  */
 Place ContentsWidget::findPrevPlace(const Place & p) {
-  QTreeWidgetItem * currentItem = 0;
-  int tc = topLevelItemCount();
-  int topIndex = -1;
-  int childIndex = -1;
-  bool found = false;
-  QString root = p.getRoot();
-  int supp = p.getSupplement();
-  QString suppTest;
   Place np;
-  if (supp == 1) {
-    suppTest = "*";
-  }
-  /// TODO replace by code using findItems
-
-  for(int i = 0;(i < tc) && ! found;i++) {
-    QTreeWidgetItem * topItem = topLevelItem(i);
-    int kidCount = topItem->childCount();
-    for(int j=0;(j < kidCount) && ! found ;j++) {
-      QTreeWidgetItem * child = topItem->child(j);
-      if ((child->text(0) == root) && (child->text(1) == suppTest)) {
-        currentItem = child;
-        /// if first child, we want the last root of the prev letter
-        topIndex = i;
-        if (j == 0) {
-          topIndex--;
-          childIndex = -1;
-        }
-        else {
-          childIndex = j - 1;
-        }
-        found = true;
-      }
-    }
-  }
-  if (topIndex == -1) {
-    emit(atStart());
-    return np;
-  }
-  /// overkill, but would only matter if there were letters without any roots
-  for(int i = topIndex;i >= 0; i--) {
-      QTreeWidgetItem * item = topLevelItem(i);
-      int kidCount = item->childCount();
-      if (kidCount > childIndex) {
-        if (childIndex == -1) {
-          childIndex = kidCount - 1;
-        }
-        QTreeWidgetItem * nextItem = item->child(childIndex);
-        currentItem->setSelected(false);
-        nextItem->setSelected(true);
-        if (nextItem->text(1) == "*") {
-          supp = 1;
-        }
-        else {
-          supp = 0;
-        }
-        np.setRoot(nextItem->text(0));
-        np.setSupplement(supp);
-        return np;
-      }
-    }
+  QString nextRoot = this->findPrevRoot(p.getRoot());
+  np.setRoot(nextRoot);
   return np;
 }
 void ContentsWidget::keyPressEvent(QKeyEvent * event) {
