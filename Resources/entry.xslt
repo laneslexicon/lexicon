@@ -60,10 +60,12 @@
       <xsl:otherwise>
     <span>
       <xsl:attribute name="class">wordheading <xsl:value-of select="$entrystyle" /></xsl:attribute>
-      <xsl:if test="not(@itype = '')">
+      <xsl:if test="not(@itype = '') and not(@itype='alphabetical letter')">
         <span class="infl"><xsl:value-of select="@itype" /></span><xsl:text> </xsl:text>
       </xsl:if>
+      <xsl:if test="not(@itype = 'alphabetical letter')">
     <span class="arabic"><xsl:value-of select="@ar"/></span>
+      </xsl:if>
     </span>
     <xsl:apply-templates select="entryFree" />
       </xsl:otherwise>
