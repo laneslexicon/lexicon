@@ -155,7 +155,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     ix = this->hasPlace(p,GraphicsEntry::NodeSearch,true);
   }
   else if (! m_startupRoot.isEmpty()) {
-    p.setRoot(m_startupRoot);
+    p.setRoot(convertString(m_startupRoot));
     ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
   }
   else if ((m_tabs->count() == 0) && ! m_firstRoot.isEmpty()) {
@@ -212,6 +212,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   edits.clear()
   */
+
   QLOG_DEBUG() << "-----------------------";
   QLOG_DEBUG() << "Initialisation complete";
   QLOG_DEBUG() << "-----------------------";
@@ -2045,6 +2046,7 @@ void LanesLexicon::onLastPage() {
  * @return the equivalent arabic string
  */
 QString LanesLexicon::convertString(const QString & s) const {
+  QLOG_DEBUG() << Q_FUNC_INFO << s << m_currentMap;
   if ( m_currentMap.isEmpty()) {
     return s;
   }
