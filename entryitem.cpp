@@ -184,7 +184,8 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     //    QLOG_DEBUG() << "bookmark goto" << jumpAction->data();
     Place p;
     p.setNode(jumpAction->data().toString());
-    emit(gotoNode(p,Lane::Create_Tab));
+    /// TODO check boolean values
+    emit(gotoNode(p,true,true));
 
   }
   else if (htmlAction && (selectedAction == htmlAction)) {
