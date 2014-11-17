@@ -7,7 +7,8 @@
 #define SID_SYSTEM_INTERFACE "Interface"
 #define SID_SYSTEM_KEYMAPS   "Keymaps"
 #define SID_SYSTEM_NAV_MODE  "Nav mode"
-
+#define SID_SYSTEM_OPEN_LINK "Open links in current tab"
+#define SID_SYSTEM_ACTIVATE_LINK "Always Make link active"
 
 #define SID_SPLASH_DELAY "Delay"
 #define SID_SPLASH_ENABLED "Enabled"

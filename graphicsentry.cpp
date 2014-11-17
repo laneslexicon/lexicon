@@ -202,6 +202,10 @@ void GraphicsEntry::readSettings() {
 
   settings->endGroup();
 
+  settings->beginGroup("System");
+  m_linksUseCurrentTab = settings->value(SID_SYSTEM_OPEN_LINK,true).toBool();
+  m_activateLink = settings->value(SID_SYSTEM_ACTIVATE_LINK,true).toBool();
+
 }
 void GraphicsEntry::writeDefaultSettings() {
 
@@ -396,12 +400,14 @@ void GraphicsEntry::anchorClicked(const QUrl & link) {
  */
 void GraphicsEntry::linkActivated(const QString & link) {
   QLOG_DEBUG() << Q_FUNC_INFO << link;
-
-  /// turn history on as the user has clicked on something
+  bool createTab = ! m_linksUseCurrentTab;
+  bool activateTab = m_activateLink;
+  ///
+  ///  shift or ctrl, toggles create tab behaviour
+  ///
   Place p;
-  int options = 0;
   if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
-    options |= Lane::Create_Tab;
+    createTab = ! createTab;
   }
 
   QUrl url(link);
@@ -425,7 +431,8 @@ void GraphicsEntry::linkActivated(const QString & link) {
       if (query.first()) {
         getHistory()->on();
         p.setRoot(query.value(0).toString());
-        emit(gotoNode(p,options));
+        /// TODO fix the boolean parameters
+        emit(gotoNode(p,createTab,activateTab));
         return;
       }
       else {
@@ -441,7 +448,7 @@ void GraphicsEntry::linkActivated(const QString & link) {
     getHistory()->on();
     /// TODO replace this
     /// including move to new tab stuff
-    showPlace(p,false,options);
+    showPlace(p,false,createTab,activateTab);
   }
 }
 void GraphicsEntry::linkHovered(const QString & link) {
@@ -475,7 +482,7 @@ void GraphicsEntry::anchorTest() {
 }
 /// TODO fix this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 /// TODO how is it supposed to be used ?????????
-Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,int options) {
+Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,bool createTab,bool activateTab) {
   /// check if the node is on this page
   QString node = p.getNode();
   for(int i=0;i < m_items.size();i++) {
@@ -495,16 +502,9 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,int options) {
     Place p;
     QLOG_DEBUG() << "Out of page for node" << node;
     p.setNode(node);
-    p.setOptions(options);
-    emit(gotoNode(p,options));
-    /*
-      np = getXmlForRoot(p);
-      /// is this right ?
-      if (np != p) {
-      emit(placeChanged(np));
-      m_place = np;
-      }
-    */
+    //   p.setOptions(options);
+    /// TODO Fix this
+    emit(gotoNode(p,createTab,activateTab));
   }
   return np;
 }

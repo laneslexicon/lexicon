@@ -314,7 +314,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(clearPage()),this,SLOT(pageClear()));
   connect(entry,SIGNAL(searchPage()),this,SLOT(pageSearch()));
 
-  connect(entry,SIGNAL(gotoNode(const Place &,int)),this,SLOT(showPlace(const Place &,int)));
+  connect(entry,SIGNAL(gotoNode(const Place &,bool,bool)),this,SLOT(showPlace(const Place &,bool,bool)));
   connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
   connect(entry,SIGNAL(printPage()),this,SLOT(pagePrint()));
   connect(entry,SIGNAL(searchFinished()),this,SLOT(pageSearchComplete()));
@@ -1835,15 +1835,22 @@ void LanesLexicon::findNextRoot(const QString & root) {
     entry->setPagingForward();
     Place p;
     p.setRoot(nroot);
-    entry->getXmlForRoot(p);
+    p = entry->getXmlForRoot(p);
+    if (m_linkContents) {
+      m_tree->ensurePlaceVisible(p,true);
+    }
   }
 }
 void LanesLexicon::findPrevRoot(const QString & root) {
   GraphicsEntry * entry = dynamic_cast<GraphicsEntry *>(QObject::sender());
   QString nroot = m_tree->findPrevRoot(root);
   if (entry && ! nroot.isEmpty()) {
+    Place p = Place::fromRoot(nroot);
     entry->setPagingBackward();
-    entry->getXmlForRoot(Place(nroot));
+    p = entry->getXmlForRoot(p);
+    if (m_linkContents) {
+      m_tree->ensurePlaceVisible(p,true);
+    }
   }
 }
 /**********************************************************************************
@@ -1868,7 +1875,9 @@ void LanesLexicon::onNextRoot() {
       if (entry->hasPlace(np,GraphicsEntry::RootSearch,true) == -1) {
         entry->setPagingForward();
         entry->getXmlForRoot(np);
-        m_tree->ensurePlaceVisible(np,true);
+        if (m_linkContents) {
+          m_tree->ensurePlaceVisible(np,true);
+        }
       }
     }
     else {
@@ -1886,7 +1895,9 @@ void LanesLexicon::onPrevRoot() {
       if (entry->hasPlace(np,GraphicsEntry::RootSearch,true) == -1) {
         entry->setPagingBackward();
         entry->getXmlForRoot(np);
-        m_tree->ensurePlaceVisible(np,true);
+        if (m_linkContents) {
+          m_tree->ensurePlaceVisible(np,true);
+        }
       }
     }
     else {

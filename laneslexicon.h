@@ -82,6 +82,7 @@ class LanesLexicon : public QMainWindow
   NoteMaster * notes();
   public slots:
     int hasPlace(const Place & p,int searchtype,bool setFocus);
+    Place showPlace(const Place &,bool newTab,bool activate);
     void setStatus(const QString &);
     //    void saveNote(Note *);
     private slots:
@@ -184,7 +185,7 @@ class LanesLexicon : public QMainWindow
       void cleanup();
       void search(int searchType,ArabicSearchDialog *,const QString &);
       Place showPlace(const Place &,int);
-      Place showPlace(const Place &,bool newTab,bool activate);
+
       void updateStatusBar();
       void updateMenu();
       int searchTabs(const QString & node);

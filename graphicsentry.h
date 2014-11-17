@@ -53,7 +53,7 @@ class GraphicsEntry : public QWidget {
   ~GraphicsEntry();
   enum SearchType { RootSearch, WordSearch, NodeSearch, PageSearch };
     Place getXmlForRoot(const Place &);
-    Place showPlace(const Place &,bool thisPageOnly,int options);
+    Place showPlace(const Place &,bool thisPageOnly,bool createTab,bool activateTab);
     Place getPage(const Place & );
     Place getPlace(int index=-1) const;
 
@@ -140,6 +140,8 @@ class GraphicsEntry : public QWidget {
     int m_searchIndex;
     QColor m_supplementBg;
 
+    bool m_linksUseCurrentTab;
+    bool m_activateLink;
     bool m_notesEnabled;
     bool m_clearScene;
     bool m_debug;
@@ -220,7 +222,7 @@ class GraphicsEntry : public QWidget {
     void clearPage();
     void searchPage();
     void findCount(int);
-    void gotoNode(const Place & p,int);
+    void gotoNode(const Place & p,bool,bool);
     void printNode(const QString &);
     void printPage();
     void searchStarted();
