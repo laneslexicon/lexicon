@@ -55,6 +55,9 @@
       <xsl:if test="@quasi = '1'">
         <span class="quasi">&#160;&#160;(Quasi root)</span>
       </xsl:if>
+      <xsl:if test="@quasi = '2'">
+        <span class="quasi">&#160;&#160;(also quasi root)</span>
+      </xsl:if>
       </p>
       </xsl:when>
       <xsl:otherwise>
