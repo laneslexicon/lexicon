@@ -487,6 +487,16 @@ void LanesLexicon::shortcut(const QString & key) {
       setupHistory(m_historyPos);
     }
   }
+  else if (key == SID_SHORTCUT_HISTORY_ENABLE) {
+    m_historyEnabled = true;
+    setupHistory();
+    setStatus(tr("History enabled"));
+  }
+  else if (key == SID_SHORTCUT_HISTORY_DISABLE) {
+    m_historyEnabled = false;
+    setupHistory();
+    setStatus(tr("History disabled"));
+  }
   else if (key == SID_SHORTCUT_SYNC) {
     syncContents();
   }
@@ -957,8 +967,14 @@ void LanesLexicon::createToolBar() {
  *
  */
 void LanesLexicon::historyAddition(const Place & p) {
-  statusBar()->showMessage(tr("History added:") + p.getShortText());
-  setupHistory(-1);
+  QString t = p.getShortText();
+  if (! t.isEmpty()) {
+    statusBar()->showMessage(tr("History added:") + p.getShortText());
+    setupHistory(-1);
+  }
+  else {
+    QLOG_DEBUG() << Q_FUNC_INFO << "empty text" << p.toString();
+  }
 }
 void LanesLexicon::historyPositionChanged(int pos) {
   setupHistory(pos);
@@ -1025,7 +1041,7 @@ void LanesLexicon::setupHistory(int currPos) {
   }
   m_historyMenu->addActions(group->actions());
     //    m->addActions(group);
-  m_historyButton->setEnabled(true);
+  m_historyButton->setEnabled(m_historyEnabled);
     //    m_historyButton->addActions(group->actions());//setMenu(m);
     //    m_historyButton->setMenu(m);
 }
