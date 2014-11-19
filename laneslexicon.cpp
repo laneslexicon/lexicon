@@ -1035,13 +1035,16 @@ void LanesLexicon::setupHistory(int currPos) {
     //      m_historyPos = p.getId();
     action->setData(QVariant(p));//event->getId());
     connect(action,SIGNAL(triggered()),this,SLOT(onHistorySelection()));
-    delete event;
+  }
+  while(events.size() > 0) {
+    delete events.takeFirst();
   }
   m_historyMenu->addActions(group->actions());
     //    m->addActions(group);
   m_historyButton->setEnabled(m_historyEnabled);
     //    m_historyButton->addActions(group->actions());//setMenu(m);
     //    m_historyButton->setMenu(m);
+  m_history->setEnabled(m_historyEnabled);
 }
 void LanesLexicon::createMenus() {
   m_mainmenu = new AppMenu(this);
@@ -2399,7 +2402,11 @@ void LanesLexicon::bookmarkAdd(const QString & id,const Place & p) {
   addBookmarkMenuItem(id);
   setStatus(QString(tr("Added bookmark:%1")).arg(id));
 }
-
+/**
+ * moveNext/movePrevious are connected to GraphicsEntry 'next/prev' signal
+ *
+ * @param p
+ */
 void LanesLexicon::moveNext(const Place & p) {
   if (m_navMode == Lane::By_Root) {
     findNextRoot(p.getRoot());

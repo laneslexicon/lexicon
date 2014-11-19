@@ -36,10 +36,11 @@ class HistoryMaster {
   HistoryMaster(const QString & dbname);
   ~HistoryMaster();
   void readSettings();
-  HistoryEvent * getEvent(int id);
+  HistoryEvent * getEvent(int id) ;
   Place getLastPlace();
   void setEnabled(bool v);
   bool add(const Place &);
+  bool enabled() const { return m_historyEnabled;}
   void on();
   void off();
   bool isOn() { return m_historyOn;}

@@ -21,8 +21,10 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
 
   QString fields = "id,node,word,root,supplement,page,vol,timewhen";
   bool ok = openDatabase(dbname);
-  if (! ok)
+  if (! ok) {
+    m_historyEnabled = false;
     return;
+  }
 
   m_getQuery = QSqlQuery(m_db);
   m_listQuery = QSqlQuery(m_db);
@@ -74,10 +76,17 @@ HistoryMaster::~HistoryMaster() {
     m_db.close();
   }
 }
+/**
+ * Only disabled/enable if the db etc is ok
+ *
+ * @param v
+ */
 void HistoryMaster::setEnabled(bool v) {
-  if (m_ok)
+  if (m_ok) {
     m_historyEnabled = v;
+  }
 }
+
 void HistoryMaster::on() {
   if (m_ok)
     m_historyOn = true;
@@ -163,9 +172,9 @@ bool HistoryMaster::add(const Place & p) {
 }
  QList<HistoryEvent *> HistoryMaster::getHistory() {
   QList<HistoryEvent *> events;
-  if (! m_historyEnabled ) {
-    return events;
-  }
+  //  if (! m_historyEnabled ) {
+  //    return events;
+  //  }
   QLOG_DEBUG() << Q_FUNC_INFO;
   m_listQuery.exec();
   while(m_listQuery.next()) {
@@ -181,9 +190,9 @@ bool HistoryMaster::add(const Place & p) {
 }
 HistoryEvent * HistoryMaster::getEvent(int id) {
    HistoryEvent * event = new HistoryEvent();
-   if ( ! m_historyEnabled ) {
-     return event;
-   }
+   //   if ( ! m_historyEnabled ) {
+   //     return event;
+   //   }
    m_getQuery.bindValue(0,id);
    m_getQuery.exec();
    if (m_getQuery.first()) {

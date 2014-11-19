@@ -429,7 +429,7 @@ void GraphicsEntry::linkActivated(const QString & link) {
       query.bindValue(0,msg);
       query.exec();
       if (query.first()) {
-        getHistory()->on();
+        p.setAction(Place::Link);
         p.setRoot(query.value(0).toString());
         /// TODO fix the boolean parameters
         emit(gotoNode(p,createTab,activateTab));
@@ -444,8 +444,8 @@ void GraphicsEntry::linkActivated(const QString & link) {
     QString node(link);
     /// remove the leading #
     node.remove(0,1);
+    p.setAction(Place::Link);
     p.setNode(node);
-    getHistory()->on();
     /// TODO replace this
     /// including move to new tab stuff
     showPlace(p,false,createTab,activateTab);
@@ -619,19 +619,22 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (rootItem == NULL) {
     return p;
   }
-  /// TODO fix this
+  ///
   /// write a history record because we are leaving this page
   ///
-  if (getHistory()->isOn()) {
-    //    QLOG_DEBUG() << "History old place" << m_place;
-    //    QLOG_DEBUG() << "New place" << dp;
-    if (dp.getAction() == Place::User) {
-      getHistory()->add(m_place);
-      /// this allows mainwindow to update the history list
-      emit(historyAddition(dp));
+  ///
+  if (m_place.isValid()) {
+    if ((m_place.getAction() == Place::User) || (m_place.getAction() == Place::Link)) {
+      if (getHistory()->enabled()) {
+        getHistory()->add(m_place);
+        /// this allows mainwindow to update the history list
+        QLOG_DEBUG() << "History event, leaving" << m_place.toString();
+        QLOG_DEBUG() << "History event, going" << dp.toString();
+
+        emit(historyAddition(m_place));
+      }
     }
   }
-
   if (m_clearScene) {
     onClearScene();
   }
@@ -748,6 +751,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
 
   m_place = centerItem->getPlace();
   m_place.setAction(dp.getAction());
+
 
   //  QLOG_DEBUG() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
   //  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));
