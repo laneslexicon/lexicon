@@ -175,9 +175,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   m_tree->resizeColumnToContents(0);
 
-  if (m_historyEnabled) {
-    setupHistory();
-  }
+  setupHistory();
 
 
   onSetInterface();
@@ -1702,7 +1700,9 @@ void LanesLexicon::writeSettings() {
   if (! m_saveSettings )
     return;
 
-
+  ///
+  /// Tabs
+  ///
   if (m_saveTabs) {
     settings->beginGroup("Tabs");
     settings->remove("");
@@ -1734,11 +1734,15 @@ void LanesLexicon::writeSettings() {
       }
     }
     settings->endGroup();
+    ///
+    ///  System
+    ///
     settings->beginGroup("System");
     settings->setValue("Focus tab",m_tabs->currentIndex());
     settings->setValue("Minimal interface",m_minimalAction->isChecked());
     settings->setValue("Show interface warning",m_interfaceWarning);
     settings->setValue("Current map",m_currentMap);
+    /// TODO change this
     if (m_navMode == Lane::By_Root) {
       settings->setValue("Navigation","root");
     }
@@ -1747,7 +1751,9 @@ void LanesLexicon::writeSettings() {
     }
     settings->endGroup();
   }
-
+  ///
+  /// Bookmarks
+  ///
   if (m_saveBookmarks) {
     settings->beginGroup("Bookmarks");
     settings->remove("");
@@ -1758,6 +1764,15 @@ void LanesLexicon::writeSettings() {
     }
     settings->endGroup();
   }
+  ///
+  /// History
+  ///
+  settings->beginGroup("History");
+  settings->setValue("Enabled",m_historyEnabled);
+  settings->endGroup();
+  ///
+  /// Main
+  ///
   settings->beginGroup("Main");
   settings->setValue("State",this->saveState());
   settings->setValue("Geometry", saveGeometry());
@@ -2937,7 +2952,7 @@ void LanesLexicon::enableKeymaps(bool v) {
     }
   }
   m_searchOptions.setKeymaps(v);
-
+  setStatus(tip);
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("System");
   settings->setValue("Keymaps",v);
