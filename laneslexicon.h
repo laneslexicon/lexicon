@@ -271,6 +271,7 @@ class LanesLexicon : public QMainWindow
       QToolBar * m_entrybar;
 
       QFont arFont;
+      QFont m_historyMenuFont;
 
       InputMapper * m_mapper;
 

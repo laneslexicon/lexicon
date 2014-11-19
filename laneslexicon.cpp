@@ -1010,6 +1010,7 @@ void LanesLexicon::setupHistory(int currPos) {
       txt = QString("%1 %2").arg(id).arg(root);
     }
     QAction * action = group->addAction(txt);
+    action->setFont(m_historyMenuFont);
     action->setCheckable(true);
     if (id == currPos) {
       action->setChecked(true);
@@ -1526,6 +1527,9 @@ void LanesLexicon::readSettings() {
   }
   m_startupRoot = cmdOptions.value("root");
   QScopedPointer<QSettings> settings(app->getSettings());
+  ///
+  /// System group
+  ///
   settings->beginGroup("System");
   m_dbName = settings->value("Database","lexicon.sqlite").toString();
   if (cmdOptions.contains("db")) {
@@ -1581,7 +1585,9 @@ void LanesLexicon::readSettings() {
   m_linkContents = settings->value("Contents linked",false).toBool();
 
   settings->endGroup();
-
+  ///
+  /// Search
+  ///
   settings->beginGroup("Search");
 
   m_searchOptions.setNewTab(settings->value("New tab",true).toBool());
@@ -1610,20 +1616,33 @@ void LanesLexicon::readSettings() {
   settings->beginGroup("FullSearch");
   m_searchOptions.setIncludeHeads(settings->value("Include heads",false).toBool());
   settings->endGroup();
-
+  ///
+  /// Debug
+  ///
   settings->beginGroup("Debug");
   m_valgrind = settings->value("Valgrind",false).toBool();
   settings->endGroup();
-
+  ///
+  /// Notes
+  ///
   settings->beginGroup("Notes");
   m_notesDbName = settings->value("Database","notes.sqlite").toString();
   m_useNotes = settings->value("Enabled",true).toBool();
   settings->endGroup();
+  ///
+  /// History
+  ///
   settings->beginGroup("History");
   m_historyEnabled = settings->value("Enabled",true).toBool();
   m_historyDbName = settings->value("Database","history.sqlite").toString();
+  v = settings->value("Menu font",QString()).toString();
+  if (! v.isEmpty()) {
+    m_historyMenuFont.fromString(v);
+  }
   settings->endGroup();
-
+  ///
+  /// Roots
+  ///
   settings->beginGroup("Roots");
   m_treeKeepsFocus = settings->value("Keep focus",true).toBool();
   settings->endGroup();
@@ -1632,7 +1651,9 @@ void LanesLexicon::readSettings() {
    * we are have a default map set that is used to convert input to Arabic
    *
    */
-
+  ///
+  /// Maps
+  ///
   settings->beginGroup("Maps");
   QStringList groups = settings->childGroups();
   for(int i=0; i < groups.size();i++) {
