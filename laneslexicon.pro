@@ -18,8 +18,8 @@ TEMPLATE = app
 }
 libxslt {
 ! win32 {
-  INCLUDEPATH += /usr/include/libxml2 /usr/local/include/libxml2
-  LIBS += -L /opt/lib -lxml2 -lxslt
+  INCLUDEPATH += /usr/include/libxml2 /usr/local/include/libxml2 /usr/local/include
+  LIBS += -L /opt/lib -lxml2 -lxslt -L/usr/local/lib
 }
 win32 {
   INCLUDEPATH += c:/Users/andrewsg/xslt/include
