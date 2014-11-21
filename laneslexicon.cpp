@@ -999,7 +999,6 @@ void LanesLexicon::setupHistory(int currPos) {
     m_clearHistoryAction->setEnabled(true);
   }
   QList<QAction *> actions = m_historyMenu->actions();
-  QLOG_DEBUG() << Q_FUNC_INFO << "history actions size" << actions.size();
   actions.removeOne(m_clearHistoryAction);
   for(int i=0;i < actions.size();i++) {
     m_historyMenu->removeAction(actions[i]);
@@ -1035,9 +1034,7 @@ void LanesLexicon::setupHistory(int currPos) {
     //      m_historyPos = p.getId();
     action->setData(QVariant(p));//event->getId());
     connect(action,SIGNAL(triggered()),this,SLOT(onHistorySelection()));
-  }
-  while(events.size() > 0) {
-    delete events.takeFirst();
+    delete event;
   }
   m_historyMenu->addActions(group->actions());
     //    m->addActions(group);

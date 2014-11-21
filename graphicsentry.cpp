@@ -628,9 +628,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       if (getHistory()->enabled()) {
         getHistory()->add(m_place);
         /// this allows mainwindow to update the history list
-        QLOG_DEBUG() << "History event, leaving" << m_place.toString();
-        QLOG_DEBUG() << "History event, going" << dp.toString();
-
         emit(historyAddition(m_place));
       }
     }
