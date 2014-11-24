@@ -147,7 +147,7 @@
   -->
   <xsl:template match="sense">
     <xsl:if test="(@type='B') or (@type='b')">
-      <span class="bseparator"><xsl:text>||</xsl:text> </span>
+      <span class="bseparator"><xsl:text>&#x2016;</xsl:text> </span>
     </xsl:if>
     <xsl:if test="(@type='A') or (@type='a')">
       <span class="aseparator"><xsl:text>&#x2017;&#x2017;&#x2017;</xsl:text> </span>
