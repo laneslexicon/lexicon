@@ -143,7 +143,7 @@ class LanesLexicon : public QMainWindow
       void onOptions();
 
       void onSetInterface(bool triggered=false);
-      void rootClicked(QTreeWidgetItem * , int);
+      void treeItemDoubleClicked(QTreeWidgetItem * , int);
       void entryActivated(QTreeWidgetItem * , int);
       void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
 

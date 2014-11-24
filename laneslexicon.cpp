@@ -132,7 +132,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
 
 
-  connect(m_tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(rootClicked(QTreeWidgetItem *,int)));
+  connect(m_tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(treeItemDoubleClicked(QTreeWidgetItem *,int)));
 
   connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(entryActivated(QTreeWidgetItem *,int)));
 
@@ -1245,7 +1245,19 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
   m_db.setDatabaseName(dbname);
   return m_db.open();
 }
-void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
+/**
+ * double click on a tree item.
+ * For root, add child entries if not already presetn
+ * For headword, activate the item by giving it focus
+ *
+ * m_treeKeepsFocus (From "Roots/Keeps focus"),controls who get focus.
+ *
+ * Currently if the tree keeps focus, the entry is made visible but
+ * it is not obvious which one it is.
+ *
+ * @param item
+ */
+void LanesLexicon::treeItemDoubleClicked(QTreeWidgetItem * item,int /* column */) {
   QString root = item->text(0);
   QString supp = item->text(1);
   int p = 0;
@@ -1262,6 +1274,7 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
     newTab = true;
   }
   /// check whether root or head word
+  /// if root, add the child entries
   if  (item->parent()->parent() == 0) {
     m_tree->addEntries(root,item);
     if (supp == "*") {
@@ -1277,7 +1290,6 @@ void LanesLexicon::rootClicked(QTreeWidgetItem * item,int /* column */) {
   }
   /// TODO are these still needed ?
   if (m_treeKeepsFocus) {
-    QLOG_DEBUG() << "tree focus";
     m_tree->setFocus();
   }
 
