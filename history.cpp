@@ -100,7 +100,7 @@ Place HistoryMaster::getLastPlace() {
 
   m_lastQuery.exec();
   if (m_lastQuery.first()) {
-    return(this->toPlace(m_lastQuery));
+    p = this->toPlace(m_lastQuery);
   }
   return p;
 }
@@ -125,6 +125,37 @@ Place HistoryMaster::toPlace(QSqlQuery & sql) {
   p.setWhen(sql.value(7).toString());
   return p;
 
+}
+/**
+ * Read backwards in the history for <depth> number of records
+ * search for the supplied Place
+ *
+ * @param p
+ * @param depth
+ *
+ * @return
+ */
+bool HistoryMaster::hasPlace(const Place & p,int depth) {
+  if (depth == -1) {
+    depth = m_duplicateDepth;
+  }
+  int id = getLastId();
+  m_backQuery.bindValue(0,id);
+  m_backQuery.exec();
+  int count = 0;
+  while(m_backQuery.next()) {
+    Place hp = this->toPlace(m_backQuery);
+    if ((hp.getNode() == p.getNode()) &&
+      (hp.getRoot() == p.getRoot()) &&
+      (hp.getWord() == p.getWord())) {
+      return true;
+    }
+    count++;
+    if (count > depth) {
+      return false;
+    }
+  }
+  return false;
 }
 //create table history(id integer primary key,nodeId text,word text,root text,timewhen text);
 bool HistoryMaster::openDatabase(const QString & dbname) {
@@ -156,10 +187,7 @@ bool HistoryMaster::add(const Place & p) {
   }
   QLOG_DEBUG() << Q_FUNC_INFO << p.toString();
   /// don't add two adjacent identical places
-  Place o = getLastPlace();
-  if ((o.getNode() == p.getNode()) &&
-      (o.getRoot() == p.getRoot()) &&
-      (o.getWord() == p.getWord())) {
+  if (this->hasPlace(p)) {
     return false;
   }
   /// TODO get last record and exit if sample place
@@ -222,6 +250,7 @@ void HistoryMaster::readSettings() {
   settings->beginGroup("History");
   m_historyEnabled = settings->value("Enabled",true).toBool();
   m_size = settings->value("Size",10).toInt();
+  m_duplicateDepth = settings->value("Duplicate depth",5).toInt();
 }
 bool HistoryMaster::clear() {
    if ( ! m_historyEnabled ) {

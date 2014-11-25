@@ -37,6 +37,7 @@ class HistoryMaster {
   ~HistoryMaster();
   void readSettings();
   HistoryEvent * getEvent(int id) ;
+  bool hasPlace(const Place & p, int historyDepth = -1);
   Place getLastPlace();
   int getLastId();
   void setEnabled(bool v);
@@ -50,6 +51,7 @@ class HistoryMaster {
   QList<HistoryEvent *> getHistory();
  private:
   QSqlDatabase m_db;
+  int m_duplicateDepth;
   int m_size;
   int m_lastId;
   /// set to false if we failed to open the db
