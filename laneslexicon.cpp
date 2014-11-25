@@ -997,11 +997,20 @@ void LanesLexicon::historyPositionChanged(int pos) {
 Place LanesLexicon::setupHistory(int currPos) {
   Place currentPlace;
   currentPlace.setAction(Place::History);
-  // get backward history
-  /// TODO set 10 to something from the QSettings
-  QLOG_DEBUG() << Q_FUNC_INFO << currPos;
+
+  int lastId = m_history->getLastId();
+  int firstId = m_history->getFirstId();
+  QLOG_DEBUG() << Q_FUNC_INFO << firstId << currPos << lastId;
+  /// if we are out of range, set the history to the most recent entry
+  //
   if (currPos == -1) {
-    currPos = m_history->getLastId();
+    currPos = lastId;
+  }
+  if (currPos > lastId) {
+    currPos = lastId;
+  }
+  if (currPos < firstId) {
+    currPos = firstId;
   }
   m_historyPos = currPos;
   QList<HistoryEvent *> events = m_history->getHistory();//10,0,currPos);
@@ -1044,8 +1053,6 @@ Place LanesLexicon::setupHistory(int currPos) {
     action->setCheckable(true);
     if (id == currPos) {
       action->setChecked(true);
-      /// TODO shouln't history back/next do something other
-      /// than move the pointer ????
       QLOG_DEBUG() << "history set to" << p.toString();
       currentPlace = p;
     }
