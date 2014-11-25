@@ -478,11 +478,20 @@ void LanesLexicon::shortcut(const QString & key) {
   }
   else if (key == SID_SHORTCUT_HISTORY_NEXT) {
     /// increment history pos
+      m_historyPos++;
+      Place p = setupHistory(m_historyPos);
+      if (p.isValid()) {
+        showPlace(p,false,true);
+      }
   }
   else if (key == SID_SHORTCUT_HISTORY_BACK) {
+     QLOG_DEBUG() << "history pos" << m_historyPos;
     if (m_historyPos > 0) {
       m_historyPos--;
-      setupHistory(m_historyPos);
+      Place p = setupHistory(m_historyPos);
+      if (p.isValid()) {
+        showPlace(p,false,true);
+      }
     }
   }
   else if (key == SID_SHORTCUT_HISTORY_ENABLE) {
@@ -982,7 +991,8 @@ void LanesLexicon::historyPositionChanged(int pos) {
  *
  * @param currPos  our current position in the history, -1 = at the end (default)
  */
-void LanesLexicon::setupHistory(int currPos) {
+Place LanesLexicon::setupHistory(int currPos) {
+  Place currentPlace;
   // get backward history
   /// TODO set 10 to something from the QSettings
   QLOG_DEBUG() << Q_FUNC_INFO << currPos;
@@ -1005,7 +1015,7 @@ void LanesLexicon::setupHistory(int currPos) {
     delete actions[i];
   }
   if (events.size() == 0) {
-    return;
+    return currentPlace;
   }
   QActionGroup * group = new QActionGroup(this);
   while(events.size() > 0) {
@@ -1027,6 +1037,10 @@ void LanesLexicon::setupHistory(int currPos) {
     action->setCheckable(true);
     if (id == currPos) {
       action->setChecked(true);
+      /// TODO shouln't history back/next do something other
+      /// than move the pointer ????
+      QLOG_DEBUG() << "history set to" << p.toString();
+      currentPlace = p;
     }
     else {
       action->setChecked(false);
@@ -1042,6 +1056,7 @@ void LanesLexicon::setupHistory(int currPos) {
     //    m_historyButton->addActions(group->actions());//setMenu(m);
     //    m_historyButton->setMenu(m);
   m_history->setEnabled(m_historyEnabled);
+  return currentPlace;
 }
 void LanesLexicon::createMenus() {
   m_mainmenu = new AppMenu(this);
@@ -1312,41 +1327,29 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   }
   QString node = item->data(0,Qt::UserRole).toString();
   if ( node.isEmpty() ) {
+    QLOG_DEBUG() << Q_FUNC_INFO << "no node";
     return;
   }
-  /// if we are not showing a graphicsentry, create a new tab
-  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-  if (! entry) {
-    Place p = Place::fromNode(node);
-    m_place = showPlace(p,true,true);
-    return;
-  }
-  if (entry->hasNode(node)) {
-    entry->focusNode(node);
-  }
-  else {
-    /// node not in the current tab
-    int ix = this->searchTabs(node);
-    if (ix != -1) {
+  ///  Tabs for the node
+  int ix = this->searchTabs(node);
+  if (ix != -1) {
       /// we found it in another tab, so switch to that one
       m_tabs->setCurrentIndex(ix);
       GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
       if (entry) {
         if (entry->hasNode(node)) {
           entry->focusNode(node);
+          return;
         }
       }
-    }
-    else {
-      Place p = Place::fromNode(node);
-      bool newTab = false;
-      if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
-        newTab = true;
-      }
-      m_place = showPlace(p,newTab,true);
-      return;
-    }
   }
+  Place p = Place::fromNode(node);
+  bool newTab = false;
+  if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+    newTab = true;
+  }
+  m_place = showPlace(p,newTab,true);
+  return;
 }
 
 Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
@@ -2851,10 +2854,12 @@ void LanesLexicon::currentTabChanged(int ix) {
 
 }
 int LanesLexicon::searchTabs(const QString & node) {
+  QLOG_DEBUG() << Q_FUNC_INFO << node;
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
     if (entry) {
       if (entry->hasNode(node)) {
+        QLOG_DEBUG() << "Node found in tab" << i;
         return i;
       }
     }

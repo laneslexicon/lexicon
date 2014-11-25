@@ -201,7 +201,7 @@ class LanesLexicon : public QMainWindow
       void setIcon(QAction *,const QString &,const QString &);
       void setIcons(const QString & theme = QString());
       void createToolBar();
-      void setupHistory(int startPos = -1);
+      Place setupHistory(int startPos = -1);
       void createMenus();
       void createStatusBar();
 
