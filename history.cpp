@@ -158,7 +158,7 @@ Place HistoryMaster::toPlace(QSqlQuery & sql) {
  *
  * @return
  */
-bool HistoryMaster::hasPlace(const Place & p,int depth) {
+int HistoryMaster::hasPlace(const Place & p,int depth) {
   if (depth == -1) {
     depth = m_duplicateDepth;
   }
@@ -171,14 +171,14 @@ bool HistoryMaster::hasPlace(const Place & p,int depth) {
     if ((hp.getNode() == p.getNode()) &&
       (hp.getRoot() == p.getRoot()) &&
       (hp.getWord() == p.getWord())) {
-      return true;
+      return m_backQuery.value(0).toInt();
     }
     count++;
     if (count > depth) {
-      return false;
+      return -1;
     }
   }
-  return false;
+  return -1;
 }
 //create table history(id integer primary key,nodeId text,word text,root text,timewhen text);
 bool HistoryMaster::openDatabase(const QString & dbname) {
@@ -205,12 +205,17 @@ bool HistoryMaster::add(const Place & p) {
     return false;
   }
   /// don't add history event
-  if (p.getAction() == Place::History) {
+  if (
+      (p.getAction() == Place::History) ||
+      (p.getAction() == Place::Bookmark) ||
+      (p.getAction() == Place::RestoreTab) ||
+      (p.getAction() == Place::SwitchTab)
+      ) {
     return false;
   }
   QLOG_DEBUG() << Q_FUNC_INFO << p.toString();
   /// don't add two adjacent identical places
-  if (this->hasPlace(p)) {
+  if (this->hasPlace(p) == -1) {
     return false;
   }
   /// TODO get last record and exit if sample place

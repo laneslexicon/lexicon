@@ -37,7 +37,7 @@ class HistoryMaster {
   ~HistoryMaster();
   void readSettings();
   HistoryEvent * getEvent(int id) ;
-  bool hasPlace(const Place & p, int historyDepth = -1);
+  int hasPlace(const Place & p, int historyDepth = -1);
   Place getLastPlace();
   int getLastId();
   Place getFirstPlace();
