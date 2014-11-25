@@ -558,8 +558,9 @@ bool GraphicsEntry::prepareQueries() {
  */
 Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QList<EntryItem *> items;
-  Place retval;
+  Place noplace;
   int supplement;
+
 
   EntryItem * centerItem;
 
@@ -583,7 +584,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
     else {
       QLOG_WARN() << QString(tr("Requested node not found : %1")).arg(node);
-      return retval;
+      return noplace;
     }
   }
   int quasi = 0;
@@ -602,7 +603,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   m_rootQuery->exec();
   if (! m_rootQuery->first()) {
     QLOG_WARN() << QString(tr("Root not found %1")).arg(root);
-    return retval;
+    return noplace;
   }
 
   QString str = QString("<word type=\"root\" ar=\"%1\" quasi=\"%2\"></word>").arg(root).arg(quasi);
@@ -613,18 +614,8 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     return p;
   }
   ///
-  /// write a history record because we are leaving this page
+  /// this is always set. Originally planned to allow build ever longer pages
   ///
-  ///
-  if (m_place.isValid()) {
-    if ((m_place.getAction() == Place::User) || (m_place.getAction() == Place::Link)) {
-      if (getHistory()->enabled()) {
-        getHistory()->add(m_place);
-        /// this allows mainwindow to update the history list
-        emit(historyAddition(m_place));
-      }
-    }
-  }
   if (m_clearScene) {
     onClearScene();
   }
@@ -735,12 +726,21 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     this->setCurrentItem(centerItem);
   }
 
-  if (dp.getAction() == Place::History) {
-    emit(historyPositionChanged(dp.getId()));
-  }
-
   m_place = centerItem->getPlace();
   m_place.setAction(dp.getAction());
+  if (m_place.isValid()) {
+    if (m_place.getAction() == Place::History) {
+      emit(historyPositionChanged(dp.getId()));
+    }
+    else if (m_place.getAction() != Place::Bookmark) {
+      if (getHistory()->enabled()) {
+        getHistory()->add(m_place);
+        /// this allows mainwindow to update the history list
+        QLOG_DEBUG() << Q_FUNC_INFO << "Adding history" << m_place.toString();
+        emit(historyAddition(m_place));
+      }
+    }
+  }
 
 
   //  QLOG_DEBUG() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();

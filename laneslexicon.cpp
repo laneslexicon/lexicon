@@ -486,13 +486,16 @@ void LanesLexicon::shortcut(const QString & key) {
   }
   else if (key == SID_SHORTCUT_HISTORY_BACK) {
      QLOG_DEBUG() << "history pos" << m_historyPos;
-    if (m_historyPos > 0) {
-      m_historyPos--;
-      Place p = setupHistory(m_historyPos);
-      if (p.isValid()) {
-        showPlace(p,false,true);
-      }
-    }
+     if (m_historyPos == -1) {
+       m_historyPos = m_history->getLastId();
+     }
+     else {
+       m_historyPos--;
+     }
+     Place p = setupHistory(m_historyPos);
+     if (p.isValid()) {
+       showPlace(p,false,true);
+     }
   }
   else if (key == SID_SHORTCUT_HISTORY_ENABLE) {
     m_historyEnabled = true;
@@ -993,9 +996,13 @@ void LanesLexicon::historyPositionChanged(int pos) {
  */
 Place LanesLexicon::setupHistory(int currPos) {
   Place currentPlace;
+  currentPlace.setAction(Place::History);
   // get backward history
   /// TODO set 10 to something from the QSettings
   QLOG_DEBUG() << Q_FUNC_INFO << currPos;
+  if (currPos == -1) {
+    currPos = m_history->getLastId();
+  }
   m_historyPos = currPos;
   QList<HistoryEvent *> events = m_history->getHistory();//10,0,currPos);
   QLOG_DEBUG() << Q_FUNC_INFO << "event size" << events.size();
@@ -1056,6 +1063,7 @@ Place LanesLexicon::setupHistory(int currPos) {
     //    m_historyButton->addActions(group->actions());//setMenu(m);
     //    m_historyButton->setMenu(m);
   m_history->setEnabled(m_historyEnabled);
+  currentPlace.setAction(Place::History);
   return currentPlace;
 }
 void LanesLexicon::createMenus() {
