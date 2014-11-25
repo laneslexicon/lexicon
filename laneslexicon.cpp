@@ -198,6 +198,11 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     entry->focusPlace();
+    Place p = entry->getPlace();
+    if (p.isValid()) {
+      m_historyPos = m_history->hasPlace(p);
+      setupHistory(m_historyPos);
+    }
     QKeyEvent * event;
     int k = 0x20;
     event = new QKeyEvent(QEvent::KeyPress, k, Qt::NoModifier,QString(QChar(k)));
