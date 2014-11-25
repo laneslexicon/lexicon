@@ -495,18 +495,11 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,bool createTab,
       return m_place;
     }
   }
-  /// trying out of page jump
-  /// TODO this does not return Place needs fixing
-  Place np;
   if (! thisPageOnly ) {
-    Place p;
-    QLOG_DEBUG() << "Out of page for node" << node;
-    p.setNode(node);
-    //   p.setOptions(options);
     /// TODO Fix this
     emit(gotoNode(p,createTab,activateTab));
   }
-  return np;
+  return p;
 }
 /**
  *
