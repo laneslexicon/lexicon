@@ -32,11 +32,13 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
   m_forQuery =  QSqlQuery(m_db);
   m_backQuery = QSqlQuery(m_db);
   m_lastQuery = QSqlQuery(m_db);
+  m_firstQuery = QSqlQuery(m_db);
   if (
       m_addQuery.prepare(QString("insert into history (datasource,node,word,root,supplement,page,vol,timewhen) values (1,?,?,?,?,?,?,?)")) &&
       m_backQuery.prepare(QString("select %1 from history where id <= ? order by id desc").arg(fields)) &&
       m_forQuery.prepare(QString("select %1 from history where id > ? order by id asc").arg(fields)) &&
       m_lastQuery.prepare(QString("select %1 from history where id = (select max(id) from history)").arg(fields)) &&
+      m_firstQuery.prepare(QString("select %1 from history order by id asc limit 1").arg(fields)) &&
       m_listQuery.prepare(QString("select %1 from history order by id desc limit %2").arg(fields).arg(m_size)) &&
       m_getQuery.prepare(QString("select %1 from history where id = ?").arg(fields)))
     {
@@ -67,6 +69,9 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
     }
     if (m_lastQuery.lastError().isValid()) {
       QLOG_WARN() << "Error on lastQuery" << m_lastQuery.lastError().text();
+    }
+    if (m_firstQuery.lastError().isValid()) {
+      QLOG_WARN() << "Error on lastQuery" << m_firstQuery.lastError().text();
     }
     QLOG_WARN() << "History not available" << m_db.lastError().text();
   }
@@ -105,11 +110,29 @@ Place HistoryMaster::getLastPlace() {
   return p;
 }
 int HistoryMaster::getLastId() {
+  m_lastId = -1;
   m_lastQuery.exec();
   if (m_lastQuery.first()) {
     m_lastId = m_lastQuery.value(0).toInt();
   }
   return m_lastId;
+}
+Place HistoryMaster::getFirstPlace() {
+  Place p;
+
+  m_firstQuery.exec();
+  if (m_firstQuery.first()) {
+    p = this->toPlace(m_firstQuery);
+  }
+  return p;
+}
+int HistoryMaster::getFirstId() {
+  m_firstId = -1;
+  m_firstQuery.exec();
+  if (m_firstQuery.first()) {
+    m_firstId = m_firstQuery.value(0).toInt();
+  }
+  return m_firstId;
 }
 //  QString fields = "id,node,word,root,supplement,page,vol,timewhen,nodeOnly,pagemode";
 Place HistoryMaster::toPlace(QSqlQuery & sql) {

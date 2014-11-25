@@ -40,6 +40,8 @@ class HistoryMaster {
   bool hasPlace(const Place & p, int historyDepth = -1);
   Place getLastPlace();
   int getLastId();
+  Place getFirstPlace();
+  int getFirstId();
   void setEnabled(bool v);
   bool add(const Place &);
   bool enabled() const { return m_historyEnabled;}
@@ -54,6 +56,7 @@ class HistoryMaster {
   int m_duplicateDepth;
   int m_size;
   int m_lastId;
+  int m_firstId;
   /// set to false if we failed to open the db
   bool m_ok;
   bool openDatabase(const QString & dbname);
@@ -68,6 +71,7 @@ class HistoryMaster {
   QSqlQuery m_backQuery;
   QSqlQuery m_forQuery;
   QSqlQuery m_lastQuery;
+  QSqlQuery m_firstQuery;
 };
 extern HistoryMaster * getHistory();
 #endif
