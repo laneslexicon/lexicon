@@ -38,6 +38,7 @@ class HistoryMaster {
   void readSettings();
   HistoryEvent * getEvent(int id) ;
   Place getLastPlace();
+  int getLastId();
   void setEnabled(bool v);
   bool add(const Place &);
   bool enabled() const { return m_historyEnabled;}

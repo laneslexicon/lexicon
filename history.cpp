@@ -104,6 +104,13 @@ Place HistoryMaster::getLastPlace() {
   }
   return p;
 }
+int HistoryMaster::getLastId() {
+  m_lastQuery.exec();
+  if (m_lastQuery.first()) {
+    m_lastId = m_lastQuery.value(0).toInt();
+  }
+  return m_lastId;
+}
 //  QString fields = "id,node,word,root,supplement,page,vol,timewhen,nodeOnly,pagemode";
 Place HistoryMaster::toPlace(QSqlQuery & sql) {
   Place p;
@@ -147,7 +154,8 @@ bool HistoryMaster::add(const Place & p) {
   if (p.getAction() == Place::History) {
     return false;
   }
-  /// don't add two adjecent identical places
+  QLOG_DEBUG() << Q_FUNC_INFO << p.toString();
+  /// don't add two adjacent identical places
   Place o = getLastPlace();
   if ((o.getNode() == p.getNode()) &&
       (o.getRoot() == p.getRoot()) &&
@@ -166,7 +174,13 @@ bool HistoryMaster::add(const Place & p) {
   m_addQuery.bindValue(4,p.getPage());
   m_addQuery.bindValue(5,p.getVol());
   m_addQuery.bindValue(6,event->getWhen());
-  return m_addQuery.exec();
+  if (m_addQuery.exec()) {
+    return true;
+  }
+  else {
+    QLOG_WARN() << QString(QObject::tr("Unable to add history record : %1")).arg(m_addQuery.lastError().text());
+  }
+  return false;
 
 
 }
