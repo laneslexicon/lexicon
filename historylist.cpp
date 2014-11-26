@@ -29,10 +29,10 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
     m_list->setItem(i,0,item);
     Place p = h->getPlace();
       //      QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(p.getText());
-    item = new QTableWidgetItem(p.getRoot());//p.getText());
+    item = new QTableWidgetItem(p.getRoot());
     item->setFont(m_arFont);
     m_list->setItem(i,1,item);
-    item = new QTableWidgetItem(p.getWord());//p.getText());
+    item = new QTableWidgetItem(p.getWord());
     item->setFont(m_arFont);
     m_list->setItem(i,2,item);
     item = new QTableWidgetItem(QString(tr("V%1/%2")).arg(p.getVol()).arg(p.getPage()));
@@ -43,6 +43,9 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   if (events.size() > 0) {
     m_list->selectRow(0);
   }
+  /// TODO set these from defaults
+  m_newTab = new QCheckBox(tr("Open in new tab"));
+  m_switchTab = new QCheckBox(tr("Switch to new tab"));
   QPushButton * jumpButton = new QPushButton(tr("&Jump to"));
   QPushButton * cancelButton = new QPushButton(tr("&Cancel"));
   if (events.size() == 0) {
@@ -56,10 +59,15 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   connect(m_list,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
   //  connect(m_list,SIGNAL(itemClicked(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
   //  connect(m_list,SIGNAL(itemPressed(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  hlayout->addWidget(m_newTab);
+  hlayout->addWidget(m_switchTab);
+  hlayout->addStretch();
+  hlayout->addWidget(buttonBox);
   QVBoxLayout * layout = new QVBoxLayout;
   //  m_list->setMinimumWidth(m_list->sizeHintForColumn(0));
   layout->addWidget(m_list);
-  layout->addWidget(buttonBox);
+  layout->addLayout(hlayout);
   setLayout(layout);
   m_list->installEventFilter(this);
 }
@@ -100,6 +108,7 @@ void HistoryWidget::readSettings() {
   settings->beginGroup("History");
   settings->beginGroup("List");
   QString fontString = settings->value("Arabic font").toString();
+  QLOG_DEBUG() << "Font" << fontString;
   if ( ! fontString.isEmpty()) {
     m_arFont.fromString(fontString);
   }
@@ -114,4 +123,10 @@ Place HistoryWidget::getSelected() const {
     p = getHistory()->getPlaceById(id);
   }
   return p;
+}
+bool HistoryWidget::getNewTab() {
+  return m_newTab->isChecked();
+}
+bool HistoryWidget::getSwitchTab() {
+  return m_switchTab->isChecked();
 }
