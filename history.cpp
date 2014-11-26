@@ -204,7 +204,7 @@ bool HistoryMaster::add(const Place & p) {
   if (! p.isValid()) {
     return false;
   }
-  /// don't add history event
+  /// don't add these events
   if (
       (p.getAction() == Place::History) ||
       (p.getAction() == Place::Bookmark) ||

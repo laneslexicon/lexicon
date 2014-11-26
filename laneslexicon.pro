@@ -71,7 +71,8 @@ SOURCES += main.cpp\
         entrylayoutwidget.cpp \
         logviewer.cpp \
         version.cpp \
-        htmldelegate.cpp
+        htmldelegate.cpp \
+        historylist.cpp
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
@@ -100,4 +101,5 @@ HEADERS  += laneslexicon.h \
             entrylayoutwidget.h \
             logviewer.h \
             version.h \
-            htmldelegate.h
+            htmldelegate.h \
+            historylist.h
