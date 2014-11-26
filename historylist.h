@@ -28,6 +28,7 @@ class HistoryWidget : public QDialog {
   public slots:
     void setPlace();
     void jump(QTableWidgetItem *);
+    void onStateChanged(int);
  private:
     QCheckBox * m_newTab;
     QCheckBox * m_switchTab;

@@ -46,6 +46,12 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   /// TODO set these from defaults
   m_newTab = new QCheckBox(tr("Open in new tab"));
   m_switchTab = new QCheckBox(tr("Switch to new tab"));
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("History");
+  m_newTab->setChecked(settings->value("New tab",false).toBool());
+  m_switchTab->setChecked(settings->value("Switch tab",true).toBool());
+  m_switchTab->setEnabled(m_newTab->isChecked());
+  connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(onStateChanged(int)));
   QPushButton * jumpButton = new QPushButton(tr("&Jump to"));
   QPushButton * cancelButton = new QPushButton(tr("&Cancel"));
   if (events.size() == 0) {
@@ -129,4 +135,7 @@ bool HistoryWidget::getNewTab() {
 }
 bool HistoryWidget::getSwitchTab() {
   return m_switchTab->isChecked();
+}
+void HistoryWidget::onStateChanged(int /* state */) {
+  m_switchTab->setEnabled(m_newTab->isChecked());
 }
