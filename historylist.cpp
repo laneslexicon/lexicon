@@ -9,7 +9,7 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   readSettings();
   setWindowTitle(tr("Current History"));
   QList<HistoryEvent *> events = history->getHistory();
-  m_list = new QTableWidget(events.size(),4);
+  m_list = new QTableWidget(events.size(),5);
   m_list->setObjectName("historylist");
   //  HtmlDelegate * d = new HtmlDelegate(m_list);
   //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
@@ -18,7 +18,7 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
 
-  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Entry") << tr("Vol/Page"));
+  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Head") << tr("Vol/Page") << tr("Visited"));
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QTableWidgetItem * item;
@@ -37,6 +37,8 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
     m_list->setItem(i,2,item);
     item = new QTableWidgetItem(QString(tr("V%1/%2")).arg(p.getVol()).arg(p.getPage()));
     m_list->setItem(i,3,item);
+    item = new QTableWidgetItem(h->getWhen().toString());
+    m_list->setItem(i,4,item);
   }
   if (events.size() > 0) {
     m_list->selectRow(0);
@@ -52,8 +54,8 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(setPlace()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(m_list,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
-  connect(m_list,SIGNAL(itemClicked(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
-  connect(m_list,SIGNAL(itemPressed(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
+  //  connect(m_list,SIGNAL(itemClicked(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
+  //  connect(m_list,SIGNAL(itemPressed(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
   QVBoxLayout * layout = new QVBoxLayout;
   //  m_list->setMinimumWidth(m_list->sizeHintForColumn(0));
   layout->addWidget(m_list);
@@ -63,11 +65,10 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
 }
 void HistoryWidget::setPlace() {
   int row = m_list->currentRow();
-  QLOG_DEBUG() << Q_FUNC_INFO << row;
   QTableWidgetItem * item = m_list->item(row,0);
   if (item) {
     QString t = item->text();
-    m_mark = item->text();//rx.cap(1);
+    m_mark = item->text();
   }
   this->accept();
 }
@@ -104,4 +105,13 @@ void HistoryWidget::readSettings() {
   }
   settings->endGroup();
   settings->endGroup();
+}
+Place HistoryWidget::getSelected() const {
+  Place p;
+  bool ok;
+  int id = m_mark.toInt(&ok);
+  if (ok) {
+    p = getHistory()->getPlaceById(id);
+  }
+  return p;
 }

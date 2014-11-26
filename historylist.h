@@ -14,11 +14,12 @@
 #include <QRegExp>
 class Place;
 class HistoryMaster;
+extern HistoryMaster * getHistory();
 class HistoryWidget : public QDialog {
   Q_OBJECT
  public:
   HistoryWidget(HistoryMaster * ,QWidget * parent = 0);
-  QString getSelected() { return m_mark;}
+  Place getSelected() const;
   QSize sizeHint() const;
   public slots:
     void setPlace();
