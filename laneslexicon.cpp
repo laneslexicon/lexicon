@@ -25,6 +25,7 @@
 #include "logviewer.h"
 #include "about.h"
 #include "externs.h"
+#include "historylist.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -658,6 +659,9 @@ void LanesLexicon::createActions() {
   m_clearHistoryAction = new QAction(tr("Clear"),this);
   connect(m_clearHistoryAction,SIGNAL(triggered()),this,SLOT(onClearHistory()));
 
+  m_showHistoryAction = new QAction(tr("List"),this);
+  connect(m_showHistoryAction,SIGNAL(triggered()),this,SLOT(onShowHistory()));
+
   m_testAction = new QAction(tr("Test"),this);
   connect(m_testAction,SIGNAL(triggered()),this,SLOT(onTest()));
   /// probably need icons
@@ -1023,14 +1027,17 @@ Place LanesLexicon::setupHistory(int currPos) {
   if (events.size() == 0) {
     m_historyButton->setEnabled(false);
     m_clearHistoryAction->setEnabled(false);
+    m_showHistoryAction->setEnabled(false);
   }
   else {
     // m_historyMenu->clear();
     m_historyButton->setEnabled(true);
     m_clearHistoryAction->setEnabled(true);
+    m_showHistoryAction->setEnabled(true);
   }
   QList<QAction *> actions = m_historyMenu->actions();
   actions.removeOne(m_clearHistoryAction);
+  actions.removeOne(m_showHistoryAction);
   for(int i=0;i < actions.size();i++) {
     m_historyMenu->removeAction(actions[i]);
     delete actions[i];
@@ -1112,6 +1119,7 @@ void LanesLexicon::createMenus() {
   m_historyMenu->setObjectName("historymenu");
   m_historyMenu->setFocusPolicy(Qt::StrongFocus);
   m_historyMenu->addAction(m_clearHistoryAction);
+  m_historyMenu->addAction(m_showHistoryAction);
 
   m_moveMenu = m_mainmenu->addMenu(tr("&Navigation"));
   m_moveMenu->setObjectName("navigationmenu");
@@ -2540,6 +2548,21 @@ void LanesLexicon::onClearHistory() {
   QLOG_DEBUG() << Q_FUNC_INFO <<  m_history->clear();
   setStatus(tr("History cleared"));
   setupHistory();
+}
+void LanesLexicon::onShowHistory() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  HistoryWidget * dlg = new HistoryWidget(m_history,this);
+  if (dlg->exec() == QDialog::Accepted) {
+    Place p = dlg->getSelected();
+    bool newTab = dlg->getNewTab();
+    bool switchTab = dlg->getSwitchTab();
+    delete dlg;
+    if ( p.isValid()) {
+      p.setAction(Place::History);
+      showPlace(p,newTab,switchTab);
+    }
+  }
+  return;
 }
 void LanesLexicon::onDocs() {
   HelpWidget * w = new HelpWidget(this);

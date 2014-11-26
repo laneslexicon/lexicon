@@ -134,6 +134,7 @@ class LanesLexicon : public QMainWindow
       void searchForEntry();
 
       void onClearHistory();
+      void onShowHistory();
       void onHistorySelection();
 
       void onKeymapChanged();
@@ -366,6 +367,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_navModeRootAction;
       QAction * m_navModePageAction;
       QAction * m_clearHistoryAction;
+      QAction * m_showHistoryAction;
       QAction * m_zoomInAction;
       QAction * m_zoomOutAction;
       QAction * m_widenAction;
