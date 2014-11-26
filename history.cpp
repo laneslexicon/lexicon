@@ -253,7 +253,7 @@ bool HistoryMaster::add(const Place & p) {
     event->setId(m_listQuery.value(fno).toInt());
     Place p = this->toPlace(m_listQuery);
     event->setPlace(p);
-    event->setWhen(m_listQuery.value(4).toDateTime());
+    event->setWhen(m_listQuery.value(7).toDateTime());
     events << event;
   }
   return events;
@@ -269,7 +269,7 @@ HistoryEvent * HistoryMaster::getEvent(int id) {
        event->setId(m_getQuery.value(0).toInt());
        Place p = this->toPlace(m_getQuery);
        event->setPlace(p);
-       event->setWhen(m_getQuery.value(4).toDateTime());
+       event->setWhen(m_getQuery.value(7).toDateTime());
    }
    return event;
 }
@@ -292,4 +292,14 @@ bool HistoryMaster::clear() {
      QLOG_DEBUG() << "Error preparing delete history sql";
    }
    return false;
+}
+Place HistoryMaster::getPlaceById(int id) {
+  QLOG_DEBUG() << Q_FUNC_INFO << id;
+  Place p;
+  m_getQuery.bindValue(0,id);
+  m_getQuery.exec();
+  if (m_getQuery.first()) {
+    p = this->toPlace(m_getQuery);
+  }
+  return p;
 }

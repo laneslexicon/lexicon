@@ -42,6 +42,7 @@ class HistoryMaster {
   int getLastId();
   Place getFirstPlace();
   int getFirstId();
+  Place getPlaceById(int);
   void setEnabled(bool v);
   bool add(const Place &);
   bool enabled() const { return m_historyEnabled;}
