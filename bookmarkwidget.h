@@ -29,10 +29,11 @@ class BookmarkWidget : public QDialog {
  private:
     QCheckBox * m_newTab;
     QCheckBox * m_switchTab;
-  void readSettings();
-  QTableWidget * m_list;
-  QString  m_mark;
-  bool eventFilter(QObject *,QEvent *);
-  QFont m_arFont;
+    void readSettings();
+    bool m_debug;
+    QTableWidget * m_list;
+    QString  m_mark;
+    bool eventFilter(QObject *,QEvent *);
+    QFont m_arFont;
 };
 #endif

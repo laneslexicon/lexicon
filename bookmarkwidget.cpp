@@ -3,13 +3,18 @@
 #include "QsLog.h"
 #include "htmldelegate.h"
 #include "application.h"
+#define KEY_COLUMN 0
+#define ROOT_COLUMN 1
+#define WORD_COLUMN 2
+#define VOL_COLUMN 3
+#define NODE_COLUMN 4
 BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * parent)
   : QDialog(parent) {
   readSettings();
   setWindowTitle(tr("Current Bookmarks"));
   QStringList keys = marks.keys();
   keys.removeOne("-here-");
-  m_list = new QTableWidget(keys.size(),4);
+  m_list = new QTableWidget(keys.size(),5);
   m_list->setObjectName("bookmarklist");
   //  HtmlDelegate * d = new HtmlDelegate(m_list);
   //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
@@ -18,26 +23,31 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
 
-  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Entry") << tr("Vol/Page"));
+  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Entry") << tr("Vol/Page") << tr("Node"));
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QTableWidgetItem * item;
   for(int i=0;i < keys.size();i++) {
     item = new QTableWidgetItem(QString("%1").arg(keys[i]));
-      m_list->setItem(i,0,item);
+      m_list->setItem(i,KEY_COLUMN,item);
       Place p = marks.value(keys[i]);
       //      QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(p.getText());
-      item = new QTableWidgetItem(p.getRoot());//p.getText());
+      item = new QTableWidgetItem(p.getRoot());
       item->setFont(m_arFont);
-      m_list->setItem(i,1,item);
-      item = new QTableWidgetItem(p.getWord());//p.getText());
+      m_list->setItem(i,ROOT_COLUMN,item);
+      item = new QTableWidgetItem(p.getWord());
       item->setFont(m_arFont);
-      m_list->setItem(i,2,item);
+      m_list->setItem(i,WORD_COLUMN,item);
       item = new QTableWidgetItem(QString(tr("V%1/%2")).arg(p.getVol()).arg(p.getPage()));
-      m_list->setItem(i,3,item);
+      m_list->setItem(i,VOL_COLUMN,item);
+      item = new QTableWidgetItem(p.getNode());
+      m_list->setItem(i,NODE_COLUMN,item);
   }
   if (keys.size() > 0) {
     m_list->selectRow(0);
+  }
+  if (! m_debug) {
+    m_list->hideColumn(NODE_COLUMN);
   }
   m_newTab = new QCheckBox(tr("Open in new tab"));
   m_switchTab = new QCheckBox(tr("Switch to new tab"));
@@ -62,7 +72,6 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   //  connect(m_list,SIGNAL(itemClicked(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
   //  connect(m_list,SIGNAL(itemPressed(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
   QVBoxLayout * layout = new QVBoxLayout;
-  //  m_list->setMinimumWidth(m_list->sizeHintForColumn(0));
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(m_newTab);
   hlayout->addWidget(m_switchTab);
@@ -77,10 +86,10 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
 void BookmarkWidget::setPlace() {
   int row = m_list->currentRow();
   QLOG_DEBUG() << Q_FUNC_INFO << row;
-  QTableWidgetItem * item = m_list->item(row,0);
+  QTableWidgetItem * item = m_list->item(row,KEY_COLUMN);
   if (item) {
     QString t = item->text();
-    m_mark = item->text();//rx.cap(1);
+    m_mark = item->text();
   }
   this->accept();
 }
@@ -116,6 +125,7 @@ void BookmarkWidget::readSettings() {
     m_arFont.fromString(fontString);
   }
   settings->endGroup();
+  m_debug = settings->value("Debug",false).toBool();
   settings->endGroup();
 }
 bool BookmarkWidget::getNewTab() {
