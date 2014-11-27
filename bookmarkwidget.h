@@ -12,6 +12,7 @@
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QRegExp>
+#include <QCheckBox>
 class Place;
 class BookmarkWidget : public QDialog {
   Q_OBJECT
@@ -19,10 +20,15 @@ class BookmarkWidget : public QDialog {
   BookmarkWidget(const QMap<QString,Place> & marks,QWidget * parent = 0);
   QString getSelected() { return m_mark;}
   QSize sizeHint() const;
+  bool getNewTab();
+  bool getSwitchTab();
   public slots:
     void setPlace();
     void jump(QTableWidgetItem *);
+    void onStateChanged(int);
  private:
+    QCheckBox * m_newTab;
+    QCheckBox * m_switchTab;
   void readSettings();
   QTableWidget * m_list;
   QString  m_mark;

@@ -39,6 +39,15 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   if (keys.size() > 0) {
     m_list->selectRow(0);
   }
+  m_newTab = new QCheckBox(tr("Open in new tab"));
+  m_switchTab = new QCheckBox(tr("Switch to new tab"));
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("Bookmark");
+  m_newTab->setChecked(settings->value("New tab",false).toBool());
+  m_switchTab->setChecked(settings->value("Switch tab",true).toBool());
+  m_switchTab->setEnabled(m_newTab->isChecked());
+  connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(onStateChanged(int)));
+
   QPushButton * jumpButton = new QPushButton(tr("&Jump to"));
   QPushButton * cancelButton = new QPushButton(tr("&Cancel"));
   if (keys.size() == 0) {
@@ -50,12 +59,18 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(setPlace()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(m_list,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
-  connect(m_list,SIGNAL(itemClicked(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
-  connect(m_list,SIGNAL(itemPressed(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
+  //  connect(m_list,SIGNAL(itemClicked(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
+  //  connect(m_list,SIGNAL(itemPressed(QTableWidgetItem *)),this,SLOT(jump(QTableWidgetItem *)));
   QVBoxLayout * layout = new QVBoxLayout;
   //  m_list->setMinimumWidth(m_list->sizeHintForColumn(0));
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  hlayout->addWidget(m_newTab);
+  hlayout->addWidget(m_switchTab);
+  hlayout->addStretch();
+  hlayout->addWidget(buttonBox);
+
   layout->addWidget(m_list);
-  layout->addWidget(buttonBox);
+  layout->addLayout(hlayout);
   setLayout(layout);
   m_list->installEventFilter(this);
 }
@@ -102,4 +117,13 @@ void BookmarkWidget::readSettings() {
   }
   settings->endGroup();
   settings->endGroup();
+}
+bool BookmarkWidget::getNewTab() {
+  return m_newTab->isChecked();
+}
+bool BookmarkWidget::getSwitchTab() {
+  return m_switchTab->isChecked();
+}
+void BookmarkWidget::onStateChanged(int /* state */) {
+  m_switchTab->setEnabled(m_newTab->isChecked());
 }
