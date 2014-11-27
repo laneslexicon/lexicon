@@ -192,7 +192,7 @@ class LanesLexicon : public QMainWindow
       int searchTabs(const QString & node);
       void restoreBookmarks();
       void setupBookmarkShortcuts();
-      void bookmarkJump(const QString & id);
+      void bookmarkJump(const QString & id,bool,bool);
       void setupShortcuts();
       int m_historyPos;
       void bookmarkClear();

@@ -2182,6 +2182,7 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
       return;
     }
     Place p = m_bookmarks.value("-here-");
+    /// TODO document this
     showPlace(p,false,true);
     m_revertEnabled = false;
     return;
@@ -2190,9 +2191,11 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
     BookmarkWidget * dlg = new BookmarkWidget(m_bookmarks,this);
     if (dlg->exec() == QDialog::Accepted) {
       QString m = dlg->getSelected();
+      bool newTab = dlg->getNewTab();
+      bool switchTab = dlg->getSwitchTab();
       delete dlg;
       if ( ! m.isEmpty()) {
-        bookmarkJump(m);
+        bookmarkJump(m,newTab,switchTab);
       }
     }
     return;
@@ -2215,7 +2218,8 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
     return;
   }
   if (v == "jump") {
-    bookmarkJump(id);
+    /// TODO document this
+    bookmarkJump(id,false,false);
     return;
   }
   /// add a bookmark
@@ -2267,7 +2271,7 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
     QLOG_DEBUG() << Q_FUNC_INFO << "fetch mapping failed " << m_bookmarkMap->mapping(id) << id;
   }
 }
-void LanesLexicon::bookmarkJump(const QString & id) {
+void LanesLexicon::bookmarkJump(const QString & id,bool newTab,bool switchTab) {
   QLOG_DEBUG() << Q_FUNC_INFO << id;
   if ( ! m_bookmarks.contains(id) ) {
     QLOG_WARN() << QString(tr("Unknown bookmark jump activated: %1")).arg(id);
@@ -2282,7 +2286,7 @@ void LanesLexicon::bookmarkJump(const QString & id) {
   Place cp = this->getCurrentPlace();
   cp.setAction(Place::Bookmark);
   m_bookmarks.insert("-here-",cp);
-  showPlace(p,false,true);
+  showPlace(p,newTab,switchTab);
   m_revertEnabled = true;
   updateMenu();
 }
