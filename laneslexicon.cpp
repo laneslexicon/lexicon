@@ -2177,6 +2177,7 @@ Place LanesLexicon::getCurrentPlace() {
  * @param key
  */
 void LanesLexicon::bookmarkShortcut(const QString & key) {
+  QLOG_DEBUG() << Q_FUNC_INFO << key;
   if (m_revertEnabled && (key == "revert")) {
     if (! m_bookmarks.contains("-here-")) {
       return;
@@ -2305,17 +2306,17 @@ void LanesLexicon::restoreBookmarks() {
   }
 
 }
+/**
+ * setup all the bookmark shortcuts and actions
+ *   add,jump,save,revert,list
+ *
+ */
 void LanesLexicon::setupBookmarkShortcuts() {
-  /**
-   * setup all the bookmark shortcuts and actions
-   *   add,jump,save,revert,list
-   *
-   *  TODO bookmark Icons ?
-   */
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Bookmark");
   m_bookmarkMap = new QSignalMapper(this);
   QString key = settings->value("Add","Ctrl+B").toString();
+  /// TODO get this from INI
   QString ids = settings->value("Id","abcdefghijklmnopqrstuvwxyz").toString();
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toLower());
@@ -2323,6 +2324,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
     QShortcut * sc = new QShortcut(ks,this);
     sc->setContext(Qt::ApplicationShortcut);
     connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+    connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
     m_bookmarkMap->setMapping(sc,QString("add-%1").arg(ids.at(i).toLower()));
   }
   for(int i=0;i < ids.size();i++) {
@@ -2330,6 +2332,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
     QShortcut * sc = new QShortcut(ks,this);
     sc->setContext(Qt::ApplicationShortcut);
     connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+    connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
     m_bookmarkMap->setMapping(sc,QString("add-%1").arg(ids.at(i).toUpper()));
   }
   m_bookmarkAddAction = new QAction(tr("Add"),this);
@@ -2339,12 +2342,14 @@ void LanesLexicon::setupBookmarkShortcuts() {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toLower());
     QShortcut * sc = new QShortcut(ks,this);
     connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+    connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
     m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i).toLower()));
   }
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toUpper());
     QShortcut * sc = new QShortcut(ks,this);
     connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
+    connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
     m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i).toUpper()));
   }
   m_bookmarkJumpAction = new QAction(tr("Jump"),this);
@@ -2401,16 +2406,6 @@ void LanesLexicon::bookmarkAdd() {
     bookmarkShortcut("add-" + text);
 
 }
-/*
-void LanesLexicon::bookmarkJump() {
-  bool ok;
-  QString text = QInputDialog::getText(this, tr("Bookmark Jump"),
-                                         tr("Bookmark ID:"), QLineEdit::Normal,
-                                         QString(), &ok);
-  if (ok && !text.isEmpty())
-    bookmarkShortcut("jump-" + text);
-}
-*/
 /**
  * remove the menu items and then clear the map
  *
@@ -2441,7 +2436,6 @@ void LanesLexicon::bookmarkRebuildMenu() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void LanesLexicon::bookmarkAdd(const QString & id,const Place & p) {
-  //  p.setAction(Place::Bookmark);
   m_bookmarks.insert(id,p);
   addBookmarkMenuItem(id);
   setStatus(QString(tr("Added bookmark:%1")).arg(id));
