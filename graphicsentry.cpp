@@ -479,10 +479,11 @@ void GraphicsEntry::showLinkDetails(const Place & link) {
     p.setRoot(m_nodeQuery->value("root").toString());
     p.setSupplement(m_nodeQuery->value("supplement").toInt());
     p.setWord(m_nodeQuery->value("word").toString());
+    p.setPage(m_nodeQuery->value("page").toInt());
     QString html =    transform(NODE_XSLT,m_nodeXslt,m_nodeQuery->value("xml").toString());
     qDebug() << html;
     NodeInfo * info = new NodeInfo(this);
-    info->setHeader(p.getRoot(),p.getWord(),p.getWord());
+    info->setPlace(p);
     info->setCss(m_currentCss);
     info->setHtml(html);
     if (info->exec()) {
