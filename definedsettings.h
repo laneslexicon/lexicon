@@ -97,6 +97,7 @@ They should not be translated.
 #define SID_SHORTCUT_GO_TAB                    "Go Tab"
 #define SID_SHORTCUT_HISTORY_BACK              "History back"
 #define SID_SHORTCUT_HISTORY_NEXT              "History next"
+#define SID_SHORTCUT_HISTORY_LIST              "History list"
 #define SID_SHORTCUT_HISTORY_CLEAR             "History clear"
 #define SID_SHORTCUT_HISTORY_ENABLE            "History enable"
 #define SID_SHORTCUT_HISTORY_DISABLE           "History disable"

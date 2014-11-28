@@ -513,6 +513,9 @@ void LanesLexicon::shortcut(const QString & key) {
     setupHistory();
     setStatus(tr("History disabled"));
   }
+  else if (key == SID_SHORTCUT_HISTORY_LIST) {
+    onShowHistory();
+  }
   else if (key == SID_SHORTCUT_SYNC) {
     syncContents();
   }
