@@ -10,6 +10,7 @@
 #include <QFont>
 #include <QPushButton>
 #include <QRegExp>
+#include "place.h"
 class NodeInfo : public QDialog {
   Q_OBJECT
 
@@ -18,7 +19,7 @@ class NodeInfo : public QDialog {
   ~NodeInfo();
   void setCss(const QString &);
   void setHtml(const QString &);
-  void setHeader(const QString & root,const QString & head,const QString & node);
+  void setPlace(const Place &);
   QTextDocument * document() { return m_browser->document(); }
   QSize sizeHint() const;
   public slots:
@@ -26,12 +27,14 @@ class NodeInfo : public QDialog {
     void reject();
     void openEntry();
  private:
+    Place m_place;
     QTextCursor m_cursor;
     QSize m_size;
     void setPreferredSize(const QString &);
     QTextBrowser * m_browser;
     QLabel * m_rlabel;
     QLabel * m_hlabel;
+    QLabel * m_vlabel;
     QString m_root;
     QString m_head;
     QString m_node;
