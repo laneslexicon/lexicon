@@ -12,6 +12,7 @@
 #include "searchdialogs.h"
 #include "searchoptionswidget.h"
 #include "externs.h"
+#include "nodeinfo.h"
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
   setObjectName("toolbuttondata");
@@ -465,6 +466,34 @@ void GraphicsEntry::linkHovered(const QString & link) {
     QLOG_DEBUG() << Q_FUNC_INFO << link;
     QLOG_DEBUG() << QApplication::keyboardModifiers();
   }
+}
+void GraphicsEntry::showLinkDetails(const Place & link) {
+  Place p;
+  QString node = link.getNode();
+  if (node.isEmpty()) {
+    return;
+  }
+  m_nodeQuery->bindValue(0,node);
+  m_nodeQuery->exec();
+  if (m_nodeQuery->first()) {
+    p.setRoot(m_nodeQuery->value("root").toString());
+    p.setSupplement(m_nodeQuery->value("supplement").toInt());
+    p.setWord(m_nodeQuery->value("word").toString());
+    QString html =    transform(NODE_XSLT,m_nodeXslt,m_nodeQuery->value("xml").toString());
+    qDebug() << html;
+    NodeInfo * info = new NodeInfo(this);
+    info->setHeader(p.getRoot(),p.getWord(),p.getWord());
+    info->setCss(m_currentCss);
+    info->setHtml(html);
+    if (info->exec()) {
+      delete info;
+    }
+  }
+  else {
+    QLOG_WARN() << QString(tr("Requested link node not found : %1")).arg(node);
+    return;
+  }
+
 }
 /**
  * redundant
@@ -931,7 +960,7 @@ Place GraphicsEntry::getPage(const Place & p) {
  */
 EntryItem * GraphicsEntry::createEntry(const QString & xml) {
   QString html =
-    transform(ENTRY_XSLT,m_xsltSource,xml);
+    transform(ENTRY_XSLT,m_entryXslt,xml);
   if (html.isEmpty()) {
     return NULL;
   }

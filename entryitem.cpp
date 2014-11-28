@@ -104,7 +104,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   menu.setObjectName("entrycontextmenu");
   menu.addSection(tr("Current entry"));
   if ( ! href.isEmpty()) {
-    QString t = QString("Goto %1").arg(anchor);
+    QString t = QString("Where's this: %1").arg(anchor);
     jumpAction = menu.addAction(t);
     jumpAction->setData(href);
   }
@@ -185,7 +185,8 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     Place p;
     p.setNode(jumpAction->data().toString());
     /// TODO check boolean values
-    emit(gotoNode(p,true,true));
+    //    emit(gotoNode(p,true,true));
+    emit(showLinkDetails(p));
 
   }
   else if (htmlAction && (selectedAction == htmlAction)) {
