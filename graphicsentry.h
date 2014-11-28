@@ -174,7 +174,8 @@ class GraphicsEntry : public QWidget {
     QString m_focusNode;
     QString m_currentCss;
     QString m_printCss;
-    QString m_xsltSource;
+    QString m_entryXslt;
+    QString m_nodeXslt;
     QString m_standardCSS;
     QString m_currentHtml;
     QString m_pattern;

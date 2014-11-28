@@ -46,13 +46,17 @@ They should not be translated.
 #define SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR "Supplement background color"
 #define SID_ENTRY_TEXT_WIDTH "Text width"
 #define SID_ENTRY_WIDEN   "Widen"
-#define SID_ENTRY_XSLT   "XSLT"
+
 #define SID_ENTRY_ZOOM_IN "Zoom in"
 #define SID_ENTRY_ZOOM_OUT "Zoom out"
 #define SID_ENTRY_PRINT_CSS "Print Css"
 #define SID_ENTRY_DUMP_HTML "Save Html"
 #define SID_ENTRY_DUMP_XML  "Save Xml"
 #define SID_ENTRY_DUMP_OUTPUT_HTML "Save output Html"
+
+#define SID_XSLT_ENTRY   "Entry"
+#define SID_XSLT_NODE   "Node"
+#define SID_XSLT_PRINT   "Print"
 
 #define SID_NOTES_ENABLED "Enabled"
 

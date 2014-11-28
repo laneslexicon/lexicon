@@ -172,11 +172,13 @@ void EntryLayoutWidget::readSettings() {
   settings->beginGroup("Entry");
   m_cssFileName = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
   m_css = loadFromFile(0,m_cssFileName);
-  m_xsltFileName = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
-  m_xslt = loadFromFile(1,m_xsltFileName);
   settings->endGroup();
   settings->beginGroup("EntryLayout");
   this->restoreGeometry(settings->value("Geometry").toByteArray());
+  settings->endGroup();
+  settings->beginGroup("XSLT");
+  m_xsltFileName = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+  m_xslt = loadFromFile(1,m_xsltFileName);
 
 }
 void EntryLayoutWidget::writeSettings() {

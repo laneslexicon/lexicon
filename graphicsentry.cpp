@@ -137,8 +137,6 @@ void GraphicsEntry::readSettings() {
   if (! css.isEmpty()) {
     m_printCss = css;
   }
-
-  m_xsltSource = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
   m_textWidth = settings->value(SID_ENTRY_TEXT_WIDTH,300).toInt();
   if (cmdOptions.contains("textwidth")) {
     int w = cmdOptions.value("textwidth").toInt(&ok);
@@ -183,6 +181,11 @@ void GraphicsEntry::readSettings() {
   m_dumpXml = settings->value(SID_ENTRY_DUMP_XML,false).toBool();
   m_dumpHtml = settings->value(SID_ENTRY_DUMP_HTML,false).toBool();
   m_dumpOutputHtml = settings->value(SID_ENTRY_DUMP_OUTPUT_HTML,false).toBool();
+  settings->endGroup();
+
+  settings->beginGroup("XSLT");
+  m_entryXslt = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+  m_nodeXslt = settings->value(SID_XSLT_NODE,QString("node.xslt")).toString();
   settings->endGroup();
 
   settings->beginGroup("Notes");
@@ -954,9 +957,11 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
 
   /// TODO this is no longer used
   connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
+
   connect(gi,SIGNAL(selectAllItems()),this,SLOT(selectAll()));
   connect(gi,SIGNAL(clearAllItems()),this,SLOT(clearAll()));
   connect(gi,SIGNAL(gotoNode(const Place &,bool,bool)),this,SIGNAL(gotoNode(const Place &,bool,bool)));
+  connect(gi,SIGNAL(showLinkDetails(const Place &)),this,SLOT(showLinkDetails(const Place &)));
   /// pass through signal for mainwindow to handle
   connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
   connect(gi,SIGNAL(copy()),this,SLOT(copy()));
@@ -1064,6 +1069,15 @@ void GraphicsEntry::prependEntries(int startPos) {
     ypos += sz.height() + m_entryMargin;
   }
 }
+/**
+ *
+ *
+ * @param type
+ * @param xsl
+ * @param xml
+ *
+ * @return
+ */
 QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
   ok = compileStylesheet(type,xsl);
@@ -1230,7 +1244,7 @@ void GraphicsEntry::showHtml() {
 
 
   QString xml = item->getXml();
-  QString html = transform(ENTRY_XSLT,m_xsltSource,xml);
+  QString html = transform(ENTRY_XSLT,m_entryXslt,xml);
 
   QMessageBox msgBox;
   msgBox.setTextFormat(Qt::PlainText);
@@ -1854,12 +1868,13 @@ void GraphicsEntry::onReload() {
   if (! css.isEmpty()) {
     m_printCss = css;
   }
-
-  m_xsltSource = settings->value(SID_ENTRY_XSLT,QString("entry.xslt")).toString();
+  settings->endGroup();
+  settings->beginGroup("XSLT");
+  m_entryXslt = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
 
   QString html;
   for (int i=0;i < m_items.size();i++) {
-    html = transform(ENTRY_XSLT_RECOMPILE,m_xsltSource,m_items[i]->getXml());
+    html = transform(ENTRY_XSLT_RECOMPILE,m_entryXslt,m_items[i]->getXml());
     m_items[i]->document()->clear();
     m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
     m_items[i]->setTextWidth(m_textWidth);
@@ -1882,7 +1897,7 @@ void GraphicsEntry::onReload(const QString & css,const QString & xslt) {
   QString html;
   for (int i=0;i < m_items.size();i++) {
     if (xslt.isEmpty()) {
-      html = transform(ENTRY_XSLT,m_xsltSource,m_items[i]->getXml());
+      html = transform(ENTRY_XSLT,m_entryXslt,m_items[i]->getXml());
     }
     else {
       html = transform(TEST_XSLT,xslt,m_items[i]->getXml());
