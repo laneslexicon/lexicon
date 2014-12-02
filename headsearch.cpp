@@ -253,10 +253,11 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   m_cancelSearch = false;
   QString node;
   QString word;
+  QString headword;
   while(m_query.next() & ! m_cancelSearch) {
     count++;
     node = m_query.value("nodeid").toString();
-    word = m_query.value("headword").toString();
+    headword = word = m_query.value("headword").toString();
     /// strip diacritics if required
     if (options.getSearchType() == SearchOptions::Normal) {
       if (replaceSearch) {
@@ -272,7 +273,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,0,item);
 
-      item = new QTableWidgetItem(word);
+      item = new QTableWidgetItem(headword);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       item->setFont(m_resultsFont);
       m_list->setItem(row,1,item);
