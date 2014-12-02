@@ -42,6 +42,8 @@ class ContentsWidget : public QTreeWidget {
   void toggleExpand();
   void readSettings();
   bool m_debug;
+  bool m_showHeadWord;
+  bool m_showEntryWord;
   /// this is the background color of the select item when the window
   /// does not have focus
   QString m_backgroundColor;

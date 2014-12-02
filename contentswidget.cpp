@@ -5,14 +5,15 @@
 #include "definedsettings.h"
 #define ROOT_COLUMN 0
 #define WORD_COLUMN 1
-#define HEAD_SUPPLEMENT_COLUMN 2
-#define NODE_COLUMN 3
+#define HEADWORD_COLUMN 2
+#define HEAD_SUPPLEMENT_COLUMN 3
+#define NODE_COLUMN 4
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   setObjectName("treeroots");
   readSettings();
-  setColumnCount(4);
+  setColumnCount(5);
   setHeaderLabels(
-                   QStringList() << tr("Letter/Root") << tr("Head") << tr("") << tr("Node"));
+                  QStringList() << tr("Letter/Root") << tr("Entry") << tr("Head") << tr("") << tr("Node"));
   setSelectionMode(QAbstractItemView::SingleSelection);
   header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
   header()->setSectionResizeMode(HEAD_SUPPLEMENT_COLUMN,QHeaderView::ResizeToContents);
@@ -23,7 +24,14 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   this->setExpandsOnDoubleClick(false);
 
   if (! m_debug)
-    this->hideColumn(3);
+    this->hideColumn(NODE_COLUMN);
+
+  if (! m_showEntryWord ) {
+    this->hideColumn(WORD_COLUMN);
+  }
+  if (! m_showHeadWord ) {
+    this->hideColumn(HEADWORD_COLUMN);
+  }
 
 }
 ContentsWidget::~ContentsWidget() {
@@ -51,6 +59,8 @@ void ContentsWidget::readSettings() {
     f.fromString(fontString);
     setFont(f);
   }
+  m_showHeadWord = settings->value(SID_CONTENTS_SHOWHEAD,false).toBool();
+  m_showEntryWord = settings->value(SID_CONTENTS_SHOWENTRY,false).toBool();
   m_debug = settings->value(SID_CONTENTS_DEBUG,false).toBool();
   m_moveDown = settings->value(SID_CONTENTS_MOVE_DOWN,"s").toString();
   m_moveUp = settings->value(SID_CONTENTS_MOVE_UP,"w").toString();
@@ -61,7 +71,7 @@ void ContentsWidget::loadContents() {
   QSqlQuery letterQuery;
 
 
-  if (! m_entryQuery.prepare("select word,itype,bword,nodeId,supplement from entry where datasource = 1 and root = ? order by nodenum asc")) {
+  if (! m_entryQuery.prepare("select word,itype,bword,nodeId,supplement,headword from entry where datasource = 1 and root = ? order by nodenum asc")) {
     QLOG_WARN() << QString(tr("Entry SQL prepare failed:%1")).arg(m_entryQuery.lastError().text());
   }
 
@@ -111,7 +121,7 @@ void ContentsWidget::loadContents() {
           QStringList cols;
           cols << root << supp;
           QTreeWidgetItem * rootItem = new QTreeWidgetItem(cols);
-          rootItem->setData(0,Qt::UserRole,"root");
+          rootItem->setData(ROOT_COLUMN,Qt::UserRole,"root");
           item->addChild(rootItem);
           //          rootCount++;
         }
@@ -383,6 +393,7 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   QString itype;
   QString word;
   QString node;
+  QString head;
   QLOG_DEBUG() << Q_FUNC_INFO << root;
   /// if already expanding return
   if (parent->childCount() > 0) {
@@ -403,7 +414,8 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
     itype = m_entryQuery.value("itype").toString();
     word = m_entryQuery.value("word").toString();
     node = m_entryQuery.value("nodeid").toString();
-    QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << itype << word << supplement << node);
+    head = m_entryQuery.value("headword").toString();
+    QTreeWidgetItem * item = new QTreeWidgetItem(QStringList() << itype << word << head << supplement << node);
     item->setFont(0,m_itypeFont);
     item->setFont(NODE_COLUMN,m_itypeFont);
     item->setFont(HEAD_SUPPLEMENT_COLUMN,m_itypeFont);
