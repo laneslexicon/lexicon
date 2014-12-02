@@ -68,6 +68,7 @@ class HeadSearchWidget : public QWidget
    QFont m_resultsFont;
    bool m_cancelSearch;
    bool m_debug;
+   bool m_verticalLayout;
    QPushButton * m_convertButton;
  signals:
    void searchResult(const QString &);

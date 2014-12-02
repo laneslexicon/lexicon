@@ -49,7 +49,13 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_entry->installEventFilter(this);
   //  QLOG_DEBUG() << "result count" << count;
   //  this->search(str,options);
-  QSplitter * splitter = new QSplitter(Qt::Horizontal);
+  QSplitter * splitter;
+  if (m_verticalLayout) {
+    splitter = new QSplitter(Qt::Vertical);
+  }
+  else {
+    splitter = new QSplitter(Qt::Horizontal);
+  }
   splitter->addWidget(container);
   splitter->addWidget(m_entry);
   splitter->setStretchFactor(0,0);
@@ -386,6 +392,7 @@ void HeadSearchWidget::readSettings() {
   }
   m_stepCount = settings->value(SID_HEADSEARCH_STEP,100).toInt();
   m_debug = settings->value(SID_HEADSEARCH_DEBUG,false).toBool();
+  m_verticalLayout = settings->value(SID_HEADSEARCH_LAYOUT,true).toBool();
   m_focusTable = settings->value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool();
   settings->endGroup();
   settings->beginGroup("Diacritics");

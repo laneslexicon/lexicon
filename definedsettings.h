@@ -152,6 +152,7 @@ They should not be translated.
 #define SID_HEADSEARCH_STEP                    "Step"
 #define SID_HEADSEARCH_DEBUG                   "Debug"
 #define SID_HEADSEARCH_FOCUS_TABLE             "Focus table"
+#define SID_HEADSEARCH_LAYOUT                  "Vertical layout"
 
 #define SID_ARABIC_FONT_NAME                   "Font"
 #define SID_ARABIC_FONT_SIZE                   "Size"
