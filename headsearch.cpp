@@ -134,9 +134,6 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
     case Qt::Key_S: {
-      QString down("S");
-      QLOG_DEBUG() << down << *down.unicode() << down.unicode()->unicode();
-      QLOG_DEBUG() << keyEvent->key() << keyEvent->text();
       int row = m_list->currentRow();
       row++;
       if (row >= m_list->rowCount()) {
@@ -146,7 +143,6 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
       break;
     }
     case Qt::Key_Escape: {
-      QLOG_DEBUG() << Q_FUNC_INFO << "escape hit" << target;
       GraphicsEntry * e = qobject_cast<GraphicsEntry *>(target);
       if (e) {
         m_list->setFocus();
@@ -216,7 +212,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   m_target = target;
   m_searchOptions = options;
   QString sql;
-  sql = "select id,word,root,nodeid,nodenum from entry where datasource = 1 order by nodenum asc";
+  sql = "select id,word,root,nodeid,nodenum,headword from entry where datasource = 1 order by nodenum asc";
 
   rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   m_currentRx = rx;
@@ -254,7 +250,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   while(m_query.next() & ! m_cancelSearch) {
     count++;
     node = m_query.value("nodeid").toString();
-    word = m_query.value("word").toString();
+    word = m_query.value("headword").toString();
     /// strip diacritics if required
     if (options.getSearchType() == SearchOptions::Normal) {
       if (replaceSearch) {
