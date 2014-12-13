@@ -709,6 +709,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
         m_focusNode = node;
       }
     }
+    else {
+      QLOG_DEBUG() << "Failed to create entry for:" << t;
+    }
   } while(m_rootQuery->next());
 
   /// TODO we've only got a root item
