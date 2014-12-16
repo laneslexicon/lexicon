@@ -275,6 +275,16 @@
                   <xsl:value-of select="text()" />
                   </a>
                 </xsl:when>
+                <xsl:when test="@nogo">
+                  <a>
+                    <xsl:attribute name="href">
+                      <xsl:text>127.0.0.0/?link=</xsl:text>
+                      <xsl:value-of select="@nogo"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="class">nolink</xsl:attribute>
+                  <xsl:value-of select="text()" />
+                  </a>
+                </xsl:when>
                 <xsl:when test="@jumptoroot">
                   <a>
                     <xsl:attribute name="href">
