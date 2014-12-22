@@ -67,7 +67,7 @@
         <span class="infl"><xsl:value-of select="@itype" /></span><xsl:text> </xsl:text>
       </xsl:if>
       <xsl:if test="not(@itype = 'alphabetical letter')">
-    <span class="arabic"><xsl:value-of select="@ar"/></span>
+    <span class="arabic"><xsl:value-of select="@ar"/></span>&#x200e;
       </xsl:if>
     </span>
     <xsl:apply-templates select="entryFree" />
@@ -186,7 +186,7 @@
               </xsl:if>
             <span class="arabicquote">
               <xsl:value-of select="."/>
-            </span>
+            </span>&#x200e;
             <xsl:if test="position() != last()">
                <span>&#160;&#160;&#160;*&#160;&#160;&#160;</span>
               </xsl:if>
@@ -278,7 +278,7 @@
                 <xsl:when test="@nogo">
                   <a>
                     <xsl:attribute name="href">
-                      <xsl:text>127.0.0.0/?link=</xsl:text>
+                      <xsl:text>127.0.0.0/?nolink=</xsl:text>
                       <xsl:value-of select="@nogo"/>
                     </xsl:attribute>
                     <xsl:attribute name="class">nolink</xsl:attribute>
@@ -298,7 +298,7 @@
                   <xsl:value-of select="text()" />
                 </xsl:otherwise>
               </xsl:choose>
-              </span>
+              </span>&#x200e;
             </xsl:when>
 
             <xsl:otherwise>
