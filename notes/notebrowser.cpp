@@ -231,7 +231,7 @@ void NoteBrowser::showEntry(const Place & p) {
   QLOG_DEBUG() << Q_FUNC_INFO  << p.getNode() << "root" << p.getRoot() << "word" << p.getWord();
   QSqlQuery query;
   if (! p.getNode().isEmpty()) {
-    ok = query.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?");
+    ok = query.prepare("select root,word,xml from entry where datasource = 1 and nodeid = ?");
     if (ok) {
       query.bindValue(0,p.getNode());
       query.exec();

@@ -50,10 +50,10 @@ void EditableSqlModel::refresh()
 {
   QString query;
   if (m_searchItem.isEmpty()) {
-      query = m_baseQuery +  " order by nodeId,word";
+      query = m_baseQuery +  " order by nodeid,word";
   }
   else if (m_searchItem.startsWith("n")) {
-    query = QString("%1 where nodeId = '%2'").arg(m_baseQuery).arg(m_searchItem);
+    query = QString("%1 where nodeid = '%2'").arg(m_baseQuery).arg(m_searchItem);
   }
   else {
     query = QString("%1 where word = '%2'").arg(m_baseQuery).arg(m_searchItem);
@@ -70,7 +70,7 @@ void EditableSqlModel::refresh()
 }
 void EditableSqlModel::addNote(const QString & node,const QString & word,const QString & note,const QString & tag) {
   QSqlQuery query(m_db);
-  query.prepare("insert into notes (nodeId,word,note,tag) values (?,?,?,?)");
+  query.prepare("insert into notes (nodeid,word,note,tag) values (?,?,?,?)");
   query.addBindValue(node);
   query.addBindValue(word);
   query.addBindValue(note);
