@@ -1,5 +1,5 @@
 #ifndef __NODEINFO_H__
-#define __NODEINFo_H__
+#define __NODEINFO_H__
 #include <QDialog>
 #include <QString>
 #include <QTextBrowser>
