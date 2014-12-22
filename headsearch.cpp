@@ -225,7 +225,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
 
   bool ok = false;
   if (m_query.prepare(sql)) {
-    if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeId = ?")) {
+    if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeid = ?")) {
       ok = true;
     }
   }

@@ -180,7 +180,7 @@ int HistoryMaster::hasPlace(const Place & p,int depth) {
   }
   return -1;
 }
-//create table history(id integer primary key,nodeId text,word text,root text,timewhen text);
+//create table history(id integer primary key,nodeid text,word text,root text,timewhen text);
 bool HistoryMaster::openDatabase(const QString & dbname) {
   QFile dbfile(dbname);
   if (! dbfile.exists()) {

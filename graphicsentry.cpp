@@ -554,17 +554,17 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
 bool GraphicsEntry::prepareQueries() {
   bool ok;
   m_pageQuery = new QSqlQuery;
-  ok = m_pageQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeId,supplement from entry where datasource = 1 and page = ? order by nodenum asc");
+  ok = m_pageQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1 and page = ? order by nodenum asc");
   if (! ok ) {
     QLOG_WARN() << "page SQL prepare failed" << m_pageQuery->lastError();
   }
   m_nodeQuery = new QSqlQuery;
-  ok = m_nodeQuery->prepare("select * from entry where datasource = 1 and nodeId = ?");
+  ok = m_nodeQuery->prepare("select * from entry where datasource = 1 and nodeid = ?");
   if (! ok ) {
     QLOG_WARN() << "node SQL prepare failed" << m_nodeQuery->lastError();
   }
   m_rootQuery = new QSqlQuery;
-  ok = m_rootQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeId,supplement from entry where datasource = 1  and root = ? order by nodenum");
+  ok = m_rootQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1  and root = ? order by nodenum");
   if (! ok ) {
     QLOG_WARN() << "root SQL prepare failed" << m_rootQuery->lastError();
   }
@@ -818,7 +818,7 @@ Place GraphicsEntry::getPage(const Place & p) {
     onClearScene();
   }
   QString lastRoot;
-  // "select root,broot,word,bword,xml,page,itype,nodeId,supplement from entry where datasource =  // 1 and page = ? order by nodenum asc");
+  // "select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource =  // 1 and page = ? order by nodenum asc");
 
 
   int rootCount = 0;

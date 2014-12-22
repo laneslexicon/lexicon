@@ -325,7 +325,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   m_currentRx = rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   QString sql("select id,word,root,entry,node,nodenum from xref where datasource = 1 order by nodenum asc");
   if (m_query.prepare(sql)) {
-    sql = "select root,word,xml from entry where datasource = 1 and nodeId = ?";
+    sql = "select root,word,xml from entry where datasource = 1 and nodeid = ?";
     if (! m_nodeQuery.prepare(sql)) {
       QLOG_WARN() << QString("SQL prepare error %1 : %2")
         .arg(sql)
@@ -858,8 +858,8 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   m_currentRx = rx;
   QString sql("select root,word,nodeid,xml from entry where datasource = 1 order by nodenum asc");
   if (m_query.prepare(sql)) {
-    sql = "select root,word,xml from entry where datasource = 1 and nodeId = ?";
-    if (! m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeId = ?")) {
+    sql = "select root,word,xml from entry where datasource = 1 and nodeid = ?";
+    if (! m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeid = ?")) {
       QLOG_WARN() << QString("SQL prepare error %1 : %2")
         .arg(sql)
         .arg(m_nodeQuery.lastError().text());

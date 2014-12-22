@@ -71,7 +71,7 @@ void ContentsWidget::loadContents() {
   QSqlQuery letterQuery;
 
 
-  if (! m_entryQuery.prepare("select word,itype,bword,nodeId,supplement,headword from entry where datasource = 1 and root = ? order by nodenum asc")) {
+  if (! m_entryQuery.prepare("select word,itype,bword,nodeid,supplement,headword from entry where datasource = 1 and root = ? order by nodenum asc")) {
     QLOG_WARN() << QString(tr("Entry SQL prepare failed:%1")).arg(m_entryQuery.lastError().text());
   }
 
@@ -406,7 +406,7 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
     isSupplementRoot = true;
   }
   while(m_entryQuery.next()) {
-    //QLOG_DEBUG() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeId").toString();
+    //QLOG_DEBUG() << m_entryQuery->value("bword").toString() << m_entryQuery->value("nodeid").toString();
     supplement.clear();
     if (! isSupplementRoot && (m_entryQuery.value("supplement").toInt() == 1)) {
       supplement = "*";
@@ -419,7 +419,7 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
     item->setFont(0,m_itypeFont);
     item->setFont(NODE_COLUMN,m_itypeFont);
     item->setFont(HEAD_SUPPLEMENT_COLUMN,m_itypeFont);
-    item->setData(0,Qt::UserRole,m_entryQuery.value("nodeId"));//.toString()
+    item->setData(0,Qt::UserRole,m_entryQuery.value("nodeid"));//.toString()
     parent->addChild(item);
     c++;
   }
