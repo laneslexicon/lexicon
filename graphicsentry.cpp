@@ -426,6 +426,29 @@ void GraphicsEntry::linkActivated(const QString & link) {
                                QMessageBox::Ok);
       return;
     }
+    if (msg.startsWith("golink")) {
+      msg.remove("golink=");
+      QSqlQuery query;
+      query.prepare("select tonode from links where linkid = ?");
+      query.bindValue(0,msg);
+      query.exec();
+      if (query.first()) {
+        p.setAction(Place::Link);
+        p.setNode(query.value(0).toString());
+        emit(gotoNode(p,createTab,activateTab));
+      }
+      else {
+        QLOG_WARN() << QString("Missing link record for linkid %1").arg(msg);
+      }
+      return;
+    }
+    if (msg.startsWith("nolink=")) {
+      msg.remove("nogo=");
+      QMessageBox::information(this, tr("Missing link"),
+                               msg,
+                               QMessageBox::Ok);
+      return;
+    }
     if (msg.startsWith("root=")) {
       msg.remove("root=");
       QSqlQuery query;

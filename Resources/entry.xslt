@@ -267,6 +267,7 @@
             <xsl:when test="name() = 'foreign' or 'orth'">
               <span class="arabic">
               <xsl:choose>
+<!--
                 <xsl:when test="@goto">
                   <a>
                     <xsl:attribute name="href">
@@ -275,10 +276,21 @@
                   <xsl:value-of select="text()" />
                   </a>
                 </xsl:when>
+-->
+                <xsl:when test="@golink">
+                  <a>
+                    <xsl:attribute name="href">
+                      <xsl:text>127.0.0.0?golink=</xsl:text>
+                      <xsl:value-of select="@golink"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="class">arlink</xsl:attribute>
+                  <xsl:value-of select="text()" />
+                  </a>
+                </xsl:when>
                 <xsl:when test="@nogo">
                   <a>
                     <xsl:attribute name="href">
-                      <xsl:text>127.0.0.0/?nolink=</xsl:text>
+                      <xsl:text>127.0.0.0?nolink=</xsl:text>
                       <xsl:value-of select="@nogo"/>
                     </xsl:attribute>
                     <xsl:attribute name="class">nolink</xsl:attribute>
@@ -288,7 +300,7 @@
                 <xsl:when test="@jumptoroot">
                   <a>
                     <xsl:attribute name="href">
-                      <xsl:text>127.0.0.0/?root=</xsl:text>
+                      <xsl:text>127.0.0.0?root=</xsl:text>
                       <xsl:value-of select="@jumptoroot"/>
                     </xsl:attribute>
                   <xsl:value-of select="text()" />
