@@ -79,6 +79,13 @@ bool EntryItem::hasNotes() const {
 
   return false;
 }
+/*
+This is what a text fragment looks like:
+<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+</style></head><body>
+<p dir='rtl' style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><!--StartFragment--><a href="127.0.0.0?nolink=11"><span style=" font-family:'Amiri'; font-size:18px; text-decoration: underline; color:#ff0000;">شَآمِيَةٌ</span></a><span style=" font-family:'Droid Sans'; font-size:12px;">‎</span><!--EndFragment--></p></body></html>"
+*/
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
   QString href;
@@ -91,20 +98,24 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   QTextCursor c = textCursor();
   c.setPosition(document()->documentLayout()->hitTest(event->pos(), Qt::FuzzyHit));
   c.select(QTextCursor::WordUnderCursor);
-  //  QLOG_DEBUG() << "selected text:" << c.selectedText();
-  if (c.charFormat().isAnchor()) {
-    //    QLOG_DEBUG() << "is anchor" << c.charFormat().isAnchor() << c.charFormat().anchorHref();
-    href = c.charFormat().anchorHref();
-    if (href.startsWith("#")) {
-      href.remove(0,1);
-    }
+
+  //  QLOG_DEBUG() << "selected text:" << c.selectedText() << c.charFormat().anchorHref();
+  QString f = c.selection().toHtml();
+  QRegExp rx("<!--StartFragment--><a\\s+href=\"\\d+\\.\\d+\\.\\d+\\.\\d+\\?([^\"]+)\">");
+  if (rx.indexIn(f) != -1) {
+    href = rx.cap(1);
     anchor = c.selectedText();
   }
   QMenu menu(m_place.getShortText());
   menu.setObjectName("entrycontextmenu");
   menu.addSection(tr("Current entry"));
-  if ( ! href.isEmpty()) {
+  if ( href.startsWith("golink")) {
     QString t = QString("Where's this: %1").arg(anchor);
+    jumpAction = menu.addAction(t);
+    jumpAction->setData(href);
+  }
+  if ( href.startsWith("nolink")) {
+    QString t = QString("Broken link: %1").arg(anchor);
     jumpAction = menu.addAction(t);
     jumpAction->setData(href);
   }
@@ -182,11 +193,11 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   }
   else if ((jumpAction != NULL) && (selectedAction == jumpAction)) {
     //    QLOG_DEBUG() << "bookmark goto" << jumpAction->data();
-    Place p;
-    p.setNode(jumpAction->data().toString());
+    //    Place p;
+    //    p.setNode(jumpAction->data().toString());
     /// TODO check boolean values
     //    emit(gotoNode(p,true,true));
-    emit(showLinkDetails(p));
+    emit(showLinkDetails(jumpAction->data().toString()));
 
   }
   else if (htmlAction && (selectedAction == htmlAction)) {

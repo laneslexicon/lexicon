@@ -111,7 +111,7 @@ class GraphicsEntry : public QWidget {
     void focusPlace();
     void showSelections();
     void print(QPrinter &,const QString & node = QString());
-    void showLinkDetails(const Place & );
+    void showLinkDetails(const QString & );
  private:
     int m_findCount;
     int m_highlightCount;

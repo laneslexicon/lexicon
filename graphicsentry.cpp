@@ -490,10 +490,28 @@ void GraphicsEntry::linkHovered(const QString & link) {
     QLOG_DEBUG() << QApplication::keyboardModifiers();
   }
 }
-void GraphicsEntry::showLinkDetails(const Place & link) {
+void GraphicsEntry::showLinkDetails(const QString  & link) {
+  QLOG_DEBUG() << Q_FUNC_INFO << link;
   Place p;
-  QString node = link.getNode();
-  if (node.isEmpty()) {
+  QString node;
+  QString t(link);
+  if (link.startsWith("nolink")) {
+    /// TODO link fixup routine
+    return;
+  }
+  if (! link.startsWith("golink")) {
+    return;
+  }
+  t.remove("golink=");
+  QSqlQuery query;
+  query.prepare("select tonode from links where linkid = ?");
+  query.bindValue(0,t);
+  query.exec();
+  if (query.first()) {
+    node = query.value(0).toString();
+  }
+  else {
+    QLOG_WARN() << QString("Missing link record for linkid %1").arg(t);
     return;
   }
   m_nodeQuery->bindValue(0,node);
@@ -1017,7 +1035,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
   connect(gi,SIGNAL(selectAllItems()),this,SLOT(selectAll()));
   connect(gi,SIGNAL(clearAllItems()),this,SLOT(clearAll()));
   connect(gi,SIGNAL(gotoNode(const Place &,bool,bool)),this,SIGNAL(gotoNode(const Place &,bool,bool)));
-  connect(gi,SIGNAL(showLinkDetails(const Place &)),this,SLOT(showLinkDetails(const Place &)));
+  connect(gi,SIGNAL(showLinkDetails(const QString &)),this,SLOT(showLinkDetails(const QString &)));
   /// pass through signal for mainwindow to handle
   connect(gi,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SIGNAL(bookmarkAdd(const QString &,const Place &)));
   connect(gi,SIGNAL(copy()),this,SLOT(copy()));

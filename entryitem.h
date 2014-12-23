@@ -105,7 +105,7 @@ class EntryItem : public QGraphicsTextItem {
     void clearAllItems();
     void copy();
     void gotoNode(const Place & p, bool,bool);
-    void showLinkDetails(const Place & p);
+    void showLinkDetails(const QString);
     void addButton(bool);
     void printNode(const QString & node);
     void printPage();
