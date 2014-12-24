@@ -38,6 +38,8 @@ class ContentsWidget : public QTreeWidget {
  protected:
   void focusInEvent(QFocusEvent *);
   void focusOutEvent(QFocusEvent *);
+  void mouseMoveEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *);
  private:
   void toggleExpand();
   void readSettings();
@@ -52,6 +54,7 @@ class ContentsWidget : public QTreeWidget {
   QString m_moveDown;
   QString m_expand;
   QFont m_itypeFont;
+  QPoint m_startPos;
  protected:
   virtual void 	keyPressEvent(QKeyEvent * event);
  signals:

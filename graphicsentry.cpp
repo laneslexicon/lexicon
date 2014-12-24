@@ -1028,7 +1028,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
   connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
   connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
   connect(gi,SIGNAL(showHtml()),this,SLOT(showHtml()));
-
+  connect(gi,SIGNAL(fixLink(const QStringList &,bool)),this,SLOT(fixLink(const QStringList &,bool)));
   /// TODO this is no longer used
   connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
 
@@ -1988,4 +1988,7 @@ void GraphicsEntry::onReload(const QString & css,const QString & xslt) {
     m_items[i]->setOutputHtml(html);
   }
   statusMessage(tr("Reloaded page"));
+}
+void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
+  QLOG_DEBUG() << Q_FUNC_INFO << params << reload;
 }

@@ -3,6 +3,9 @@
 #include "place.h"
 #include "application.h"
 #include "definedsettings.h"
+#include <QDrag>
+#include <QMimeData>
+#include <QPixmap>
 #define ROOT_COLUMN 0
 #define WORD_COLUMN 1
 #define HEADWORD_COLUMN 2
@@ -12,6 +15,7 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   setObjectName("treeroots");
   readSettings();
   setColumnCount(5);
+  //  setDragEnabled(true);
   setHeaderLabels(
                   QStringList() << tr("Letter/Root") << tr("Entry") << tr("Head") << tr("") << tr("Node"));
   setSelectionMode(QAbstractItemView::SingleSelection);
@@ -420,6 +424,7 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
     item->setFont(NODE_COLUMN,m_itypeFont);
     item->setFont(HEAD_SUPPLEMENT_COLUMN,m_itypeFont);
     item->setData(0,Qt::UserRole,m_entryQuery.value("nodeid"));//.toString()
+    item->setFlags(item->flags() | Qt::ItemIsDragEnabled);
     parent->addChild(item);
     c++;
   }
@@ -427,6 +432,34 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
     parent->setExpanded(true);
   }
   return c;
+}
+void ContentsWidget::mousePressEvent(QMouseEvent * event) {
+  if (event->button() == Qt::LeftButton) {
+    m_startPos = event->pos();
+  }
+  QTreeWidget::mousePressEvent(event);
+}
+void ContentsWidget::mouseMoveEvent(QMouseEvent * event) {
+  if (event->buttons() & Qt::LeftButton) {
+    int distance = (event->pos() - m_startPos).manhattanLength();
+    if (distance >= QApplication::startDragDistance()) {
+      QTreeWidgetItem * item = currentItem();
+      if (item && (item->columnCount() == 5)) {
+        QMimeData * mimeData = new QMimeData;
+        QString t = QString("%1:%2")
+          .arg(item->text(NODE_COLUMN))
+          .arg(item->text(WORD_COLUMN));
+        mimeData->setText(t);
+          QDrag * drag = new QDrag(this);
+        drag->setPixmap(QPixmap("notes-0.xpm"));
+        drag->setMimeData(mimeData);
+        if (drag->exec(Qt::LinkAction) == Qt::LinkAction) {
+          QLOG_DEBUG() << "Linked ok";
+        }
+      }
+    }
+  }
+  QTreeWidget::mouseMoveEvent(event);
 }
 void ContentsWidget::nodeExpanded(QTreeWidgetItem * /*item */) {
   QLOG_DEBUG() << Q_FUNC_INFO;

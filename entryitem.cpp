@@ -7,6 +7,7 @@
 #include "laneslexicon.h"
 #include "namespace.h"
 #include "entryitem.h"
+#include "contentswidget.h"
 extern LanesLexicon * getApp();
 extern NoteMaster * getNotes();
 EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTextItem(text,parent) {
@@ -16,6 +17,7 @@ EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTe
   setObjectName("entryitem");
   setFlag(QGraphicsItem::ItemIsSelectable,true);
   setFlag(QGraphicsItem::ItemIsFocusable,true);
+  setAcceptDrops(true);
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
   m_focusOnHover = false;
@@ -24,6 +26,7 @@ EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
   setObjectName("entryitem");
   setFlag(QGraphicsItem::ItemIsSelectable,true);
   setFlag(QGraphicsItem::ItemIsFocusable,true);
+  setAcceptDrops(true);
 }
 /**
  * the note dialog does not have a QWidget parent so delete it manually
@@ -447,4 +450,50 @@ QPair<int,int> EntryItem::find(const QRegExp & rx,int position,bool highlight) {
 }
 bool EntryItem::hasHighlights() {
   return (m_highlights.size() > 0);
+}
+void EntryItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  ContentsWidget * source = qobject_cast<ContentsWidget *>(event->source());
+  if (source) {
+    event->setDropAction(Qt::LinkAction);
+    event->accept();//setAccepted(event->mimeData()->hasFormat("text/plain"));
+  }
+}
+void EntryItem::dragMoveEvent(QGraphicsSceneDragDropEvent *event) {
+  ContentsWidget * source = qobject_cast<ContentsWidget *>(event->source());
+  if (source) {
+    event->setDropAction(Qt::LinkAction);
+    event->accept();//setAccepted(event->mimeData()->hasFormat("text/plain"));
+  }
+}
+void EntryItem::dropEvent(QGraphicsSceneDragDropEvent *event) {
+  QLOG_DEBUG() << Q_FUNC_INFO << event->mimeData()->text();
+  ContentsWidget * source = qobject_cast<ContentsWidget *>(event->source());
+  if (! source) {
+    return;
+  }
+  QTextCursor c = textCursor();
+  c.setPosition(document()->documentLayout()->hitTest(event->pos(), Qt::FuzzyHit));
+  c.select(QTextCursor::WordUnderCursor);
+
+  QString href;
+  QString anchor;
+  QString f = c.selection().toHtml();
+  QRegExp rx("<!--StartFragment--><a\\s+href=\"\\d+\\.\\d+\\.\\d+\\.\\d+\\?([^\"]+)\">");
+  if (rx.indexIn(f) != -1) {
+    QString t = event->mimeData()->text();
+    href = rx.cap(1);
+    QLOG_DEBUG() << "Dropping on" << href << t;
+    anchor = c.selectedText();
+    event->setDropAction(Qt::LinkAction);
+    event->accept();
+    /// pass link info i.e either nolink=nn or golink=nn
+    /// the link text - this should match the text in the link record
+    /// target info in the form <node>:<word>
+    /// node that needs fixing
+    /// reload page after fixup
+    QStringList param;
+    param << href << anchor << t << m_place.getNode();
+    emit(fixLink(param,true));
+  }
 }

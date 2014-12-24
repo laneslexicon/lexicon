@@ -39,6 +39,7 @@
 #include "place.h"
 class Note;
 class NoteDialog;
+
 class ToolButtonData : public QToolButton {
   Q_OBJECT
  public:
@@ -109,13 +110,16 @@ class EntryItem : public QGraphicsTextItem {
     void addButton(bool);
     void printNode(const QString & node);
     void printPage();
+    void fixLink(const QStringList &,bool);
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
   void focusInEvent(QFocusEvent *);
   void focusOutEvent(QFocusEvent *);
   void paint( QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-
+  void dropEvent(QGraphicsSceneDragDropEvent *);
+  void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
+  void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 
   QColor m_backgroundColor;
   bool m_focusOnHover;
