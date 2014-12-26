@@ -483,7 +483,11 @@ void EntryItem::dropEvent(QGraphicsSceneDragDropEvent *event) {
   if (rx.indexIn(f) != -1) {
     QString t = event->mimeData()->text();
     href = rx.cap(1);
-    QLOG_DEBUG() << "Dropping on" << href << t;
+    ///
+    /// entry.xslt adds 200e after a link to force a left-to-right
+    ///
+    t.remove(QChar(0x200e));
+    href.remove(QChar(0x200e));
     anchor = c.selectedText();
     event->setDropAction(Qt::LinkAction);
     event->accept();

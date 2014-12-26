@@ -1527,8 +1527,6 @@ void LanesLexicon::onLogViewer() {
   m_logview->show();
 }
 void LanesLexicon::onTest() {
-  m_logview = new LogViewer();
-  m_logview->show();
   if (0) {
     SearchOptionsWidget * s = new SearchOptionsWidget(SearchOptions::Word);
     s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
@@ -1569,6 +1567,14 @@ void LanesLexicon::onTest() {
         QLOG_DEBUG() << "could not clone graphcicsentry";
       }
     }
+  }
+  if (1) {
+    Place p = m_tree->getCurrentPlace();
+    QLOG_DEBUG() << QString("Root %1, Word %2 , Node %3, Supplement %4")
+      .arg(p.getRoot())
+      .arg(p.getWord())
+      .arg(p.getNode())
+      .arg(p.getSupplement());
   }
 }
 /**

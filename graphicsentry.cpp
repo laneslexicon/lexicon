@@ -1989,6 +1989,108 @@ void GraphicsEntry::onReload(const QString & css,const QString & xslt) {
   }
   statusMessage(tr("Reloaded page"));
 }
+/**
+ * Params:
+ * link info i.e either nolink=nn or golink=nn
+ * link text - this should match the text in the link record
+ * target info in the form <node>:<word>
+ * the node that needs fixing
+ * reload page after fixup
+ *
+ * Update the link record, setting its target node. This will work for
+ * all link records so can be used to redirect a 'working' link.
+ *
+ * If the fix is for a broken link (i.e. "nonlink=nn"), then also udpate
+ * the XML for all entry records that use that link.
+ *
+ * void GraphicsEntry::fixLink(const QStringList &, bool) ("nolink=32090", "اثّغر‎", "n4460:اِتَّغَرَ", "n4459") true
+ * @param params
+ * @param reload
+ */
 void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
   QLOG_DEBUG() << Q_FUNC_INFO << params << reload;
+  EntryItem * item = qobject_cast<EntryItem *>(QObject::sender());
+  QRegExp rx("(nolink|golink)=(\\d+)");
+  if (rx.indexIn(params[0]) == -1) {
+    QLOG_WARN() << QString(tr("Link fixup invalid parameter: %1")).arg(params[0]);
+    return;
+  }
+  QString linkId = rx.cap(2);
+  QString linkType = rx.cap(1);
+  QString targetNode;
+  rx.setPattern("(n\\d+):");
+  if (rx.indexIn(params[2]) != -1) {
+    targetNode = rx.cap(1);
+  }
+  QLOG_DEBUG() << linkId << linkType << "to" << targetNode;
+  QSqlQuery findLink;
+  if (! findLink.prepare("select id,linkid,fromnode,tonode,link from links where datasource = 1 and linkid = ?")) {
+    QLOG_WARN() << findLink.lastError().text();
+    return;
+  }
+  QSqlQuery updateLink;
+  if (! updateLink.prepare("update links set tonode = ?, matchtype = 100 where datasource = 1 and link = ?")) {
+    QLOG_WARN() << updateLink.lastError().text();
+    return;
+  }
+  QSqlQuery nodefind;
+  if (! nodefind.prepare("select xml from entry where nodeid = ?")) {
+    QLOG_WARN() << nodefind.lastError().text();
+    return;
+  }
+  QSqlQuery nodeupdate;
+  if (! nodeupdate.prepare("update entry set xml = ? where nodeid = ?")) {
+    QLOG_WARN() << nodeupdate.lastError().text();
+    return;
+  }
+
+  findLink.bindValue(0,linkId);
+  findLink.exec();
+  int c = 0;
+  while(findLink.next()) {
+    QLOG_DEBUG() << "fixup" << findLink.value(1) << findLink.value(2) << findLink.value(3);
+    QString node = findLink.value(2).toString();
+    QString linkWord = findLink.value(4).toString();
+    if (! linkWord.isEmpty()) {
+      updateLink.bindValue(0,targetNode);
+      updateLink.bindValue(1,linkWord);
+      if (! updateLink.exec()) {
+        QLOG_WARN() << QString(tr("Update links error: %1")).arg(updateLink.lastError().text());
+      }
+      else {
+        c++;
+        if (linkType == "nolink") {
+          nodefind.bindValue(0,node);
+          if (nodefind.exec() && nodefind.first()) {
+            QString xml = nodefind.value(0).toString();
+            xml.replace(QString("nogo=\"%1\"").arg(linkId),QString("golink=\"%1\"").arg(linkId));
+            nodeupdate.bindValue(0,xml);
+            nodeupdate.bindValue(1,node);
+            if (!nodeupdate.exec()) {
+              QLOG_WARN() << QString(tr("Failed to update link details for node %1: %2")).arg(node).arg(nodeupdate.lastError().text());
+            }
+            else {
+              QLOG_DEBUG() << "Updated entry record for node" << node;
+              /// the page reload doesn't reread the xml so we need to update the in memory xml
+              ///
+              if (item && (item->getNode() == node)) {
+                xml = item->getXml();
+                xml.replace(QString("nogo=\"%1\"").arg(linkId),QString("golink=\"%1\"").arg(linkId));
+                item->setXml(xml);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (c > 0) {
+    QSqlDatabase::database().commit();
+    QLOG_DEBUG() << "update count" << c;
+    statusMessage(QString(tr("Updated link details")));
+    if (reload) {
+      this->onReload();
+    }
+  }
+
 }
