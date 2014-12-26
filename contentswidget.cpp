@@ -6,6 +6,7 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QPixmap>
+
 #define ROOT_COLUMN 0
 #define WORD_COLUMN 1
 #define HEADWORD_COLUMN 2
@@ -36,6 +37,9 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   if (! m_showHeadWord ) {
     this->hideColumn(HEADWORD_COLUMN);
   }
+  if (! m_showSupplement) {
+    this->hideColumn(HEAD_SUPPLEMENT_COLUMN);
+  }
 
 }
 ContentsWidget::~ContentsWidget() {
@@ -63,6 +67,7 @@ void ContentsWidget::readSettings() {
     f.fromString(fontString);
     setFont(f);
   }
+  m_showSupplement = settings->value(SID_CONTENTS_SHOWSUPPLEMENT,true).toBool();
   m_showHeadWord = settings->value(SID_CONTENTS_SHOWHEAD,false).toBool();
   m_showEntryWord = settings->value(SID_CONTENTS_SHOWENTRY,false).toBool();
   m_debug = settings->value(SID_CONTENTS_DEBUG,false).toBool();
@@ -123,11 +128,10 @@ void ContentsWidget::loadContents() {
         }
         if (ok) {
           QStringList cols;
-          cols << root << supp;
+          cols << root << "" << "" << supp;
           QTreeWidgetItem * rootItem = new QTreeWidgetItem(cols);
           rootItem->setData(ROOT_COLUMN,Qt::UserRole,"root");
           item->addChild(rootItem);
-          //          rootCount++;
         }
       }
       addTopLevelItem(item);
@@ -406,7 +410,7 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   m_entryQuery.bindValue(0,root);
   m_entryQuery.exec();
   bool isSupplementRoot = false;
-  if (parent->text(1) == "*") {
+  if (parent->text(HEAD_SUPPLEMENT_COLUMN) == "*") {
     isSupplementRoot = true;
   }
   while(m_entryQuery.next()) {
@@ -473,34 +477,45 @@ Place ContentsWidget::getCurrentPlace() {
   if (!item) {
     return p;
   }
+  for(int i=0;i < item->columnCount();i++) {
+    QLOG_DEBUG() << QString("[%1][%21]").arg(i).arg(item->text(i));
+  }
   /// at at letter
   if (item->parent() == 0) {
     return p;
   }
-  QString root = item->parent()->text(ROOT_COLUMN);
-  QString word;
-  QString node;
-  QString supplement;
-  //  for(int i=0; i < item->columnCount();i++) {
-  //      QLOG_DEBUG() << i << item->text(i);
-  //  }
-  if ((item->parent() != 0) && (item->parent()->parent() != 0)) {
-    root = item->parent()->text(0);
-    word = item->text(1);
-    node = item->text(3);
-    supplement = item->text(2);
-    p.setNode(node);
+  /// at a root
+  if (item->childCount() > 0) {
+    p.setRoot(item->text(ROOT_COLUMN));
+    if (item->text(HEAD_SUPPLEMENT_COLUMN) == "*") {
+      p.setSupplement(1);
+    }
+    else {
+      p.setSupplement(0);
+    }
+    return p;
   }
-  else {
-    root = item->text(0);
-    supplement = item->text(1);
-    p.setRoot(root);
-  }
-  if (supplement == "*") {
+  /// at node
+  p.setNode(item->text(NODE_COLUMN));
+  if ((item->text(HEAD_SUPPLEMENT_COLUMN) == "*") ||
+      (item->parent()->text(HEAD_SUPPLEMENT_COLUMN) == "*")) {
     p.setSupplement(1);
   }
   else {
     p.setSupplement(0);
   }
   return p;
+}
+void ContentsWidget::contextMenuEvent(QContextMenuEvent * event) {
+  QTreeWidgetItem * item = this->itemAt(event->pos());
+  if (!item) {
+    return;
+  }
+  if ((item->parent() == 0) ||                     // at letter
+      (item->childCount() == 0)) {                 // at node
+    return;
+  }
+  QString root = item->text(ROOT_COLUMN);
+  QLOG_DEBUG() << "at root" << root;
+
 }
