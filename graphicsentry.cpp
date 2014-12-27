@@ -182,6 +182,8 @@ void GraphicsEntry::readSettings() {
   m_dumpXml = settings->value(SID_ENTRY_DUMP_XML,false).toBool();
   m_dumpHtml = settings->value(SID_ENTRY_DUMP_HTML,false).toBool();
   m_dumpOutputHtml = settings->value(SID_ENTRY_DUMP_OUTPUT_HTML,false).toBool();
+
+  m_showLinkWarning = settings->value(SID_ENTRY_SHOW_LINK_WARNING,true).toBool();
   settings->endGroup();
 
   settings->beginGroup("XSLT");
@@ -2052,6 +2054,13 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
     QString node = findLink.value(2).toString();
     QString linkWord = findLink.value(4).toString();
     if (! linkWord.isEmpty()) {
+      /// first time through optionally present the save link
+      /// dialog
+      if ((c == 0) && m_showLinkWarning) {
+        if (! saveLink()) {
+          return;
+        }
+      }
       updateLink.bindValue(0,targetNode);
       updateLink.bindValue(1,linkWord);
       if (! updateLink.exec()) {
@@ -2093,4 +2102,30 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
     }
   }
 
+}
+bool GraphicsEntry::saveLink() {
+  if (! m_showLinkWarning ) {
+    return true;
+  }
+  QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
+  QMessageBox msgBox;
+  msgBox.setCheckBox(noshow);
+  msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
+  msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
+  msgBox.setDefaultButton(QMessageBox::Save);
+  msgBox.setText(tr("This will change where the link points to."));
+  msgBox.setInformativeText(tr("Do you want to save the link target?"));
+  msgBox.setDetailedText(tr("You can change the link as many times as you want."));
+  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+  int ret = msgBox.exec();
+  if (ret == QMessageBox::Cancel) {
+    return false;
+  }
+  if (noshow->isChecked()) {
+    QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+    settings->beginGroup("Entry");
+    settings->setValue(SID_ENTRY_SHOW_LINK_WARNING,false);
+    m_showLinkWarning = false;
+  }
+  return true;
 }

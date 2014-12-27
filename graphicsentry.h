@@ -125,6 +125,7 @@ class GraphicsEntry : public QWidget {
     void writeDefaultSettings();
     QString readCssFromFile(const QString &name);
     bool prepareQueries();
+    bool saveLink();
     void reposition();
     void appendEntries(int);
     void prependEntries(int);
@@ -142,6 +143,7 @@ class GraphicsEntry : public QWidget {
     int m_searchIndex;
     QColor m_supplementBg;
 
+    bool m_showLinkWarning;
     bool m_linksUseCurrentTab;
     bool m_activateLink;
     bool m_notesEnabled;

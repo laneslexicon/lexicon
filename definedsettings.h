@@ -53,6 +53,7 @@ They should not be translated.
 #define SID_ENTRY_DUMP_HTML "Save Html"
 #define SID_ENTRY_DUMP_XML  "Save Xml"
 #define SID_ENTRY_DUMP_OUTPUT_HTML "Save output Html"
+#define SID_ENTRY_SHOW_LINK_WARNING  "Show link warning"
 
 #define SID_XSLT_ENTRY   "Entry"
 #define SID_XSLT_NODE   "Node"

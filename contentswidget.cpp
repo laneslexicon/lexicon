@@ -455,7 +455,7 @@ void ContentsWidget::mouseMoveEvent(QMouseEvent * event) {
           .arg(item->text(WORD_COLUMN));
         mimeData->setText(t);
           QDrag * drag = new QDrag(this);
-        drag->setPixmap(QPixmap("notes-0.xpm"));
+        drag->setPixmap(QPixmap("insert-link.png"));
         drag->setMimeData(mimeData);
         if (drag->exec(Qt::LinkAction) == Qt::LinkAction) {
           QLOG_DEBUG() << "Linked ok";
