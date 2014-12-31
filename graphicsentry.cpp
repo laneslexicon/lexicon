@@ -2020,11 +2020,15 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
   QString linkId = rx.cap(2);
   QString linkType = rx.cap(1);
   QString targetNode;
-  rx.setPattern("(n\\d+):");
+  QString targetWord;
+  rx.setPattern("(n\\d+):(\\w+)");
   if (rx.indexIn(params[2]) != -1) {
     targetNode = rx.cap(1);
+    targetWord = rx.cap(2);
   }
   QLOG_DEBUG() << linkId << linkType << "to" << targetNode;
+  QLOG_DEBUG() << "Point link word" << params[1];
+  QLOG_DEBUG() << "To word" << targetWord;
   QSqlQuery findLink;
   if (! findLink.prepare("select id,linkid,fromnode,tonode,link from links where datasource = 1 and linkid = ?")) {
     QLOG_WARN() << findLink.lastError().text();
@@ -2057,7 +2061,7 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
       /// first time through optionally present the save link
       /// dialog
       if ((c == 0) && m_showLinkWarning) {
-        if (! saveLink()) {
+        if (! saveLink(linkWord,targetWord)) {
           return;
         }
       }
@@ -2103,18 +2107,21 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
   }
 
 }
-bool GraphicsEntry::saveLink() {
+bool GraphicsEntry::saveLink(const QString & linkWord,const QString & target) {
   if (! m_showLinkWarning ) {
     return true;
   }
   QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
   QMessageBox msgBox;
+  msgBox.setTextFormat(Qt::RichText);
   msgBox.setCheckBox(noshow);
-  msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
+  msgBox.setWindowTitle(tr("Update link"));
   msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
   msgBox.setDefaultButton(QMessageBox::Save);
-  msgBox.setText(tr("This will change where the link points to."));
-  msgBox.setInformativeText(tr("Do you want to save the link target?"));
+  QString html1 = qobject_cast<Lexicon *>(qApp)->spanArabic(linkWord);
+  QString html2 = qobject_cast<Lexicon *>(qApp)->spanArabic(target);
+  msgBox.setText(QString(tr("This will point %1 to %2.")).arg(html1).arg(html2));
+  msgBox.setInformativeText(tr("Do you wish to update the link?"));
   msgBox.setDetailedText(tr("You can change the link as many times as you want."));
   msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
   int ret = msgBox.exec();

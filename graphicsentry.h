@@ -125,7 +125,7 @@ class GraphicsEntry : public QWidget {
     void writeDefaultSettings();
     QString readCssFromFile(const QString &name);
     bool prepareQueries();
-    bool saveLink();
+    bool saveLink(const QString &,const QString &);
     void reposition();
     void appendEntries(int);
     void prependEntries(int);
