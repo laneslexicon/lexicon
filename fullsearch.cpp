@@ -401,7 +401,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
         }
         if (headword.indexOf(rx) != -1) {
           if (options.includeHeads()) {
-            int row = addRow(root,m_nodeQuery.value("word").toString(),node,m_headText,0);
+            int row = addRow(root,m_nodeQuery.value("word").toString(),node,m_headText,-1);
             QTableWidgetItem * item = m_rxlist->item(row,NODE_COLUMN);
             item->setData(Qt::UserRole,true);
             headCount++;
@@ -557,19 +557,23 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
 
   int c = pos;
   ///
-  /// for header row, m_positions.size() == 0
+  /// for pos = -1
   ///
-  if (!m_singleRow) {
+  if (pos == -1) {
+    m_rxlist->setItem(row,POSITION_COLUMN,new QTableWidgetItem(""));
+  }
+  else {
+    if (!m_singleRow) {
       c = 0;
       if ((pos >= 0) && (pos < m_positions.size())) {
         c = m_positions[pos];
       }
+    }
+    item = new QTableWidgetItem(QString("%1").arg(c));
+    item->setData(Qt::UserRole,pos);
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_rxlist->setItem(row,POSITION_COLUMN,item);
   }
-  item = new QTableWidgetItem(QString("%1").arg(c));
-  item->setData(Qt::UserRole,pos);
-  item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-  m_rxlist->setItem(row,POSITION_COLUMN,item);
-
   if (text.size() > 0) {
     item = new QTableWidgetItem(text);
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
