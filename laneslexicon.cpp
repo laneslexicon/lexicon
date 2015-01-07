@@ -871,8 +871,6 @@ void LanesLexicon::createToolBar() {
   m_navigation->addSeparator();
 
 
-  //  addToolBarBreak();
-
   m_entrybar = addToolBar(tr("Page"));
   m_entrybar->setObjectName("pagetoolbar");
   m_entrybar->setIconSize(m_toolbarIconSize);
@@ -884,35 +882,30 @@ void LanesLexicon::createToolBar() {
   m_entrybar->addWidget(m_zoomInButton);
 
 
-  //  m_entrybar->addAction(m_zoomInAction);
   m_zoomOutButton = new QToolButton(m_entrybar);
   m_zoomOutButton->setDefaultAction(m_zoomOutAction);
   m_zoomOutButton->setText(tr("Zoom out"));
   m_zoomOutButton->setFocusPolicy(Qt::StrongFocus);
   m_entrybar->addWidget(m_zoomOutButton);
 
-  //  m_entrybar->addAction(m_zoomOutAc!tion);
   m_widenButton = new QToolButton(m_entrybar);
   m_widenButton->setDefaultAction(m_widenAction);
   m_widenButton->setText(tr("Widen"));
   m_widenButton->setFocusPolicy(Qt::StrongFocus);
   m_entrybar->addWidget(m_widenButton);
 
-  //  m_entrybar->addAction(m_widenAction);
   m_narrowButton = new QToolButton(m_entrybar);
   m_narrowButton->setDefaultAction(m_narrowAction);
   m_narrowButton->setText(tr("Narrow"));
   m_narrowButton->setFocusPolicy(Qt::StrongFocus);
   m_entrybar->addWidget(m_narrowButton);
 
-  //  m_entrybar->addAction(m_narrowAction);
   m_printButton = new QToolButton(m_entrybar);
   m_printButton->setDefaultAction(m_printAction);
   m_printButton->setText(tr("Print"));
   m_printButton->setFocusPolicy(Qt::StrongFocus);
   m_entrybar->addWidget(m_printButton);
 
-  //  m_entrybar->addAction(m_printAction);
   m_localSearchButton = new QToolButton(m_entrybar);
   m_localSearchButton->setDefaultAction(m_localSearchAction);
   m_localSearchButton->setText(tr("Search page"));
@@ -925,16 +918,12 @@ void LanesLexicon::createToolBar() {
   m_localSearchNextButton->setFocusPolicy(Qt::StrongFocus);
   m_entrybar->addWidget(m_localSearchNextButton);
 
-  //  m_entrybar->addAction(m_localSearchAction);
   m_clearButton = new QToolButton(m_entrybar);
   m_clearButton->setDefaultAction(m_clearAction);
   m_clearButton->setText(tr("Clear search"));
   m_clearButton->setFocusPolicy(Qt::StrongFocus);
   m_entrybar->addWidget(m_clearButton);
 
-  //  m_entrybar->addAction(m_clearAction);
-
-  //  m_entrybar->addAction(m_convertToEntryAction);
   m_entrybar->setFloatable(true);
 
   setTabOrder(m_exitButton,m_historyButton);
@@ -2675,8 +2664,9 @@ void LanesLexicon::searchForRoot() {
         msgBox.exec();
       }
       else {
-        /// TODO make dependent
-        this->syncContents();
+        if (m_linkContents) {
+          this->syncContents();
+        }
       }
     }
   }
@@ -3139,19 +3129,10 @@ void LanesLexicon::setIcons(const QString & theme) {
     return;
   }
 
-  //  fi.setFile(imgdir,iconfile);
-  //  if ( ! iconfile.isEmpty() && fi.exists() ) {
-  //    action = new QAction(QIcon(fi.absoluteFilePath()),text,this);
-  //  }
-
   QString iconfile;
 
   iconfile = settings->value("Exit",QString()).toString();
   setIcon(m_exitAction,imgdir,iconfile);
-
-  //  m_clearHistoryAction;
-
-  //m_testAction
 
   iconfile = settings->value("History",QString()).toString();
   setIcon(m_historyAction,imgdir,iconfile);
@@ -3178,20 +3159,8 @@ void LanesLexicon::setIcons(const QString & theme) {
   iconfile = settings->value("Bookmarks",QString()).toString();
   setIcon(m_bookmarkAction,imgdir,iconfile);
 
-  //  iconfile = settings->value("Move",QString()).toString();
-  //  setIcon(m_navigationAction,imgdir,iconfile);
-
   iconfile = settings->value("Search",QString()).toString();
   setIcon(m_searchAction,imgdir,iconfile);
-
-  //  m_navModeRootAction
-  // m_navModePageAction
-
-  // m_searchWordAction = new QAction(tr("For Arabic &word"),this);
-  //m_searchPageAction = new QAction(tr("For &page"),this);
-  //  m_searchRootAction = new QAction(tr("For &root"),this);
-  //m_searchNodeAction = new QAction(tr("For &node"),this);
-
 
   iconfile = settings->value("ZoomIn",QString()).toString();
   setIcon(m_zoomInAction,imgdir,iconfile);
@@ -3217,8 +3186,6 @@ void LanesLexicon::setIcons(const QString & theme) {
   iconfile = settings->value("Clear",QString()).toString();
   setIcon(m_clearAction,imgdir,iconfile);
   m_clearAction->setEnabled(false);
-
-  //  m_convertToEntryAction = createIconAction(imgdir,settings->value("SearchToEntry",QString()).toString(),tr("Convert to Entry"));
 
   iconfile = settings->value("Keymaps",QString()).toString();
   setIcon(m_keymapsAction,imgdir,iconfile);
