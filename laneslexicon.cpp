@@ -738,8 +738,8 @@ void LanesLexicon::createActions() {
   m_linkAction = new QAction(tr("Link contents"),this);
   m_linkAction->setCheckable(true);
 
-  m_syncFromEntryAction = new QAction(tr("Sync contents to entry"),this);
-  m_syncFromContentsAction = new QAction(tr("Sync entry to contents"),this);
+  m_syncFromEntryAction = new QAction(tr("Align contents with entry"),this);
+  m_syncFromContentsAction = new QAction(tr("Align entry with contents"),this);
 
   connect(m_syncFromEntryAction,SIGNAL(triggered()),this,SLOT(syncFromEntry()));
   connect(m_syncFromContentsAction,SIGNAL(triggered()),this,SLOT(syncFromContents()));
@@ -926,6 +926,18 @@ void LanesLexicon::createToolBar() {
   m_clearButton->setText(tr("Clear search"));
   m_clearButton->setFocusPolicy(Qt::StrongFocus);
   m_entrybar->addWidget(m_clearButton);
+
+  m_syncLeftButton = new QToolButton(m_entrybar);
+  m_syncLeftButton->setDefaultAction(m_syncFromEntryAction);
+  m_syncLeftButton->setText(tr("Align contents with page"));
+  m_syncLeftButton->setFocusPolicy(Qt::StrongFocus);
+  m_entrybar->addWidget(m_syncLeftButton);
+
+  m_syncRightButton = new QToolButton(m_entrybar);
+  m_syncRightButton->setDefaultAction(m_syncFromContentsAction);
+  m_syncRightButton->setText(tr("Align contents with page"));
+  m_syncRightButton->setFocusPolicy(Qt::StrongFocus);
+  m_entrybar->addWidget(m_syncRightButton);
 
   m_entrybar->setFloatable(true);
 
@@ -3103,6 +3115,11 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
     action->setIcon(icon);
   }
 }
+/**
+ * sets icons for actions using the defined theme
+ *
+ * @param theme
+ */
 void LanesLexicon::setIcons(const QString & theme) {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   QStringList groups = settings->childGroups();

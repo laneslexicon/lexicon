@@ -329,6 +329,8 @@ class LanesLexicon : public QMainWindow
       QToolButton * m_localSearchButton;
       QToolButton * m_localSearchNextButton;
       QToolButton * m_clearButton;
+      QToolButton * m_syncLeftButton;
+      QToolButton * m_syncRightButton;
       QToolButton * m_navFirstButton;
       QToolButton * m_navLastButton;
       QToolButton * m_navNextButton;
