@@ -737,6 +737,7 @@ void LanesLexicon::createActions() {
 
   m_linkAction = new QAction(tr("Link contents"),this);
   m_linkAction->setCheckable(true);
+  m_linkAction->setChecked(m_linkContents);
 
   m_syncFromEntryAction = new QAction(tr("Align contents with entry"),this);
   m_syncFromContentsAction = new QAction(tr("Align entry with contents"),this);
@@ -1110,7 +1111,7 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_optionsAction);
   m_viewMenu->addAction(m_syncFromContentsAction);
   m_viewMenu->addAction(m_syncFromEntryAction);
-
+  m_viewMenu->addAction(m_linkAction);
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -1204,8 +1205,13 @@ void LanesLexicon::createStatusBar() {
 
   m_linkButton = new QToolButton(this);
   m_linkButton->setDefaultAction(m_linkAction);
-  m_linkButton->setEnabled(m_linkContents);
-
+  //  m_linkButton->setEnabled(m_linkContents);
+  if (m_linkContents) {
+    m_linkButton->setText(tr("Unlink"));
+  }
+  else {
+    m_linkButton->setText(tr("Link"));
+  }
 
 
   connect(m_linkAction,SIGNAL(triggered()),this,SLOT(onLinkChanged()));
@@ -1259,10 +1265,10 @@ void LanesLexicon::onLinkChanged() {
   m_linkContents = ! m_linkContents;
   m_linkAction->setChecked(m_linkContents);
   if (m_linkContents) {
-    m_linkAction->setText(tr("Contents linked"));
+    m_linkButton->setText(tr("Unlink"));
   }
   else {
-    m_linkAction->setText(tr("Contents not linked"));
+    m_linkButton->setText(tr("Link"));
   }
 }
 QSize LanesLexicon::sizeHint() const {
@@ -1587,6 +1593,8 @@ void LanesLexicon::onTest() {
  * Read settings from INIFILE (by default : "default.ini");
  * Options can also come from the command line and they override settings
  * in the ini file
+ *
+ * All QActions have been created when we get here
  */
 void LanesLexicon::readSettings() {
   QString v;
@@ -1655,6 +1663,7 @@ void LanesLexicon::readSettings() {
   m_keymapsEnabled = settings->value("Keymaps",false).toBool();
 
   m_linkContents = settings->value("Contents linked",false).toBool();
+  m_linkAction->setChecked(m_linkContents);
 
   settings->endGroup();
   ///
@@ -3234,8 +3243,8 @@ void LanesLexicon::setIcons(const QString & theme) {
   fi.setFile(imgdir,settings->value("Unlink",QString()).toString());
   icon.addPixmap(fi.absoluteFilePath(),QIcon::Normal,QIcon::Off);
 
-  m_linkAction->setIcon(icon);
-  m_linkAction->setChecked(m_linkContents);
+  //  m_linkAction->setIcon(icon);
+  //  m_linkAction->setChecked(m_linkContents);
 
 }
 /**
