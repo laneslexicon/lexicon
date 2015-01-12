@@ -516,8 +516,11 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_HISTORY_LIST) {
     onShowHistory();
   }
-  else if (key == SID_SHORTCUT_SYNC) {
-    syncContents();
+  else if (key == SID_SHORTCUT_SYNC_PAGE_WITH_CONTENTS) {
+    syncFromContents();
+  }
+  else if (key == SID_SHORTCUT_SYNC_CONTENTS_WITH_PAGE) {
+    syncFromEntry();
   }
   else if (key == SID_SHORTCUT_SHOW_NOTES) {
     showNoteBrowser();
@@ -638,10 +641,7 @@ QAction * LanesLexicon::createIconAction(const QString imgdir,const QString & ic
 }
 */
 void LanesLexicon::createActions() {
-  /// TODO get this from QSettings
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-
-  settings->beginGroup("Icons");
 
   m_exitAction = new QAction(tr("Exit"),this);
   connect(m_exitAction,SIGNAL(triggered()),this,SLOT(onExit()));
@@ -740,6 +740,12 @@ void LanesLexicon::createActions() {
 
   m_linkAction = new QAction(tr("Link contents"),this);
   m_linkAction->setCheckable(true);
+
+  m_syncFromEntryAction = new QAction(tr("Sync contents to entry"),this);
+  m_syncFromContentsAction = new QAction(tr("Sync entry to contents"),this);
+
+  connect(m_syncFromEntryAction,SIGNAL(triggered()),this,SLOT(syncFromEntry()));
+  connect(m_syncFromContentsAction,SIGNAL(triggered()),this,SLOT(syncFromContents()));
 
   connect(m_zoomInAction,SIGNAL(triggered()),this,SLOT(pageZoomIn()));
   connect(m_zoomOutAction,SIGNAL(triggered()),this,SLOT(pageZoomOut()));
@@ -1093,6 +1099,8 @@ void LanesLexicon::createMenus() {
   m_viewMenu->setFocusPolicy(Qt::StrongFocus);
   m_viewMenu->addAction(m_minimalAction);
   m_viewMenu->addAction(m_optionsAction);
+  m_viewMenu->addAction(m_syncFromContentsAction);
+  m_viewMenu->addAction(m_syncFromEntryAction);
 
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
@@ -2631,7 +2639,9 @@ void LanesLexicon::searchForPage() {
     p.setPage(page);
     this->onGoToPage(p);
   }
-  this->syncContents();
+  if (m_linkContents) {
+    this->syncFromEntry();
+  }
 }
 void LanesLexicon::searchForRoot() {
   int ix;
@@ -2665,7 +2675,7 @@ void LanesLexicon::searchForRoot() {
       }
       else {
         if (m_linkContents) {
-          this->syncContents();
+          this->syncFromEntry();
         }
       }
     }
@@ -2878,10 +2888,13 @@ void LanesLexicon::pageClear() {
 }
 void LanesLexicon::currentTabChanged(int ix) {
   QLOG_DEBUG() << Q_FUNC_INFO << ix;
+
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if ( entry ) {
     Place p = entry->getPlace();
-    m_tree->ensurePlaceVisible(p,true);
+    if (m_linkContents) {
+      m_tree->ensurePlaceVisible(p,true);
+    }
     this->enableForPage(true);
     return;
   }
@@ -2905,16 +2918,6 @@ int LanesLexicon::searchTabs(const QString & node) {
     }
   }
   return -1;
-}
-void LanesLexicon::syncContents() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
-  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-  if ( ! entry )
-    return;
-
-  Place p = entry->getPlace();
-  if (p.isValid())
-    m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::showNoteBrowser() {
   for(int i=0;i < m_tabs->count();i++) {
@@ -3072,6 +3075,7 @@ void LanesLexicon::localSearchShow() {
   }
 }
 void LanesLexicon::tabsChanged() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QRegExp rx("^\\d+");
   for(int i=0;i < m_tabs->count();i++) {
     QString t = m_tabs->tabText(i);
@@ -3083,7 +3087,7 @@ void LanesLexicon::tabsChanged() {
   if (entry) {
     this->enableForPage(true);
     if (m_linkContents) {
-      this->syncContents();
+      this->syncFromEntry();
     }
   }
   else {
@@ -3199,6 +3203,13 @@ void LanesLexicon::setIcons(const QString & theme) {
   iconfile = settings->value("Logs",QString()).toString();
   setIcon(m_logViewerAction,imgdir,iconfile);
 
+  iconfile = settings->value("Sync right",QString()).toString();
+  setIcon(m_syncFromContentsAction,imgdir,iconfile);
+
+  iconfile = settings->value("Sync left",QString()).toString();
+  setIcon(m_syncFromEntryAction,imgdir,iconfile);
+
+
   QIcon icon;
   iconfile = settings->value("Link",QString()).toString();
 
@@ -3212,6 +3223,18 @@ void LanesLexicon::setIcons(const QString & theme) {
   m_linkAction->setIcon(icon);
   m_linkAction->setChecked(m_linkContents);
 
+}
+void LanesLexicon::syncFromContents() {
+}
+void LanesLexicon::syncFromEntry() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if ( ! entry )
+    return;
+
+  Place p = entry->getPlace();
+  if (p.isValid())
+    m_tree->ensurePlaceVisible(p);
 }
 void LanesLexicon::sync() {
   QLOG_DEBUG() << Q_FUNC_INFO;

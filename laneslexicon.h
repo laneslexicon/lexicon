@@ -173,11 +173,12 @@ class LanesLexicon : public QMainWindow
       void pageClear();
       void pageSearchComplete();
       void pageSearchStart();
-      void syncContents();
       /// from FullSearchWidget
       void showSearchNode(const QString &);
       void convertToEntry();
       void printNode(const QString &);
+      void syncFromContents();
+      void syncFromEntry();
  protected:
       void closeEvent(QCloseEvent *);
  private:
@@ -267,6 +268,7 @@ class LanesLexicon : public QMainWindow
       bool m_restoreBookmarks;
       bool m_revertEnabled;
       bool m_debug;
+
       QToolBar * m_mainbar;
       QToolBar * m_navigation;
       QToolBar * m_entrybar;
@@ -379,6 +381,8 @@ class LanesLexicon : public QMainWindow
       QAction * m_convertToEntryAction;      // convert HeadSearch to GraphicsEntry
       QAction * m_keymapsAction;
       QAction * m_linkAction;
+      QAction * m_syncFromContentsAction;
+      QAction * m_syncFromEntryAction;
       QAction * m_aboutAction;
 
       HistoryMaster * m_history;
