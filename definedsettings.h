@@ -142,6 +142,7 @@ They should not be translated.
 #define SID_SHORTCUT_SELECT_ALL                "Select all"
 #define SID_SHORTCUT_SELECT_ENTRY              "Select entry"
 #define SID_SHORTCUT_SHOW_NOTES                "Show notes"
+#define SID_SHORTCUT_KEEP_SYNCED               "Toggle sync always"
 #define SID_SHORTCUT_SYNC_PAGE_WITH_CONTENTS   "Sync page with contents"
 #define SID_SHORTCUT_SYNC_CONTENTS_WITH_PAGE   "Sync contents with page"
 #define SID_SHORTCUT_TOGGLE_INTERFACE          "Toggle interface"

@@ -516,6 +516,9 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_HISTORY_LIST) {
     onShowHistory();
   }
+  else if (key == SID_SHORTCUT_KEEP_SYNCED) {
+    onLinkChanged();
+  }
   else if (key == SID_SHORTCUT_SYNC_PAGE_WITH_CONTENTS) {
     syncFromContents();
   }
