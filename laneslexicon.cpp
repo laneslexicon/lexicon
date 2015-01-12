@@ -561,9 +561,6 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_SHOW_LOGS) {
     this->onLogViewer();
   }
-  else if (key == "sync") {
-    this->sync();
-  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -3224,8 +3221,27 @@ void LanesLexicon::setIcons(const QString & theme) {
   m_linkAction->setChecked(m_linkContents);
 
 }
+/**
+ * show current contents item as page
+ *
+ */
 void LanesLexicon::syncFromContents() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  //  QWidget * w = QApplication::focusWidget();
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (!entry) {
+    QLOG_WARN() << "Cannot sync to current tab";
+    return;
+  }
+  Place p = m_tree->getCurrentPlace();
+  if (p.isValid()) {
+      this->showPlace(p,false,true);
+  }
 }
+/**
+ * make current page item, current item in contents
+ *
+ */
 void LanesLexicon::syncFromEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
@@ -3236,6 +3252,10 @@ void LanesLexicon::syncFromEntry() {
   if (p.isValid())
     m_tree->ensurePlaceVisible(p);
 }
+/**
+ * Redundant replace by syncFromContents and syncFromEntry
+ *
+ */
 void LanesLexicon::sync() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   QWidget * w = QApplication::focusWidget();
@@ -3301,6 +3321,12 @@ void LanesLexicon::pageSearchStart() {
   m_localSearchNextAction->setEnabled(entry->hasMoreFinds());
   m_clearAction->setEnabled(entry->hasHighlights());
 }
+/**
+ * enabled/disable toolbar amd menubar items that only work when showing
+ * a page
+ *
+ * @param v
+ */
 void LanesLexicon::enableForPage(bool v) {
   m_entrybar->setEnabled(v);
   m_navigation->setEnabled(v);
