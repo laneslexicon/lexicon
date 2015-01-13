@@ -1031,7 +1031,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
   connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
   connect(gi,SIGNAL(showHtml()),this,SLOT(showHtml()));
   connect(gi,SIGNAL(fixLink(const QStringList &,bool)),this,SLOT(fixLink(const QStringList &,bool)));
-  /// TODO this is no longer used
+  /// placeChanged is emitted whenever an EntryItem gets a focusInEvent
   connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
 
   connect(gi,SIGNAL(selectAllItems()),this,SLOT(selectAll()));
@@ -1327,8 +1327,10 @@ void GraphicsEntry::showHtml() {
   msgBox.setText(html);
   msgBox.exec();
 }
-void GraphicsEntry::updateCurrentPlace(const Place & /* p */) {
-  //  m_place = p;
+void GraphicsEntry::updateCurrentPlace(const Place &  p ) {
+  m_place = p;
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  emit(placeChanged(p));
 }
 /**
  *
@@ -1549,13 +1551,23 @@ void GraphicsEntry::focusPlace() {
     this->shiftFocus();
   }
 }
+/**
+ * TODO Do we want to keep the contents tree in sync ?
+ *
+ * @param item
+ */
 void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_view->setFocus();
   m_view->ensureVisible(item);
+  /// call scene->setFocusItem results in a call to updateCurrentPlace
   m_scene->setFocusItem(item);
   EntryItem * entry = dynamic_cast<EntryItem *>(item);
-  if (entry)
+  if (entry) {
     m_place = entry->getPlace();
+    updateCurrentPlace(m_place);
+    //    emit(placeChanged(m_place));
+  }
 
 }
 /**
@@ -2111,7 +2123,7 @@ bool GraphicsEntry::saveLink(const QString & linkWord,const QString & target) {
   if (! m_showLinkWarning ) {
     return true;
   }
-  QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
+  QCheckBox * noshow = new QCheckBox(tr("Check this box to stop the dialog appearing again"));
   QMessageBox msgBox;
   msgBox.setTextFormat(Qt::RichText);
   msgBox.setCheckBox(noshow);

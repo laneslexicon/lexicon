@@ -236,9 +236,13 @@ void EntryItem::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
   QGraphicsTextItem::hoverEnterEvent(event);
 }
 void EntryItem::focusInEvent(QFocusEvent * event) {
-  //  QLOG_DEBUG() << Q_FUNC_INFO << this->getPlace().getText();
-  /// this updates m_place in graphicsentry so the current node is saved on exit
-  emit(placeChanged(this->getPlace()));
+  //  QLOG_DEBUG() << Q_FUNC_INFO << event->reason();
+  /// when GraphicsEntry sets the current focus via
+  /// scene->setFocusItem, we don't emit the signal
+  ///
+  if (event->reason() != Qt::OtherFocusReason) {
+    emit(placeChanged(this->getPlace()));
+  }
   QGraphicsTextItem::focusInEvent(event);
 }
 void EntryItem::focusOutEvent(QFocusEvent * event) {
