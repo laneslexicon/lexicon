@@ -147,8 +147,13 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   if (m_restoreTabs) {
     restoreTabs();
   }
-  /// TODO if no tabs, show first root. Change this to somethign else ?
-
+  /**
+   *  if we asked for a node or root at the command line, check if it showing in a the
+   *  tabs and switch tabs if it is.
+   *  Otherwise, create a new tab
+   *
+   *  When done, call currentTabChanged(), so the tree can be kept in sync
+   */
   Place p;
   int ix;
   if (! m_startupNode.isEmpty()) {
@@ -168,13 +173,18 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
       showPlace(p,false,true);
       m_tree->ensurePlaceVisible(p);
     }
+    else {
+      this->currentTabChanged(ix);
+    }
   }
-
+  else {
+    this->currentTabChanged(m_tabs->currentIndex());
+  }
   if (m_restoreBookmarks) {
     restoreBookmarks();
   }
 
-  m_tree->resizeColumnToContents(0);
+  //  m_tree->resizeColumnToContents(0);
 
   setupHistory();
 
@@ -194,6 +204,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
    * and gives focus etc. It's a kludge, but the whole focus/selection stuff is a
    * bit confusing.
    */
+  /*
   QApplication::setActiveWindow(m_tabs->currentWidget());
 
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
@@ -209,6 +220,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     event = new QKeyEvent(QEvent::KeyPress, k, Qt::NoModifier,QString(QChar(k)));
     QApplication::postEvent(entry,event);
   }
+  */
   /*
   QList<QShortcut *> edits = this->findChildren<QShortcut *>();
   foreach(QShortcut *  widget,edits) {
@@ -216,6 +228,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   edits.clear()
   */
+  this->currentTabChanged();
 
   QLOG_DEBUG() << "-----------------------";
   QLOG_DEBUG() << "Initialisation complete";

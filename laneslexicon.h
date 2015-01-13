@@ -162,7 +162,7 @@ class LanesLexicon : public QMainWindow
       void onAbout();
       void bookmarkRebuildMenu();
 
-      void currentTabChanged(int);
+      void currentTabChanged(int ix = -1);
       /// these apply to the current graphicsentry
       void pageZoomIn();
       void pageZoomOut();
