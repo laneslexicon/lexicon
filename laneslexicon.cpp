@@ -3301,8 +3301,10 @@ void LanesLexicon::syncFromEntry() {
     return;
 
   Place p = entry->getPlace();
-  if (p.isValid())
+  if (p.isValid()) {
     m_tree->ensurePlaceVisible(p);
+    entry->focusPlace();
+  }
 }
 /**
  * Redundant replace by syncFromContents and syncFromEntry
