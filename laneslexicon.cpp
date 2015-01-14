@@ -177,9 +177,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
       this->currentTabChanged(ix);
     }
   }
-  else {
-    this->currentTabChanged(m_tabs->currentIndex());
-  }
+
   if (m_restoreBookmarks) {
     restoreBookmarks();
   }
@@ -228,7 +226,10 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   edits.clear()
   */
-  this->currentTabChanged();
+
+  //  this->currentTabChanged();
+  //  this->syncFromEntry();
+
 
   QLOG_DEBUG() << "-----------------------";
   QLOG_DEBUG() << "Initialisation complete";
@@ -1825,6 +1826,8 @@ void LanesLexicon::writeSettings() {
     settings->setValue("Minimal interface",m_minimalAction->isChecked());
     settings->setValue("Show interface warning",m_interfaceWarning);
     settings->setValue("Current map",m_currentMap);
+    settings->setValue("Sync",m_linkContents);
+    settings->setValue("Contents linked",m_linkContents);
     /// TODO change this
     if (m_navMode == Lane::By_Root) {
       settings->setValue("Navigation","root");
@@ -2045,13 +2048,17 @@ void LanesLexicon::onFirstRoot() {
   Place p;
   p.setRoot(m_firstRoot);
   showPlace(p,false,true);
-  m_tree->ensurePlaceVisible(p);
+  if (m_linkContents) {
+    m_tree->ensurePlaceVisible(p);
+  }
 }
 void LanesLexicon::onLastRoot() {
   Place p;
   p.setRoot(m_lastRoot);
   showPlace(p,false,true);
+  if (m_linkContents) {
   m_tree->ensurePlaceVisible(p);
+  }
 }
 /********************************************************************************
  *
@@ -2060,7 +2067,9 @@ void LanesLexicon::onLastRoot() {
 void LanesLexicon::rootChanged(const QString & root,const QString & /* node */) {
   Place p;
   p.setRoot(root);
+  if (m_linkContents) {
   m_tree->ensurePlaceVisible(p,true);
+  }
 }
 void LanesLexicon::placeChanged(const Place & p) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());
@@ -2070,8 +2079,9 @@ void LanesLexicon::placeChanged(const Place & p) {
       m_tabs->setTabText(ix,p.getShortText());
     }
   }
-
-  m_tree->ensurePlaceVisible(p,true);
+  if (m_linkContents) {
+    m_tree->ensurePlaceVisible(p,true);
+  }
 }
 /***************************************************************************************************
  *

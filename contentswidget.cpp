@@ -308,6 +308,15 @@ void ContentsWidget::toggleExpand() {
       }
     }
 }
+/**
+ * (1) find the root and add its headwords if this
+ * has not already been done.
+ * (2) expand the root
+ * (3) if we have a word/node, find it
+ *
+ * @param p              Place we want to find
+ * @param select
+ */
 void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
   QLOG_DEBUG() << Q_FUNC_INFO << p << select;
   QString root = p.getRoot();
@@ -321,22 +330,14 @@ void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
   rootPlace.setRoot(p.getRoot());
   item = this->findPlace(rootPlace);
   if (! item ) {
+    QLOG_DEBUG() << "Cannot find root" << p.getRoot();
     return;
   }
   /**
    * this is called when restoring tabs so we need to load
    * the head words for each root we are restoring
    */
-  int c;
-  if (item) {
-    c = addEntries(p.getRoot(),item);
-  }
-  else {
-    QLOG_WARN() << "Ensure visible error: could not find item" << p.getRoot() << p.getWord();
-    return;
-  }
-  if (c == 0) {
-    QLOG_WARN() << "Add entries did not add any entries for" << p;
+  if (addEntries(p.getRoot(),item) == 0) {
     return;
   }
   item->setExpanded(true);
@@ -360,16 +361,19 @@ QTreeWidgetItem * ContentsWidget::findPlace(const Place & p) const {
   QTreeWidgetItem * item = 0;
   QString target;
   int column;
+
+
   if (p.isRoot()) {
     column = ROOT_COLUMN;
     target = p.getRoot();
   }
   else {
-    column = WORD_COLUMN;
-    target = p.getWord();
+    column = NODE_COLUMN;
+    target = p.getNode();
   }
-  //  QLOG_DEBUG() << Q_FUNC_INFO << target;
+
   QList<QTreeWidgetItem *> items = this->findItems(target,Qt::MatchRecursive,column);
+  QLOG_DEBUG() << Q_FUNC_INFO << target << items.size();
   /// TODO multiple items, for supplement ?
   if (items.size() > 0) {
     item = items[0];
@@ -405,7 +409,7 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
   QLOG_DEBUG() << Q_FUNC_INFO << root;
   /// if already expanding return
   if (parent->childCount() > 0) {
-    return -1;
+    return parent->childCount();
   }
   m_entryQuery.bindValue(0,root);
   m_entryQuery.exec();
