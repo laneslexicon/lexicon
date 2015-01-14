@@ -182,6 +182,7 @@ class LanesLexicon : public QMainWindow
  protected:
       void closeEvent(QCloseEvent *);
  private:
+      void showStartupEntry();
       void printCurrentPage(const QString & node = QString());
       void restoreSavedState();
       void cleanup();

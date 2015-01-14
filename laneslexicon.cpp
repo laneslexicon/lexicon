@@ -154,35 +154,13 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
    *
    *  When done, call currentTabChanged(), so the tree can be kept in sync
    */
-  Place p;
-  int ix;
-  if (! m_startupNode.isEmpty()) {
-    p.setNode(m_startupNode);
-    ix = this->hasPlace(p,GraphicsEntry::NodeSearch,true);
-  }
-  else if (! m_startupRoot.isEmpty()) {
-    p.setRoot(convertString(m_startupRoot));
-    ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
-  }
-  else if ((m_tabs->count() == 0) && ! m_firstRoot.isEmpty()) {
-    p.setRoot(m_firstRoot);
-    ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
-  }
-  if (p.isValid()) {
-    if (ix == -1) {  // not showing in another tab
-      showPlace(p,false,true);
-      m_tree->ensurePlaceVisible(p);
-    }
-    else {
-      this->currentTabChanged(ix);
-    }
-  }
+  this->showStartupEntry();
 
   if (m_restoreBookmarks) {
     restoreBookmarks();
   }
 
-  //  m_tree->resizeColumnToContents(0);
+  m_tree->resizeColumnToContents(0);
 
   setupHistory();
 
@@ -227,8 +205,15 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   edits.clear()
   */
 
-  //  this->currentTabChanged();
-  //  this->syncFromEntry();
+  /**
+   * this gets around the problem that treewidgets viewport has not been updated
+   * At this point it reports its size 84x0
+   * When syncFromEntry runs with the timer, view port is 160x809
+   */
+
+
+ QTimer::singleShot(200, this, SLOT(syncFromEntry()));
+
 
 
   QLOG_DEBUG() << "-----------------------";
@@ -241,6 +226,33 @@ LanesLexicon::~LanesLexicon()
   /// TODO make this check something has changed or give
   /// option to save settings ?
   //  cleanup();
+}
+void LanesLexicon::showStartupEntry() {
+  Place p;
+  int ix;
+  if (! m_startupNode.isEmpty()) {
+    p.setNode(m_startupNode);
+    ix = this->hasPlace(p,GraphicsEntry::NodeSearch,true);
+  }
+  else if (! m_startupRoot.isEmpty()) {
+    p.setRoot(convertString(m_startupRoot));
+    ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
+  }
+  else if ((m_tabs->count() == 0) && ! m_firstRoot.isEmpty()) {
+    p.setRoot(m_firstRoot);
+    ix = this->hasPlace(p,GraphicsEntry::RootSearch,true);
+  }
+  if (! p.isValid())
+    return;
+
+  if (ix == -1) {  // not showing in another tab
+    showPlace(p,false,true);
+    m_tree->ensurePlaceVisible(p);
+  }
+  else {
+    /// TODO make sure requested item has focus
+    this->currentTabChanged(ix);
+  }
 }
 void LanesLexicon::restoreSavedState() {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());

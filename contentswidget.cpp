@@ -330,7 +330,7 @@ void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
   rootPlace.setRoot(p.getRoot());
   item = this->findPlace(rootPlace);
   if (! item ) {
-    QLOG_DEBUG() << "Cannot find root" << p.getRoot();
+    QLOG_DEBUG() << Q_FUNC_INFO << "Cannot find root" << p.getRoot();
     return;
   }
   /**
