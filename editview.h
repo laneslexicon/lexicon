@@ -23,6 +23,8 @@ class EditPage : public QWidget {
  public:
   EditPage(int type,QWidget * parent = 0);
   QString getText() const;
+  QString getOriginalText() const;
+  void writeFile();
   public slots:
     void onClicked(QAbstractButton *);
     void onTextChanged();
@@ -39,6 +41,8 @@ class EditPage : public QWidget {
     QPlainTextEdit * m_text;
     QCheckBox * m_useOther;
     QDialogButtonBox * m_buttons;
+ signals:
+      void apply(int,bool);
 
 
 };
@@ -49,6 +53,7 @@ class EditView : public QWidget {
   public slots:
     void accept();
     void reject();
+    void apply(int,bool);
  protected:
   QSize sizeHint() const;
  private:
@@ -57,5 +62,7 @@ class EditView : public QWidget {
   void readSettings();
   QTabWidget * m_tabs;
   QDialogButtonBox * m_buttons;
+ signals:
+      void reload(const QString &,const QString &);
 };
 #endif

@@ -1631,7 +1631,9 @@ void LanesLexicon::onTest() {
   }
   if (m_editView == 0) {
     m_editView = new EditView;
+    connect(m_editView,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
   }
+
   m_editView->show();
 }
 /**

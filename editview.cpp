@@ -21,14 +21,18 @@ EditPage::EditPage(int type,QWidget * parent) : QWidget(parent) {
   layout->addWidget(m_useOther);
   layout->addWidget(m_buttons);
   setLayout(layout);
-  m_text->setPlainText(m_lines.join("\n"));
+  this->restore();
 }
 QString EditPage::getText() const {
   return m_text->toPlainText();
 
 }
-void EditPage::apply() {
+QString EditPage::getOriginalText() const {
+  return m_lines.join("\n");
 
+}
+void EditPage::apply() {
+  emit(apply(m_type,m_useOther->isChecked()));
 }
 void EditPage::reset() {
 
@@ -72,11 +76,21 @@ void EditPage::readFile(const QString & name) {
   }
   f.close();
 }
+void EditPage::writeFile() {
+  QFile f(m_fileName);
+  if (! f.open(QIODevice::WriteOnly)) {
+        QLOG_WARN() << QString(tr("Cannot open file %1 for writing: %2"))
+          .arg(m_fileName).
+          arg(qPrintable(f.errorString()));
+        return;
+  }
+  QTextStream out(&f);
+  out << m_text->toPlainText();
+  f.close();
+}
 
 void EditPage::readSettings() {
-  QString fileName;
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-
   settings->beginGroup("Entry");
   if (m_type == EDIT_CSS) {
     m_fileName = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
@@ -104,16 +118,20 @@ EditView::EditView(QWidget * parent) : QWidget(parent) {
   layout->addWidget(m_buttons);
   connect(m_buttons,SIGNAL(accepted()),this,SLOT(accept()));
   connect(m_buttons,SIGNAL(rejected()),this,SLOT(reject()));
+
+  connect(m_cssEditor,SIGNAL(apply(int,bool)),this,SLOT(apply(int,bool)));
+  connect(m_xsltEditor,SIGNAL(apply(int,bool)),this,SLOT(apply(int,bool)));
   setLayout(layout);
 }
 void EditView::accept() {
   qDebug() << Q_FUNC_INFO;
-  qDebug() << m_cssEditor->getText();
+  m_cssEditor->writeFile();
+  m_xsltEditor->writeFile();
 }
 void EditView::reject() {
   qDebug() << Q_FUNC_INFO;
-  m_cssEditor->restore();
-  m_xsltEditor->restore();
+  //  m_cssEditor->restore();
+  //  m_xsltEditor->restore();
   this->hide();
 }
 
@@ -123,9 +141,33 @@ QSize EditView::sizeHint() const {
   return QSize(800,600);
 }
 void EditView::readSettings() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("EntryLayout");
   this->restoreGeometry(settings->value("Geometry").toByteArray());
   settings->endGroup();
+}
+void EditView::apply(int type,bool useEdited) {
+  QString css;
+  QString xslt;
+  if (type == EDIT_CSS) {
+    css = m_cssEditor->getText();
+    if (useEdited) {
+      xslt = m_xsltEditor->getText();
+    }
+    else {
+      xslt = m_xsltEditor->getOriginalText();
+    }
+  }
+  if (type == EDIT_XSLT) {
+    xslt = m_xsltEditor->getText();
+    if (useEdited) {
+      css = m_cssEditor->getText();
+    }
+    else {
+      css = m_cssEditor->getOriginalText();
+    }
+  }
+  if (! css.isEmpty() && ! xslt.isEmpty()) {
+    emit(reload(css,xslt));
+  }
 }
