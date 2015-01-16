@@ -143,6 +143,17 @@ void Lexicon::scanForFonts(const QDir & dir)
      QFontDatabase::addApplicationFont(fonts.takeFirst());
    }
 }
+/**
+ * This is for mixed language text and will wrap any Arabic in a <span>
+ * with the class given by the css parameter. It embeds the style information
+ * in the "class" attribute and so can only be used widgets that support
+ * stylesheets.
+ *
+ * @param str
+ * @param css
+ *
+ * @return
+ */
 QString Lexicon::scanAndSpan(const QString & str,const QString & css) {
   QString teststr("You say, كَتَبَ إِلَىَّ يَسْتَبْطِئُنِى He wrote وَجَدَ هَ          and thats it");
   QString ar = str;
@@ -202,10 +213,19 @@ QString Lexicon::scanAndSpan(const QString & str,const QString & css) {
   return html;
 }
 /**
- * If 'which' is empty get the default settings
+ * This is used to wrap Arabic only text. It embeds the style information
+ * in the "style" attribute - it does NOT use CSS classes because for some
+ * widgets these are not available.
  *
+ *
+ * The spanstyle parameter should be a key in the spanArabic section
+ * of the INI file. This allows for different font/sizes to be used.
+ *
+ * If no spanstyle supplied it looks at the "Arabic" and get the default
+ * font and size from there.
+
  * @param ar
- * @param which
+ * @param style
  *
  * @return
  */
