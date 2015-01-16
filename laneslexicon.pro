@@ -73,7 +73,9 @@ SOURCES += main.cpp\
         version.cpp \
         htmldelegate.cpp \
         historylist.cpp \
-        nodeinfo.cpp
+        nodeinfo.cpp \
+        fontchangedialog.cpp \
+        arabicfontdialog.cpp
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
@@ -104,4 +106,6 @@ HEADERS  += laneslexicon.h \
             version.h \
             htmldelegate.h \
             historylist.h \
-            nodeinfo.h
+            nodeinfo.h \
+            fontchangedialog.h \
+            arabicfontdialog.h

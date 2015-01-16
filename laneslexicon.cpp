@@ -26,6 +26,7 @@
 #include "about.h"
 #include "externs.h"
 #include "historylist.h"
+#include "fontchangedialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -1609,7 +1610,7 @@ void LanesLexicon::onTest() {
       }
     }
   }
-  if (1) {
+  if (0) {
     Place p = m_tree->getCurrentPlace();
     QLOG_DEBUG() << QString("Root %1, Word %2 , Node %3, Supplement %4")
       .arg(p.getRoot())
@@ -1617,6 +1618,9 @@ void LanesLexicon::onTest() {
       .arg(p.getNode())
       .arg(p.getSupplement());
   }
+  FontChangeDialog * d = new FontChangeDialog(this);
+  d->exec();
+  delete d;
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");
