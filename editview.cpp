@@ -16,8 +16,6 @@ EditPage::EditPage(int type,QWidget * parent) : QWidget(parent) {
   }
 
   m_buttons =   new QDialogButtonBox(QDialogButtonBox::Apply|QDialogButtonBox::Reset|QDialogButtonBox::RestoreDefaults,this);
-  connect(m_buttons,SIGNAL(accepted()),this,SLOT(accept()));
-  connect(m_buttons,SIGNAL(rejected()),this,SLOT(onReject()));
   connect(m_buttons,SIGNAL(clicked(QAbstractButton *)),this,SLOT(onClicked(QAbstractButton *)));
   layout->addWidget(m_text);
   layout->addWidget(m_useOther);
@@ -25,7 +23,8 @@ EditPage::EditPage(int type,QWidget * parent) : QWidget(parent) {
   setLayout(layout);
   m_text->setPlainText(m_lines.join("\n"));
 }
-void EditPage::setText(const QString & text) {
+QString EditPage::getText() const {
+  return m_text->toPlainText();
 
 }
 void EditPage::apply() {
@@ -35,7 +34,10 @@ void EditPage::reset() {
 
 }
 void EditPage::restore() {
-
+  qDebug() << Q_FUNC_INFO;
+  m_lines.clear();
+  this->readFile(m_fileName);
+  m_text->setPlainText(m_lines.join("\n"));
 }
 
 void EditPage::onClicked(QAbstractButton * btn) {
@@ -77,12 +79,12 @@ void EditPage::readSettings() {
 
   settings->beginGroup("Entry");
   if (m_type == EDIT_CSS) {
-    fileName = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
+    m_fileName = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
   }
   else {
-    fileName = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+    m_fileName = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
   }
-  readFile(fileName);
+  readFile(m_fileName);
 }
 
 EditView::EditView(QWidget * parent) : QWidget(parent) {
@@ -97,40 +99,33 @@ EditView::EditView(QWidget * parent) : QWidget(parent) {
   m_xsltEditor = new EditPage(EDIT_XSLT,this);
   //  m_xsltEditor->setText(m_xslt.join("\n"));
   m_tabs->addTab(m_xsltEditor,tr("XSLT"));
-
+  m_buttons = new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
   layout->addWidget(m_tabs);
+  layout->addWidget(m_buttons);
+  connect(m_buttons,SIGNAL(accepted()),this,SLOT(accept()));
+  connect(m_buttons,SIGNAL(rejected()),this,SLOT(reject()));
   setLayout(layout);
 }
+void EditView::accept() {
+  qDebug() << Q_FUNC_INFO;
+  qDebug() << m_cssEditor->getText();
+}
+void EditView::reject() {
+  qDebug() << Q_FUNC_INFO;
+  m_cssEditor->restore();
+  m_xsltEditor->restore();
+  this->hide();
+}
+
+
+
 QSize EditView::sizeHint() const {
   return QSize(800,600);
 }
 void EditView::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-
-  settings->beginGroup("Entry");
-  m_cssFileName = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
-  m_css = readFile(m_cssFileName);
-  settings->endGroup();
   settings->beginGroup("EntryLayout");
   this->restoreGeometry(settings->value("Geometry").toByteArray());
   settings->endGroup();
-  settings->beginGroup("XSLT");
-  m_xsltFileName = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
-  m_xslt = readFile(m_xsltFileName);
-
-}
-QStringList EditView::readFile(const QString & name) {
-  QStringList lines;
-  QFile f(name);
-  if (! f.open(QIODevice::ReadOnly)) {
-    QLOG_WARN()  << QString(tr("Cannot open file %1:  %2")).arg(name).arg(f.errorString());
-    return lines;
-  }
-  QTextStream in(&f);
-  while(! in.atEnd()) {
-    lines << in.readLine();
-  }
-  f.close();
-  return lines;
 }

@@ -22,17 +22,19 @@ class EditPage : public QWidget {
 
  public:
   EditPage(int type,QWidget * parent = 0);
-  void setText(const QString &);
+  QString getText() const;
   public slots:
     void onClicked(QAbstractButton *);
     void onTextChanged();
+    void restore();
  private:
     void readSettings();
     void readFile(const QString &);
     void apply();
     void reset();
-    void restore();
+
     int m_type;
+    QString m_fileName;
     QStringList m_lines;
     QPlainTextEdit * m_text;
     QCheckBox * m_useOther;
@@ -44,17 +46,16 @@ class EditView : public QWidget {
   Q_OBJECT
  public:
   EditView(QWidget * parent = 0);
+  public slots:
+    void accept();
+    void reject();
  protected:
   QSize sizeHint() const;
  private:
   EditPage * m_cssEditor;
   EditPage * m_xsltEditor;
   void readSettings();
-  QStringList readFile(const QString &);
   QTabWidget * m_tabs;
-  QString m_cssFileName;
-  QString m_xsltFileName;
-  QStringList m_css;
-  QStringList m_xslt;
+  QDialogButtonBox * m_buttons;
 };
 #endif
