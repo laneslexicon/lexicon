@@ -27,6 +27,7 @@
 #include "externs.h"
 #include "historylist.h"
 #include "fontchangedialog.h"
+#include "editview.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -37,6 +38,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_history = 0;
   m_revertEnabled = false;
   m_entryLayout = NULL;
+  m_editView = NULL;
   m_mapper = im_new();
   m_logview = NULL;
   createActions();
@@ -285,6 +287,10 @@ void LanesLexicon::cleanup() {
   if (m_entryLayout != NULL) {
     delete m_entryLayout;
     m_entryLayout = 0;
+  }
+  if (m_editView != NULL){
+    delete m_editView;
+    m_editView = 0;
   }
 
   if (m_logview != NULL) {
@@ -1618,9 +1624,15 @@ void LanesLexicon::onTest() {
       .arg(p.getNode())
       .arg(p.getSupplement());
   }
+  if (0) {
   FontChangeDialog * d = new FontChangeDialog(this);
   d->exec();
   delete d;
+  }
+  if (m_editView == 0) {
+    m_editView = new EditView;
+  }
+  m_editView->show();
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");

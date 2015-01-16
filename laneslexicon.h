@@ -63,6 +63,7 @@ class GraphicsEntry;
 class ContentsWidget;
 class TabWidget;
 class EntryLayoutWidget;
+class EditView;
 class LogViewer;
 class LanesLexicon : public QMainWindow
 {
@@ -306,6 +307,7 @@ class LanesLexicon : public QMainWindow
       TabWidget * m_tabs;
       QDockWidget * m_treeDock;
       EntryLayoutWidget * m_entryLayout;
+      EditView * m_editView;
       LogViewer * m_logview;
 
 
