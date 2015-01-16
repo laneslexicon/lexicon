@@ -42,7 +42,8 @@ class EditPage : public QWidget {
     QCheckBox * m_useOther;
     QDialogButtonBox * m_buttons;
  signals:
-      void apply(int,bool);
+    void apply(int,bool);
+    void modified(int,bool);
 
 
 };
@@ -54,6 +55,7 @@ class EditView : public QWidget {
     void accept();
     void reject();
     void apply(int,bool);
+    void modified(int,bool);
  protected:
   QSize sizeHint() const;
  private:
@@ -62,6 +64,8 @@ class EditView : public QWidget {
   void readSettings();
   QTabWidget * m_tabs;
   QDialogButtonBox * m_buttons;
+  bool m_cssModified;
+  bool m_xsltModified;
  signals:
       void reload(const QString &,const QString &);
 };

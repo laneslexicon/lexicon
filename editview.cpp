@@ -15,13 +15,16 @@ EditPage::EditPage(int type,QWidget * parent) : QWidget(parent) {
     m_useOther = new QCheckBox(tr("Use edited CSS"));
   }
 
-  m_buttons =   new QDialogButtonBox(QDialogButtonBox::Apply|QDialogButtonBox::Reset|QDialogButtonBox::RestoreDefaults,this);
+  m_buttons =   new QDialogButtonBox(QDialogButtonBox::Apply|QDialogButtonBox::RestoreDefaults,this);
   connect(m_buttons,SIGNAL(clicked(QAbstractButton *)),this,SLOT(onClicked(QAbstractButton *)));
+  connect(m_text,SIGNAL(textChanged()),this,SLOT(onTextChanged()));
+
   layout->addWidget(m_text);
   layout->addWidget(m_useOther);
   layout->addWidget(m_buttons);
   setLayout(layout);
   this->restore();
+  //  m_buttons->button(QDialogButtonBox::Reset)->setEnabled(false);
 }
 QString EditPage::getText() const {
   return m_text->toPlainText();
@@ -35,13 +38,16 @@ void EditPage::apply() {
   emit(apply(m_type,m_useOther->isChecked()));
 }
 void EditPage::reset() {
-
+  m_text->setPlainText(m_lines.join("\n"));
+  //  m_buttons->button(QDialogButtonBox::Reset)->setEnabled(false);
 }
 void EditPage::restore() {
   qDebug() << Q_FUNC_INFO;
   m_lines.clear();
   this->readFile(m_fileName);
   m_text->setPlainText(m_lines.join("\n"));
+  //  m_buttons->button(QDialogButtonBox::Reset)->setEnabled(false);
+  emit(modified(m_type,false));
 }
 
 void EditPage::onClicked(QAbstractButton * btn) {
@@ -63,6 +69,8 @@ void EditPage::onClicked(QAbstractButton * btn) {
   }
 }
 void EditPage::onTextChanged() {
+  //  m_buttons->button(QDialogButtonBox::Reset)->setEnabled(true);
+  emit(modified(m_type,true));
 }
 void EditPage::readFile(const QString & name) {
   QFile f(name);
@@ -106,11 +114,11 @@ EditView::EditView(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   m_tabs = new QTabWidget;
 
-  m_cssEditor = new EditPage(EDIT_CSS,this);
+  m_cssEditor = new EditPage(EDIT_CSS);
   //  m_cssEditor->setText(m_css.join("\n"));
   m_tabs->addTab(m_cssEditor,tr("CSS"));
 
-  m_xsltEditor = new EditPage(EDIT_XSLT,this);
+  m_xsltEditor = new EditPage(EDIT_XSLT);
   //  m_xsltEditor->setText(m_xslt.join("\n"));
   m_tabs->addTab(m_xsltEditor,tr("XSLT"));
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
@@ -121,6 +129,12 @@ EditView::EditView(QWidget * parent) : QWidget(parent) {
 
   connect(m_cssEditor,SIGNAL(apply(int,bool)),this,SLOT(apply(int,bool)));
   connect(m_xsltEditor,SIGNAL(apply(int,bool)),this,SLOT(apply(int,bool)));
+  connect(m_cssEditor,SIGNAL(modified(int,bool)),this,SLOT(modified(int,bool)));
+  connect(m_xsltEditor,SIGNAL(modified(int,bool)),this,SLOT(modified(int,bool)));
+  m_cssModified = false;
+  m_xsltModified = false;
+  m_buttons->button(QDialogButtonBox::Save)->setEnabled(m_cssModified || m_xsltModified);
+
   setLayout(layout);
 }
 void EditView::accept() {
@@ -134,7 +148,15 @@ void EditView::reject() {
   //  m_xsltEditor->restore();
   this->hide();
 }
-
+void EditView::modified(int type,bool isDirty) {
+  if (type == EDIT_CSS) {
+    m_cssModified = isDirty;
+  }
+  if (type == EDIT_XSLT) {
+    m_xsltModified = isDirty;
+  }
+  m_buttons->button(QDialogButtonBox::Save)->setEnabled(m_cssModified || m_xsltModified);
+}
 
 
 QSize EditView::sizeHint() const {
