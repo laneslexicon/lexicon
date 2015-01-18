@@ -127,6 +127,8 @@ class LanesLexicon : public QMainWindow
       void onFirstPage();
       void onLastPage();
 
+      void onDefaultScale();
+
       void searchForWord();
       void searchForPage();
       void searchForNode();
@@ -387,6 +389,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_syncFromContentsAction;
       QAction * m_syncFromEntryAction;
       QAction * m_aboutAction;
+      QAction * m_defaultScaleAction;
 
       HistoryMaster * m_history;
       NoteMaster * m_notes;

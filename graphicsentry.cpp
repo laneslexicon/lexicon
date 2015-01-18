@@ -63,7 +63,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   /// 0 = paging forward, items are appended
   /// 1 = paging backward, items are prepended
   m_pagingDir = 0;
-  m_scale = 1.0;
+  //  m_scale = 1.5;
 
   m_scene = new QGraphicsScene(this);
   m_view = new QGraphicsView(m_scene,this);
@@ -74,12 +74,6 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_view->setAlignment(Qt::AlignTop);
   m_highlightCount = 0;
   m_findCount = 0;
-
-
-  //  connect(m_view,SIGNAL(nextPage()),this,SLOT(nextPageRequested()));
-  //  connect(m_view,SIGNAL(backPage()),this,SLOT(prevPageRequested()));
-
-
 
   m_view->setInteractive(true);
   //  m_view->setAlignment(Qt::AlignLeft);
@@ -184,6 +178,10 @@ void GraphicsEntry::readSettings() {
   m_dumpOutputHtml = settings->value(SID_ENTRY_DUMP_OUTPUT_HTML,false).toBool();
 
   m_showLinkWarning = settings->value(SID_ENTRY_SHOW_LINK_WARNING,true).toBool();
+
+  qDebug() << "scale" << m_scale;
+  m_scale = settings->value(SID_ENTRY_SCALE,1.0).toDouble();
+  qDebug() << "scale after" << m_scale;
   settings->endGroup();
 
   settings->beginGroup("XSLT");
@@ -1177,15 +1175,17 @@ QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xm
   clearParseErrors();
   return QString();
 }
-void GraphicsEntry::onZoomIn() {
+qreal GraphicsEntry::onZoomIn() {
   m_view->setTransform(m_transform);
   m_scale += .1;
   m_view->scale(m_scale,m_scale);
+  return m_scale;
 }
-void GraphicsEntry::onZoomOut() {
+qreal GraphicsEntry::onZoomOut() {
   m_view->setTransform(m_transform);
   m_scale -= .1;
   m_view->scale(m_scale,m_scale);
+  return m_scale;
 }
 void GraphicsEntry::setScale(qreal v, bool use) {
   m_scale = v;

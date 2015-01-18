@@ -91,8 +91,8 @@ class GraphicsEntry : public QWidget {
     void linkActivated(const QString &);
     void linkHovered(const QString &);
     void anchorTest();
-    void onZoomIn();
-    void onZoomOut();
+    qreal onZoomIn();
+    qreal onZoomOut();
     void onReload();
     void onReload(const QString & css,const QString & xslt);
     void onClearScene();

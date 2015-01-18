@@ -41,6 +41,7 @@ They should not be translated.
 #define SID_ENTRY_MOVE_FOCUS_DOWN "Move focus down"
 #define SID_ENTRY_NARROW  "Narrow"
 #define SID_ENTRY_RELOAD    "Reload"
+#define SID_ENTRY_SCALE   "Scale"
 #define SID_ENTRY_SHOW    "Show"
 #define SID_ENTRY_STEP    "Step"
 #define SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR "Supplement background color"

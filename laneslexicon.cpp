@@ -772,6 +772,8 @@ void LanesLexicon::createActions() {
   m_syncFromEntryAction = new QAction(tr("Align contents with entry"),this);
   m_syncFromContentsAction = new QAction(tr("Align entry with contents"),this);
 
+  m_defaultScaleAction = new QAction(tr("Set default zoom"),this);
+
   connect(m_syncFromEntryAction,SIGNAL(triggered()),this,SLOT(syncFromEntry()));
   connect(m_syncFromContentsAction,SIGNAL(triggered()),this,SLOT(syncFromContents()));
 
@@ -784,6 +786,7 @@ void LanesLexicon::createActions() {
   connect(m_localSearchNextAction,SIGNAL(triggered()),this,SLOT(localSearchNext()));
   connect(m_clearAction,SIGNAL(triggered()),this,SLOT(pageClear()));
   connect(m_convertToEntryAction,SIGNAL(triggered()),this,SLOT(convertToEntry()));
+  connect(m_defaultScaleAction,SIGNAL(triggered()),this,SLOT(onDefaultScale()));
 
 
 }
@@ -991,6 +994,9 @@ void LanesLexicon::createToolBar() {
   setTabOrder(m_narrowButton,m_printButton);
   setTabOrder(m_printButton,m_localSearchButton);
   setTabOrder(m_localSearchButton,m_localSearchNextButton);
+  setTabOrder(m_localSearchNextButton,m_clearButton);
+  setTabOrder(m_clearButton,m_syncLeftButton);
+  setTabOrder(m_syncLeftButton,m_syncRightButton);
 
   if (m_toolbarText) {
     m_exitButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -1142,6 +1148,7 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_syncFromContentsAction);
   m_viewMenu->addAction(m_syncFromEntryAction);
   m_viewMenu->addAction(m_linkAction);
+  m_viewMenu->addAction(m_defaultScaleAction);
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -3231,6 +3238,9 @@ void LanesLexicon::setIcons(const QString & theme) {
   iconfile = settings->value("Search",QString()).toString();
   setIcon(m_searchAction,imgdir,iconfile);
 
+  iconfile = settings->value("Zoom",QString()).toString();
+  setIcon(m_defaultScaleAction,imgdir,iconfile);
+
   iconfile = settings->value("ZoomIn",QString()).toString();
   setIcon(m_zoomInAction,imgdir,iconfile);
 
@@ -3410,4 +3420,8 @@ void LanesLexicon::enableForPage(bool v) {
   }
   m_pageMenu->setEnabled(v);
   m_moveMenu->setEnabled(v);
+}
+void LanesLexicon::onDefaultScale() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
 }
