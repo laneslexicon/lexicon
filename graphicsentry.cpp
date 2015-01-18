@@ -77,12 +77,13 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 
   m_view->setInteractive(true);
   //  m_view->setAlignment(Qt::AlignLeft);
-  /// TODO what is this for ?
+  ///
+  /*  TODO what is this for ? Commented out on 16th Jan
   m_item = new QGraphicsTextItem("");
   m_item->setTextInteractionFlags(Qt::TextBrowserInteraction);
   m_item->setTextWidth(m_textWidth);
   m_scene->addItem(m_item);
-
+  */
   // add the graphics viwe
   layout->addWidget(m_view);
 
@@ -90,10 +91,11 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   //  layout->addWidget(m_showPlace,0);
   m_nodeQuery = 0;
   setLayout(layout);
-
+  /*
   connect(m_item,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
   connect(m_item,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
 
+  */
   connect(m_scene,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
