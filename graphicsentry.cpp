@@ -637,6 +637,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   Place noplace;
   int supplement;
 
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("Entry");
+  m_scale  = settings->value("Zoom",1.0).toDouble();
 
   EntryItem * centerItem;
 
@@ -795,7 +798,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   ///
   m_view->setFocus();
   m_transform = m_view->transform();
-
+  this->setScale(m_scale);
   //QLOG_DEBUG() << "Scene rect" << m_scene->sceneRect();
   /// without thus centerOn() does not work properly for
   /// items added to the scene
@@ -860,6 +863,10 @@ Place GraphicsEntry::getPage(const Place & p) {
   if (m_clearScene) {
     onClearScene();
   }
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("Entry");
+  m_scale  = settings->value("Zoom",1.0).toDouble();
+
   QString lastRoot;
   // "select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource =  // 1 and page = ? order by nodenum asc");
 
