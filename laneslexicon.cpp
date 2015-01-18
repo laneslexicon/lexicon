@@ -2973,6 +2973,13 @@ void LanesLexicon::currentTabChanged(int ix) {
   this->enableForPage(false);
 
 }
+/**
+ * Searchs the tabs for the requested node
+ *
+ * @param node
+ *
+ * @return tab index if found, otherwise -1
+ */
 int LanesLexicon::searchTabs(const QString & node) {
   QLOG_DEBUG() << Q_FUNC_INFO << node;
   for(int i=0;i < m_tabs->count();i++) {

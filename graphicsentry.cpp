@@ -1448,14 +1448,17 @@ void GraphicsEntry::shiftFocus() {
     item = m_items[0];
   }
   if (item) {
-    QLOG_DEBUG() << "ensuring current node is visible";
-    //    this->setFocus();
     this->setCurrentItem(item);
-    //m_view->ensureVisible(item);
-    //    m_scene->setFocusItem(item);
   }
   return;
 }
+/**
+ * Sets the current item to the specified node.
+ * If not found, does nothing
+ * @param node
+ *
+ * @return true when node found, false otherwise
+ */
 bool GraphicsEntry::focusNode(const QString & node) {
   if (node.isEmpty()) {
     return true;
@@ -1464,16 +1467,10 @@ bool GraphicsEntry::focusNode(const QString & node) {
   for(int i=0;i < m_items.size();i++) {
     Place p = m_items[i]->getPlace();
     if (p.getNode() == node) {
-      //      m_view->ensureVisible(m_items[i]);
-      //      m_view->setFocus();
-      //      m_scene->setFocus();
-      //      m_scene->setFocusItem(m_items[i]);
-      //      m_items[i]->setSelected(true);
       this->setCurrentItem(m_items[i]);
       return true;
     }
   }
-  QLOG_DEBUG() << "focusNode failed, cannot find node" << node;
   return false;
 }
 /**
@@ -1541,7 +1538,11 @@ void GraphicsEntry::addButtonDecoration(bool ok) {
   }
 
 }
-
+/**
+ * Will set the current item (gives focus etc) to the pages Place
+ * If is is a headword/node, that gets focus other the first item
+ * on the page gets it. (Which should be the root)
+ */
 void GraphicsEntry::focusPlace() {
   Place p = this->getPlace();
   if (! p.getNode().isEmpty()) {
@@ -1549,13 +1550,12 @@ void GraphicsEntry::focusPlace() {
     return;
   }
   else {
-    QLOG_DEBUG() << "setting focus through shiftFocus()";
     this->shiftFocus();
   }
 }
 /**
- * TODO Do we want to keep the contents tree in sync ?
- *
+ * gives the item the focus, makes sure its in the view and,
+ * if the contents are linked, keeps the tree in sync
  * @param item
  */
 void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
@@ -1568,9 +1568,7 @@ void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
   if (entry) {
     m_place = entry->getPlace();
     updateCurrentPlace(m_place);
-    //    emit(placeChanged(m_place));
   }
-
 }
 /**
  * This uses different default search options from the other search routines
