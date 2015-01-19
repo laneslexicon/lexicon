@@ -27,6 +27,7 @@
 #include "externs.h"
 #include "historylist.h"
 #include "fontchangedialog.h"
+#include "zoomdialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -3430,5 +3431,14 @@ void LanesLexicon::enableForPage(bool v) {
 }
 void LanesLexicon::onDefaultScale() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("Entry");
+  qreal scale  = settings->value("Zoom",1.0).toDouble();
+  ZoomDialog * d = new ZoomDialog(scale);
+  if (d->exec()) {
+    if (d->value() != scale) {
+      settings->setValue("Zoom",d->value());
+    }
+  }
+  delete d;
 }
