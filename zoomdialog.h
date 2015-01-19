@@ -11,5 +11,7 @@ class ZoomDialog : public QDialog {
   double value();
  private:
   QDoubleSpinBox * m_spinner;
+ signals:
+    void valueChanged(double);
 };
 #endif

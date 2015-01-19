@@ -1,4 +1,5 @@
 #include "zoomdialog.h"
+#include "graphicsentry.h"
 ZoomDialog::ZoomDialog(qreal v,QWidget * parent) : QDialog(parent) {
   setWindowTitle(tr("Adjust default zoom"));
   QVBoxLayout * layout = new QVBoxLayout;
@@ -13,7 +14,7 @@ ZoomDialog::ZoomDialog(qreal v,QWidget * parent) : QDialog(parent) {
   setLayout(layout);
   connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
-
+  connect(m_spinner,SIGNAL(valueChanged(double)),this,SIGNAL(valueChanged(double)));
 }
 double ZoomDialog::value() {
   return m_spinner->value();

@@ -93,6 +93,7 @@ class GraphicsEntry : public QWidget {
     void anchorTest();
     qreal onZoomIn();
     qreal onZoomOut();
+    void onZoom(double);
     void onReload();
     void onReload(const QString & css,const QString & xslt);
     void onClearScene();

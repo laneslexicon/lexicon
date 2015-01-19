@@ -1184,6 +1184,17 @@ QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xm
   clearParseErrors();
   return QString();
 }
+/**
+ * This is called when the user is setting the default scale
+ *
+ * @param v
+ */
+void GraphicsEntry::onZoom(double v) {
+  m_view->setTransform(m_transform);
+  m_scale = v;
+  m_view->scale(m_scale,m_scale);
+  return;
+}
 qreal GraphicsEntry::onZoomIn() {
   m_view->setTransform(m_transform);
   m_scale += .1;

@@ -3435,6 +3435,11 @@ void LanesLexicon::onDefaultScale() {
   settings->beginGroup("Entry");
   qreal scale  = settings->value("Zoom",1.0).toDouble();
   ZoomDialog * d = new ZoomDialog(scale);
+
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    connect(d,SIGNAL(valueChanged(double)),entry,SLOT(onZoom(double)));
+  }
   if (d->exec()) {
     if (d->value() != scale) {
       settings->setValue("Zoom",d->value());
