@@ -3429,6 +3429,10 @@ void LanesLexicon::enableForPage(bool v) {
   m_pageMenu->setEnabled(v);
   m_moveMenu->setEnabled(v);
 }
+/**
+ * set the default scaling factor and apply it to the current tab widget
+ * if appropriate
+ */
 void LanesLexicon::onDefaultScale() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
@@ -3437,12 +3441,19 @@ void LanesLexicon::onDefaultScale() {
   ZoomDialog * d = new ZoomDialog(scale);
 
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  qreal entryScale = 0;
   if (entry) {
     connect(d,SIGNAL(valueChanged(double)),entry,SLOT(onZoom(double)));
+    entryScale = entry->getScale();
   }
   if (d->exec()) {
     if (d->value() != scale) {
       settings->setValue("Zoom",d->value());
+    }
+  }
+  else {
+    if (entryScale > 0) {
+      entry->setScale(entryScale);
     }
   }
   delete d;
