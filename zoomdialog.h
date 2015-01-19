@@ -4,6 +4,7 @@
 #include <QDoubleSpinBox>
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
+#include <QCheckBox>
 class ZoomDialog : public QDialog {
   Q_OBJECT
  public:
@@ -11,6 +12,9 @@ class ZoomDialog : public QDialog {
   double value();
  private:
   QDoubleSpinBox * m_spinner;
+  QCheckBox * m_applyZoom;
+ private slots:
+  void applyChanged(int);
  signals:
     void valueChanged(double);
 };
