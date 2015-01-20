@@ -68,7 +68,6 @@ SOURCES += main.cpp\
         nodeview.cpp \
         splashscreen.cpp \
         about.cpp \
-        entrylayoutwidget.cpp \
         logviewer.cpp \
         version.cpp \
         htmldelegate.cpp \
@@ -102,7 +101,6 @@ HEADERS  += laneslexicon.h \
             about.h \
             definedsettings.h \
             externs.h \
-            entrylayoutwidget.h \
             logviewer.h \
             version.h \
             htmldelegate.h \
