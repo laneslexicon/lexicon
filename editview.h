@@ -17,6 +17,7 @@
 #include <QTextStream>
 #include <QGroupBox>
 #include <QDebug>
+#include <QMessageBox>
 class EditPage : public QWidget {
   Q_OBJECT
 
@@ -24,7 +25,7 @@ class EditPage : public QWidget {
   EditPage(int type,QWidget * parent = 0);
   QString getText() const;
   QString getOriginalText() const;
-  void writeFile();
+  bool writeFile();
   public slots:
     void onClicked(QAbstractButton *);
     void onTextChanged();

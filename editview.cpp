@@ -84,17 +84,28 @@ void EditPage::readFile(const QString & name) {
   }
   f.close();
 }
-void EditPage::writeFile() {
+bool EditPage::writeFile() {
   QFile f(m_fileName);
   if (! f.open(QIODevice::WriteOnly)) {
-        QLOG_WARN() << QString(tr("Cannot open file %1 for writing: %2"))
-          .arg(m_fileName).
-          arg(qPrintable(f.errorString()));
-        return;
+    qDebug() << "File" << m_fileName;
+    QString msg = QString(tr("Cannot open file %1 for writing: %2\n")).arg(m_fileName).arg(qPrintable(f.errorString()));
+    QString title;
+    if (m_type == EDIT_CSS) {
+      title = tr("Edit CSS");
+    }
+    else {
+      title = tr("Edit XSLT");
+    }
+    QMessageBox::warning(this,
+                         title,
+                         msg + "\n" + tr("Unable to save changes.\nYou may wish to copy the text and save outside the application."),
+                         QMessageBox::Ok);
+    return false;
   }
   QTextStream out(&f);
   out << m_text->toPlainText();
   f.close();
+  return true;
 }
 
 void EditPage::readSettings() {
@@ -108,8 +119,13 @@ void EditPage::readSettings() {
   }
   readFile(m_fileName);
 }
-
+/**
+ * EditView
+ *
+ * @param parent
+ */
 EditView::EditView(QWidget * parent) : QWidget(parent) {
+  setWindowTitle(tr("CSS/XSLT Editor"));
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_tabs = new QTabWidget;
@@ -139,8 +155,12 @@ EditView::EditView(QWidget * parent) : QWidget(parent) {
 }
 void EditView::accept() {
   qDebug() << Q_FUNC_INFO;
-  m_cssEditor->writeFile();
-  m_xsltEditor->writeFile();
+  if (m_cssEditor->writeFile() &&
+      m_xsltEditor->writeFile()) {
+    m_buttons->button(QDialogButtonBox::Save)->setEnabled(false);
+    return;
+  }
+
 }
 void EditView::reject() {
   qDebug() << Q_FUNC_INFO;
