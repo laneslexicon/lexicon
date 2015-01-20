@@ -20,7 +20,6 @@
 #include "fullsearch.h"
 #include "headsearch.h"
 #include "definedsettings.h"
-#include "entrylayoutwidget.h"
 #include "optionsdialog.h"
 #include "logviewer.h"
 #include "about.h"
@@ -28,6 +27,7 @@
 #include "historylist.h"
 #include "fontchangedialog.h"
 #include "zoomdialog.h"
+#include "editview.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -37,7 +37,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_ok = false;
   m_history = 0;
   m_revertEnabled = false;
-  m_entryLayout = NULL;
+  m_editView = NULL;
   m_mapper = im_new();
   m_logview = NULL;
   createActions();
@@ -283,9 +283,9 @@ void LanesLexicon::cleanup() {
   if (m_notesDb.isOpen())
     m_notesDb.close();
 
-  if (m_entryLayout != NULL) {
-    delete m_entryLayout;
-    m_entryLayout = 0;
+  if (m_editView != NULL){
+    delete m_editView;
+    m_editView = 0;
   }
 
   if (m_logview != NULL) {
@@ -1561,14 +1561,11 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
 }
 void LanesLexicon::onEditView() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  if (m_entryLayout != NULL) {
-    m_entryLayout->show();
-    return;
+  if (m_editView == 0) {
+    m_editView = new EditView;
+    connect(m_editView,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
   }
-  m_entryLayout  = new EntryLayoutWidget();
-  connect(m_entryLayout,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
-  connect(m_entryLayout,SIGNAL(revert()),this,SLOT(revertEntry()));
-  m_entryLayout->show();
+  m_editView->show();
 }
 void LanesLexicon::onLogViewer() {
   if (m_logview == NULL) {
@@ -1626,9 +1623,17 @@ void LanesLexicon::onTest() {
       .arg(p.getNode())
       .arg(p.getSupplement());
   }
+  if (0) {
   FontChangeDialog * d = new FontChangeDialog(this);
   d->exec();
   delete d;
+  }
+  if (m_editView == 0) {
+    m_editView = new EditView;
+    connect(m_editView,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
+  }
+
+  m_editView->show();
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");

@@ -68,7 +68,6 @@ SOURCES += main.cpp\
         nodeview.cpp \
         splashscreen.cpp \
         about.cpp \
-        entrylayoutwidget.cpp \
         logviewer.cpp \
         version.cpp \
         htmldelegate.cpp \
@@ -76,7 +75,9 @@ SOURCES += main.cpp\
         nodeinfo.cpp \
         fontchangedialog.cpp \
         arabicfontdialog.cpp \
-        zoomdialog.cpp
+        zoomdialog.cpp \
+        editview.cpp
+
 
 HEADERS  += laneslexicon.h \
             contentswidget.h \
@@ -102,7 +103,6 @@ HEADERS  += laneslexicon.h \
             about.h \
             definedsettings.h \
             externs.h \
-            entrylayoutwidget.h \
             logviewer.h \
             version.h \
             htmldelegate.h \
@@ -110,4 +110,5 @@ HEADERS  += laneslexicon.h \
             nodeinfo.h \
             fontchangedialog.h \
             arabicfontdialog.h \
-            zoomdialog.h
+            zoomdialog.h \
+            editview.h
