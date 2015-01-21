@@ -104,16 +104,19 @@ int main(int argc, char *argv[])
     QCommandLineOption nosaveOption(QStringList() << "x" << "no-save","do not save the settings");
     parser.addOption(nosaveOption);
 
-    QCommandLineOption notabsOption(QStringList() << "t" << "no-restore","do not restore tabs");
+    QCommandLineOption notabsOption(QStringList() << "s" << "no-restore","do not restore tabs");
     parser.addOption(notabsOption);
+
+    QCommandLineOption themeOption(QStringList() << "t" << "theme","use given theme","theme");
+    parser.addOption(themeOption);
 
     QCommandLineOption textWidthOption(QStringList() << "w" << "text-width","set textwidth","textwidth");
     parser.addOption(textWidthOption);
 
-    QCommandLineOption nosplashOption(QStringList() << "s" << "no-splash","do not show splash screen");
+    QCommandLineOption nosplashOption(QStringList() << "p" << "no-splash","do not show splash screen");
     parser.addOption(nosplashOption);
 
-    QCommandLineOption debugOption(QStringList() << "b" << "debug","set debug option");
+    QCommandLineOption debugOption(QStringList() << "v" << "debug","set debug option");
     parser.addOption(debugOption);
 
     // Process the actual command line arguments
@@ -147,6 +150,9 @@ int main(int argc, char *argv[])
     }
     if (parser.isSet(langOption)) {
       options.insert(langOption.valueName(),parser.value(langOption));
+    }
+    if (parser.isSet(themeOption)) {
+      options.insert(themeOption.valueName(),parser.value(themeOption));
     }
     if (parser.isSet(nosaveOption)) {
       options.insert("nosave","");
