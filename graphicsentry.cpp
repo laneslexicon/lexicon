@@ -79,6 +79,8 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   //  m_view->setAlignment(Qt::AlignLeft);
   ///
   /*  TODO what is this for ? Commented out on 16th Jan
+      (adding the dummy item)
+
   m_item = new QGraphicsTextItem("");
   m_item->setTextInteractionFlags(Qt::TextBrowserInteraction);
   m_item->setTextWidth(m_textWidth);
@@ -470,6 +472,8 @@ void GraphicsEntry::linkActivated(const QString & link) {
     }
   }
   else {
+    /// TODO check this is no longer used
+    QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "NOSHOW activate link";
     QString node(link);
     /// remove the leading #
     node.remove(0,1);

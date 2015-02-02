@@ -114,7 +114,7 @@ FullSearchWidget::~FullSearchWidget() {
 }
 
 void FullSearchWidget::itemChanged(QTableWidgetItem * /* item */,QTableWidgetItem * /* prev */) {
-  QLOG_DEBUG() << Q_FUNC_INFO << "we should not be here";
+  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "NOSHOW we should not be here";
 /*  bool isHead = false;
   /// get the node
   item = item->tableWidget()->item(item->row(),NODE_COLUMN);
