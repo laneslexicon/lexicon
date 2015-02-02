@@ -15,6 +15,7 @@ class Lexicon : public QApplication {
 public:
   Lexicon(int & argc, char ** argv);
   enum Status { Ok, ResourceDirError, NoThemeDirectory, ThemeNotFound , SettingsNotFound};
+  enum Resource { Stylesheet, Image,XSLT,Keyboard,Map };
   QString getConfig() const;
   void setOptions(const QMap<QString,QString> &);
   QMap<QString,QString> getOptions() const;
@@ -25,21 +26,23 @@ public:
   bool isOk() const;
   int setTheme(const QString &);
   void scanForFonts(const QDir &);
+  QString getResource(int type,const QString & name);
   QString spanArabic(const QString &,const QString & which = QString());
   QString scanAndSpan(const QString &,const QString & css = QString("ar"));
   QDir themeDirectory() { return m_settingsDir; }
   QString imageDirectory();
   void startLogging();
+  QString takeLastError();
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:
-  QString m_configFile;
-  QString m_showFirst;
-  QString m_themeDirectory;
-  QString m_currentTheme;
-  QDir m_settingsDir;
-
-  int m_status;
-  QMap<QString,QString> m_options;
+    QStringList m_errors;
+    QString m_configFile;
+    QString m_showFirst;
+    QString m_themeDirectory;
+    QString m_currentTheme;
+    QDir m_settingsDir;
+    int m_status;
+    QMap<QString,QString> m_options;
 };
 #endif

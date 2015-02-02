@@ -55,9 +55,57 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
 bool Lexicon::isOk() const {
   return (m_status == Lexicon::Ok);
 }
+QString Lexicon::getResource(int type, const QString & name) {
+  QFile file;
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Resources");
+  QString d(".");
+  switch(type) {
+  case Lexicon::Stylesheet : {
+    d = settings.value("Stylesheet","css").toString();
+    break;
+  }
+  case Lexicon::Image : {
+    d = settings.value("Image","images").toString();
+    break;
+  }
+  case Lexicon::XSLT : {
+    d = settings.value("XSLT","xslt").toString();
+    break;
+  }
+  case Lexicon::Keyboard : {
+    d = settings.value("Keyboard","keyboards").toString();
+    break;
+  }
+  case Lexicon::Map : {
+    d = settings.value("Map","maps").toString();
+    break;
+  }
+  default : { break; }
+  }
+  if (m_settingsDir.exists(d)) {
+    QDir rd = m_settingsDir;
+    rd.cd(d);
+    QFileInfo r(rd,name);
+    if (r.exists()) {
+      return r.absoluteFilePath();
+    }
+    else {
+      m_errors << QString(tr("Resource type %1 not found: %2")).arg(type).arg(name);
+    }
+  }
+  else {
+    m_errors << QString(tr("Settings directory not found: %1")).arg(m_settingsDir.absolutePath());
+  }
+  return QString();
+}
+QString Lexicon::takeLastError() {
+  return m_errors.takeLast();
+}
 QString Lexicon::imageDirectory() {
   QFileInfo f(m_settingsDir,m_configFile);
-  qDebug() << "config:" << f.absoluteFilePath();
   QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Icons");
@@ -125,6 +173,7 @@ int Lexicon::setTheme(const QString & theme) {
   }
   m_currentTheme = theme;
   m_settingsDir = d;
+  return Lexicon::Ok;
 }
 void Lexicon::setOptions(const QMap<QString,QString> & options) {
   m_options = options;

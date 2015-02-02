@@ -639,9 +639,15 @@ void LanesLexicon::setupShortcuts() {
  *
  */
 void LanesLexicon::loadStyleSheet() {
-  QFile f(m_applicationCssFile);
+  QString filename = getLexicon()->getResource(Lexicon::Stylesheet,m_applicationCssFile);
+  if (filename.isEmpty()) {
+    QString err = getLexicon()->takeLastError();
+    QLOG_WARN() << QString(tr("Unable to open stylesheet: %1")).arg(err);
+    return;
+  }
+  QFile f(filename);
   if ( ! f.open(QIODevice::ReadOnly)) {
-    QLOG_WARN() << "Unable to open stylesheet" << m_applicationCssFile;
+    QLOG_WARN() << QString(tr("Error opening stylesheet: %1")).arg(filename);
     return;
   }
   QTextStream in(&f);
