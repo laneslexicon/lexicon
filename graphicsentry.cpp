@@ -190,7 +190,11 @@ void GraphicsEntry::readSettings() {
 
   settings->beginGroup("XSLT");
   m_entryXslt = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+  m_entryXslt = getLexicon()->getResource(Lexicon::XSLT,m_entryXslt);
+
   m_nodeXslt = settings->value(SID_XSLT_NODE,QString("node.xslt")).toString();
+  m_nodeXslt = getLexicon()->getResource(Lexicon::XSLT,m_nodeXslt);
+
   settings->endGroup();
 
   settings->beginGroup("Notes");
@@ -587,10 +591,18 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,bool createTab,
  */
 QString GraphicsEntry::readCssFromFile(const QString & name) {
   QString css;
-  QFile f(name);
+  QString filename = getLexicon()->getResource(Lexicon::Stylesheet,name);
+  if (filename.isEmpty()) {
+    QString err = getLexicon()->takeLastError();
+    QLOG_WARN() << QString(tr("Unable to open entry stylesheet: %1")).arg(err);
+    return css;
+  }
+
+  QFile f(filename);
   if (! f.open(QIODevice::ReadOnly)) {
-    QLOG_WARN()  << "Cannot open CSS file for reading: " << name
-                 << f.errorString();
+    QLOG_WARN()  << QString(tr("I/O Error opening CSS file for reading: %1 - %2"))
+      .arg(filename)
+      .arg(f.errorString());
     return css;
   }
   QTextStream in(&f);
@@ -1961,9 +1973,15 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
     statusMessage(QString(tr("PDF created: %1")).arg(printer.outputFileName()));
   }
 }
+/**
+ * reread the CSS file from QSettings and therefore disk
+ * and reread  the name of the XSLT file
+ *
+ * The readCssFromFile function use the Lexicon->getResource to look in the
+ * the correct directory.
+ */
 void GraphicsEntry::onReload() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  /// TODO reload CSS
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Entry");
   m_debug = settings->value(SID_ENTRY_DEBUG,false).toBool();
@@ -1981,7 +1999,7 @@ void GraphicsEntry::onReload() {
   settings->endGroup();
   settings->beginGroup("XSLT");
   m_entryXslt = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
-
+  m_entryXslt = getLexicon()->getResource(Lexicon::XSLT,m_entryXslt);
   QString html;
   for (int i=0;i < m_items.size();i++) {
     html = transform(ENTRY_XSLT_RECOMPILE,m_entryXslt,m_items[i]->getXml());
