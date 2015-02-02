@@ -100,7 +100,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   setupShortcuts();
   setupBookmarkShortcuts();
 
-
   setIcons(m_iconTheme);
   createMenus();
   createToolBar();
@@ -3191,33 +3190,21 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
  *
  * @param theme
  */
-void LanesLexicon::setIcons(const QString & theme) {
+void LanesLexicon::setIcons(const QString & /* theme */) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  QStringList groups = settings->childGroups();
-  QString icongroup;
-  if (theme.isEmpty()) {
-    icongroup = "Icons-Default";
-  }
-  else {
-    icongroup = QString("Icons-%1").arg(theme);
-  }
-  if (! groups.contains(icongroup)) {
-    QLOG_WARN() << QString(tr("Theme not found:%1")).arg(theme);
-    return;
-  }
-  settings->beginGroup(icongroup);
 
-  QString imgdir = settings->value("Directory","images").toString();
+  QString imgdir = getLexicon()->imageDirectory();
   QFileInfo fi(imgdir);
   if (! fi.exists()) {
-    QLOG_WARN() << "theme directory not found" << imgdir;
+    QLOG_WARN() << QString(tr("Theme image directory not found : %1")).arg(imgdir);
     return;
   }
   if (! fi.isDir()) {
-    QLOG_WARN() << "theme directory is not a directory" << imgdir;
+    QLOG_WARN() << QString(tr("Theme image directory is not a directory: %1")).arg(imgdir);
     return;
   }
-
+  settings->beginGroup("Icons");
   QString iconfile;
 
   iconfile = settings->value("Exit",QString()).toString();

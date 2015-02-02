@@ -5,6 +5,7 @@
 Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QString resourceDir;
   m_status = Lexicon::Ok;
+  m_configFile = "settings.ini";
 #ifdef __APPLE__
   resourceDir = QCoreApplication::applicationDirPath() + "/../Resources";
 #else
@@ -49,9 +50,21 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
     m_status = Lexicon::ThemeNotFound;
     return;
   }
+  m_settingsDir = d;
 }
 bool Lexicon::isOk() const {
   return (m_status == Lexicon::Ok);
+}
+QString Lexicon::imageDirectory() {
+  QFileInfo f(m_settingsDir,m_configFile);
+  qDebug() << "config:" << f.absoluteFilePath();
+  QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Icons");
+  QString imageDirectory = settings.value("Directory","images").toString();
+  QFileInfo img(m_settingsDir,imageDirectory);
+  return img.absoluteFilePath();
+
 }
 void Lexicon::startLogging() {
   QSettings * settings = getSettings();
@@ -91,20 +104,35 @@ void Lexicon::startLogging() {
 QString Lexicon::getConfig() const {
   return m_configFile;
 }
+/*
 void Lexicon::setConfig(const QString & fileName) {
   QFileInfo fi(fileName);
   if (fi.exists()) {
     m_configFile = fileName;
   }
 }
-
+*/
+int Lexicon::setTheme(const QString & theme) {
+  QDir d = QDir::current();
+  if (! d.cd(m_themeDirectory)) {
+    return Lexicon::NoThemeDirectory;
+  }
+  if (! d.cd(theme)) {
+    return Lexicon::ThemeNotFound;
+  }
+  if (! d.exists(m_configFile)) {
+    return Lexicon::SettingsNotFound;
+  }
+  m_currentTheme = theme;
+  m_settingsDir = d;
+}
 void Lexicon::setOptions(const QMap<QString,QString> & options) {
   m_options = options;
   if (m_options.contains("config")) {
     m_configFile = m_options.value("config");
   }
   else {
-    m_configFile = "default.ini";
+    m_configFile = "settings.ini";
   }
 }
 QMap<QString,QString> Lexicon::getOptions() const  {
@@ -115,7 +143,8 @@ QSettings * Lexicon::getSettings() {
   if (m_configFile.isEmpty()) {
     return new QSettings;
   }
-  QSettings * settings = new QSettings(m_configFile,QSettings::IniFormat);
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings * settings = new QSettings(f.absoluteFilePath(),QSettings::IniFormat);
   settings->setIniCodec("UTF-8");
   return settings;
 }

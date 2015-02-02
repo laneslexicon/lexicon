@@ -47,7 +47,9 @@ int random_in_range (unsigned int min, unsigned int max)
     return random_in_range(min, max);
   }
 }
-
+Lexicon * getLexicon() {
+  return qobject_cast<Lexicon *>(qApp);
+}
 LanesLexicon * getApp() {
   foreach(QWidget *widget, qApp->topLevelWidgets()) {
     if(widget->inherits("QMainWindow"))
