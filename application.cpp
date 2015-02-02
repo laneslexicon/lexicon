@@ -4,7 +4,7 @@
 #include "version.h"
 Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QString resourceDir;
-  m_ok = true;
+  m_status = Lexicon::Ok;
 #ifdef __APPLE__
   resourceDir = QCoreApplication::applicationDirPath() + "/../Resources";
 #else
@@ -14,13 +14,10 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   if ( ! QDir::setCurrent(resourceDir)) {
     QString errmsg  = QString(QObject::tr("Warning failed to change application working directory to : %1")).arg(resourceDir);
     std::cout << errmsg.toLocal8Bit().data() << std::endl;
-    m_ok = false;
+    m_status = Lexicon::ResourceDirError;
   }
   QDir fonts(resourceDir + "/fonts");
-  if (! fonts.exists()) {
-    QLOG_DEBUG() << "No font directory";
-  }
-  else {
+  if (fonts.exists()) {
     scanForFonts(fonts);
   }
 
@@ -32,6 +29,29 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QCoreApplication::setApplicationVersion(buildVersion());
 
   connect(this,SIGNAL(focusChanged(QWidget *,QWidget *)),this,SLOT(onFocusChange(QWidget *,QWidget *)));
+
+  QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
+  settings->beginGroup("System");
+  m_themeDirectory = settings->value("Theme directory","themes").toString();
+  m_currentTheme =  settings->value("Theme","oxygen").toString();
+  /// check the theme directory exists
+  QDir d = QDir::current();
+  if (! d.cd(m_themeDirectory)) {
+    QString errmsg  = QString(QObject::tr("Warning: Theme directory not found : %1")).arg(m_themeDirectory);
+    std::cout << errmsg.toLocal8Bit().data() << std::endl;
+    m_status = Lexicon::NoThemeDirectory;
+    return;
+  }
+  /// check the theme exists
+  if (!d.cd(m_currentTheme)) {
+    QString errmsg  = QString(QObject::tr("Warning: specified theme directory not found : %1")).arg(m_currentTheme);
+    std::cout << errmsg.toLocal8Bit().data() << std::endl;
+    m_status = Lexicon::ThemeNotFound;
+    return;
+  }
+}
+bool Lexicon::isOk() const {
+  return (m_status == Lexicon::Ok);
 }
 void Lexicon::startLogging() {
   QSettings * settings = getSettings();

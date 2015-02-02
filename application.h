@@ -14,6 +14,7 @@ class Lexicon : public QApplication {
   Q_OBJECT;
 public:
   Lexicon(int & argc, char ** argv);
+  enum Status { Ok, ResourceDirError, NoThemeDirectory, ThemeNotFound };
   QString getConfig() const;
   void setOptions(const QMap<QString,QString> &);
   QMap<QString,QString> getOptions() const;
@@ -21,7 +22,7 @@ public:
   QVariant getValue(const QString & group,const QString & key);
   bool     getBool(const QString & group,const QString & key);
   void setConfig(const QString & fileName);
-  bool isOk() { return m_ok;}
+  bool isOk() const;
   void scanForFonts(const QDir &);
   QString spanArabic(const QString &,const QString & which = QString());
   QString scanAndSpan(const QString &,const QString & css = QString("ar"));
@@ -31,7 +32,9 @@ public:
  private:
   QString m_configFile;
   QString m_showFirst;
-  bool m_ok;
+  QString m_themeDirectory;
+  QString m_currentTheme;
+  int m_status;
   QMap<QString,QString> m_options;
 };
 #endif
