@@ -24,6 +24,7 @@ class KeyboardWidget : public QDialog {
 
  public:
   KeyboardWidget(QWidget * parent = 0);
+  KeyboardWidget(const QString & keyboardDir,const QString & configname,QWidget * parent = 0);
   void setTarget(QWidget * w) { m_target = w;};
   void loadDefinitions(const QString & targetScript = QString());
   bool isAttached();
@@ -43,8 +44,10 @@ class KeyboardWidget : public QDialog {
    void detach();
    void onKeyboardShortcut();
  private:
+   void setup();
    void readSettings();
    QString m_keyboardDirectory;
+   QString m_keyboardConfig;
    QString m_defaultKeyboard;
    bool m_keepAspectRatio;
    QSize m_currentSize;

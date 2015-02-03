@@ -6,6 +6,16 @@
  * @param parent
  */
 KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
+  m_keyboardConfig = "keyboard.ini";
+  m_keyboardDirectory = ".";
+  this->setup();
+}
+KeyboardWidget::KeyboardWidget(const QString & d,const QString & config,QWidget * parent) : QDialog(parent) {
+  m_keyboardConfig = config;
+  m_keyboardDirectory = d;
+  this->setup();
+}
+void KeyboardWidget::setup() {
   m_target = 0;
   setWindowTitle(tr("Virtual Keyboard"));
   readSettings();
@@ -56,32 +66,40 @@ QSize KeyboardWidget::sizeHint() const {
 
   return QSize(800,300);
 }
+/**
+ * Load all the <keyboar name>.ini files in the keyboard directory that support the
+ * requested script
+ *
+ * @param targetScript
+ */
 void KeyboardWidget::loadDefinitions(const QString & targetScript) {
   bool ok;
-  QDir d(QDir::current().absolutePath() + QDir::separator() + "keyboards");
+  QDir d(m_keyboardDirectory); //QDir::current().absolutePath() + QDir::separator() + "keyboards");
   QStringList files = d.entryList(QDir::Files | QDir::Readable);
   for(int i=0;i < files.size();i++) {
     if (files[i].endsWith(".ini")) {
-      QString name;
-      QString file = d.absolutePath() + QDir::separator() + files[i];
-      ok = false;
-      QSettings settings(file,QSettings::IniFormat);
-      settings.setIniCodec("UTF-8");
-      if (settings.childGroups().contains("Header")) {
-        settings.beginGroup("Header");
-        name = settings.value("name",QString()).toString();
-        QString script = settings.value("script",QString()).toString();
-        settings.endGroup();
-        if ( ! name.isEmpty()) {
-          if ( targetScript.isEmpty()) {
-            ok = true;
-          }
-          else  if (script == targetScript) {
+      if (files[i] != m_keyboardConfig) {
+        QString name;
+        QString file = d.absolutePath() + QDir::separator() + files[i];
+        ok = false;
+        QSettings settings(file,QSettings::IniFormat);
+        settings.setIniCodec("UTF-8");
+        if (settings.childGroups().contains("Header")) {
+          settings.beginGroup("Header");
+          name = settings.value("name",QString()).toString();
+          QString script = settings.value("script",QString()).toString();
+          settings.endGroup();
+          if ( ! name.isEmpty()) {
+            if ( targetScript.isEmpty()) {
               ok = true;
+            }
+            else  if (script == targetScript) {
+              ok = true;
+            }
           }
-        }
-        if (ok) {
-          m_keyboards->addItem(name,file);
+          if (ok) {
+            m_keyboards->addItem(name,file);
+          }
         }
       }
     }
@@ -167,10 +185,11 @@ void KeyboardWidget::virtualKeyPressed(int k) {
   QApplication::postEvent(m_target,event);
 }
 void KeyboardWidget::readSettings() {
-  QSettings settings("keyboard.ini",QSettings::IniFormat);
+  qDebug() << Q_FUNC_INFO << m_keyboardDirectory << m_keyboardConfig;
+  QFileInfo fi(m_keyboardDirectory,m_keyboardConfig);
+  QSettings settings(fi.absoluteFilePath(),QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("System");
-  m_keyboardDirectory = settings.value("location","keyboards").toString();
   m_defaultKeyboard = settings.value("default",QString()).toString();
   m_keepAspectRatio = settings.value("keep aspect ratio",false).toBool();
   settings.endGroup();

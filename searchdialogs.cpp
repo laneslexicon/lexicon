@@ -3,7 +3,9 @@
 #include "namespace.h"
 #include "searchoptionswidget.h"
 #include "laneslexicon.h"
-extern LanesLexicon * getApp();
+#include "externs.h"
+extern Lexicon * getLexicon();
+
 ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   m_searchType = searchType;
@@ -30,8 +32,8 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_count = 0;
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
+
+  QSettings * settings = qobject_cast<Lexicon *>(qApp)->getSettings();
   m_edit->readSettings(settings);
   m_edit->activateMap(getApp()->getActiveKeymap(),true);
   m_prompt->setBuddy(m_edit);
@@ -110,7 +112,14 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_edit->setFocus();
 
   m_attached = false;
-  m_keyboard = new KeyboardWidget(this);
+
+  QScopedPointer<QSettings> ksettings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  ksettings->beginGroup("Keyboards");
+  QString keyboardConfig = ksettings->value("Config","keyboard.ini").toString();
+
+  m_keyboard = new KeyboardWidget(getLexicon()->getResourcePath(Lexicon::Keyboard),keyboardConfig,this);
+
+  //  m_keyboard = new KeyboardWidget(this);
   QList<QAbstractButton *> buttons = m_buttonBox->buttons();
   for(int i=0;i < buttons.size();i++) {
     QString k = buttons[i]->shortcut().toString();
