@@ -1,6 +1,7 @@
 #include "editview.h"
 #include "application.h"
 #include "definedsettings.h"
+extern Lexicon * getLexicon();
 #define EDIT_CSS 0
 #define EDIT_XSLT 1
 EditPage::EditPage(int type,QWidget * parent) : QWidget(parent) {
@@ -87,7 +88,7 @@ void EditPage::readFile(const QString & name) {
 bool EditPage::writeFile() {
   QFile f(m_fileName);
   if (! f.open(QIODevice::WriteOnly)) {
-    qDebug() << "File" << m_fileName;
+    qDebug() << Q_FUNC_INFO << m_fileName;
     QString msg = QString(tr("Cannot open file %1 for writing: %2\n")).arg(m_fileName).arg(qPrintable(f.errorString()));
     QString title;
     if (m_type == EDIT_CSS) {
@@ -113,9 +114,12 @@ void EditPage::readSettings() {
   settings->beginGroup("Entry");
   if (m_type == EDIT_CSS) {
     m_fileName = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
+    m_fileName = getLexicon()->getResourcePath(Lexicon::Stylesheet,m_fileName);
   }
   else {
     m_fileName = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+    m_fileName = getLexicon()->getResourcePath(Lexicon::XSLT,m_fileName);
+
   }
   readFile(m_fileName);
 }
