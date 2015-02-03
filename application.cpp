@@ -203,13 +203,15 @@ QSettings * Lexicon::getSettings() {
   return settings;
 }
 QVariant Lexicon::getValue(const QString & group,const QString & key) {
-  QSettings s(m_configFile,QSettings::IniFormat);
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings s(f.absoluteFilePath(),QSettings::IniFormat);
   s.setIniCodec("UTF-8");
   s.beginGroup(group);
   return s.value(key);
 }
 bool Lexicon::getBool(const QString & group,const QString & key) {
-  QSettings s(m_configFile,QSettings::IniFormat);
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings s(f.absoluteFilePath(),QSettings::IniFormat);
   s.setIniCodec("UTF-8");
   s.beginGroup(group);
   return s.value(key).toBool();
@@ -333,7 +335,8 @@ QString Lexicon::scanAndSpan(const QString & str,const QString & css) {
  * @return
  */
 QString Lexicon::spanArabic(const QString & ar,const QString & spanstyle) {
-  QSettings s(m_configFile,QSettings::IniFormat);
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings s(f.absoluteFilePath(),QSettings::IniFormat);
   s.setIniCodec("UTF-8");
   if ( ! spanstyle.isEmpty() ) {
     s.beginGroup("SpannedArabic");

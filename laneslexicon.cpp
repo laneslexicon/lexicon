@@ -1225,7 +1225,7 @@ void LanesLexicon::createStatusBar() {
   m_placeIndicator->setObjectName("placeindicator");
 
   m_keymapsButton = new QToolButton(this);
-  QStringList maps =  m_definedMaps;//m_mapper->getMaps();
+  QStringList maps =  m_definedMaps;
   maps << m_nullMap;
   QMenu * menu = new QMenu(this);
   for(int i=0;i < maps.size();i++) {
@@ -2550,6 +2550,10 @@ void LanesLexicon::setStatus(const QString & txt) {
   QLOG_INFO() << txt;
   statusBar()->showMessage(txt);
 }
+/**
+ * Use the spanArabic function to set the font
+ *
+ */
 void LanesLexicon::updateStatusBar() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   QString headseparator;
