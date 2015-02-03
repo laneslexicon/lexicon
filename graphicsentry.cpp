@@ -156,6 +156,8 @@ void GraphicsEntry::readSettings() {
     m_supplementBg = QColor::fromRgb(211,211,211);
   }
   m_clearScene = settings->value(SID_ENTRY_CLEAR_SCENE,true).toBool();
+
+
   /// these are set to empty to disable the feature
   m_moveFocusUpKey = settings->value(SID_ENTRY_MOVE_FOCUS_UP,QString()).toString();
   m_moveFocusDownKey = settings->value(SID_ENTRY_MOVE_FOCUS_DOWN,QString()).toString();
@@ -236,6 +238,10 @@ void GraphicsEntry::readSettings() {
   settings->beginGroup("System");
   m_linksUseCurrentTab = settings->value(SID_SYSTEM_OPEN_LINK,true).toBool();
   m_activateLink = settings->value(SID_SYSTEM_ACTIVATE_LINK,true).toBool();
+  settings->endGroup();
+  settings->beginGroup("Icons");
+  m_notesIcon = settings->value("Notes","notes-0.xpm").toString();
+  m_notesIcon = getLexicon()->getResourcePath(Lexicon::Image,m_notesIcon);
 
 }
 void GraphicsEntry::writeDefaultSettings() {
@@ -1129,7 +1135,7 @@ void GraphicsEntry::appendEntries(int startPos) {
       btny = ypos;// + sz.height();
 
       ToolButtonData  * notesBtn = new ToolButtonData(i);
-      notesBtn->setIcon(QIcon("notes-0.xpm"));
+      notesBtn->setIcon(QIcon(m_notesIcon));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
@@ -1177,7 +1183,7 @@ void GraphicsEntry::prependEntries(int startPos) {
       btnx = xpos + m_items[i]->boundingRect().width();
       btny = ypos;// + sz.height();
       ToolButtonData  * notesBtn = new ToolButtonData(i);
-      notesBtn->setIcon(QIcon("notes-0.xpm"));
+      notesBtn->setIcon(QIcon(m_notesIcon));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
@@ -1579,7 +1585,7 @@ void GraphicsEntry::addButtonDecoration(bool ok) {
       btny = pos.y();// + sz.height();
 
       ToolButtonData  * notesBtn = new ToolButtonData(i);
-      notesBtn->setIcon(QIcon("notes-0.xpm"));
+      notesBtn->setIcon(QIcon(m_notesIcon));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
