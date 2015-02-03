@@ -55,6 +55,14 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
 bool Lexicon::isOk() const {
   return (m_status == Lexicon::Ok);
 }
+/**
+ * Returns the absolute path to the requested file
+ *
+ * @param type
+ * @param name If empty return the path to the directory of the required item type
+ *
+ * @return
+ */
 QString Lexicon::getResourcePath(int type, const QString & name) {
   QFile file;
   QFileInfo f(m_settingsDir,m_configFile);
@@ -88,6 +96,9 @@ QString Lexicon::getResourcePath(int type, const QString & name) {
   if (m_settingsDir.exists(d)) {
     QDir rd = m_settingsDir;
     rd.cd(d);
+    if (name.isEmpty()) {
+      return rd.absolutePath();
+    }
     QFileInfo r(rd,name);
     if (r.exists()) {
       return r.absoluteFilePath();
@@ -109,7 +120,14 @@ QString Lexicon::takeLastError() {
   }
   return QString();
 }
+/**
+ * This is not required
+ *
+ *
+ * @return
+ */
 QString Lexicon::imageDirectory() {
+  qDebug() << Q_FUNC_INFO << "NOSHOW we should not be here";
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
   settings.setIniCodec("UTF-8");

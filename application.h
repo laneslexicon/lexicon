@@ -26,7 +26,7 @@ public:
   bool isOk() const;
   int setTheme(const QString &);
   void scanForFonts(const QDir &);
-  QString getResourcePath(int type,const QString & name);
+  QString getResourcePath(int type,const QString & name = QString());
   QString spanArabic(const QString &,const QString & which = QString());
   QString scanAndSpan(const QString &,const QString & css = QString("ar"));
   QDir themeDirectory() { return m_settingsDir; }
