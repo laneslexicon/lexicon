@@ -26,17 +26,21 @@ public:
   bool isOk() const;
   int setTheme(const QString &);
   void scanForFonts(const QDir &);
-  QString getResource(int type,const QString & name);
+  QString getResourcePath(int type,const QString & name);
   QString spanArabic(const QString &,const QString & which = QString());
   QString scanAndSpan(const QString &,const QString & css = QString("ar"));
   QDir themeDirectory() { return m_settingsDir; }
   QString imageDirectory();
+  QString errorPath() const { return m_errorFilePath; }
+  QString errorFile() const { return m_errorFile; }
   void startLogging();
   QString takeLastError();
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:
     QStringList m_errors;
+    QString m_errorFilePath;
+    QString m_errorFile;
     QString m_configFile;
     QString m_showFirst;
     QString m_themeDirectory;

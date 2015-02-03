@@ -127,10 +127,12 @@ void GraphicsEntry::readSettings() {
   m_debug = settings->value(SID_ENTRY_DEBUG,false).toBool();
   QString css = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
   css = readCssFromFile(css);
+  /// if there are errors, readCssFromFile will show them
   if (! css.isEmpty()) {
     m_currentCss = css;
     emit(cssChanged());
   }
+
   css = settings->value(SID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
   css = readCssFromFile(css);
   if (! css.isEmpty()) {
@@ -190,10 +192,27 @@ void GraphicsEntry::readSettings() {
 
   settings->beginGroup("XSLT");
   m_entryXslt = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
-  m_entryXslt = getLexicon()->getResource(Lexicon::XSLT,m_entryXslt);
-
+  m_entryXslt = getLexicon()->getResourcePath(Lexicon::XSLT,m_entryXslt);
+  if (m_entryXslt.isEmpty()) {
+    /// TODO tidy this message box
+    QString err = getLexicon()->takeLastError();
+    QMessageBox msgBox;
+    QStringList errs;
+    errs << QString(tr("Missing file:%1")).arg(getLexicon()->errorFile());
+    errs << QString(tr("Location:%1")).arg(getLexicon()->errorPath());
+    errs << tr("Not much is going to work without this file");
+    msgBox.setText(errs.join("\n"));
+    msgBox.setInformativeText(err);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
+    QLOG_WARN() << QString(tr("Cannot find required entry XSLT file: %1")).arg(getLexicon()->takeLastError());
+  }
   m_nodeXslt = settings->value(SID_XSLT_NODE,QString("node.xslt")).toString();
-  m_nodeXslt = getLexicon()->getResource(Lexicon::XSLT,m_nodeXslt);
+  m_nodeXslt = getLexicon()->getResourcePath(Lexicon::XSLT,m_nodeXslt);
+  if (m_nodeXslt.isEmpty()) {
+    QLOG_WARN() << QString(tr("Cannot find required node XSLT file: %1")).arg(getLexicon()->takeLastError());
+  }
 
   settings->endGroup();
 
@@ -591,7 +610,7 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,bool createTab,
  */
 QString GraphicsEntry::readCssFromFile(const QString & name) {
   QString css;
-  QString filename = getLexicon()->getResource(Lexicon::Stylesheet,name);
+  QString filename = getLexicon()->getResourcePath(Lexicon::Stylesheet,name);
   if (filename.isEmpty()) {
     QString err = getLexicon()->takeLastError();
     QLOG_WARN() << QString(tr("Unable to open entry stylesheet: %1")).arg(err);
@@ -1999,7 +2018,7 @@ void GraphicsEntry::onReload() {
   settings->endGroup();
   settings->beginGroup("XSLT");
   m_entryXslt = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
-  m_entryXslt = getLexicon()->getResource(Lexicon::XSLT,m_entryXslt);
+  m_entryXslt = getLexicon()->getResourcePath(Lexicon::XSLT,m_entryXslt);
   QString html;
   for (int i=0;i < m_items.size();i++) {
     html = transform(ENTRY_XSLT_RECOMPILE,m_entryXslt,m_items[i]->getXml());

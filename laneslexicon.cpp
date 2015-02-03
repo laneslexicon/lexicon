@@ -639,7 +639,7 @@ void LanesLexicon::setupShortcuts() {
  *
  */
 void LanesLexicon::loadStyleSheet() {
-  QString filename = getLexicon()->getResource(Lexicon::Stylesheet,m_applicationCssFile);
+  QString filename = getLexicon()->getResourcePath(Lexicon::Stylesheet,m_applicationCssFile);
   if (filename.isEmpty()) {
     QString err = getLexicon()->takeLastError();
     QLOG_WARN() << QString(tr("Unable to open stylesheet: %1")).arg(err);

@@ -55,7 +55,7 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
 bool Lexicon::isOk() const {
   return (m_status == Lexicon::Ok);
 }
-QString Lexicon::getResource(int type, const QString & name) {
+QString Lexicon::getResourcePath(int type, const QString & name) {
   QFile file;
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
@@ -93,7 +93,9 @@ QString Lexicon::getResource(int type, const QString & name) {
       return r.absoluteFilePath();
     }
     else {
-      m_errors << QString(tr("Resource type %1 not found: %2")).arg(type).arg(name);
+      m_errorFilePath = rd.absolutePath();
+      m_errorFile = name;
+      m_errors << QString(tr("Resource not found: %1")).arg(name);
     }
   }
   else {
@@ -102,7 +104,10 @@ QString Lexicon::getResource(int type, const QString & name) {
   return QString();
 }
 QString Lexicon::takeLastError() {
-  return m_errors.takeLast();
+  if (m_errors.size() > 0) {
+    return m_errors.takeLast();
+  }
+  return QString();
 }
 QString Lexicon::imageDirectory() {
   QFileInfo f(m_settingsDir,m_configFile);
