@@ -1791,14 +1791,15 @@ void LanesLexicon::readSettings() {
   for(int i=0; i < groups.size();i++) {
     settings->beginGroup(groups[i]);
     v = settings->value("file",QString()).toString();
+    v = getLexicon()->getResourcePath(Lexicon::Map,v);
     QFile file(v);
     if ( file.exists() ) {
       if (! im_load_map_from_json(m_mapper,v.toUtf8().constData(),groups[i].toUtf8().constData())) {
-        QLOG_WARN() << QString(tr("Could not load <%1> from file <%2>")).arg(groups[i]).arg(v);
+        QLOG_WARN() << QString(tr("Error loading <%1> from file <%2>")).arg(groups[i]).arg(v);
       }
       else {
         m_definedMaps << groups[i];
-          }
+      }
     }
     else {
       QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(groups[i]).arg(v);
