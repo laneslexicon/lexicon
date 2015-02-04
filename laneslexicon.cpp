@@ -1225,7 +1225,7 @@ void LanesLexicon::createStatusBar() {
   m_placeIndicator->setObjectName("placeindicator");
 
   m_keymapsButton = new QToolButton(this);
-  QStringList maps =  m_definedMaps;
+  QStringList maps =  m_maps.keys();
   maps << m_nullMap;
   QMenu * menu = new QMenu(this);
   for(int i=0;i < maps.size();i++) {
@@ -1798,7 +1798,7 @@ void LanesLexicon::readSettings() {
         QLOG_WARN() << QString(tr("Error loading <%1> from file <%2>")).arg(groups[i]).arg(v);
       }
       else {
-        m_definedMaps << groups[i];
+        m_maps.insert(groups[i],v);
       }
     }
     else {
@@ -1807,7 +1807,7 @@ void LanesLexicon::readSettings() {
     settings->endGroup();
   }
   settings->endGroup();
-  if ((m_currentMap != m_nullMap) && ! m_definedMaps.contains(m_currentMap) ) {
+  if ((m_currentMap != m_nullMap) && ! m_maps.contains(m_currentMap) ) {
     QLOG_WARN() << QString(tr("Default map <%1> not found in settings")).arg(m_currentMap);
   }
 }
@@ -3113,6 +3113,12 @@ void LanesLexicon::enableKeymaps(bool v) {
 }
 QString LanesLexicon::getActiveKeymap() const {
   return m_currentMap;
+}
+QString LanesLexicon::getKeymapFileName(const QString & mapname) const {
+  if (m_maps.contains(mapname)) {
+    return m_maps.value(mapname);
+  }
+  return QString();
 }
 void LanesLexicon::deleteSearch() {
   //  if (! p.isValid()) {

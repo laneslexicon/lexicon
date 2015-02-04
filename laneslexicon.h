@@ -78,6 +78,7 @@ class LanesLexicon : public QMainWindow
   bool isOk() { return m_ok;}
   QString convertString(const QString &) const;
   QString getActiveKeymap() const;
+  QString getKeymapFileName(const QString &) const;
   HistoryMaster * history();
   NoteMaster * notes();
   public slots:
@@ -281,7 +282,7 @@ class LanesLexicon : public QMainWindow
 
       InputMapper * m_mapper;
 
-      QStringList m_definedMaps;
+      QMap<QString,QString> m_maps;
 
       QSignalMapper * m_signalMapper;
       QSignalMapper * m_bookmarkMap;

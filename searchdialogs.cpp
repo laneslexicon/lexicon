@@ -33,9 +33,14 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
 
-  QSettings * settings = qobject_cast<Lexicon *>(qApp)->getSettings();
-  m_edit->readSettings(settings);
-  m_edit->activateMap(getApp()->getActiveKeymap(),true);
+  //  QSettings * settings = qobject_cast<Lexicon *>(qApp)->getSettings();
+  //  m_edit->readSettings(settings);
+  QString mapname = getApp()->getActiveKeymap();
+  QString mapfile = getApp()->getKeymapFileName(mapname);
+  if (! mapfile.isEmpty()) {
+    m_edit->loadMap(mapfile,mapname);
+    m_edit->activateMap(mapname,true);
+  }
   m_prompt->setBuddy(m_edit);
   m_findButton = new QPushButton(tr("&Find"));
   m_findButton->setDefault(true);

@@ -29,9 +29,16 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   //QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
-  QSettings * settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
-  m_findTarget->readSettings(settings);
-  m_findTarget->activateMap(getApp()->getActiveKeymap(),true);
+  QString mapname = getApp()->getActiveKeymap();
+  QString mapfile = getApp()->getKeymapFileName(mapname);
+  if (! mapfile.isEmpty()) {
+    m_findTarget->loadMap(mapfile,mapname);
+    m_findTarget->activateMap(mapname,true);
+  }
+
+  //  QSettings * settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
+  //  m_findTarget->readSettings(settings);
+  //  m_findTarget->activateMap(getApp()->getActiveKeymap(),true);
 
   m_findButton = new QPushButton(tr("F&ind"));
   m_findButton->setDefault(true);

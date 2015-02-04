@@ -26,6 +26,7 @@ QString ImLineEdit::getNullMap() const {
   return m_nullMap;
 }
 bool ImLineEdit::loadMap(const QString & filename,const QString & mapname) {
+  qDebug() << Q_FUNC_INFO << filename << mapname;
   QFile f(filename);
   if (!f.open(QIODevice::ReadOnly)) {
     // TODO emit(logMessage(QString("Error loading file %1: %2 ").arg(fileName).arg(f.errorString())));
