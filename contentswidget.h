@@ -55,6 +55,7 @@ class ContentsWidget : public QTreeWidget {
   QString m_moveUp;
   QString m_moveDown;
   QString m_expand;
+  QString m_dragIconFileName;
   QFont m_itypeFont;
   QPoint m_startPos;
  protected:

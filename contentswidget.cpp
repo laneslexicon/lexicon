@@ -6,7 +6,7 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QPixmap>
-
+extern Lexicon * getLexicon();
 #define ROOT_COLUMN 0
 #define WORD_COLUMN 1
 #define HEADWORD_COLUMN 2
@@ -74,6 +74,11 @@ void ContentsWidget::readSettings() {
   m_moveDown = settings->value(SID_CONTENTS_MOVE_DOWN,"s").toString();
   m_moveUp = settings->value(SID_CONTENTS_MOVE_UP,"w").toString();
   m_expand = settings->value(SID_CONTENTS_EXPAND," ").toString();
+
+  settings->endGroup();
+  settings->beginGroup("Icons");
+  QString dragicon = settings->value("Insert link","insert-link.png").toString();
+  m_dragIconFileName = getLexicon()->getResourcePath(Lexicon::Image,dragicon);
   delete settings;
 }
 void ContentsWidget::loadContents() {
@@ -458,8 +463,9 @@ void ContentsWidget::mouseMoveEvent(QMouseEvent * event) {
           .arg(item->text(NODE_COLUMN))
           .arg(item->text(WORD_COLUMN));
         mimeData->setText(t);
-          QDrag * drag = new QDrag(this);
-        drag->setPixmap(QPixmap("insert-link.png"));
+        QDrag * drag = new QDrag(this);
+
+        drag->setPixmap(QPixmap(m_dragIconFileName));
         drag->setMimeData(mimeData);
         if (drag->exec(Qt::LinkAction) == Qt::LinkAction) {
           QLOG_DEBUG() << "Linked ok";
