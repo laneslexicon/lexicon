@@ -67,6 +67,7 @@ void ImLineEdit::shortcutActivated() {
 /**
  * NB this deletes settings
  *
+ * It no longer loads the maps, but only sets up the shortcut
  * @param settings
  */
 void ImLineEdit::readSettings(QSettings * settings) {
@@ -83,10 +84,10 @@ void ImLineEdit::readSettings(QSettings * settings) {
   QStringList groups = settings->childGroups();
   for(int i=0;i < groups.size();i++) {
     settings->beginGroup(groups[i]);
-    QString file = settings->value("file",QString()).toString();
-    if (! file.isEmpty()) {
-      loadMap(file,groups[i]);
-    }
+    //   QString file = settings->value("file",QString()).toString();
+    //    if (! file.isEmpty()) {
+    //      loadMap(file,groups[i]);
+    //    }
     QString scut = settings->value("shortcut",QString()).toString();
     if (! scut.isEmpty()) {
       QKeySequence k = QKeySequence(scut);
