@@ -11,7 +11,6 @@ KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
   this->setup();
 }
 KeyboardWidget::KeyboardWidget(const QString & d,const QString & config,QWidget * parent) : QDialog(parent) {
-  qDebug() << Q_FUNC_INFO << d << config;
   m_keyboardConfig = config;
   m_keyboardDirectory = d;
   this->setup();
@@ -34,17 +33,12 @@ void KeyboardWidget::setup() {
   setLayout(layout);
 
   m_transform = m_view->transform();
-  //  m_view->loadKeyboard("keyboards/arabic1.ini");
-  //  this->autoScale();//  m_view->scale(0.5,0.5);
-  /// TODO find default keyboard and load it
 
   connect(m_view,SIGNAL(virtualKeyPressed(int)),this,SLOT(virtualKeyPressed(int)));
   connect(m_keyboards,SIGNAL(currentIndexChanged(int)),this,SLOT(loadKeyboard(int)));
 
   if (! m_defaultKeyboard.isEmpty()) {
     int ix = m_keyboards->findText(m_defaultKeyboard);
-    qDebug() << Q_FUNC_INFO << "loading default keyboard" << m_defaultKeyboard << ix;
-    fopen("/tmp/flag-setCurrentIndex","r");
     m_keyboards->setCurrentIndex(ix);
   }
 }
@@ -56,7 +50,6 @@ void KeyboardWidget::addShortcut(const QString & keys) {
   //  emit(keyboardShortcut());
 }
 void KeyboardWidget::onKeyboardShortcut() {
-  qDebug() << Q_FUNC_INFO;
   QAction * action = qobject_cast<QAction *>(sender());
   if (action) {
     qDebug() << Q_FUNC_INFO << action->shortcut().toString();
@@ -80,7 +73,7 @@ QSize KeyboardWidget::sizeHint() const {
  */
 void KeyboardWidget::loadDefinitions(const QString & targetScript) {
   bool ok;
-  QDir d(m_keyboardDirectory); //QDir::current().absolutePath() + QDir::separator() + "keyboards");
+  QDir d(m_keyboardDirectory);
   QStringList files = d.entryList(QDir::Files | QDir::Readable);
   for(int i=0;i < files.size();i++) {
     if (files[i].endsWith(".ini")) {
@@ -89,7 +82,6 @@ void KeyboardWidget::loadDefinitions(const QString & targetScript) {
         QString file = d.absolutePath() + QDir::separator() + files[i];
         ok = false;
         QSettings settings(file,QSettings::IniFormat);
-        qDebug() << Q_FUNC_INFO << settings.fileName();
         settings.setIniCodec("UTF-8");
         if (settings.childGroups().contains("Header")) {
           settings.beginGroup("Header");
@@ -137,18 +129,6 @@ void KeyboardWidget::autoScale() {
   else
     m_view->fitInView(m_view->sceneRect(), Qt::IgnoreAspectRatio);
 }
-/*
-void KeyboardWidget::zoomIn() {
-  m_view->setTransform(m_transform);
-  m_scale += .1;
-  m_view->scale(m_scale,m_scale);
-}
-void KeyboardWidget::zoomOut() {
-  m_view->setTransform(m_transform);
-  m_scale -= .1;
-  m_view->scale(m_scale,m_scale);
-}
-*/
 void KeyboardWidget::showKeyboard() {
   this->show();
   //  this->raise();
@@ -164,18 +144,6 @@ void KeyboardWidget::attach(QWidget * w) {
   m_target = w;
   showKeyboard();
   emit(attached());
-  /*
-  if (m_target == w) {
-    m_target = 0;
-    this->hide();
-    this->lower();
-  }
-  else {
-    m_target = w;
-    setFocusProxy(m_target);
-    showKeyboard();
-  }
-  */
 }
 void KeyboardWidget::detach() {
   m_target = 0;
