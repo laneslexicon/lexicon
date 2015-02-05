@@ -36,8 +36,8 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
     m_findTarget->activateMap(mapname,true);
   }
 
-  //  QSettings * settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
-  //  m_findTarget->readSettings(settings);
+  QSettings * settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
+  m_findTarget->readSettings(settings);
   //  m_findTarget->activateMap(getApp()->getActiveKeymap(),true);
 
   m_findButton = new QPushButton(tr("F&ind"));

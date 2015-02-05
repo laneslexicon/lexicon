@@ -33,8 +33,10 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
 
-  //  QSettings * settings = qobject_cast<Lexicon *>(qApp)->getSettings();
-  //  m_edit->readSettings(settings);
+  /// TODO change the way this works - having the ImLineEdit delete the settings *
+  /// not good
+  QSettings * settings = qobject_cast<Lexicon *>(qApp)->getSettings();
+  m_edit->readSettings(settings);
   QString mapname = getApp()->getActiveKeymap();
   QString mapfile = getApp()->getKeymapFileName(mapname);
   if (! mapfile.isEmpty()) {
@@ -117,14 +119,16 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_edit->setFocus();
 
   m_attached = false;
+  /**
+   * initialise the KeyboardWidget telling where the keyboard definitions are and the
+   * name of the config file (which tells it what the default one is).
+   */
 
   QScopedPointer<QSettings> ksettings((qobject_cast<Lexicon *>(qApp))->getSettings());
   ksettings->beginGroup("Keyboards");
   QString keyboardConfig = ksettings->value("Config","keyboard.ini").toString();
-
   m_keyboard = new KeyboardWidget(getLexicon()->getResourcePath(Lexicon::Keyboard),keyboardConfig,this);
 
-  //  m_keyboard = new KeyboardWidget(this);
   QList<QAbstractButton *> buttons = m_buttonBox->buttons();
   for(int i=0;i < buttons.size();i++) {
     QString k = buttons[i]->shortcut().toString();
