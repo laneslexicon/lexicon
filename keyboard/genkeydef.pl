@@ -64,6 +64,16 @@ key up color=
 keyboard color=
 EOH
 
+my $charcodes = <<EOC;
+Escape=0x01000000
+Tab=0x01000001
+Backtab=0x01000002
+Backspace=0x01000003
+Return=0x01000004
+Enter=0x01000005
+Insert=0x01000006
+Delete=0x01000007
+EOC
 
 getopts("o:i:");
 #
@@ -97,6 +107,9 @@ if ($keyStartPos == -1) {
   }
   shift @lines;
 }
+push @ini, "[CharacterCodes]";
+push @ini, "$charcodes";
+
 # my $s = "4,2,ز:ظ";
 
 # my $t ="4,1,<Shift>,Shift,[sticky,type=level2]";
