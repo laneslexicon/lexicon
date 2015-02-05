@@ -52,14 +52,14 @@ class KeyboardWidget : public QDialog {
    bool m_keepAspectRatio;
    QSize m_currentSize;
    QPoint m_currentPosition;
-  QComboBox * m_keyboards;
-  KeyboardView * m_view;
-  qreal m_scale;
+   QComboBox * m_keyboards;
+   KeyboardView * m_view;
+   qreal m_scale;
 
-  QWidget * m_target;
-  QTransform m_transform;
-  void autoScale();
-  signals:
+   QWidget * m_target;
+   QTransform m_transform;
+   void autoScale();
+ signals:
     void closed();
     void attached();
     void detached();

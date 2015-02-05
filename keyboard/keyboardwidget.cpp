@@ -11,6 +11,7 @@ KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
   this->setup();
 }
 KeyboardWidget::KeyboardWidget(const QString & d,const QString & config,QWidget * parent) : QDialog(parent) {
+  qDebug() << Q_FUNC_INFO << d << config;
   m_keyboardConfig = config;
   m_keyboardDirectory = d;
   this->setup();
@@ -23,6 +24,7 @@ void KeyboardWidget::setup() {
   m_keyboards = new QComboBox(this);
   m_view = new KeyboardView(this);
   m_view->setStyleSheet("border-style : 2px solid black");
+
   loadDefinitions();
   m_transform = m_view->transform();
   m_scale = 1.0;
@@ -39,8 +41,12 @@ void KeyboardWidget::setup() {
   connect(m_view,SIGNAL(virtualKeyPressed(int)),this,SLOT(virtualKeyPressed(int)));
   connect(m_keyboards,SIGNAL(currentIndexChanged(int)),this,SLOT(loadKeyboard(int)));
 
-  int ix = m_keyboards->findText(m_defaultKeyboard);
-  m_keyboards->setCurrentIndex(ix);
+  if (! m_defaultKeyboard.isEmpty()) {
+    int ix = m_keyboards->findText(m_defaultKeyboard);
+    qDebug() << Q_FUNC_INFO << "loading default keyboard" << m_defaultKeyboard << ix;
+    fopen("/tmp/flag-setCurrentIndex","r");
+    m_keyboards->setCurrentIndex(ix);
+  }
 }
 void KeyboardWidget::addShortcut(const QString & keys) {
   QAction * closeAction = new QAction(this);
@@ -83,6 +89,7 @@ void KeyboardWidget::loadDefinitions(const QString & targetScript) {
         QString file = d.absolutePath() + QDir::separator() + files[i];
         ok = false;
         QSettings settings(file,QSettings::IniFormat);
+        qDebug() << Q_FUNC_INFO << settings.fileName();
         settings.setIniCodec("UTF-8");
         if (settings.childGroups().contains("Header")) {
           settings.beginGroup("Header");
@@ -107,6 +114,7 @@ void KeyboardWidget::loadDefinitions(const QString & targetScript) {
 }
 void KeyboardWidget::loadKeyboard(int /*ix */) {
   QString name = m_keyboards->currentData().toString();
+  qDebug() << Q_FUNC_INFO << name;
   m_view->loadKeyboard(name);
   this->autoScale();
 }
@@ -188,10 +196,11 @@ void KeyboardWidget::readSettings() {
   qDebug() << Q_FUNC_INFO << m_keyboardDirectory << m_keyboardConfig;
   QFileInfo fi(m_keyboardDirectory,m_keyboardConfig);
   QSettings settings(fi.absoluteFilePath(),QSettings::IniFormat);
+  qDebug() << Q_FUNC_INFO << settings.fileName();
   settings.setIniCodec("UTF-8");
   settings.beginGroup("System");
-  m_defaultKeyboard = settings.value("default",QString()).toString();
-  m_keepAspectRatio = settings.value("keep aspect ratio",false).toBool();
+  m_defaultKeyboard = settings.value("Default",QString()).toString();
+  m_keepAspectRatio = settings.value("Keep aspect ratio",false).toBool();
   settings.endGroup();
 }
 QWidget * KeyboardWidget::target() const {

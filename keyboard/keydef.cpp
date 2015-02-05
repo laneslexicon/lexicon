@@ -95,7 +95,7 @@ int KeyDef::getValue() {
   }
   return -1;
 }
-void KeyDef::setValues(const QString & name,QSettings & settings,QSettings & specials) {
+void KeyDef::setValues(const QString & /* name */,QSettings & settings,QSettings & specials) {
   QRegExp lx("level(\\d+)");
   QRegExp gx("group(\\d+)");
   //  qDebug() << "Loading key" << name;
@@ -258,7 +258,7 @@ void KeyDef::setLevelValues(int group,int level,QSettings & settings,QSettings &
   }
 }
 /**
- *
+ * This is the keyboard, made up of rows/cols of  KeyDef
  *
  */
 KeyboardDef::KeyboardDef() {
@@ -316,15 +316,20 @@ double KeyboardDef::cols() {
   return maxCol;
 }
 /**
- * This uses two ini files.
- *  1. A system wide one, keyboard.ini, that contains* the character codes for tab,backspace etc *  2. The keyboard layout itself
  *
- * The keyboard.ini file should always be in the applications working directory
+ * Extact the header information and then load each key as it is in
+ * a section [Key-<row>-<col>]
+ *
+ * we pass two QSettings to the load routine but they both point to the
+ * same ini file. The first contains the key definitions and the other
+ * the special character codes like <Backspace>,<Tab>
+ *
+ * It's not pretty.
  *
  * @param name absolute path to settings file
  */
 void KeyboardDef::load(const QString & name) {
-  QSettings sp("keyboard.ini",QSettings::IniFormat);
+  QSettings sp(name,QSettings::IniFormat);
   sp.beginGroup("CharacterCodes");
   QSettings settings(name,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
@@ -335,13 +340,15 @@ void KeyboardDef::load(const QString & name) {
   m_levels = settings.value("levels",2).toInt();
   m_groups = settings.value("groups",1).toInt();
   settings.endGroup();
-  groups.removeOne("Header");
+
   for(int i=0;i < groups.size();i++) {
-    settings.beginGroup(groups[i]);
-    KeyDef * k = new KeyDef();
-    k->setValues(groups[i],settings,sp);
-    m_keys << k;
-    settings.endGroup();
+    if (groups[i].startsWith("Key")) {
+      settings.beginGroup(groups[i]);
+      KeyDef * k = new KeyDef();
+      k->setValues(groups[i],settings,sp);
+      m_keys << k;
+      settings.endGroup();
+    }
   }
 
 }
