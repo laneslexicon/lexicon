@@ -811,29 +811,25 @@ void FullSearchWidget::cancelSearch() {
   m_cancelSearch = true;
 }
 void FullSearchWidget::showKeyboard() {
-  m_keyboard->attach(m_findTarget);
-  m_attached = ! m_attached;
-  if (m_attached) {
-    m_keyboardButton->setText(tr("Hide keyboard"));
+  if (! m_attached) {
+    m_keyboard->attach(m_findTarget);
+    m_keyboardButton->setText(tr("Hide &keyboard"));
     QPoint p;
-    QPoint gp;
     p = m_keyboard->currentPosition();
     if (p.isNull()) {
       p = m_findTarget->pos();
-      gp =  m_findTarget->mapToGlobal(p);
-      QRect r = m_findTarget->frameGeometry();
-      int x = gp.x();
-      int y = gp.y() + r.height();
-      m_keyboard->move(getApp()->mapFromGlobal(QPoint(x,y)));
+      p = m_findTarget->mapToGlobal(p);
+      p.setX(p.x() - 50);
+      p.setY(p.y() + 50);
     }
-    else {
-      gp =  m_findTarget->mapToGlobal(p);
-      m_keyboard->move(p);
-    }
+    m_keyboard->move(p);
+    m_attached = true;
   }
-  else
-    m_keyboardButton->setText(tr("Show keyboard"));
-
+  else {
+    m_keyboard->detach();
+    m_keyboardButton->setText(tr("Show &keyboard"));
+    m_attached = false;
+  }
 }
 void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & options) {
   QLOG_DEBUG() << Q_FUNC_INFO;
