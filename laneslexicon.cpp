@@ -40,6 +40,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_editView = NULL;
   m_mapper = im_new();
   m_logview = NULL;
+  m_shortcutMap = NULL;
+  m_bookmarkMap = NULL;
   createActions();
   readSettings();
 
@@ -309,20 +311,22 @@ void LanesLexicon::onSetInterface(bool triggered) {
   if (! triggered || ! v || ! m_interfaceWarning) {
     return;
   }
-  QShortcut * sc = qobject_cast<QShortcut *>(m_shortcutMap->mapping(QString("Toggle interface")));
-  if (sc) {
-    QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
-    QMessageBox msgBox;
-    msgBox.setCheckBox(noshow);
-    msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
-    QString errorMessage(tr("Warning"));
-    QString info(tr("The toolbars and menubars will not be visible"));
-    QString next = QString(tr("To make them visible again, press %1")).arg(sc->key().toString());
-    msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
-                   + info + "</p><p>" + next + "</p></body></html>");
-    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-    msgBox.exec();
-    m_interfaceWarning = ! noshow->isChecked();
+  if (m_shortcutMap != NULL) {
+    QShortcut * sc = qobject_cast<QShortcut *>(m_shortcutMap->mapping(QString("Toggle interface")));
+    if (sc) {
+      QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
+      QMessageBox msgBox;
+      msgBox.setCheckBox(noshow);
+      msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
+      QString errorMessage(tr("Warning"));
+      QString info(tr("The toolbars and menubars will not be visible"));
+      QString next = QString(tr("To make them visible again, press %1")).arg(sc->key().toString());
+      msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
+                     + info + "</p><p>" + next + "</p></body></html>");
+      msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+      msgBox.exec();
+      m_interfaceWarning = ! noshow->isChecked();
+    }
   }
 }
 /**
@@ -604,9 +608,16 @@ void LanesLexicon::shortcut(const QString & key) {
  *
  */
 void LanesLexicon::setupShortcuts() {
+  bool update = false;
+  if (m_shortcutMap == NULL) {
+    m_shortcutMap = new QSignalMapper(this);
+  }
+  else {
+    update = true;
+  }
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Shortcut");
-  m_shortcutMap = new QSignalMapper(this);
+
   QStringList keys = settings->childKeys();
   for(int i=0;i < keys.size();i++) {
     if (keys[i] == "Go Tab") {
@@ -614,29 +625,37 @@ void LanesLexicon::setupShortcuts() {
       /// e.g 123456789abcdef
       for(int j=1;j < 10;j++) {
         QString ks = QString("%1,%2").arg(settings->value(keys[i]).toString()).arg(j);
-        QShortcut * sc = new QShortcut(ks,this);
-        connect(sc,SIGNAL(activated()),m_shortcutMap,SLOT(map()));
-        m_shortcutMap->setMapping(sc,QString("%1-%2").arg(keys[i]).arg(j));
+        QString name = QString("%1-%2").arg(keys[i]).arg(j);
+        addShortcut(name,ks,update);
       }
     }
     else {
-      QString k = settings->value(keys[i]).toString();
-      QShortcut * sc = new QShortcut(k,this);
-      sc->setObjectName(keys[i]);
-      connect(sc,SIGNAL(activated()),m_shortcutMap,SLOT(map()));
-      /// use the setting name as the shortcut 'name'
-      m_shortcutMap->setMapping(sc,keys[i]);
+      addShortcut(keys[i],settings->value(keys[i]).toString(),update);
     }
   }
   connect(m_shortcutMap,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
   settings->endGroup();
 }
-
+void LanesLexicon::addShortcut(const QString & name,const QString & k,bool update) {
+  //  QLOG_DEBUG() << Q_FUNC_INFO << name << k << update;
+  QShortcut * sc;
+  if (update) {
+    sc = qobject_cast<QShortcut *>(m_shortcutMap->mapping(name));
+    if (sc) {
+      sc->setKey(QKeySequence(k));
+      return;
+    }
+  }
+  sc = new QShortcut(k,this);
+  sc->setObjectName(name);
+  connect(sc,SIGNAL(activated()),m_shortcutMap,SLOT(map()));
+  m_shortcutMap->setMapping(sc,name);
+}
 
 
 /**
- * load the application level stylesheet, stripping out lines
- * beginning with #
+ * load the application level stylesheet and applies it
+ *
  *
  */
 void LanesLexicon::loadStyleSheet() {
@@ -659,21 +678,7 @@ void LanesLexicon::loadStyleSheet() {
   }
   f.close();
 }
-/*
-QAction * LanesLexicon::createIconAction(const QString imgdir,const QString & iconfile,const QString & text) {
-  QAction * action;
-  QFileInfo fi;
-  fi.setFile(imgdir,iconfile);
-  if ( ! iconfile.isEmpty() && fi.exists() ) {
-    action = new QAction(QIcon(fi.absoluteFilePath()),text,this);
-  }
-  else {
-    action = new QAction(text,this);
 
-  }
-  return action;
-}
-*/
 void LanesLexicon::createActions() {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
 
@@ -1642,8 +1647,10 @@ void LanesLexicon::onTest() {
     m_editView = new EditView;
     connect(m_editView,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
   }
-
-  m_editView->show();
+  if (0) {
+    m_editView->show();
+  }
+  addShortcut("Search node","Ctrl+S,X",true);
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");
@@ -1654,7 +1661,11 @@ void LanesLexicon::onTest() {
  */
 void LanesLexicon::readSettings() {
   QString v;
+
+  m_currentTheme = getLexicon()->currentTheme();
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
+
+
   QMap<QString,QString> cmdOptions = app->getOptions();
 
   m_startupNode = cmdOptions.value("node");
@@ -1676,7 +1687,7 @@ void LanesLexicon::readSettings() {
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
   }
-  m_currentTheme = settings->value("Theme",QString()).toString();
+
   m_toolbarText = settings->value("Toolbar text",false).toBool();
   m_nullMap = settings->value("Null map","Native").toString();
   m_currentMap = settings->value("Current map","Native").toString();
@@ -3487,21 +3498,21 @@ void LanesLexicon::onDefaultScale() {
 }
 void LanesLexicon::onSelectTheme() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  QDir themeDir = QDir::current();
-  themeDir.cd("themes");
-  QStringList themes = themeDir.entryList(QStringList(),QDir::NoDotAndDotDot| QDir::Dirs);
+  QStringList themes = getLexicon()->getThemes() ;
   qDebug() << themes;
   if (themes.size() == 1) {
-    /// message box
-    /// should disable menubar item if only one theme available
+    QMessageBox msgBox;
+    msgBox.setText(tr("Only one theme has been setup."));
+    msgBox.exec();
     return;
   }
   QDialog * d = new QDialog(this);
   d->setWindowTitle(tr("Change theme"));
   QVBoxLayout * layout = new QVBoxLayout;
   QComboBox * b = new QComboBox();
-  QLabel * label = new QLabel(QString(tr("Select a theme from the list. The current theme is %1.")).arg(m_currentTheme));
+  QLabel * label = new QLabel(QString(tr("Select a theme from the list.\nThe current theme is: %1.")).arg(m_currentTheme));
   b->addItems(themes);
+  b->setCurrentText(m_currentTheme);
   layout->addWidget(label);
   layout->addWidget(b);
   QDialogButtonBox * btns =  new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -3516,5 +3527,20 @@ void LanesLexicon::onSelectTheme() {
   }
   QString theme = b->currentText();
   delete d;
-  qDebug() << "Changing theme" << theme;
+  int ret = getLexicon()->setTheme(theme);
+  if (ret != Lexicon::Ok) {
+    qDebug() << "Error" << ret;
+  }
+  readSettings();
+  setIcons(theme);
+  loadStyleSheet();
+  setupShortcuts();
+  // reload pages
+  for(int i=0;i < m_tabs->count();i++) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+    if (entry) {
+      entry->onReload();
+    }
+  }
+  /// may need to something about printer setup
 }

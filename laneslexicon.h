@@ -166,7 +166,7 @@ class LanesLexicon : public QMainWindow
       void onDocs();
       void onAbout();
       void bookmarkRebuildMenu();
-
+      void addShortcut(const QString & name,const QString & key,bool update = false);
       void currentTabChanged(int ix = -1);
       /// these apply to the current graphicsentry
       void pageZoomIn();
