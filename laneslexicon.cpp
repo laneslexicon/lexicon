@@ -3194,7 +3194,7 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
   QDir d(imgdir);
   QFileInfo fi(d,iconfile);
   if (! fi.exists()) {
-    QLOG_WARN() << "Icon not found" << fi.absolutePath();
+    QLOG_WARN() << "Icon not found" << imgdir << iconfile;
     return;
   }
   QIcon icon(fi.absoluteFilePath());
@@ -3209,21 +3209,32 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
  */
 void LanesLexicon::setIcons(const QString & /* theme */) {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-
-  QString imgdir = getLexicon()->imageDirectory();
-  QFileInfo fi(imgdir);
-  if (! fi.exists()) {
-    QLOG_WARN() << QString(tr("Theme image directory not found : %1")).arg(imgdir);
-    return;
-  }
-  if (! fi.isDir()) {
-    QLOG_WARN() << QString(tr("Theme image directory is not a directory: %1")).arg(imgdir);
-    return;
-  }
-  settings->beginGroup("Icons");
+  bool ok = true;
   QString iconfile;
+  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings->beginGroup("Icons");
 
+  QDir imgd = QDir(getLexicon()->getResourcePath(Lexicon::Image));
+  ok = imgd.exists();
+
+  /**
+   * this allows for a subdirectories in the main images directory. The idea is to allow
+   * for 16px,32px etc icons
+   */
+
+  QString subdir = settings->value("Directory",QString()).toString();
+  if (! subdir.isEmpty()) {
+    if (imgd.exists(subdir)) {
+      if (imgd.cd(subdir)) {
+        ok = true;
+      }
+    }
+  }
+  if ( !ok) {
+    QLOG_WARN() << QString(tr("Theme image directory not found : %1")).arg(imgd.absolutePath());
+    return;
+  }
+  QString imgdir = imgd.absolutePath();
   iconfile = settings->value("Exit",QString()).toString();
   setIcon(m_exitAction,imgdir,iconfile);
 
@@ -3305,12 +3316,14 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   QIcon icon;
   iconfile = settings->value("Link",QString()).toString();
 
+  if (imgd.exists(iconfile)) {
+    icon.addPixmap(imgd.absoluteFilePath(iconfile),QIcon::Normal,QIcon::On);
+  }
 
-  fi.setFile(imgdir,iconfile);
-  icon.addPixmap(fi.absoluteFilePath(),QIcon::Normal,QIcon::On);
-
-  fi.setFile(imgdir,settings->value("Unlink",QString()).toString());
-  icon.addPixmap(fi.absoluteFilePath(),QIcon::Normal,QIcon::Off);
+  iconfile = settings->value("Unlink",QString()).toString();
+  if (imgd.exists(iconfile)) {
+    icon.addPixmap(imgd.absoluteFilePath(iconfile),QIcon::Normal,QIcon::Off);
+  }
 
   //  m_linkAction->setIcon(icon);
   //  m_linkAction->setChecked(m_linkContents);
