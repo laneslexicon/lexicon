@@ -100,7 +100,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   setupShortcuts();
   setupBookmarkShortcuts();
 
-  setIcons(m_iconTheme);
+  setIcons(m_currentTheme);
   createMenus();
   createToolBar();
   createStatusBar();
@@ -309,7 +309,7 @@ void LanesLexicon::onSetInterface(bool triggered) {
   if (! triggered || ! v || ! m_interfaceWarning) {
     return;
   }
-  QShortcut * sc = qobject_cast<QShortcut *>(m_signalMapper->mapping(QString("Toggle interface")));
+  QShortcut * sc = qobject_cast<QShortcut *>(m_shortcutMap->mapping(QString("Toggle interface")));
   if (sc) {
     QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
     QMessageBox msgBox;
@@ -386,6 +386,7 @@ void LanesLexicon::onCloseTab(int ix) {
   }
   FullSearchWidget * search = qobject_cast<FullSearchWidget *>(m_tabs->widget(ix));
   if (search) {
+    m_tabs->removeTab(ix);
     delete search;
     return;
   }
@@ -596,7 +597,7 @@ void LanesLexicon::shortcut(const QString & key) {
   }
   updateStatusBar();
   updateMenu();
-  //QLOG_DEBUG() << qobject_cast<QShortcut *>(m_signalMapper->mapping(k));
+  //QLOG_DEBUG() << qobject_cast<QShortcut *>(m_shortcutMap->mapping(k));
 }
 /**
  * setup the shortcuts from the conf
@@ -605,7 +606,7 @@ void LanesLexicon::shortcut(const QString & key) {
 void LanesLexicon::setupShortcuts() {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   settings->beginGroup("Shortcut");
-  m_signalMapper = new QSignalMapper(this);
+  m_shortcutMap = new QSignalMapper(this);
   QStringList keys = settings->childKeys();
   for(int i=0;i < keys.size();i++) {
     if (keys[i] == "Go Tab") {
@@ -614,20 +615,20 @@ void LanesLexicon::setupShortcuts() {
       for(int j=1;j < 10;j++) {
         QString ks = QString("%1,%2").arg(settings->value(keys[i]).toString()).arg(j);
         QShortcut * sc = new QShortcut(ks,this);
-        connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
-        m_signalMapper->setMapping(sc,QString("%1-%2").arg(keys[i]).arg(j));
+        connect(sc,SIGNAL(activated()),m_shortcutMap,SLOT(map()));
+        m_shortcutMap->setMapping(sc,QString("%1-%2").arg(keys[i]).arg(j));
       }
     }
     else {
       QString k = settings->value(keys[i]).toString();
       QShortcut * sc = new QShortcut(k,this);
       sc->setObjectName(keys[i]);
-      connect(sc,SIGNAL(activated()),m_signalMapper,SLOT(map()));
+      connect(sc,SIGNAL(activated()),m_shortcutMap,SLOT(map()));
       /// use the setting name as the shortcut 'name'
-      m_signalMapper->setMapping(sc,keys[i]);
+      m_shortcutMap->setMapping(sc,keys[i]);
     }
   }
-  connect(m_signalMapper,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
+  connect(m_shortcutMap,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
   settings->endGroup();
 }
 
@@ -780,6 +781,8 @@ void LanesLexicon::createActions() {
 
   m_defaultScaleAction = new QAction(tr("Set default zoom"),this);
 
+  m_selectThemeAction = new QAction(tr("Select theme"),this);
+
   connect(m_syncFromEntryAction,SIGNAL(triggered()),this,SLOT(syncFromEntry()));
   connect(m_syncFromContentsAction,SIGNAL(triggered()),this,SLOT(syncFromContents()));
 
@@ -793,6 +796,7 @@ void LanesLexicon::createActions() {
   connect(m_clearAction,SIGNAL(triggered()),this,SLOT(pageClear()));
   connect(m_convertToEntryAction,SIGNAL(triggered()),this,SLOT(convertToEntry()));
   connect(m_defaultScaleAction,SIGNAL(triggered()),this,SLOT(onDefaultScale()));
+  connect(m_selectThemeAction,SIGNAL(triggered()),this,SLOT(onSelectTheme()));
 
 
 }
@@ -1155,6 +1159,7 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_syncFromEntryAction);
   m_viewMenu->addAction(m_linkAction);
   m_viewMenu->addAction(m_defaultScaleAction);
+  m_viewMenu->addAction(m_selectThemeAction);
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -1671,7 +1676,7 @@ void LanesLexicon::readSettings() {
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
   }
-  m_iconTheme = settings->value("Theme",QString()).toString();
+  m_currentTheme = settings->value("Theme",QString()).toString();
   m_toolbarText = settings->value("Toolbar text",false).toBool();
   m_nullMap = settings->value("Null map","Native").toString();
   m_currentMap = settings->value("Current map","Native").toString();
@@ -3479,4 +3484,37 @@ void LanesLexicon::onDefaultScale() {
     }
   }
   delete d;
+}
+void LanesLexicon::onSelectTheme() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  QDir themeDir = QDir::current();
+  themeDir.cd("themes");
+  QStringList themes = themeDir.entryList(QStringList(),QDir::NoDotAndDotDot| QDir::Dirs);
+  qDebug() << themes;
+  if (themes.size() == 1) {
+    /// message box
+    /// should disable menubar item if only one theme available
+    return;
+  }
+  QDialog * d = new QDialog(this);
+  d->setWindowTitle(tr("Change theme"));
+  QVBoxLayout * layout = new QVBoxLayout;
+  QComboBox * b = new QComboBox();
+  QLabel * label = new QLabel(QString(tr("Select a theme from the list. The current theme is %1.")).arg(m_currentTheme));
+  b->addItems(themes);
+  layout->addWidget(label);
+  layout->addWidget(b);
+  QDialogButtonBox * btns =  new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  layout->addWidget(btns);
+  d->setLayout(layout);
+  connect(btns, SIGNAL(accepted()), d, SLOT(accept()));
+  connect(btns, SIGNAL(rejected()), d, SLOT(reject()));
+  if ((d->exec() == QDialog::Rejected) ||
+      (b->currentText() == m_currentTheme)) {
+    delete d;
+    return;
+  }
+  QString theme = b->currentText();
+  delete d;
+  qDebug() << "Changing theme" << theme;
 }

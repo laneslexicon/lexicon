@@ -130,6 +130,8 @@ class LanesLexicon : public QMainWindow
 
       void onDefaultScale();
 
+      void onSelectTheme();
+
       void searchForWord();
       void searchForPage();
       void searchForNode();
@@ -233,7 +235,7 @@ class LanesLexicon : public QMainWindow
       QString m_interface;    // "default","minimal"
       QString m_applicationCssFile;
       QString m_printPdfLocation;
-      QString m_iconTheme;
+      QString m_currentTheme;
       QString m_nullMap;
       QString m_currentMap;
       QString m_dbName;
@@ -284,7 +286,7 @@ class LanesLexicon : public QMainWindow
 
       QMap<QString,QString> m_maps;
 
-      QSignalMapper * m_signalMapper;
+      QSignalMapper * m_shortcutMap;
       QSignalMapper * m_bookmarkMap;
 
       QMap<QString, Place> m_bookmarks;
@@ -391,6 +393,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_syncFromEntryAction;
       QAction * m_aboutAction;
       QAction * m_defaultScaleAction;
+      QAction * m_selectThemeAction;
 
       HistoryMaster * m_history;
       NoteMaster * m_notes;
