@@ -91,6 +91,9 @@ QString Lexicon::getResourcePath(int type, const QString & name) {
     d = settings.value("Map","maps").toString();
     break;
   }
+  case Lexicon::Splash : {
+    d = settings.value("Splash","images/splash").toString();
+  }
   default : { break; }
   }
   if (m_settingsDir.exists(d)) {
@@ -196,6 +199,10 @@ int Lexicon::setTheme(const QString & theme) {
   }
   m_currentTheme = theme;
   m_settingsDir = d;
+
+  QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
+  settings->beginGroup("System");
+  settings->setValue("Theme",theme);
   return Lexicon::Ok;
 }
 void Lexicon::setOptions(const QMap<QString,QString> & options) {
@@ -379,4 +386,9 @@ QString Lexicon::spanArabic(const QString & ar,const QString & spanstyle) {
     style += QString("font-size : %1").arg(fontsize);
   }
   return QString("<span style=\"%1\">%2</span>").arg(style).arg(ar);
+}
+QStringList Lexicon::getThemes() const {
+  QDir d(m_themeDirectory);
+  return d.entryList(QStringList(),QDir::NoDotAndDotDot| QDir::Dirs);
+
 }
