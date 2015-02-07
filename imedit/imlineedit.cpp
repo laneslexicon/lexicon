@@ -70,25 +70,23 @@ void ImLineEdit::shortcutActivated() {
  * It no longer loads the maps, but only sets up the shortcut
  * @param settings
  */
-void ImLineEdit::readSettings(QSettings * settings) {
-  if (! settings ) {
-    settings = new QSettings;
-  }
-  settings->beginGroup("System");
-  m_nullMap = settings->value("Null map","Native").toString();
-  m_keymapsEnabled = settings->value("Keymaps",false).toBool();
-  settings->endGroup();
+void ImLineEdit::readSettings(const QString & fileName) {
+  QSettings settings(fileName,QSettings::IniFormat);
+  settings.beginGroup("System");
+  m_nullMap = settings.value("Null map","Native").toString();
+  m_keymapsEnabled = settings.value("Keymaps",false).toBool();
+  settings.endGroup();
 
-  settings->beginGroup("Maps");
-  m_debug = settings->value("Debug",false).toBool();
-  QStringList groups = settings->childGroups();
+  settings.beginGroup("Maps");
+  m_debug = settings.value("Debug",false).toBool();
+  QStringList groups = settings.childGroups();
   for(int i=0;i < groups.size();i++) {
-    settings->beginGroup(groups[i]);
-    //   QString file = settings->value("file",QString()).toString();
+    settings.beginGroup(groups[i]);
+    //   QString file = settings.value("file",QString()).toString();
     //    if (! file.isEmpty()) {
     //      loadMap(file,groups[i]);
     //    }
-    QString scut = settings->value("shortcut",QString()).toString();
+    QString scut = settings.value("shortcut",QString()).toString();
     if (! scut.isEmpty()) {
       QKeySequence k = QKeySequence(scut);
       QShortcut * sc = new QShortcut(k,this);
@@ -96,14 +94,12 @@ void ImLineEdit::readSettings(QSettings * settings) {
       sc->setContext(Qt::WidgetShortcut);
       connect(sc,SIGNAL(activated()),this,SLOT(shortcutActivated()));
     }
-    bool  enabled = settings->value("enabled",false).toBool();
+    bool  enabled = settings.value("enabled",false).toBool();
     if (enabled) {
       m_activeMap = groups[i];
     }
-    settings->endGroup();
+    settings.endGroup();
   }
-
-  delete settings;
 }
 void ImLineEdit::setEnabled(bool v) {
   m_keymapsEnabled = v;

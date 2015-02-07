@@ -5,7 +5,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 
 {
-  QSettings * settings = new QSettings("default.ini",QSettings::IniFormat);
   QVBoxLayout * layout = new QVBoxLayout;
   m_edit = new ImEdit;
   m_edit->setDebug(true);
@@ -19,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
   m_lineEdit->activateMap("Buckwalter");
   m_lineEdit->setForceLTR(true);
   m_lineEdit->setDebug(true);
-  m_lineEdit->readSettings(settings);
+  m_lineEdit->readSettings("default.ini");
   QFont f("Amiri",30);
   m_lineEdit->setFont(f);
   QWidget * w = new QWidget;

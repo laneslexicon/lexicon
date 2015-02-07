@@ -26,7 +26,7 @@ class ImLineEdit : public QLineEdit {
     QString getActiveMap() const;
     QString getNullMap() const;
     void setDebug(bool v) { m_debug = v;}
-    void readSettings(QSettings * settings = 0);
+    void readSettings(const QString & filePath = QString());
     public slots:
     bool loadMap(const QString & filename,const QString & mapname = QString());
     void activateMap(const QString &,bool enable = true);
