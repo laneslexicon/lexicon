@@ -5,6 +5,7 @@
 #include "fullsearch.h"
 #include "application.h"
 #include "definedsettings.h"
+#include "externs.h"
 TabWidget::TabWidget(QWidget * parent) : QTabWidget(parent) {
   setObjectName("tabwidget");
   tabBar()->setObjectName("tabwidgettabs");
@@ -64,10 +65,10 @@ void TabWidget::tabInserted(int index) {
   }
 }
 void TabWidget::readSettings() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("TabBar");
-  m_numberTabs = settings->value(SID_TABBAR_NUMBER,true).toBool();
-  setMovable(settings->value(SID_TABBAR_MOVEABLE,true).toBool());
+  SETTINGS
+  settings.beginGroup("TabBar");
+  m_numberTabs = settings.value(SID_TABBAR_NUMBER,true).toBool();
+  setMovable(settings.value(SID_TABBAR_MOVEABLE,true).toBool());
 }
 void TabWidget::tabContentsChanged() {
   if (m_numberTabs) {

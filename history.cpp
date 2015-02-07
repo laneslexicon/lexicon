@@ -1,4 +1,5 @@
 #include "history.h"
+#include "externs.h"
 HistoryEvent::HistoryEvent() {
   m_when = QDateTime::currentDateTime();
   m_id = -1;
@@ -274,11 +275,11 @@ HistoryEvent * HistoryMaster::getEvent(int id) {
    return event;
 }
 void HistoryMaster::readSettings() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("History");
-  m_historyEnabled = settings->value("Enabled",true).toBool();
-  m_size = settings->value("Size",10).toInt();
-  m_duplicateDepth = settings->value("Duplicate depth",5).toInt();
+  SETTINGS
+  settings.beginGroup("History");
+  m_historyEnabled = settings.value("Enabled",true).toBool();
+  m_size = settings.value("Size",10).toInt();
+  m_duplicateDepth = settings.value("Duplicate depth",5).toInt();
 }
 bool HistoryMaster::clear() {
    if ( ! m_historyEnabled ) {

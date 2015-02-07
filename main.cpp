@@ -15,6 +15,7 @@
 #include "splashscreen.h"
 #include "definedsettings.h"
 #include <iostream>
+#include "externs.h"
 #ifdef __APPLE__
 int RandomUnder(int topPlusOne)
 {
@@ -192,11 +193,13 @@ int main(int argc, char *argv[])
     SplashScreen * splash = 0;
     QString splashDir = mansur.getResourcePath(Lexicon::Splash);
 
-    QSettings * settings = mansur.getSettings();
-    settings->beginGroup("Splash");
-    int splashDelay = settings->value(SID_SPLASH_DELAY,5).toInt();
-    bool makeSplash = settings->value(SID_SPLASH_ENABLED,true).toBool();
-    delete settings;
+    SETTINGS
+
+      qDebug() << "!!!!!!!!!" << mansur.settingsFileName();
+    settings.beginGroup("Splash");
+    int splashDelay = settings.value(SID_SPLASH_DELAY,5).toInt();
+    bool makeSplash = settings.value(SID_SPLASH_ENABLED,true).toBool();
+
     QDir d(splashDir);
     if (! d.exists()) {
       makeSplash = false;

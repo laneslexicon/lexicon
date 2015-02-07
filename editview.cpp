@@ -1,7 +1,7 @@
 #include "editview.h"
 #include "application.h"
 #include "definedsettings.h"
-extern Lexicon * getLexicon();
+#include "externs.h"
 #define EDIT_CSS 0
 #define EDIT_XSLT 1
 EditPage::EditPage(int type,QWidget * parent) : QWidget(parent) {
@@ -110,14 +110,14 @@ bool EditPage::writeFile() {
 }
 
 void EditPage::readSettings() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Entry");
+  SETTINGS
+  settings.beginGroup("Entry");
   if (m_type == EDIT_CSS) {
-    m_fileName = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
+    m_fileName = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
     m_fileName = getLexicon()->getResourcePath(Lexicon::Stylesheet,m_fileName);
   }
   else {
-    m_fileName = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+    m_fileName = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
     m_fileName = getLexicon()->getResourcePath(Lexicon::XSLT,m_fileName);
 
   }
@@ -187,10 +187,10 @@ QSize EditView::sizeHint() const {
   return QSize(800,600);
 }
 void EditView::readSettings() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("EntryLayout");
-  this->restoreGeometry(settings->value("Geometry").toByteArray());
-  settings->endGroup();
+  SETTINGS
+  settings.beginGroup("EntryLayout");
+  this->restoreGeometry(settings.value("Geometry").toByteArray());
+  settings.endGroup();
 }
 void EditView::apply(int type,bool useEdited) {
   QString css;

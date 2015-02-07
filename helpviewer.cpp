@@ -1,5 +1,6 @@
 #include "helpviewer.h"
 #include "QsLog.h"
+#include "externs.h"
 HelpBrowser::HelpBrowser(QWidget * parent) : QTextBrowser(parent) {
   connect(this,SIGNAL(anchorClicked(const QUrl &)),this,SLOT(getAnchor(const QUrl &)));
 }
@@ -154,15 +155,15 @@ void HelpWidget::helpLinkActivated(const QUrl & url)  {
 }
 
 void HelpWidget::writeSettings() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Help");
-  settings->setValue("Current page",m_currentUrl);
+  SETTINGS
+  settings.beginGroup("Help");
+  settings.setValue("Current page",m_currentUrl);
 }
 void HelpWidget::readSettings() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Help");
-  m_helpCollection = settings->value("Help collection","lanedocs.qhc").toString();
-  m_currentUrl = settings->value("Current page").toUrl();
+  SETTINGS
+  settings.beginGroup("Help");
+  m_helpCollection = settings.value("Help collection","lanedocs.qhc").toString();
+  m_currentUrl = settings.value("Current page").toUrl();
 }
 /*
  TRACE_OBJ
