@@ -4,6 +4,7 @@
 #include "htmldelegate.h"
 #include "application.h"
 #include "history.h"
+#include "externs.h"
 HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   : QDialog(parent) {
   readSettings();
@@ -46,10 +47,10 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   /// TODO set these from defaults
   m_newTab = new QCheckBox(tr("Open in new tab"));
   m_switchTab = new QCheckBox(tr("Switch to new tab"));
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("History");
-  m_newTab->setChecked(settings->value("New tab",false).toBool());
-  m_switchTab->setChecked(settings->value("Switch tab",true).toBool());
+  SETTINGS
+  settings.beginGroup("History");
+  m_newTab->setChecked(settings.value("New tab",false).toBool());
+  m_switchTab->setChecked(settings.value("Switch tab",true).toBool());
   m_switchTab->setEnabled(m_newTab->isChecked());
   connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(onStateChanged(int)));
   QPushButton * jumpButton = new QPushButton(tr("&Jump to"));
@@ -110,16 +111,14 @@ QSize HistoryWidget::sizeHint() const {
   return QSize(600,300);
 }
 void HistoryWidget::readSettings() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("History");
-  settings->beginGroup("List");
-  QString fontString = settings->value("Arabic font").toString();
+  SETTINGS
+  settings.beginGroup("History");
+  settings.beginGroup("List");
+  QString fontString = settings.value("Arabic font").toString();
   QLOG_DEBUG() << "Font" << fontString;
   if ( ! fontString.isEmpty()) {
     m_arFont.fromString(fontString);
   }
-  settings->endGroup();
-  settings->endGroup();
 }
 Place HistoryWidget::getSelected() const {
   Place p;

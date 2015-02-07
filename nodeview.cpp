@@ -1,15 +1,15 @@
 #include "nodeview.h"
 #include "application.h"
-
+#include "externs.h"
 NodeView::NodeView(QWidget * parent)
   : QDialog(parent) {
 
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("System");
-  QString fontString = settings->value("Arabic font").toString();
-  settings->endGroup();
-  settings->beginGroup("FullSearch");
-  QString sz = settings->value("Viewer size",QString()).toString();
+  SETTINGS
+  settings.beginGroup("System");
+  QString fontString = settings.value("Arabic font").toString();
+  settings.endGroup();
+  settings.beginGroup("FullSearch");
+  QString sz = settings.value("Viewer size",QString()).toString();
   if (! sz.isEmpty())
     this->setPreferredSize(sz);
 
@@ -57,11 +57,6 @@ NodeView::NodeView(QWidget * parent)
 
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-
-
-
-
-
 
   layout->addLayout(hlayout);
   layout->addWidget(m_browser);

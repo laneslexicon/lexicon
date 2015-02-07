@@ -6,7 +6,7 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QPixmap>
-extern Lexicon * getLexicon();
+#include "externs.h"
 #define ROOT_COLUMN 0
 #define WORD_COLUMN 1
 #define HEADWORD_COLUMN 2
@@ -53,33 +53,33 @@ ContentsWidget::~ContentsWidget() {
  *
  */
 void ContentsWidget::readSettings() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->beginGroup("Roots");
-  m_backgroundColor = settings->value(SID_CONTENTS_BACKGROUND,"lightgray").toString();
-  QString fontString = settings->value(SID_CONTENTS_STANDARD_FONT,QString()).toString();
+  SETTINGS
+    //Lexicon * app = qobject_cast<Lexicon *>(qApp);
+    //  QSettings * settings = app->getSettings();
+  settings.beginGroup("Roots");
+  m_backgroundColor = settings.value(SID_CONTENTS_BACKGROUND,"lightgray").toString();
+  QString fontString = settings.value(SID_CONTENTS_STANDARD_FONT,QString()).toString();
   if ( ! fontString.isEmpty()) {
     m_itypeFont.fromString(fontString);
   }
-  fontString = settings->value(SID_CONTENTS_ARABIC_FONT,QString()).toString();
+  fontString = settings.value(SID_CONTENTS_ARABIC_FONT,QString()).toString();
   if ( ! fontString.isEmpty()) {
     QFont f;
     f.fromString(fontString);
     setFont(f);
   }
-  m_showSupplement = settings->value(SID_CONTENTS_SHOWSUPPLEMENT,true).toBool();
-  m_showHeadWord = settings->value(SID_CONTENTS_SHOWHEAD,false).toBool();
-  m_showEntryWord = settings->value(SID_CONTENTS_SHOWENTRY,false).toBool();
-  m_debug = settings->value(SID_CONTENTS_DEBUG,false).toBool();
-  m_moveDown = settings->value(SID_CONTENTS_MOVE_DOWN,"s").toString();
-  m_moveUp = settings->value(SID_CONTENTS_MOVE_UP,"w").toString();
-  m_expand = settings->value(SID_CONTENTS_EXPAND," ").toString();
+  m_showSupplement = settings.value(SID_CONTENTS_SHOWSUPPLEMENT,true).toBool();
+  m_showHeadWord = settings.value(SID_CONTENTS_SHOWHEAD,false).toBool();
+  m_showEntryWord = settings.value(SID_CONTENTS_SHOWENTRY,false).toBool();
+  m_debug = settings.value(SID_CONTENTS_DEBUG,false).toBool();
+  m_moveDown = settings.value(SID_CONTENTS_MOVE_DOWN,"s").toString();
+  m_moveUp = settings.value(SID_CONTENTS_MOVE_UP,"w").toString();
+  m_expand = settings.value(SID_CONTENTS_EXPAND," ").toString();
 
-  settings->endGroup();
-  settings->beginGroup("Icons");
-  QString dragicon = settings->value("Insert link","insert-link.png").toString();
+  settings.endGroup();
+  settings.beginGroup("Icons");
+  QString dragicon = settings.value("Insert link","insert-link.png").toString();
   m_dragIconFileName = getLexicon()->getResourcePath(Lexicon::Image,dragicon);
-  delete settings;
 }
 void ContentsWidget::loadContents() {
   QSqlQuery letterQuery;

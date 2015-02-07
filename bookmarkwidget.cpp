@@ -3,6 +3,7 @@
 #include "QsLog.h"
 #include "htmldelegate.h"
 #include "application.h"
+#include "externs.h"
 #define KEY_COLUMN 0
 #define ROOT_COLUMN 1
 #define WORD_COLUMN 2
@@ -51,10 +52,10 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   }
   m_newTab = new QCheckBox(tr("Open in new tab"));
   m_switchTab = new QCheckBox(tr("Switch to new tab"));
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Bookmark");
-  m_newTab->setChecked(settings->value("New tab",false).toBool());
-  m_switchTab->setChecked(settings->value("Switch tab",true).toBool());
+  SETTINGS
+  settings.beginGroup("Bookmark");
+  m_newTab->setChecked(settings.value("New tab",false).toBool());
+  m_switchTab->setChecked(settings.value("Switch tab",true).toBool());
   m_switchTab->setEnabled(m_newTab->isChecked());
   connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(onStateChanged(int)));
 
@@ -117,16 +118,16 @@ QSize BookmarkWidget::sizeHint() const {
   return QSize(600,300);
 }
 void BookmarkWidget::readSettings() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Bookmark");
-  settings->beginGroup("List");
-  QString fontString = settings->value("Arabic font").toString();
+  SETTINGS
+  settings.beginGroup("Bookmark");
+  settings.beginGroup("List");
+  QString fontString = settings.value("Arabic font").toString();
   if ( ! fontString.isEmpty()) {
     m_arFont.fromString(fontString);
   }
-  settings->endGroup();
-  m_debug = settings->value("Debug",false).toBool();
-  settings->endGroup();
+  settings.endGroup();
+  m_debug = settings.value("Debug",false).toBool();
+  settings.endGroup();
 }
 bool BookmarkWidget::getNewTab() {
   return m_newTab->isChecked();

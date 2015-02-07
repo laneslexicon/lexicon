@@ -6,6 +6,7 @@
 #include "laneslexicon.h"
 #include "searchoptionswidget.h"
 #include "definedsettings.h"
+#include "externs.h"
 #define NODE_COLUMN 2
 /// TODO
 /// some of these functions pass SearchOptions - why can't we use the class member
@@ -384,31 +385,30 @@ void HeadSearchWidget::cancelSearch() {
   m_cancelSearch = true;
 }
 void HeadSearchWidget::readSettings() {
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QSettings * settings = app->getSettings();
-  settings->beginGroup("HeadSearch");
-  QString f = settings->value(SID_HEADSEARCH_RESULTS_FONT,QString()).toString();
+  SETTINGS
+
+  settings.beginGroup("HeadSearch");
+  QString f = settings.value(SID_HEADSEARCH_RESULTS_FONT,QString()).toString();
   if (! f.isEmpty()) {
     m_resultsFont.fromString(f);
   }
-  m_stepCount = settings->value(SID_HEADSEARCH_STEP,100).toInt();
-  m_debug = settings->value(SID_HEADSEARCH_DEBUG,false).toBool();
-  m_verticalLayout = settings->value(SID_HEADSEARCH_LAYOUT,true).toBool();
-  m_focusTable = settings->value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool();
-  settings->endGroup();
-  settings->beginGroup("Diacritics");
-  QStringList keys = settings->childKeys();
+  m_stepCount = settings.value(SID_HEADSEARCH_STEP,100).toInt();
+  m_debug = settings.value(SID_HEADSEARCH_DEBUG,false).toBool();
+  m_verticalLayout = settings.value(SID_HEADSEARCH_LAYOUT,true).toBool();
+  m_focusTable = settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool();
+  settings.endGroup();
+  settings.beginGroup("Diacritics");
+  QStringList keys = settings.childKeys();
   QStringList points;
   for(int i=0;i < keys.size();i++) {
     if (keys[i].startsWith("Char")) {
-      f = settings->value(keys[i],QString()).toString();
+      f = settings.value(keys[i],QString()).toString();
       points << f;
     }
   }
   m_diacritics = QString("[\\x%1]*").arg(points.join("\\x"));
-  settings->endGroup();
+  settings.endGroup();
 
-  delete settings;
 }
 void HeadSearchWidget::onRemoveResults() {
   Place p = m_entry->getPlace();

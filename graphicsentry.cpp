@@ -122,10 +122,10 @@ void GraphicsEntry::readSettings() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QMap<QString,QString> cmdOptions = app->getOptions();
 
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Entry");
-  m_debug = settings->value(SID_ENTRY_DEBUG,false).toBool();
-  QString css = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
+  SETTINGS
+  settings.beginGroup("Entry");
+  m_debug = settings.value(SID_ENTRY_DEBUG,false).toBool();
+  QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
   css = readCssFromFile(css);
   /// if there are errors, readCssFromFile will show them
   if (! css.isEmpty()) {
@@ -133,12 +133,12 @@ void GraphicsEntry::readSettings() {
     emit(cssChanged());
   }
 
-  css = settings->value(SID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
+  css = settings.value(SID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
   css = readCssFromFile(css);
   if (! css.isEmpty()) {
     m_printCss = css;
   }
-  m_textWidth = settings->value(SID_ENTRY_TEXT_WIDTH,300).toInt();
+  m_textWidth = settings.value(SID_ENTRY_TEXT_WIDTH,300).toInt();
   if (cmdOptions.contains("textwidth")) {
     int w = cmdOptions.value("textwidth").toInt(&ok);
     if (ok) {
@@ -147,53 +147,53 @@ void GraphicsEntry::readSettings() {
   }
   m_defaultWidth = m_textWidth;
 
-  m_entryMargin = settings->value(SID_ENTRY_MARGIN,10).toInt();
+  m_entryMargin = settings.value(SID_ENTRY_MARGIN,10).toInt();
   /// TODO change this to use color names
-  v  = settings->value(SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR,"lightgray").toString();
+  v  = settings.value(SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR,"lightgray").toString();
 
   m_supplementBg = QColor(v);
   if (! m_supplementBg.isValid())  {
     m_supplementBg = QColor::fromRgb(211,211,211);
   }
-  m_clearScene = settings->value(SID_ENTRY_CLEAR_SCENE,true).toBool();
+  m_clearScene = settings.value(SID_ENTRY_CLEAR_SCENE,true).toBool();
 
 
   /// these are set to empty to disable the feature
-  m_moveFocusUpKey = settings->value(SID_ENTRY_MOVE_FOCUS_UP,QString()).toString();
-  m_moveFocusDownKey = settings->value(SID_ENTRY_MOVE_FOCUS_DOWN,QString()).toString();
-  m_moveForwardKey = settings->value(SID_ENTRY_FORWARD,QString()).toString();
-  m_moveBackwardKey = settings->value(SID_ENTRY_BACK,QString()).toString();
-  m_zoomInKey = settings->value(SID_ENTRY_ZOOM_IN,QString()).toString();
-  m_zoomOutKey = settings->value(SID_ENTRY_ZOOM_OUT,QString()).toString();
-  m_reloadKey = settings->value(SID_ENTRY_RELOAD,QString()).toString();
+  m_moveFocusUpKey = settings.value(SID_ENTRY_MOVE_FOCUS_UP,QString()).toString();
+  m_moveFocusDownKey = settings.value(SID_ENTRY_MOVE_FOCUS_DOWN,QString()).toString();
+  m_moveForwardKey = settings.value(SID_ENTRY_FORWARD,QString()).toString();
+  m_moveBackwardKey = settings.value(SID_ENTRY_BACK,QString()).toString();
+  m_zoomInKey = settings.value(SID_ENTRY_ZOOM_IN,QString()).toString();
+  m_zoomOutKey = settings.value(SID_ENTRY_ZOOM_OUT,QString()).toString();
+  m_reloadKey = settings.value(SID_ENTRY_RELOAD,QString()).toString();
 
-  m_widenKey = settings->value(SID_ENTRY_WIDEN,QString()).toString();
-  m_narrowKey = settings->value(SID_ENTRY_NARROW,QString()).toString();
-  m_widenStep = settings->value(SID_ENTRY_STEP,50).toInt(&ok);
+  m_widenKey = settings.value(SID_ENTRY_WIDEN,QString()).toString();
+  m_narrowKey = settings.value(SID_ENTRY_NARROW,QString()).toString();
+  m_widenStep = settings.value(SID_ENTRY_STEP,50).toInt(&ok);
   if ( ! ok ) {
     m_widenStep = 50;
   }
-  m_searchKey = settings->value(SID_ENTRY_FIND,QString()).toString();
-  m_searchNextKey = settings->value(SID_ENTRY_FIND_NEXT,QString()).toString();
-  m_clearKey = settings->value(SID_ENTRY_CLEAN,QString()).toString();
-  m_showKey = settings->value(SID_ENTRY_SHOW,QString()).toString();
-  m_homeKey = settings->value(SID_ENTRY_HOME,QString()).toString();
-  m_markKey = settings->value(SID_ENTRY_MARK,QString()).toString();
+  m_searchKey = settings.value(SID_ENTRY_FIND,QString()).toString();
+  m_searchNextKey = settings.value(SID_ENTRY_FIND_NEXT,QString()).toString();
+  m_clearKey = settings.value(SID_ENTRY_CLEAN,QString()).toString();
+  m_showKey = settings.value(SID_ENTRY_SHOW,QString()).toString();
+  m_homeKey = settings.value(SID_ENTRY_HOME,QString()).toString();
+  m_markKey = settings.value(SID_ENTRY_MARK,QString()).toString();
 
 
-  m_dumpXml = settings->value(SID_ENTRY_DUMP_XML,false).toBool();
-  m_dumpHtml = settings->value(SID_ENTRY_DUMP_HTML,false).toBool();
-  m_dumpOutputHtml = settings->value(SID_ENTRY_DUMP_OUTPUT_HTML,false).toBool();
+  m_dumpXml = settings.value(SID_ENTRY_DUMP_XML,false).toBool();
+  m_dumpHtml = settings.value(SID_ENTRY_DUMP_HTML,false).toBool();
+  m_dumpOutputHtml = settings.value(SID_ENTRY_DUMP_OUTPUT_HTML,false).toBool();
 
-  m_showLinkWarning = settings->value(SID_ENTRY_SHOW_LINK_WARNING,true).toBool();
+  m_showLinkWarning = settings.value(SID_ENTRY_SHOW_LINK_WARNING,true).toBool();
 
   qDebug() << "scale" << m_scale;
-  m_scale = settings->value(SID_ENTRY_SCALE,1.0).toDouble();
+  m_scale = settings.value(SID_ENTRY_SCALE,1.0).toDouble();
   qDebug() << "scale after" << m_scale;
-  settings->endGroup();
+  settings.endGroup();
 
-  settings->beginGroup("XSLT");
-  m_entryXslt = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+  settings.beginGroup("XSLT");
+  m_entryXslt = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
   m_entryXslt = getLexicon()->getResourcePath(Lexicon::XSLT,m_entryXslt);
   if (m_entryXslt.isEmpty()) {
     /// TODO tidy this message box
@@ -210,37 +210,37 @@ void GraphicsEntry::readSettings() {
     msgBox.exec();
     QLOG_WARN() << QString(tr("Cannot find required entry XSLT file: %1")).arg(getLexicon()->takeLastError());
   }
-  m_nodeXslt = settings->value(SID_XSLT_NODE,QString("node.xslt")).toString();
+  m_nodeXslt = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
   m_nodeXslt = getLexicon()->getResourcePath(Lexicon::XSLT,m_nodeXslt);
   if (m_nodeXslt.isEmpty()) {
     QLOG_WARN() << QString(tr("Cannot find required node XSLT file: %1")).arg(getLexicon()->takeLastError());
   }
 
-  settings->endGroup();
+  settings.endGroup();
 
-  settings->beginGroup("Notes");
-  m_notesEnabled = settings->value(SID_NOTES_ENABLED,true).toBool();
-  settings->endGroup();
+  settings.beginGroup("Notes");
+  m_notesEnabled = settings.value(SID_NOTES_ENABLED,true).toBool();
+  settings.endGroup();
 
-  settings->beginGroup("Diacritics");
-  QStringList keys = settings->childKeys();
+  settings.beginGroup("Diacritics");
+  QStringList keys = settings.childKeys();
   QStringList points;
   for(int i=0;i < keys.size();i++) {
     if (keys[i].startsWith("Char")) {
-      v = settings->value(keys[i],QString()).toString();
+      v = settings.value(keys[i],QString()).toString();
       points << v;
     }
   }
   m_pattern = QString("[\\x%1]*").arg(points.join("\\x"));
 
-  settings->endGroup();
+  settings.endGroup();
 
-  settings->beginGroup("System");
-  m_linksUseCurrentTab = settings->value(SID_SYSTEM_OPEN_LINK,true).toBool();
-  m_activateLink = settings->value(SID_SYSTEM_ACTIVATE_LINK,true).toBool();
-  settings->endGroup();
-  settings->beginGroup("Icons");
-  m_notesIcon = settings->value("Notes","notes-0.xpm").toString();
+  settings.beginGroup("System");
+  m_linksUseCurrentTab = settings.value(SID_SYSTEM_OPEN_LINK,true).toBool();
+  m_activateLink = settings.value(SID_SYSTEM_ACTIVATE_LINK,true).toBool();
+  settings.endGroup();
+  settings.beginGroup("Icons");
+  m_notesIcon = settings.value("Notes","notes-0.xpm").toString();
   m_notesIcon = getLexicon()->getResourcePath(Lexicon::Image,m_notesIcon);
 
 }
@@ -678,9 +678,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   Place noplace;
   int supplement;
 
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Entry");
-  m_scale  = settings->value("Zoom",1.0).toDouble();
+  SETTINGS
+  settings.beginGroup("Entry");
+  m_scale  = settings.value("Zoom",1.0).toDouble();
 
   EntryItem * centerItem;
 
@@ -904,9 +904,9 @@ Place GraphicsEntry::getPage(const Place & p) {
   if (m_clearScene) {
     onClearScene();
   }
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Entry");
-  m_scale  = settings->value("Zoom",1.0).toDouble();
+  SETTINGS
+  settings.beginGroup("Entry");
+  m_scale  = settings.value("Zoom",1.0).toDouble();
 
   QString lastRoot;
   // "select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource =  // 1 and page = ? order by nodenum asc");
@@ -1646,9 +1646,9 @@ int GraphicsEntry::search() {
   QString v;
 
   QLOG_DEBUG() << Q_FUNC_INFO;
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("LocalSearch");
-  v  = settings->value("Type",QString("normal")).toString();
+  SETTINGS
+  settings.beginGroup("LocalSearch");
+  v  = settings.value("Type",QString("normal")).toString();
   if (v == "normal") {
     options.setSearchType(SearchOptions::Normal);
   }
@@ -1656,9 +1656,9 @@ int GraphicsEntry::search() {
     options.setSearchType(SearchOptions::Regex);
   }
 
-  options.setIgnoreDiacritics(settings->value("Ignore diacritics",true).toBool());
-  options.setWholeWordMatch(settings->value("Whole word",true).toBool());
-  options.setForceLTR(settings->value("Force LTR",false).toBool());
+  options.setIgnoreDiacritics(settings.value("Ignore diacritics",true).toBool());
+  options.setWholeWordMatch(settings.value("Whole word",true).toBool());
+  options.setForceLTR(settings.value("Force LTR",false).toBool());
 
   ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Local,this);
   d->setOptions(options);
@@ -1928,14 +1928,14 @@ QString GraphicsEntry::getPageInfo(bool summary) {
  * @param node
  */
 void GraphicsEntry::print(QPrinter & printer,const QString & node) {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Printer");
-  bool pdfoutput = settings->value(SID_PRINTER_OUTPUT_PDF).toBool();
+  SETTINGS
+  settings.beginGroup("Printer");
+  bool pdfoutput = settings.value(SID_PRINTER_OUTPUT_PDF).toBool();
 
   if (pdfoutput) {
-    QString pdfdir = settings->value(SID_PRINTER_PDF_DIRECTORY).toString();
+    QString pdfdir = settings.value(SID_PRINTER_PDF_DIRECTORY).toString();
     QString filename;
-    filename = getOutputFilename(pdfdir,settings->value(SID_PRINTER_AUTONAME_METHOD).toString(),node);
+    filename = getOutputFilename(pdfdir,settings.value(SID_PRINTER_AUTONAME_METHOD).toString(),node);
     printer.setOutputFileName(filename);
   }
   QString html; // = "<html><body>";
@@ -2007,23 +2007,23 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
  */
 void GraphicsEntry::onReload() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Entry");
-  m_debug = settings->value(SID_ENTRY_DEBUG,false).toBool();
-  QString css = settings->value(SID_ENTRY_CSS,QString("entry.css")).toString();
+  SETTINGS
+  settings.beginGroup("Entry");
+  m_debug = settings.value(SID_ENTRY_DEBUG,false).toBool();
+  QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
   css = readCssFromFile(css);
   if (! css.isEmpty()) {
     m_currentCss = css;
     emit(cssChanged());
   }
-  css = settings->value(SID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
+  css = settings.value(SID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
   css = readCssFromFile(css);
   if (! css.isEmpty()) {
     m_printCss = css;
   }
-  settings->endGroup();
-  settings->beginGroup("XSLT");
-  m_entryXslt = settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+  settings.endGroup();
+  settings.beginGroup("XSLT");
+  m_entryXslt = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
   m_entryXslt = getLexicon()->getResourcePath(Lexicon::XSLT,m_entryXslt);
   QString html;
   for (int i=0;i < m_items.size();i++) {
@@ -2206,9 +2206,9 @@ bool GraphicsEntry::saveLink(const QString & linkWord,const QString & target) {
     return false;
   }
   if (noshow->isChecked()) {
-    QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-    settings->beginGroup("Entry");
-    settings->setValue(SID_ENTRY_SHOW_LINK_WARNING,false);
+    SETTINGS
+    settings.beginGroup("Entry");
+    settings.setValue(SID_ENTRY_SHOW_LINK_WARNING,false);
     m_showLinkWarning = false;
   }
   return true;

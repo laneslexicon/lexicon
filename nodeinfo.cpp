@@ -1,15 +1,15 @@
 #include "nodeinfo.h"
 #include "application.h"
-
+#include "externs.h"
 NodeInfo::NodeInfo(QWidget * parent)
   : QDialog(parent) {
 
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("System");
-  QString fontString = settings->value("Arabic font").toString();
-  settings->endGroup();
-  settings->beginGroup("FullSearch");
-  QString sz = settings->value("Viewer size",QString()).toString();
+  SETTINGS
+  settings.beginGroup("System");
+  QString fontString = settings.value("Arabic font").toString();
+  settings.endGroup();
+  settings.beginGroup("FullSearch");
+  QString sz = settings.value("Viewer size",QString()).toString();
   if (! sz.isEmpty())
     this->setPreferredSize(sz);
 

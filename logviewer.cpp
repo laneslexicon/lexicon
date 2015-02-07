@@ -2,6 +2,7 @@
 #include "QsLog.h"
 #include "place.h"
 #include "application.h"
+#include "externs.h"
 #include "definedsettings.h"
 LogViewer::LogViewer(QWidget * parent) : QWidget(parent) {
   this->setObjectName("logviewer");
@@ -50,15 +51,15 @@ LogViewer::LogViewer(QWidget * parent) : QWidget(parent) {
 
 }
 void LogViewer::readSettings() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Logging");
-  m_log.setFileName(settings->value(SID_LOGGING_FILE,"../log.txt").toString());
-  m_maxlines = settings->value(SID_LOGGING_VIEWER_MAXLINES,1000).toInt();
-  m_refreshInterval = settings->value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
-  this->restoreGeometry(settings->value("Geometry").toByteArray());
-  settings->endGroup();
-  settings->beginGroup("System");
-  QString theme = settings->value("Theme",QString()).toString();
+  SETTINGS
+  settings.beginGroup("Logging");
+  m_log.setFileName(settings.value(SID_LOGGING_FILE,"../log.txt").toString());
+  m_maxlines = settings.value(SID_LOGGING_VIEWER_MAXLINES,1000).toInt();
+  m_refreshInterval = settings.value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
+  this->restoreGeometry(settings.value("Geometry").toByteArray());
+  settings.endGroup();
+  settings.beginGroup("System");
+  QString theme = settings.value("Theme",QString()).toString();
   QString section;
   if (theme.isEmpty()) {
     section = "Icons-Default";
@@ -66,9 +67,9 @@ void LogViewer::readSettings() {
   else {
     section = QString("Icons-%1").arg(theme);
   }
-  settings->endGroup();
-  settings->beginGroup(section);
-  QString imgdir = settings->value("Directory","images").toString();
+  settings.endGroup();
+  settings.beginGroup(section);
+  QString imgdir = settings.value("Directory","images").toString();
   QFileInfo fi(imgdir);
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Theme directory not found:%1")).arg(imgdir);
@@ -80,7 +81,7 @@ void LogViewer::readSettings() {
   }
   QString filename;
   QDir d(imgdir);
-  filename = settings->value("Warning",QString()).toString();
+  filename = settings.value("Warning",QString()).toString();
   fi.setFile(d,filename);
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
@@ -88,7 +89,7 @@ void LogViewer::readSettings() {
   else {
     m_warning = new QIcon(fi.absoluteFilePath());
   }
-  filename = settings->value("Error",QString()).toString();
+  filename = settings.value("Error",QString()).toString();
   fi.setFile(d,filename);
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
@@ -96,7 +97,7 @@ void LogViewer::readSettings() {
   else {
     m_error = new QIcon(fi.absoluteFilePath());
   }
-  filename = settings->value("Info",QString()).toString();
+  filename = settings.value("Info",QString()).toString();
   fi.setFile(d,filename);
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
@@ -104,7 +105,7 @@ void LogViewer::readSettings() {
   else {
     m_info = new QIcon(fi.absoluteFilePath());
   }
-  filename = settings->value("Debug",QString()).toString();
+  filename = settings.value("Debug",QString()).toString();
   fi.setFile(d,filename);
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
@@ -114,10 +115,10 @@ void LogViewer::readSettings() {
   }
 }
 void LogViewer::writeSettings() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Logging");
-  settings->setValue("Geometry", saveGeometry());
-  settings->endGroup();
+  SETTINGS
+  settings.beginGroup("Logging");
+  settings.setValue("Geometry", saveGeometry());
+  settings.endGroup();
 }
 QSize LogViewer::sizeHint() const {
   return QSize(400,600);

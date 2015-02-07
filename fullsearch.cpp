@@ -623,60 +623,60 @@ QString FullSearchWidget::transform(const QString & xml) {
 }
 void FullSearchWidget::readSettings() {
   QString v;
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Entry");
-  QString css = settings->value("CSS",QString("entry.css")).toString();
+  SETTINGS
+  settings.beginGroup("Entry");
+  QString css = settings.value("CSS",QString("entry.css")).toString();
   css = getLexicon()->getResourcePath(Lexicon::Stylesheet,css);
   readCssFromFile(css);
-  //m_xsltSource = settings->value("XSLT",QString("entry.xslt")).toString();
-  settings->endGroup();
-  settings->beginGroup("FullSearch");
-  m_singleRow = settings->value("One row",true).toBool();
-  QString f = settings->value("Results font",QString()).toString();
+  //m_xsltSource = settings.value("XSLT",QString("entry.xslt")).toString();
+  settings.endGroup();
+  settings.beginGroup("FullSearch");
+  m_singleRow = settings.value("One row",true).toBool();
+  QString f = settings.value("Results font",QString()).toString();
   if (! f.isEmpty()) {
     m_resultsFont.fromString(f);
   }
-  m_xsltSource = settings->value("XSLT",QString("node.xslt")).toString();
+  m_xsltSource = settings.value("XSLT",QString("node.xslt")).toString();
   m_xsltSource = getLexicon()->getResourcePath(Lexicon::XSLT,m_xsltSource);
-  m_debug = settings->value("Debug",false).toBool();
-  m_fragmentSize = settings->value("Fragment size",40).toInt();
+  m_debug = settings.value("Debug",false).toBool();
+  m_fragmentSize = settings.value("Fragment size",40).toInt();
 
-  m_defaultOptions.setIncludeHeads(settings->value("Include heads",false).toBool());
+  m_defaultOptions.setIncludeHeads(settings.value("Include heads",false).toBool());
 
-  v = settings->value("Head word background").toString();
+  v = settings.value("Head word background").toString();
   m_headBackgroundColor.setNamedColor(v);
-  m_headText = settings->value("Head text").toString();
-  settings->endGroup();
+  m_headText = settings.value("Head text").toString();
+  settings.endGroup();
 
-  settings->beginGroup("Search");
-  v  = settings->value("Type",QString("normal")).toString();
+  settings.beginGroup("Search");
+  v  = settings.value("Type",QString("normal")).toString();
   if (v == "normal")
     m_defaultOptions.setSearchType(SearchOptions::Normal);
   else
     m_defaultOptions.setSearchType(SearchOptions::Regex);
 
 
-  m_defaultOptions.setIgnoreDiacritics(settings->value("Ignore diacritics",true).toBool());
+  m_defaultOptions.setIgnoreDiacritics(settings.value("Ignore diacritics",true).toBool());
 
-  m_defaultOptions.setWholeWordMatch(settings->value("Whole word",false).toBool());
-  settings->endGroup();
-  settings->beginGroup("Diacritics");
-  QStringList keys = settings->childKeys();
+  m_defaultOptions.setWholeWordMatch(settings.value("Whole word",false).toBool());
+  settings.endGroup();
+  settings.beginGroup("Diacritics");
+  QStringList keys = settings.childKeys();
   QStringList points;
   for(int i=0;i < keys.size();i++) {
     if (keys[i].startsWith("Char")) {
-      v = settings->value(keys[i],QString()).toString();
+      v = settings.value(keys[i],QString()).toString();
       points << v;
     }
   }
   m_diacritics = QString("[\\x%1]*").arg(points.join("\\x"));
 
-  settings->endGroup();
-  settings->beginGroup("Embedded");
-  m_spanStyle = settings->value("fullsearch",QString()).toString();
-  settings->endGroup();
-  settings->beginGroup("Keyboards");
-  m_keyboardConfig = settings->value("Config","keyboard.ini").toString();
+  settings.endGroup();
+  settings.beginGroup("Embedded");
+  m_spanStyle = settings.value("fullsearch",QString()).toString();
+  settings.endGroup();
+  settings.beginGroup("Keyboards");
+  m_keyboardConfig = settings.value("Config","keyboard.ini").toString();
 
 }
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
