@@ -227,6 +227,10 @@ QSettings * Lexicon::getSettings() {
   settings->setIniCodec("UTF-8");
   return settings;
 }
+QString Lexicon::settingsFileName() {
+  QFileInfo f(m_settingsDir,m_configFile);
+  return f.absoluteFilePath();
+}
 QVariant Lexicon::getValue(const QString & group,const QString & key) {
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings s(f.absoluteFilePath(),QSettings::IniFormat);
