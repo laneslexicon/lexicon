@@ -258,10 +258,10 @@ void LanesLexicon::showStartupEntry() {
   }
 }
 void LanesLexicon::restoreSavedState() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Main");
-  this->restoreGeometry(settings->value("Geometry").toByteArray());
-  this->restoreState(settings->value("State").toByteArray());
+  SETTINGS
+  settings.beginGroup("Main");
+  this->restoreGeometry(settings.value("Geometry").toByteArray());
+  this->restoreState(settings.value("State").toByteArray());
  }
 void LanesLexicon::closeEvent(QCloseEvent * event) {
   cleanup();
@@ -615,26 +615,26 @@ void LanesLexicon::setupShortcuts() {
   else {
     update = true;
   }
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Shortcut");
+  SETTINGS
+  settings.beginGroup("Shortcut");
 
-  QStringList keys = settings->childKeys();
+  QStringList keys = settings.childKeys();
   for(int i=0;i < keys.size();i++) {
     if (keys[i] == "Go Tab") {
       /// TODO make this a user string of characters
       /// e.g 123456789abcdef
       for(int j=1;j < 10;j++) {
-        QString ks = QString("%1,%2").arg(settings->value(keys[i]).toString()).arg(j);
+        QString ks = QString("%1,%2").arg(settings.value(keys[i]).toString()).arg(j);
         QString name = QString("%1-%2").arg(keys[i]).arg(j);
         addShortcut(name,ks,update);
       }
     }
     else {
-      addShortcut(keys[i],settings->value(keys[i]).toString(),update);
+      addShortcut(keys[i],settings.value(keys[i]).toString(),update);
     }
   }
   connect(m_shortcutMap,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
-  settings->endGroup();
+  settings.endGroup();
 }
 void LanesLexicon::addShortcut(const QString & name,const QString & k,bool update) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << name << k << update;
@@ -1673,48 +1673,49 @@ void LanesLexicon::readSettings() {
     m_startupNode = "n" + m_startupNode;
   }
   m_startupRoot = cmdOptions.value("root");
-  QScopedPointer<QSettings> settings(app->getSettings());
+  SETTINGS
+    //  QScopedPointer<QSettings> settings(app->getSettings());
   ///
   /// System group
   ///
-  settings->beginGroup("System");
-  m_dbName = settings->value("Database","lexicon.sqlite").toString();
+  settings.beginGroup("System");
+  m_dbName = settings.value("Database","lexicon.sqlite").toString();
   if (cmdOptions.contains("db")) {
     m_dbName = cmdOptions.value("db");
   }
-  m_applicationCssFile = settings->value("Stylesheet","app.css").toString();
-  QString ar = settings->value("Arabic font").toString();
+  m_applicationCssFile = settings.value("Stylesheet","app.css").toString();
+  QString ar = settings.value("Arabic font").toString();
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
   }
 
-  m_toolbarText = settings->value("Toolbar text",false).toBool();
-  m_nullMap = settings->value("Null map","Native").toString();
-  m_currentMap = settings->value("Current map","Native").toString();
+  m_toolbarText = settings.value("Toolbar text",false).toBool();
+  m_nullMap = settings.value("Null map","Native").toString();
+  m_currentMap = settings.value("Current map","Native").toString();
 
-  m_interfaceWarning = settings->value("Show interface warning",true).toBool();
-  m_saveSettings = settings->value("Save settings",true).toBool();
+  m_interfaceWarning = settings.value("Show interface warning",true).toBool();
+  m_saveSettings = settings.value("Save settings",true).toBool();
   if (cmdOptions.contains("nosave")) {
     m_saveSettings = false;
   }
-  m_saveTabs = settings->value("Save tabs",true).toBool();
+  m_saveTabs = settings.value("Save tabs",true).toBool();
 
-  m_restoreTabs = settings->value("Restore tabs",true).toBool();
+  m_restoreTabs = settings.value("Restore tabs",true).toBool();
   if (cmdOptions.contains("notabs")) {
     m_restoreTabs = false;
   }
-  m_debug = settings->value("Debug",false).toBool();
+  m_debug = settings.value("Debug",false).toBool();
   if (cmdOptions.contains("debug")) {
     m_debug = true;
   }
 
-  m_saveBookmarks = settings->value("Save bookmarks",true).toBool();
-  m_restoreBookmarks = settings->value("Restore bookmarks",true).toBool();
+  m_saveBookmarks = settings.value("Save bookmarks",true).toBool();
+  m_restoreBookmarks = settings.value("Restore bookmarks",true).toBool();
 
-  m_docked = settings->value("Docked",false).toBool();
-  m_minimalAction->setChecked(settings->value("Minimal interface",false).toBool());
+  m_docked = settings.value("Docked",false).toBool();
+  m_minimalAction->setChecked(settings.value("Minimal interface",false).toBool());
 
-  v  = settings->value("Navigation","root").toString();
+  v  = settings.value("Navigation","root").toString();
 
   if (v.toLower() == "root") {
     m_navMode = Lane::By_Root;
@@ -1722,36 +1723,36 @@ void LanesLexicon::readSettings() {
   else {
     m_navMode = Lane::By_Page;
   }
-  v = settings->value("Title",tr("Lane's Arabic-English Lexicon")).toString();
+  v = settings.value("Title",tr("Lane's Arabic-English Lexicon")).toString();
   this->setWindowTitle(v);
 
-  m_toolbarIconSize = settings->value("Icon size",QSize(16,16)).toSize();
+  m_toolbarIconSize = settings.value("Icon size",QSize(16,16)).toSize();
 
-  m_keymapsEnabled = settings->value("Keymaps",false).toBool();
+  m_keymapsEnabled = settings.value("Keymaps",false).toBool();
 
-  m_linkContents = settings->value("Contents linked",false).toBool();
+  m_linkContents = settings.value("Contents linked",false).toBool();
   m_linkAction->setChecked(m_linkContents);
 
-  settings->endGroup();
+  settings.endGroup();
   ///
   /// Search
   ///
-  settings->beginGroup("Search");
+  settings.beginGroup("Search");
 
-  m_searchOptions.setNewTab(settings->value("New tab",true).toBool());
-  m_searchOptions.setActivateTab(settings->value("Switch tab",true).toBool());
+  m_searchOptions.setNewTab(settings.value("New tab",true).toBool());
+  m_searchOptions.setActivateTab(settings.value("Switch tab",true).toBool());
 
-  v  = settings->value("Type",QString("normal")).toString();
+  v  = settings.value("Type",QString("normal")).toString();
   if (v == "normal")
     m_searchOptions.setSearchType(SearchOptions::Normal);
   else
     m_searchOptions.setSearchType(SearchOptions::Regex);
 
-  m_searchOptions.setIgnoreDiacritics(settings->value("Ignore diacritics",true).toBool());
-  m_searchOptions.setWholeWordMatch(settings->value("Whole word",false).toBool());
+  m_searchOptions.setIgnoreDiacritics(settings.value("Ignore diacritics",true).toBool());
+  m_searchOptions.setWholeWordMatch(settings.value("Whole word",false).toBool());
 
 
-  // v = settings->value("Target",QString("Arabic")).toString();
+  // v = settings.value("Target",QString("Arabic")).toString();
   // if (v == "Arabic")
   //   m_searchOptions |= Lane::Arabic;
   // else
@@ -1759,41 +1760,41 @@ void LanesLexicon::readSettings() {
 
   m_searchOptions.setKeymaps(m_keymapsEnabled);
 
-  settings->endGroup();
+  settings.endGroup();
 
-  settings->beginGroup("FullSearch");
-  m_searchOptions.setIncludeHeads(settings->value("Include heads",false).toBool());
-  settings->endGroup();
+  settings.beginGroup("FullSearch");
+  m_searchOptions.setIncludeHeads(settings.value("Include heads",false).toBool());
+  settings.endGroup();
   ///
   /// Debug
   ///
-  settings->beginGroup("Debug");
-  m_valgrind = settings->value("Valgrind",false).toBool();
-  settings->endGroup();
+  settings.beginGroup("Debug");
+  m_valgrind = settings.value("Valgrind",false).toBool();
+  settings.endGroup();
   ///
   /// Notes
   ///
-  settings->beginGroup("Notes");
-  m_notesDbName = settings->value("Database","notes.sqlite").toString();
-  m_useNotes = settings->value("Enabled",true).toBool();
-  settings->endGroup();
+  settings.beginGroup("Notes");
+  m_notesDbName = settings.value("Database","notes.sqlite").toString();
+  m_useNotes = settings.value("Enabled",true).toBool();
+  settings.endGroup();
   ///
   /// History
   ///
-  settings->beginGroup("History");
-  m_historyEnabled = settings->value("Enabled",true).toBool();
-  m_historyDbName = settings->value("Database","history.sqlite").toString();
-  v = settings->value("Menu font",QString()).toString();
+  settings.beginGroup("History");
+  m_historyEnabled = settings.value("Enabled",true).toBool();
+  m_historyDbName = settings.value("Database","history.sqlite").toString();
+  v = settings.value("Menu font",QString()).toString();
   if (! v.isEmpty()) {
     m_historyMenuFont.fromString(v);
   }
-  settings->endGroup();
+  settings.endGroup();
   ///
   /// Roots
   ///
-  settings->beginGroup("Roots");
-  m_treeKeepsFocus = settings->value("Keep focus",true).toBool();
-  settings->endGroup();
+  settings.beginGroup("Roots");
+  m_treeKeepsFocus = settings.value("Keep focus",true).toBool();
+  settings.endGroup();
 
   /**
    * we are have a default map set that is used to convert input to Arabic
@@ -1802,11 +1803,11 @@ void LanesLexicon::readSettings() {
   ///
   /// Maps
   ///
-  settings->beginGroup("Maps");
-  QStringList groups = settings->childGroups();
+  settings.beginGroup("Maps");
+  QStringList groups = settings.childGroups();
   for(int i=0; i < groups.size();i++) {
-    settings->beginGroup(groups[i]);
-    v = settings->value("file",QString()).toString();
+    settings.beginGroup(groups[i]);
+    v = settings.value("file",QString()).toString();
     v = getLexicon()->getResourcePath(Lexicon::Map,v);
     QFile file(v);
     if ( file.exists() ) {
@@ -1820,100 +1821,101 @@ void LanesLexicon::readSettings() {
     else {
       QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(groups[i]).arg(v);
     }
-    settings->endGroup();
+    settings.endGroup();
   }
-  settings->endGroup();
+  settings.endGroup();
   if ((m_currentMap != m_nullMap) && ! m_maps.contains(m_currentMap) ) {
     QLOG_WARN() << QString(tr("Default map <%1> not found in settings")).arg(m_currentMap);
   }
 }
 void LanesLexicon::writeSettings() {
   QString v;
-  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  QScopedPointer<QSettings> settings(app->getSettings());
+  //  Lexicon * app = qobject_cast<Lexicon *>(qApp);
+  //  QScopedPointer<QSettings> settings(app->getSettings());
 
   if (! m_saveSettings )
     return;
 
+  SETTINGS
   ///
   /// Tabs
   ///
   if (m_saveTabs) {
-    settings->beginGroup("Tabs");
-    settings->remove("");
+    settings.beginGroup("Tabs");
+    settings.remove("");
     for(int i=0;i < m_tabs->count();i++) {
       GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
       if (entry) {
         Place p = entry->getPlace();
-        settings->beginGroup(QString("Tab-%1").arg(i));
-        settings->setValue("type","entry");
-        settings->setValue("place",p.toString());
-        settings->setValue("zoom",entry->getScale());
-        settings->setValue("textwidth",entry->getTextWidth());
+        settings.beginGroup(QString("Tab-%1").arg(i));
+        settings.setValue("type","entry");
+        settings.setValue("place",p.toString());
+        settings.setValue("zoom",entry->getScale());
+        settings.setValue("textwidth",entry->getTextWidth());
         v = entry->getHome();
         if (! v.isEmpty()) {
-          settings->setValue("home",v);
+          settings.setValue("home",v);
         }
-        settings->endGroup();
+        settings.endGroup();
       }
       else {
         NoteBrowser * browser = qobject_cast<NoteBrowser *>(m_tabs->widget(i));
         if (browser) {
-          settings->beginGroup(QString("Tab-%1").arg(i));
-          settings->setValue("type","notes");
-          settings->endGroup();
+          settings.beginGroup(QString("Tab-%1").arg(i));
+          settings.setValue("type","notes");
+          settings.endGroup();
         }
         else {
           /// could be search results
         }
       }
     }
-    settings->endGroup();
+    settings.endGroup();
     ///
     ///  System
     ///
-    settings->beginGroup("System");
-    settings->setValue("Focus tab",m_tabs->currentIndex());
-    settings->setValue("Minimal interface",m_minimalAction->isChecked());
-    settings->setValue("Show interface warning",m_interfaceWarning);
-    settings->setValue("Current map",m_currentMap);
-    settings->setValue("Sync",m_linkContents);
-    settings->setValue("Contents linked",m_linkContents);
+    settings.beginGroup("System");
+    settings.setValue("Focus tab",m_tabs->currentIndex());
+    settings.setValue("Minimal interface",m_minimalAction->isChecked());
+    settings.setValue("Show interface warning",m_interfaceWarning);
+    settings.setValue("Current map",m_currentMap);
+    settings.setValue("Sync",m_linkContents);
+    settings.setValue("Contents linked",m_linkContents);
     /// TODO change this
     if (m_navMode == Lane::By_Root) {
-      settings->setValue("Navigation","root");
+      settings.setValue("Navigation","root");
     }
     else {
-      settings->setValue("Navigation","page");
+      settings.setValue("Navigation","page");
     }
-    settings->endGroup();
+    settings.endGroup();
   }
   ///
   /// Bookmarks
   ///
   if (m_saveBookmarks) {
-    settings->beginGroup("Bookmarks");
-    settings->remove("");
+    settings.beginGroup("Bookmarks");
+    settings.remove("");
     QStringList keys = m_bookmarks.keys();
     for(int i=0;i < keys.size();i++) {
       Place p = m_bookmarks.value(keys[i]);
-      settings->setValue(keys[i],p.toString());
+      settings.setValue(keys[i],p.toString());
     }
-    settings->endGroup();
+    settings.endGroup();
   }
   ///
   /// History
   ///
-  settings->beginGroup("History");
-  settings->setValue("Enabled",m_historyEnabled);
-  settings->endGroup();
+  settings.beginGroup("History");
+  settings.setValue("Enabled",m_historyEnabled);
+  settings.endGroup();
   ///
   /// Main
   ///
-  settings->beginGroup("Main");
-  settings->setValue("State",this->saveState());
-  settings->setValue("Geometry", saveGeometry());
-  settings->endGroup();
+  settings.beginGroup("Main");
+  settings.setValue("State",this->saveState());
+  settings.setValue("Geometry", saveGeometry());
+  settings.endGroup();
 }
 void LanesLexicon::restoreTabs() {
   bool ok;
@@ -1923,13 +1925,14 @@ void LanesLexicon::restoreTabs() {
   QMap<QString,QString> cmdOptions = app->getOptions();
 
 
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("System");
-  int focusTab =  settings->value("Focus tab",0).toInt();
-  settings->endGroup();
+  //  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  SETTINGS
+  settings.beginGroup("System");
+  int focusTab =  settings.value("Focus tab",0).toInt();
+  settings.endGroup();
   int textWidth;
-  settings->beginGroup("Entry");
-  textWidth = settings->value("Text width",400).toInt(&ok);
+  settings.beginGroup("Entry");
+  textWidth = settings.value("Text width",400).toInt(&ok);
   if (!ok) {
     textWidth = 400;
   }
@@ -1939,29 +1942,29 @@ void LanesLexicon::restoreTabs() {
       textWidth = w;
     }
   }
-  settings->endGroup();
+  settings.endGroup();
   Place wp;
-  settings->beginGroup("Tabs");
-  QStringList tabs = settings->childGroups();
+  settings.beginGroup("Tabs");
+  QStringList tabs = settings.childGroups();
   /// restore tab may fail, so we need to keep count of the actual tabs
   int j = 0;
   for(int i=0;i < tabs.size();i++) {
-    settings->beginGroup(tabs[i]);
-    if (settings->value("type","entry").toString() == "notes") {
+    settings.beginGroup(tabs[i]);
+    if (settings.value("type","entry").toString() == "notes") {
       NoteBrowser * notes = new NoteBrowser(this);
       m_tabs->addTab(notes,tr("Notes"));
       j++;
     }
     else {
-      v = settings->value("place",QString()).toString();
-      qreal scale = settings->value("zoom",1.0).toReal(&ok);
+      v = settings.value("place",QString()).toString();
+      qreal scale = settings.value("zoom",1.0).toReal(&ok);
       if ( !ok ) {
         scale = 1.0;
       }
       Place p = Place::fromString(v);
       int tw;
       if (! cmdOptions.contains("textwidth")) {
-        tw = settings->value("textwidth",textWidth).toInt(&ok);
+        tw = settings.value("textwidth",textWidth).toInt(&ok);
         if (!ok) {
           tw = textWidth;
         }
@@ -1969,7 +1972,7 @@ void LanesLexicon::restoreTabs() {
       else {
         tw = textWidth;
       }
-      home = settings->value("home",QString()).toString();
+      home = settings.value("home",QString()).toString();
       if (p.isValid()) {
         if (focusTab == i) {
           focusTab = j;
@@ -1992,9 +1995,9 @@ void LanesLexicon::restoreTabs() {
         QLOG_DEBUG() << Q_FUNC_INFO << "invalid place" << p;
       }
     }
-    settings->endGroup();
+    settings.endGroup();
   }
-  settings->endGroup();
+  settings.endGroup();
   wp.setAction(Place::RestoreTab);
   if (focusTab < m_tabs->count()) {
     m_tabs->setCurrentIndex(focusTab);
@@ -2393,11 +2396,11 @@ void LanesLexicon::bookmarkJump(const QString & id,bool newTab,bool switchTab) {
   updateMenu();
 }
 void LanesLexicon::restoreBookmarks() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Bookmarks");
-  QStringList keys = settings->childKeys();
+  SETTINGS
+  settings.beginGroup("Bookmarks");
+  QStringList keys = settings.childKeys();
   for(int i=0;i < keys.size();i++) {
-    QString t = settings->value(keys[i]).toString();
+    QString t = settings.value(keys[i]).toString();
     Place p = Place::fromString(t);
     if (p.isValid()) {
       m_bookmarks.insert(keys[i],p);
@@ -2413,12 +2416,12 @@ void LanesLexicon::restoreBookmarks() {
  *
  */
 void LanesLexicon::setupBookmarkShortcuts() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Bookmark");
+  SETTINGS
+  settings.beginGroup("Bookmark");
   m_bookmarkMap = new QSignalMapper(this);
-  QString key = settings->value("Add","Ctrl+B").toString();
+  QString key = settings.value("Add","Ctrl+B").toString();
   /// TODO get this from INI
-  QString ids = settings->value("Id","abcdefghijklmnopqrstuvwxyz").toString();
+  QString ids = settings.value("Id","abcdefghijklmnopqrstuvwxyz").toString();
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toLower());
     //    QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toUpper());
@@ -2438,7 +2441,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   }
   m_bookmarkAddAction = new QAction(tr("Add"),this);
 
-  key = settings->value("Jump","Ctrl+J").toString();
+  key = settings.value("Jump","Ctrl+J").toString();
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toLower());
     QShortcut * sc = new QShortcut(ks,this);
@@ -2456,7 +2459,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkJumpAction = new QAction(tr("Jump"),this);
 
   QShortcut * sc;
-  key = settings->value("List","Ctrl+B,Ctrl+L").toString();
+  key = settings.value("List","Ctrl+B,Ctrl+L").toString();
   sc = new QShortcut(key,this);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
   connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
@@ -2467,7 +2470,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkListAction->setShortcutContext(Qt::WidgetShortcut);
   connect(m_bookmarkListAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
 
-  key = settings->value("Revert","Ctrl+B,Ctrl+R").toString();
+  key = settings.value("Revert","Ctrl+B,Ctrl+R").toString();
   sc = new QShortcut(key,this);
     sc->setContext(Qt::ApplicationShortcut);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
@@ -2477,7 +2480,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkRevertAction->setShortcutContext(Qt::WidgetShortcut);
   connect(m_bookmarkRevertAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
 
-  key = settings->value("Clear","Ctrl+B,Ctrl+C").toString();
+  key = settings.value("Clear","Ctrl+B,Ctrl+C").toString();
   sc = new QShortcut(key,this);
     sc->setContext(Qt::ApplicationShortcut);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
@@ -2911,9 +2914,9 @@ void LanesLexicon::printCurrentPage(const QString & node) {
   if (!entry)
     return;
 
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Printer");
-  m_printerReUse = settings->value(SID_PRINTER_USE).toBool();
+  SETTINGS
+  settings.beginGroup("Printer");
+  m_printerReUse = settings.value(SID_PRINTER_USE).toBool();
 
   if (! m_printer.isValid())
     m_printerReUse = false;
@@ -3123,9 +3126,9 @@ void LanesLexicon::enableKeymaps(bool v) {
   }
   m_searchOptions.setKeymaps(v);
   setStatus(tip);
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("System");
-  settings->setValue("Keymaps",v);
+  SETTINGS
+  settings.beginGroup("System");
+  settings.setValue("Keymaps",v);
 }
 QString LanesLexicon::getActiveKeymap() const {
   return m_currentMap;
@@ -3227,8 +3230,8 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   QLOG_DEBUG() << Q_FUNC_INFO;
   bool ok = true;
   QString iconfile;
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Icons");
+  SETTINGS
+  settings.beginGroup("Icons");
 
   QDir imgd = QDir(getLexicon()->getResourcePath(Lexicon::Image));
   ok = imgd.exists();
@@ -3238,7 +3241,7 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
    * for 16px,32px etc icons
    */
 
-  QString subdir = settings->value("Directory",QString()).toString();
+  QString subdir = settings.value("Directory",QString()).toString();
   if (! subdir.isEmpty()) {
     if (imgd.exists(subdir)) {
       if (imgd.cd(subdir)) {
@@ -3251,92 +3254,92 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
     return;
   }
   QString imgdir = imgd.absolutePath();
-  iconfile = settings->value("Exit",QString()).toString();
+  iconfile = settings.value("Exit",QString()).toString();
   setIcon(m_exitAction,imgdir,iconfile);
 
-  iconfile = settings->value("History",QString()).toString();
+  iconfile = settings.value("History",QString()).toString();
   setIcon(m_historyAction,imgdir,iconfile);
 
 
-  iconfile = settings->value("Next",QString()).toString();
+  iconfile = settings.value("Next",QString()).toString();
   setIcon(m_navNextAction,imgdir,iconfile);
 
-  iconfile = settings->value("Back",QString()).toString();
+  iconfile = settings.value("Back",QString()).toString();
   setIcon(m_navPrevAction,imgdir,iconfile);
 
-  iconfile = settings->value("First",QString()).toString();
+  iconfile = settings.value("First",QString()).toString();
   setIcon(m_navFirstAction,imgdir,iconfile);
 
-  iconfile = settings->value("Last",QString()).toString();
+  iconfile = settings.value("Last",QString()).toString();
   setIcon(m_navLastAction,imgdir,iconfile);
 
-  iconfile = settings->value("Docs",QString()).toString();
+  iconfile = settings.value("Docs",QString()).toString();
   setIcon(m_docAction,imgdir,iconfile);
 
-  iconfile = settings->value("About",QString()).toString();
+  iconfile = settings.value("About",QString()).toString();
   setIcon(m_aboutAction,imgdir,iconfile);
 
-  iconfile = settings->value("Bookmarks",QString()).toString();
+  iconfile = settings.value("Bookmarks",QString()).toString();
   setIcon(m_bookmarkAction,imgdir,iconfile);
 
-  iconfile = settings->value("Search",QString()).toString();
+  iconfile = settings.value("Search",QString()).toString();
   setIcon(m_searchAction,imgdir,iconfile);
 
-  iconfile = settings->value("Zoom",QString()).toString();
+  iconfile = settings.value("Zoom",QString()).toString();
   setIcon(m_defaultScaleAction,imgdir,iconfile);
 
-  iconfile = settings->value("ZoomIn",QString()).toString();
+  iconfile = settings.value("ZoomIn",QString()).toString();
   setIcon(m_zoomInAction,imgdir,iconfile);
 
-  iconfile = settings->value("ZoomOut",QString()).toString();
+  iconfile = settings.value("ZoomOut",QString()).toString();
   setIcon(m_zoomOutAction,imgdir,iconfile);
 
-  iconfile = settings->value("Widen",QString()).toString();
+  iconfile = settings.value("Widen",QString()).toString();
   setIcon(m_widenAction,imgdir,iconfile);
 
-  iconfile = settings->value("Narrow",QString()).toString();
+  iconfile = settings.value("Narrow",QString()).toString();
   setIcon(m_narrowAction,imgdir,iconfile);
 
-  iconfile = settings->value("Print",QString()).toString();
+  iconfile = settings.value("Print",QString()).toString();
   setIcon(m_printAction,imgdir,iconfile);
 
-  iconfile = settings->value("Local search",QString()).toString();
+  iconfile = settings.value("Local search",QString()).toString();
   setIcon(m_localSearchAction,imgdir,iconfile);
 
-  iconfile = settings->value("Local search next",QString()).toString();
+  iconfile = settings.value("Local search next",QString()).toString();
   setIcon(m_localSearchNextAction,imgdir,iconfile);
 
-  iconfile = settings->value("Clear",QString()).toString();
+  iconfile = settings.value("Clear",QString()).toString();
   setIcon(m_clearAction,imgdir,iconfile);
   m_clearAction->setEnabled(false);
 
-  iconfile = settings->value("Keymaps",QString()).toString();
+  iconfile = settings.value("Keymaps",QString()).toString();
   setIcon(m_keymapsAction,imgdir,iconfile);
 
-  iconfile = settings->value("Keymaps-disabled",QString()).toString();
+  iconfile = settings.value("Keymaps-disabled",QString()).toString();
   setIcon(m_keymapsAction,imgdir,iconfile);
 
-  iconfile = settings->value("Preferences",QString()).toString();
+  iconfile = settings.value("Preferences",QString()).toString();
   setIcon(m_optionsAction,imgdir,iconfile);
 
-  iconfile = settings->value("Logs",QString()).toString();
+  iconfile = settings.value("Logs",QString()).toString();
   setIcon(m_logViewerAction,imgdir,iconfile);
 
-  iconfile = settings->value("Sync right",QString()).toString();
+  iconfile = settings.value("Sync right",QString()).toString();
   setIcon(m_syncFromContentsAction,imgdir,iconfile);
 
-  iconfile = settings->value("Sync left",QString()).toString();
+  iconfile = settings.value("Sync left",QString()).toString();
   setIcon(m_syncFromEntryAction,imgdir,iconfile);
 
 
   QIcon icon;
-  iconfile = settings->value("Link",QString()).toString();
+  iconfile = settings.value("Link",QString()).toString();
 
   if (imgd.exists(iconfile)) {
     icon.addPixmap(imgd.absoluteFilePath(iconfile),QIcon::Normal,QIcon::On);
   }
 
-  iconfile = settings->value("Unlink",QString()).toString();
+  iconfile = settings.value("Unlink",QString()).toString();
   if (imgd.exists(iconfile)) {
     icon.addPixmap(imgd.absoluteFilePath(iconfile),QIcon::Normal,QIcon::Off);
   }
@@ -3473,9 +3476,10 @@ void LanesLexicon::enableForPage(bool v) {
  */
 void LanesLexicon::onDefaultScale() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
-  settings->beginGroup("Entry");
-  qreal scale  = settings->value("Zoom",1.0).toDouble();
+  SETTINGS
+    //  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  settings.beginGroup("Entry");
+  qreal scale  = settings.value("Zoom",1.0).toDouble();
   ZoomDialog * d = new ZoomDialog(scale);
 
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
@@ -3486,7 +3490,7 @@ void LanesLexicon::onDefaultScale() {
   }
   if (d->exec()) {
     if (d->value() != scale) {
-      settings->setValue("Zoom",d->value());
+      settings.setValue("Zoom",d->value());
     }
   }
   else {
