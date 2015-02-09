@@ -15,6 +15,7 @@ class OptionsWidget : public QWidget {
   Q_OBJECT
  public:
   OptionsWidget(QSettings * settings = 0,QWidget * parent = 0);
+  OptionsWidget(const QString & theme,QWidget * parent = 0);
   OptionsWidget(QWidget * parent = 0);
   ~OptionsWidget();
   virtual bool isModified();
@@ -30,6 +31,7 @@ class OptionsWidget : public QWidget {
   bool m_dirty;
   QSettings * m_settings;
   QString m_section;
+  QString m_settingsFileName;
   QLabel * m_info;
   void notifyChange();
  signals:

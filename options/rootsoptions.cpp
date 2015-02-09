@@ -4,13 +4,15 @@
 #ifndef STANDALONE
 #include "application.h"
 #endif
-RootsOptions::RootsOptions(QWidget * parent) : OptionsWidget(parent) {
+RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
+  /*
 #ifdef STANDALONE
   m_settings = new QSettings("default.ini",QSettings::IniFormat);
   m_settings->setIniCodec("UTF-8");
 #else
   m_settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
 #endif
+  */
   m_section = "Roots";
 
   QVBoxLayout * vlayout = new QVBoxLayout;
@@ -79,49 +81,61 @@ RootsOptions::RootsOptions(QWidget * parent) : OptionsWidget(parent) {
   setupConnections();
 }
 void RootsOptions::readSettings() {
-  m_settings->beginGroup(m_section);
+  qDebug() << Q_FUNC_INFO << m_settingsFileName;
+  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup(m_section);
 
-  m_debug->setChecked(m_settings->value(SID_CONTENTS_DEBUG).toBool());
-  m_moveUp->setText(m_settings->value(SID_CONTENTS_MOVE_UP).toString());
-  m_moveDown->setText(m_settings->value(SID_CONTENTS_MOVE_DOWN).toString());
-  m_expand->setText(m_settings->value(SID_CONTENTS_EXPAND).toString());
+  m_debug->setChecked(settings.value(SID_CONTENTS_DEBUG).toBool());
+  m_moveUp->setText(settings.value(SID_CONTENTS_MOVE_UP).toString());
+  m_moveDown->setText(settings.value(SID_CONTENTS_MOVE_DOWN).toString());
+  m_expand->setText(settings.value(SID_CONTENTS_EXPAND).toString());
 
-  m_arabicFont->setText(m_settings->value(SID_CONTENTS_ARABIC_FONT).toString());
-  m_standardFont->setText(m_settings->value(SID_CONTENTS_STANDARD_FONT).toString());
-  m_settings->endGroup();
+  m_arabicFont->setText(settings.value(SID_CONTENTS_ARABIC_FONT).toString());
+  m_standardFont->setText(settings.value(SID_CONTENTS_STANDARD_FONT).toString());
+  settings.endGroup();
 }
 void RootsOptions::writeSettings() {
-  m_settings->beginGroup(m_section);
-  m_settings->setValue(SID_CONTENTS_DEBUG,m_debug->isChecked());
-  m_settings->setValue(SID_CONTENTS_MOVE_UP,m_moveUp->text());
-  m_settings->setValue(SID_CONTENTS_MOVE_DOWN,m_moveDown->text());
-  m_settings->setValue(SID_CONTENTS_EXPAND,m_expand->text());
-  m_settings->setValue(SID_CONTENTS_ARABIC_FONT,m_arabicFont->text());
-  m_settings->setValue(SID_CONTENTS_STANDARD_FONT,m_standardFont->text());
-  m_settings->sync();
+  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup(m_section);
+  settings.setValue(SID_CONTENTS_DEBUG,m_debug->isChecked());
+  settings.setValue(SID_CONTENTS_MOVE_UP,m_moveUp->text());
+  settings.setValue(SID_CONTENTS_MOVE_DOWN,m_moveDown->text());
+  settings.setValue(SID_CONTENTS_EXPAND,m_expand->text());
+  settings.setValue(SID_CONTENTS_ARABIC_FONT,m_arabicFont->text());
+  settings.setValue(SID_CONTENTS_STANDARD_FONT,m_standardFont->text());
+  settings.sync();
 
-  m_settings->endGroup();
+  settings.endGroup();
 }
+/**
+ * TODO not complete
+ *
+ *
+ * @return
+ */
 bool RootsOptions::isModified()  {
   bool v;
   QString s;
   m_dirty = false;
+  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup(m_section);
 
-  m_settings->beginGroup(m_section);
-
-  v = m_settings->value(SID_CONTENTS_DEBUG).toBool();
+  v = settings.value(SID_CONTENTS_DEBUG).toBool();
   if (m_debug->isChecked() != v) {
     m_dirty = true;
   }
-  s = m_settings->value(SID_CONTENTS_MOVE_UP).toString();
+  s = settings.value(SID_CONTENTS_MOVE_UP).toString();
   if (m_moveUp->text() != s) {
     m_dirty = true;
   }
-  s = m_settings->value(SID_CONTENTS_MOVE_DOWN).toString();
+  s = settings.value(SID_CONTENTS_MOVE_DOWN).toString();
   if (m_moveDown->text() != s) {
     m_dirty = true;
   }
-  m_settings->endGroup();
+  settings.endGroup();
   return m_dirty;
 }
 void RootsOptions::onSetFont() {

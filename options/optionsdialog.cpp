@@ -9,24 +9,24 @@
 #include "application.h"
 #include "externs.h"
 #endif
-OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
+OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(parent) {
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
 #ifdef STANDALONE
   QSettings settings("default.ini",QSettings::IniFormat);
-  settings.setIniCodec("UTF-8");
-#else
-  SETTINGS
-#endif
 
-  RootsOptions * tree = new RootsOptions(this);
+#else
+  QSettings settings(getLexicon()->settingsFileName(theme),QSettings::IniFormat);
+#endif
+  settings.setIniCodec("UTF-8");
+  RootsOptions * tree = new RootsOptions(QString(),this);
   m_tabs->addTab(tree,tr("Contents"));
-  PrintOptions * print = new PrintOptions(this);
+  PrintOptions * print = new PrintOptions(QString(),this);
   m_tabs->addTab(print,tr("Printer"));
-  ShortcutOptions * shortcut = new ShortcutOptions(this);
+  ShortcutOptions * shortcut = new ShortcutOptions(QString(),this);
   m_tabs->addTab(shortcut,tr("Shortcuts"));
 
-  DiacriticsOptions * diacritics = new DiacriticsOptions(this);
+  DiacriticsOptions * diacritics = new DiacriticsOptions(QString(),this);
   m_tabs->addTab(diacritics,tr("Diacritics"));
 
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save

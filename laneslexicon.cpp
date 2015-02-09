@@ -28,6 +28,7 @@
 #include "fontchangedialog.h"
 #include "zoomdialog.h"
 #include "editview.h"
+#include "themedialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -803,6 +804,7 @@ void LanesLexicon::createActions() {
   connect(m_convertToEntryAction,SIGNAL(triggered()),this,SLOT(convertToEntry()));
   connect(m_defaultScaleAction,SIGNAL(triggered()),this,SLOT(onDefaultScale()));
   connect(m_selectThemeAction,SIGNAL(triggered()),this,SLOT(onSelectTheme()));
+  connect(m_editThemeAction,SIGNAL(triggered()),this,SLOT(onEditTheme()));
 
 
 }
@@ -3436,7 +3438,7 @@ void LanesLexicon::revertEntry() {
   }
 }
 void LanesLexicon::onOptions() {
-  OptionsDialog * d = new OptionsDialog(this);
+  OptionsDialog * d = new OptionsDialog(QString(),this);
   d->exec();
   delete d;
 }
@@ -3554,4 +3556,8 @@ void LanesLexicon::onSelectTheme() {
     }
   }
   /// may need to something about printer setup
+}
+void LanesLexicon::onEditTheme() {
+  ThemeDialog d;
+  d.exec();
 }

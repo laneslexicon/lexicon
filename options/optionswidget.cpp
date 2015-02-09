@@ -1,10 +1,22 @@
 #include "optionswidget.h"
+#ifndef STANDALONE
+#include "application.h"
+#include "externs.h"
+#endif
 OptionsWidget::OptionsWidget(QSettings * settings,QWidget * parent) : QWidget(parent) {
   m_dirty = false;
   m_settings = settings;
 }
 OptionsWidget::OptionsWidget(QWidget * parent) : QWidget(parent) {
   m_dirty = false;
+  m_settings = 0;
+}
+OptionsWidget::OptionsWidget(const QString & theme,QWidget * parent) : QWidget(parent) {
+#ifndef STANDALONE
+  m_settingsFileName = getLexicon()->settingsFileName(theme);
+#else
+  m_settingsFileName = QString("%1.ini").arg(theme0;
+#endif
   m_settings = 0;
 }
 void OptionsWidget::readSettings() {

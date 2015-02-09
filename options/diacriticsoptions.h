@@ -8,7 +8,7 @@ class DiacriticsOptions : public OptionsWidget {
   Q_OBJECT
 
  public:
-  DiacriticsOptions(QWidget * parent = 0);
+  DiacriticsOptions(const QString &,QWidget * parent = 0);
   public slots:
     void writeSettings();
     void readSettings();

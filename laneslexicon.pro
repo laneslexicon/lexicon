@@ -76,7 +76,8 @@ SOURCES += main.cpp\
         fontchangedialog.cpp \
         arabicfontdialog.cpp \
         zoomdialog.cpp \
-        editview.cpp
+        editview.cpp \
+        themedialog.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -111,4 +112,5 @@ HEADERS  += laneslexicon.h \
             fontchangedialog.h \
             arabicfontdialog.h \
             zoomdialog.h \
-            editview.h
+            editview.h \
+            themedialog.h

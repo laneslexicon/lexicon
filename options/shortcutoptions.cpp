@@ -3,14 +3,17 @@
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
+#include "externs.h"
 #endif
-ShortcutOptions::ShortcutOptions(QWidget * parent) : OptionsWidget(parent) {
+ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
+  /*
 #ifdef STANDALONE
   m_settings = new QSettings("default.ini",QSettings::IniFormat);
   m_settings->setIniCodec("UTF-8");
 #else
   m_settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
 #endif
+  */
   m_section = "Shortcut";
 
   m_tabs = new QTabWidget;
@@ -68,35 +71,42 @@ ShortcutOptions::ShortcutOptions(QWidget * parent) : OptionsWidget(parent) {
   readSettings();
   setupConnections();
 }
+/**
+ * compare the key sequences with what's in the QSettings
+ *
+ */
 
 void ShortcutOptions::readSettings() {
   QString key;
   QString value;
-  if (m_settings == 0) {
-    m_settings = new QSettings("default.ini",QSettings::IniFormat);
-  }
-  m_settings->beginGroup(m_section);
+  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup(m_section);
+
   for(int i=0;i < m_tabs->count();i++) {
     QWidget * w = m_tabs->widget(i);
     QList<QKeySequenceEdit *> edits = w->findChildren<QKeySequenceEdit *>();
     foreach(QKeySequenceEdit *  widget,edits) {
       key = widget->objectName();
-      value = m_settings->value(key,QString()).toString();
+      value = settings.value(key,QString()).toString();
       m_values.insert(key,value);
       if (! value.isEmpty()) {
         widget->setKeySequence(QKeySequence(value));
       }
     }
   }
-  m_settings->endGroup();
+  settings.endGroup();
 }
+/**
+ * TODO not complete
+ *
+ */
 void ShortcutOptions::writeSettings() {
-  if (m_settings == 0) {
-    m_settings = new QSettings("default.ini",QSettings::IniFormat);
-  }
-  m_settings->beginGroup(m_section);
+  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup(m_section);
   //  m_settings->setValue(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL,m_collapseAll->keySequence().toString());
-  m_settings->endGroup();
+  settings.endGroup();
 }
 bool ShortcutOptions::isModified()  {
   QString key;
@@ -121,7 +131,7 @@ void ShortcutOptions::addTab(const QString & title,const QStringList & keys) {
   QFormLayout * formlayout = new QFormLayout;
   for(int i=0; i < keys.size();i++) {
     QKeySequenceEdit * edit = new QKeySequenceEdit;
-    edit->setObjectName(keys[i]);
+    edit->setObjectName(QString("%1-%2").arg(i).arg(keys[i]));
     formlayout->addRow(new QLabel(keys[i]),edit);
   }
   widget->setLayout(formlayout);

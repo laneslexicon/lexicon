@@ -227,9 +227,30 @@ QSettings * Lexicon::getSettings() {
   settings->setIniCodec("UTF-8");
   return settings;
 }
-QString Lexicon::settingsFileName() {
-  QFileInfo f(m_settingsDir,m_configFile);
-  return f.absoluteFilePath();
+/**
+ * Returns the filename of the active settings file if no theme is supplied
+ * otherwise returns the filename of supplied theme
+ *
+ * @param theme
+ *
+ * @return
+ */
+QString Lexicon::settingsFileName(const QString & theme) {
+  if (theme.isEmpty()) {
+    QFileInfo f(m_settingsDir,m_configFile);
+    return f.absoluteFilePath();
+  }
+  QDir d = QDir::current();
+  if (! d.cd(m_themeDirectory)) {
+    return QString();
+  }
+  if (! d.cd(theme)) {
+    return QString();
+  }
+  if (! d.exists(m_configFile)) {
+    return QString();
+  }
+  return d.absoluteFilePath(m_configFile);
 }
 QVariant Lexicon::getValue(const QString & group,const QString & key) {
   QFileInfo f(m_settingsDir,m_configFile);

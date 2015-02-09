@@ -131,6 +131,7 @@ class LanesLexicon : public QMainWindow
       void onDefaultScale();
 
       void onSelectTheme();
+      void onEditTheme();
 
       void searchForWord();
       void searchForPage();

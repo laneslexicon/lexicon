@@ -4,6 +4,7 @@ SOURCES += $$PWD/optionswidget.cpp \
            $$PWD/printoptions.cpp \
            $$PWD/shortcutoptions.cpp \
            $$PWD/optionsdialog.cpp \
+           $$PWD/optionstabwidget.cpp \
            $$PWD/diacriticsoptions.cpp
 
 
@@ -12,4 +13,5 @@ HEADERS += $$PWD/optionswidget.h \
            $$PWD/printoptions.h \
            $$PWD/shortcutoptions.h \
            $$PWD/optionsdialog.h \
+           $$PWD/optionstabwidget.h \
            $$PWD/diacriticsoptions.h

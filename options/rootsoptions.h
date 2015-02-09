@@ -7,7 +7,7 @@ class RootsOptions : public OptionsWidget {
   Q_OBJECT
 
  public:
-  RootsOptions(QWidget * parent = 0);
+  RootsOptions(const QString & theme,QWidget * parent = 0);
   public slots:
     void writeSettings();
     void readSettings();
