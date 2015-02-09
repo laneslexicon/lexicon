@@ -786,7 +786,8 @@ void LanesLexicon::createActions() {
 
   m_defaultScaleAction = new QAction(tr("Set default zoom"),this);
 
-  m_selectThemeAction = new QAction(tr("Select theme"),this);
+  m_selectThemeAction = new QAction(tr("Switch"),this);
+  m_editThemeAction = new QAction(tr("Edit"),this);
 
   connect(m_syncFromEntryAction,SIGNAL(triggered()),this,SLOT(syncFromEntry()));
   connect(m_syncFromContentsAction,SIGNAL(triggered()),this,SLOT(syncFromContents()));
@@ -1164,7 +1165,7 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_syncFromEntryAction);
   m_viewMenu->addAction(m_linkAction);
   m_viewMenu->addAction(m_defaultScaleAction);
-  m_viewMenu->addAction(m_selectThemeAction);
+
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -1221,6 +1222,12 @@ void LanesLexicon::createMenus() {
   m_toolMenu->setObjectName("toolmenu");
   m_toolMenu->addAction(m_logViewerAction);
   m_toolMenu->addAction(m_editViewAction);
+
+  m_themeMenu = m_mainmenu->addMenu(tr("The&mes"));
+  m_themeMenu->setFocusPolicy(Qt::StrongFocus);
+  m_themeMenu->setObjectName("thememenu");
+  m_themeMenu->addAction(m_selectThemeAction);
+  m_themeMenu->addAction(m_editThemeAction);
 
   m_helpMenu = m_mainmenu->addMenu(tr("&Help"));
   m_helpMenu->setFocusPolicy(Qt::StrongFocus);

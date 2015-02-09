@@ -301,6 +301,7 @@ class LanesLexicon : public QMainWindow
       QMenu * m_pageMenu;
       QMenu * m_toolMenu;
       QMenu * m_helpMenu;
+      QMenu * m_themeMenu;
       AppMenu * m_mainmenu;
 
       QSize m_toolbarIconSize;
@@ -394,6 +395,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_aboutAction;
       QAction * m_defaultScaleAction;
       QAction * m_selectThemeAction;
+      QAction * m_editThemeAction;
 
       HistoryMaster * m_history;
       NoteMaster * m_notes;
