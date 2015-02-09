@@ -7,15 +7,16 @@
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
+#include "externs.h"
 #endif
 OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
 #ifdef STANDALONE
-  QSettings * settings = new QSettings("default.ini",QSettings::IniFormat);
-  settings->setIniCodec("UTF-8");
+  QSettings settings("default.ini",QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
 #else
-  QSettings * settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
+  SETTINGS
 #endif
 
   RootsOptions * tree = new RootsOptions(this);
@@ -55,30 +56,27 @@ OptionsDialog::OptionsDialog(QWidget * parent) : QDialog(parent) {
   btn->setEnabled(false);
   connect(btn,SIGNAL(clicked()),this,SLOT(saveChanges()));
   enableButtons();
-  QString group = settings->group();
+  QString group = settings.group();
   while(! group.isEmpty()) {
-    settings->endGroup();
-    group = settings->group();
+    settings.endGroup();
+    group = settings.group();
   }
-  settings->beginGroup("Options");
-  this->restoreGeometry(settings->value("Geometry").toByteArray());
+  settings.beginGroup("Options");
+  this->restoreGeometry(settings.value("Geometry").toByteArray());
 }
 OptionsDialog::~OptionsDialog() {
   writeSettings();
 }
 void OptionsDialog::writeSettings() {
 #ifdef STANDALONE
-  QSettings * settings = new QSettings("default.ini",QSettings::IniFormat);
-  settings->setIniCodec("UTF-8");
+  QSettings settings("default.ini",QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
 #else
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  SETTINGS
 #endif
-  settings->beginGroup("Options");
-  settings->setValue("Geometry", saveGeometry());
-  settings->endGroup();
-#ifdef STANDALONE
-  delete settings;
-#endif
+  settings.beginGroup("Options");
+  settings.setValue("Geometry", saveGeometry());
+  settings.endGroup();
 }
 
 void OptionsDialog::applyChanges() {

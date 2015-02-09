@@ -16,6 +16,7 @@ OBJECTS_DIR = ./obj
 QMAKE_CXXFLAGS += -Wunused-parameter -g
 include(../qslog/QsLog.pri)
 INCLUDEPATH += ..
+LIBS += -L $$[QT_INSTALL_LIBS]
 DEFINES += STANDALONE
 SOURCES += main.cpp\
         mainwindow.cpp \
