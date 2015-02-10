@@ -8,6 +8,8 @@
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QTabWidget>
+#include <QInputDialog>
+#include <QMessageBox>
 class OptionsTabWidget;
 
 class ThemeDialog : public QDialog {
@@ -22,6 +24,7 @@ class ThemeDialog : public QDialog {
     void onNew();
 
  private:
+    bool copyRecursively(const QString &,const QString &);
     void addTabs();
     QComboBox * m_themes;
     QPushButton * m_editThemeButton;
@@ -29,5 +32,6 @@ class ThemeDialog : public QDialog {
     QPushButton * m_deleteThemeButton;
     QPushButton * m_newThemeButton;
     OptionsTabWidget  * m_tabs;
+    int m_copyCount;
 };
 #endif
