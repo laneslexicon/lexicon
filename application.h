@@ -15,7 +15,7 @@ class Lexicon : public QApplication {
 public:
   Lexicon(int & argc, char ** argv);
   enum Status { Ok, ResourceDirError, NoThemeDirectory, ThemeNotFound , SettingsNotFound};
-  enum Resource { Stylesheet, Image,XSLT,Keyboard,Map,Splash };
+  enum Resource { Stylesheet, Image,XSLT,Keyboard,Map,Splash,ThemeRoot };
   QString getConfig() const;
   void setOptions(const QMap<QString,QString> &);
   QMap<QString,QString> getOptions() const;

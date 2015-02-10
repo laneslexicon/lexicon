@@ -9,7 +9,7 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
 #ifdef __APPLE__
   resourceDir = QCoreApplication::applicationDirPath() + "/../Resources";
 #else
-  resourceDir = QCoreApplication::applicationDirPath() + "/Resources";
+  resourceDir = QCoreApplication::applicationDirPath() + QDir::separator() + "Resources";
 #endif
 
   if ( ! QDir::setCurrent(resourceDir)) {
@@ -17,12 +17,12 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
     std::cout << errmsg.toLocal8Bit().data() << std::endl;
     m_status = Lexicon::ResourceDirError;
   }
-  QDir fonts(resourceDir + "/fonts");
+  QDir fonts(resourceDir + QDir::separator() + "fonts");
   if (fonts.exists()) {
     scanForFonts(fonts);
   }
 
-  addLibraryPath(resourceDir + "/lib");
+  addLibraryPath(resourceDir + QDir::separator() + "lib");
 
   QCoreApplication::setOrganizationName("Gabanjo");
   QCoreApplication::setOrganizationDomain("theunwalledcity.com");
@@ -71,6 +71,14 @@ QString Lexicon::getResourcePath(int type, const QString & name) {
   settings.beginGroup("Resources");
   QString d(".");
   switch(type) {
+  case Lexicon::ThemeRoot : {
+    QDir d = QDir::current();
+    QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
+    settings->beginGroup("System");
+    QString  t = settings->value("Theme directory","themes").toString();
+    return d.absolutePath() + QDir::separator() + t;
+    break;
+  }
   case Lexicon::Stylesheet : {
     d = settings.value("Stylesheet","css").toString();
     break;
