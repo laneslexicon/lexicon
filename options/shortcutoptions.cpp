@@ -89,6 +89,7 @@ void ShortcutOptions::readSettings() {
     foreach(QKeySequenceEdit *  widget,edits) {
       key = widget->objectName();
       value = settings.value(key,QString()).toString();
+      value.remove(QChar(' '));
       m_values.insert(key,value);
       if (! value.isEmpty()) {
         widget->setKeySequence(QKeySequence(value));
@@ -119,7 +120,9 @@ bool ShortcutOptions::isModified()  {
     foreach(QKeySequenceEdit *  widget,edits) {
       key = widget->objectName();
       value = widget->keySequence().toString();
+      value.remove(QChar(' '));
       if (value != m_values.value(key)) {
+        qDebug() << Q_FUNC_INFO << key << value << m_values.value(key);
         m_dirty = true;
       }
     }
@@ -131,7 +134,7 @@ void ShortcutOptions::addTab(const QString & title,const QStringList & keys) {
   QFormLayout * formlayout = new QFormLayout;
   for(int i=0; i < keys.size();i++) {
     QKeySequenceEdit * edit = new QKeySequenceEdit;
-    edit->setObjectName(QString("%1-%2").arg(i).arg(keys[i]));
+    edit->setObjectName(keys[i]);
     formlayout->addRow(new QLabel(keys[i]),edit);
   }
   widget->setLayout(formlayout);
