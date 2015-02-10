@@ -22,6 +22,7 @@ ThemeDialog::ThemeDialog(QWidget * parent) : QDialog(parent) {
   editlayout->addWidget(m_deleteThemeButton);
 
   m_tabs = new OptionsTabWidget(QString());
+
   vlayout->addLayout(editlayout);
   vlayout->addWidget(m_tabs);
 

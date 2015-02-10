@@ -20,6 +20,7 @@ class OptionsTabWidget : public QWidget {
     void resetChanges();
     void applyChanges();
     void currentChanged(int);
+    void lock(bool);
  private:
     void setup();
     void writeSettings();

@@ -78,7 +78,12 @@ void OptionsTabWidget::writeSettings() {
   settings.setValue("Geometry", saveGeometry());
   settings.endGroup();
 }
+void OptionsTabWidget::lock(bool enable) {
+  for(int i=0;i < m_tabs->count();i++){
+    m_tabs->widget(i)->setEnabled(enable);
+  }
 
+}
 void OptionsTabWidget::applyChanges() {
   OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
   if (tab) {
