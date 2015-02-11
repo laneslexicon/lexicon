@@ -81,7 +81,7 @@ DiacriticsOptions::DiacriticsOptions(const QString & theme,QWidget * parent) : O
     QCheckBox * box = new QCheckBox(i.value());
     box->setObjectName("charname");
     box->setProperty("codepoint", i.key());
-    connect(box,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
+    //    connect(box,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
     gridlayout->addWidget(box,row,col);
     col++;
     if (col == 4) {
@@ -133,12 +133,14 @@ void DiacriticsOptions::readSettings() {
   settings.endGroup();
 
   /// Test code
+  /*
   QString rx = QString("[\\x%1]*").arg(points.join("\\x"));
   QRegExp p(rx);
   QRegExp rxclass("[\\x064b\\x0671\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670]*");
   qDebug() << p.pattern();
   qDebug() << rxclass.pattern();
   qDebug() << "Rx match" << (p.pattern() == rxclass.pattern());
+  */
 }
 void DiacriticsOptions::writeSettings() {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
