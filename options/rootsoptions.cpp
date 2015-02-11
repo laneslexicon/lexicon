@@ -77,6 +77,7 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_info->setText(html.join(""));
   vlayout->addWidget(m_info);
   setLayout(vlayout);
+  addButtons();
   readSettings();
   setupConnections();
 }
@@ -94,6 +95,7 @@ void RootsOptions::readSettings() {
   m_arabicFont->setText(settings.value(SID_CONTENTS_ARABIC_FONT).toString());
   m_standardFont->setText(settings.value(SID_CONTENTS_STANDARD_FONT).toString());
   settings.endGroup();
+  m_dirty = false;
 }
 void RootsOptions::writeSettings() {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
@@ -136,6 +138,7 @@ bool RootsOptions::isModified()  {
     m_dirty = true;
   }
   settings.endGroup();
+  qDebug() << Q_FUNC_INFO << m_dirty;
   return m_dirty;
 }
 void RootsOptions::onSetFont() {

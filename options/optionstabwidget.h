@@ -18,10 +18,14 @@ class OptionsTabWidget : public QWidget {
     void valueChanged(bool);
     void saveChanges();
     void resetChanges();
-    void applyChanges();
+    //    void applyChanges();
     void currentChanged(int);
+    bool isModified();
     void lock(bool);
+    void readTheme(const QString & theme);
  private:
+    QPushButton * m_saveButton;
+    QPushButton * m_resetButton;
     void setup();
     void writeSettings();
     void enableButtons();

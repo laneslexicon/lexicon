@@ -101,6 +101,7 @@ DiacriticsOptions::DiacriticsOptions(const QString & theme,QWidget * parent) : O
   vlayout->addLayout(gridlayout);
   vlayout->addWidget(info);
   setLayout(vlayout);
+  addButtons();
   readSettings();
   setupConnections();
 }

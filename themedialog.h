@@ -22,7 +22,7 @@ class ThemeDialog : public QDialog {
     void onEdit();
     void onDelete();
     void onNew();
-
+    void onThemeChanged(const QString &);
  private:
     bool copyRecursively(const QString &,const QString &);
     void addTabs();
@@ -33,5 +33,6 @@ class ThemeDialog : public QDialog {
     QPushButton * m_newThemeButton;
     OptionsTabWidget  * m_tabs;
     int m_copyCount;
+    QString m_currentTheme;
 };
 #endif

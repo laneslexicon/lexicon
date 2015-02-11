@@ -68,6 +68,7 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
   vlayout->addWidget(m_info);
 
   setLayout(vlayout);
+  addButtons();
   readSettings();
   setupConnections();
 }
@@ -122,7 +123,6 @@ bool ShortcutOptions::isModified()  {
       value = widget->keySequence().toString();
       value.remove(QChar(' '));
       if (value != m_values.value(key)) {
-        qDebug() << Q_FUNC_INFO << key << value << m_values.value(key);
         m_dirty = true;
       }
     }

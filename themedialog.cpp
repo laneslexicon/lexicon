@@ -10,8 +10,9 @@ ThemeDialog::ThemeDialog(QWidget * parent) : QDialog(parent) {
   QStringList themes = getLexicon()->getThemes();
   themes.sort();
   m_themes->addItems(themes);
-  m_themes->setCurrentText(getLexicon()->currentTheme());
-  m_editThemeButton = new QPushButton(tr("Edit"));
+  m_currentTheme = getLexicon()->currentTheme();
+  m_themes->setCurrentText(m_currentTheme);
+  //  m_editThemeButton = new QPushButton(tr("Edit"));
   m_copyThemeButton = new QPushButton(tr("Copy as"));
   m_deleteThemeButton = new QPushButton(tr("Delete"));
   m_newThemeButton = new QPushButton(tr("Create new theme"));
@@ -19,7 +20,7 @@ ThemeDialog::ThemeDialog(QWidget * parent) : QDialog(parent) {
   QHBoxLayout * editlayout = new QHBoxLayout;
   editlayout->addWidget(new QLabel(tr("Themes")));
   editlayout->addWidget(m_themes);
-  editlayout->addWidget(m_editThemeButton);
+  //  editlayout->addWidget(m_editThemeButton);
   editlayout->addWidget(m_copyThemeButton);
   editlayout->addWidget(m_deleteThemeButton);
 
@@ -35,10 +36,34 @@ ThemeDialog::ThemeDialog(QWidget * parent) : QDialog(parent) {
   connect(btns, SIGNAL(rejected()), this, SLOT(reject()));
   connect(btns, SIGNAL(accepted()), this, SLOT(onNew()));
 
-  connect(m_editThemeButton,SIGNAL(clicked()),this,SLOT(onEdit()));
+  connect(m_themes,SIGNAL(currentTextChanged(const QString &)),this,SLOT(onThemeChanged(const QString &)));
   connect(m_copyThemeButton,SIGNAL(clicked()),this,SLOT(onCopy()));
   vlayout->addWidget(btns);
   setLayout(vlayout);
+}
+void ThemeDialog::onThemeChanged(const QString & theme) {
+  qDebug() << Q_FUNC_INFO << m_currentTheme << theme;
+  if (theme == m_currentTheme) {
+    return;
+  }
+  if (m_tabs->isModified()) {
+        int ret = QMessageBox::warning(this, tr("Edit Theme"),
+                                       QString(tr("You have unsaved changes to the theme: %1\nDo you want to save the changes?")).arg(m_currentTheme),
+                                       QMessageBox::Yes | QMessageBox::No|QMessageBox::Cancel);
+    if (ret == QMessageBox::Cancel) {
+      m_themes->setCurrentText(m_currentTheme);
+      return;
+    }
+    if (ret == QMessageBox::Yes) {
+      m_tabs->saveChanges();
+    }
+  }
+  /**
+   * set the theme settings file name and reload all the tabs
+   *
+   */
+  m_tabs->readTheme(getLexicon()->settingsFileName(theme));
+  m_currentTheme = theme;
 }
 void ThemeDialog::addTabs() {
 }

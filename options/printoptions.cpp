@@ -76,6 +76,7 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
   vlayout->addLayout(formlayout);
 
   setLayout(vlayout);
+  addButtons();
   setupPaperSize();
   readSettings();
   setupConnections();

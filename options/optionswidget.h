@@ -11,6 +11,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QDialogButtonBox>
+#include <QPushButton>
 class OptionsWidget : public QWidget {
   Q_OBJECT
  public:
@@ -18,17 +20,24 @@ class OptionsWidget : public QWidget {
   OptionsWidget(const QString & theme,QWidget * parent = 0);
   OptionsWidget(QWidget * parent = 0);
   ~OptionsWidget();
-  virtual bool isModified();
+  virtual bool isModified() = 0;
   virtual void setupConnections();
+  virtual void addButtons();
+  void setFileName(const QString &);
+  void blockAllSignals(bool block);
   public slots:
-    virtual void readSettings();
-  virtual void stateChanged(int);
-  virtual void writeSettings();
+    virtual void onSave();
+    virtual void onReset();
+    virtual void readSettings() = 0;
+    virtual void stateChanged(int);
+    virtual void writeSettings() = 0;
+    virtual void setButtons(bool);
   //  virtual void reset();
   virtual void editingFinished();
    void textChanged(const QString &);
  protected:
   bool m_dirty;
+  QDialogButtonBox * m_btns;
   QSettings * m_settings;
   QString m_section;
   QString m_settingsFileName;

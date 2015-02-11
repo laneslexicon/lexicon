@@ -28,16 +28,22 @@ OptionsTabWidget::OptionsTabWidget(const QString & theme,QWidget * parent) : QWi
 
   DiacriticsOptions * diacritics = new DiacriticsOptions(getLexicon()->currentTheme(),this);
   m_tabs->addTab(diacritics,tr("Diacritics"));
-
+  /*
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save
-                                     | QDialogButtonBox::Cancel
-                                     | QDialogButtonBox::Apply
+                                   //                                     | QDialogButtonBox::Cancel
+                                   //                                     | QDialogButtonBox::Apply
                                      | QDialogButtonBox::Reset
                                      );
+  */
+  m_saveButton = new QPushButton("Save all");
+  m_resetButton = new QPushButton("Reset all");
+  m_buttons = new QDialogButtonBox;
+  m_buttons->addButton(m_resetButton,QDialogButtonBox::ResetRole);
+  m_buttons->addButton(m_saveButton,QDialogButtonBox::AcceptRole);
 
   connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(currentChanged(int)));
-  connect(m_buttons, SIGNAL(accepted()), this, SLOT(saveChanges()));
-  connect(m_buttons, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(m_saveButton, SIGNAL(clicked()), this, SLOT(saveChanges()));
+  connect(m_resetButton, SIGNAL(clicked()), this, SLOT(resetChanges()));
 
   connect(tree,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
   connect(print,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
@@ -46,9 +52,9 @@ OptionsTabWidget::OptionsTabWidget(const QString & theme,QWidget * parent) : QWi
   vlayout->addWidget(m_tabs);
   vlayout->addWidget(m_buttons);
   setLayout(vlayout);
+
+  /*
   QPushButton * btn = m_buttons->button(QDialogButtonBox::Apply);
-  btn->setEnabled(false);
-  connect(btn,SIGNAL(clicked()),this,SLOT(applyChanges()));
   btn = m_buttons->button(QDialogButtonBox::Reset);
   btn->setEnabled(false);
   connect(btn,SIGNAL(clicked()),this,SLOT(resetChanges()));
@@ -56,6 +62,7 @@ OptionsTabWidget::OptionsTabWidget(const QString & theme,QWidget * parent) : QWi
   btn->setEnabled(false);
   connect(btn,SIGNAL(clicked()),this,SLOT(saveChanges()));
   enableButtons();
+  */
   QString group = settings.group();
   while(! group.isEmpty()) {
     settings.endGroup();
@@ -63,6 +70,7 @@ OptionsTabWidget::OptionsTabWidget(const QString & theme,QWidget * parent) : QWi
   }
   settings.beginGroup("Options");
   this->restoreGeometry(settings.value("Geometry").toByteArray());
+  enableButtons();
 }
 OptionsTabWidget::~OptionsTabWidget() {
   writeSettings();
@@ -84,6 +92,7 @@ void OptionsTabWidget::lock(bool enable) {
   }
 
 }
+/*
 void OptionsTabWidget::applyChanges() {
   OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
   if (tab) {
@@ -91,32 +100,37 @@ void OptionsTabWidget::applyChanges() {
     this->enableButtons();
   }
 }
+*/
+bool OptionsTabWidget::isModified() {
+  for(int i=0;i < m_tabs->count();i++){
+    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
+    if (tab && tab->isModified()) {
+      return true;
+    }
+  }
+  return false;
+}
 void OptionsTabWidget::enableButtons() {
   bool v = false;
   OptionsWidget * currentTab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
-  for(int i=0;i < m_tabs->count();i++) {
+  for(int i=0;(i < m_tabs->count()) && !v;i++) {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab) {
-      QLOG_DEBUG() << Q_FUNC_INFO << i << tab->isModified();
       if (tab->isModified()) {
         v = true;
       }
-      if (tab == currentTab) {
-        this->setApplyReset(tab->isModified());
-      }
     }
   }
-  QPushButton * btn = m_buttons->button(QDialogButtonBox::Save);
-  if (btn) {
-    btn->setEnabled(v);
-  }
+  m_saveButton->setEnabled(v);
+  m_resetButton->setEnabled(v);
+
 }
 void OptionsTabWidget::valueChanged(bool /* v */) {
   this->enableButtons();
 }
 void OptionsTabWidget::saveChanges() {
   for(int i=0;i < m_tabs->count();i++) {
-    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
+    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab) {
       tab->writeSettings();
     }
@@ -124,18 +138,43 @@ void OptionsTabWidget::saveChanges() {
   //  this->accept();
 }
 void OptionsTabWidget::resetChanges() {
+  for(int i=0;i < m_tabs->count();i++) {
+    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
+    if (tab) {
+      tab->readSettings();
+    }
+  }
+  //  this->accept();
+}
+void OptionsTabWidget::readTheme(const QString & theme) {
+  for(int i=0;i < m_tabs->count();i++) {
+    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
+    if (tab) {
+      tab->setFileName(theme);
+      tab->blockAllSignals(true);
+      tab->readSettings();
+      tab->blockAllSignals(false);
+    }
+  }
+  //  this->accept();
+}
+/*
+void OptionsTabWidget::resetChanges() {
   OptionsWidget * w = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
   if (w) {
     w->readSettings();
     this->enableButtons();
   }
 }
+*/
 void OptionsTabWidget::currentChanged(int /* ix */) {
   enableButtons();
 }
+  /*
 void OptionsTabWidget::setApplyReset(bool v) {
   QPushButton * btn = m_buttons->button(QDialogButtonBox::Apply);
   btn->setEnabled(v);
   btn = m_buttons->button(QDialogButtonBox::Reset);
   btn->setEnabled(v);
 }
+  */
