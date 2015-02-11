@@ -10,7 +10,7 @@ ThemeDialog::ThemeDialog(QWidget * parent) : QDialog(parent) {
   QStringList themes = getLexicon()->getThemes();
   themes.sort();
   m_themes->addItems(themes);
-  m_currentTheme = getLexicon()->currentTheme();
+  m_startupTheme = m_currentTheme = getLexicon()->currentTheme();
   m_themes->setCurrentText(m_currentTheme);
   //  m_editThemeButton = new QPushButton(tr("Edit"));
   m_copyThemeButton = new QPushButton(tr("Copy as"));
@@ -30,7 +30,7 @@ ThemeDialog::ThemeDialog(QWidget * parent) : QDialog(parent) {
   vlayout->addWidget(m_tabs);
 
   //  vlayout->addWidget(m_newThemeButton);
-  QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Cancel);
+  QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Close);
   btns->addButton(m_newThemeButton,QDialogButtonBox::AcceptRole);
 
   connect(btns, SIGNAL(rejected()), this, SLOT(reject()));
@@ -38,6 +38,7 @@ ThemeDialog::ThemeDialog(QWidget * parent) : QDialog(parent) {
 
   connect(m_themes,SIGNAL(currentTextChanged(const QString &)),this,SLOT(onThemeChanged(const QString &)));
   connect(m_copyThemeButton,SIGNAL(clicked()),this,SLOT(onCopy()));
+  connect(m_deleteThemeButton,SIGNAL(clicked()),this,SLOT(onDelete()));
   vlayout->addWidget(btns);
   setLayout(vlayout);
 }
@@ -64,6 +65,7 @@ void ThemeDialog::onThemeChanged(const QString & theme) {
    */
   m_tabs->readTheme(getLexicon()->settingsFileName(theme));
   m_currentTheme = theme;
+  setButtons();
 }
 void ThemeDialog::addTabs() {
 }
@@ -108,6 +110,10 @@ void ThemeDialog::onCopy() {
   else {
     /// TODO tell them it failed
   }
+  setButtons();
+}
+void ThemeDialog::setButtons() {
+  m_deleteThemeButton->setEnabled(m_themes->count() > 1);
 }
 bool ThemeDialog::copyRecursively(const QString & srcPath,const QString & targetPath) {
   QFileInfo srcFileInfo(srcPath);
@@ -119,29 +125,80 @@ bool ThemeDialog::copyRecursively(const QString & srcPath,const QString & target
     QDir sourceDir(srcPath);
     QStringList fileNames = sourceDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
     foreach (const QString &fileName, fileNames) {
-      const QString newSrcFilePath
-        = srcPath + QDir::separator() + fileName;
-      const QString newTgtFilePath
-        = targetPath + QDir::separator() + fileName;
+      const QString newSrcFilePath = srcPath + QDir::separator() + fileName;
+      const QString newTgtFilePath = targetPath + QDir::separator() + fileName;
       if (!copyRecursively(newSrcFilePath, newTgtFilePath))
         return false;
     }
-  } else {
-    if (!QFile::copy(srcPath, targetPath))
+  }
+  else {
+    if (!QFile::copy(srcPath, targetPath)) {
       return false;
+    }
     else {
       m_copyCount++;
     }
   }
   return true;
- }
+}
+/**
+ * get the directory to be deleted, switch to a new theme and then
+ * delete the files
+ */
 void ThemeDialog::onDelete() {
+  QString theme = m_themes->currentText();
+  QString srcFilePath = getLexicon()->getResourcePath(Lexicon::ThemeRoot,theme);
+
+
+  if (theme == m_startupTheme) {
+    if (m_themes->count() > 0) {
+      m_startupTheme = m_themes->itemText(0);
+    }
+    else {
+      QLOG_WARN() << tr("No themes defined");
+    }
+  }
+  m_themes->setCurrentText(m_startupTheme);
+  int ix = m_themes->findText(theme);
+  if (ix != -1) {
+    m_themes->removeItem(ix);
+  }
+  bool ok = removeDir(srcFilePath);
+  if (!ok) {
+    QMessageBox::warning(this, tr("Theme deletion"),
+                               tr("There was an error deleting one or more files.\n"
+                                  "You may wish to manually delete them. The directory to remove is:\n") +
+                                  srcFilePath,
+                         QMessageBox::Ok);
+  }
+  setButtons();
 }
 void ThemeDialog::onNew() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void ThemeDialog::onEdit() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  //  OptionsDialog d(m_themes->currentText());
-  //  d.exec();
+}
+bool ThemeDialog::removeDir(const QString &dirName){
+    bool result = true;
+    QDir dir(dirName);
+
+    if (dir.exists(dirName)) {
+        Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+          //          qDebug() << "delete" << info.absoluteFilePath();
+            if (info.isDir()) {
+                result = removeDir(info.absoluteFilePath());
+            }
+            else {
+                result = QFile::remove(info.absoluteFilePath());
+            }
+
+            if (!result) {
+                return result;
+            }
+        }
+        result = dir.rmdir(dirName);
+    }
+
+    return result;
 }

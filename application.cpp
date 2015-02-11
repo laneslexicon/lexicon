@@ -73,10 +73,16 @@ QString Lexicon::getResourcePath(int type, const QString & name) {
   switch(type) {
   case Lexicon::ThemeRoot : {
     QDir d = QDir::current();
+    QString t;
     QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
     settings->beginGroup("System");
-    QString  t = settings->value("Theme directory","themes").toString();
-    return d.absolutePath() + QDir::separator() + t;
+    t = settings->value("Theme directory","themes").toString();
+    if (name.isEmpty()) {
+      return d.absolutePath() + QDir::separator() + t;
+    }
+    else {
+      return d.absolutePath() + QDir::separator() + t + QDir::separator() + name;
+    }
     break;
   }
   case Lexicon::Stylesheet : {
