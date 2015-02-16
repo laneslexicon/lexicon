@@ -29,7 +29,7 @@ class OptionsTabWidget : public QWidget {
     void setup();
     void writeSettings();
     void enableButtons();
-    void setApplyReset(bool);
+    //    void setApplyReset(bool);
     QDialogButtonBox * m_buttons;
     QTabWidget * m_tabs;
 };
