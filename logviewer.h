@@ -31,10 +31,10 @@ public:
   QPushButton * m_pauseButton;
   QPushButton * m_closeButton;
   QTextStream m_stream;
-  QIcon * m_warning;
-  QIcon * m_info;
-  QIcon * m_error;
-  QIcon * m_debug;
+  QIcon m_warning;
+  QIcon m_info;
+  QIcon m_error;
+  QIcon m_debug;
   QTimer * m_timer;
   void readSettings();
   void writeSettings();

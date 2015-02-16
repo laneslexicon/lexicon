@@ -48,70 +48,50 @@ LogViewer::LogViewer(QWidget * parent) : QWidget(parent) {
   connect(m_pauseButton,SIGNAL(clicked()),this,SLOT(onPause()));
   connect(m_closeButton,SIGNAL(clicked()),this,SLOT(onClose()));
   m_timer->start(m_refreshInterval);
-
+  qDebug() << Q_FUNC_INFO << "exit";
 }
 void LogViewer::readSettings() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   SETTINGS
   settings.beginGroup("Logging");
   m_log.setFileName(settings.value(SID_LOGGING_FILE,"../log.txt").toString());
   m_maxlines = settings.value(SID_LOGGING_VIEWER_MAXLINES,1000).toInt();
   m_refreshInterval = settings.value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
   this->restoreGeometry(settings.value("Geometry").toByteArray());
-  settings.endGroup();
-  settings.beginGroup("System");
-  QString theme = settings.value("Theme",QString()).toString();
-  QString section;
-  if (theme.isEmpty()) {
-    section = "Icons-Default";
-  }
-  else {
-    section = QString("Icons-%1").arg(theme);
-  }
-  settings.endGroup();
-  settings.beginGroup(section);
-  QString imgdir = settings.value("Directory","images").toString();
-  QFileInfo fi(imgdir);
-  if (! fi.exists()) {
-    QLOG_WARN() << QString(tr("Theme directory not found:%1")).arg(imgdir);
-    return;
-  }
-  if (! fi.isDir()) {
-    QLOG_WARN() << QString(tr("Theme directory is not a directory:%1")).arg(imgdir);
-    return;
-  }
   QString filename;
-  QDir d(imgdir);
+  QFileInfo fi;
   filename = settings.value("Warning",QString()).toString();
-  fi.setFile(d,filename);
+  fi.setFile(getLexicon()->getResourcePath(Lexicon::Image,filename));
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
   }
   else {
-    m_warning = new QIcon(fi.absoluteFilePath());
+    m_warning.addFile(fi.absoluteFilePath());
   }
   filename = settings.value("Error",QString()).toString();
-  fi.setFile(d,filename);
+  fi.setFile(getLexicon()->getResourcePath(Lexicon::Image,filename));
+
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
   }
   else {
-    m_error = new QIcon(fi.absoluteFilePath());
+    m_error.addFile(fi.absoluteFilePath());
   }
   filename = settings.value("Info",QString()).toString();
-  fi.setFile(d,filename);
+  fi.setFile(getLexicon()->getResourcePath(Lexicon::Image,filename));
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
   }
   else {
-    m_info = new QIcon(fi.absoluteFilePath());
+    m_info.addFile(fi.absoluteFilePath());
   }
   filename = settings.value("Debug",QString()).toString();
-  fi.setFile(d,filename);
+  fi.setFile(getLexicon()->getResourcePath(Lexicon::Image,filename));
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
   }
   else {
-    m_debug = new QIcon(fi.absoluteFilePath());
+    m_debug.addFile(fi.absoluteFilePath());
   }
 }
 void LogViewer::writeSettings() {
@@ -126,9 +106,6 @@ QSize LogViewer::sizeHint() const {
 LogViewer::~LogViewer() {
   writeSettings();
   m_list->clear();
-  delete m_warning;
-  delete m_error;
-  delete m_info;
 }
 void LogViewer::addLine(const QString & line) {
   QString t  = line.trimmed();
@@ -137,19 +114,19 @@ void LogViewer::addLine(const QString & line) {
   row++;
   if (rx.indexIn(t) != -1) {
     if (rx.cap(1) == "INFO") {
-      QListWidgetItem * item = new QListWidgetItem(*m_info,rx.cap(3));
+      QListWidgetItem * item = new QListWidgetItem(m_info,rx.cap(3));
       m_list->addItem(item);
     }
     if ((rx.cap(1) == "DEBUG") || (rx.cap(1) == "DEBUG")) {
-      QListWidgetItem * item = new QListWidgetItem(*m_debug,rx.cap(3));
+      QListWidgetItem * item = new QListWidgetItem(m_debug,rx.cap(3));
       m_list->addItem(item);
     }
     if (rx.cap(1) == "WARN") {
-      QListWidgetItem * item = new QListWidgetItem(*m_warning,rx.cap(3));
+      QListWidgetItem * item = new QListWidgetItem(m_warning,rx.cap(3));
       m_list->addItem(item);
     }
     if (rx.cap(1) == "FATAL") {
-      QListWidgetItem * item = new QListWidgetItem(*m_error,rx.cap(3));
+      QListWidgetItem * item = new QListWidgetItem(m_error,rx.cap(3));
       m_list->addItem(item);
     }
   }
