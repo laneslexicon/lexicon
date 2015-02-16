@@ -35,7 +35,7 @@ public:
   QIcon m_info;
   QIcon m_error;
   QIcon m_debug;
-  QTimer * m_timer;
+  QTimer m_timer;
   void readSettings();
   void writeSettings();
 };

@@ -43,11 +43,11 @@ LogViewer::LogViewer(QWidget * parent) : QWidget(parent) {
     m_list->addItem(err);
 
   }
-  m_timer = new QTimer(this);
-  connect(m_timer, SIGNAL(timeout()), this, SLOT(onRefresh()));
+  //  m_timer = new QTimer(this);
+  connect(&m_timer, SIGNAL(timeout()), this, SLOT(onRefresh()));
   connect(m_pauseButton,SIGNAL(clicked()),this,SLOT(onPause()));
   connect(m_closeButton,SIGNAL(clicked()),this,SLOT(onClose()));
-  m_timer->start(m_refreshInterval);
+  m_timer.start(m_refreshInterval);
   qDebug() << Q_FUNC_INFO << "exit";
 }
 void LogViewer::readSettings() {
@@ -99,6 +99,7 @@ void LogViewer::writeSettings() {
   settings.beginGroup("Logging");
   settings.setValue("Geometry", saveGeometry());
   settings.endGroup();
+  settings.sync();
 }
 QSize LogViewer::sizeHint() const {
   return QSize(400,600);
@@ -148,8 +149,8 @@ void LogViewer::onClose() {
   this->hide();
 }
 void LogViewer::onPause() {
-  m_timer->blockSignals(! m_timer->signalsBlocked());
-  if (m_timer->signalsBlocked()) {
+  m_timer.blockSignals(! m_timer.signalsBlocked());
+  if (m_timer.signalsBlocked()) {
     m_pauseButton->setText(tr("Resume auto-update"));
   }
   else {
