@@ -11,6 +11,7 @@
 #include "keyboardwidget.h"
 #include "xsltsupport.h"
 #include "htmldelegate.h"
+#include "definedsettings.h"
 #include "externs.h"
 #define NODE_COLUMN 2
 #define POSITION_COLUMN 3
@@ -631,34 +632,39 @@ void FullSearchWidget::readSettings() {
   //m_xsltSource = settings.value("XSLT",QString("entry.xslt")).toString();
   settings.endGroup();
   settings.beginGroup("FullSearch");
-  m_singleRow = settings.value("One row",true).toBool();
-  QString f = settings.value("Results font",QString()).toString();
+  m_singleRow = settings.value(SID_FULLSEARCH_ONE_ROW,true).toBool();
+  QString f = settings.value(SID_FULLSEARCH_RESULTS_FONT,QString()).toString();
   if (! f.isEmpty()) {
     m_resultsFont.fromString(f);
   }
-  m_xsltSource = settings.value("XSLT",QString("node.xslt")).toString();
+  m_xsltSource = settings.value(SID_FULLSEARCH_XSLT,QString("node.xslt")).toString();
   m_xsltSource = getLexicon()->getResourcePath(Lexicon::XSLT,m_xsltSource);
-  m_debug = settings.value("Debug",false).toBool();
-  m_fragmentSize = settings.value("Fragment size",40).toInt();
+  m_debug = settings.value(SID_FULLSEARCH_DEBUG,false).toBool();
+  m_fragmentSize = settings.value(SID_FULLSEARCH_FRAGMENT_SIZE,40).toInt();
 
-  m_defaultOptions.setIncludeHeads(settings.value("Include heads",false).toBool());
+  m_defaultOptions.setIncludeHeads(settings.value(SID_FULLSEARCH_INCLUDE_HEADS,false).toBool());
 
-  v = settings.value("Head word background").toString();
+  v = settings.value(SID_FULLSEARCH_HEAD_BACKGROUND).toString();
   m_headBackgroundColor.setNamedColor(v);
-  m_headText = settings.value("Head text").toString();
+  m_headText = settings.value(SID_FULLSEARCH_HEAD_TEXT).toString();
   settings.endGroup();
 
   settings.beginGroup("Search");
-  v  = settings.value("Type",QString("normal")).toString();
+  v  = settings.value(SID_SEARCH_TYPE,QString("normal")).toString();
   if (v == "normal")
     m_defaultOptions.setSearchType(SearchOptions::Normal);
   else
     m_defaultOptions.setSearchType(SearchOptions::Regex);
 
 
-  m_defaultOptions.setIgnoreDiacritics(settings.value("Ignore diacritics",true).toBool());
+  m_defaultOptions.setIgnoreDiacritics(settings.value(SID_SEARCH_IGNORE_DIACRITICS,true).toBool());
 
-  m_defaultOptions.setWholeWordMatch(settings.value("Whole word",false).toBool());
+  m_defaultOptions.setWholeWordMatch(settings.value(SID_SEARCH_WHOLE_WORD,false).toBool());
+
+
+  m_spanStyle = settings.value(SID_SEARCH_ARABIC_CONTEXT_STYLE,QString()).toString();
+
+
   settings.endGroup();
   settings.beginGroup("Diacritics");
   QStringList keys = settings.childKeys();
@@ -671,9 +677,6 @@ void FullSearchWidget::readSettings() {
   }
   m_diacritics = QString("[\\x%1]*").arg(points.join("\\x"));
 
-  settings.endGroup();
-  settings.beginGroup("Embedded");
-  m_spanStyle = settings.value("fullsearch",QString()).toString();
   settings.endGroup();
   settings.beginGroup("Keyboards");
   m_keyboardConfig = settings.value("Config","keyboard.ini").toString();

@@ -148,13 +148,28 @@ They should not be translated.
 #define SID_SHORTCUT_SYNC_CONTENTS_WITH_PAGE   "Sync contents with page"
 #define SID_SHORTCUT_TOGGLE_INTERFACE          "Toggle interface"
 #define SID_SHORTCUT_SHOW_LOGS                 "Show logs"
+
+#define SID_SEARCH_IGNORE_DIACRITICS           "Ignore diacritics"
+#define SID_SEARCH_TYPE                        "Type"
+#define SID_SEARCH_WHOLE_WORD                  "Whole word"
+#define SID_SEARCH_ARABIC_CONTEXT_STYLE        "Arabic context style"
 #define SID_SEARCH_DIACRITICS                  "Diacritics"
 
-#define SID_HEADSEARCH_RESULTS_FONT            "Results font"
+#define SID_HEADSEARCH_RESULTS_FONT            "Results Arabic font"
 #define SID_HEADSEARCH_STEP                    "Step"
 #define SID_HEADSEARCH_DEBUG                   "Debug"
 #define SID_HEADSEARCH_FOCUS_TABLE             "Focus table"
 #define SID_HEADSEARCH_LAYOUT                  "Vertical layout"
+
+
+#define SID_FULLSEARCH_ONE_ROW                 "One row"
+#define SID_FULLSEARCH_RESULTS_FONT            "Results Arabic font"
+#define SID_FULLSEARCH_XSLT                    "XSLT"
+#define SID_FULLSEARCH_DEBUG                   "Debug"
+#define SID_FULLSEARCH_FRAGMENT_SIZE           "Fragment size"
+#define SID_FULLSEARCH_INCLUDE_HEADS           "Include heads"
+#define SID_FULLSEARCH_HEAD_BACKGROUND         "Head word background"
+#define SID_FULLSEARCH_HEAD_TEXT               "Head text"
 
 #define SID_ARABIC_FONT_NAME                   "Font"
 #define SID_ARABIC_FONT_SIZE                   "Size"
