@@ -606,16 +606,19 @@ void LanesLexicon::shortcut(const QString & key) {
 }
 /**
  * setup the shortcuts from the conf
- *
+ * TODO don't think we need the update stuff since the old shortcuts are
+ * being deleted.
  */
 void LanesLexicon::setupShortcuts() {
   bool update = false;
   if (m_shortcutMap == NULL) {
     m_shortcutMap = new QSignalMapper(this);
+    connect(m_shortcutMap,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
   }
   else {
     update = true;
   }
+  m_shortcutMap->blockSignals(true);
   SETTINGS
   settings.beginGroup("Shortcut");
 
@@ -634,8 +637,8 @@ void LanesLexicon::setupShortcuts() {
       addShortcut(keys[i],settings.value(keys[i]).toString(),update);
     }
   }
-  connect(m_shortcutMap,SIGNAL(mapped(QString)),this,SLOT(shortcut(const QString &)));
   settings.endGroup();
+  m_shortcutMap->blockSignals(false);
 }
 void LanesLexicon::addShortcut(const QString & name,const QString & k,bool update) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << name << k << update;
@@ -643,8 +646,12 @@ void LanesLexicon::addShortcut(const QString & name,const QString & k,bool updat
   if (update) {
     sc = qobject_cast<QShortcut *>(m_shortcutMap->mapping(name));
     if (sc) {
-      sc->setKey(QKeySequence(k));
-      return;
+      m_shortcutMap->removeMappings(sc);
+      delete sc;
+      //      sc->setEnabled(false);
+      //      sc->setKey(QKeySequence(k));
+      //      sc->setEnabled(true);
+      //      return;
     }
   }
   sc = new QShortcut(k,this);
@@ -1647,11 +1654,12 @@ void LanesLexicon::onTest() {
       .arg(p.getNode())
       .arg(p.getSupplement());
   }
-  if (0) {
+  if (1) {
   FontChangeDialog * d = new FontChangeDialog(this);
   d->exec();
   delete d;
   }
+  if (0) {
   if (m_editView == 0) {
     m_editView = new EditView;
     connect(m_editView,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
@@ -1660,6 +1668,7 @@ void LanesLexicon::onTest() {
     m_editView->show();
   }
   addShortcut("Search node","Ctrl+S,X",true);
+  }
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");
@@ -1793,7 +1802,7 @@ void LanesLexicon::readSettings() {
   settings.beginGroup("History");
   m_historyEnabled = settings.value("Enabled",true).toBool();
   m_historyDbName = settings.value("Database","history.sqlite").toString();
-  v = settings.value("Menu font",QString()).toString();
+  v = settings.value("Menu Arabic font",QString()).toString();
   if (! v.isEmpty()) {
     m_historyMenuFont.fromString(v);
   }
@@ -2756,17 +2765,17 @@ void LanesLexicon::searchForPage() {
 }
 void LanesLexicon::searchForRoot() {
   int ix;
-  ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Root,this);
-  d->setOptions(m_searchOptions);
-  if (d->exec()) {
-    QString t = d->getText();
+  ArabicSearchDialog d(SearchOptions::Root,this);
+  d.setOptions(m_searchOptions);
+  if (d.exec()) {
+    QString t = d.getText();
     if (! t.isEmpty()) {
       /// TODO maybe change this to if == Latin
       if (! UcdScripts::isScript(t,"Arabic")) {
         t = convertString(t);
       }
       SearchOptions opts;
-      d->getOptions(opts);
+      d.getOptions(opts);
       Place p;
       p.setRoot(t);
       ix = this->hasPlace(p,GraphicsEntry::RootSearch,false);
@@ -2791,7 +2800,6 @@ void LanesLexicon::searchForRoot() {
       }
     }
   }
-  delete d;
 }
 /**
  *
@@ -2839,20 +2847,23 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   }
 }
 void LanesLexicon::searchForWord() {
-  ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Word,this);
-  d->setOptions(m_searchOptions);
-  if (d->exec()) {
-    QString t = d->getText();
+  ArabicSearchDialog d(SearchOptions::Word,this);
+  QLOG_DEBUG() << Q_FUNC_INFO << &d;
+  d.setOptions(m_searchOptions);
+  if (d.exec()) {
+    QString t = d.getText();
     if (! t.isEmpty()) {
-      this->search(SearchOptions::Word,d,t);
+      this->search(SearchOptions::Word,&d,t);
     }
   }
-  delete d;
+  d.close();
   m_searchButton->menu()->hide();
+  QLOG_DEBUG() << Q_FUNC_INFO << "exit";
 }
 
 /// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Entry,this);
   d->setOptions(m_searchOptions);
   if (d->exec()) {
@@ -2864,6 +2875,7 @@ void LanesLexicon::searchForEntry() {
   delete d;
 }
 void LanesLexicon::searchForNode() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   int ix;
   NodeSearchDialog * d = new NodeSearchDialog(this);
   d->setOptions(m_searchOptions);
@@ -3531,6 +3543,7 @@ void LanesLexicon::onSelectTheme() {
   QDialogButtonBox * btns =  new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   layout->addWidget(btns);
   d->setLayout(layout);
+  b->setFocus();
   connect(btns, SIGNAL(accepted()), d, SLOT(accept()));
   connect(btns, SIGNAL(rejected()), d, SLOT(reject()));
   if ((d->exec() == QDialog::Rejected) ||
@@ -3555,6 +3568,8 @@ void LanesLexicon::onSelectTheme() {
       entry->onReload();
     }
   }
+  statusMessage(QString(tr("Theme set to: %1")).arg(theme));
+  qDebug() << Q_FUNC_INFO << "Exit";
   /// may need to something about printer setup
 }
 void LanesLexicon::onEditTheme() {
