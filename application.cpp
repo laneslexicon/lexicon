@@ -77,31 +77,52 @@ QString Lexicon::getResourcePath(int type) {
     QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
     settings->beginGroup("System");
     t = settings->value("Theme directory","themes").toString();
+    if (t.isEmpty()) {
+      t = "themes";
+    }
     return d.absolutePath() + QDir::separator() + t;
     break;
   }
   case Lexicon::Stylesheet : {
     d = settings.value("Stylesheet","css").toString();
+    if (d.isEmpty()) {
+      d = "css";
+    }
     break;
   }
   case Lexicon::Image : {
     d = settings.value("Image","images").toString();
+    if (d.isEmpty()) {
+      d = "images";
+    }
     break;
   }
   case Lexicon::XSLT : {
     d = settings.value("XSLT","xslt").toString();
+    if (d.isEmpty()) {
+      d = "xslt";
+    }
     break;
   }
   case Lexicon::Keyboard : {
     d = settings.value("Keyboard","keyboards").toString();
+    if (d.isEmpty()) {
+      d = "keyboards";
+    }
     break;
   }
   case Lexicon::Map : {
     d = settings.value("Map","maps").toString();
+    if (d.isEmpty()) {
+      d = "maps";
+    }
     break;
   }
   case Lexicon::Splash : {
     d = settings.value("Splash","images/splash").toString();
+    if (d.isEmpty()) {
+      d = "images/splash";
+    }
   }
   default : { break; }
   }
@@ -129,31 +150,52 @@ QString Lexicon::getResourceFilePath(int type, const QString & name) {
     QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
     settings->beginGroup("System");
     t = settings->value("Theme directory","themes").toString();
+    if (t.isEmpty()) {
+      t = "themes";
+    }
     return d.absolutePath() + QDir::separator() + t + QDir::separator() + name;
     break;
   }
   case Lexicon::Stylesheet : {
     d = settings.value("Stylesheet","css").toString();
+    if (d.isEmpty()) {
+      d = "css";
+    }
     break;
   }
   case Lexicon::Image : {
     d = settings.value("Image","images").toString();
+    if (d.isEmpty()) {
+      d = "images";
+    }
     break;
   }
   case Lexicon::XSLT : {
     d = settings.value("XSLT","xslt").toString();
+    if (d.isEmpty()) {
+      d = "xslt";
+    }
     break;
   }
   case Lexicon::Keyboard : {
     d = settings.value("Keyboard","keyboards").toString();
+    if (d.isEmpty()) {
+      d = "keyboards";
+    }
     break;
   }
   case Lexicon::Map : {
     d = settings.value("Map","maps").toString();
+    if (d.isEmpty()) {
+      d = "maps";
+    }
     break;
   }
   case Lexicon::Splash : {
     d = settings.value("Splash","images/splash").toString();
+    if (d.isEmpty()) {
+      d = "images/splash";
+    }
   }
   default : { break; }
   }

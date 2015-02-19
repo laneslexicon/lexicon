@@ -33,6 +33,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
 {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   setAttribute(Qt::WA_DeleteOnClose);
   setObjectName("lexicon");
   m_ok = false;
@@ -667,6 +668,10 @@ void LanesLexicon::addShortcut(const QString & name,const QString & k,bool updat
  *
  */
 void LanesLexicon::loadStyleSheet() {
+  QLOG_DEBUG() << Q_FUNC_INFO << m_applicationCssFile;
+  if (m_applicationCssFile.isEmpty()) {
+    return;
+  }
   QString filename = getLexicon()->getResourceFilePath(Lexicon::Stylesheet,m_applicationCssFile);
   if (filename.isEmpty()) {
     QString err = getLexicon()->takeLastError();
@@ -1678,6 +1683,7 @@ void LanesLexicon::onTest() {
  * All QActions have been created when we get here
  */
 void LanesLexicon::readSettings() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QString v;
 
   m_currentTheme = getLexicon()->currentTheme();
@@ -1706,6 +1712,10 @@ void LanesLexicon::readSettings() {
   }
 
   m_applicationCssFile = settings.value("Stylesheet","app.css").toString();
+  if (m_applicationCssFile.isEmpty()) {
+    m_applicationCssFile = "app.css";
+  }
+
   QString ar = settings.value("Arabic font").toString();
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
@@ -3237,6 +3247,9 @@ void LanesLexicon::tabsChanged() {
   }
 }
 void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString & iconfile) {
+  if (imgdir.isEmpty() || iconfile.isEmpty()) {
+    return;
+  }
   QDir d(imgdir);
   QFileInfo fi(d,iconfile);
   if (! fi.exists()) {
@@ -3259,8 +3272,12 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   QString iconfile;
   SETTINGS
   settings.beginGroup("Icons");
-
-  QDir imgd = QDir(getLexicon()->getResourcePath(Lexicon::Image));
+  QString imageDirectory = getLexicon()->getResourcePath(Lexicon::Image);
+  if (imageDirectory.isEmpty() || ! QFileInfo::exists(imageDirectory)) {
+    QLOG_DEBUG() << Q_FUNC_INFO << "Blank or non-existent images directory";
+    return;
+  }
+  QDir imgd(imageDirectory);
   ok = imgd.exists();
 
   /**
@@ -3280,6 +3297,8 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
     QLOG_WARN() << QString(tr("Theme image directory not found : %1")).arg(imgd.absolutePath());
     return;
   }
+
+
   QString imgdir = imgd.absolutePath();
   iconfile = settings.value("Exit",QString()).toString();
   setIcon(m_exitAction,imgdir,iconfile);
@@ -3361,19 +3380,14 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
 
   QIcon icon;
   iconfile = settings.value("Link",QString()).toString();
-
-  if (imgd.exists(iconfile)) {
+  if (!iconfile.isEmpty() && imgd.exists(iconfile)) {
     icon.addPixmap(imgd.absoluteFilePath(iconfile),QIcon::Normal,QIcon::On);
   }
 
   iconfile = settings.value("Unlink",QString()).toString();
-  if (imgd.exists(iconfile)) {
+  if (!iconfile.isEmpty() && imgd.exists(iconfile)) {
     icon.addPixmap(imgd.absoluteFilePath(iconfile),QIcon::Normal,QIcon::Off);
   }
-
-  //  m_linkAction->setIcon(icon);
-  //  m_linkAction->setChecked(m_linkContents);
-
 }
 /**
  * show current contents item as page

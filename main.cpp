@@ -191,22 +191,25 @@ int main(int argc, char *argv[])
     }
     int ret;
     SplashScreen * splash = 0;
+    int splashDelay = 0;
+    bool makeSplash = false;
     QString splashDir = mansur.getResourcePath(Lexicon::Splash);
-
-    SETTINGS
-
-    settings.beginGroup("Splash");
-    int splashDelay = settings.value(SID_SPLASH_DELAY,5).toInt();
-    bool makeSplash = settings.value(SID_SPLASH_ENABLED,true).toBool();
-
-    QDir d(splashDir);
-    if (! d.exists()) {
+    if (splashDir.isEmpty() || ! QFileInfo::exists(splashDir)) {
       makeSplash = false;
     }
-    if (parser.isSet(nosplashOption)) {
-      makeSplash = false;
+    else {
+      SETTINGS
+
+      settings.beginGroup("Splash");
+      splashDelay = settings.value(SID_SPLASH_DELAY,5).toInt();
+      makeSplash = settings.value(SID_SPLASH_ENABLED,true).toBool();
+
+      if (parser.isSet(nosplashOption)) {
+        makeSplash = false;
+      }
     }
     if (makeSplash) {
+      QDir d(splashDir);
       QList<QByteArray> formats =  QImageReader::supportedImageFormats();
       QStringList m;
       for(int i=0;i < formats.size();i++) {
@@ -232,6 +235,7 @@ int main(int argc, char *argv[])
       }
     }
     mansur.processEvents();
+
     LanesLexicon *  w = new LanesLexicon;
     if (w->isOk()) {
       w->show();

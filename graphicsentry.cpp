@@ -138,11 +138,18 @@ void GraphicsEntry::readSettings() {
   if (! css.isEmpty()) {
     m_printCss = css;
   }
-  m_textWidth = settings.value(SID_ENTRY_TEXT_WIDTH,300).toInt();
+  m_textWidth = settings.value(SID_ENTRY_TEXT_WIDTH,400).toInt();
+  if (m_textWidth == 0) {
+    m_textWidth = 400;
+  }
+
   if (cmdOptions.contains("textwidth")) {
     int w = cmdOptions.value("textwidth").toInt(&ok);
     if (ok) {
       m_textWidth = w;
+    }
+    else {
+      m_textWidth = 400;
     }
   }
   m_defaultWidth = m_textWidth;
@@ -196,25 +203,35 @@ void GraphicsEntry::readSettings() {
   if (m_entryXslt.isEmpty()) {
     m_entryXslt = "entry.xslt";
   }
+  qDebug() << Q_FUNC_INFO << __LINE__ << m_entryXslt;
+
   QString xsltPath = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_entryXslt);
+  qDebug() << Q_FUNC_INFO << __LINE__ << "Returned path" << xsltPath;
   if (xsltPath.isEmpty()) {
     /// TODO tidy this message box
     QString err = getLexicon()->takeLastError();
     QMessageBox msgBox;
     QStringList errs;
-    errs << QString(tr("Missing XSLT file:%1")).arg(getLexicon()->errorFile());
-    errs << QString(tr("Location:%1")).arg(getLexicon()->errorPath());
-    errs << tr("Not much is going to work without this file");
+    //    errs << QString(tr("Missing XSLT file:%1")).arg(getLexicon()->errorFile());
+    //    errs << QString(tr("Location:%1")).arg(getLexicon()->errorPath());
+    //    errs << tr("Not much is going to work without this file");
+    qDebug() << "Error file" << getLexicon()->errorFile();
+    qDebug() << "Error path" << getLexicon()->errorPath();
+    /*
     msgBox.setText(errs.join("\n"));
     msgBox.setInformativeText(err);
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
     msgBox.exec();
+    */
     QLOG_WARN() << QString(tr("Cannot find required entry XSLT file: %1")).arg(getLexicon()->takeLastError());
   }
   m_nodeXslt = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
-  m_nodeXslt = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_nodeXslt);
   if (m_nodeXslt.isEmpty()) {
+    m_nodeXslt = "node.xslt";
+  }
+  QString nodePath = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_nodeXslt);
+  if (nodePath.isEmpty()) {
     QLOG_WARN() << QString(tr("Cannot find required node XSLT file: %1")).arg(getLexicon()->takeLastError());
   }
 
@@ -618,6 +635,9 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,bool createTab,
  */
 QString GraphicsEntry::readCssFromFile(const QString & name) {
   QString css;
+  if (name.isEmpty()) {
+    return css;
+  }
   QString filename = getLexicon()->getResourceFilePath(Lexicon::Stylesheet,name);
   if (filename.isEmpty()) {
     QString err = getLexicon()->takeLastError();
@@ -683,6 +703,10 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   SETTINGS
   settings.beginGroup("Entry");
   m_scale  = settings.value("Zoom",1.0).toDouble();
+  if (m_scale == 0) {
+    m_scale = 1.0;
+  }
+  qDebug() << Q_FUNC_INFO << __LINE__ << m_scale;
 
   EntryItem * centerItem;
 
@@ -909,6 +933,9 @@ Place GraphicsEntry::getPage(const Place & p) {
   SETTINGS
   settings.beginGroup("Entry");
   m_scale  = settings.value("Zoom",1.0).toDouble();
+  if (m_scale == 0) {
+    m_scale = 1.0;
+  }
 
   QString lastRoot;
   // "select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource =  // 1 and page = ? order by nodenum asc");
@@ -1062,7 +1089,9 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
     return NULL;
   }
   EntryItem * gi = new EntryItem("");
-  gi->document()->setDefaultStyleSheet(m_currentCss);
+  if (! m_currentCss.isEmpty()) {
+    gi->document()->setDefaultStyleSheet(m_currentCss);
+  }
   gi->setTextWidth(m_textWidth);
   gi->setHtml(html);
   gi->setOutputHtml(html);
@@ -1206,6 +1235,15 @@ void GraphicsEntry::prependEntries(int startPos) {
  */
 QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
+  if (xsl.isEmpty()) {
+    QLOG_WARN() << tr("No XSLT file name supplied");
+    return QString();
+  }
+  if (! QFileInfo::exists(xsl)) {
+    QLOG_WARN() << QString(tr("Cannot find XSLT file: %1")).arg(xsl);
+    return QString();
+  }
+
   ok = compileStylesheet(type,xsl);
   if (ok == 0) {
     QString html = xsltTransform(type,xml);
@@ -1217,7 +1255,7 @@ QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xm
       return QString();
     }
   }
-  /// could be errors in stylesheet or in the xml
+
   QStringList errors = getParseErrors();
   /// TODO fix this
   errors.prepend("Errors when processing entry styesheet:");
