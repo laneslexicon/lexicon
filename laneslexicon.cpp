@@ -667,7 +667,7 @@ void LanesLexicon::addShortcut(const QString & name,const QString & k,bool updat
  *
  */
 void LanesLexicon::loadStyleSheet() {
-  QString filename = getLexicon()->getResourcePath(Lexicon::Stylesheet,m_applicationCssFile);
+  QString filename = getLexicon()->getResourceFilePath(Lexicon::Stylesheet,m_applicationCssFile);
   if (filename.isEmpty()) {
     QString err = getLexicon()->takeLastError();
     QLOG_WARN() << QString(tr("Unable to open stylesheet: %1")).arg(err);
@@ -1698,9 +1698,13 @@ void LanesLexicon::readSettings() {
   ///
   settings.beginGroup("System");
   m_dbName = settings.value("Database","lexicon.sqlite").toString();
+  if (m_dbName.isEmpty()) {
+    m_dbName = "lexicon.sqlite";
+  }
   if (cmdOptions.contains("db")) {
     m_dbName = cmdOptions.value("db");
   }
+
   m_applicationCssFile = settings.value("Stylesheet","app.css").toString();
   QString ar = settings.value("Arabic font").toString();
   if (! ar.isEmpty()) {
@@ -1826,7 +1830,8 @@ void LanesLexicon::readSettings() {
   for(int i=0; i < groups.size();i++) {
     settings.beginGroup(groups[i]);
     v = settings.value("file",QString()).toString();
-    v = getLexicon()->getResourcePath(Lexicon::Map,v);
+    if (!v.isEmpty()) {
+    v = getLexicon()->getResourceFilePath(Lexicon::Map,v);
     QFile file(v);
     if ( file.exists() ) {
       if (! im_load_map_from_json(m_mapper,v.toUtf8().constData(),groups[i].toUtf8().constData())) {
@@ -1838,6 +1843,7 @@ void LanesLexicon::readSettings() {
     }
     else {
       QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(groups[i]).arg(v);
+    }
     }
     settings.endGroup();
   }
@@ -3524,7 +3530,6 @@ void LanesLexicon::onDefaultScale() {
 void LanesLexicon::onSelectTheme() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   QStringList themes = getLexicon()->getThemes() ;
-  qDebug() << themes;
   if (themes.size() == 1) {
     QMessageBox msgBox;
     msgBox.setText(tr("Only one theme has been setup."));
@@ -3555,6 +3560,7 @@ void LanesLexicon::onSelectTheme() {
   delete d;
   int ret = getLexicon()->setTheme(theme);
   if (ret != Lexicon::Ok) {
+    /// TODO say something
     qDebug() << "Error" << ret;
   }
   readSettings();
@@ -3569,7 +3575,6 @@ void LanesLexicon::onSelectTheme() {
     }
   }
   statusMessage(QString(tr("Theme set to: %1")).arg(theme));
-  qDebug() << Q_FUNC_INFO << "Exit";
   /// may need to something about printer setup
 }
 void LanesLexicon::onEditTheme() {

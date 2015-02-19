@@ -114,11 +114,11 @@ void EditPage::readSettings() {
   settings.beginGroup("Entry");
   if (m_type == EDIT_CSS) {
     m_fileName = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
-    m_fileName = getLexicon()->getResourcePath(Lexicon::Stylesheet,m_fileName);
+    m_fileName = getLexicon()->getResourceFilePath(Lexicon::Stylesheet,m_fileName);
   }
   else {
     m_fileName = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
-    m_fileName = getLexicon()->getResourcePath(Lexicon::XSLT,m_fileName);
+    m_fileName = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_fileName);
 
   }
   readFile(m_fileName);

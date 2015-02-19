@@ -79,7 +79,7 @@ void ContentsWidget::readSettings() {
   settings.endGroup();
   settings.beginGroup("Icons");
   QString dragicon = settings.value("Insert link","insert-link.png").toString();
-  m_dragIconFileName = getLexicon()->getResourcePath(Lexicon::Image,dragicon);
+  m_dragIconFileName = getLexicon()->getResourceFilePath(Lexicon::Image,dragicon);
 }
 void ContentsWidget::loadContents() {
   QSqlQuery letterQuery;

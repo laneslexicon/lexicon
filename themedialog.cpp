@@ -147,7 +147,7 @@ bool ThemeDialog::copyRecursively(const QString & srcPath,const QString & target
  */
 void ThemeDialog::onDelete() {
   QString theme = m_themes->currentText();
-  QString srcFilePath = getLexicon()->getResourcePath(Lexicon::ThemeRoot,theme);
+  QString srcFilePath = getLexicon()->getResourceFilePath(Lexicon::ThemeRoot,theme);
 
 
   if (theme == m_startupTheme) {

@@ -63,7 +63,7 @@ bool Lexicon::isOk() const {
  *
  * @return
  */
-QString Lexicon::getResourcePath(int type, const QString & name) {
+QString Lexicon::getResourcePath(int type) {
   QFile file;
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
@@ -77,12 +77,7 @@ QString Lexicon::getResourcePath(int type, const QString & name) {
     QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
     settings->beginGroup("System");
     t = settings->value("Theme directory","themes").toString();
-    if (name.isEmpty()) {
-      return d.absolutePath() + QDir::separator() + t;
-    }
-    else {
-      return d.absolutePath() + QDir::separator() + t + QDir::separator() + name;
-    }
+    return d.absolutePath() + QDir::separator() + t;
     break;
   }
   case Lexicon::Stylesheet : {
@@ -113,9 +108,58 @@ QString Lexicon::getResourcePath(int type, const QString & name) {
   if (m_settingsDir.exists(d)) {
     QDir rd = m_settingsDir;
     rd.cd(d);
-    if (name.isEmpty()) {
-      return rd.absolutePath();
-    }
+    return rd.absolutePath();
+  }
+  else {
+    m_errors << QString(tr("Settings directory not found: %1")).arg(m_settingsDir.absolutePath());
+  }
+  return QString();
+}
+QString Lexicon::getResourceFilePath(int type, const QString & name) {
+  QFile file;
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Resources");
+  QString d(".");
+  switch(type) {
+  case Lexicon::ThemeRoot : {
+    QDir d = QDir::current();
+    QString t;
+    QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
+    settings->beginGroup("System");
+    t = settings->value("Theme directory","themes").toString();
+    return d.absolutePath() + QDir::separator() + t + QDir::separator() + name;
+    break;
+  }
+  case Lexicon::Stylesheet : {
+    d = settings.value("Stylesheet","css").toString();
+    break;
+  }
+  case Lexicon::Image : {
+    d = settings.value("Image","images").toString();
+    break;
+  }
+  case Lexicon::XSLT : {
+    d = settings.value("XSLT","xslt").toString();
+    break;
+  }
+  case Lexicon::Keyboard : {
+    d = settings.value("Keyboard","keyboards").toString();
+    break;
+  }
+  case Lexicon::Map : {
+    d = settings.value("Map","maps").toString();
+    break;
+  }
+  case Lexicon::Splash : {
+    d = settings.value("Splash","images/splash").toString();
+  }
+  default : { break; }
+  }
+  if (m_settingsDir.exists(d)) {
+    QDir rd = m_settingsDir;
+    rd.cd(d);
     QFileInfo r(rd,name);
     if (r.exists()) {
       return r.absoluteFilePath();
@@ -163,7 +207,13 @@ void Lexicon::startLogging() {
   int archiveCount = settings->value(SID_LOGGING_ARCHIVES,4).toInt();
   bool rotate = settings->value(SID_LOGGING_ROTATE,true).toBool();
   delete settings;
-
+  /// we need some settings that make sense
+  if (logfile.isEmpty()) {
+    logfile = "log.txt";
+  }
+  if (maxsize < 1000) {
+    maxsize = 64000;
+  }
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);
     switch(loglevel) {

@@ -61,7 +61,7 @@ void LogViewer::readSettings() {
   QString filename;
   QFileInfo fi;
   filename = settings.value("Warning",QString()).toString();
-  fi.setFile(getLexicon()->getResourcePath(Lexicon::Image,filename));
+  fi.setFile(getLexicon()->getResourceFilePath(Lexicon::Image,filename));
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
   }
@@ -69,7 +69,7 @@ void LogViewer::readSettings() {
     m_warning.addFile(fi.absoluteFilePath());
   }
   filename = settings.value("Error",QString()).toString();
-  fi.setFile(getLexicon()->getResourcePath(Lexicon::Image,filename));
+  fi.setFile(getLexicon()->getResourceFilePath(Lexicon::Image,filename));
 
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
@@ -78,7 +78,7 @@ void LogViewer::readSettings() {
     m_error.addFile(fi.absoluteFilePath());
   }
   filename = settings.value("Info",QString()).toString();
-  fi.setFile(getLexicon()->getResourcePath(Lexicon::Image,filename));
+  fi.setFile(getLexicon()->getResourceFilePath(Lexicon::Image,filename));
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
   }
@@ -86,7 +86,7 @@ void LogViewer::readSettings() {
     m_info.addFile(fi.absoluteFilePath());
   }
   filename = settings.value("Debug",QString()).toString();
-  fi.setFile(getLexicon()->getResourcePath(Lexicon::Image,filename));
+  fi.setFile(getLexicon()->getResourceFilePath(Lexicon::Image,filename));
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
   }

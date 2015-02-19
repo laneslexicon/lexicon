@@ -627,7 +627,7 @@ void FullSearchWidget::readSettings() {
   SETTINGS
   settings.beginGroup("Entry");
   QString css = settings.value("CSS",QString("entry.css")).toString();
-  css = getLexicon()->getResourcePath(Lexicon::Stylesheet,css);
+  css = getLexicon()->getResourceFilePath(Lexicon::Stylesheet,css);
   readCssFromFile(css);
   //m_xsltSource = settings.value("XSLT",QString("entry.xslt")).toString();
   settings.endGroup();
@@ -638,7 +638,7 @@ void FullSearchWidget::readSettings() {
     m_resultsFont.fromString(f);
   }
   m_xsltSource = settings.value(SID_FULLSEARCH_XSLT,QString("node.xslt")).toString();
-  m_xsltSource = getLexicon()->getResourcePath(Lexicon::XSLT,m_xsltSource);
+  m_xsltSource = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_xsltSource);
   m_debug = settings.value(SID_FULLSEARCH_DEBUG,false).toBool();
   m_fragmentSize = settings.value(SID_FULLSEARCH_FRAGMENT_SIZE,40).toInt();
 

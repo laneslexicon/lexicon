@@ -195,7 +195,6 @@ int main(int argc, char *argv[])
 
     SETTINGS
 
-      qDebug() << "!!!!!!!!!" << mansur.settingsFileName();
     settings.beginGroup("Splash");
     int splashDelay = settings.value(SID_SPLASH_DELAY,5).toInt();
     bool makeSplash = settings.value(SID_SPLASH_ENABLED,true).toBool();
