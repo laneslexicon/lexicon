@@ -31,6 +31,9 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   if (! m_debug)
     this->hideColumn(NODE_COLUMN);
 
+  if (! m_showEntryWord && ! m_showHeadWord ) {
+    m_showEntryWord = true;
+  }
   if (! m_showEntryWord ) {
     this->hideColumn(WORD_COLUMN);
   }
