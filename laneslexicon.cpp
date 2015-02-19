@@ -1211,7 +1211,6 @@ void LanesLexicon::createMenus() {
 
   m_searchMenu = m_mainmenu->addMenu(tr("&Search"));
   m_searchMenu->setFocusPolicy(Qt::StrongFocus);
-  m_searchMenu->setTitle(tr("Search"));
   m_searchMenu->setObjectName("searchmenu");
   m_searchMenu->addAction(m_searchRootAction);
   m_searchMenu->addAction(m_searchEntryAction);
@@ -1472,7 +1471,7 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
 Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
   Place np;
 
-  QLOG_DEBUG() << Q_FUNC_INFO << p;
+  QLOG_DEBUG() << Q_FUNC_INFO << p << createTab << activateTab;
   GraphicsEntry * entry;
   if (! p.isValid()) {
     return p;
