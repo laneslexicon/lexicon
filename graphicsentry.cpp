@@ -268,8 +268,21 @@ void GraphicsEntry::readSettings() {
   settings.endGroup();
 
   settings.beginGroup("System");
-  m_linksUseCurrentTab = settings.value(SID_SYSTEM_OPEN_LINK,true).toBool();
-  m_activateLink = settings.value(SID_SYSTEM_ACTIVATE_LINK,true).toBool();
+  vn  = settings.value(SID_SYSTEM_OPEN_LINK,true).toBool();
+  if (vn.type() != QMetaType::Bool) {
+    m_linksUseCurrentTab = true;
+  }
+  else {
+    m_linksUseCurrentTab = vn.toBool();
+  }
+
+  vn = settings.value(SID_SYSTEM_ACTIVATE_LINK,true).toBool();
+  if (vn.type() != QMetaType::Bool) {
+    m_activateLink = true;
+  }
+  else {
+    m_activateLink = vn.toBool();
+  }
   settings.endGroup();
   settings.beginGroup("Icons");
   m_notesIcon = settings.value("Notes","notes-0.xpm").toString();
@@ -469,7 +482,7 @@ void GraphicsEntry::anchorClicked(const QUrl & link) {
  */
 void GraphicsEntry::linkActivated(const QString & link) {
   QLOG_DEBUG() << Q_FUNC_INFO << link;
-  bool createTab = ! m_linksUseCurrentTab;
+  bool createTab =  m_linksUseCurrentTab;
   bool activateTab = m_activateLink;
   ///
   ///  shift or ctrl, toggles create tab behaviour
