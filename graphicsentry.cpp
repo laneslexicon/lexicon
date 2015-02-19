@@ -118,6 +118,7 @@ QGraphicsView * GraphicsEntry::getView() const {
 }
 void GraphicsEntry::readSettings() {
   QString v;
+  QVariant vn;
   bool ok;
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QMap<QString,QString> cmdOptions = app->getOptions();
@@ -162,7 +163,19 @@ void GraphicsEntry::readSettings() {
   if (! m_supplementBg.isValid())  {
     m_supplementBg = QColor::fromRgb(211,211,211);
   }
-  m_clearScene = settings.value(SID_ENTRY_CLEAR_SCENE,true).toBool();
+
+  vn = settings.value(SID_ENTRY_CLEAR_SCENE,true);
+  /**
+   *
+   * this produces compiler warnings but the documentation says to QMetaType
+   *
+   */
+  if (vn.type() != QMetaType::Bool) {
+    m_clearScene = true;
+  }
+  else {
+    m_clearScene = vn.toBool();
+  }
 
 
   /// these are set to empty to disable the feature
@@ -706,7 +719,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (m_scale == 0) {
     m_scale = 1.0;
   }
-  qDebug() << Q_FUNC_INFO << __LINE__ << m_scale;
+  qDebug() << Q_FUNC_INFO << __LINE__ << dp;
 
   EntryItem * centerItem;
 
@@ -757,6 +770,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   EntryItem * rootItem  = createEntry(str);
   /// will be null if the XSLT/XML has not parsed correctly
   if (rootItem == NULL) {
+    QLOG_WARN() << QString("Error build root item for:[%1]").arg(str);
     return p;
   }
   ///
