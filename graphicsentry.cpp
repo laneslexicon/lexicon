@@ -211,39 +211,14 @@ void GraphicsEntry::readSettings() {
 
   settings.endGroup();
 
+  m_entryXslt = getXsltFileName();
   settings.beginGroup("XSLT");
-  m_entryXslt = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
-  if (m_entryXslt.isEmpty()) {
-    m_entryXslt = "entry.xslt";
-  }
-  qDebug() << Q_FUNC_INFO << __LINE__ << m_entryXslt;
-
-  QString xsltPath = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_entryXslt);
-  qDebug() << Q_FUNC_INFO << __LINE__ << "Returned path" << xsltPath;
-  if (xsltPath.isEmpty()) {
-    /// TODO tidy this message box
-    QString err = getLexicon()->takeLastError();
-    QMessageBox msgBox;
-    QStringList errs;
-    //    errs << QString(tr("Missing XSLT file:%1")).arg(getLexicon()->errorFile());
-    //    errs << QString(tr("Location:%1")).arg(getLexicon()->errorPath());
-    //    errs << tr("Not much is going to work without this file");
-    qDebug() << "Error file" << getLexicon()->errorFile();
-    qDebug() << "Error path" << getLexicon()->errorPath();
-    /*
-    msgBox.setText(errs.join("\n"));
-    msgBox.setInformativeText(err);
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-    msgBox.exec();
-    */
-    QLOG_WARN() << QString(tr("Cannot find required entry XSLT file: %1")).arg(getLexicon()->takeLastError());
-  }
   m_nodeXslt = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
   if (m_nodeXslt.isEmpty()) {
     m_nodeXslt = "node.xslt";
   }
   QString nodePath = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_nodeXslt);
+  /// TODO tell them something
   if (nodePath.isEmpty()) {
     QLOG_WARN() << QString(tr("Cannot find required node XSLT file: %1")).arg(getLexicon()->takeLastError());
   }
@@ -289,6 +264,19 @@ void GraphicsEntry::readSettings() {
   m_notesIcon = getLexicon()->getResourceFilePath(Lexicon::Image,m_notesIcon);
 
 }
+QString GraphicsEntry::getXsltFileName()  {
+  QString fileName;
+  SETTINGS
+  settings.beginGroup("XSLT");
+  fileName = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+  if (fileName.isEmpty()) {
+    fileName = "entry.xslt";
+  }
+  QString xsltDir = getLexicon()->getResourcePath(Lexicon::XSLT);
+  QFileInfo fi(xsltDir,fileName);
+  return fi.absoluteFilePath();
+}
+
 void GraphicsEntry::writeDefaultSettings() {
 
 }
@@ -496,7 +484,6 @@ void GraphicsEntry::linkActivated(const QString & link) {
   QLOG_DEBUG() << Q_FUNC_INFO << url;
   if (url.hasQuery()) {
     QString msg = url.query();
-    QLOG_DEBUG() << "query" << msg;
     if (msg.startsWith("text=")) {
       msg.remove("text=");
       QMessageBox::information(this, tr("A note from the editor"),

@@ -47,18 +47,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createActions();
   readSettings();
 
-  if (! openDatabase(m_dbName)) {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
-    QString errorMessage(tr("Database not found"));
-    QDir d;
-    QString currentDir = d.absoluteFilePath(m_dbName);
-    QString info = QString("Missing file %1").arg(QDir::cleanPath(currentDir));
-    QString next(tr("This application will terminate"));
-    msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
-                   + info + "</p><p>" + next + "</p></body></html>");
-    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-    msgBox.exec();
+  if (! sanityCheck()) {
     return;
   }
   loadStyleSheet();
@@ -3543,6 +3532,7 @@ void LanesLexicon::onDefaultScale() {
 void LanesLexicon::onSelectTheme() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   QStringList themes = getLexicon()->getThemes() ;
+  QString currentTheme = m_currentTheme;
   if (themes.size() == 1) {
     QMessageBox msgBox;
     msgBox.setText(tr("Only one theme has been setup."));
@@ -3577,6 +3567,11 @@ void LanesLexicon::onSelectTheme() {
     qDebug() << "Error" << ret;
   }
   readSettings();
+  if (! sanityCheck(1)) {
+    getLexicon()->setTheme(currentTheme);
+    readSettings();
+    return;
+  }
   setIcons(theme);
   loadStyleSheet();
   setupShortcuts();
@@ -3593,4 +3588,56 @@ void LanesLexicon::onSelectTheme() {
 void LanesLexicon::onEditTheme() {
   ThemeDialog d;
   d.exec();
+}
+/**
+ *
+ *
+ * @param type 0 - on startup, 1 - on theme change
+ *
+ * @return
+ */
+bool LanesLexicon::sanityCheck(int type) {
+  if (! openDatabase(m_dbName)) {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
+    QString errorMessage(tr("Database not found"));
+    QDir d;
+    QString currentDir = d.absoluteFilePath(m_dbName);
+    QString info = QString("Missing file %1").arg(QDir::cleanPath(currentDir));
+    QString next;
+    if (type == 0) {
+      next = tr("This application will terminate");
+    }
+    else {
+      next = tr("Theme change will be ignored");
+    }
+    msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
+                   + info + "</p><p>" + next + "</p></body></html>");
+    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+    msgBox.exec();
+    return false;
+  }
+  QString xslt =  GraphicsEntry::getXsltFileName();
+  qDebug() << Q_FUNC_INFO << __LINE__ << xslt;
+  if (xslt.isEmpty() || ! QFileInfo::exists(xslt)) {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
+    QString errorMessage(tr("Critical file not found"));
+    QDir d;
+    QString info = QString("Missing file %1").arg(xslt);
+    QString next;
+    if (type == 0) {
+      next = tr("This application will terminate");
+    }
+    else {
+      next = tr("Theme change will be ignored");
+    }
+    msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
+                   + info + "</p><p>" + next + "</p></body></html>");
+    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+    msgBox.exec();
+    return false;
+
+  }
+  return true;
 }

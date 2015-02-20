@@ -81,6 +81,7 @@ class LanesLexicon : public QMainWindow
   QString getKeymapFileName(const QString &) const;
   HistoryMaster * history();
   NoteMaster * notes();
+  bool sanityCheck(int type = 0);
   public slots:
     int hasPlace(const Place & p,int searchtype,bool setFocus);
     Place showPlace(const Place &,bool newTab,bool activate);
