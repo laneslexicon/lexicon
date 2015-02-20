@@ -34,14 +34,19 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_searchTitle->hide();
   m_resultsText = new QLabel("");
   m_resultsText->hide();
-  m_convertButton = new QPushButton("Close");
+  m_convertButton = new QPushButton("&Close results list");
   m_convertButton->hide();
   connect(m_convertButton,SIGNAL(clicked()),this,SLOT(onRemoveResults()));
   containerlayout->addWidget(m_searchTitle);
   containerlayout->addWidget(m_list);
-  containerlayout->addWidget(m_resultsText);
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  hlayout->addWidget(m_resultsText);
+  hlayout->addStretch();
+  hlayout->addWidget(m_convertButton);
+  //  containerlayout->addWidget(m_resultsText);
   //  resultslayout->addStretch();
-  containerlayout->addWidget(m_convertButton);
+  //  containerlayout->addWidget(m_convertButton);
+  containerlayout->addLayout(hlayout);
 
 
   //  containerlayout->addLayout(resultslayout);
@@ -287,7 +292,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
       pd->setValue(count);
     }
   }
-  QString ar = qobject_cast<Lexicon *>(qApp)->spanArabic(m_target);
+  QString ar = getLexicon()->spanArabic(m_target);
   QString html =  QString(tr("<p>Search for:%1</p>")).arg(ar);
   m_searchTitle->setText(html);
   m_searchTitle->show();
