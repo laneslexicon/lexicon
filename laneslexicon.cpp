@@ -762,7 +762,7 @@ void LanesLexicon::createActions() {
   connect(m_searchRootAction,SIGNAL(triggered()),this,SLOT(searchForRoot()));
   m_searchNodeAction = new QAction(tr("For &node"),this);
   connect(m_searchNodeAction,SIGNAL(triggered()),this,SLOT(searchForNode()));
-  m_searchEntryAction = new QAction(tr("For &entry"),this);
+  m_searchEntryAction = new QAction(tr("For &head word"),this);
   connect(m_searchEntryAction,SIGNAL(triggered()),this,SLOT(searchForEntry()));
 
   m_zoomInAction = new QAction(tr("Zoom in"),this);
@@ -2838,12 +2838,12 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
         QMessageBox msgBox;
         msgBox.setObjectName("wordnotfound");
         msgBox.setTextFormat(Qt::RichText);
-        msgBox.setText(QString(tr("Entry not found: <span style=\"font-family : Amiri;font-size : 18pt\">%1</span>")).arg(target));
+        msgBox.setText(QString(tr("Head word not found: %1")).arg(getLexicon()->spanArabic(target,"wordnotfound")));
         msgBox.exec();
         delete s;
       }
       else {
-        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Entry search for %1")).arg(target));
+        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Head word search for %1")).arg(target));
         m_tabs->setCurrentIndex(i);
         setSignals(s->getEntry());
         s->showFirst();
