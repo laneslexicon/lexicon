@@ -46,7 +46,7 @@ void MainWindow::on_actionExit()
 }
 void MainWindow::on_actionOptions()
 {
-  OptionsDialog * d = new OptionsDialog;
+  OptionsDialog * d = new OptionsDialog("oxygen");
   d->exec();
   delete d;
 }

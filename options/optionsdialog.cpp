@@ -9,24 +9,35 @@
 #include "application.h"
 #include "externs.h"
 #endif
+/**
+ * For use in the standalone app there should be <theme>.ini files in the
+ * same directory as the executable (OSX issues ?)
+ *
+ * @param theme
+ * @param parent
+ */
 OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(parent) {
+  QString useTheme = theme;
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
 #ifdef STANDALONE
-  QSettings settings("default.ini",QSettings::IniFormat);
-
+  QSettings settings("config.ini",QSettings::IniFormat);
+  if (useTheme.isEmpty()) {
+    useTheme = settings.value("Theme").toString();
+  }
 #else
   QSettings settings(getLexicon()->settingsFileName(theme),QSettings::IniFormat);
 #endif
   settings.setIniCodec("UTF-8");
-  RootsOptions * tree = new RootsOptions(QString(),this);
-  m_tabs->addTab(tree,tr("Contents"));
-  PrintOptions * print = new PrintOptions(QString(),this);
-  m_tabs->addTab(print,tr("Printer"));
-  ShortcutOptions * shortcut = new ShortcutOptions(QString(),this);
-  m_tabs->addTab(shortcut,tr("Shortcuts"));
+  RootsOptions * tree = new RootsOptions(useTheme,this);
+  PrintOptions * print = new PrintOptions(useTheme,this);
+  ShortcutOptions * shortcut = new ShortcutOptions(useTheme,this);
+  DiacriticsOptions * diacritics = new DiacriticsOptions(useTheme,this);
 
-  DiacriticsOptions * diacritics = new DiacriticsOptions(QString(),this);
+
+  m_tabs->addTab(tree,tr("Contents"));
+  m_tabs->addTab(shortcut,tr("Shortcuts"));
+  m_tabs->addTab(print,tr("Printer"));
   m_tabs->addTab(diacritics,tr("Diacritics"));
 
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save
