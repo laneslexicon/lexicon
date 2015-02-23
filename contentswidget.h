@@ -42,12 +42,15 @@ class ContentsWidget : public QTreeWidget {
   void mousePressEvent(QMouseEvent *);
   void contextMenuEvent(QContextMenuEvent *);
  private:
+  QString itypeText(const QString &);
+  QStringList m_itypesText;
   void toggleExpand();
   void readSettings();
   bool m_debug;
   bool m_showHeadWord;
   bool m_showEntryWord;
   bool m_showSupplement;
+  bool m_romanItypes;
   /// this is the background color of the select item when the window
   /// does not have focus
   QString m_backgroundColor;

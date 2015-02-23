@@ -28,6 +28,7 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(nodeCollapsed(QTreeWidgetItem *)));
   this->setExpandsOnDoubleClick(false);
 
+  m_itypesText << "I" << "II" << "III" << "IV" << "V" << "VI" << "VII" << "VIII" << "IX" << "X" << "XI" << "XII" << "XIII" << "XIV";
   if (! m_debug)
     this->hideColumn(NODE_COLUMN);
 
@@ -57,10 +58,10 @@ ContentsWidget::~ContentsWidget() {
  */
 void ContentsWidget::readSettings() {
   SETTINGS
-    //Lexicon * app = qobject_cast<Lexicon *>(qApp);
-    //  QSettings * settings = app->getSettings();
+
   settings.beginGroup("Roots");
   m_backgroundColor = settings.value(SID_CONTENTS_BACKGROUND,"lightgray").toString();
+  /// the itype font just controls the numbers
   QString fontString = settings.value(SID_CONTENTS_STANDARD_FONT,QString()).toString();
   if ( ! fontString.isEmpty()) {
     m_itypeFont.fromString(fontString);
@@ -71,15 +72,20 @@ void ContentsWidget::readSettings() {
     f.fromString(fontString);
     setFont(f);
   }
+  /// this is not really on option since it's not in any of the ini files
+  ///
   m_showSupplement = settings.value(SID_CONTENTS_SHOWSUPPLEMENT,true).toBool();
+  /// entry is Lane's (multi-)word head,
+  /// head is the single word version
   m_showHeadWord = settings.value(SID_CONTENTS_SHOWHEAD,false).toBool();
   m_showEntryWord = settings.value(SID_CONTENTS_SHOWENTRY,false).toBool();
   m_debug = settings.value(SID_CONTENTS_DEBUG,false).toBool();
   m_moveDown = settings.value(SID_CONTENTS_MOVE_DOWN,"s").toString();
   m_moveUp = settings.value(SID_CONTENTS_MOVE_UP,"w").toString();
   m_expand = settings.value(SID_CONTENTS_EXPAND," ").toString();
-
+  m_romanItypes = settings.value(SID_CONTENTS_ROMAN_ITYPES,false).toBool();
   settings.endGroup();
+
   settings.beginGroup("Icons");
   QString dragicon = settings.value("Insert link","insert-link.png").toString();
   m_dragIconFileName = getLexicon()->getResourceFilePath(Lexicon::Image,dragicon);
@@ -431,7 +437,8 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
     if (! isSupplementRoot && (m_entryQuery.value("supplement").toInt() == 1)) {
       supplement = "*";
     }
-    itype = m_entryQuery.value("itype").toString();
+    itype = itypeText(m_entryQuery.value("itype").toString());
+
     word = m_entryQuery.value("word").toString();
     node = m_entryQuery.value("nodeid").toString();
     head = m_entryQuery.value("headword").toString();
@@ -448,6 +455,20 @@ int ContentsWidget::addEntries(const QString & root,QTreeWidgetItem * parent) {
     parent->setExpanded(true);
   }
   return c;
+}
+QString ContentsWidget::itypeText(const QString & itype) {
+  bool ok;
+
+  if (! m_romanItypes) {
+    return itype;
+  }
+  int n = itype.toInt(&ok);
+  if (ok  && (n >= 0) && (n < m_itypesText.size())) {
+    return m_itypesText[n];
+  }
+  else {
+    return itype;
+  }
 }
 void ContentsWidget::mousePressEvent(QMouseEvent * event) {
   if (event->button() == Qt::LeftButton) {

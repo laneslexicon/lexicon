@@ -21,6 +21,10 @@ class RootsOptions : public OptionsWidget {
     QLineEdit * m_expand;
     QLineEdit * m_standardFont;
     QLineEdit * m_arabicFont;
+    QCheckBox * m_showEntryColumn;
+    QCheckBox * m_showHeadColumn;
+    QCheckBox * m_showNodeColumn;
+    QCheckBox * m_romanItypes;
     QCheckBox * m_singleClick;
     QCheckBox * m_doubleClick;
     QCheckBox * m_debug;

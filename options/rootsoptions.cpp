@@ -20,15 +20,24 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   m_moveDown = new QLineEdit;
   m_moveDown->setMaxLength(1);
+  m_moveDown->setMaximumWidth(30);
   m_moveUp = new QLineEdit;
   m_moveUp->setMaxLength(1);
+  m_moveUp->setMaximumWidth(30);
   m_expand = new QLineEdit;
   m_expand->setMaxLength(1);
+  m_expand->setMaximumWidth(30);
 
   m_singleClick = new QCheckBox;
   m_doubleClick = new QCheckBox;
+  m_showHeadColumn = new QCheckBox;
+  m_showEntryColumn = new QCheckBox;
+  m_romanItypes = new QCheckBox;
   m_debug = new QCheckBox;
 
+  formlayout->addRow(tr("Show head word"),m_showHeadColumn);
+  formlayout->addRow(tr("Show multi-head word"),m_showEntryColumn);
+  formlayout->addRow(tr("Verb form number in Roman format"),m_romanItypes);
   formlayout->addRow(tr("Move up"),m_moveUp);
   formlayout->addRow(tr("Move down"),m_moveDown);
   formlayout->addRow(tr("Expand/collapse"),m_expand);
@@ -94,6 +103,11 @@ void RootsOptions::readSettings() {
 
   m_arabicFont->setText(settings.value(SID_CONTENTS_ARABIC_FONT).toString());
   m_standardFont->setText(settings.value(SID_CONTENTS_STANDARD_FONT).toString());
+
+  m_showHeadColumn->setChecked(settings.value(SID_CONTENTS_SHOWHEAD,true).toBool());
+  m_showEntryColumn->setChecked(settings.value(SID_CONTENTS_SHOWENTRY,false).toBool());
+  m_romanItypes->setChecked(settings.value(SID_CONTENTS_ROMAN_ITYPES,false).toBool());
+
   settings.endGroup();
   m_dirty = false;
 }
@@ -101,6 +115,9 @@ void RootsOptions::writeSettings() {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
+  settings.setValue(SID_CONTENTS_SHOWHEAD,m_showHeadColumn->isChecked());
+  settings.setValue(SID_CONTENTS_SHOWENTRY,m_showEntryColumn->isChecked());
+  settings.setValue(SID_CONTENTS_ROMAN_ITYPES,m_romanItypes->isChecked());
   settings.setValue(SID_CONTENTS_DEBUG,m_debug->isChecked());
   settings.setValue(SID_CONTENTS_MOVE_UP,m_moveUp->text());
   settings.setValue(SID_CONTENTS_MOVE_DOWN,m_moveDown->text());
@@ -125,6 +142,12 @@ bool RootsOptions::isModified()  {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
+  if (settings.value(SID_CONTENTS_SHOWHEAD).toBool() != m_showHeadColumn->isChecked()) {
+    m_dirty = true;
+  }
+  if (settings.value(SID_CONTENTS_SHOWENTRY).toBool() != m_showEntryColumn->isChecked()) {
+    m_dirty = true;
+  }
   v = settings.value(SID_CONTENTS_DEBUG).toBool();
   if (m_debug->isChecked() != v) {
     m_dirty = true;

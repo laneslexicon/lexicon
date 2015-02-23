@@ -189,6 +189,7 @@ They should not be translated.
 #define SID_CONTENTS_SHOWHEAD                  "Show head"
 #define SID_CONTENTS_SHOWENTRY                 "Show entry"
 #define SID_CONTENTS_SHOWSUPPLEMENT            "Show supplement"
+#define SID_CONTENTS_ROMAN_ITYPES              "Verb form number Roman"
 #define SID_LOGGING_FILE                       "Logfile"
 #define SID_LOGGING_MAXSIZE                    "Maximum size"
 #define SID_LOGGING_LEVEL                      "Level"
