@@ -1370,7 +1370,7 @@ bool LanesLexicon::openDatabase(const QString & dbname) {
  * For root, add child entries if not already presetn
  * For headword, activate the item by giving it focus
  *
- * m_treeKeepsFocus (From "Roots/Keeps focus"),controls who get focus.
+ *
  *
  * Currently if the tree keeps focus, the entry is made visible but
  * it is not obvious which one it is.
@@ -1407,10 +1407,6 @@ void LanesLexicon::treeItemDoubleClicked(QTreeWidgetItem * item,int /* column */
   else {
     /// double clicked on head word, highlight it
     entryActivated(item,0);
-  }
-  /// TODO are these still needed ?
-  if (m_treeKeepsFocus) {
-    m_tree->setFocus();
   }
 
   if ( ! item->isExpanded() ) {
@@ -1800,13 +1796,6 @@ void LanesLexicon::readSettings() {
     m_historyMenuFont.fromString(v);
   }
   settings.endGroup();
-  ///
-  /// Roots
-  ///
-  settings.beginGroup("Roots");
-  m_treeKeepsFocus = settings.value("Keep focus",true).toBool();
-  settings.endGroup();
-
   /**
    * we are have a default map set that is used to convert input to Arabic
    *

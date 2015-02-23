@@ -271,7 +271,6 @@ class LanesLexicon : public QMainWindow
       bool m_searchNewTab;
       bool m_searchSwitchTab;
       bool m_interfaceWarning;
-      bool m_treeKeepsFocus;
       bool m_saveBookmarks;
       bool m_restoreBookmarks;
       bool m_revertEnabled;
