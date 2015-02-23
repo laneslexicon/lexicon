@@ -1737,11 +1737,11 @@ void LanesLexicon::readSettings() {
 
   v  = settings.value("Navigation","root").toString();
 
-  if (v.toLower() == "root") {
-    m_navMode = Lane::By_Root;
+  if (v.toLower() == "page") {
+    m_navMode = Lane::By_Page;
   }
   else {
-    m_navMode = Lane::By_Page;
+    m_navMode = Lane::By_Root;
   }
   v = settings.value("Title",tr("Lane's Arabic-English Lexicon")).toString();
   this->setWindowTitle(v);
@@ -1770,16 +1770,7 @@ void LanesLexicon::readSettings() {
 
   m_searchOptions.setIgnoreDiacritics(settings.value("Ignore diacritics",true).toBool());
   m_searchOptions.setWholeWordMatch(settings.value("Whole word",false).toBool());
-
-
-  // v = settings.value("Target",QString("Arabic")).toString();
-  // if (v == "Arabic")
-  //   m_searchOptions |= Lane::Arabic;
-  // else
-  //   m_searchOptions |= Lane::Buckwalter;
-
   m_searchOptions.setKeymaps(m_keymapsEnabled);
-
   settings.endGroup();
 
   settings.beginGroup("FullSearch");
