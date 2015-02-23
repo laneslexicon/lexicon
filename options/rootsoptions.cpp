@@ -4,15 +4,14 @@
 #ifndef STANDALONE
 #include "application.h"
 #endif
+/**
+ * Not done:
+ *  supplement background colour
+ *
+ * @param theme
+ * @param parent
+ */
 RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
-  /*
-#ifdef STANDALONE
-  m_settings = new QSettings("default.ini",QSettings::IniFormat);
-  m_settings->setIniCodec("UTF-8");
-#else
-  m_settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
-#endif
-  */
   m_section = "Roots";
 
   QVBoxLayout * vlayout = new QVBoxLayout;
@@ -135,29 +134,36 @@ void RootsOptions::writeSettings() {
  * @return
  */
 bool RootsOptions::isModified()  {
-  bool v;
-  QString s;
   m_dirty = false;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
-  if (settings.value(SID_CONTENTS_SHOWHEAD).toBool() != m_showHeadColumn->isChecked()) {
+  if (compare(&settings,SID_CONTENTS_SHOWHEAD,m_showHeadColumn)) {
     m_dirty = true;
   }
-  if (settings.value(SID_CONTENTS_SHOWENTRY).toBool() != m_showEntryColumn->isChecked()) {
+  if (compare(&settings,SID_CONTENTS_SHOWENTRY,m_showEntryColumn)) {
     m_dirty = true;
   }
-  v = settings.value(SID_CONTENTS_DEBUG).toBool();
-  if (m_debug->isChecked() != v) {
+  if (compare(&settings,SID_CONTENTS_ROMAN_ITYPES,m_romanItypes)) {
     m_dirty = true;
   }
-  s = settings.value(SID_CONTENTS_MOVE_UP).toString();
-  if (m_moveUp->text() != s) {
+  if (compare(&settings,SID_CONTENTS_DEBUG,m_debug)) {
     m_dirty = true;
   }
-  s = settings.value(SID_CONTENTS_MOVE_DOWN).toString();
-  if (m_moveDown->text() != s) {
+  if (compare(&settings,SID_CONTENTS_MOVE_UP,m_moveUp)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_CONTENTS_MOVE_DOWN,m_moveDown)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_CONTENTS_EXPAND,m_expand)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_CONTENTS_ARABIC_FONT,m_arabicFont)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_CONTENTS_STANDARD_FONT,m_standardFont)) {
     m_dirty = true;
   }
   settings.endGroup();
@@ -165,23 +171,38 @@ bool RootsOptions::isModified()  {
   return m_dirty;
 }
 void RootsOptions::onSetFont() {
+  bool arabic = false;
   QPushButton * button = qobject_cast<QPushButton *>(QObject::sender());
   QFont f;
   if (button == m_standardButton) {
     f.fromString(m_standardFont->text());
   }
   else {
+    arabic = true;
     f.fromString(m_arabicFont->text());
+  }
+  if (arabic) {
+    QFontDialog * d = new QFontDialog(f);
+    QList<QComboBox *> boxes = d->findChildren<QComboBox *>();
+    if (boxes.size() == 1) {
+      int ix = boxes[0]->findText("Arabic");
+      if (ix >= 0) {
+        boxes[0]->setCurrentText("Arabic");
+        boxes[0]->activated(ix);
+      }
+    }
+    d->setCurrentFont(f);
+    if (d->exec() == QDialog::Accepted) {
+      QFont font = d->currentFont();
+      m_arabicFont->setText(font.toString());
+    }
+    delete d;
+    return;
   }
   bool ok;
   QFont font = QFontDialog::getFont(&ok, f,  this);
   if (!ok) {
     return;
   }
-  if (button == m_standardButton) {
-    m_standardFont->setText(font.toString());
-  }
-  else {
-    m_arabicFont->setText(font.toString());
-  }
+  m_standardFont->setText(font.toString());
 }
