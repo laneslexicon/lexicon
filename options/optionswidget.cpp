@@ -139,3 +139,14 @@ void OptionsWidget::setupConnections() {
   */
 
 }
+bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWidget * p) {
+  QLineEdit * edit = qobject_cast<QLineEdit *>(p);
+  if (edit) {
+    return (settings->value(key).toString() != edit->text());
+  }
+  QCheckBox * box = qobject_cast<QCheckBox *>(p);
+  if (box) {
+    return (settings->value(key).toBool() != box->isChecked());
+  }
+  return false;
+}

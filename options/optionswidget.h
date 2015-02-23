@@ -25,6 +25,7 @@ class OptionsWidget : public QWidget {
   virtual void addButtons();
   void setFileName(const QString &);
   void blockAllSignals(bool block);
+  virtual bool compare(const QSettings *,const QString & key, QWidget * p);
   public slots:
     virtual void onSave();
     virtual void onReset();
