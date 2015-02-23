@@ -81,7 +81,6 @@ DiacriticsOptions::DiacriticsOptions(const QString & theme,QWidget * parent) : O
     QCheckBox * box = new QCheckBox(i.value());
     box->setObjectName("charname");
     box->setProperty("codepoint", i.key());
-    //    connect(box,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
     gridlayout->addWidget(box,row,col);
     col++;
     if (col == 4) {
@@ -108,14 +107,16 @@ DiacriticsOptions::DiacriticsOptions(const QString & theme,QWidget * parent) : O
 void DiacriticsOptions::readSettings() {
   QString hex;
   bool ok;
-  QLOG_DEBUG() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
   QList<QCheckBox *> boxes = this->findChildren<QCheckBox *>();
   QStringList points;
-
+  for(int i=0;i < boxes.size();i++) {
+    boxes[i]->setChecked(false);
+  }
   QStringList keys = settings.childKeys();
   for(int i=0;i < keys.size();i++) {
     if (keys[i].startsWith("Char")) {
@@ -123,7 +124,7 @@ void DiacriticsOptions::readSettings() {
       int x = hex.toInt(&ok,16);
       points << hex;
       for(int j=0;j < boxes.size();j++) {
-        if (boxes[j]->property("codepoint") == x) {
+        if (boxes[j]->property("codepoint").toInt() == x) {
           boxes[j]->setChecked(true);
           j = boxes.size();
         }
