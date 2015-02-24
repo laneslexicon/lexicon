@@ -2682,7 +2682,12 @@ void LanesLexicon::onDocs() {
     m_helpview = new HelpWidget();
     qDebug() << "Create help view";
   }
-  m_helpview->show();
+  if (m_helpview->isHidden()) {
+    m_helpview->show();
+  }
+  else {
+    m_helpview->hide();
+  }
   //   m_tabs->setCurrentIndex(m_tabs->addTab(w,"Docs"));
    return;
 }
