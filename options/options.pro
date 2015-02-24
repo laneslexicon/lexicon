@@ -25,7 +25,8 @@ SOURCES += main.cpp\
 	rootsoptions.cpp \
         shortcutoptions.cpp \
         printoptions.cpp \
-        diacriticsoptions.cpp
+        diacriticsoptions.cpp \
+        entryoptions.cpp
 
 HEADERS  += mainwindow.h \
         optionswidget.h \
@@ -33,4 +34,5 @@ HEADERS  += mainwindow.h \
 	rootsoptions.h \
         shortcutoptions.h \
         printoptions.h \
-        diacriticsoptions.h
+        diacriticsoptions.h \
+        entryoptions.h

@@ -6,14 +6,6 @@
 #include "externs.h"
 #endif
 ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
-  /*
-#ifdef STANDALONE
-  m_settings = new QSettings("default.ini",QSettings::IniFormat);
-  m_settings->setIniCodec("UTF-8");
-#else
-  m_settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
-#endif
-  */
   m_section = "Shortcut";
 
   m_tabs = new QTabWidget;

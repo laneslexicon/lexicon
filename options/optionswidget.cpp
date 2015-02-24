@@ -25,7 +25,7 @@ void OptionsWidget::setFileName(const QString & theme) {
   m_btns = 0;
 }
 void OptionsWidget::addButtons() {
-  m_btns = new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Reset);
+  m_btns = new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Reset|QDialogButtonBox::Help);
   m_btns->button(QDialogButtonBox::Save)->setEnabled(false);
   m_btns->button(QDialogButtonBox::Reset)->setEnabled(false);
 
@@ -85,6 +85,16 @@ void OptionsWidget::textChanged(const QString & /* text */) {
   //  emit(modified(m_dirty));
 
 }
+void OptionsWidget::valueChanged(int /* v */) {
+  bool v =  isModified();
+  setButtons(v);
+  emit(modified(v));
+}
+void OptionsWidget::valueChanged(double /* v */) {
+  bool v =  isModified();
+  setButtons(v);
+  emit(modified(v));
+}
 /*
 bool OptionsWidget::isModified()  {
   return false;
@@ -107,6 +117,15 @@ void OptionsWidget::blockAllSignals(bool block) {
   foreach(QComboBox *  widget,comboboxes) {
     widget->blockSignals(block);
   }
+  QList<QDoubleSpinBox *> doublespinboxes = this->findChildren<QDoubleSpinBox *>();
+  foreach(QDoubleSpinBox *  widget,doublespinboxes) {
+    widget->blockSignals(block);
+  }
+  QList<QSpinBox *> spinboxes = this->findChildren<QSpinBox *>();
+  foreach(QSpinBox *  widget,spinboxes) {
+    widget->blockSignals(block);
+  }
+
 }
 void OptionsWidget::setupConnections() {
   QList<QKeySequenceEdit *> edits = this->findChildren<QKeySequenceEdit *>();
@@ -124,6 +143,14 @@ void OptionsWidget::setupConnections() {
   QList<QComboBox *> comboboxes = this->findChildren<QComboBox *>();
   foreach(QComboBox *  widget,comboboxes) {
       connect(widget,SIGNAL(currentIndexChanged(int)),this,SLOT(stateChanged(int)));
+  }
+  QList<QDoubleSpinBox *> doublespinboxes = this->findChildren<QDoubleSpinBox *>();
+  foreach(QDoubleSpinBox *  widget,doublespinboxes) {
+    connect(widget,SIGNAL(valueChanged(double)),this,SLOT(valueChanged(double)));
+  }
+  QList<QSpinBox *> spinboxes = this->findChildren<QSpinBox *>();
+  foreach(QSpinBox *  widget,spinboxes) {
+    connect(widget,SIGNAL(valueChanged(int)),this,SLOT(valueChanged(int)));
   }
 
   /*

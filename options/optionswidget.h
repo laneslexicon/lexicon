@@ -7,9 +7,12 @@
 #include <QComboBox>
 #include <QKeySequenceEdit>
 #include <QLineEdit>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QGridLayout>
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QPushButton>
@@ -35,6 +38,8 @@ class OptionsWidget : public QWidget {
     virtual void setButtons(bool);
   //  virtual void reset();
   virtual void editingFinished();
+  virtual void valueChanged(int);
+  virtual void valueChanged(double);
    void textChanged(const QString &);
  protected:
   bool m_dirty;

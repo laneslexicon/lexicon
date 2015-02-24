@@ -4,6 +4,7 @@
 #include "printoptions.h"
 #include "shortcutoptions.h"
 #include "diacriticsoptions.h"
+#include "entryoptions.h"
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
@@ -33,9 +34,10 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   PrintOptions * print = new PrintOptions(useTheme,this);
   ShortcutOptions * shortcut = new ShortcutOptions(useTheme,this);
   DiacriticsOptions * diacritics = new DiacriticsOptions(useTheme,this);
-
+  EntryOptions * entry = new EntryOptions(useTheme,this);
 
   m_tabs->addTab(tree,tr("Contents"));
+  m_tabs->addTab(entry,tr("Entry"));
   m_tabs->addTab(shortcut,tr("Shortcuts"));
   m_tabs->addTab(print,tr("Printer"));
   m_tabs->addTab(diacritics,tr("Diacritics"));
@@ -53,6 +55,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   connect(tree,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
   connect(print,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
   connect(diacritics,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
+  connect(entry,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
 
   vlayout->addWidget(m_tabs);
   vlayout->addWidget(m_buttons);
