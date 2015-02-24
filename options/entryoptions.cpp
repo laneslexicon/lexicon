@@ -40,6 +40,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_zoom = new QDoubleSpinBox ;
   m_zoom->setMaximumWidth(75);
   m_zoom->setDecimals(2);
+  m_zoom->setSingleStep(0.01);
   m_zoomIn = new QLineEdit ;
   m_zoomIn->setMaximumWidth(30);
   m_zoomOut = new QLineEdit ;
@@ -171,7 +172,6 @@ void EntryOptions::readSettings() {
   m_supplementBackgroundColor->setText(settings.value(SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR).toString());
   m_textWidth->setText(settings.value(SID_ENTRY_TEXT_WIDTH).toString());
   m_widen->setText(settings.value(SID_ENTRY_WIDEN).toString());
-  qDebug() << ">>>>>>>>>>>>>" << settings.value(SID_ENTRY_SCALE);
   m_zoom->setValue(settings.value(SID_ENTRY_SCALE).toDouble());
   m_zoomIn->setText(settings.value(SID_ENTRY_ZOOM_IN).toString());
   m_zoomOut->setText(settings.value(SID_ENTRY_ZOOM_OUT).toString());
@@ -198,6 +198,109 @@ bool EntryOptions::isModified()  {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
+
+  if (compare(&settings,SID_ENTRY_BACK,m_back)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ENTRY_CSS,m_css)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_CLEAN,m_clean)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ENTRY_DEBUG,m_debug)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_FIND,m_find)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_FIND_NEXT,m_findNext)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ENTRY_FORWARD,m_forward)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_HOME,m_home)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_MARGIN,m_margin)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_MARK,m_mark)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_MOVE_FOCUS_UP,m_focusUp)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_MOVE_FOCUS_DOWN,m_focusDown)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_NARROW,m_narrow)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_RELOAD,m_reload)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_DUMP_HTML,m_saveHtml)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_DUMP_XML,m_saveXml)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_DUMP_OUTPUT_HTML,m_saveOutputHtml)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_SHOW,m_show)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_SHOW_LINK_WARNING,m_showLinkWarning)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_STEP,m_step)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR,m_supplementBackgroundColor)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_TEXT_WIDTH,m_textWidth)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_WIDEN,m_widen)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_SCALE,m_zoom)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_ZOOM_IN,m_zoomIn)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ENTRY_ZOOM_OUT,m_zoomOut)) {
+    m_dirty = true;
+  }
+
+  m_zoomOut->setText(settings.value(SID_ENTRY_ZOOM_OUT).toString());
 
   return m_dirty;
 }

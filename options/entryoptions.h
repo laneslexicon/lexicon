@@ -3,7 +3,6 @@
 #include "optionswidget.h"
 #include <QFontDialog>
 #include <QPushButton>
-#include <QDoubleSpinBox>
 class EntryOptions : public OptionsWidget {
   Q_OBJECT
 
