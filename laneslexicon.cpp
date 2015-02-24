@@ -44,6 +44,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_logview = NULL;
   m_shortcutMap = NULL;
   m_bookmarkMap = NULL;
+  m_helpview = NULL;
   createActions();
   readSettings();
 
@@ -283,6 +284,10 @@ void LanesLexicon::cleanup() {
   if (m_logview != NULL) {
     delete m_logview;
     m_logview = 0;
+  }
+  if (m_helpview != NULL) {
+    delete m_helpview;
+    m_helpview = 0;
   }
   /// TODO close notes db
   freeXslt();
@@ -2673,8 +2678,12 @@ void LanesLexicon::onShowHistory() {
   return;
 }
 void LanesLexicon::onDocs() {
-  HelpWidget * w = new HelpWidget(this);
-   m_tabs->setCurrentIndex(m_tabs->addTab(w,"Docs"));
+  if (m_helpview == NULL) {
+    m_helpview = new HelpWidget();
+    qDebug() << "Create help view";
+  }
+  m_helpview->show();
+  //   m_tabs->setCurrentIndex(m_tabs->addTab(w,"Docs"));
    return;
 }
 void LanesLexicon::onAbout() {

@@ -17,7 +17,8 @@
 #include <QHelpContentWidget>
 #include <QHelpIndexModel>
 #include <QHelpIndexWidget>
-#include "application.h"
+#include <QDialogButtonBox>
+
 class HelpBrowser : public QTextBrowser {
   Q_OBJECT;
  public:
@@ -47,9 +48,11 @@ class HelpViewer : public QWidget {
   public slots:
     void backwardAvailable(bool);
     void goBack();
+
  private:
   HelpBrowser * m_browser;
   QPushButton * m_backBtn;
+  QPushButton * m_searchBtn;
   QHelpEngine * m_he;
 };
 class HelpWidget : public QWidget {
@@ -64,6 +67,7 @@ class HelpWidget : public QWidget {
  public slots:
   void contentsCreated();
   void helpLinkActivated(const QUrl &);
+    void onClose();
  private:
   QHelpEngine * m_he;
   HelpViewer * m_viewer;

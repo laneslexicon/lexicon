@@ -1,4 +1,5 @@
 #include "helpviewer.h"
+#include "application.h"
 #include "QsLog.h"
 #include "externs.h"
 HelpBrowser::HelpBrowser(QWidget * parent) : QTextBrowser(parent) {
@@ -38,14 +39,26 @@ void HelpBrowser::toAnchor() {
     this->scrollToAnchor(c);
   }
 }
+/**
+ *
+ *
+ * @param parent
+ */
 HelpViewer::HelpViewer(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
-  m_browser = new HelpBrowser;
+  QHBoxLayout * btnlayout = new QHBoxLayout;
+
   m_backBtn = new QPushButton("Back");
+  m_searchBtn = new QPushButton("Search");
+  btnlayout->addWidget(m_searchBtn);
+  btnlayout->addWidget(m_backBtn);
+  btnlayout->addStretch();
+  m_browser = new HelpBrowser;
+
   connect(m_browser,SIGNAL(backwardAvailable(bool)),this,SLOT(backwardAvailable(bool)));
   connect(m_backBtn,SIGNAL(clicked()),this,SLOT(goBack()));
-  layout->addWidget(m_backBtn);
   layout->addWidget(m_browser);
+  layout->addLayout(btnlayout);
   setLayout(layout);
 }
 HelpViewer::~HelpViewer() {
@@ -65,6 +78,7 @@ void HelpViewer::goBack() {
   }
 }
 HelpWidget::HelpWidget(QWidget * parent) : QWidget(parent) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_ok = false;
   readSettings();
   m_he = new QHelpEngine(m_helpCollection);
@@ -90,15 +104,25 @@ HelpWidget::HelpWidget(QWidget * parent) : QWidget(parent) {
 
     indexWidget->setModel(indexModel);
     QVBoxLayout * layout = new QVBoxLayout;
+
+    QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Close);
     layout->addWidget(splitter);
+    layout->addWidget(btns);
     setLayout(layout);
    connect(contentWidget,SIGNAL(linkActivated(const QUrl &)),this,SLOT(helpLinkActivated(const QUrl &)));
+
+   connect(btns,SIGNAL(rejected()),this,SLOT(onClose()));
    if (! m_currentUrl.isEmpty()) {
      helpLinkActivated(m_currentUrl);
    }
 }
 HelpWidget::~HelpWidget() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   writeSettings();
+}
+void HelpWidget::onClose() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  this->hide();
 }
 void HelpWidget::contentsCreated() {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -158,12 +182,16 @@ void HelpWidget::writeSettings() {
   SETTINGS
   settings.beginGroup("Help");
   settings.setValue("Current page",m_currentUrl);
+  settings.setValue("size", size());
+  settings.setValue("pos", pos());
 }
 void HelpWidget::readSettings() {
   SETTINGS
   settings.beginGroup("Help");
   m_helpCollection = settings.value("Help collection","lanedocs.qhc").toString();
   m_currentUrl = settings.value("Current page").toUrl();
+  resize(settings.value("size", QSize(500, 700)).toSize());
+  move(settings.value("pos", QPoint(200, 200)).toPoint());
 }
 /*
  TRACE_OBJ

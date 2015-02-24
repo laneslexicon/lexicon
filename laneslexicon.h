@@ -64,6 +64,7 @@ class ContentsWidget;
 class TabWidget;
 class EditView;
 class LogViewer;
+class HelpWidget;
 class LanesLexicon : public QMainWindow
 {
   Q_OBJECT
@@ -314,7 +315,7 @@ class LanesLexicon : public QMainWindow
       QDockWidget * m_treeDock;
       EditView * m_editView;
       LogViewer * m_logview;
-
+      HelpWidget * m_helpview;
 
 
       QSqlDatabase m_db;
