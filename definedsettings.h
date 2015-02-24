@@ -31,7 +31,6 @@ They should not be translated.
 #define SID_ENTRY_DEBUG "Debug"
 #define SID_ENTRY_FIND  "Find"
 #define SID_ENTRY_FIND_NEXT "Find next"
-#define SID_ENTRY_FONT       "Font"
 #define SID_ENTRY_FORWARD  "Forward"
 #define SID_ENTRY_FONT_SIZE "Font size"
 #define SID_ENTRY_HOME       "Home"

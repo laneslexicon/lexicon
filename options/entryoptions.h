@@ -3,6 +3,7 @@
 #include "optionswidget.h"
 #include <QFontDialog>
 #include <QPushButton>
+#include <QDoubleSpinBox>
 class EntryOptions : public OptionsWidget {
   Q_OBJECT
 
@@ -37,7 +38,7 @@ class EntryOptions : public OptionsWidget {
     QLineEdit * m_supplementBackgroundColor;
     QLineEdit * m_textWidth;
     QLineEdit * m_widen;
-    QSpinBox * m_zoom;
+    QDoubleSpinBox * m_zoom;
     QLineEdit * m_zoomIn;
     QLineEdit * m_zoomOut;
 };

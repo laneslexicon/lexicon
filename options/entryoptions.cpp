@@ -37,8 +37,9 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_textWidth = new QLineEdit ;
   m_widen = new QLineEdit ;
 
-  m_zoom = new QSpinBox ;
-  m_zoom->setMaximumWidth(50);
+  m_zoom = new QDoubleSpinBox ;
+  m_zoom->setMaximumWidth(75);
+  m_zoom->setDecimals(2);
   m_zoomIn = new QLineEdit ;
   m_zoomIn->setMaximumWidth(30);
   m_zoomOut = new QLineEdit ;
@@ -77,16 +78,18 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_margin->setMaximumWidth(50);
   m_narrow->setMaximumWidth(30);
   m_widen->setMaximumWidth(30);
+  m_step->setMaximumWidth(30);
   layout->addRow(tr("Text width"),m_textWidth);
   layout->addRow(tr("Text margin"),m_margin);
   layout->addRow(tr("Widen text"),m_widen);
   layout->addRow(tr("Narrow text"),m_narrow);
+  layout->addRow(tr("Step size"),m_step);
 
   // Lexicon movement
   m_back->setMaximumWidth(30);
   m_forward->setMaximumWidth(30);
-  layout->addRow(tr("Lexicon next"),m_forward);
-  layout->addRow(tr("Lexicon prev"),m_back);
+  layout->addRow(tr("Lexicon next entry"),m_forward);
+  layout->addRow(tr("Lexicon previous entry"),m_back);
 
 
 
@@ -104,16 +107,15 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   searchlayout->addWidget(m_clean);
   searchlayout->addStretch();
   layout->addRow(tr("Local search"),searchlayout);
-
+  layout->addRow(tr("Show last search results"),m_show);
   /// Assorted
-  m_step->setMaximumWidth(30);
+
   m_reload->setMaximumWidth(30);
   m_show->setMaximumWidth(30);
   m_showLinkWarning->setMaximumWidth(30);
   m_supplementBackgroundColor->setMaximumWidth(100);
-  layout->addRow(tr("Step"),m_step);
   layout->addRow(tr("Reload"),m_reload);
-  layout->addRow(tr("Show"),m_show);
+
   layout->addRow(tr("Show link warning"),m_showLinkWarning);
   layout->addRow(tr("Supplement color"),m_supplementBackgroundColor);
 
@@ -169,8 +171,8 @@ void EntryOptions::readSettings() {
   m_supplementBackgroundColor->setText(settings.value(SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR).toString());
   m_textWidth->setText(settings.value(SID_ENTRY_TEXT_WIDTH).toString());
   m_widen->setText(settings.value(SID_ENTRY_WIDEN).toString());
-
-  //  m_zoom = new QSpinBox ;
+  qDebug() << ">>>>>>>>>>>>>" << settings.value(SID_ENTRY_SCALE);
+  m_zoom->setValue(settings.value(SID_ENTRY_SCALE).toDouble());
   m_zoomIn->setText(settings.value(SID_ENTRY_ZOOM_IN).toString());
   m_zoomOut->setText(settings.value(SID_ENTRY_ZOOM_OUT).toString());
 
