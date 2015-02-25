@@ -293,7 +293,8 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
     }
   }
   QString ar = getLexicon()->spanArabic(m_target);
-  QString html =  QString(tr("<p>Search for:%1</p>")).arg(ar);
+  /// need the <body> otherwise it's treated as plain text
+  QString html =  QString(tr("<body><p>Search for:%1</p></body>")).arg(ar);
   m_searchTitle->setText(html);
   m_searchTitle->show();
   m_resultsText->setText(this->buildText(options));
