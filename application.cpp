@@ -482,10 +482,10 @@ QString Lexicon::scanAndSpan(const QString & str,const QString & css) {
  * The spanstyle parameter should be a key in the spanArabic section
  * of the INI file. This allows for different font/sizes to be used.
  *
- * If no spanstyle supplied it looks at the "Arabic" and get the default
+ * If no spanstyle supplied it looks at the "System/Arabic font" settings and get the default
  * font and size from there.
 
- * @param ar
+ * @param ar                the text to wrap
  * @param style
  *
  * @return
@@ -493,20 +493,43 @@ QString Lexicon::scanAndSpan(const QString & str,const QString & css) {
 QString Lexicon::spanArabic(const QString & ar,const QString & spanstyle) {
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings s(f.absoluteFilePath(),QSettings::IniFormat);
+  QString fontFamily;
+  int fontSize = 10;
+  QString style;
   s.setIniCodec("UTF-8");
   if ( ! spanstyle.isEmpty() ) {
-    s.beginGroup("SpannedArabic");
+    s.beginGroup("SpannedText");
+    s.beginGroup("Arabic");
     QString style = s.value(spanstyle,QString()).toString();
     if (! style.isEmpty()) {
       return QString("<span style=\"%1\">%2</span>").arg(style).arg(ar);
     }
     s.endGroup();
+    s.endGroup();
   }
-
+  s.beginGroup("System");
+  QString fontString = s.value(SID_SYSTEM_ARABIC_FONT,QString()).toString();
+  if (! fontString.isEmpty()) {
+    QFont f;
+    f.fromString(fontString);
+    fontFamily = f.family();
+    int  sz = f.pixelSize();
+    if (sz <= 0) {
+      sz = f.pointSize();
+    }
+    if (sz > 0) {
+      fontSize = sz;
+    }
+  }
+  style  = QString("<span style=\"font-family : %1;font-size : %2\">%3</span>")
+    .arg(fontFamily)
+    .arg(fontSize)
+    .arg(ar);
+  return style;
+  /*
   s.beginGroup("Arabic");
   QString fontname = s.value(SID_ARABIC_FONT_NAME,QString()).toString();
   QString fontsize = s.value(SID_ARABIC_FONT_SIZE,QString()).toString();
-  QString style;
   if ( ! fontname.isEmpty()) {
     style = QString("font-family : %1").arg(fontname);
   }
@@ -517,6 +540,7 @@ QString Lexicon::spanArabic(const QString & ar,const QString & spanstyle) {
     style += QString("font-size : %1").arg(fontsize);
   }
   return QString("<span style=\"%1\">%2</span>").arg(style).arg(ar);
+  */
 }
 QStringList Lexicon::getThemes() const {
   QDir d(m_themeDirectory);

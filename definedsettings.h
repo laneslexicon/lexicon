@@ -13,7 +13,7 @@
 #define SID_SPLASH_DELAY "Delay"
 #define SID_SPLASH_ENABLED "Enabled"
 #define SID_SPLASH_LOCATION "Location"
-
+#define SID_SYSTEM_ARABIC_FONT "Arabic font"
 /*
 
 These are the keys to access values in the INI file.
