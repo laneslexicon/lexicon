@@ -1649,9 +1649,9 @@ void LanesLexicon::onTest() {
       .arg(p.getSupplement());
   }
   if (1) {
-  FontChangeDialog * d = new FontChangeDialog(this);
-  d->exec();
-  delete d;
+    FontChangeDialog * d = new FontChangeDialog(this);
+    d->exec();
+    delete d;
   }
   if (0) {
   if (m_editView == 0) {

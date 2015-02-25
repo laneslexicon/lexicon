@@ -326,8 +326,6 @@ bool EntryOptions::isModified()  {
     m_dirty = true;
   }
 
-  m_zoomOut->setText(settings.value(SID_ENTRY_ZOOM_OUT).toString());
-
   return m_dirty;
 }
 void EntryOptions::onSetFont() {

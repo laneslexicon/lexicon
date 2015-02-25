@@ -137,6 +137,7 @@ void HelpWidget::contentsCreated() {
     QLOG_DEBUG() << "No documents registered";
     return;
   }
+  /// this is test code
   QList<QStringList> fa = m_he->filterAttributeSets(regs[0]);
   QLOG_DEBUG() << "Filter attribute sets" << fa;
 
@@ -164,6 +165,8 @@ void HelpWidget::contentsCreated() {
     it.next();
     QLOG_DEBUG() << it.key() << ": " << it.value();
   }
+  /// end test code
+  m_he->setCurrentFilter("Lanes Lexicon 1.0");
   m_he->contentWidget()->expandAll();
   m_ok = true;
 }
@@ -182,16 +185,16 @@ void HelpWidget::writeSettings() {
   SETTINGS
   settings.beginGroup("Help");
   settings.setValue("Current page",m_currentUrl);
-  settings.setValue("size", size());
-  settings.setValue("pos", pos());
+  settings.setValue("Size", size());
+  settings.setValue("Pos", pos());
 }
 void HelpWidget::readSettings() {
   SETTINGS
   settings.beginGroup("Help");
   m_helpCollection = settings.value("Help collection","lanedocs.qhc").toString();
   m_currentUrl = settings.value("Current page").toUrl();
-  resize(settings.value("size", QSize(500, 700)).toSize());
-  move(settings.value("pos", QPoint(200, 200)).toPoint());
+  resize(settings.value("Size", QSize(500, 700)).toSize());
+  move(settings.value("Pos", QPoint(200, 200)).toPoint());
 }
 /*
  TRACE_OBJ
