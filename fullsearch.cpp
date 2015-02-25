@@ -637,8 +637,6 @@ void FullSearchWidget::readSettings() {
   if (! f.isEmpty()) {
     m_resultsFont.fromString(f);
   }
-  m_xsltSource = settings.value(SID_FULLSEARCH_XSLT,QString("node.xslt")).toString();
-  m_xsltSource = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_xsltSource);
   m_debug = settings.value(SID_FULLSEARCH_DEBUG,false).toBool();
   m_fragmentSize = settings.value(SID_FULLSEARCH_FRAGMENT_SIZE,40).toInt();
 
@@ -647,6 +645,10 @@ void FullSearchWidget::readSettings() {
   v = settings.value(SID_FULLSEARCH_HEAD_BACKGROUND).toString();
   m_headBackgroundColor.setNamedColor(v);
   m_headText = settings.value(SID_FULLSEARCH_HEAD_TEXT).toString();
+  settings.endGroup();
+  settings.beginGroup("XSLT");
+  m_xsltSource = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
+  m_xsltSource = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_xsltSource);
   settings.endGroup();
 
   settings.beginGroup("Search");

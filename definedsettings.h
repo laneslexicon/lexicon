@@ -163,7 +163,6 @@ They should not be translated.
 
 #define SID_FULLSEARCH_ONE_ROW                 "One row"
 #define SID_FULLSEARCH_RESULTS_FONT            "Results Arabic font"
-#define SID_FULLSEARCH_XSLT                    "XSLT"
 #define SID_FULLSEARCH_DEBUG                   "Debug"
 #define SID_FULLSEARCH_FRAGMENT_SIZE           "Fragment size"
 #define SID_FULLSEARCH_INCLUDE_HEADS           "Include heads"
