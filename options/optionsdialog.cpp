@@ -5,6 +5,7 @@
 #include "shortcutoptions.h"
 #include "diacriticsoptions.h"
 #include "entryoptions.h"
+#include "findoptions.h"
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
@@ -35,12 +36,13 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   ShortcutOptions * shortcut = new ShortcutOptions(useTheme,this);
   DiacriticsOptions * diacritics = new DiacriticsOptions(useTheme,this);
   EntryOptions * entry = new EntryOptions(useTheme,this);
-
+  FindOptions * find = new FindOptions(useTheme,this);
   m_tabs->addTab(tree,tr("Contents"));
   m_tabs->addTab(entry,tr("Entry"));
   m_tabs->addTab(shortcut,tr("Shortcuts"));
   m_tabs->addTab(print,tr("Printer"));
   m_tabs->addTab(diacritics,tr("Diacritics"));
+  m_tabs->addTab(find,tr("Search"));
 
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save
                                      | QDialogButtonBox::Cancel

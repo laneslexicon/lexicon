@@ -14,8 +14,11 @@
 #include <QHBoxLayout>
 #include <QGridLayout>
 #include <QLabel>
+#include <QGroupBox>
 #include <QDialogButtonBox>
 #include <QPushButton>
+#include <QColorDialog>
+#include <QFontDialog>
 class OptionsWidget : public QWidget {
   Q_OBJECT
  public:
