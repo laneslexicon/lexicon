@@ -33,7 +33,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_show = new QLineEdit ;
   m_showLinkWarning = new QCheckBox ;
   m_step = new QLineEdit ;
-  m_supplementBackgroundColor = new QLineEdit ;
+  m_highlightColor = new QLineEdit ;
   m_textWidth = new QLineEdit ;
   m_widen = new QLineEdit ;
 
@@ -114,11 +114,11 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_reload->setMaximumWidth(30);
   m_show->setMaximumWidth(30);
   m_showLinkWarning->setMaximumWidth(30);
-  m_supplementBackgroundColor->setMaximumWidth(100);
+  m_highlightColor->setMaximumWidth(100);
   layout->addRow(tr("Reload"),m_reload);
 
   layout->addRow(tr("Show link warning"),m_showLinkWarning);
-  layout->addRow(tr("Supplement color"),m_supplementBackgroundColor);
+  layout->addRow(tr("Highlight color"),m_highlightColor);
 
   /// Debug
   QHBoxLayout * debugcontainer = new QHBoxLayout;
@@ -169,7 +169,7 @@ void EntryOptions::readSettings() {
   m_show->setText(settings.value(SID_ENTRY_SHOW).toString());
   m_showLinkWarning->setChecked(settings.value(SID_ENTRY_SHOW_LINK_WARNING).toBool());
   m_step->setText(settings.value(SID_ENTRY_STEP).toString());
-  m_supplementBackgroundColor->setText(settings.value(SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR).toString());
+  m_highlightColor->setText(settings.value(SID_ENTRY_HIGHLIGHT_COLOR).toString());
   m_textWidth->setText(settings.value(SID_ENTRY_TEXT_WIDTH).toString());
   m_widen->setText(settings.value(SID_ENTRY_WIDEN).toString());
   m_zoom->setValue(settings.value(SID_ENTRY_SCALE).toDouble());
@@ -203,7 +203,7 @@ void EntryOptions::writeSettings() {
   settings.value(SID_ENTRY_SHOW,m_show->text());
   settings.value(SID_ENTRY_SHOW_LINK_WARNING,m_showLinkWarning->isChecked());
   settings.value(SID_ENTRY_STEP,m_step->text());
-  settings.value(SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR,m_supplementBackgroundColor->text());
+  settings.value(SID_ENTRY_HIGHLIGHT_COLOR,m_highlightColor->text());
   settings.value(SID_ENTRY_TEXT_WIDTH,m_textWidth->text());
   settings.value(SID_ENTRY_WIDEN,m_widen->text());
   settings.value(SID_ENTRY_SCALE,m_zoom->value());
@@ -302,7 +302,7 @@ bool EntryOptions::isModified()  {
     m_dirty = true;
   }
 
-  if (compare(&settings,SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR,m_supplementBackgroundColor)) {
+  if (compare(&settings,SID_ENTRY_HIGHLIGHT_COLOR,m_highlightColor)) {
     m_dirty = true;
   }
 

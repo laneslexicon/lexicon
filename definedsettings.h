@@ -43,7 +43,7 @@ They should not be translated.
 #define SID_ENTRY_SCALE   "Scale"
 #define SID_ENTRY_SHOW    "Show"
 #define SID_ENTRY_STEP    "Step"
-#define SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR "Supplement background color"
+#define SID_ENTRY_HIGHLIGHT_COLOR "Highlight color"
 #define SID_ENTRY_TEXT_WIDTH "Text width"
 #define SID_ENTRY_WIDEN   "Widen"
 

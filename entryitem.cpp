@@ -18,6 +18,7 @@ EntryItem::EntryItem(const QString & text, QGraphicsItem * parent) : QGraphicsTe
   setFlag(QGraphicsItem::ItemIsSelectable,true);
   setFlag(QGraphicsItem::ItemIsFocusable,true);
   setAcceptDrops(true);
+  m_backgroundColorName = "yellow";
 }
 EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
   m_focusOnHover = false;
@@ -27,6 +28,7 @@ EntryItem::EntryItem(QGraphicsItem * parent) :QGraphicsTextItem(parent) {
   setFlag(QGraphicsItem::ItemIsSelectable,true);
   setFlag(QGraphicsItem::ItemIsFocusable,true);
   setAcceptDrops(true);
+  m_backgroundColorName = "yellow";
 }
 /**
  * the note dialog does not have a QWidget parent so delete it manually
@@ -43,6 +45,12 @@ EntryItem::~EntryItem() {
     delete n;
   }
   /// TODO Check proxywidget are delete automatically
+}
+void EntryItem::setHighlightColor(const QString & name) {
+  m_backgroundColorName = name;
+}
+void EntryItem::setOutputHtml(const QString & html) {
+  m_html = html;
 }
 QString EntryItem::getNode() {
   return m_place.getNode();
@@ -248,37 +256,14 @@ void EntryItem::focusInEvent(QFocusEvent * event) {
 void EntryItem::focusOutEvent(QFocusEvent * event) {
   QGraphicsTextItem::focusOutEvent(event);
 }
-/*
-void EntryItem::copy() {
-  QString txt = this->textCursor().selectedText();
-  QClipboard *clipboard = QApplication::clipboard();
-  clipboard->setText(txt);
-}
-*/
+/**
+ * can remove this
+ *
+ * @param painter
+ * @param o
+ * @param w
+ */
 void EntryItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *o, QWidget *w) {
-  QPen pen = painter->pen();
-  QBrush brush = painter->brush();
-  if (! m_defaultBackground.isValid()) {
-    if (m_place.isSupplement()) {
-      m_defaultBackground = m_backgroundColor;
-    }
-    else {
-      m_defaultBackground = painter->background().color();
-    }
-  }
-  painter->setPen(Qt::NoPen);
-
-  if ( ! m_place.isSupplement()) {
-    /// TODO get this from somewhere
-    painter->setBrush(Qt::white);
-  }
-  else {
-    if (m_backgroundColor.isValid()) {
-      painter->setBrush(m_backgroundColor);
-    }
-    painter->drawRect(this->boundingRect());
-  }
-  painter->setPen(pen);
   QGraphicsTextItem::paint(painter, o, w);
 }
 void EntryItem::showHighlights() {
@@ -287,7 +272,8 @@ void EntryItem::showHighlights() {
     c.setPosition(m_highlights[i]);
     c.select(QTextCursor::WordUnderCursor);
     QTextCharFormat fmt = c.charFormat();
-    fmt.setBackground(Qt::yellow);
+
+    fmt.setBackground(QColor(m_backgroundColorName));
     c.setCharFormat(fmt);
     this->setTextCursor(c);
   }
@@ -306,7 +292,7 @@ int EntryItem::showHighlight(int index) {
     c.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,t.size());
     //    c.select(QTextCursor::WordUnderCursor);
     QTextCharFormat fmt = c.charFormat();
-    fmt.setBackground(Qt::yellow);
+    fmt.setBackground(QColor(m_backgroundColorName));
     c.setCharFormat(fmt);
     c.clearSelection();
     this->setTextCursor(c);
@@ -315,23 +301,10 @@ int EntryItem::showHighlight(int index) {
   return -1;
 }
 void EntryItem::clearHighlights(bool keepResults) {
+
   QString t;
-  QTextCursor c = this->textCursor();
-  for(int i=0;i < m_highlights.size();i++) {
-    c.setPosition(m_highlights[i]);
-    t = m_finds.value(m_highlights[i]);
-    //    c.select(QTextCursor::WordUnderCursor);
-    c.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,t.size());
-    QTextCharFormat fmt = c.charFormat();
-    /// problem is we are clear highlights for items we have painted yet
-    /// so the defautlBackground is not set and so is black
-    if (m_defaultBackground.isValid()) {
-      fmt.setBackground(m_defaultBackground);
-    }
-    //    fmt.setBackground(Qt::white);//m_defaultBackground);
-    c.setCharFormat(fmt);
-    c.clearSelection();
-    this->setTextCursor(c);
+  if (! m_html.isEmpty()) {
+    this->document()->setHtml(m_html);
   }
   if (! keepResults ) {
     m_highlights.clear();
@@ -427,14 +400,24 @@ QPair<int,int> EntryItem::find(const QRegExp & rx,int position,bool highlight) {
   m_highlights << c.position();
   m_finds.insert(c.position(),t);
   c.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,t.size());
+  this->setTextCursor(c);
+
   QTextCharFormat fmt = c.charFormat();
+  /*
+  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << fmt.background().color().name();
+  if (! m_background.isValid() || (m_background.name() == "#000000")) {
+      m_background = fmt.background().color();
+
+  }
+  */
   if (highlight) {
     //    c.select(QTextCursor::WordUnderCursor);
-    fmt.setBackground(Qt::yellow);
+    fmt.setBackground(QColor(m_backgroundColorName));
     c.setCharFormat(fmt);
   }
   c.clearSelection();
   this->setTextCursor(c);
+
 
   /*
   QTextCharFormat fmt = QTextEdit::ExtraSelection::format;//c.charFormat();

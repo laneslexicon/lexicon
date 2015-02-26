@@ -156,13 +156,6 @@ void GraphicsEntry::readSettings() {
   m_defaultWidth = m_textWidth;
 
   m_entryMargin = settings.value(SID_ENTRY_MARGIN,10).toInt();
-  /// TODO change this to use color names
-  v  = settings.value(SID_ENTRY_SUPPLEMENT_BACKGROUND_COLOR,"lightgray").toString();
-
-  m_supplementBg = QColor(v);
-  if (! m_supplementBg.isValid())  {
-    m_supplementBg = QColor::fromRgb(211,211,211);
-  }
 
   vn = settings.value(SID_ENTRY_CLEAR_SCENE,true);
   /**
@@ -208,6 +201,8 @@ void GraphicsEntry::readSettings() {
   m_showLinkWarning = settings.value(SID_ENTRY_SHOW_LINK_WARNING,true).toBool();
 
   m_scale = settings.value(SID_ENTRY_SCALE,1.0).toDouble();
+
+  m_highlightColorName = settings.value(SID_ENTRY_HIGHLIGHT_COLOR,"yellow").toString();
 
   settings.endGroup();
 
@@ -919,9 +914,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     QLOG_DEBUG() << "viewport rect" << viewport_rect << "scene rect" << visible_scene_rect;
     QLOG_DEBUG() << visible_scene_rect.width();
   */
-  //  if (m_place.isSupplement()) {
-  //    m_view->setBackgroundBrush(QBrush(m_supplementBg));
-  //  }
   return m_place;
 }
 Place GraphicsEntry::getPage(const Place & p) {
@@ -1114,8 +1106,8 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
   gi->document()->setDefaultTextOption(m_textOption);
   gi->setTextInteractionFlags(Qt::TextBrowserInteraction);
   gi->setAcceptHoverEvents(true);
-  gi->setBackground(m_supplementBg);
   gi->setNotesEnabled(m_notesEnabled);
+  gi->setHighlightColor(m_highlightColorName);
   //    if (m_dumpOutputHtml) {
   //      gi->setOutputHtml(html);
   //    }

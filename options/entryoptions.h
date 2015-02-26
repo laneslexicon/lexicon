@@ -34,7 +34,7 @@ class EntryOptions : public OptionsWidget {
     QLineEdit * m_show;
     QCheckBox * m_showLinkWarning;
     QLineEdit * m_step;
-    QLineEdit * m_supplementBackgroundColor;
+    QLineEdit * m_highlightColor;
     QLineEdit * m_textWidth;
     QLineEdit * m_widen;
     QDoubleSpinBox * m_zoom;
