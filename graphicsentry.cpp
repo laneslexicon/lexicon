@@ -1702,18 +1702,17 @@ int GraphicsEntry::search() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   SETTINGS
   settings.beginGroup("LocalSearch");
-  v  = settings.value("Type",QString("normal")).toString();
-  if (v == "normal") {
-    options.setSearchType(SearchOptions::Normal);
-  }
-  else {
+  if (settings.value(SID_LOCALSEARCH_TYPE_REGEX,false).toBool()) {
     options.setSearchType(SearchOptions::Regex);
   }
+  else {
+    options.setSearchType(SearchOptions::Normal);
+  }
 
-  options.setIgnoreDiacritics(settings.value("Ignore diacritics",true).toBool());
-  options.setWholeWordMatch(settings.value("Whole word",true).toBool());
-  options.setForceLTR(settings.value("Force LTR",false).toBool());
-
+  options.setIgnoreDiacritics(settings.value(SID_LOCALSEARCH_IGNORE_DIACRITICS,true).toBool());
+  options.setWholeWordMatch(settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool());
+  options.setForceLTR(settings.value(SID_LOCALSEARCH_FORCE_LTR,false).toBool());
+  options.setShowAll(settings.value(SID_LOCALSEARCH_SHOW_ALL,false).toBool());
   ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Local,this);
   d->setOptions(options);
   QString t;
