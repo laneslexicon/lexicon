@@ -26,21 +26,61 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_fullXslt = new QLineEdit;
   m_fullHeadColor = new QLineEdit;
   m_fullHeadColor->setText("wheat");
-  QFormLayout * fulllayout = new QFormLayout;
-  fulllayout->addRow(tr("Debug"),m_fullDebug);
+  m_fullHeadText = new QLineEdit;
 
+  QFormLayout * fulllayout = new QFormLayout;
   QHBoxLayout * colorlayout = new QHBoxLayout;
   colorlayout->addWidget(m_fullHeadColor);
   QPushButton * colorbutton = new QPushButton(tr("Set colour"));
   connect(colorbutton,SIGNAL(clicked()),this,SLOT(onSetColor()));
   colorlayout->addWidget(colorbutton);
   colorlayout->addStretch();
-
-  fulllayout->addRow(tr("Head word colour"),colorlayout);
+  fulllayout->addRow(tr("Include head words in\nsearch results"),m_fullIncludeHeads);
+  fulllayout->addRow(tr("Head word background colour"),colorlayout);
+  fulllayout->addRow(tr("Text for head word results"),m_fullHeadText);
+  fulllayout->addRow(tr("One row for each entry"),m_fullOneRow);
+  fulllayout->addRow(tr("Step interval"),m_fullStep);
+  fulllayout->addRow(tr("Debug"),m_fullDebug);
 
   fullbox->setLayout(fulllayout);
 
+
+
+  /// Head word search
+  QGroupBox * headbox = new QGroupBox(tr("Head word search"));
+  m_headDebug = new QCheckBox;
+  m_headStep = new QSpinBox;
+  m_headVertical = new QCheckBox;
+  m_headFocusTable = new QCheckBox;
+
+  QFormLayout * headlayout = new QFormLayout;
+  headlayout->addRow(tr("Vertical layout"),m_headVertical);
+  headlayout->addRow(tr("Step interval"),m_headStep);
+  headlayout->addRow(tr("Initial focus on results"),m_headFocusTable);
+  headlayout->addRow(tr("Debug"),m_headDebug);
+  headbox->setLayout(headlayout);
+
+  /// Local search
+  QGroupBox * localbox = new QGroupBox(tr("Local search"));
+  m_localForce      = new QCheckBox;
+  m_localIgnore     = new QCheckBox;
+  m_localWholeWord  = new QCheckBox;
+  m_localRegex      = new QCheckBox;
+  m_localShowAll    = new QCheckBox;
+  QFormLayout * locallayout = new QFormLayout;
+  locallayout->addRow(tr("Regular expression search"),m_localRegex);
+  locallayout->addRow(tr("Ignore diacritics"),m_localIgnore);
+  locallayout->addRow(tr("Whole word match"),m_localWholeWord);
+  locallayout->addRow(tr("Show all results"),m_localShowAll);
+  locallayout->addRow(tr("Force Left-to-Right input\nfor regular expression search"),m_localForce);
+
+  localbox->setLayout(locallayout);
+
+
   layout->addWidget(fullbox);
+  layout->addWidget(headbox);
+  layout->addWidget(localbox);
+
   setLayout(layout);
   addButtons();
   readSettings();

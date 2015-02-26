@@ -15,6 +15,7 @@ class FindOptions : public OptionsWidget {
     void onSetFont();
     void onSetColor();
  private:
+    /// full search
     QCheckBox * m_fullDebug;
     QSpinBox *  m_fullFragmentSize;
     QCheckBox * m_fullIncludeHeads;
@@ -25,5 +26,18 @@ class FindOptions : public OptionsWidget {
     QCheckBox * m_fullWholeWord;
     QLineEdit * m_fullXslt;
     QLineEdit * m_fullHeadColor;
+    QLineEdit * m_fullHeadText;
+    /// head word search
+    QCheckBox * m_headDebug;
+    QSpinBox * m_headStep;
+    QCheckBox * m_headVertical;
+    QCheckBox * m_headFocusTable;
+    /// local search
+    QCheckBox * m_localForce;
+    QCheckBox * m_localIgnore;
+    QCheckBox * m_localWholeWord;
+    QCheckBox * m_localRegex;
+    QCheckBox * m_localShowAll;
+
 };
 #endif
