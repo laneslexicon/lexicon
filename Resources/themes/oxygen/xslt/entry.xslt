@@ -12,35 +12,33 @@
 
   <xsl:template match="/">
   <html>
-    <xsl:apply-templates select="//root" />
-    <body>
     <xsl:apply-templates select="//word" />
-    </body>
     <xsl:if test="$ddebug = 'entryfree'">
       <xsl:apply-templates select="//entryFree" />
     </xsl:if>
   </html>
   </xsl:template>
 
-  <!--
-   this is not used anymore
-   -->
-  <xsl:template match="root">
-    <p class="rootword"><span class="arabichead rootword"><xsl:value-of  select="@text"/></span>
-    <xsl:if test="@quasi = '1'">
-      <span class="quasi">Quasi</span>
-    </xsl:if>
-    </p>
-  </xsl:template>
 
   <xsl:template match="word">
-    <xsl:variable name="entrystyle">
+    <body>
+      <xsl:attribute name="class">
     <xsl:choose>
       <xsl:when test="boolean(./@supp = 1)">
         <xsl:text>supplement</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>main</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+      </xsl:attribute>
+    <xsl:variable name="entrystyle">
+    <xsl:choose>
+      <xsl:when test="boolean(./@supp = 1)">
+        <xsl:text>insupplement</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>inmain</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
     </xsl:variable>
@@ -73,6 +71,7 @@
     <xsl:apply-templates select="entryFree" />
       </xsl:otherwise>
     </xsl:choose>
+    </body>
   </xsl:template>
 <!---
   These use characters from Arabic Presentation Forms-B to show short vowels u/i/a
