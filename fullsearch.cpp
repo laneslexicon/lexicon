@@ -650,13 +650,13 @@ void FullSearchWidget::readSettings() {
   m_xsltSource = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
   m_xsltSource = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_xsltSource);
   settings.endGroup();
-
   settings.beginGroup("Search");
-  v  = settings.value(SID_SEARCH_TYPE,QString("normal")).toString();
-  if (v == "normal")
-    m_defaultOptions.setSearchType(SearchOptions::Normal);
-  else
+  if (settings.value(SID_SEARCH_TYPE_REGEX,false).toBool()) {
     m_defaultOptions.setSearchType(SearchOptions::Regex);
+  }
+  else {
+    m_defaultOptions.setSearchType(SearchOptions::Normal);
+  }
 
 
   m_defaultOptions.setIgnoreDiacritics(settings.value(SID_SEARCH_IGNORE_DIACRITICS,true).toBool());

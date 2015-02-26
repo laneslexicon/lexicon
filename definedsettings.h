@@ -149,7 +149,7 @@ They should not be translated.
 #define SID_SHORTCUT_SHOW_LOGS                 "Show logs"
 
 #define SID_SEARCH_IGNORE_DIACRITICS           "Ignore diacritics"
-#define SID_SEARCH_TYPE                        "Type"
+#define SID_SEARCH_TYPE_REGEX                  "Regex"
 #define SID_SEARCH_WHOLE_WORD                  "Whole word"
 #define SID_SEARCH_ARABIC_CONTEXT_STYLE        "Arabic context style"
 #define SID_SEARCH_DIACRITICS                  "Diacritics"
