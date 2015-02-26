@@ -169,6 +169,8 @@ void SearchOptionsWidget::showMore(bool /* show */) {
     break;
   }
   case SearchOptions::Local : {
+    m_newTab->hide();
+    m_makeActive->hide();
     m_showAllSearch->show();
     m_typeGroup->show();
     if (USE_KEYMAPS) {
