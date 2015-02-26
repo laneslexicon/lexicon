@@ -13,6 +13,7 @@ class EntryOptions : public OptionsWidget {
     void readSettings();
     bool isModified();
     void onSetFont();
+    void onSetColor();
  private:
     QLineEdit * m_back;
     QLineEdit * m_css;

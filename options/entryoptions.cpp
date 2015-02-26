@@ -118,7 +118,14 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   layout->addRow(tr("Reload"),m_reload);
 
   layout->addRow(tr("Show link warning"),m_showLinkWarning);
-  layout->addRow(tr("Highlight color"),m_highlightColor);
+
+  QHBoxLayout * colorlayout = new QHBoxLayout;
+  colorlayout->addWidget(m_highlightColor);
+  QPushButton * colorbutton = new QPushButton(tr("Set colour"));
+  connect(colorbutton,SIGNAL(clicked()),this,SLOT(onSetColor()));
+  colorlayout->addWidget(colorbutton);
+  colorlayout->addStretch();
+  layout->addRow(tr("Highlight color"),colorlayout);
 
   /// Debug
   QHBoxLayout * debugcontainer = new QHBoxLayout;
@@ -365,4 +372,29 @@ void EntryOptions::onSetFont() {
   }
   m_standardFont->setText(font.toString());
   */
+}
+void EntryOptions::onSetColor() {
+  QColor color;
+  color.setNamedColor(m_highlightColor->text());
+  QColorDialog d(color);
+  if (d.exec() != QDialog::Accepted) {
+    return;
+  }
+  int r,g,b;
+  color = d.currentColor();
+  color.getRgb(&r,&g,&b);
+  QString str = QString("%1,%2,%3").arg(r).arg(g).arg(b);
+  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Colors");
+  QStringList keys = settings.allKeys();
+  QStringList v;
+  for(int i=0;i < keys.size();i++) {
+    v = settings.value(keys[i]).toStringList();
+    if (v.join(",") == str) {
+      m_highlightColor->setText(keys[i]);
+      return;
+    }
+  }
+  m_highlightColor->setText(d.currentColor().name());
 }

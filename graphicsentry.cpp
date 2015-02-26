@@ -2052,6 +2052,7 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
  */
 void GraphicsEntry::onReload() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+  /*
   SETTINGS
   settings.beginGroup("Entry");
   m_debug = settings.value(SID_ENTRY_DEBUG,false).toBool();
@@ -2070,11 +2071,14 @@ void GraphicsEntry::onReload() {
   settings.beginGroup("XSLT");
   m_entryXslt = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
   m_entryXslt = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_entryXslt);
+  */
+  readSettings();
   QString html;
   for (int i=0;i < m_items.size();i++) {
     html = transform(ENTRY_XSLT_RECOMPILE,m_entryXslt,m_items[i]->getXml());
     m_items[i]->document()->clear();
     m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
+    m_items[i]->setHighlightColor(m_highlightColorName);
     m_items[i]->setTextWidth(m_textWidth);
     m_items[i]->setHtml(html);
     m_items[i]->setOutputHtml(html);
@@ -2111,7 +2115,7 @@ void GraphicsEntry::onReload(const QString & css,const QString & xslt) {
     m_items[i]->setHtml(html);
     m_items[i]->setOutputHtml(html);
   }
-  statusMessage(tr("Reloaded page"));
+  statusMessage(tr("In-memory page reload"));
 }
 /**
  * Params:
