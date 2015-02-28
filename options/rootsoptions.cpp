@@ -126,6 +126,7 @@ void RootsOptions::writeSettings() {
   settings.sync();
 
   settings.endGroup();
+  emit(modified(false));
 }
 /**
  * TODO not complete

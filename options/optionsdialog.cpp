@@ -58,6 +58,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   connect(print,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
   connect(diacritics,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
   connect(entry,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
+  connect(find,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
 
   vlayout->addWidget(m_tabs);
   vlayout->addWidget(m_buttons);

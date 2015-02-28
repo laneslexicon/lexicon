@@ -186,39 +186,39 @@ void EntryOptions::readSettings() {
   m_dirty = false;
 }
 void EntryOptions::writeSettings() {
+  qDebug() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
-  settings.value(SID_ENTRY_BACK,m_back->text());
-  settings.value(SID_ENTRY_CSS,m_css->text());
-  settings.value(SID_ENTRY_CLEAN,m_clean->text());
-  settings.value(SID_ENTRY_DEBUG,m_debug->isChecked());
-  settings.value(SID_ENTRY_FIND,m_find->text());
-  settings.value(SID_ENTRY_FIND_NEXT,m_findNext->text());
-  settings.value(SID_ENTRY_FORWARD,m_forward->text());
-  settings.value(SID_ENTRY_HOME,m_home->text());
-  settings.value(SID_ENTRY_MARGIN,m_margin->text());
-  settings.value(SID_ENTRY_MARK,m_mark->text());
-  settings.value(SID_ENTRY_MOVE_FOCUS_UP,m_focusUp->text());
-  settings.value(SID_ENTRY_MOVE_FOCUS_DOWN,m_focusDown->text());
-  settings.value(SID_ENTRY_NARROW,m_narrow->text());
-  settings.value(SID_ENTRY_RELOAD,m_reload->text());
-  settings.value(SID_ENTRY_DUMP_HTML,m_saveHtml->isChecked());
-  settings.value(SID_ENTRY_DUMP_XML,m_saveXml->isChecked());
-  settings.value(SID_ENTRY_DUMP_OUTPUT_HTML,m_saveOutputHtml->isChecked());
-  settings.value(SID_ENTRY_SHOW,m_show->text());
-  settings.value(SID_ENTRY_SHOW_LINK_WARNING,m_showLinkWarning->isChecked());
-  settings.value(SID_ENTRY_STEP,m_step->text());
-  settings.value(SID_ENTRY_HIGHLIGHT_COLOR,m_highlightColor->text());
-  settings.value(SID_ENTRY_TEXT_WIDTH,m_textWidth->text());
-  settings.value(SID_ENTRY_WIDEN,m_widen->text());
-  settings.value(SID_ENTRY_SCALE,m_zoom->value());
-  settings.value(SID_ENTRY_ZOOM_IN,m_zoomIn->text());
-  settings.value(SID_ENTRY_ZOOM_OUT,m_zoomOut->text());
-
-  settings.sync();
-  settings.endGroup();
+  settings.setValue(SID_ENTRY_BACK,m_back->text());
+  settings.setValue(SID_ENTRY_CSS,m_css->text());
+  settings.setValue(SID_ENTRY_CLEAN,m_clean->text());
+  settings.setValue(SID_ENTRY_DEBUG,m_debug->isChecked());
+  settings.setValue(SID_ENTRY_FIND,m_find->text());
+  settings.setValue(SID_ENTRY_FIND_NEXT,m_findNext->text());
+  settings.setValue(SID_ENTRY_FORWARD,m_forward->text());
+  settings.setValue(SID_ENTRY_HOME,m_home->text());
+  settings.setValue(SID_ENTRY_MARGIN,m_margin->text());
+  settings.setValue(SID_ENTRY_MARK,m_mark->text());
+  settings.setValue(SID_ENTRY_MOVE_FOCUS_UP,m_focusUp->text());
+  settings.setValue(SID_ENTRY_MOVE_FOCUS_DOWN,m_focusDown->text());
+  settings.setValue(SID_ENTRY_NARROW,m_narrow->text());
+  settings.setValue(SID_ENTRY_RELOAD,m_reload->text());
+  settings.setValue(SID_ENTRY_DUMP_HTML,m_saveHtml->isChecked());
+  settings.setValue(SID_ENTRY_DUMP_XML,m_saveXml->isChecked());
+  settings.setValue(SID_ENTRY_DUMP_OUTPUT_HTML,m_saveOutputHtml->isChecked());
+  settings.setValue(SID_ENTRY_SHOW,m_show->text());
+  settings.setValue(SID_ENTRY_SHOW_LINK_WARNING,m_showLinkWarning->isChecked());
+  settings.setValue(SID_ENTRY_STEP,m_step->text());
+  settings.setValue(SID_ENTRY_HIGHLIGHT_COLOR,m_highlightColor->text());
+  settings.setValue(SID_ENTRY_TEXT_WIDTH,m_textWidth->text());
+  settings.setValue(SID_ENTRY_WIDEN,m_widen->text());
+  settings.setValue(SID_ENTRY_SCALE,m_zoom->value());
+  settings.setValue(SID_ENTRY_ZOOM_IN,m_zoomIn->text());
+  settings.setValue(SID_ENTRY_ZOOM_OUT,m_zoomOut->text());
+  m_dirty = false;
+  emit(modified(false));
 }
 /**
  * TODO not complete

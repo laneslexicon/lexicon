@@ -157,6 +157,7 @@ void PrintOptions::writeSettings() {
   settings.sync();
 
   settings.endGroup();
+  emit(modified(false));
 }
 bool PrintOptions::isModified()  {
   m_dirty = false;

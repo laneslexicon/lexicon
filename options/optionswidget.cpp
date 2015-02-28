@@ -175,6 +175,10 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   if (box) {
     return (settings->value(key).toBool() != box->isChecked());
   }
+  QSpinBox * spin = qobject_cast<QSpinBox *>(p);
+  if (spin) {
+    return (settings->value(key).toInt() != spin->value());
+  }
   QDoubleSpinBox * dspin = qobject_cast<QDoubleSpinBox *>(p);
   if (dspin) {
     return (settings->value(key).toDouble() != dspin->value());

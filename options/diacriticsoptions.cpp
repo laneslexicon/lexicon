@@ -167,6 +167,7 @@ void DiacriticsOptions::writeSettings() {
       hexstr.clear();
   }
   settings.endGroup();
+  emit(modified(false));
 }
 bool DiacriticsOptions::isModified()  {
   bool ok;

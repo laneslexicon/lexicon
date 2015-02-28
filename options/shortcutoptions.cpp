@@ -101,6 +101,8 @@ void ShortcutOptions::writeSettings() {
   settings.beginGroup(m_section);
   //  m_settings->setValue(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL,m_collapseAll->keySequence().toString());
   settings.endGroup();
+  emit(modified(false));
+
 }
 bool ShortcutOptions::isModified()  {
   QString key;
