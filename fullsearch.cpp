@@ -641,7 +641,7 @@ void FullSearchWidget::readSettings() {
   m_fragmentSize = settings.value(SID_FULLSEARCH_FRAGMENT_SIZE,40).toInt();
 
   m_defaultOptions.setIncludeHeads(settings.value(SID_FULLSEARCH_INCLUDE_HEADS,false).toBool());
-
+  m_stepCount = settings.value(SID_FULLSEARCH_STEP,500).toInt();
   v = settings.value(SID_FULLSEARCH_HEAD_BACKGROUND).toString();
   m_headBackgroundColor.setNamedColor(v);
   m_headText = settings.value(SID_FULLSEARCH_HEAD_TEXT).toString();
@@ -930,7 +930,7 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   m_rxlist->setUpdatesEnabled(false);
   while(m_query.next() && ! m_cancelSearch) {
     readCount++;
-    if ((readCount % 500) == 0) {
+    if ((readCount % m_stepCount) == 0) {
       m_progress->setValue(readCount);
     }
     if (pd) {
