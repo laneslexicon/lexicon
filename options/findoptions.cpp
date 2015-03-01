@@ -12,7 +12,7 @@
  * @param parent
  */
 FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
-  m_section = "Entry";
+  m_section = "FullSearch";
   QVBoxLayout * layout = new QVBoxLayout;
   QGroupBox * fullbox = new QGroupBox(tr("Full text search"));
 
@@ -21,11 +21,16 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_fullIncludeHeads = new QCheckBox;
   m_fullOneRow = new QCheckBox;
   m_fullStep = new QSpinBox;
-  //  m_fullViewerWidth = new QLineEdit;
+
+  m_fullFragmentSize->setMaximumWidth(MEDIUM_EDIT);
+  m_fullStep->setMaximumWidth(MEDIUM_EDIT);
+  m_fullStep->setSingleStep(25);
+ //  m_fullViewerWidth = new QLineEdit;
   //  m_fullViewerHeight = new QLineEdit;
   //  m_fullXslt = new QLineEdit;
   m_fullHeadColor = new QLineEdit;
   m_fullHeadText = new QLineEdit;
+
 
   /// these are for the SearchDialog box
   /*
@@ -59,10 +64,13 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   */
   fulllayout->addRow(tr("Progress interval"),m_fullStep);
   QPushButton * fullbtn = new QPushButton(tr("Set"));
-  fulllayout->addRow(tr("Search dialog options"),fullbtn);
+  QHBoxLayout * setlayout1 = new QHBoxLayout;
+  setlayout1->addWidget(fullbtn);
+  setlayout1->addStretch();
+  fulllayout->addRow(tr("Search dialog options"),setlayout1);
   fulllayout->addRow(tr("Debug"),m_fullDebug);
 
-  connect(fullbtn,SIGNAL(clicked()),this,SLOT(onHeadDialog()));
+  connect(fullbtn,SIGNAL(clicked()),this,SLOT(onFullDialog()));
 
   fullbox->setLayout(fulllayout);
 
@@ -74,6 +82,8 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_headStep = new QSpinBox;
   m_headVertical = new QCheckBox;
   m_headFocusTable = new QCheckBox;
+  m_headStep->setMaximumWidth(MEDIUM_EDIT);
+  m_headStep->setSingleStep(25);
   /*
   m_headNewTab = new QCheckBox;
   m_headGoTab = new QCheckBox;
@@ -85,6 +95,15 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   headlayout->addRow(tr("Vertical layout"),m_headVertical);
   headlayout->addRow(tr("Step interval"),m_headStep);
   headlayout->addRow(tr("Initial focus on results"),m_headFocusTable);
+
+  QPushButton * headbtn = new QPushButton(tr("Set"));
+  QHBoxLayout * setlayout2 = new QHBoxLayout;
+  setlayout2->addWidget(headbtn);
+  setlayout2->addStretch();
+  headlayout->addRow(tr("Search dialog options"),setlayout2);
+  connect(headbtn,SIGNAL(clicked()),this,SLOT(onHeadDialog()));
+
+
   //  headlayout->addRow(tr("Open in new tab"),m_headNewTab);
   //  headlayout->addRow(tr("Go to new tab"),m_headGoTab);
   headlayout->addRow(tr("Debug"),m_headDebug);
@@ -122,7 +141,7 @@ void FindOptions::readSettings() {
   qDebug() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
-  settings.beginGroup(m_section);
+  settings.beginGroup("FullSearch");
 
   m_fullDebug->setChecked(settings.value(SID_FULLSEARCH_DEBUG,false).toBool());
   m_fullFragmentSize->setValue(settings.value(SID_FULLSEARCH_FRAGMENT_SIZE,50).toInt());

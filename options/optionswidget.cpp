@@ -32,6 +32,7 @@ void OptionsWidget::addButtons() {
   layout()->addWidget(m_btns);
   connect(m_btns->button(QDialogButtonBox::Save),SIGNAL(clicked()),this,SLOT(onSave()));
   connect(m_btns->button(QDialogButtonBox::Reset),SIGNAL(clicked()),this,SLOT(onReset()));
+  connect(m_btns->button(QDialogButtonBox::Help),SIGNAL(clicked()),this,SLOT(onHelp()));
 }
 void OptionsWidget::onSave() {
   writeSettings();
@@ -184,4 +185,7 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
     return (settings->value(key).toDouble() != dspin->value());
   }
   return false;
+}
+void OptionsWidget::onHelp() {
+  emit(showHelp(m_section));
 }

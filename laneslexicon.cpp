@@ -3453,6 +3453,7 @@ void LanesLexicon::revertEntry() {
 }
 void LanesLexicon::onOptions() {
   OptionsDialog * d = new OptionsDialog(QString(),this);
+  connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   d->exec();
   delete d;
 }
@@ -3612,7 +3613,6 @@ bool LanesLexicon::sanityCheck(int type) {
     return false;
   }
   QString xslt =  GraphicsEntry::getXsltFileName();
-  qDebug() << Q_FUNC_INFO << __LINE__ << xslt;
   if (xslt.isEmpty() || ! QFileInfo::exists(xslt)) {
     QMessageBox msgBox;
     msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
@@ -3634,4 +3634,7 @@ bool LanesLexicon::sanityCheck(int type) {
 
   }
   return true;
+}
+void LanesLexicon::showHelp(const QString & section) {
+  QLOG_DEBUG() << Q_FUNC_INFO << section;
 }

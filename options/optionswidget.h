@@ -44,6 +44,7 @@ class OptionsWidget : public QWidget {
     virtual void stateChanged(int);
     virtual void writeSettings() = 0;
     virtual void setButtons(bool);
+    virtual void onHelp();
   //  virtual void reset();
   virtual void editingFinished();
   virtual void valueChanged(int);
@@ -60,5 +61,6 @@ class OptionsWidget : public QWidget {
  signals:
   void valueChanged();
   void modified(bool);
+  void showHelp(const QString &);
 };
 #endif

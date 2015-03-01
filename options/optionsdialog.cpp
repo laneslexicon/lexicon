@@ -53,13 +53,20 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(currentChanged(int)));
   connect(m_buttons, SIGNAL(accepted()), this, SLOT(saveChanges()));
   connect(m_buttons, SIGNAL(rejected()), this, SLOT(reject()));
-
+  /*
   connect(tree,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
   connect(print,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
   connect(diacritics,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
   connect(entry,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
   connect(find,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
+  connect(find,SIGNAL(showHelp(const QString &)),this,SIGNAL(showHelp(const QString &)));
+  */
+  for(int i=0;i < m_tabs->count();i++) {
+    OptionsWidget * w = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
+    connect(w,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
+    connect(w,SIGNAL(showHelp(const QString &)),this,SIGNAL(showHelp(const QString &)));
 
+  }
   vlayout->addWidget(m_tabs);
   vlayout->addWidget(m_buttons);
   setLayout(vlayout);
