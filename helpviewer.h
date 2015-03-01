@@ -67,6 +67,7 @@ class HelpWidget : public QWidget {
  public slots:
   void contentsCreated();
   void helpLinkActivated(const QUrl &);
+  void showSection(const QString & id);
     void onClose();
  private:
   QHelpEngine * m_he;

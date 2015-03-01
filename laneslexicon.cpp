@@ -3637,4 +3637,12 @@ bool LanesLexicon::sanityCheck(int type) {
 }
 void LanesLexicon::showHelp(const QString & section) {
   QLOG_DEBUG() << Q_FUNC_INFO << section;
+  if (m_helpview == NULL) {
+    m_helpview = new HelpWidget();
+    qDebug() << "Create help view";
+  }
+  if (m_helpview->isHidden()) {
+    m_helpview->show();
+  }
+  m_helpview->showSection("idSearchConfiguration");
 }

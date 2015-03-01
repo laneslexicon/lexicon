@@ -150,14 +150,19 @@ void HelpWidget::contentsCreated() {
   }
 
   m_he->setCurrentFilter("Lanes Lexicon 1.0");
+  QStringList keywords;
+  keywords << "introname" << "preface" << "lanex" << "idPreface";
   QLOG_DEBUG() << "Filter attributes" << m_he->filterAttributes();
-  QMap<QString,QUrl> links = m_he->linksForIdentifier(QLatin1String("MyApplication::config"));
-  QLOG_DEBUG() << "Links for ID size:" << links.size();
-  QMapIterator<QString, QUrl> i(links);
-  while (i.hasNext()) {
-    i.next();
-    QLOG_DEBUG() << i.key() << ": " << i.value();
+  for(int i=0;i < keywords.size();i++) {
+    QMap<QString,QUrl> links = m_he->linksForIdentifier(keywords[i]);//QLatin1String("introname"));
+    QLOG_DEBUG() << "Links for ID size:" << keywords[i] << links.size();
+    QMapIterator<QString, QUrl> iter(links);
+    while (iter.hasNext()) {
+      iter.next();
+      QLOG_DEBUG() << iter.key() << iter.value();
+    }
   }
+  /*
   links = m_he->linksForIdentifier(QLatin1String("lanex"));
   QLOG_DEBUG() << "Links for ID size:" << links.size();
   QMapIterator<QString, QUrl> it(links);
@@ -165,6 +170,7 @@ void HelpWidget::contentsCreated() {
     it.next();
     QLOG_DEBUG() << it.key() << ": " << it.value();
   }
+  */
   /// end test code
   m_he->setCurrentFilter("Lanes Lexicon 1.0");
   m_he->contentWidget()->expandAll();
@@ -195,6 +201,16 @@ void HelpWidget::readSettings() {
   m_currentUrl = settings.value("Current page").toUrl();
   resize(settings.value("Size", QSize(500, 700)).toSize());
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
+}
+void HelpWidget::showSection(const QString & id) {
+  QLOG_DEBUG() << Q_FUNC_INFO << id;
+  QMap<QString,QUrl> links = m_he->linksForIdentifier(id);
+  QMapIterator<QString, QUrl> iter(links);
+  if (iter.hasNext()) {
+      iter.next();
+      QLOG_DEBUG() << iter.key() << iter.value();
+      helpLinkActivated(iter.value());
+  }
 }
 /*
  TRACE_OBJ
