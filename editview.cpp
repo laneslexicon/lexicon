@@ -188,6 +188,8 @@ QSize EditView::sizeHint() const {
 }
 void EditView::readSettings() {
   SETTINGS
+
+    /// TODO change to EditView and save size and pos
   settings.beginGroup("EntryLayout");
   this->restoreGeometry(settings.value("Geometry").toByteArray());
   settings.endGroup();

@@ -159,6 +159,8 @@ They should not be translated.
 #define SID_HEADSEARCH_DEBUG                   "Debug"
 #define SID_HEADSEARCH_FOCUS_TABLE             "Focus table"
 #define SID_HEADSEARCH_LAYOUT                  "Vertical layout"
+#define SID_HEADSEARCH_NEW_TAB                 "New tab"
+#define SID_HEADSEARCH_GO_TAB                  "Go to new tab"
 
 #define SID_LOCALSEARCH_SHOW_ALL               "Show all results"
 #define SID_LOCALSEARCH_IGNORE_DIACRITICS      "Ignore diacritics"
@@ -180,7 +182,9 @@ They should not be translated.
 #define SID_FULLSEARCH_DIACRITICS              "Ignore diacritics"
 #define SID_FULLSEARCH_TYPE_REGEX              "Regex"
 #define SID_FULLSEARCH_NEW_TAB                 "Open in new tab"
-#define SID_FULLSEARCH_GO_NEW_TAB              "Go to new tab"
+#define SID_FULLSEARCH_GO_TAB                  "Go to new tab"
+#define SID_ROOTSEARCH_NEW_TAB                 "New tab"
+#define SID_ROOTSEARCH_GO_TAB                  "Go to new tab"
 
 #define SID_ARABIC_FONT_NAME                   "Font"
 #define SID_ARABIC_FONT_SIZE                   "Size"

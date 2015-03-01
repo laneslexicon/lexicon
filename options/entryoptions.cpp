@@ -42,9 +42,9 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_zoom->setDecimals(2);
   m_zoom->setSingleStep(0.01);
   m_zoomIn = new QLineEdit ;
-  m_zoomIn->setMaximumWidth(30);
+  m_zoomIn->setMaximumWidth(SMALL_EDIT);
   m_zoomOut = new QLineEdit ;
-  m_zoomOut->setMaximumWidth(30);
+  m_zoomOut->setMaximumWidth(SMALL_EDIT);
 
   QVBoxLayout * vlayout = new QVBoxLayout;
   QFormLayout * layout = new QFormLayout;
@@ -56,15 +56,15 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   /// Focus
   QGridLayout * focuslayout = new QGridLayout;
-  m_home->setMaximumWidth(30);
-  m_mark->setMaximumWidth(30);
-  m_focusUp->setMaximumWidth(30);
-  m_focusDown->setMaximumWidth(30);
+  m_home->setMaximumWidth(SMALL_EDIT);
+  m_mark->setMaximumWidth(SMALL_EDIT);
+  m_focusUp->setMaximumWidth(SMALL_EDIT);
+  m_focusDown->setMaximumWidth(SMALL_EDIT);
   focuslayout->addWidget(new QLabel(tr("Up")),0,0);
   focuslayout->addWidget(m_focusUp,0,1);
   focuslayout->addWidget(new QLabel(tr("Down")),0,2);
   focuslayout->addWidget(m_focusDown,0,3);
-  focuslayout->addItem(new QSpacerItem(30,30),0,4);
+  focuslayout->addItem(new QSpacerItem(SMALL_EDIT,SMALL_EDIT),0,4);
   focuslayout->addWidget(new QLabel(tr("Home")),1,0);
   focuslayout->addWidget(m_home,1,1);
   focuslayout->addWidget(new QLabel(tr("Mark")),1,2);
@@ -75,11 +75,11 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   layout->addRow(tr("Page movement"),focuscontainer);
 
   /// Text size
-  m_textWidth->setMaximumWidth(50);
-  m_margin->setMaximumWidth(50);
-  m_narrow->setMaximumWidth(30);
-  m_widen->setMaximumWidth(30);
-  m_step->setMaximumWidth(30);
+  m_textWidth->setMaximumWidth(MEDIUM_EDIT);
+  m_margin->setMaximumWidth(MEDIUM_EDIT);
+  m_narrow->setMaximumWidth(SMALL_EDIT);
+  m_widen->setMaximumWidth(SMALL_EDIT);
+  m_step->setMaximumWidth(SMALL_EDIT);
   layout->addRow(tr("Text width"),m_textWidth);
   layout->addRow(tr("Text margin"),m_margin);
   layout->addRow(tr("Widen text"),m_widen);
@@ -87,8 +87,8 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   layout->addRow(tr("Step size"),m_step);
 
   // Lexicon movement
-  m_back->setMaximumWidth(30);
-  m_forward->setMaximumWidth(30);
+  m_back->setMaximumWidth(SMALL_EDIT);
+  m_forward->setMaximumWidth(SMALL_EDIT);
   layout->addRow(tr("Lexicon next entry"),m_forward);
   layout->addRow(tr("Lexicon previous entry"),m_back);
 
@@ -97,9 +97,9 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   /// Local search
   QHBoxLayout * searchlayout = new QHBoxLayout;
-  m_find->setMaximumWidth(30);
-  m_findNext->setMaximumWidth(30);
-  m_clean->setMaximumWidth(30);
+  m_find->setMaximumWidth(SMALL_EDIT);
+  m_findNext->setMaximumWidth(SMALL_EDIT);
+  m_clean->setMaximumWidth(SMALL_EDIT);
   searchlayout->addWidget(new QLabel(tr("Find")));
   searchlayout->addWidget(m_find);
   searchlayout->addWidget(new QLabel(tr("Find next")));
@@ -111,9 +111,9 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   layout->addRow(tr("Show last search results"),m_show);
   /// Assorted
 
-  m_reload->setMaximumWidth(30);
-  m_show->setMaximumWidth(30);
-  m_showLinkWarning->setMaximumWidth(30);
+  m_reload->setMaximumWidth(SMALL_EDIT);
+  m_show->setMaximumWidth(SMALL_EDIT);
+  m_showLinkWarning->setMaximumWidth(SMALL_EDIT);
   m_highlightColor->setMaximumWidth(100);
   layout->addRow(tr("Reload"),m_reload);
 

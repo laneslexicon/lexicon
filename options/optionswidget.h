@@ -19,6 +19,11 @@
 #include <QPushButton>
 #include <QColorDialog>
 #include <QFontDialog>
+#define SMALL_EDIT 30
+#define MEDIUM_EDIT 50
+#define LARGE_EDIT 60
+
+
 class OptionsWidget : public QWidget {
   Q_OBJECT
  public:
