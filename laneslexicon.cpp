@@ -45,6 +45,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_shortcutMap = NULL;
   m_bookmarkMap = NULL;
   m_helpview = NULL;
+  m_optionsDialog = NULL;
   createActions();
   readSettings();
 
@@ -288,6 +289,10 @@ void LanesLexicon::cleanup() {
   if (m_helpview != NULL) {
     delete m_helpview;
     m_helpview = 0;
+  }
+  if (m_optionsDialog != NULL) {
+    delete m_optionsDialog;
+    m_optionsDialog = 0;
   }
   /// TODO close notes db
   freeXslt();
@@ -3452,10 +3457,11 @@ void LanesLexicon::revertEntry() {
   }
 }
 void LanesLexicon::onOptions() {
-  OptionsDialog * d = new OptionsDialog(QString(),this);
-  connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
-  d->exec();
-  delete d;
+  if (m_optionsDialog == NULL) {
+    m_optionsDialog  = new OptionsDialog(QString(),this);
+    connect(m_optionsDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
+  }
+  m_optionsDialog->show();
 }
 void LanesLexicon::pageSearchComplete() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());

@@ -65,6 +65,7 @@ class TabWidget;
 class EditView;
 class LogViewer;
 class HelpWidget;
+class OptionsDialog;
 class LanesLexicon : public QMainWindow
 {
   Q_OBJECT
@@ -316,7 +317,7 @@ class LanesLexicon : public QMainWindow
       EditView * m_editView;
       LogViewer * m_logview;
       HelpWidget * m_helpview;
-
+      OptionsDialog * m_optionsDialog;
 
       QSqlDatabase m_db;
       QSqlDatabase m_notesDb;
