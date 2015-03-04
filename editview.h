@@ -32,6 +32,7 @@ class EditPage : public QWidget {
     void restore();
  private:
     void readSettings();
+
     void readFile(const QString &);
     void apply();
     void reset();
@@ -52,6 +53,7 @@ class EditView : public QWidget {
   Q_OBJECT
  public:
   EditView(QWidget * parent = 0);
+  ~EditView();
   public slots:
     void accept();
     void reject();
@@ -63,6 +65,7 @@ class EditView : public QWidget {
   EditPage * m_cssEditor;
   EditPage * m_xsltEditor;
   void readSettings();
+  void writeSettings();
   QTabWidget * m_tabs;
   QDialogButtonBox * m_buttons;
   bool m_cssModified;

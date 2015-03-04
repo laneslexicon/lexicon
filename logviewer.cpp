@@ -57,7 +57,11 @@ void LogViewer::readSettings() {
   m_log.setFileName(settings.value(SID_LOGGING_FILE,"../log.txt").toString());
   m_maxlines = settings.value(SID_LOGGING_VIEWER_MAXLINES,1000).toInt();
   m_refreshInterval = settings.value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
-  this->restoreGeometry(settings.value("Geometry").toByteArray());
+
+
+  resize(settings.value("Size", QSize(500, 700)).toSize());
+  move(settings.value("Pos", QPoint(200, 200)).toPoint());
+
   QString filename;
   QFileInfo fi;
   filename = settings.value("Warning",QString()).toString();
@@ -97,7 +101,8 @@ void LogViewer::readSettings() {
 void LogViewer::writeSettings() {
   SETTINGS
   settings.beginGroup("Logging");
-  settings.setValue("Geometry", saveGeometry());
+  settings.setValue("Size", size());
+  settings.setValue("Pos", pos());
   settings.endGroup();
   settings.sync();
 }

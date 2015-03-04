@@ -157,6 +157,9 @@ EditView::EditView(QWidget * parent) : QWidget(parent) {
 
   setLayout(layout);
 }
+EditView::~EditView() {
+  writeSettings();
+}
 void EditView::accept() {
   qDebug() << Q_FUNC_INFO;
   if (m_cssEditor->writeFile() &&
@@ -185,6 +188,14 @@ void EditView::modified(int type,bool isDirty) {
 
 QSize EditView::sizeHint() const {
   return QSize(800,600);
+}
+void EditView::writeSettings() {
+  SETTINGS
+  settings.beginGroup("EntryLayout");
+  settings.setValue("Size", size());
+  settings.setValue("Pos", pos());
+  settings.endGroup();
+  settings.sync();
 }
 void EditView::readSettings() {
   SETTINGS

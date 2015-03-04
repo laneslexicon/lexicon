@@ -250,11 +250,36 @@ void LanesLexicon::showStartupEntry() {
     this->currentTabChanged(ix);
   }
 }
+/**
+ * Only call restoreState() if we have a valid size setting otherwise
+ * restoring the state will set the width for the child windows which may
+ * not look so good. (This will only happen if we've been manually editing
+ * the INI file.)
+ */
 void LanesLexicon::restoreSavedState() {
   SETTINGS
   settings.beginGroup("Main");
-  this->restoreGeometry(settings.value("Geometry").toByteArray());
-  this->restoreState(settings.value("State").toByteArray());
+
+
+  QSize sz = settings.value("Size", QSize()).toSize();
+  QPoint pos = settings.value("Pos", QPoint()).toPoint();
+
+  settings.endGroup();
+  if (! sz.isValid()) {
+    settings.beginGroup("System");
+    sz = settings.value("Size",QSize(800,860)).toSize();
+    settings.endGroup();
+  }
+  else {
+    this->restoreState(settings.value("State").toByteArray());
+  }
+  if (pos.isNull()) {
+    settings.beginGroup("System");
+    pos = settings.value("Pos",QSize(200,80)).toPoint();
+    settings.endGroup();
+  }
+  resize(sz);
+  move(pos);
  }
 void LanesLexicon::closeEvent(QCloseEvent * event) {
   cleanup();
@@ -1926,8 +1951,10 @@ void LanesLexicon::writeSettings() {
   ///
   settings.beginGroup("Main");
   settings.setValue("State",this->saveState());
-  settings.setValue("Geometry", saveGeometry());
+  settings.setValue("Size", size());
+  settings.setValue("Pos", pos());
   settings.endGroup();
+
 }
 void LanesLexicon::restoreTabs() {
   bool ok;
