@@ -199,7 +199,41 @@ void FindOptions::writeSettings() {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
+  settings.setValue(SID_FULLSEARCH_DEBUG,m_fullDebug->isChecked());
+  settings.setValue(SID_FULLSEARCH_FRAGMENT_SIZE,m_fullFragmentSize->value());
+  settings.setValue(SID_FULLSEARCH_INCLUDE_HEADS,m_fullIncludeHeads->isChecked());
+  settings.setValue(SID_FULLSEARCH_ONE_ROW,m_fullOneRow->isChecked());
+  settings.setValue(SID_FULLSEARCH_STEP,m_fullStep->value());
+  settings.setValue(SID_FULLSEARCH_HEAD_BACKGROUND,m_fullHeadColor->text());
 
+
+  settings.setValue(SID_FULLSEARCH_NEW_TAB,m_fullNewTab);
+  settings.setValue(SID_FULLSEARCH_GO_TAB,m_fullGoTab);
+  settings.setValue(SID_FULLSEARCH_WHOLE_WORD,m_fullWholeWord);
+  settings.setValue(SID_FULLSEARCH_DIACRITICS,m_fullDiacritics);
+  settings.setValue(SID_FULLSEARCH_TYPE_REGEX,m_fullRegex);
+  settings.setValue(SID_FULLSEARCH_FORCE,m_fullForce);
+
+  settings.value(SID_HEADSEARCH_DEBUG,m_headDebug->isChecked());
+  settings.value(SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical->isChecked());
+  settings.value(SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable->isChecked());
+  settings.value(SID_HEADSEARCH_STEP,m_headStep->value());
+
+  settings.setValue(SID_HEADSEARCH_NEW_TAB,m_headNewTab);
+  settings.setValue(SID_HEADSEARCH_GO_TAB,m_headGoTab);
+  settings.setValue(SID_HEADSEARCH_WHOLE_WORD,m_headWholeWord );
+  settings.setValue(SID_HEADSEARCH_DIACRITICS,m_headDiacritics);
+  settings.setValue(SID_HEADSEARCH_TYPE_REGEX,m_headRegex);
+  settings.setValue(SID_HEADSEARCH_FORCE,m_headForce);
+
+
+   settings.setValue(SID_LOCALSEARCH_WHOLE_WORD,m_localWholeWord);
+   settings.setValue(SID_LOCALSEARCH_DIACRITICS,m_localDiacritics);
+   settings.setValue(SID_LOCALSEARCH_TYPE_REGEX,m_localRegex);
+   settings.setValue(SID_LOCALSEARCH_FORCE,m_localForce);
+
+
+  settings.value(SID_LOCALSEARCH_SHOW_ALL,m_localShowAll->isChecked());
 
   settings.sync();
   settings.endGroup();
