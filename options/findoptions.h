@@ -52,7 +52,6 @@ class FindOptions : public OptionsWidget {
 
     /// local search
     bool m_localForce;
-    bool m_localIgnore;
     bool m_localWholeWord;
     bool m_localRegex;
     bool m_localDiacritics;

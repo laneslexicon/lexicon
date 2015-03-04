@@ -167,7 +167,7 @@ They should not be translated.
 #define SID_HEADSEARCH_FORCE                   "Force LTR"
 
 #define SID_LOCALSEARCH_SHOW_ALL               "Show all results"
-#define SID_LOCALSEARCH_IGNORE_DIACRITICS      "Ignore diacritics"
+#define SID_LOCALSEARCH_DIACRITICS             "Ignore diacritics"
 #define SID_LOCALSEARCH_WHOLE_WORD             "Whole word"
 #define SID_LOCALSEARCH_FORCE_LTR              "Force LTR"
 #define SID_LOCALSEARCH_TYPE_REGEX             "Regex"

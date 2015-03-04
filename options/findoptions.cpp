@@ -185,7 +185,7 @@ void FindOptions::readSettings() {
 
   */
   m_localWholeWord  = settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool();
-  //  m_localDiacritics = settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool();
+  m_localDiacritics = settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool();
   m_localRegex      = settings.value(SID_LOCALSEARCH_TYPE_REGEX,true).toBool();
   m_localForce      = settings.value(SID_LOCALSEARCH_FORCE,true).toBool();
 
@@ -344,14 +344,13 @@ void FindOptions::onLocalDialog() {
   DialogOptions d;
   d.enableOption(DialogOptions::Tab,false);
   d.enableOption(DialogOptions::Go,false);
-  d.enableOption(DialogOptions::Diacritics,false);
   d.setChecked(DialogOptions::Whole,m_localWholeWord);
-  //  d.setChecked(DialogOptions::Diacritics,m_localDiacritics);
+  d.setChecked(DialogOptions::Diacritics,m_localDiacritics);
   d.setChecked(DialogOptions::Regex,m_localRegex);
   d.setChecked(DialogOptions::Force,m_localForce);
   if (d.exec() == QDialog::Accepted) {
     m_localWholeWord = d.isChecked(DialogOptions::Whole);
-    //    m_localDiacritics = d.isChecked(DialogOptions::Diacritics);
+    m_localDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_localRegex = d.isChecked(DialogOptions::Regex);
     m_localForce = d.isChecked(DialogOptions::Force);
   }

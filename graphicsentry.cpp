@@ -1701,7 +1701,7 @@ int GraphicsEntry::search() {
     options.setSearchType(SearchOptions::Normal);
   }
 
-  options.setIgnoreDiacritics(settings.value(SID_LOCALSEARCH_IGNORE_DIACRITICS,true).toBool());
+  options.setIgnoreDiacritics(settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool());
   options.setWholeWordMatch(settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool());
   options.setForceLTR(settings.value(SID_LOCALSEARCH_FORCE_LTR,false).toBool());
   options.setShowAll(settings.value(SID_LOCALSEARCH_SHOW_ALL,false).toBool());
