@@ -8,12 +8,15 @@ DialogOptions::DialogOptions(QWidget * parent) : QDialog(parent) {
   m_wholeWord = new QCheckBox;
   m_diacritics = new QCheckBox;
   m_regex  = new QCheckBox;
+  m_force  = new QCheckBox;
 
   layout->addRow(tr("Whole word"),m_wholeWord);
   layout->addRow(tr("Ignore diacritics"),m_diacritics);
   layout->addRow(tr("Regular exprssion search"),m_regex);
+  layout->addRow(tr("Force Left-to-Right input\n(for Regular exprssion search)"),m_force);
   layout->addRow(tr("Open in new tab"),m_newTab);
   layout->addRow(tr("Go to new tab"),m_goTab);
+
 
   QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
   connect(btns,SIGNAL(accepted()),this,SLOT(accept()));
@@ -40,6 +43,9 @@ void DialogOptions::setChecked(int which,bool v) {
   case DialogOptions::Regex :
     m_regex->setChecked(v);
     break;
+  case DialogOptions::Force :
+    m_force->setChecked(v);
+    break;
   }
 }
 bool DialogOptions::isChecked(int which) {
@@ -58,6 +64,9 @@ bool DialogOptions::isChecked(int which) {
     break;
   case DialogOptions::Regex :
     return m_regex->isChecked();
+    break;
+  case DialogOptions::Force :
+    return m_force->isChecked();
     break;
   }
   return false;
