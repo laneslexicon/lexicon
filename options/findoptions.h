@@ -16,6 +16,7 @@ class FindOptions : public OptionsWidget {
     void onSetColor();
     void onHeadDialog();
     void onFullDialog();
+    void onLocalDialog();
  private:
     /// full search
     QCheckBox * m_fullDebug;
@@ -34,24 +35,31 @@ class FindOptions : public OptionsWidget {
     bool m_fullRegex;
     bool m_fullNewTab;
     bool m_fullGoTab;
+    bool m_fullForce;
+
     /// head word search
     QCheckBox * m_headDebug;
     QSpinBox  * m_headStep;
     QCheckBox * m_headVertical;
     QCheckBox * m_headFocusTable;
+
     bool m_headWholeWord;
     bool m_headDiacritics;
     bool m_headRegex;
     bool m_headNewTab;
     bool m_headGoTab;
+    bool m_headForce;
+
     /// local search
-    QCheckBox * m_localForce;
-    QCheckBox * m_localIgnore;
-    QCheckBox * m_localWholeWord;
-    QCheckBox * m_localRegex;
+    bool m_localForce;
+    bool m_localIgnore;
+    bool m_localWholeWord;
+    bool m_localRegex;
+    bool m_localDiacritics;
+
     QCheckBox * m_localShowAll;
-    QSize       m_viewerSize;
-    QPoint      m_viewerPosition;
+    //    QSize       m_viewerSize;
+    //    QPoint      m_viewerPosition;
 
 };
 #endif

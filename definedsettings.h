@@ -158,15 +158,20 @@ They should not be translated.
 #define SID_HEADSEARCH_STEP                    "Step"
 #define SID_HEADSEARCH_DEBUG                   "Debug"
 #define SID_HEADSEARCH_FOCUS_TABLE             "Focus table"
-#define SID_HEADSEARCH_LAYOUT                  "Vertical layout"
 #define SID_HEADSEARCH_NEW_TAB                 "New tab"
 #define SID_HEADSEARCH_GO_TAB                  "Go to new tab"
+#define SID_HEADSEARCH_VERTICAL_LAYOUT         "Vertical layout"
+#define SID_HEADSEARCH_WHOLE_WORD              "Whole word"
+#define SID_HEADSEARCH_DIACRITICS              "Ignore diacritics"
+#define SID_HEADSEARCH_TYPE_REGEX              "Regex"
+#define SID_HEADSEARCH_FORCE                   "Force LTR"
 
 #define SID_LOCALSEARCH_SHOW_ALL               "Show all results"
 #define SID_LOCALSEARCH_IGNORE_DIACRITICS      "Ignore diacritics"
 #define SID_LOCALSEARCH_WHOLE_WORD             "Whole word"
 #define SID_LOCALSEARCH_FORCE_LTR              "Force LTR"
 #define SID_LOCALSEARCH_TYPE_REGEX             "Regex"
+#define SID_LOCALSEARCH_FORCE                  "Force LTR"
 
 #define SID_FULLSEARCH_ONE_ROW                 "One row"
 #define SID_FULLSEARCH_RESULTS_FONT            "Results Arabic font"
@@ -183,6 +188,9 @@ They should not be translated.
 #define SID_FULLSEARCH_TYPE_REGEX              "Regex"
 #define SID_FULLSEARCH_NEW_TAB                 "Open in new tab"
 #define SID_FULLSEARCH_GO_TAB                  "Go to new tab"
+#define SID_FULLSEARCH_FORCE                   "Force LTR"
+
+
 #define SID_ROOTSEARCH_NEW_TAB                 "New tab"
 #define SID_ROOTSEARCH_GO_TAB                  "Go to new tab"
 

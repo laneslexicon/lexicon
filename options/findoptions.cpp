@@ -111,17 +111,18 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   /// Local search
   QGroupBox * localbox = new QGroupBox(tr("Local search"));
-  m_localForce      = new QCheckBox;
-  m_localIgnore     = new QCheckBox;
-  m_localWholeWord  = new QCheckBox;
-  m_localRegex      = new QCheckBox;
+
   m_localShowAll    = new QCheckBox;
+
   QFormLayout * locallayout = new QFormLayout;
-  locallayout->addRow(tr("Regular expression search"),m_localRegex);
-  locallayout->addRow(tr("Ignore diacritics"),m_localIgnore);
-  locallayout->addRow(tr("Whole word match"),m_localWholeWord);
   locallayout->addRow(tr("Show all results"),m_localShowAll);
-  locallayout->addRow(tr("Force Left-to-Right input\nfor regular expression search"),m_localForce);
+
+  QPushButton * localbtn = new QPushButton(tr("Set"));
+  QHBoxLayout * setlayout3 = new QHBoxLayout;
+  setlayout3->addWidget(localbtn);
+  setlayout3->addStretch();
+  locallayout->addRow(tr("Search dialog options"),setlayout3);
+  connect(localbtn,SIGNAL(clicked()),this,SLOT(onLocalDialog()));
 
   localbox->setLayout(locallayout);
 
@@ -156,7 +157,22 @@ void FindOptions::readSettings() {
   m_fullWholeWord  = settings.value(SID_FULLSEARCH_WHOLE_WORD,true).toBool();
   m_fullDiacritics = settings.value(SID_FULLSEARCH_DIACRITICS,true).toBool();
   m_fullRegex      = settings.value(SID_FULLSEARCH_TYPE_REGEX,true).toBool();
+  m_fullForce      = settings.value(SID_FULLSEARCH_FORCE,true).toBool();
 
+
+  // head word search
+
+  m_headDebug->setChecked(settings.value(SID_HEADSEARCH_DEBUG,false).toBool());
+  m_headVertical->setChecked(settings.value(SID_HEADSEARCH_VERTICAL_LAYOUT,true).toBool());
+  m_headFocusTable->setChecked(settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool());
+  m_headStep->setValue(settings.value(SID_HEADSEARCH_STEP,50).toInt());
+
+  m_headNewTab     = settings.value(SID_HEADSEARCH_NEW_TAB,true).toBool();
+  m_headGoTab      = settings.value(SID_HEADSEARCH_GO_TAB,true).toBool();
+  m_headWholeWord  = settings.value(SID_HEADSEARCH_WHOLE_WORD,true).toBool();
+  m_headDiacritics = settings.value(SID_HEADSEARCH_DIACRITICS,true).toBool();
+  m_headRegex      = settings.value(SID_HEADSEARCH_TYPE_REGEX,true).toBool();
+  m_headForce      = settings.value(SID_HEADSEARCH_FORCE,true).toBool();
 
   //  m_viewerSize = settings.value(SID_FULLSEARCH_VIEWER_SIZE,QSize(600,400)).toSize();
 
@@ -167,19 +183,15 @@ void FindOptions::readSettings() {
  m_fullHeadColor;
  m_fullHeadText;
 
- m_headDebug->setChecked(
-m_headStep;
- m_headVertical->setChecked(
- m_headFocusTable->setChecked(
-  m_headNewTab->setChecked(settings.value(SID_HEADSEARCH_NEW_TAB,true).toBool());
-  m_headGoTab->setChecked(settings.value(SID_HEADSEARCH_GO_TAB,true).toBool());
-
- m_localForce->setChecked(
- m_localIgnore->setChecked(
- m_localWholeWord->setChecked(
- m_localRegex->setChecked(
- m_localShowAll->setChecked(
   */
+  m_localWholeWord  = settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool();
+  //  m_localDiacritics = settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool();
+  m_localRegex      = settings.value(SID_LOCALSEARCH_TYPE_REGEX,true).toBool();
+  m_localForce      = settings.value(SID_LOCALSEARCH_FORCE,true).toBool();
+
+
+  m_localShowAll->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
+
   m_dirty = false;
 }
 void FindOptions::writeSettings() {
@@ -301,12 +313,14 @@ void FindOptions::onFullDialog() {
   d.setChecked(DialogOptions::Whole,m_fullWholeWord);
   d.setChecked(DialogOptions::Diacritics,m_fullDiacritics);
   d.setChecked(DialogOptions::Regex,m_fullRegex);
+  d.setChecked(DialogOptions::Force,m_fullForce);
   if (d.exec() == QDialog::Accepted) {
     m_fullNewTab =  d.isChecked(DialogOptions::Tab);
     m_fullGoTab = d.isChecked(DialogOptions::Go);
     m_fullWholeWord = d.isChecked(DialogOptions::Whole);
     m_fullDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_fullRegex = d.isChecked(DialogOptions::Regex);
+    m_fullForce = d.isChecked(DialogOptions::Force);
   }
 }
 void FindOptions::onHeadDialog() {
@@ -316,11 +330,29 @@ void FindOptions::onHeadDialog() {
   d.setChecked(DialogOptions::Whole,m_headWholeWord);
   d.setChecked(DialogOptions::Diacritics,m_headDiacritics);
   d.setChecked(DialogOptions::Regex,m_headRegex);
+  d.setChecked(DialogOptions::Force,m_headForce);
   if (d.exec() == QDialog::Accepted) {
     m_headNewTab =  d.isChecked(DialogOptions::Tab);
     m_headGoTab = d.isChecked(DialogOptions::Go);
     m_headWholeWord = d.isChecked(DialogOptions::Whole);
     m_headDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_headRegex = d.isChecked(DialogOptions::Regex);
+    m_headForce = d.isChecked(DialogOptions::Force);
+  }
+}
+void FindOptions::onLocalDialog() {
+  DialogOptions d;
+  d.enableOption(DialogOptions::Tab,false);
+  d.enableOption(DialogOptions::Go,false);
+  d.enableOption(DialogOptions::Diacritics,false);
+  d.setChecked(DialogOptions::Whole,m_localWholeWord);
+  //  d.setChecked(DialogOptions::Diacritics,m_localDiacritics);
+  d.setChecked(DialogOptions::Regex,m_localRegex);
+  d.setChecked(DialogOptions::Force,m_localForce);
+  if (d.exec() == QDialog::Accepted) {
+    m_localWholeWord = d.isChecked(DialogOptions::Whole);
+    //    m_localDiacritics = d.isChecked(DialogOptions::Diacritics);
+    m_localRegex = d.isChecked(DialogOptions::Regex);
+    m_localForce = d.isChecked(DialogOptions::Force);
   }
 }

@@ -400,7 +400,7 @@ void HeadSearchWidget::readSettings() {
   }
   m_stepCount = settings.value(SID_HEADSEARCH_STEP,100).toInt();
   m_debug = settings.value(SID_HEADSEARCH_DEBUG,false).toBool();
-  m_verticalLayout = settings.value(SID_HEADSEARCH_LAYOUT,true).toBool();
+  m_verticalLayout = settings.value(SID_HEADSEARCH_VERTICAL_LAYOUT,true).toBool();
   m_focusTable = settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool();
   settings.endGroup();
   settings.beginGroup("Diacritics");
