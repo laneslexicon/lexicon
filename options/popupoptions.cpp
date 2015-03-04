@@ -13,7 +13,7 @@ DialogOptions::DialogOptions(QWidget * parent) : QDialog(parent) {
   layout->addRow(tr("Whole word"),m_wholeWord);
   layout->addRow(tr("Ignore diacritics"),m_diacritics);
   layout->addRow(tr("Regular exprssion search"),m_regex);
-  layout->addRow(tr("Force Left-to-Right input\n(for Regular exprssion search)"),m_force);
+  layout->addRow(tr("Force Left-to-Right input\n(for regular exprssion search)"),m_force);
   layout->addRow(tr("Open in new tab"),m_newTab);
   layout->addRow(tr("Go to new tab"),m_goTab);
 
@@ -25,6 +25,28 @@ DialogOptions::DialogOptions(QWidget * parent) : QDialog(parent) {
   vlayout->addLayout(layout);
   vlayout->addWidget(btns);
   setLayout(vlayout);
+}
+void DialogOptions::enableOption(int which,bool v) {
+  switch(which) {
+  case DialogOptions::Tab :
+    m_newTab->setEnabled(v);
+    break;
+  case DialogOptions::Go :
+    m_goTab->setEnabled(v);
+    break;
+  case DialogOptions::Whole :
+    m_wholeWord->setEnabled(v);
+    break;
+  case DialogOptions::Diacritics :
+    m_diacritics->setEnabled(v);
+    break;
+  case DialogOptions::Regex :
+    m_regex->setEnabled(v);
+    break;
+  case DialogOptions::Force :
+    m_force->setEnabled(v);
+    break;
+  }
 }
 void DialogOptions::setChecked(int which,bool v) {
   switch(which) {

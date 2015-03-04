@@ -14,6 +14,7 @@ class DialogOptions : public QDialog {
   enum Which { Tab , Go , Whole, Diacritics, Regex, Force };
   void setChecked(int,bool);
   bool isChecked(int);
+  void enableOption(int,bool v);
  private:
   QCheckBox * m_newTab;
   QCheckBox * m_goTab;
