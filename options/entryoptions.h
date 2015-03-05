@@ -9,7 +9,7 @@ class EntryOptions : public OptionsWidget {
  public:
   EntryOptions(const QString & theme,QWidget * parent = 0);
   public slots:
-    void writeSettings();
+    void writeSettings(const QString & fileName = QString());
     void readSettings();
     bool isModified();
     void onSetFont();

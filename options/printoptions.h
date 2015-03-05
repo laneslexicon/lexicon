@@ -15,7 +15,7 @@ class PrintOptions : public OptionsWidget {
   PrintOptions(const QString &,QWidget * parent = 0);
   bool isModified();
   public slots:
-    void writeSettings();
+    void writeSettings(const QString & fileName = QString());
     void readSettings();
     void onPrintDialog();
     void onDirectory();

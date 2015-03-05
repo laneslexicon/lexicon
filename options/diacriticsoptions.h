@@ -10,7 +10,7 @@ class DiacriticsOptions : public OptionsWidget {
  public:
   DiacriticsOptions(const QString &,QWidget * parent = 0);
   public slots:
-    void writeSettings();
+    void writeSettings(const QString & fileName = QString());
     void readSettings();
     bool isModified();
  private:

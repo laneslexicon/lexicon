@@ -42,7 +42,7 @@ class OptionsWidget : public QWidget {
     virtual void onReset();
     virtual void readSettings() = 0;
     virtual void stateChanged(int);
-    virtual void writeSettings() = 0;
+    virtual void writeSettings(const QString & fileName = QString()) = 0;
     virtual void setButtons(bool);
     virtual void onHelp();
   //  virtual void reset();

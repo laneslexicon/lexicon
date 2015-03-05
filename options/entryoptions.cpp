@@ -185,7 +185,7 @@ void EntryOptions::readSettings() {
 
   m_dirty = false;
 }
-void EntryOptions::writeSettings() {
+void EntryOptions::writeSettings(const QString & fileName) {
   qDebug() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
@@ -392,6 +392,7 @@ void EntryOptions::onSetColor() {
   for(int i=0;i < keys.size();i++) {
     v = settings.value(keys[i]).toStringList();
     if (v.join(",") == str) {
+
       m_highlightColor->setText(keys[i]);
       return;
     }

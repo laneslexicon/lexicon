@@ -137,7 +137,7 @@ void PrintOptions::readSettings() {
 
   settings.endGroup();
 }
-void PrintOptions::writeSettings() {
+void PrintOptions::writeSettings(const QString & fileName) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

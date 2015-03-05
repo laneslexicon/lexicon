@@ -143,7 +143,7 @@ void DiacriticsOptions::readSettings() {
   qDebug() << "Rx match" << (p.pattern() == rxclass.pattern());
   */
 }
-void DiacriticsOptions::writeSettings() {
+void DiacriticsOptions::writeSettings(const QString & fileName) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

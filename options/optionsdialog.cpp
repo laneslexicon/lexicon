@@ -65,7 +65,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   if (settings.value("Search",true).toBool()) {
     FindOptions * find = new FindOptions(useTheme,this);
     m_tabs->addTab(find,tr("Search"));
-    //find->writeSettings();
+    find->writeSettings("xxx.ini");
   }
 
 

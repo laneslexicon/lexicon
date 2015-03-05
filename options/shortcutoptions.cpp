@@ -95,7 +95,7 @@ void ShortcutOptions::readSettings() {
  * TODO not complete
  *
  */
-void ShortcutOptions::writeSettings() {
+void ShortcutOptions::writeSettings(const QString & fileName) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

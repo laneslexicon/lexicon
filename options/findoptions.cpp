@@ -197,8 +197,13 @@ void FindOptions::readSettings() {
 
   m_dirty = false;
 }
-void FindOptions::writeSettings() {
-  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+void FindOptions::writeSettings(const QString & fileName) {
+  QString f = m_settingsFileName;
+  if (!fileName.isEmpty()) {
+    f = fileName;
+  }
+
+  QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("FullSearch");
 
@@ -257,60 +262,72 @@ bool FindOptions::isModified()  {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("FullSearch");
-
+  qDebug() << Q_FUNC_INFO << __LINE__;
   if (compare(&settings,SID_FULLSEARCH_DEBUG,m_fullDebug))  {
     m_dirty = true;
     return true;
   }
+
 
   if (compare(&settings,SID_FULLSEARCH_FRAGMENT_SIZE,m_fullFragmentSize)) {
     m_dirty = true;
     return true;
   }
 
+
   if (compare(&settings,SID_FULLSEARCH_INCLUDE_HEADS,m_fullIncludeHeads)) {
     m_dirty = true;
     return true;
   }
 
+
   if (compare(&settings,SID_FULLSEARCH_ONE_ROW,m_fullOneRow)) {
     m_dirty = true;
     return true;
   }
+
   if (compare(&settings,SID_FULLSEARCH_STEP,m_fullStep)) {
     m_dirty = true;
     return true;
   }
+
   if (compare(&settings,SID_FULLSEARCH_HEAD_BACKGROUND,m_fullHeadColor)) {
     m_dirty = true;
     return true;
   }
 
 
-  if (m_fullNewTab     == settings.value(SID_FULLSEARCH_NEW_TAB,true).toBool()) {
+
+  if (m_fullNewTab     != settings.value(SID_FULLSEARCH_NEW_TAB,true).toBool()) {
     m_dirty = true;
     return true;
   }
-  if (m_fullGoTab      == settings.value(SID_FULLSEARCH_GO_TAB,true).toBool()) {
+
+  if (m_fullGoTab      != settings.value(SID_FULLSEARCH_GO_TAB,true).toBool()) {
     m_dirty = true;
     return true;
   }
-  if (m_fullWholeWord  == settings.value(SID_FULLSEARCH_WHOLE_WORD,true).toBool()) {
+
+  if (m_fullWholeWord  != settings.value(SID_FULLSEARCH_WHOLE_WORD,true).toBool()) {
     m_dirty = true;
     return true;
   }
-  if (m_fullDiacritics == settings.value(SID_FULLSEARCH_DIACRITICS,true).toBool()) {
+
+  if (m_fullDiacritics != settings.value(SID_FULLSEARCH_DIACRITICS,true).toBool()) {
     m_dirty = true;
     return true;
   }
-  if (m_fullRegex      == settings.value(SID_FULLSEARCH_TYPE_REGEX,true).toBool()) {
+
+  if (m_fullRegex      != settings.value(SID_FULLSEARCH_TYPE_REGEX,true).toBool()) {
     m_dirty = true;
     return true;
   }
-  if (m_fullForce      == settings.value(SID_FULLSEARCH_FORCE,true).toBool()) {
+
+  if (m_fullForce      != settings.value(SID_FULLSEARCH_FORCE,true).toBool()) {
     m_dirty = true;
     return true;
   }
+
 
   settings.endGroup();
   settings.beginGroup("HeadSearch");
@@ -319,68 +336,81 @@ bool FindOptions::isModified()  {
     m_dirty = true;
     return true;
   }
+
   if (compare(&settings,SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical)) {
     m_dirty = true;
     return true;
   }
+
   if (compare(&settings,SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable)) {
     m_dirty = true;
     return true;
   }
+
   if (compare(&settings,SID_HEADSEARCH_STEP,m_headStep)) {
     m_dirty = true;
     return true;
   }
-  if (m_headNewTab     == settings.value(SID_HEADSEARCH_NEW_TAB,true).toBool()) {
-    m_dirty = true;
-    return true;
-  }
-  if (m_headGoTab      == settings.value(SID_HEADSEARCH_GO_TAB,true).toBool()) {
-    m_dirty = true;
-    return true;
-  }
-  if (m_headWholeWord  == settings.value(SID_HEADSEARCH_WHOLE_WORD,true).toBool()) {
-    m_dirty = true;
-    return true;
-  }
-  if (m_headDiacritics == settings.value(SID_HEADSEARCH_DIACRITICS,true).toBool()) {
-    m_dirty = true;
-    return true;
-  }
-  if (m_headRegex      == settings.value(SID_HEADSEARCH_TYPE_REGEX,true).toBool()) {
-    m_dirty = true;
-    return true;
-  }
-  if (m_headForce      == settings.value(SID_HEADSEARCH_FORCE,true).toBool()) {
+
+  if (m_headNewTab     != settings.value(SID_HEADSEARCH_NEW_TAB,true).toBool()) {
     m_dirty = true;
     return true;
   }
 
+  if (m_headGoTab      != settings.value(SID_HEADSEARCH_GO_TAB,true).toBool()) {
+    m_dirty = true;
+    return true;
+  }
+
+  if (m_headWholeWord  != settings.value(SID_HEADSEARCH_WHOLE_WORD,true).toBool()) {
+    m_dirty = true;
+    return true;
+  }
+
+  if (m_headDiacritics != settings.value(SID_HEADSEARCH_DIACRITICS,true).toBool()) {
+    m_dirty = true;
+    return true;
+  }
+
+  if (m_headRegex      != settings.value(SID_HEADSEARCH_TYPE_REGEX,true).toBool()) {
+    m_dirty = true;
+    return true;
+  }
+
+  if (m_headForce      != settings.value(SID_HEADSEARCH_FORCE,true).toBool()) {
+    m_dirty = true;
+    return true;
+  }
+
+
   settings.endGroup();
-  return true;
   settings.beginGroup("LocalSearch");
-  return true;
 
   if (compare(&settings,SID_LOCALSEARCH_SHOW_ALL,m_localShowAll)) {
     m_dirty = true;
     return true;
   }
-  if (m_localWholeWord  == settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool()) {
+
+  if (m_localWholeWord  != settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool()) {
     m_dirty = true;
     return true;
   }
-  if (m_localDiacritics == settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool()) {
+
+  if (m_localDiacritics != settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool()) {
     m_dirty = true;
     return true;
   }
-  if (m_localRegex      == settings.value(SID_LOCALSEARCH_TYPE_REGEX,true).toBool()) {
+
+  if (m_localRegex      != settings.value(SID_LOCALSEARCH_TYPE_REGEX,true).toBool()) {
     m_dirty = true;
     return true;
   }
-  if (m_localForce      == settings.value(SID_LOCALSEARCH_FORCE,true).toBool()) {
+
+  if (m_localForce      != settings.value(SID_LOCALSEARCH_FORCE,true).toBool()) {
     m_dirty = true;
     return true;
   }
+
 
   return m_dirty;
 }
