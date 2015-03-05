@@ -96,6 +96,11 @@ void OptionsWidget::valueChanged(double /* v */) {
   setButtons(v);
   emit(modified(v));
 }
+void OptionsWidget::keySequenceChanged(const QKeySequence & /* v */) {
+  bool v =  isModified();
+  setButtons(v);
+  emit(modified(v));
+}
 /*
 bool OptionsWidget::isModified()  {
   return false;
@@ -126,6 +131,10 @@ void OptionsWidget::blockAllSignals(bool block) {
   foreach(QSpinBox *  widget,spinboxes) {
     widget->blockSignals(block);
   }
+  QList<QKeySequenceEdit *> keyedits = this->findChildren<QKeySequenceEdit *>();
+  foreach(QKeySequenceEdit *  widget,keyedits) {
+    widget->blockSignals(block);
+  }
 
 }
 void OptionsWidget::setupConnections() {
@@ -152,6 +161,10 @@ void OptionsWidget::setupConnections() {
   QList<QSpinBox *> spinboxes = this->findChildren<QSpinBox *>();
   foreach(QSpinBox *  widget,spinboxes) {
     connect(widget,SIGNAL(valueChanged(int)),this,SLOT(valueChanged(int)));
+  }
+  QList<QKeySequenceEdit *> keyedits = this->findChildren<QKeySequenceEdit *>();
+  foreach(QKeySequenceEdit *  widget,keyedits) {
+    connect(widget,SIGNAL(keySequenceChanged(const QKeySequence &)),this,SLOT(keySequenceChanged(const QKeySequence &)));
   }
 
   /*
@@ -183,6 +196,10 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   QDoubleSpinBox * dspin = qobject_cast<QDoubleSpinBox *>(p);
   if (dspin) {
     return (settings->value(key).toDouble() != dspin->value());
+  }
+  QKeySequenceEdit * keyedit = qobject_cast<QKeySequenceEdit *>(p);
+  if (keyedit) {
+    return (settings->value(key).toString() != keyedit->keySequence().toString());
   }
   return false;
 }

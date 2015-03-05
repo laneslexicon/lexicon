@@ -19,6 +19,7 @@
 #include <QPushButton>
 #include <QColorDialog>
 #include <QFontDialog>
+#include <QKeySequence>
 #define SMALL_EDIT 30
 #define MEDIUM_EDIT 50
 #define LARGE_EDIT 60
@@ -49,6 +50,7 @@ class OptionsWidget : public QWidget {
   virtual void editingFinished();
   virtual void valueChanged(int);
   virtual void valueChanged(double);
+  virtual void keySequenceChanged(const QKeySequence &);
    void textChanged(const QString &);
  protected:
   bool m_dirty;
