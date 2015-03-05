@@ -220,3 +220,15 @@ They should not be translated.
 #define SID_LOGGING_VIEWER_MAXLINES            "Viewer lines"
 #define SID_LOGGING_VIEWER_INTERVAL            "Viewer refresh interval"
 #define SID_LOGGING_ROTATE                     "Rotate"
+
+
+#define SID_BOOKMARK_NEW_TAB                   "New tab"
+#define SID_BOOKMARK_GO_TAB                    "Activate tab"
+#define SID_BOOKMARK_ARABIC_FONT               "Arabic font"
+#define SID_BOOKMARK_DEBUG                     "Debug"
+#define SID_BOOKMARK_ADD                       "Add"
+#define SID_BOOKMARK_LIST                      "List"
+#define SID_BOOKMARK_JUMP                      "Jump"
+#define SID_BOOKMARK_REVERT                    "Revert"
+#define SID_BOOKMARK_CLEAR                     "Clear"
+#define SID_BOOKMARK_ID                        "Id"

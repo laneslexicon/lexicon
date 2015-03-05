@@ -2451,6 +2451,9 @@ void LanesLexicon::restoreBookmarks() {
 }
 /**
  * setup all the bookmark shortcuts and actions
+ * these are not in the [Shortcut] section because they need to be handled
+ * differently
+ *
  *   add,jump,save,revert,list
  *
  */
@@ -2458,9 +2461,9 @@ void LanesLexicon::setupBookmarkShortcuts() {
   SETTINGS
   settings.beginGroup("Bookmark");
   m_bookmarkMap = new QSignalMapper(this);
-  QString key = settings.value("Add","Ctrl+B").toString();
+  QString key = settings.value(SID_BOOKMARK_ADD,"Ctrl+B").toString();
   /// TODO get this from INI
-  QString ids = settings.value("Id","abcdefghijklmnopqrstuvwxyz").toString();
+  QString ids = settings.value(SID_BOOKMARK_ID,"abcdefghijklmnopqrstuvwxyz").toString();
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toLower());
     //    QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toUpper());
@@ -2480,7 +2483,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   }
   m_bookmarkAddAction = new QAction(tr("Add"),this);
 
-  key = settings.value("Jump","Ctrl+J").toString();
+  key = settings.value(SID_BOOKMARK_JUMP,"Ctrl+J").toString();
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toLower());
     QShortcut * sc = new QShortcut(ks,this);
@@ -2498,7 +2501,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkJumpAction = new QAction(tr("Jump"),this);
 
   QShortcut * sc;
-  key = settings.value("List","Ctrl+B,Ctrl+L").toString();
+  key = settings.value(SID_BOOKMARK_LIST,"Ctrl+B,Ctrl+L").toString();
   sc = new QShortcut(key,this);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
   connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
@@ -2509,7 +2512,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkListAction->setShortcutContext(Qt::WidgetShortcut);
   connect(m_bookmarkListAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
 
-  key = settings.value("Revert","Ctrl+B,Ctrl+R").toString();
+  key = settings.value(SID_BOOKMARK_REVERT,"Ctrl+B,Ctrl+R").toString();
   sc = new QShortcut(key,this);
     sc->setContext(Qt::ApplicationShortcut);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
@@ -2519,7 +2522,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   m_bookmarkRevertAction->setShortcutContext(Qt::WidgetShortcut);
   connect(m_bookmarkRevertAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
 
-  key = settings.value("Clear","Ctrl+B,Ctrl+C").toString();
+  key = settings.value(SID_BOOKMARK_CLEAR,"Ctrl+B,Ctrl+C").toString();
   sc = new QShortcut(key,this);
     sc->setContext(Qt::ApplicationShortcut);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
