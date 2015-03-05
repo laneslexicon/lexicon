@@ -6,6 +6,7 @@
 #include "diacriticsoptions.h"
 #include "entryoptions.h"
 #include "findoptions.h"
+#include "bookmarkoptions.h"
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
@@ -65,7 +66,11 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   if (settings.value("Search",true).toBool()) {
     FindOptions * find = new FindOptions(useTheme,this);
     m_tabs->addTab(find,tr("Search"));
-    find->writeSettings("xxx.ini");
+    //    find->writeSettings("xxx.ini");
+  }
+  if (settings.value("Bookmark",true).toBool()) {
+    BookmarkOptions * find = new BookmarkOptions(useTheme,this);
+    m_tabs->addTab(find,tr("Bookmark"));
   }
 
 

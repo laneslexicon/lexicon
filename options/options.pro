@@ -28,7 +28,8 @@ SOURCES += main.cpp\
         diacriticsoptions.cpp \
         entryoptions.cpp \
         findoptions.cpp \
-        popupoptions.cpp
+        popupoptions.cpp \
+        bookmarkoptions.cpp
 
 HEADERS  += mainwindow.h \
         optionswidget.h \
@@ -39,4 +40,5 @@ HEADERS  += mainwindow.h \
         diacriticsoptions.h \
         entryoptions.h \
         findoptions.h \
-        popupoptions.h
+        popupoptions.h \
+        bookmarkoptions.h

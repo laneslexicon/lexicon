@@ -8,7 +8,8 @@ SOURCES += $$PWD/optionswidget.cpp \
            $$PWD/optionstabwidget.cpp \
            $$PWD/diacriticsoptions.cpp \
            $$PWD/findoptions.cpp \
-           $$PWD/popupoptions.cpp
+           $$PWD/popupoptions.cpp \
+           $$PWD/bookmarkoptions.cpp
 
 
 HEADERS += $$PWD/optionswidget.h \
@@ -20,4 +21,5 @@ HEADERS += $$PWD/optionswidget.h \
            $$PWD/optionstabwidget.h \
            $$PWD/diacriticsoptions.h \
            $$PWD/findoptions.h \
-           $$PWD/popupoptions.h
+           $$PWD/popupoptions.h \
+           $$PWD/bookmarkoptions.h
