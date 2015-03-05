@@ -28,6 +28,7 @@ class OptionsDialog : public QDialog {
     void setApplyReset(bool);
     QDialogButtonBox * m_buttons;
     QTabWidget * m_tabs;
+    QString m_theme;
   signals:
     void showHelp(const QString &);
 };

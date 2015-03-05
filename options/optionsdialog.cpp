@@ -12,37 +12,67 @@
 #include "externs.h"
 #endif
 /**
- * For use in the standalone app there should be <theme>.ini files in the
- * same directory as the executable (OSX issues ?)
+ * For use in the standalone app:
+ *   read config.ini to get the current theme
+ *   then use <theme>.ini as the name of the QSettings file
  *
  * @param theme
  * @param parent
  */
 OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(parent) {
   QString useTheme = theme;
+
+
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
 #ifdef STANDALONE
-  QSettings settings("config.ini",QSettings::IniFormat);
+  QSettings testSettings("config.ini",QSettings::IniFormat);
   if (useTheme.isEmpty()) {
-    useTheme = settings.value("Theme").toString();
+    useTheme = testSettings.value("Theme").toString();
   }
+  QSettings settings(QString("%1.ini").arg(useTheme),QSettings::IniFormat);
+
 #else
   QSettings settings(getLexicon()->settingsFileName(theme),QSettings::IniFormat);
 #endif
+  m_theme = useTheme;
+
   settings.setIniCodec("UTF-8");
-  RootsOptions * tree = new RootsOptions(useTheme,this);
-  PrintOptions * print = new PrintOptions(useTheme,this);
-  ShortcutOptions * shortcut = new ShortcutOptions(useTheme,this);
-  DiacriticsOptions * diacritics = new DiacriticsOptions(useTheme,this);
-  EntryOptions * entry = new EntryOptions(useTheme,this);
-  FindOptions * find = new FindOptions(useTheme,this);
-  m_tabs->addTab(tree,tr("Contents"));
-  m_tabs->addTab(entry,tr("Entry"));
-  m_tabs->addTab(shortcut,tr("Shortcuts"));
-  m_tabs->addTab(print,tr("Printer"));
-  m_tabs->addTab(diacritics,tr("Diacritics"));
-  m_tabs->addTab(find,tr("Search"));
+  settings.beginGroup("Options");
+  resize(settings.value("Size", QSize(500, 700)).toSize());
+  move(settings.value("Pos", QPoint(200, 200)).toPoint());
+
+  if (settings.value("Roots",true).toBool()) {
+    RootsOptions * tree = new RootsOptions(useTheme,this);
+    m_tabs->addTab(tree,tr("Contents"));
+  }
+  if (settings.value("Print",true).toBool()) {
+    PrintOptions * print = new PrintOptions(useTheme,this);
+    m_tabs->addTab(print,tr("Printer"));
+  }
+  if (settings.value("Shortcuts",true).toBool()) {
+    ShortcutOptions * shortcut = new ShortcutOptions(useTheme,this);
+    m_tabs->addTab(shortcut,tr("Shortcuts"));
+  }
+  if (settings.value("Diacritics",true).toBool()) {
+    DiacriticsOptions * diacritics = new DiacriticsOptions(useTheme,this);
+    m_tabs->addTab(diacritics,tr("Diacritics"));
+  }
+  if (settings.value("Entry",true).toBool()) {
+    EntryOptions * entry = new EntryOptions(useTheme,this);
+    m_tabs->addTab(entry,tr("Entry"));
+  }
+  if (settings.value("Search",true).toBool()) {
+    FindOptions * find = new FindOptions(useTheme,this);
+    m_tabs->addTab(find,tr("Search"));
+    //find->writeSettings();
+  }
+
+
+
+
+
+
 
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save
                                      | QDialogButtonBox::Cancel
@@ -85,21 +115,19 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     settings.endGroup();
     group = settings.group();
   }
-  settings.beginGroup("Options");
-  this->restoreGeometry(settings.value("Geometry").toByteArray());
 }
 OptionsDialog::~OptionsDialog() {
   writeSettings();
 }
 void OptionsDialog::writeSettings() {
 #ifdef STANDALONE
-  QSettings settings("default.ini",QSettings::IniFormat);
-  settings.setIniCodec("UTF-8");
+  QSettings settings(QString("%1.ini").arg(m_theme),QSettings::IniFormat);
 #else
-  SETTINGS
+  QSettings settings(getLexicon()->settingsFileName(m_theme),QSettings::IniFormat);
 #endif
   settings.beginGroup("Options");
-  settings.setValue("Geometry", saveGeometry());
+  settings.setValue("Size", size());
+  settings.setValue("Pos", pos());
   settings.endGroup();
 }
 
