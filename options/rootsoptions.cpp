@@ -111,7 +111,11 @@ void RootsOptions::readSettings() {
   m_dirty = false;
 }
 void RootsOptions::writeSettings(const QString & fileName) {
-  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+  QString f = m_settingsFileName;
+  if (!fileName.isEmpty()) {
+    f = fileName;
+  }
+  QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
   settings.setValue(SID_CONTENTS_SHOWHEAD,m_showHeadColumn->isChecked());

@@ -34,10 +34,10 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   QSettings settings(QString("%1.ini").arg(useTheme),QSettings::IniFormat);
 
 #else
-  QSettings settings(getLexicon()->settingsFileName(theme),QSettings::IniFormat);
+  QSettings settinnngs(getLexicon()->settingsFileName(theme),QSettings::IniFormat);
 #endif
   m_theme = useTheme;
-
+  QString testFileName("xxx.ini");
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Options");
   resize(settings.value("Size", QSize(500, 700)).toSize());
@@ -46,31 +46,37 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   if (settings.value("Roots",true).toBool()) {
     RootsOptions * tree = new RootsOptions(useTheme,this);
     m_tabs->addTab(tree,tr("Contents"));
+    tree->writeSettings(testFileName);
   }
   if (settings.value("Print",true).toBool()) {
     PrintOptions * print = new PrintOptions(useTheme,this);
     m_tabs->addTab(print,tr("Printer"));
+    print->writeSettings(testFileName);
   }
   if (settings.value("Shortcuts",true).toBool()) {
     ShortcutOptions * shortcut = new ShortcutOptions(useTheme,this);
     m_tabs->addTab(shortcut,tr("Shortcuts"));
+    shortcut->writeSettings(testFileName);
   }
   if (settings.value("Diacritics",true).toBool()) {
     DiacriticsOptions * diacritics = new DiacriticsOptions(useTheme,this);
     m_tabs->addTab(diacritics,tr("Diacritics"));
+    diacritics->writeSettings(testFileName);
   }
   if (settings.value("Entry",true).toBool()) {
     EntryOptions * entry = new EntryOptions(useTheme,this);
     m_tabs->addTab(entry,tr("Entry"));
+    entry->writeSettings(testFileName);
   }
   if (settings.value("Search",true).toBool()) {
     FindOptions * find = new FindOptions(useTheme,this);
     m_tabs->addTab(find,tr("Search"));
-    //    find->writeSettings("xxx.ini");
+    find->writeSettings(testFileName);
   }
   if (settings.value("Bookmark",true).toBool()) {
-    BookmarkOptions * find = new BookmarkOptions(useTheme,this);
-    m_tabs->addTab(find,tr("Bookmark"));
+    BookmarkOptions * bookmark = new BookmarkOptions(useTheme,this);
+    m_tabs->addTab(bookmark,tr("Bookmark"));
+    bookmark->writeSettings(testFileName);
   }
 
 

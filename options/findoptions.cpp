@@ -262,7 +262,7 @@ bool FindOptions::isModified()  {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("FullSearch");
-  qDebug() << Q_FUNC_INFO << __LINE__;
+
   if (compare(&settings,SID_FULLSEARCH_DEBUG,m_fullDebug))  {
     m_dirty = true;
     return true;

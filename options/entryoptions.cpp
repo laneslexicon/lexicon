@@ -186,8 +186,11 @@ void EntryOptions::readSettings() {
   m_dirty = false;
 }
 void EntryOptions::writeSettings(const QString & fileName) {
-  qDebug() << Q_FUNC_INFO << m_settingsFileName;
-  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+  QString f = m_settingsFileName;
+  if (!fileName.isEmpty()) {
+    f = fileName;
+  }
+  QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
