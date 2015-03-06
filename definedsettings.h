@@ -251,7 +251,7 @@ They should not be translated.
 #define SID_SYSTEM_RESTORE_BOOKMARKS           "Restore bookmarks"
 #define SID_SYSTEM_DOCKED                      "Docked"
 #define SID_SYSTEM_MINIMAL                     "Minimal interface"
-#define SID_SYSTEM_BY_ROOT                     "Navigation"
+#define SID_SYSTEM_BY_ROOT                     "By root"
 #define SID_SYSTEM_TITLE                       "Title"
 #define SID_SYSTEM_ICON_SIZE                   "Icon size"
 #define SID_SYSTEM_KEYMAPS                     "Keymaps"

@@ -1767,9 +1767,7 @@ void LanesLexicon::readSettings() {
 
   m_minimalAction->setChecked(settings.value(SID_SYSTEM_MINIMAL,false).toBool());
 
-  v  = settings.value( SID_SYSTEM_BY_ROOT,"root").toString();
-
-  if (v.toLower() == "page") {
+  if ( ! settings.value( SID_SYSTEM_BY_ROOT,true).toBool()) {
     m_navMode = Lane::By_Page;
   }
   else {
