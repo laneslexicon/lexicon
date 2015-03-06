@@ -2733,6 +2733,10 @@ void LanesLexicon::onAbout() {
 void LanesLexicon::testSlot() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
+/**
+ *
+ *
+ */
 void LanesLexicon::searchForPage() {
   int page = 0;
   SearchOptions options;
@@ -2779,14 +2783,7 @@ void LanesLexicon::searchForPage() {
       m_tabs->setCurrentIndex(ix);
       return;
     }
-    int taboptions = 0;
-    if (options.newTab()) {
-      taboptions |= Lane::Create_Tab;
-    }
-    if (options.activateTab()) {
-      taboptions |= Lane::Switch_Tab;
-    }
-    this->showPlace(p,taboptions);
+    p = showPlace(p,options.newTab(),options.activateTab());
   }
   else {
     p.setPage(page);
@@ -2843,6 +2840,8 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   QString target = t;
   SearchOptions options;
   d->getOptions(options);
+  int ix = m_tabs->currentIndex();
+  /// TODO chec new tab etc
   if (searchType == SearchOptions::Word) {
     FullSearchWidget * s = new FullSearchWidget;
       s->setSearch(t,options);
@@ -2850,9 +2849,20 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       s->findTarget(true);
       connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
       int c = this->getSearchCount();
-      int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Search %1")).arg(c+1));
-      m_tabs->setCurrentIndex(i);
-      s->focusTable();
+      if (options.newTab()) {
+        ix++;
+      }
+      else {
+        QWidget * w = m_tabs->currentWidget();
+        m_tabs->removeTab(ix);
+        qDebug() << Q_FUNC_INFO << __LINE__ << "deleting";
+        delete w;
+      }
+      m_tabs->insertTab(ix,s,QString(tr("Search %1")).arg(c+1));
+      if (options.activateTab()) {
+        m_tabs->setCurrentIndex(ix);
+        s->focusTable();
+      }
       return;
   }
   if (searchType == SearchOptions::Entry) {
@@ -2870,10 +2880,20 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
         msgBox.setText(QString(tr("Head word not found: %1")).arg(getLexicon()->spanArabic(target,"wordnotfound")));
         msgBox.exec();
         delete s;
+        return;
+      }
+      if (options.newTab()) {
+        ix++;
       }
       else {
-        int i = m_tabs->insertTab(m_tabs->currentIndex()+1,s,QString(tr("Head word search for %1")).arg(target));
-        m_tabs->setCurrentIndex(i);
+        QWidget * w = m_tabs->currentWidget();
+        m_tabs->removeTab(ix);
+        qDebug() << Q_FUNC_INFO << __LINE__ << "deleting";
+        delete w;
+      }
+      m_tabs->insertTab(ix,s,QString(tr("Head word search for %1")).arg(target));
+      if (options.activateTab()) {
+        m_tabs->setCurrentIndex(ix);
         setSignals(s->getEntry());
         s->showFirst();
       }
@@ -2907,9 +2927,7 @@ void LanesLexicon::searchForEntry() {
 }
 void LanesLexicon::searchForNode() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  int ix;
   NodeSearchDialog * d = new NodeSearchDialog(this);
-  //  d->setOptions(m_searchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
@@ -2917,10 +2935,10 @@ void LanesLexicon::searchForNode() {
       d->getOptions(options);
       Place p;
       p.setNode(t);
-      ix = this->hasPlace(p,GraphicsEntry::NodeSearch,false);
-      if (ix != -1) {
+      int i = this->hasPlace(p,GraphicsEntry::NodeSearch,false);
+      if (i != -1) {
         p.setAction(Place::SwitchTab);
-        m_tabs->setCurrentIndex(ix);
+        m_tabs->setCurrentIndex(i);
         return;
       }
       p = showPlace(p,options.newTab(),options.activateTab());
