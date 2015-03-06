@@ -1789,8 +1789,8 @@ void LanesLexicon::readSettings() {
   ///
   /// Search
   ///
+  /*
   settings.beginGroup("Search");
-
   m_searchOptions.setNewTab(settings.value("New tab",true).toBool());
   m_searchOptions.setActivateTab(settings.value("Switch tab",true).toBool());
 
@@ -1808,6 +1808,7 @@ void LanesLexicon::readSettings() {
   settings.beginGroup("FullSearch");
   m_searchOptions.setIncludeHeads(settings.value("Include heads",false).toBool());
   settings.endGroup();
+  */
   ///
   /// Debug
   ///
@@ -2738,7 +2739,7 @@ void LanesLexicon::searchForPage() {
   int page = 0;
   SearchOptions options;
   PageSearchDialog * d = new PageSearchDialog(this);
-  d->setOptions(m_searchOptions);
+  //  d->setOptions(m_searchOptions);
   if (d->exec()) {
       page = d->getPage();
       d->getOptions(options);
@@ -2800,7 +2801,7 @@ void LanesLexicon::searchForPage() {
 void LanesLexicon::searchForRoot() {
   int ix;
   ArabicSearchDialog d(SearchOptions::Root,this);
-  d.setOptions(m_searchOptions);
+  //  d.setOptions(m_searchOptions);
   if (d.exec()) {
     QString t = d.getText();
     if (! t.isEmpty()) {
@@ -2882,8 +2883,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
 }
 void LanesLexicon::searchForWord() {
   ArabicSearchDialog d(SearchOptions::Word,this);
-  QLOG_DEBUG() << Q_FUNC_INFO << &d;
-  d.setOptions(m_searchOptions);
+  //  d.setOptions(m_searchOptions);
   if (d.exec()) {
     QString t = d.getText();
     if (! t.isEmpty()) {
@@ -2892,14 +2892,13 @@ void LanesLexicon::searchForWord() {
   }
   d.close();
   m_searchButton->menu()->hide();
-  QLOG_DEBUG() << Q_FUNC_INFO << "exit";
 }
 
 /// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Entry,this);
-  d->setOptions(m_searchOptions);
+  //  d->setOptions(m_searchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
@@ -2912,7 +2911,7 @@ void LanesLexicon::searchForNode() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   int ix;
   NodeSearchDialog * d = new NodeSearchDialog(this);
-  d->setOptions(m_searchOptions);
+  //  d->setOptions(m_searchOptions);
   if (d->exec()) {
     QString t = d->getText();
     if (! t.isEmpty()) {
@@ -3179,7 +3178,7 @@ void LanesLexicon::enableKeymaps(bool v) {
       }
     }
   }
-  m_searchOptions.setKeymaps(v);
+  //  m_searchOptions.setKeymaps(v);
   setStatus(tip);
   SETTINGS
   settings.beginGroup("System");

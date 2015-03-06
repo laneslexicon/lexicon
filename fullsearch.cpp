@@ -645,29 +645,23 @@ void FullSearchWidget::readSettings() {
   v = settings.value(SID_FULLSEARCH_HEAD_BACKGROUND).toString();
   m_headBackgroundColor.setNamedColor(v);
   m_headText = settings.value(SID_FULLSEARCH_HEAD_TEXT).toString();
-  settings.endGroup();
-  settings.beginGroup("XSLT");
-  m_xsltSource = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
-  m_xsltSource = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_xsltSource);
-  settings.endGroup();
-  settings.beginGroup("Search");
-  if (settings.value(SID_SEARCH_TYPE_REGEX,false).toBool()) {
+  if (settings.value(SID_FULLSEARCH_TYPE_REGEX,false).toBool()) {
     m_defaultOptions.setSearchType(SearchOptions::Regex);
   }
   else {
     m_defaultOptions.setSearchType(SearchOptions::Normal);
   }
-
-
-  m_defaultOptions.setIgnoreDiacritics(settings.value(SID_SEARCH_IGNORE_DIACRITICS,true).toBool());
-
-  m_defaultOptions.setWholeWordMatch(settings.value(SID_SEARCH_WHOLE_WORD,false).toBool());
-
-
+  m_defaultOptions.setIgnoreDiacritics(settings.value(SID_FULLSEARCH_DIACRITICS,true).toBool());
+  m_defaultOptions.setWholeWordMatch(settings.value(SID_FULLSEARCH_WHOLE_WORD,false).toBool());
   m_spanStyle = settings.value(SID_SEARCH_ARABIC_CONTEXT_STYLE,QString()).toString();
-
-
   settings.endGroup();
+
+
+  settings.beginGroup("XSLT");
+  m_xsltSource = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
+  m_xsltSource = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_xsltSource);
+  settings.endGroup();
+
   settings.beginGroup("Diacritics");
   QStringList keys = settings.childKeys();
   QStringList points;

@@ -4,6 +4,7 @@
 #include "searchoptionswidget.h"
 #include "laneslexicon.h"
 #include "externs.h"
+#include "definedsettings.h"
 extern Lexicon * getLexicon();
 
 ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::WindowFlags f) :
@@ -86,6 +87,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   }
   maps << m_edit->getNullMap();
   m_options->addKeymaps(map,maps);
+  m_options->setOptions(m_searchType);
 
   connect(m_moreButton, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
 
@@ -204,10 +206,12 @@ QString ArabicSearchDialog::getText() {
 void ArabicSearchDialog::setPrompt(const QString & text) {
   m_prompt->setText(text);
 }
+/*
 void ArabicSearchDialog::setOptions(SearchOptions & opts) {
   opts.setSearchScope(m_searchType);
   m_options->setOptions(m_searchType);
 }
+*/
 void ArabicSearchDialog::getOptions(SearchOptions & opts) {
   m_options->getOptions(opts);
 }
@@ -270,6 +274,7 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   mainLayout->addWidget(m_options, 1, 0, 1, 2);
   mainLayout->setRowStretch(2, 1);
 
+  setOptions();
   setLayout(mainLayout);
 }
 QString NodeSearchDialog::getText() const {
@@ -283,9 +288,14 @@ void NodeSearchDialog::getOptions(SearchOptions & opts) {
   opts.setNewTab(m_newTab->checkState() == Qt::Checked);
   opts.setActivateTab(m_switchFocus->checkState() == Qt::Checked);
 }
-void NodeSearchDialog::setOptions(const SearchOptions & options) {
-  m_newTab->setChecked(options.newTab());
-  m_switchFocus->setChecked(options.activateTab());
+void NodeSearchDialog::setOptions() {
+  SETTINGS
+
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Search");
+  settings.beginGroup("Node");
+  m_newTab->setChecked(settings.value(SID_PAGESEARCH_NEW_TAB,false).toBool());
+  m_switchFocus->setChecked(settings.value(SID_PAGESEARCH_GO_TAB,false).toBool());
   checkOptions();
 }
 void NodeSearchDialog::checkOptions(int /* state */) {
@@ -340,7 +350,7 @@ PageSearchDialog::PageSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   mainLayout->setRowStretch(2, 1);
 
   setLayout(mainLayout);
-
+  setOptions();
 }
 int PageSearchDialog::getPage() const {
   QString t = m_edit->text();
@@ -355,9 +365,14 @@ void PageSearchDialog::getOptions(SearchOptions & opts) {
   opts.setNewTab(m_newTab->checkState() == Qt::Checked);
   opts.setActivateTab(m_switchFocus->checkState() == Qt::Checked);
 }
-void PageSearchDialog::setOptions(const SearchOptions & options) {
-  m_newTab->setChecked(options.newTab());
-  m_switchFocus->setChecked(options.activateTab());
+void PageSearchDialog::setOptions() {
+  SETTINGS
+
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("Search");
+  settings.beginGroup("Page");
+  m_newTab->setChecked(settings.value(SID_PAGESEARCH_NEW_TAB,false).toBool());
+  m_switchFocus->setChecked(settings.value(SID_PAGESEARCH_GO_TAB,false).toBool());
   checkOptions();
 }
 void PageSearchDialog::checkOptions(int /* state */) {

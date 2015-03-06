@@ -193,6 +193,10 @@ They should not be translated.
 
 #define SID_ROOTSEARCH_NEW_TAB                 "New tab"
 #define SID_ROOTSEARCH_GO_TAB                  "Activate tab"
+#define SID_PAGESEARCH_NEW_TAB                 "New tab"
+#define SID_PAGESEARCH_GO_TAB                  "Activate tab"
+#define SID_NODESEARCH_NEW_TAB                 "New tab"
+#define SID_NODESEARCH_GO_TAB                  "Activate tab"
 
 #define SID_ARABIC_FONT_NAME                   "Font"
 #define SID_ARABIC_FONT_SIZE                   "Size"

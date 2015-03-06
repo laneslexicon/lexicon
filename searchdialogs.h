@@ -21,7 +21,7 @@ class ArabicSearchDialog : public QDialog {
   ArabicSearchDialog(int type,QWidget * parent = 0, Qt::WindowFlags f = 0);
   QString getText();
   void setPrompt(const QString &);
-  void setOptions(SearchOptions &);
+  //  void setOptions(SearchOptions &);
   void getOptions(SearchOptions &);
   bool getForceLTR() ;
   public slots:
@@ -52,7 +52,7 @@ class NodeSearchDialog : public QDialog {
   NodeSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   QString getText() const;
   void getOptions(SearchOptions &);
-  void setOptions(const SearchOptions &);
+  void setOptions();
   public slots:
   void checkOptions(int x = 0);
  private:
@@ -72,7 +72,7 @@ class PageSearchDialog : public QDialog {
   PageSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   int getPage() const;
   void getOptions(SearchOptions &);
-  void setOptions(const SearchOptions &);
+  void setOptions();
   public slots:
   void checkOptions(int x = 0);
  private:

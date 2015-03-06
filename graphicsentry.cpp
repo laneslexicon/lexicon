@@ -1706,7 +1706,7 @@ int GraphicsEntry::search() {
   options.setForceLTR(settings.value(SID_LOCALSEARCH_FORCE_LTR,false).toBool());
   options.setShowAll(settings.value(SID_LOCALSEARCH_SHOW_ALL,false).toBool());
   ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Local,this);
-  d->setOptions(options);
+  //  d->setOptions(options);
   QString t;
   if (d->exec()) {
     t = d->getText();

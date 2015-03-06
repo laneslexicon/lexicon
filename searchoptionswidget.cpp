@@ -366,7 +366,7 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
 
 }
 void SearchOptionsWidget::setOptions(int type) {
-  QLOG_DEBUG() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO << type;
 
   SETTINGS
 
@@ -382,6 +382,7 @@ void SearchOptionsWidget::setOptions(int type) {
     m_makeActive->setChecked(settings.value(SID_FULLSEARCH_GO_TAB,true).toBool());
     m_includeHeads->setChecked(settings.value(SID_FULLSEARCH_INCLUDE_HEADS,false).toBool());
     settings.endGroup();
+    break;
     //  m_keymapsEnabled = options.keymaps();
   }
   case SearchOptions::Entry : {
@@ -393,12 +394,15 @@ void SearchOptionsWidget::setOptions(int type) {
     m_newTab->setChecked(settings.value(SID_HEADSEARCH_NEW_TAB,false).toBool());
     m_makeActive->setChecked(settings.value(SID_HEADSEARCH_GO_TAB,true).toBool());
     settings.endGroup();
+    break;
   }
   case SearchOptions::Root : {
-    settings.beginGroup("RootSearch");
+    settings.beginGroup("Search");
+    settings.beginGroup("Root");
     m_newTab->setChecked(settings.value(SID_ROOTSEARCH_NEW_TAB,false).toBool());
     m_makeActive->setChecked(settings.value(SID_ROOTSEARCH_GO_TAB,true).toBool());
     settings.endGroup();
+    break;
   }
   case SearchOptions::Local : {
     settings.beginGroup("LocalSearch");
@@ -408,10 +412,10 @@ void SearchOptionsWidget::setOptions(int type) {
     m_normalSearch->setChecked(! m_regexSearch->isChecked());
     m_showAllSearch->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
     settings.endGroup();
+    break;
   }
+  default : break;
   }
-
-
 }
 void SearchOptionsWidget::hideTabOptions(bool visible) {
   m_newTab->setVisible(visible);

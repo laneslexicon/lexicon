@@ -232,8 +232,8 @@ class LanesLexicon : public QMainWindow
       //    QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
       /// look through all tabs for the given node, -1 if not found, else tab index
 
-      SearchOptions m_defaultSearchOptions;
-      SearchOptions m_searchOptions;
+      //      SearchOptions m_defaultSearchOptions;
+      //      SearchOptions m_searchOptions;
 
       QString m_configFile;
       QString m_interface;    // "default","minimal"
