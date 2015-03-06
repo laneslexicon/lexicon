@@ -206,7 +206,7 @@ void ArabicSearchDialog::setPrompt(const QString & text) {
 }
 void ArabicSearchDialog::setOptions(SearchOptions & opts) {
   opts.setSearchScope(m_searchType);
-  m_options->setOptions(opts);
+  m_options->setOptions(m_searchType);
 }
 void ArabicSearchDialog::getOptions(SearchOptions & opts) {
   m_options->getOptions(opts);

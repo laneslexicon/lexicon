@@ -3,6 +3,9 @@
 #include "namespace.h"
 #include "scripts.h"
 #include "QsLog.h"
+#include "definedsettings.h"
+#include "externs.h"
+#include "application.h"
 #define USE_KEYMAPS 0
 /**
  * There are some unused options here that have been left in just in case.
@@ -359,6 +362,54 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   m_keymapsEnabled = options.keymaps();
 
   m_showAllSearch->setChecked(options.showAll());
+
+
+}
+void SearchOptionsWidget::setOptions(int type) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
+  SETTINGS
+
+  settings.setIniCodec("UTF-8");
+  switch (type) {
+  case SearchOptions::Word : {
+    settings.beginGroup("FullSearch");
+    m_ignoreDiacritics->setChecked(settings.value(SID_FULLSEARCH_DIACRITICS,true).toBool());
+    m_wholeWordMatch->setChecked(settings.value(SID_FULLSEARCH_WHOLE_WORD,true).toBool());
+    m_regexSearch->setChecked(settings.value(SID_FULLSEARCH_TYPE_REGEX,false).toBool());
+    m_normalSearch->setChecked(! m_regexSearch->isChecked());
+    m_newTab->setChecked(settings.value(SID_FULLSEARCH_NEW_TAB,false).toBool());
+    m_makeActive->setChecked(settings.value(SID_FULLSEARCH_GO_TAB,true).toBool());
+    m_includeHeads->setChecked(settings.value(SID_FULLSEARCH_INCLUDE_HEADS,false).toBool());
+    settings.endGroup();
+    //  m_keymapsEnabled = options.keymaps();
+  }
+  case SearchOptions::Entry : {
+    settings.beginGroup("HeadSearch");
+    m_ignoreDiacritics->setChecked(settings.value(SID_HEADSEARCH_DIACRITICS,true).toBool());
+    m_wholeWordMatch->setChecked(settings.value(SID_HEADSEARCH_WHOLE_WORD,true).toBool());
+    m_regexSearch->setChecked(settings.value(SID_HEADSEARCH_TYPE_REGEX,false).toBool());
+    m_normalSearch->setChecked(! m_regexSearch->isChecked());
+    m_newTab->setChecked(settings.value(SID_HEADSEARCH_NEW_TAB,false).toBool());
+    m_makeActive->setChecked(settings.value(SID_HEADSEARCH_GO_TAB,true).toBool());
+    settings.endGroup();
+  }
+  case SearchOptions::Root : {
+    settings.beginGroup("RootSearch");
+    m_newTab->setChecked(settings.value(SID_ROOTSEARCH_NEW_TAB,false).toBool());
+    m_makeActive->setChecked(settings.value(SID_ROOTSEARCH_GO_TAB,true).toBool());
+    settings.endGroup();
+  }
+  case SearchOptions::Local : {
+    settings.beginGroup("LocalSearch");
+    m_ignoreDiacritics->setChecked(settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool());
+    m_wholeWordMatch->setChecked(settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool());
+    m_regexSearch->setChecked(settings.value(SID_LOCALSEARCH_TYPE_REGEX,false).toBool());
+    m_normalSearch->setChecked(! m_regexSearch->isChecked());
+    m_showAllSearch->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
+    settings.endGroup();
+  }
+  }
 
 
 }
