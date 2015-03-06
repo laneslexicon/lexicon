@@ -7,6 +7,7 @@
 #include "entryoptions.h"
 #include "findoptions.h"
 #include "bookmarkoptions.h"
+#include "systemoptions.h"
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
@@ -34,7 +35,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   QSettings settings(QString("%1.ini").arg(useTheme),QSettings::IniFormat);
 
 #else
-  QSettings settinnngs(getLexicon()->settingsFileName(theme),QSettings::IniFormat);
+  QSettings settings(getLexicon()->settingsFileName(theme),QSettings::IniFormat);
 #endif
   m_theme = useTheme;
   QString testFileName("xxx.ini");

@@ -66,9 +66,9 @@ void TabWidget::tabInserted(int index) {
 }
 void TabWidget::readSettings() {
   SETTINGS
-  settings.beginGroup("TabBar");
-  m_numberTabs = settings.value(SID_TABBAR_NUMBER,true).toBool();
-  setMovable(settings.value(SID_TABBAR_MOVEABLE,true).toBool());
+  settings.beginGroup("System");
+  m_numberTabs = settings.value(SID_SYSTEM_TABBAR_NUMBER,true).toBool();
+  setMovable(settings.value(SID_SYSTEM_TABBAR_MOVEABLE,true).toBool());
 }
 void TabWidget::tabContentsChanged() {
   if (m_numberTabs) {

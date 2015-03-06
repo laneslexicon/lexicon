@@ -197,8 +197,6 @@ They should not be translated.
 #define SID_ARABIC_FONT_NAME                   "Font"
 #define SID_ARABIC_FONT_SIZE                   "Size"
 
-#define SID_TABBAR_NUMBER                      "Number"
-#define SID_TABBAR_MOVEABLE                    "Moveable"
 
 
 #define SID_CONTENTS_BACKGROUND                "Background"
@@ -232,3 +230,27 @@ They should not be translated.
 #define SID_BOOKMARK_REVERT                    "Revert"
 #define SID_BOOKMARK_CLEAR                     "Clear"
 #define SID_BOOKMARK_ID                        "Id"
+
+
+#define SID_SYSTEM_DATABASE                    "Database"
+#define SID_SYSTEM_STYLESHEET                  "Stylesheet"
+#define SID_SYSTEM_ARABIC_FONT                 "Arabic font"
+#define SID_SYSTEM_TOOLBAR_TEXT                "Toolbar text"
+#define SID_SYSTEM_NULL_MAP_NAME               "Native map name"
+#define SID_SYSTEM_CURRENT_MAP                 "Current map"
+#define SID_SYSTEM_INTERFACE_WARNING           "Show interface warning"
+#define SID_SYSTEM_SAVE_SETTINGS               "Save settings"
+#define SID_SYSTEM_SAVE_TABS                   "Save tabs"
+#define SID_SYSTEM_RESTORE_TABS                "Restore tabs"
+#define SID_SYSTEM_DEBUG                       "Debug"
+#define SID_SYSTEM_SAVE_BOOKMARKS              "Save bookmarks"
+#define SID_SYSTEM_RESTORE_BOOKMARKS           "Restore bookmarks"
+#define SID_SYSTEM_DOCKED                      "Docked"
+#define SID_SYSTEM_MINIMAL                     "Minimal interface"
+#define SID_SYSTEM_BY_ROOT                     "Navigation"
+#define SID_SYSTEM_TITLE                       "Title"
+#define SID_SYSTEM_ICON_SIZE                   "Icon size"
+#define SID_SYSTEM_KEYMAPS                     "Keymaps"
+#define SID_SYSTEM_CONTENTS_LINKED             "Contents linked"
+#define SID_SYSTEM_TABBAR_NUMBER               "Tabs number"
+#define SID_SYSTEM_TABBAR_MOVEABLE             "Tabs moveable"

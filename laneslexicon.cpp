@@ -911,12 +911,12 @@ void LanesLexicon::createToolBar() {
   m_mainbar->addWidget(m_logButton);
 
   m_mainbar->setFloatable(true);
-  m_mainbar->setIconSize(m_toolbarIconSize);
+  //  m_mainbar->setIconSize(m_toolbarIconSize);
   //  addToolBarBreak();
 
   m_navigation = addToolBar(tr("Navigation"));
   m_navigation->setObjectName("navigationtoolbar");
-  m_navigation->setIconSize(m_toolbarIconSize);
+  //  m_navigation->setIconSize(m_toolbarIconSize);
   m_navigation->setFloatable(true);
 
   m_navigationModeMenu = new QMenu(m_navigation);
@@ -964,7 +964,7 @@ void LanesLexicon::createToolBar() {
 
   m_entrybar = addToolBar(tr("Page"));
   m_entrybar->setObjectName("pagetoolbar");
-  m_entrybar->setIconSize(m_toolbarIconSize);
+  //  m_entrybar->setIconSize(m_toolbarIconSize);
 
   m_zoomInButton = new QToolButton(m_entrybar);
   m_zoomInButton->setDefaultAction(m_zoomInAction);
@@ -1722,7 +1722,7 @@ void LanesLexicon::readSettings() {
   /// System group
   ///
   settings.beginGroup("System");
-  m_dbName = settings.value("Database","lexicon.sqlite").toString();
+  m_dbName = settings.value(SID_SYSTEM_DATABASE,"lexicon.sqlite").toString();
   if (m_dbName.isEmpty()) {
     m_dbName = "lexicon.sqlite";
   }
@@ -1730,43 +1730,44 @@ void LanesLexicon::readSettings() {
     m_dbName = cmdOptions.value("db");
   }
 
-  m_applicationCssFile = settings.value("Stylesheet","app.css").toString();
+  m_applicationCssFile = settings.value(SID_SYSTEM_STYLESHEET,"app.css").toString();
   if (m_applicationCssFile.isEmpty()) {
     m_applicationCssFile = "app.css";
   }
 
-  QString ar = settings.value("Arabic font").toString();
+  QString ar = settings.value(SID_SYSTEM_ARABIC_FONT).toString();
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
   }
 
-  m_toolbarText = settings.value("Toolbar text",false).toBool();
-  m_nullMap = settings.value("Null map","Native").toString();
-  m_currentMap = settings.value("Current map","Native").toString();
+  m_toolbarText = settings.value(SID_SYSTEM_TOOLBAR_TEXT,false).toBool();
+  m_nullMap = settings.value( SID_SYSTEM_NULL_MAP_NAME,"Native").toString();
+  m_currentMap = settings.value(SID_SYSTEM_CURRENT_MAP,"Native").toString();
 
-  m_interfaceWarning = settings.value("Show interface warning",true).toBool();
-  m_saveSettings = settings.value("Save settings",true).toBool();
+  m_interfaceWarning = settings.value(SID_SYSTEM_INTERFACE_WARNING,true).toBool();
+  m_saveSettings = settings.value(SID_SYSTEM_SAVE_SETTINGS,true).toBool();
   if (cmdOptions.contains("nosave")) {
     m_saveSettings = false;
   }
-  m_saveTabs = settings.value("Save tabs",true).toBool();
+  m_saveTabs = settings.value(SID_SYSTEM_SAVE_TABS,true).toBool();
 
-  m_restoreTabs = settings.value("Restore tabs",true).toBool();
+  m_restoreTabs = settings.value(SID_SYSTEM_RESTORE_TABS,true).toBool();
   if (cmdOptions.contains("notabs")) {
     m_restoreTabs = false;
   }
-  m_debug = settings.value("Debug",false).toBool();
+  m_debug = settings.value(SID_SYSTEM_DEBUG,false).toBool();
   if (cmdOptions.contains("debug")) {
     m_debug = true;
   }
 
-  m_saveBookmarks = settings.value("Save bookmarks",true).toBool();
-  m_restoreBookmarks = settings.value("Restore bookmarks",true).toBool();
+  m_saveBookmarks = settings.value(SID_SYSTEM_SAVE_BOOKMARKS,true).toBool();
+  m_restoreBookmarks = settings.value(SID_SYSTEM_RESTORE_BOOKMARKS,true).toBool();
 
-  m_docked = settings.value("Docked",false).toBool();
-  m_minimalAction->setChecked(settings.value("Minimal interface",false).toBool());
+  m_docked = settings.value(SID_SYSTEM_DOCKED,false).toBool();
 
-  v  = settings.value("Navigation","root").toString();
+  m_minimalAction->setChecked(settings.value(SID_SYSTEM_MINIMAL,false).toBool());
+
+  v  = settings.value( SID_SYSTEM_BY_ROOT,"root").toString();
 
   if (v.toLower() == "page") {
     m_navMode = Lane::By_Page;
@@ -1774,14 +1775,14 @@ void LanesLexicon::readSettings() {
   else {
     m_navMode = Lane::By_Root;
   }
-  v = settings.value("Title",tr("Lane's Arabic-English Lexicon")).toString();
+  v = settings.value(SID_SYSTEM_TITLE,tr("Lane's Arabic-English Lexicon")).toString();
   this->setWindowTitle(v);
 
-  m_toolbarIconSize = settings.value("Icon size",QSize(16,16)).toSize();
+  //  m_toolbarIconSize = settings.value(SID_SYSTEM_ICON_SIZE,QSize(16,16)).toSize();
 
-  m_keymapsEnabled = settings.value("Keymaps",false).toBool();
+  m_keymapsEnabled = settings.value(SID_SYSTEM_KEYMAPS,false).toBool();
 
-  m_linkContents = settings.value("Contents linked",false).toBool();
+  m_linkContents = settings.value(SID_SYSTEM_CONTENTS_LINKED,false).toBool();
   m_linkAction->setChecked(m_linkContents);
 
   settings.endGroup();
