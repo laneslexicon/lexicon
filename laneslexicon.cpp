@@ -394,31 +394,37 @@ void LanesLexicon::onCloseOtherTabs() {
   m_tabs->addTab(w,label);
   m_tabs->setUpdatesEnabled(true);
 }
-void LanesLexicon::onCloseTab(int ix) {
-  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
+bool LanesLexicon::deleteWidget(QWidget * w) {
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(w);
   if (entry) {
-    m_tabs->removeTab(ix);
     entry->close();
     delete entry;
-    return;
+    return true;
   }
-  HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(m_tabs->widget(ix));
+  HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(w);
   if (results) {
-      m_tabs->removeTab(ix);
       delete results;
-      return;
+      return true;
   }
-  NoteBrowser * notes = qobject_cast<NoteBrowser *>(m_tabs->widget(ix));
+  NoteBrowser * notes = qobject_cast<NoteBrowser *>(w);
   if (notes) {
-      m_tabs->removeTab(ix);
       delete notes;
-      return;
+      return true;
   }
-  FullSearchWidget * search = qobject_cast<FullSearchWidget *>(m_tabs->widget(ix));
+  FullSearchWidget * search = qobject_cast<FullSearchWidget *>(w);
   if (search) {
-    m_tabs->removeTab(ix);
     delete search;
-    return;
+    return true;
+  }
+  return false;
+}
+void LanesLexicon::onCloseTab(int ix) {
+  bool ok;
+
+  QWidget * w = m_tabs->widget(ix);
+  ok = deleteWidget(w);
+  if (! ok) {
+    delete w;
   }
   m_tabs->removeTab(ix);
 }
@@ -2832,7 +2838,7 @@ void LanesLexicon::searchForRoot() {
   }
 }
 /**
- *
+ * TODO
  *
  */
 void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & t) {
@@ -2841,7 +2847,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   SearchOptions options;
   d->getOptions(options);
   int ix = m_tabs->currentIndex();
-  /// TODO chec new tab etc
+
   if (searchType == SearchOptions::Word) {
     FullSearchWidget * s = new FullSearchWidget;
       s->setSearch(t,options);
@@ -2853,22 +2859,20 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
         ix++;
       }
       else {
-        QWidget * w = m_tabs->currentWidget();
-        m_tabs->removeTab(ix);
-        qDebug() << Q_FUNC_INFO << __LINE__ << "deleting";
-        delete w;
+        this->onCloseTab(ix);
       }
+
       m_tabs->insertTab(ix,s,QString(tr("Search %1")).arg(c+1));
-      if (options.activateTab()) {
+      /// deleting old tab changes current index
+      if (!options.newTab()) {
         m_tabs->setCurrentIndex(ix);
+      }
+      if (options.activateTab()) {
         s->focusTable();
       }
       return;
   }
   if (searchType == SearchOptions::Entry) {
-    //      if (! UcdScripts::isScript(target,"Arabic")) {
-    //        target = convertString(target);
-    //      }
       HeadSearchWidget * s = new HeadSearchWidget(this);
       connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
       connect(s,SIGNAL(deleteSearch()),this,SLOT(deleteSearch()));
@@ -2886,17 +2890,17 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
         ix++;
       }
       else {
-        QWidget * w = m_tabs->currentWidget();
-        m_tabs->removeTab(ix);
-        qDebug() << Q_FUNC_INFO << __LINE__ << "deleting";
-        delete w;
+        this->onCloseTab(ix);
       }
       m_tabs->insertTab(ix,s,QString(tr("Head word search for %1")).arg(target));
-      if (options.activateTab()) {
+      if (!options.newTab()) {
         m_tabs->setCurrentIndex(ix);
-        setSignals(s->getEntry());
-        s->showFirst();
       }
+
+      setSignals(s->getEntry());
+      //      if (options.activateTab()) {
+        s->showFirst();
+        //      }
   }
 }
 void LanesLexicon::searchForWord() {

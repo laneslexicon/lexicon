@@ -191,6 +191,7 @@ class LanesLexicon : public QMainWindow
  protected:
       void closeEvent(QCloseEvent *);
  private:
+      bool deleteWidget(QWidget * );
       void showStartupEntry();
       void printCurrentPage(const QString & node = QString());
       void restoreSavedState();
