@@ -79,6 +79,11 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     m_tabs->addTab(bookmark,tr("Bookmark"));
     bookmark->writeSettings(testFileName);
   }
+  if (settings.value("System",true).toBool()) {
+    SystemOptions * systems = new SystemOptions(useTheme,this);
+    m_tabs->addTab(systems,tr("System"));
+    systems->writeSettings(testFileName);
+  }
 
 
 

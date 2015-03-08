@@ -14,31 +14,21 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   QVBoxLayout * vlayout = new QVBoxLayout;
 
 
-  m_arabicFont = new QLineEdit;
-  m_color = new QLineEdit;
+
+
   m_contentsLinked = new QCheckBox;
-  m_currentMap = new QLineEdit;
   m_lexicon = new QLineEdit;
   m_debug = new QCheckBox;
   m_docked = new QCheckBox;
-  m_focusTab = new QCheckBox;
-  // Icon siz
-  m_mapsEnabled = new QCheckBox;
+  m_focusTab = new QLineEdit;
   m_minimalInterface = new QCheckBox;
-  // Navigati
-  m_nullMapName = new QLineEdit;
-
-  m_linksInCurrentTab = new QCheckBox;
-  m_linksActivate = new QCheckBox;
-
   m_restoreBookmarks = new QCheckBox;
   m_restoreTabs = new QCheckBox;
   m_saveSettings = new QCheckBox;
   m_saveTabs = new QCheckBox;
-
-
+  m_rootNavigation = new QCheckBox;
   // Root mod
-  m_runData = new QLineEdit;
+  m_runDate = new QDateTimeEdit;
   // Save boo
   m_showInterfaceWarning = new QCheckBox;
   m_css = new QLineEdit;
@@ -46,6 +36,28 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   m_title = new QLineEdit;
   m_toolbarText = new QCheckBox;
   m_useNotes = new QCheckBox;
+  m_notesDb = new QLineEdit;
+  QFormLayout * layout = new QFormLayout;
+
+  layout->addRow(tr("Contents linked"),m_contentsLinked);
+  layout->addRow(tr("Database"),m_lexicon);
+  layout->addRow(tr("Debug"),m_debug);
+  layout->addRow(tr("Docked"),m_docked);
+  layout->addRow(tr("Current tab"),m_focusTab);
+  layout->addRow(tr("Minimal interface"),m_minimalInterface);
+  layout->addRow(tr("Restore bookmarks"),m_restoreBookmarks);
+  layout->addRow(tr("Restore tab"),m_restoreTabs);
+  layout->addRow(tr("Save settings"),m_saveSettings);
+  layout->addRow(tr("Run date"),m_runDate);
+  layout->addRow(tr("Show interface warning"),m_showInterfaceWarning);
+  layout->addRow(tr("Application stylesheet"),m_css);
+  layout->addRow(tr("Theme"),m_theme);
+  layout->addRow(tr("Title"),m_title);
+  layout->addRow(tr("Toolbar text"),m_toolbarText);
+  layout->addRow(tr("Nav by root"),m_rootNavigation);
+  layout->addRow(tr("Use notes"),m_useNotes);
+  layout->addRow(tr("Notes db"),m_notesDb);
+  vlayout->addLayout(layout);
 
   vlayout->addStretch();
   setLayout(vlayout);
@@ -60,6 +72,32 @@ void SystemOptions::readSettings() {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
+
+  m_contentsLinked->setChecked(settings.value(SID_SYSTEM_CONTENTS_LINKED,true).toBool());
+  m_lexicon->setText(settings.value(SID_SYSTEM_DATABASE,"lexicon.sqlite").toString());
+  m_debug->setChecked(settings.value(SID_SYSTEM_DEBUG,true).toBool());
+  m_docked->setChecked(settings.value(SID_SYSTEM_DOCKED,true).toBool());
+  m_focusTab->setText(settings.value(SID_SYSTEM_CURRENT_TAB,"0").toString());
+  m_minimalInterface->setChecked(settings.value(SID_SYSTEM_MINIMAL,true).toBool());
+  m_restoreBookmarks->setChecked(settings.value(SID_SYSTEM_RESTORE_BOOKMARKS,true).toBool());
+  m_restoreTabs->setChecked(settings.value(SID_SYSTEM_RESTORE_TABS,true).toBool());
+  m_saveSettings->setChecked(settings.value(SID_SYSTEM_SAVE_SETTINGS,true).toBool());
+  m_saveTabs->setChecked(settings.value(SID_SYSTEM_SAVE_TABS,true).toBool());
+  m_rootNavigation->setChecked(settings.value(SID_SYSTEM_BY_ROOT,true).toBool());
+
+  QString d = settings.value(SID_SYSTEM_RUN_DATE,QString()).toString();
+  m_runDate->setDate(QDate::fromString(d,Qt::ISODate));
+
+  m_showInterfaceWarning->setChecked(settings.value(SID_SYSTEM_INTERFACE_WARNING,true).toBool());
+  m_css->setText(settings.value(SID_SYSTEM_STYLESHEET,"app.css").toString());
+
+  m_title->setText(settings.value(SID_SYSTEM_TITLE,"Lane's Lexicon").toString());
+  m_toolbarText->setChecked(settings.value(SID_SYSTEM_TOOLBAR_TEXT,true).toBool());
+
+  settings.endGroup();
+  settings.beginGroup("Notes");
+  m_useNotes->setChecked(settings.value(SID_NOTES_ENABLED,false).toBool());
+  m_notesDb->setText(settings.value(SID_NOTES_DATABASE,"notes.sqlite").toString());
 
   m_dirty = false;
 }

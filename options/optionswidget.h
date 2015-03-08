@@ -20,6 +20,7 @@
 #include <QColorDialog>
 #include <QFontDialog>
 #include <QKeySequence>
+#include <QDateTimeEdit>
 #define SMALL_EDIT 30
 #define MEDIUM_EDIT 50
 #define LARGE_EDIT 60

@@ -1740,11 +1740,12 @@ void LanesLexicon::readSettings() {
   if (m_applicationCssFile.isEmpty()) {
     m_applicationCssFile = "app.css";
   }
-
+  /*
   QString ar = settings.value(SID_SYSTEM_ARABIC_FONT).toString();
   if (! ar.isEmpty()) {
     arFont.fromString(ar);
   }
+  */
 
   m_toolbarText = settings.value(SID_SYSTEM_TOOLBAR_TEXT,false).toBool();
 

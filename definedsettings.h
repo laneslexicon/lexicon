@@ -60,7 +60,7 @@ They should not be translated.
 #define SID_XSLT_PRINT   "Print"
 
 #define SID_NOTES_ENABLED "Enabled"
-
+#define SID_NOTES_DATABASE "Database"
 
 
 #define SID_SHORTCUT_COLLAPSE_ALL "Collapse all"
@@ -238,7 +238,6 @@ They should not be translated.
 
 #define SID_SYSTEM_DATABASE                    "Database"
 #define SID_SYSTEM_STYLESHEET                  "Stylesheet"
-#define SID_SYSTEM_ARABIC_FONT                 "Arabic font"
 #define SID_SYSTEM_TOOLBAR_TEXT                "Toolbar text"
 #define SID_SYSTEM_INTERFACE_WARNING           "Show interface warning"
 #define SID_SYSTEM_SAVE_SETTINGS               "Save settings"
@@ -256,7 +255,7 @@ They should not be translated.
 #define SID_SYSTEM_TABBAR_NUMBER               "Tabs number"
 #define SID_SYSTEM_TABBAR_MOVEABLE             "Tabs moveable"
 #define SID_SYSTEM_CURRENT_TAB                 "Current tab"
-
+#define SID_SYSTEM_RUN_DATE                    "Run date"
 
 #define SID_MAPS_NULL_MAP_NAME                  "Native map name"
 #define SID_MAPS_CURRENT_MAP                    "Current map"

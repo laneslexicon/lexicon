@@ -3,6 +3,7 @@
 #include "optionswidget.h"
 #include <QFontDialog>
 #include <QPushButton>
+
 class SystemOptions : public OptionsWidget {
   Q_OBJECT
 
@@ -15,25 +16,22 @@ class SystemOptions : public OptionsWidget {
     void onSetFont();
     void onSetColor();
  private:
-    QCheckBox * m_linksActivate;
-    QLineEdit * m_arabicFont;
-    QLineEdit * m_color;
+    //    QLineEdit * m_arabicFont;
+    //    QLineEdit * m_color;
     QCheckBox * m_contentsLinked;
-    QLineEdit * m_currentMap;
     QLineEdit * m_lexicon;
     QCheckBox * m_debug;
     QCheckBox * m_docked;
-    QCheckBox * m_focusTab;
+    QLineEdit * m_focusTab;
+    QCheckBox * m_rootNavigation;
     // Icon size
-    QCheckBox * m_mapsEnabled;
     QCheckBox * m_minimalInterface;
     // Navigation
-    QLineEdit * m_nullMapName;
     QCheckBox * m_linksInCurrentTab;
     QCheckBox * m_restoreBookmarks;
     QCheckBox * m_restoreTabs;
     // Root mode
-    QLineEdit * m_runData;
+    QDateTimeEdit * m_runDate;
     // Save bookmarks ?
     QCheckBox * m_saveSettings;
     QCheckBox * m_saveTabs;
@@ -43,6 +41,7 @@ class SystemOptions : public OptionsWidget {
     QLineEdit * m_title;
     QCheckBox * m_toolbarText;
     QCheckBox * m_useNotes;
+    QLineEdit * m_notesDb;
 
 };
 #endif
