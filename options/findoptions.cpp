@@ -492,6 +492,9 @@ void FindOptions::onFullDialog() {
     m_fullDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_fullRegex = d.isChecked(DialogOptions::Regex);
     m_fullForce = d.isChecked(DialogOptions::Force);
+    bool v = isModified();
+    setButtons(v);
+    emit(modified(v));
   }
 }
 void FindOptions::onHeadDialog() {
@@ -509,6 +512,9 @@ void FindOptions::onHeadDialog() {
     m_headDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_headRegex = d.isChecked(DialogOptions::Regex);
     m_headForce = d.isChecked(DialogOptions::Force);
+    bool v = isModified();
+    setButtons(v);
+    emit(modified(v));
   }
 }
 void FindOptions::onLocalDialog() {
@@ -524,5 +530,9 @@ void FindOptions::onLocalDialog() {
     m_localDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_localRegex = d.isChecked(DialogOptions::Regex);
     m_localForce = d.isChecked(DialogOptions::Force);
+    emit(modified(true));
+    bool v = isModified();
+    setButtons(v);
+    emit(modified(v));
   }
 }
