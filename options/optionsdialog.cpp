@@ -84,7 +84,14 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     m_tabs->addTab(systems,tr("System"));
     systems->writeSettings(testFileName);
   }
-
+  /// TODO
+  /// maps
+  /// keyboards
+  /// logging
+  /// help
+  /// history
+  /// icons
+  /// themes / resources etc
 
 
 

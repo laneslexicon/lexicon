@@ -112,6 +112,31 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
+  settings.setValue(SID_SYSTEM_CONTENTS_LINKED,  m_contentsLinked->isChecked());
+  settings.setValue(SID_SYSTEM_DATABASE,m_lexicon->text());
+  settings.setValue(SID_SYSTEM_DEBUG,m_debug->isChecked());
+  settings.setValue(SID_SYSTEM_DOCKED,m_docked->isChecked());
+  settings.setValue(SID_SYSTEM_CURRENT_TAB,m_focusTab->text());
+  settings.setValue(SID_SYSTEM_MINIMAL,m_minimalInterface->isChecked());
+  settings.setValue(SID_SYSTEM_RESTORE_BOOKMARKS,m_restoreBookmarks->isChecked());
+  settings.setValue(SID_SYSTEM_RESTORE_TABS,m_restoreTabs->isChecked());
+  settings.setValue(SID_SYSTEM_SAVE_SETTINGS,m_saveSettings->isChecked());
+  settings.setValue(SID_SYSTEM_SAVE_TABS,m_saveTabs->isChecked());
+  settings.setValue(SID_SYSTEM_BY_ROOT,m_rootNavigation->isChecked());
+
+  settings.setValue(SID_SYSTEM_RUN_DATE,m_runDate->dateTime());
+
+  settings.setValue(SID_SYSTEM_INTERFACE_WARNING,m_showInterfaceWarning->isChecked());
+  settings.setValue(SID_SYSTEM_STYLESHEET,m_css->text());
+
+  settings.setValue(SID_SYSTEM_TITLE,m_title->text());
+  settings.setValue(SID_SYSTEM_TOOLBAR_TEXT,m_toolbarText->isChecked());
+
+  settings.endGroup();
+  settings.beginGroup("Notes");
+  settings.setValue(SID_NOTES_ENABLED,m_useNotes->isChecked());
+  settings.setValue(SID_NOTES_DATABASE,m_notesDb->text());
+
   m_dirty = false;
   emit(modified(false));
 }
