@@ -1973,11 +1973,11 @@ void LanesLexicon::restoreTabs() {
   //  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   SETTINGS
   settings.beginGroup("System");
-  int focusTab =  settings.value("Focus tab",0).toInt();
+  int focusTab =  settings.value(SID_SYSTEM_CURRENT_TAB,0).toInt();
   settings.endGroup();
   int textWidth;
   settings.beginGroup("Entry");
-  textWidth = settings.value("Text width",400).toInt(&ok);
+  textWidth = settings.value(SID_ENTRY_TEXT_WIDTH,400).toInt(&ok);
   if (!ok) {
     textWidth = 400;
   }

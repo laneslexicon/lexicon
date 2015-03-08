@@ -258,3 +258,4 @@ They should not be translated.
 #define SID_SYSTEM_CONTENTS_LINKED             "Contents linked"
 #define SID_SYSTEM_TABBAR_NUMBER               "Tabs number"
 #define SID_SYSTEM_TABBAR_MOVEABLE             "Tabs moveable"
+#define SID_SYSTEM_CURRENT_TAB                 "Current tab"
