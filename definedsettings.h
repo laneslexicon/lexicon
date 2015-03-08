@@ -240,8 +240,6 @@ They should not be translated.
 #define SID_SYSTEM_STYLESHEET                  "Stylesheet"
 #define SID_SYSTEM_ARABIC_FONT                 "Arabic font"
 #define SID_SYSTEM_TOOLBAR_TEXT                "Toolbar text"
-#define SID_SYSTEM_NULL_MAP_NAME               "Native map name"
-#define SID_SYSTEM_CURRENT_MAP                 "Current map"
 #define SID_SYSTEM_INTERFACE_WARNING           "Show interface warning"
 #define SID_SYSTEM_SAVE_SETTINGS               "Save settings"
 #define SID_SYSTEM_SAVE_TABS                   "Save tabs"
@@ -254,8 +252,13 @@ They should not be translated.
 #define SID_SYSTEM_BY_ROOT                     "By root"
 #define SID_SYSTEM_TITLE                       "Title"
 #define SID_SYSTEM_ICON_SIZE                   "Icon size"
-#define SID_SYSTEM_KEYMAPS                     "Keymaps"
 #define SID_SYSTEM_CONTENTS_LINKED             "Contents linked"
 #define SID_SYSTEM_TABBAR_NUMBER               "Tabs number"
 #define SID_SYSTEM_TABBAR_MOVEABLE             "Tabs moveable"
 #define SID_SYSTEM_CURRENT_TAB                 "Current tab"
+
+
+#define SID_MAPS_NULL_MAP_NAME                  "Native map name"
+#define SID_MAPS_CURRENT_MAP                    "Current map"
+#define SID_MAPS_ENABLED                        "Enabled"
+#define SID_MAPS_DEBUG                          "Debug"

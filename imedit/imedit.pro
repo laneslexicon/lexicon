@@ -15,6 +15,7 @@ LIBS += -L $$[QT_INSTALL_LIBS]
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 QMAKE_CXXFLAGS += -Wunused-parameter
+INCLUDEPATH += ..
 SOURCES += main.cpp\
 	imedit.cpp \
         imlineedit.cpp \

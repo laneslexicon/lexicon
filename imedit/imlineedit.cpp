@@ -1,6 +1,7 @@
 #include "scripts.h"
 #include "inputmapper.h"
 #include "imlineedit.h"
+#include "definedsettings.h"
 ImLineEdit::ImLineEdit(QWidget * parent)
   : QLineEdit(parent)
 {
@@ -72,13 +73,11 @@ void ImLineEdit::shortcutActivated() {
  */
 void ImLineEdit::readSettings(const QString & fileName) {
   QSettings settings(fileName,QSettings::IniFormat);
-  settings.beginGroup("System");
-  m_nullMap = settings.value("Null map","Native").toString();
-  m_keymapsEnabled = settings.value("Keymaps",false).toBool();
-  settings.endGroup();
-
   settings.beginGroup("Maps");
-  m_debug = settings.value("Debug",false).toBool();
+  m_nullMap = settings.value(SID_MAPS_NULL_MAP_NAME,"Native").toString();
+  m_keymapsEnabled = settings.value(SID_MAPS_ENABLED,false).toBool();
+
+  m_debug = settings.value(SID_MAPS_DEBUG,false).toBool();
   QStringList groups = settings.childGroups();
   for(int i=0;i < groups.size();i++) {
     settings.beginGroup(groups[i]);

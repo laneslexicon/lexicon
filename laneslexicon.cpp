@@ -1747,8 +1747,6 @@ void LanesLexicon::readSettings() {
   }
 
   m_toolbarText = settings.value(SID_SYSTEM_TOOLBAR_TEXT,false).toBool();
-  m_nullMap = settings.value( SID_SYSTEM_NULL_MAP_NAME,"Native").toString();
-  m_currentMap = settings.value(SID_SYSTEM_CURRENT_MAP,"Native").toString();
 
   m_interfaceWarning = settings.value(SID_SYSTEM_INTERFACE_WARNING,true).toBool();
   m_saveSettings = settings.value(SID_SYSTEM_SAVE_SETTINGS,true).toBool();
@@ -1784,12 +1782,21 @@ void LanesLexicon::readSettings() {
 
   //  m_toolbarIconSize = settings.value(SID_SYSTEM_ICON_SIZE,QSize(16,16)).toSize();
 
-  m_keymapsEnabled = settings.value(SID_SYSTEM_KEYMAPS,false).toBool();
+
 
   m_linkContents = settings.value(SID_SYSTEM_CONTENTS_LINKED,false).toBool();
   m_linkAction->setChecked(m_linkContents);
 
   settings.endGroup();
+
+  settings.beginGroup("Maps");
+
+  m_keymapsEnabled = settings.value(SID_MAPS_ENABLED,false).toBool();
+  m_nullMap = settings.value( SID_MAPS_NULL_MAP_NAME,"Native").toString();
+  m_currentMap = settings.value(SID_MAPS_CURRENT_MAP,"Native").toString();
+
+  settings.endGroup();
+
   ///
   /// Search
   ///
@@ -3201,8 +3208,8 @@ void LanesLexicon::enableKeymaps(bool v) {
   //  m_searchOptions.setKeymaps(v);
   setStatus(tip);
   SETTINGS
-  settings.beginGroup("System");
-  settings.setValue("Keymaps",v);
+  settings.beginGroup("Maps");
+  settings.setValue(SID_MAPS_ENABLED,v);
 }
 QString LanesLexicon::getActiveKeymap() const {
   return m_currentMap;
