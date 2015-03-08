@@ -398,7 +398,6 @@ void SearchOptionsWidget::setOptions(int type) {
   }
   case SearchOptions::Root : {
     settings.beginGroup("Search");
-    settings.beginGroup("Root");
     m_newTab->setChecked(settings.value(SID_ROOTSEARCH_NEW_TAB,false).toBool());
     m_makeActive->setChecked(settings.value(SID_ROOTSEARCH_GO_TAB,true).toBool());
     settings.endGroup();

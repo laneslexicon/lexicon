@@ -239,7 +239,6 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_switchFocus = new QCheckBox(tr("Switch to &new tab"));
   connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(checkOptions(int)));
 
-
   m_findButton = new QPushButton(tr("&Find"));
   m_findButton->setDefault(true);
 
@@ -276,6 +275,15 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
 
   setOptions();
   setLayout(mainLayout);
+
+  readSettings();
+}
+void NodeSearchDialog::readSettings() {
+  SETTINGS
+
+    settings.beginGroup("Search");
+  m_newTab->setChecked(settings.value(SID_NODESEARCH_NEW_TAB,true).toBool());
+  m_switchFocus->setChecked(settings.value(SID_NODESEARCH_GO_TAB,true).toBool());
 }
 QString NodeSearchDialog::getText() const {
   QString t = m_edit->text();
@@ -301,6 +309,12 @@ void NodeSearchDialog::setOptions() {
 void NodeSearchDialog::checkOptions(int /* state */) {
   m_switchFocus->setEnabled(m_newTab->isChecked());
 }
+/**
+ *
+ *
+ * @param parent
+ * @param f
+ */
 PageSearchDialog::PageSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   setWindowTitle(tr("Search for page"));
@@ -351,6 +365,7 @@ PageSearchDialog::PageSearchDialog(QWidget * parent,Qt::WindowFlags f) :
 
   setLayout(mainLayout);
   setOptions();
+  readSettings();
 }
 int PageSearchDialog::getPage() const {
   QString t = m_edit->text();
@@ -360,6 +375,13 @@ int PageSearchDialog::getPage() const {
     return 0;
   }
   return x;
+}
+void PageSearchDialog::readSettings() {
+  SETTINGS
+
+    settings.beginGroup("Search");
+  m_newTab->setChecked(settings.value(SID_PAGESEARCH_NEW_TAB,true).toBool());
+  m_switchFocus->setChecked(settings.value(SID_PAGESEARCH_GO_TAB,true).toBool());
 }
 void PageSearchDialog::getOptions(SearchOptions & opts) {
   opts.setNewTab(m_newTab->checkState() == Qt::Checked);

@@ -57,6 +57,15 @@ class FindOptions : public OptionsWidget {
     bool m_localDiacritics;
 
     QCheckBox * m_localShowAll;
+
+
+    QCheckBox * m_nodeNew;
+    QCheckBox * m_nodeGo;
+    QCheckBox * m_pageNew;
+    QCheckBox * m_pageGo;
+    QCheckBox * m_rootNew;
+    QCheckBox * m_rootGo;
+
     //    QSize       m_viewerSize;
     //    QPoint      m_viewerPosition;
 

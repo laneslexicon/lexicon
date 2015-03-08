@@ -56,6 +56,7 @@ class NodeSearchDialog : public QDialog {
   public slots:
   void checkOptions(int x = 0);
  private:
+  void readSettings();
     int m_searchType;
   QLabel * m_prompt;
   QLineEdit * m_edit;
@@ -76,6 +77,7 @@ class PageSearchDialog : public QDialog {
   public slots:
   void checkOptions(int x = 0);
  private:
+  void readSettings();
   int m_searchType;
   QLabel * m_prompt;
   QLineEdit * m_edit;

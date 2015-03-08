@@ -191,12 +191,12 @@ They should not be translated.
 #define SID_FULLSEARCH_FORCE                   "Force LTR"
 
 
-#define SID_ROOTSEARCH_NEW_TAB                 "New tab"
-#define SID_ROOTSEARCH_GO_TAB                  "Activate tab"
-#define SID_PAGESEARCH_NEW_TAB                 "New tab"
-#define SID_PAGESEARCH_GO_TAB                  "Activate tab"
-#define SID_NODESEARCH_NEW_TAB                 "New tab"
-#define SID_NODESEARCH_GO_TAB                  "Activate tab"
+#define SID_ROOTSEARCH_NEW_TAB                 "Root new tab"
+#define SID_ROOTSEARCH_GO_TAB                  "Root activate tab"
+#define SID_PAGESEARCH_NEW_TAB                 "Page new tab"
+#define SID_PAGESEARCH_GO_TAB                  "Page activate tab"
+#define SID_NODESEARCH_NEW_TAB                 "Node new tab"
+#define SID_NODESEARCH_GO_TAB                  "Node activate tab"
 
 #define SID_ARABIC_FONT_NAME                   "Font"
 #define SID_ARABIC_FONT_SIZE                   "Size"

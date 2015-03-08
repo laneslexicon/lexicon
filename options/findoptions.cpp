@@ -126,10 +126,38 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   localbox->setLayout(locallayout);
 
+  ///
+  QGroupBox * otherbox = new QGroupBox(tr("Tab options for root,page and node search"));
+  QGridLayout * gridlayout = new QGridLayout;
+
+  m_nodeNew = new  QCheckBox;
+  m_nodeGo  = new  QCheckBox;
+  m_pageNew = new  QCheckBox;
+  m_pageGo  = new  QCheckBox;
+  m_rootNew = new  QCheckBox;
+  m_rootGo  = new  QCheckBox;
+
+
+  gridlayout->addWidget(new QLabel("Root"),0,1);
+  gridlayout->addWidget(new QLabel("Page"),0,2);
+  gridlayout->addWidget(new QLabel("Node"),0,3);
+
+  gridlayout->addWidget(new QLabel("New tab"),1,0);
+  gridlayout->addWidget(new QLabel("Activate tab"),2,0);
+
+  gridlayout->addWidget(m_rootNew,1,1);
+  gridlayout->addWidget(m_pageNew,1,2);
+  gridlayout->addWidget(m_nodeNew,1,3);
+  gridlayout->addWidget(m_rootGo,2,1);
+  gridlayout->addWidget(m_pageGo,2,2);
+  gridlayout->addWidget(m_nodeGo,2,3);
+  otherbox->setLayout(gridlayout);
+
 
   layout->addWidget(fullbox);
   layout->addWidget(headbox);
   layout->addWidget(localbox);
+  layout->addWidget(otherbox);
 
   setLayout(layout);
   addButtons();
@@ -195,6 +223,16 @@ void FindOptions::readSettings() {
 
   m_localShowAll->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
 
+  settings.endGroup();
+  settings.beginGroup("Search");
+
+  m_nodeNew->setChecked(settings.value(SID_NODESEARCH_NEW_TAB,true).toBool());
+  m_nodeGo->setChecked(settings.value(SID_NODESEARCH_GO_TAB,true).toBool());
+  m_pageNew->setChecked(settings.value(SID_PAGESEARCH_NEW_TAB,true).toBool());
+  m_pageGo->setChecked(settings.value(SID_PAGESEARCH_GO_TAB,true).toBool());
+  m_rootNew->setChecked(settings.value(SID_ROOTSEARCH_NEW_TAB,true).toBool());
+  m_rootGo->setChecked(settings.value(SID_ROOTSEARCH_GO_TAB,true).toBool());
+
   m_dirty = false;
 }
 void FindOptions::writeSettings(const QString & fileName) {
@@ -246,6 +284,16 @@ void FindOptions::writeSettings(const QString & fileName) {
 
 
   settings.value(SID_LOCALSEARCH_SHOW_ALL,m_localShowAll->isChecked());
+
+  settings.endGroup();
+  settings.beginGroup("Search");
+
+  settings.value(SID_NODESEARCH_NEW_TAB,m_nodeNew->isChecked());
+  settings.value(SID_NODESEARCH_GO_TAB,m_nodeGo->isChecked());
+  settings.value(SID_PAGESEARCH_NEW_TAB,m_pageNew->isChecked());
+  settings.value(SID_PAGESEARCH_GO_TAB,m_pageGo->isChecked());
+  settings.value(SID_ROOTSEARCH_NEW_TAB,m_rootNew->isChecked());
+  settings.value(SID_ROOTSEARCH_GO_TAB,m_rootGo->isChecked());
 
   settings.sync();
   settings.endGroup();
@@ -410,7 +458,34 @@ bool FindOptions::isModified()  {
     m_dirty = true;
     return true;
   }
+  settings.endGroup();
+  settings.beginGroup("Search");
 
+
+  if (compare(&settings,SID_NODESEARCH_NEW_TAB,m_nodeNew)) {
+    m_dirty = true;
+    return true;
+  }
+  if (compare(&settings,SID_NODESEARCH_GO_TAB,m_nodeGo)) {
+    m_dirty = true;
+    return true;
+  }
+  if (compare(&settings,SID_PAGESEARCH_NEW_TAB,m_pageNew)) {
+    m_dirty = true;
+    return true;
+  }
+  if (compare(&settings,SID_PAGESEARCH_GO_TAB,m_pageGo)) {
+    m_dirty = true;
+    return true;
+  }
+  if (compare(&settings,SID_ROOTSEARCH_NEW_TAB,m_rootNew)) {
+    m_dirty = true;
+    return true;
+  }
+  if (compare(&settings,SID_ROOTSEARCH_GO_TAB,m_rootGo)) {
+    m_dirty = true;
+    return true;
+  }
 
   return m_dirty;
 }
