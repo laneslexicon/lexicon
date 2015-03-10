@@ -368,6 +368,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(searchFoundNext()),this,SLOT(pageSearchStart()));
 }
 void LanesLexicon::onCloseOtherTabs() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_tabs->setUpdatesEnabled(false);
   QString label = m_tabs->tabText(m_tabs->currentIndex());
   QWidget * w = m_tabs->currentWidget();
@@ -403,14 +404,12 @@ bool LanesLexicon::deleteWidget(QWidget * w) {
   return false;
 }
 void LanesLexicon::onCloseTab(int ix) {
-  bool ok;
-
+  QLOG_DEBUG() << Q_FUNC_INFO << ix;
   QWidget * w = m_tabs->widget(ix);
-  ok = deleteWidget(w);
-  if (! ok) {
+  m_tabs->removeTab(ix);
+  if (! deleteWidget(w)) {
     delete w;
   }
-  m_tabs->removeTab(ix);
 }
 void LanesLexicon::shortcut(const QString & key) {
   QLOG_DEBUG() << Q_FUNC_INFO << key;
@@ -577,7 +576,9 @@ void LanesLexicon::shortcut(const QString & key) {
     showNoteBrowser();
   }
   else if (key == SID_SHORTCUT_DELETE_TAB) {
+    qDebug() << Q_FUNC_INFO << __LINE__;
     this->onCloseTab(m_tabs->currentIndex());
+    qDebug() << Q_FUNC_INFO << __LINE__;
   }
   else if (key == SID_SHORTCUT_DELETE_OTHER_TABS) {
     this->onCloseOtherTabs();
