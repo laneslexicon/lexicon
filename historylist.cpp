@@ -79,6 +79,9 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   setLayout(layout);
   m_list->installEventFilter(this);
 }
+HistoryWidget::~HistoryWidget() {
+  writeSettings();
+}
 void HistoryWidget::setPlace() {
   int row = m_list->currentRow();
   QTableWidgetItem * item = m_list->item(row,0);
@@ -118,7 +121,17 @@ void HistoryWidget::readSettings() {
   if ( ! fontString.isEmpty()) {
     m_arFont.fromString(fontString);
   }
+  resize(settings.value(SID_HISTORY_VIEWER_SIZE,QSize(650,30)).toSize());
+  move(settings.value(SID_HISTORY_VIEWER_POS,QPoint(100,100)).toPoint());
 }
+void HistoryWidget::writeSettings() {
+  SETTINGS
+  settings.beginGroup("History");
+  settings.setValue(SID_HISTORY_VIEWER_POS,pos());
+  settings.setValue(SID_HISTORY_VIEWER_SIZE,size());
+  settings.sync();
+}
+
 Place HistoryWidget::getSelected() const {
   Place p;
   bool ok;

@@ -21,6 +21,7 @@ class HistoryWidget : public QDialog {
   Q_OBJECT
  public:
   HistoryWidget(HistoryMaster * ,QWidget * parent = 0);
+  ~HistoryWidget();
   Place getSelected() const;
   QSize sizeHint() const;
   bool getNewTab();
@@ -33,6 +34,7 @@ class HistoryWidget : public QDialog {
     QCheckBox * m_newTab;
     QCheckBox * m_switchTab;
     void readSettings();
+    void writeSettings();
     QTableWidget * m_list;
     QString  m_mark;
     bool eventFilter(QObject *,QEvent *);

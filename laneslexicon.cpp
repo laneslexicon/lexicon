@@ -2697,12 +2697,13 @@ void LanesLexicon::onShowHistory() {
     Place p = dlg->getSelected();
     bool newTab = dlg->getNewTab();
     bool switchTab = dlg->getSwitchTab();
-    delete dlg;
+
     if ( p.isValid()) {
       p.setAction(Place::History);
       showPlace(p,newTab,switchTab);
     }
   }
+  delete dlg;
   return;
 }
 void LanesLexicon::onDocs() {

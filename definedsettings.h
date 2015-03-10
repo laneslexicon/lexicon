@@ -62,6 +62,8 @@ They should not be translated.
 #define SID_HISTORY_DUPLICATE_DEPTH  "Duplicate depth"
 #define SID_HISTORY_SIZE             "Size"
 #define SID_HISTORY_LIST_ARABIC_FONT "List Arabic font"
+#define SID_HISTORY_VIEWER_SIZE      "Viewer size"
+#define SID_HISTORY_VIEWER_POS       "Viewer pos"
 
 #define SID_ROOTS_DEBUG "Debug"
 #define SID_ROOTS_EXPAND "Expand"
