@@ -200,9 +200,9 @@ void EditView::writeSettings() {
 void EditView::readSettings() {
   SETTINGS
 
-    /// TODO change to EditView and save size and pos
-  settings.beginGroup("EntryLayout");
-  this->restoreGeometry(settings.value("Geometry").toByteArray());
+  settings.beginGroup("EditView");
+  move(settings.value(SID_EDITVIEW_POS,QPoint(400,150)).toPoint());
+  resize(settings.value(SID_EDITVIEW_SIZE,QSize(800,60)).toSize());
   settings.endGroup();
 }
 void EditView::apply(int type,bool useEdited) {

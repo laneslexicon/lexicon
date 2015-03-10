@@ -258,29 +258,13 @@ void LanesLexicon::showStartupEntry() {
  */
 void LanesLexicon::restoreSavedState() {
   SETTINGS
-  settings.beginGroup("Main");
 
+  settings.beginGroup("System");
+  resize(settings.value(SID_SYSTEM_SIZE,QSize(800,860)).toSize());
+  move(settings.value(SID_SYSTEM_POS,QSize(200,80)).toPoint());
+  this->restoreState(settings.value(SID_SYSTEM_STATE).toByteArray());
 
-  QSize sz = settings.value("Size", QSize()).toSize();
-  QPoint pos = settings.value("Pos", QPoint()).toPoint();
-
-  settings.endGroup();
-  if (! sz.isValid()) {
-    settings.beginGroup("System");
-    sz = settings.value("Size",QSize(800,860)).toSize();
-    settings.endGroup();
-  }
-  else {
-    this->restoreState(settings.value("State").toByteArray());
-  }
-  if (pos.isNull()) {
-    settings.beginGroup("System");
-    pos = settings.value("Pos",QSize(200,80)).toPoint();
-    settings.endGroup();
-  }
-  resize(sz);
-  move(pos);
- }
+}
 void LanesLexicon::closeEvent(QCloseEvent * event) {
   cleanup();
   QMainWindow::closeEvent(event);
@@ -1801,26 +1785,26 @@ void LanesLexicon::readSettings() {
   ///
   /// Search
   ///
-  /*
-  settings.beginGroup("Search");
-  m_searchOptions.setNewTab(settings.value("New tab",true).toBool());
-  m_searchOptions.setActivateTab(settings.value("Switch tab",true).toBool());
 
-  v  = settings.value("Type",QString("normal")).toString();
-  if (v == "normal")
-    m_searchOptions.setSearchType(SearchOptions::Normal);
-  else
-    m_searchOptions.setSearchType(SearchOptions::Regex);
+  // settings.beginGroup("Search");
+  // m_searchOptions.setNewTab(settings.value("New tab",true).toBool());
+  // m_searchOptions.setActivateTab(settings.value("Switch tab",true).toBool());
 
-  m_searchOptions.setIgnoreDiacritics(settings.value("Ignore diacritics",true).toBool());
-  m_searchOptions.setWholeWordMatch(settings.value("Whole word",false).toBool());
-  m_searchOptions.setKeymaps(m_keymapsEnabled);
-  settings.endGroup();
+  // v  = settings.value("Type",QString("normal")).toString();
+  // if (v == "normal")
+  //   m_searchOptions.setSearchType(SearchOptions::Normal);
+  // else
+  //   m_searchOptions.setSearchType(SearchOptions::Regex);
 
-  settings.beginGroup("FullSearch");
-  m_searchOptions.setIncludeHeads(settings.value("Include heads",false).toBool());
-  settings.endGroup();
-  */
+  // m_searchOptions.setIgnoreDiacritics(settings.value("Ignore diacritics",true).toBool());
+  // m_searchOptions.setWholeWordMatch(settings.value("Whole word",false).toBool());
+  // m_searchOptions.setKeymaps(m_keymapsEnabled);
+  // settings.endGroup();
+
+  // settings.beginGroup("FullSearch");
+  // m_searchOptions.setIncludeHeads(settings.value("Include heads",false).toBool());
+  // settings.endGroup();
+
   ///
   /// Debug
   ///
@@ -1831,16 +1815,16 @@ void LanesLexicon::readSettings() {
   /// Notes
   ///
   settings.beginGroup("Notes");
-  m_notesDbName = settings.value("Database","notes.sqlite").toString();
-  m_useNotes = settings.value("Enabled",true).toBool();
+  m_notesDbName = settings.value(SID_NOTES_DATABASE,"notes.sqlite").toString();
+  m_useNotes = settings.value(SID_NOTES_ENABLED,true).toBool();
   settings.endGroup();
   ///
   /// History
   ///
   settings.beginGroup("History");
-  m_historyEnabled = settings.value("Enabled",true).toBool();
-  m_historyDbName = settings.value("Database","history.sqlite").toString();
-  v = settings.value("Menu Arabic font",QString()).toString();
+  m_historyEnabled = settings.value(SID_HISTORY_ENABLED,true).toBool();
+  m_historyDbName = settings.value(SID_HISTORY_DATABASE,"history.sqlite").toString();
+  v = settings.value(SID_HISTORY_MENU_ARABIC_FONT,QString()).toString();
   if (! v.isEmpty()) {
     m_historyMenuFont.fromString(v);
   }
@@ -1899,13 +1883,13 @@ void LanesLexicon::writeSettings() {
       if (entry) {
         Place p = entry->getPlace();
         settings.beginGroup(QString("Tab-%1").arg(i));
-        settings.setValue("type","entry");
-        settings.setValue("place",p.toString());
-        settings.setValue("zoom",entry->getScale());
-        settings.setValue("textwidth",entry->getTextWidth());
+        settings.setValue(SID_TABS_TYPE,"entry");
+        settings.setValue(SID_TABS_PLACE,p.toString());
+        settings.setValue(SID_TABS_ZOOM,entry->getScale());
+        settings.setValue(SID_TABS_TEXTWIDTH,entry->getTextWidth());
         v = entry->getHome();
         if (! v.isEmpty()) {
-          settings.setValue("home",v);
+          settings.setValue(SID_TABS_HOME,v);
         }
         settings.endGroup();
       }
@@ -1913,7 +1897,7 @@ void LanesLexicon::writeSettings() {
         NoteBrowser * browser = qobject_cast<NoteBrowser *>(m_tabs->widget(i));
         if (browser) {
           settings.beginGroup(QString("Tab-%1").arg(i));
-          settings.setValue("type","notes");
+          settings.setValue(SID_TABS_TYPE,"notes");
           settings.endGroup();
         }
         else {
@@ -1926,21 +1910,23 @@ void LanesLexicon::writeSettings() {
     ///  System
     ///
     settings.beginGroup("System");
-    settings.setValue("Focus tab",m_tabs->currentIndex());
-    settings.setValue("Minimal interface",m_minimalAction->isChecked());
-    settings.setValue("Show interface warning",m_interfaceWarning);
-    settings.setValue("Current map",m_currentMap);
-    settings.setValue("Sync",m_linkContents);
-    settings.setValue("Contents linked",m_linkContents);
-    /// TODO change this
+    settings.setValue(SID_SYSTEM_MINIMAL,m_minimalAction->isChecked());
+    settings.setValue(SID_SYSTEM_INTERFACE_WARNING,m_interfaceWarning);
+    settings.setValue(SID_SYSTEM_CONTENTS_LINKED,m_linkContents);
+    settings.setValue(SID_SYSTEM_STATE,this->saveState());
+    settings.setValue(SID_SYSTEM_SIZE, size());
+    settings.setValue(SID_SYSTEM_POS, pos());
     if (m_navMode == Lane::By_Root) {
-      settings.setValue("Navigation","root");
+      settings.setValue(SID_SYSTEM_BY_ROOT,true);
     }
     else {
-      settings.setValue("Navigation","page");
+      settings.setValue(SID_SYSTEM_BY_ROOT,false);
     }
     settings.endGroup();
-  }
+    settings.beginGroup("Maps");
+    settings.setValue(SID_MAPS_CURRENT_MAP,m_currentMap);
+    settings.endGroup();
+    }
   ///
   /// Bookmarks
   ///
@@ -1959,14 +1945,6 @@ void LanesLexicon::writeSettings() {
   ///
   settings.beginGroup("History");
   settings.setValue("Enabled",m_historyEnabled);
-  settings.endGroup();
-  ///
-  /// Main
-  ///
-  settings.beginGroup("Main");
-  settings.setValue("State",this->saveState());
-  settings.setValue("Size", size());
-  settings.setValue("Pos", pos());
   settings.endGroup();
 
 }
@@ -2003,21 +1981,21 @@ void LanesLexicon::restoreTabs() {
   int j = 0;
   for(int i=0;i < tabs.size();i++) {
     settings.beginGroup(tabs[i]);
-    if (settings.value("type","entry").toString() == "notes") {
+    if (settings.value(SID_TABS_TYPE,"entry").toString() == "notes") {
       NoteBrowser * notes = new NoteBrowser(this);
       m_tabs->addTab(notes,tr("Notes"));
       j++;
     }
     else {
-      v = settings.value("place",QString()).toString();
-      qreal scale = settings.value("zoom",1.0).toReal(&ok);
+      v = settings.value(SID_TABS_PLACE,QString()).toString();
+      qreal scale = settings.value(SID_TABS_ZOOM,1.0).toReal(&ok);
       if ( !ok ) {
         scale = 1.0;
       }
       Place p = Place::fromString(v);
       int tw;
       if (! cmdOptions.contains("textwidth")) {
-        tw = settings.value("textwidth",textWidth).toInt(&ok);
+        tw = settings.value(SID_TABS_TEXTWIDTH,textWidth).toInt(&ok);
         if (!ok) {
           tw = textWidth;
         }
@@ -2025,7 +2003,7 @@ void LanesLexicon::restoreTabs() {
       else {
         tw = textWidth;
       }
-      home = settings.value("home",QString()).toString();
+      home = settings.value(SID_TABS_HOME,QString()).toString();
       if (p.isValid()) {
         if (focusTab == i) {
           focusTab = j;

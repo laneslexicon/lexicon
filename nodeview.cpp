@@ -1,15 +1,14 @@
 #include "nodeview.h"
 #include "application.h"
+#include "definedsettings.h"
 #include "externs.h"
 NodeView::NodeView(QWidget * parent)
   : QDialog(parent) {
 
   SETTINGS
-  settings.beginGroup("System");
-  QString fontString = settings.value("Arabic font").toString();
-  settings.endGroup();
-  settings.beginGroup("FullSearch");
-  QString sz = settings.value("Viewer size",QString()).toString();
+  settings.beginGroup("Node");
+  QString fontString = settings.value(SID_NODE_ARABIC_FONT).toString();
+  QString sz = settings.value(SID_NODE_VIEWER_SIZE,QString()).toString();
   if (! sz.isEmpty())
     this->setPreferredSize(sz);
 

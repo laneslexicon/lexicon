@@ -1,6 +1,7 @@
 #include "helpviewer.h"
 #include "application.h"
 #include "QsLog.h"
+#include "definedsettings.h"
 #include "externs.h"
 HelpBrowser::HelpBrowser(QWidget * parent) : QTextBrowser(parent) {
   connect(this,SIGNAL(anchorClicked(const QUrl &)),this,SLOT(getAnchor(const QUrl &)));
@@ -190,17 +191,17 @@ void HelpWidget::helpLinkActivated(const QUrl & url)  {
 void HelpWidget::writeSettings() {
   SETTINGS
   settings.beginGroup("Help");
-  settings.setValue("Current page",m_currentUrl);
-  settings.setValue("Size", size());
-  settings.setValue("Pos", pos());
+  settings.setValue(SID_HELP_CURRENT_PAGE,m_currentUrl);
+  settings.setValue(SID_HELP_SIZE, size());
+  settings.setValue(SID_HELP_POS, pos());
 }
 void HelpWidget::readSettings() {
   SETTINGS
   settings.beginGroup("Help");
-  m_helpCollection = settings.value("Help collection","lanedocs.qhc").toString();
-  m_currentUrl = settings.value("Current page").toUrl();
-  resize(settings.value("Size", QSize(500, 700)).toSize());
-  move(settings.value("Pos", QPoint(200, 200)).toPoint());
+  m_helpCollection = settings.value(SID_HELP_COLLECTION,"lanedocs.qhc").toString();
+  m_currentUrl = settings.value(SID_HELP_CURRENT_PAGE).toUrl();
+  resize(settings.value(SID_HELP_SIZE, QSize(500, 700)).toSize());
+  move(settings.value(SID_HELP_POS, QPoint(200, 200)).toPoint());
 }
 void HelpWidget::showSection(const QString & id) {
   QLOG_DEBUG() << Q_FUNC_INFO << id;

@@ -1,14 +1,3 @@
-#define SID_SYSTEM_EXIT     "Exit"
-#define SID_SYSTEM_COLOR    "Color"
-#define SID_SYSTEM_DATABASE "Database"
-#define SID_SYSTEM_DEFAULT_MAP "Buckwwalter"
-#define SID_SYSTEM_DOCKED    "Docked"
-#define SID_SYSTEM_FOCUS_TAB "Focus tab"
-#define SID_SYSTEM_INTERFACE "Interface"
-#define SID_SYSTEM_KEYMAPS   "Keymaps"
-#define SID_SYSTEM_NAV_MODE  "Nav mode"
-#define SID_SYSTEM_OPEN_LINK "Open links in current tab"
-#define SID_SYSTEM_ACTIVATE_LINK "Always Make link active"
 
 #define SID_SPLASH_DELAY "Delay"
 #define SID_SPLASH_ENABLED "Enabled"
@@ -63,8 +52,16 @@ They should not be translated.
 #define SID_NOTES_DATABASE "Database"
 
 
-#define SID_SHORTCUT_COLLAPSE_ALL "Collapse all"
+//#define SID_SHORTCUT_COLLAPSE_ALL "Collapse all"
 
+#define SID_HISTORY_ENABLED          "Enabled"
+#define SID_HISTORY_DATABASE         "Database"
+#define SID_HISTORY_MENU_ARABIC_FONT "Menu Arabic font"
+#define SID_HISTORY_NEW_TAB          "New tab"
+#define SID_HISTORY_GO_TAB           "Activate tab"
+#define SID_HISTORY_DUPLICATE_DEPTH  "Duplicate depth"
+#define SID_HISTORY_SIZE             "Size"
+#define SID_HISTORY_LIST_ARABIC_FONT "List Arabic font"
 
 #define SID_ROOTS_DEBUG "Debug"
 #define SID_ROOTS_EXPAND "Expand"
@@ -180,7 +177,7 @@ They should not be translated.
 #define SID_FULLSEARCH_INCLUDE_HEADS           "Include heads"
 #define SID_FULLSEARCH_HEAD_BACKGROUND         "Head word background"
 #define SID_FULLSEARCH_HEAD_TEXT               "Head text"
-#define SID_FULLSEARCH_VIEWER_SIZE             "Viewer size"
+
 #define SID_FULLSEARCH_VIEWER_POSITION         "Viewer position"
 #define SID_FULLSEARCH_STEP                    "Step"
 #define SID_FULLSEARCH_WHOLE_WORD              "Whole word"
@@ -201,7 +198,8 @@ They should not be translated.
 #define SID_ARABIC_FONT_NAME                   "Font"
 #define SID_ARABIC_FONT_SIZE                   "Size"
 
-
+#define SID_NODE_VIEWER_SIZE                   "Viewer size"
+#define SID_NODE_ARABIC_FONT                   "Arabic font"
 
 #define SID_CONTENTS_BACKGROUND                "Background"
 #define SID_CONTENTS_DEBUG                     "Debug"
@@ -256,8 +254,37 @@ They should not be translated.
 #define SID_SYSTEM_TABBAR_MOVEABLE             "Tabs moveable"
 #define SID_SYSTEM_CURRENT_TAB                 "Current tab"
 #define SID_SYSTEM_RUN_DATE                    "Run date"
+#define SID_SYSTEM_SIZE                        "Size"
+#define SID_SYSTEM_POS                         "Pos"
+#define SID_SYSTEM_STATE                       "State"
+
+#define SID_SYSTEM_OPEN_LINK                   "Open links in current tab"
+#define SID_SYSTEM_ACTIVATE_LINK "Always Make link active"
+
+#define SID_SYSTEM_EXIT     "Exit"
+#define SID_SYSTEM_DEFAULT_MAP "Buckwwalter"
+
+
+
+
 
 #define SID_MAPS_NULL_MAP_NAME                  "Native map name"
 #define SID_MAPS_CURRENT_MAP                    "Current map"
 #define SID_MAPS_ENABLED                        "Enabled"
 #define SID_MAPS_DEBUG                          "Debug"
+
+
+#define SID_HELP_CURRENT_PAGE                   "Current page"
+#define SID_HELP_SIZE                           "Size"
+#define SID_HELP_POS                            "Pos"
+#define SID_HELP_COLLECTION                     "Help collection"
+
+#define SID_EDITVIEW_SIZE                       "Size"
+#define SID_EDITVIEW_POS                       "Pos"
+
+
+#define SID_TABS_TYPE                           "type"
+#define SID_TABS_PLACE                          "place"
+#define SID_TABS_ZOOM                           "zoom"
+#define SID_TABS_TEXTWIDTH                      "textwidth"
+#define SID_TABS_HOME                           "home"

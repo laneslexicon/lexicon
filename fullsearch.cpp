@@ -626,7 +626,7 @@ void FullSearchWidget::readSettings() {
   QString v;
   SETTINGS
   settings.beginGroup("Entry");
-  QString css = settings.value("CSS",QString("entry.css")).toString();
+  QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
   css = getLexicon()->getResourceFilePath(Lexicon::Stylesheet,css);
   readCssFromFile(css);
   //m_xsltSource = settings.value("XSLT",QString("entry.xslt")).toString();

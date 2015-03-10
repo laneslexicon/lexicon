@@ -1,21 +1,27 @@
 #include "nodeinfo.h"
 #include "application.h"
+#include "definedsettings.h"
 #include "externs.h"
+/**
+ * This is used to show details of the linked-to node in a cross reference
+ * The some settings are used by NodeView
+ *
+ * @param parent
+ */
 NodeInfo::NodeInfo(QWidget * parent)
   : QDialog(parent) {
 
   SETTINGS
-  settings.beginGroup("System");
-  QString fontString = settings.value("Arabic font").toString();
-  settings.endGroup();
-  settings.beginGroup("FullSearch");
-  QString sz = settings.value("Viewer size",QString()).toString();
+  settings.beginGroup("Node");
+  QString fontString = settings.value(SID_NODE_ARABIC_FONT).toString();
+  QString sz = settings.value(SID_NODE_VIEWER_SIZE,QString()).toString();
   if (! sz.isEmpty())
     this->setPreferredSize(sz);
 
   QFont f;
   if (! fontString.isEmpty())
     f.fromString(fontString);
+
   setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
   setSizeGripEnabled(true);
   QVBoxLayout * layout = new QVBoxLayout;

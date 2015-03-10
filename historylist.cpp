@@ -5,6 +5,7 @@
 #include "application.h"
 #include "history.h"
 #include "externs.h"
+#include "definedsettings.h"
 HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   : QDialog(parent) {
   readSettings();
@@ -49,8 +50,8 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   m_switchTab = new QCheckBox(tr("Switch to new tab"));
   SETTINGS
   settings.beginGroup("History");
-  m_newTab->setChecked(settings.value("New tab",false).toBool());
-  m_switchTab->setChecked(settings.value("Switch tab",true).toBool());
+  m_newTab->setChecked(settings.value(SID_HISTORY_NEW_TAB,false).toBool());
+  m_switchTab->setChecked(settings.value(SID_HISTORY_GO_TAB,true).toBool());
   m_switchTab->setEnabled(m_newTab->isChecked());
   connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(onStateChanged(int)));
   QPushButton * jumpButton = new QPushButton(tr("&Jump to"));
@@ -113,9 +114,7 @@ QSize HistoryWidget::sizeHint() const {
 void HistoryWidget::readSettings() {
   SETTINGS
   settings.beginGroup("History");
-  settings.beginGroup("List");
-  QString fontString = settings.value("Arabic font").toString();
-  QLOG_DEBUG() << "Font" << fontString;
+  QString fontString = settings.value(SID_HISTORY_LIST_ARABIC_FONT).toString();
   if ( ! fontString.isEmpty()) {
     m_arFont.fromString(fontString);
   }

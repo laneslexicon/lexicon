@@ -710,7 +710,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
 
   SETTINGS
   settings.beginGroup("Entry");
-  m_scale  = settings.value("Zoom",1.0).toDouble();
+  m_scale  = settings.value(SID_ENTRY_SCALE,1.0).toDouble();
   if (m_scale == 0) {
     m_scale = 1.0;
   }
@@ -938,7 +938,7 @@ Place GraphicsEntry::getPage(const Place & p) {
   }
   SETTINGS
   settings.beginGroup("Entry");
-  m_scale  = settings.value("Zoom",1.0).toDouble();
+  m_scale  = settings.value(SID_ENTRY_SCALE,1.0).toDouble();
   if (m_scale == 0) {
     m_scale = 1.0;
   }

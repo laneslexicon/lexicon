@@ -1,5 +1,6 @@
 #include "history.h"
 #include "externs.h"
+#include "definedsettings.h"
 HistoryEvent::HistoryEvent() {
   m_when = QDateTime::currentDateTime();
   m_id = -1;
@@ -277,9 +278,9 @@ HistoryEvent * HistoryMaster::getEvent(int id) {
 void HistoryMaster::readSettings() {
   SETTINGS
   settings.beginGroup("History");
-  m_historyEnabled = settings.value("Enabled",true).toBool();
-  m_size = settings.value("Size",10).toInt();
-  m_duplicateDepth = settings.value("Duplicate depth",5).toInt();
+  m_historyEnabled = settings.value(SID_HISTORY_ENABLED,true).toBool();
+  m_size = settings.value(SID_HISTORY_SIZE,10).toInt();
+  m_duplicateDepth = settings.value(SID_HISTORY_DUPLICATE_DEPTH,5).toInt();
 }
 bool HistoryMaster::clear() {
    if ( ! m_historyEnabled ) {
