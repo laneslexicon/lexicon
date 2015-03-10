@@ -200,6 +200,7 @@ bool HistoryMaster::openDatabase(const QString & dbname) {
   return ok;
 }
 bool HistoryMaster::add(const Place & p) {
+  QLOG_DEBUG() << Q_FUNC_INFO << m_historyEnabled << p.toString();
   if (! m_historyEnabled ) {
     return false;
   }
@@ -217,7 +218,8 @@ bool HistoryMaster::add(const Place & p) {
   }
   QLOG_DEBUG() << Q_FUNC_INFO << p.toString();
   /// don't add two adjacent identical places
-  if (this->hasPlace(p) == -1) {
+  if (this->hasPlace(p) != -1) {
+    QLOG_DEBUG() << "History rejected, duplicate place";
     return false;
   }
   /// TODO get last record and exit if sample place
@@ -233,6 +235,7 @@ bool HistoryMaster::add(const Place & p) {
   m_addQuery.bindValue(5,p.getVol());
   m_addQuery.bindValue(6,event->getWhen());
   if (m_addQuery.exec()) {
+    QLOG_DEBUG() << "Successfully updated history table";
     return true;
   }
   else {
