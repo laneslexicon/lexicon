@@ -892,10 +892,10 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
     else if (m_place.getAction() != Place::Bookmark) {
       if (getHistory()->enabled()) {
-        getHistory()->add(m_place);
+        if (getHistory()->add(m_place)) {
         /// this allows mainwindow to update the history list
-        QLOG_DEBUG() << Q_FUNC_INFO << "Adding history" << m_place.toString();
-        emit(historyAddition(m_place));
+          emit(historyAddition(m_place));
+        }
       }
     }
   }
