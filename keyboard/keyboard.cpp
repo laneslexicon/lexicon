@@ -288,7 +288,13 @@ void KeyboardScene::keyPressed(GraphicsButton * button) {
   QList<QGraphicsView *> v = this->views();
   for(int i=0;i < v.size();i++) {
     KeyboardView * k = dynamic_cast<KeyboardView *>(v[i]);
-    k->keyPressed(button->getKeyDef()->getValue());
+    QList<int> v = button->getKeyDef()->getValues();
+    if (v.size() == 1) {
+      k->keyPressed(v[0]);
+    }
+    else {
+      k->keyPressed(v);
+    }
   }
   QList<QGraphicsItem *> items = this->items();
   for(int i=0;i < items.size();i++) {

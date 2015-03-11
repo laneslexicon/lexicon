@@ -38,6 +38,7 @@ class KeyboardWidget : public QDialog {
   void closeEvent(QCloseEvent * );
  public slots:
    void virtualKeyPressed(int);
+   void virtualKeyPressed(QList<int>);
    void loadKeyboard(int);
    void showKeyboard();
    void attach(QWidget *);

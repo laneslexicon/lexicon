@@ -35,6 +35,7 @@ void KeyboardWidget::setup() {
   m_transform = m_view->transform();
 
   connect(m_view,SIGNAL(virtualKeyPressed(int)),this,SLOT(virtualKeyPressed(int)));
+  connect(m_view,SIGNAL(virtualKeyPressed(QList<int>)),this,SLOT(virtualKeyPressed(QList<int>)));
   connect(m_keyboards,SIGNAL(currentIndexChanged(int)),this,SLOT(loadKeyboard(int)));
 
   if (! m_defaultKeyboard.isEmpty()) {
@@ -164,6 +165,17 @@ void KeyboardWidget::virtualKeyPressed(int k) {
   QKeyEvent * event;
   event = new QKeyEvent(QEvent::KeyPress, k, Qt::NoModifier,QString(QChar(k)));
   QApplication::postEvent(m_target,event);
+}
+void KeyboardWidget::virtualKeyPressed(QList<int> k) {
+  qDebug() << Q_FUNC_INFO << k;
+  if (m_target == 0) {
+    return;
+  }
+  for(int i=0;i < k.size();i++) {
+    QKeyEvent * event;
+    event = new QKeyEvent(QEvent::KeyPress, k[i], Qt::NoModifier,QString(QChar(k[i])));
+    QApplication::postEvent(m_target,event);
+  }
 }
 void KeyboardWidget::readSettings() {
   qDebug() << Q_FUNC_INFO << m_keyboardDirectory << m_keyboardConfig;

@@ -95,6 +95,18 @@ int KeyDef::getValue() {
   }
   return -1;
 }
+QList<int> KeyDef::getValues() {
+  QList<int> v;
+  QPair<int,int> ix(m_currentGroup,m_currentLevel);
+  if (!m_values.contains(ix)) {
+    return v;
+  }
+  v = m_values.values(ix);
+  for(int k = 0; k < (v.size()/2); k++) {
+    v.swap(k,v.size()-(1+k));
+  }
+  return v;
+}
 void KeyDef::setValues(const QString & /* name */,QSettings & settings,QSettings & specials) {
   QRegExp lx("level(\\d+)");
   QRegExp gx("group(\\d+)");
@@ -216,6 +228,16 @@ void KeyDef::setLevelValues(int group,int level,QSettings & settings,QSettings &
           }
           else {
             qDebug() << "warning: no value for special key" << s;
+          }
+        }
+
+        else if (s.indexOf(QChar(',')) != -1) {
+          QStringList chars = s.split(QChar(','),QString::SkipEmptyParts);
+          for(int  i=0;i < chars.size();i++) {
+            if (hx.indexIn(chars[i]) != -1) {
+              m_values.insert(k,chars[i].toInt(&ok,0));
+              qDebug() << "key" << i << chars[i] << chars[i].toInt(&ok,0);
+            }
           }
         }
         else if (nx.indexIn(s) != -1) {
