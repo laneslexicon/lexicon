@@ -125,7 +125,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   SETTINGS
   settings.beginGroup("Keyboards");
-  QString keyboardConfig = settings.value("Config","keyboard.ini").toString();
+  QString keyboardConfig = settings.value(SID_KEYBOARDS_CONFIG,"keyboard.ini").toString();
   m_keyboard = new KeyboardWidget(getLexicon()->getResourcePath(Lexicon::Keyboard),keyboardConfig,this);
 
   QList<QAbstractButton *> buttons = m_buttonBox->buttons();

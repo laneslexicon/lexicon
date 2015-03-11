@@ -3,6 +3,7 @@
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
+#include "externs.h"
 #endif
 /**
  *
@@ -32,7 +33,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   // Save boo
   m_showInterfaceWarning = new QCheckBox;
   m_css = new QLineEdit;
-  m_theme = new QLineEdit;
+  m_theme = new QComboBox;
   m_title = new QLineEdit;
   m_toolbarText = new QCheckBox;
   m_useNotes = new QCheckBox;
@@ -85,6 +86,12 @@ void SystemOptions::readSettings() {
   m_saveTabs->setChecked(settings.value(SID_SYSTEM_SAVE_TABS,true).toBool());
   m_rootNavigation->setChecked(settings.value(SID_SYSTEM_BY_ROOT,true).toBool());
 
+
+  QStringList themes = getLexicon()->getThemes();
+  themes.sort();
+  m_theme->addItems(themes);
+  m_theme->setCurrentText(getLexicon()->currentTheme());
+
   QString d = settings.value(SID_SYSTEM_RUN_DATE,QString()).toString();
   m_runDate->setDate(QDate::fromString(d,Qt::ISODate));
 
@@ -136,6 +143,8 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.beginGroup("Notes");
   settings.setValue(SID_NOTES_ENABLED,m_useNotes->isChecked());
   settings.setValue(SID_NOTES_DATABASE,m_notesDb->text());
+
+  getLexicon()->setTheme(m_theme->currentText());
 
   m_dirty = false;
   emit(modified(false));

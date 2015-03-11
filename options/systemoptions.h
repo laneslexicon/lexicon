@@ -37,7 +37,7 @@ class SystemOptions : public OptionsWidget {
     QCheckBox * m_saveTabs;
     QCheckBox * m_showInterfaceWarning;
     QLineEdit * m_css;
-    QLineEdit * m_theme;
+    QComboBox * m_theme;
     QLineEdit * m_title;
     QCheckBox * m_toolbarText;
     QCheckBox * m_useNotes;
