@@ -52,7 +52,7 @@ void KeyboardWidget::addShortcut(const QString & keys) {
 void KeyboardWidget::onKeyboardShortcut() {
   QAction * action = qobject_cast<QAction *>(sender());
   if (action) {
-    qDebug() << Q_FUNC_INFO << action->shortcut().toString();
+    //    qDebug() << Q_FUNC_INFO << action->shortcut().toString();
     emit(keyboardShortcut(action->shortcut().toString()));
     }
 }
@@ -151,6 +151,11 @@ void KeyboardWidget::detach() {
   this->lower();
   emit(detached());
 }
+/**
+ * we would have to modify this for multivalued keys
+ *
+ * @param k
+ */
 void KeyboardWidget::virtualKeyPressed(int k) {
   //  qDebug() << Q_FUNC_INFO << k << QChar(k);
   if (m_target == 0) {

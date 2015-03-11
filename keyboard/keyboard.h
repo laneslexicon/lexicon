@@ -90,6 +90,7 @@ class KeyboardView : public QGraphicsView   {
     void setLevel(int);
     void setGroup(int);
     void keyPressed(int);
+    void keyPressed(QList<int>);
   private:
     void addButton(int row,int col,GraphicsButton *);
     QGraphicsScene * m_scene;
@@ -101,6 +102,6 @@ class KeyboardView : public QGraphicsView   {
     KeyboardDef * m_kbd;
  signals:
     void virtualKeyPressed(int);
-
+    void virtualKeyPressed(QList<int>);
 };
 #endif

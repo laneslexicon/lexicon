@@ -29,6 +29,7 @@ class KeyDef {
   bool isToggle() { return m_toggle;}
   double getSpan() { return m_span;}
   int  getValue();
+  QList<int> getValues();
   void toggle();
   void sticky();
   int getType() { return m_type; }
@@ -55,7 +56,7 @@ class KeyDef {
   double m_span;
   bool m_sticky;
   bool m_toggle;
-  QMap<QPair<int,int>, int> m_values;
+  QMultiMap<QPair<int,int>, int> m_values;
   QMap<QPair<int,int>, int> m_vpos;
   QMap<QPair<int,int>,QString> m_decoration;
   void setGroupValues(int group, QSettings &,QSettings &);

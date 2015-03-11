@@ -276,6 +276,11 @@ void GraphicsButton::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)  {
     scene->keyPressed(this);
   }
 }
+/**
+ *
+ *
+ * @param parent
+ */
 KeyboardScene::KeyboardScene(QObject * parent) : QGraphicsScene(parent) {
 }
 void KeyboardScene::keyPressed(GraphicsButton * button) {
@@ -362,6 +367,10 @@ void KeyboardView::setGroup(int n) {
 }
 
 void KeyboardView::keyPressed(int k) {
+  emit(virtualKeyPressed(k));
+  m_kbd->unstick();
+}
+void KeyboardView::keyPressed(QList<int> k) {
   emit(virtualKeyPressed(k));
   m_kbd->unstick();
 }
