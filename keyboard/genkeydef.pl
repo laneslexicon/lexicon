@@ -172,6 +172,9 @@ foreach $line (@lines) {
   if ($v)  {
     @values = split ":",$v;
   }
+  if (($row == 4) && ($col == 6)) {
+	  print "here [$v]\n";
+  }
   push @ini , sprintf "[Key%s-%s]",$row,$col;
   push @ini , sprintf "row=$row";
   push @ini , sprintf "col=$col";
@@ -191,7 +194,12 @@ foreach $line (@lines) {
   }
   push @ini , sprintf "type=%s",$keytype;
   for(my $i=0;$i <= $#values;$i++) {
-    push @ini , sprintf "level%d/value=%s",$i + 1,$values[$i];
+	  my $v = $values[$i];
+	  if ($v =~ /;0x/) {
+		  $v =~ s/;0x/,0x/g;
+		  $v = sprintf "\"%s\"",$v;
+	  }
+    push @ini , sprintf "level%d/value=%s",$i + 1,$v;
   }
   if ($count == 4) {
     if ($k[3] =~ /level/) {
