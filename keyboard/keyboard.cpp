@@ -183,7 +183,8 @@ QGraphicsTextItem * GraphicsButton::decorateKey(const QRectF & cell,int group,in
   //  QFont f("Amiri",30);
   //  item->setFont(f);
   //  html = QString("<html><body><span class=\"%1\">%2</span></body></html>").arg(script).arg(text);
-  html = QString("<span class=\"%1\">%2</span>").arg(script).arg(text);
+  html = QString("<span class=\"%1\">%2</span>").arg(script).arg(text.toHtmlEscaped());
+
   item->setHtml(html);//Html(html);
 
   QRectF wr = item->boundingRect();
