@@ -55,7 +55,7 @@ class KeyboardWidget : public QDialog {
    QPoint m_currentPosition;
    QComboBox * m_keyboards;
    KeyboardView * m_view;
-   qreal m_scale;
+   //   qreal m_scale;
 
    QWidget * m_target;
    QTransform m_transform;

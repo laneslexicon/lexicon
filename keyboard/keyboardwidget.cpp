@@ -23,10 +23,9 @@ void KeyboardWidget::setup() {
   m_keyboards = new QComboBox(this);
   m_view = new KeyboardView(this);
   m_view->setStyleSheet("border-style : 2px solid black");
+  m_view->setAlignment(Qt::AlignLeft|Qt::AlignTop);
 
   loadDefinitions();
-  m_transform = m_view->transform();
-  m_scale = 1.0;
 
   layout->addWidget(m_keyboards);
   layout->addWidget(m_view);
@@ -108,7 +107,13 @@ void KeyboardWidget::loadDefinitions(const QString & targetScript) {
 void KeyboardWidget::loadKeyboard(int /*ix */) {
   QString name = m_keyboards->currentData().toString();
   qDebug() << Q_FUNC_INFO << name;
+  //  m_view->setTransform(m_transform);
+  m_view->resetMatrix();
+  m_view->setAlignment(Qt::AlignLeft|Qt::AlignTop);
   m_view->loadKeyboard(name);
+  /// The following odd looking code ensures that scene is view is set correctly
+  /// after changing keyboard.
+  m_view->setSceneRect(m_view->sceneRect());
   this->autoScale();
 }
 void KeyboardWidget::resizeEvent(QResizeEvent * /* event */) {
@@ -129,6 +134,7 @@ void KeyboardWidget::autoScale() {
     m_view->fitInView(m_view->sceneRect(), Qt::KeepAspectRatio);
   else
     m_view->fitInView(m_view->sceneRect(), Qt::IgnoreAspectRatio);
+
 }
 void KeyboardWidget::showKeyboard() {
   this->show();

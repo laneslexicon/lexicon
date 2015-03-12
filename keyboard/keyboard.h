@@ -98,7 +98,7 @@ class KeyboardView : public QGraphicsView   {
     int m_vspace;        // space between rows
     int m_buttonWidth;
     int m_buttonHeight;
-
+    bool m_debug;
     KeyboardDef * m_kbd;
  signals:
     void virtualKeyPressed(int);

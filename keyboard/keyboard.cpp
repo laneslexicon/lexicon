@@ -331,6 +331,7 @@ KeyboardView::KeyboardView(QWidget * parent) : QGraphicsView(parent) {
   m_kbd = new KeyboardDef();
   m_scene = new KeyboardScene;
   /// TODO get from ini ?
+  m_debug = false;
   m_vspace = 5;
   m_hspace = 5;
   /**
@@ -342,6 +343,7 @@ KeyboardView::KeyboardView(QWidget * parent) : QGraphicsView(parent) {
    * set the key pen from the ini file
    *
    */
+  setAlignment(Qt::AlignLeft|Qt::AlignTop);
   setScene(m_scene);
   //  setSceneRect(QRectF());
 }
@@ -390,12 +392,11 @@ void KeyboardView::loadKeyboard(const QString & fileName) {
    * set the key pen from the ini file
    *
    */
-  qDebug() << "Loading keyboard" << fileName;
   delete m_kbd;
   m_kbd = new KeyboardDef();
   m_scene->clear();
   m_kbd->load(fileName);
-  //  m_scene->setBackgroundBrush(Qt::darkCyan);
+
   QSettings settings(fileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Header");
@@ -431,22 +432,25 @@ void KeyboardView::loadKeyboard(const QString & fileName) {
   /**
    * we need to resize the sceneRect after each load. It seems that if the
    * scene rect is updated as it increases, but not as it decreases
+   * this is now done in KeyboardWidget
+   *  m_view->setSceneRect(m_view->sceneRect());
    */
-
-  /// NOTE: if the buttons are not square, this does not work correctly
-  ///  qDebug() << "dimensions" << m_kbd->rows() << m_kbd->cols();
-  //  int width  =  (m_kbd->cols() * m_buttonWidth) + (m_kbd->cols() - 1)*m_hspace;
-  //  int height =  (m_kbd->rows() * m_buttonHeight) + (m_kbd->rows() - 1)*m_vspace;
-  //  m_aspectRatio = (qreal)width/(qreal)height;
-  //  qDebug() << "Keyboard dimension" << width << height << m_aspectRatio;
-  //  QRectF r = m_scene->sceneRect();
-  //  r.setWidth(width);
-  //  r.setHeight(height);
-  //  m_scene->setSceneRect(r);
+  if (m_debug) {
+  qDebug() << "--------------------------------------------------";
+  int width  =  (m_kbd->cols() * m_buttonWidth) + (m_kbd->cols() - 1)*m_hspace;
+  int height =  (m_kbd->rows() * m_buttonHeight) + (m_kbd->rows() - 1)*m_vspace;
+  qDebug() << "Keyboard" << fileName;
+  qDebug() << QString("Rows: %1 [%2], Cols: %3 [%4]")
+    .arg(m_kbd->rows())
+    .arg(m_kbd->cols())
+    .arg(m_buttonWidth)
+    .arg(m_buttonHeight);
+  qDebug() << QString("Calculated size: %1 x %2").arg(width).arg(height);
+  QRectF r = m_scene->sceneRect();
+  qDebug() << QString("Scenerect %1 x %2").arg(r.width()).arg(r.height());
+  qDebug() << "--------------------------------------------------";
+  }
   setScene(m_scene);
-
-  //  qDebug() << Q_FUNC_INFO << "scene rect" << m_scene->sceneRect();
   /// TODO get from ini and poss to KeyboardDef before creating buttons
   m_scene->setBackgroundBrush(QColor(keyboardColor));
-
 }

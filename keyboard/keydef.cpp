@@ -236,7 +236,7 @@ void KeyDef::setLevelValues(int group,int level,QSettings & settings,QSettings &
           for(int  i=0;i < chars.size();i++) {
             if (hx.indexIn(chars[i]) != -1) {
               m_values.insert(k,chars[i].toInt(&ok,0));
-              qDebug() << "key" << i << chars[i] << chars[i].toInt(&ok,0);
+              //              qDebug() << "key" << i << chars[i] << chars[i].toInt(&ok,0);
             }
           }
         }
@@ -289,7 +289,6 @@ KeyboardDef::~KeyboardDef() {
   this->clear();
 }
 void KeyboardDef::clear() {
-  qDebug() << Q_FUNC_INFO;
   while(m_keys.size() > 0) {
     KeyDef * k = m_keys.takeFirst();
     delete k;
