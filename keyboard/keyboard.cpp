@@ -343,7 +343,7 @@ KeyboardView::KeyboardView(QWidget * parent) : QGraphicsView(parent) {
    * set the key pen from the ini file
    *
    */
-  setAlignment(Qt::AlignLeft|Qt::AlignTop);
+  //  setAlignment(Qt::AlignLeft|Qt::AlignTop);
   setScene(m_scene);
   //  setSceneRect(QRectF());
 }
@@ -361,6 +361,9 @@ KeyboardView::~KeyboardView() {
  * @param button
  */
 void KeyboardView::addButton(int row,int col,GraphicsButton * button) {
+  if ((row == 0) && (col == 0)) {
+    return;
+  }
   m_scene->addItem(button);
   qreal x,y;
   x = col*m_buttonWidth  + col*m_hspace; // + button->span()*m_hspace
@@ -440,17 +443,20 @@ void KeyboardView::loadKeyboard(const QString & fileName) {
   int width  =  (m_kbd->cols() * m_buttonWidth) + (m_kbd->cols() - 1)*m_hspace;
   int height =  (m_kbd->rows() * m_buttonHeight) + (m_kbd->rows() - 1)*m_vspace;
   qDebug() << "Keyboard" << fileName;
-  qDebug() << QString("Rows: %1 [%2], Cols: %3 [%4]")
+  qDebug() << QString("Rows: %1, Cols: %2, button size %3 x %4")
     .arg(m_kbd->rows())
     .arg(m_kbd->cols())
     .arg(m_buttonWidth)
     .arg(m_buttonHeight);
   qDebug() << QString("Calculated size: %1 x %2").arg(width).arg(height);
   QRectF r = m_scene->sceneRect();
+  //  m_scene->setSceneRect(r);
   qDebug() << QString("Scenerect %1 x %2").arg(r.width()).arg(r.height());
+  qDebug() << "Scenerect" << r;
   qDebug() << "--------------------------------------------------";
   }
   setScene(m_scene);
   /// TODO get from ini and poss to KeyboardDef before creating buttons
   m_scene->setBackgroundBrush(QColor(keyboardColor));
+
 }
