@@ -179,11 +179,13 @@ QGraphicsTextItem * GraphicsButton::decorateKey(const QRectF & cell,int group,in
   QTextOption topt;
   topt.setTextDirection(Qt::LeftToRight);
   item->document()->setDefaultTextOption(topt);
+  QString sep("<br/>");
   QString html;
+  QStringList w = text.toHtmlEscaped().split(QChar(' '),QString::SkipEmptyParts);
   //  QFont f("Amiri",30);
   //  item->setFont(f);
   //  html = QString("<html><body><span class=\"%1\">%2</span></body></html>").arg(script).arg(text);
-  html = QString("<span class=\"%1\">%2</span>").arg(script).arg(text.toHtmlEscaped());
+  html = QString("<span class=\"%1\">%2</span>").arg(script).arg(w.join("<br/>"));
 
   item->setHtml(html);//Html(html);
 

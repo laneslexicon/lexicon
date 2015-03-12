@@ -42,7 +42,7 @@ START_KEYS
 2,13,َ:ً,[level2/vpos=20]
 2,14,ْ:0x651,[level2/vpos=20]
 #### row 3
-3,1,<CapsLock>,Caps<br/>lock,[toggle=true,type=level2]
+3,1,<CapsLock>,Caps lock,[toggle=true,type=level2]
 # 671 == alef wasla
 3,2,|:0x0671
 3,3,س:ص
