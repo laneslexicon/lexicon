@@ -110,13 +110,6 @@ if ($keyStartPos == -1) {
 push @ini, "[CharacterCodes]";
 push @ini, "$charcodes";
 
-# my $s = "4,2,ز:ظ";
-
-# my $t ="4,1,<Shift>,Shift,[sticky,type=level2]";
-# if ($t =~ /(.+),\[(.+)\]$/) {
-#   push @ini , "yep $1  ---------- $2 ";
-# }
-# exit;
 
 ####################################################################################################
 #
@@ -126,6 +119,17 @@ push @ini, "$charcodes";
 # the key.
 # The other two entries specify the value to output when the key is pressed and what character is to appear on the keyboard (this is termed the 'decoration'
 # If the value is the same as the decoration, the decoration may be omitted.
+#
+# Use vpos=nn to move the text decoration. A negative number moves it upwards
+#
+# The text decoration will be html escaped in the keyboard loader and spaces will be replaced by <br/>
+#
+# (This was done mainly because "Caps lock" it too long. Yuck)
+# The text because the html for a QGraphicsTextItem.setHtml().
+#
+# To insert multiple characters with a single keystroke (as in Windows Arabic 101 keyboard), set the
+# value to the hex values separated by a semi-colon i.e 0xnnnn;0xnnnn. For example,
+#2,6,ف:0x0644;0x0625,ف:لإ
 #
 # key line format
 # row,col,values,optional decoration ,[properties]
@@ -154,6 +158,7 @@ push @ini, "$charcodes";
 ###################################################################################################
 foreach $line (@lines) {
   next unless $line !~ /^#/;
+  next unless $line !~ /^\s*$/;
   my @values;
   my $key;
   my $props;
@@ -172,8 +177,8 @@ foreach $line (@lines) {
   if ($v)  {
     @values = split ":",$v;
   }
-  if (($row == 4) && ($col == 6)) {
-	  print "here [$v]\n";
+  if (! $row ||  ! $col) {
+    next;
   }
   push @ini , sprintf "[Key%s-%s]",$row,$col;
   push @ini , sprintf "row=$row";

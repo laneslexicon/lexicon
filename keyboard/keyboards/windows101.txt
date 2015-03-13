@@ -1,5 +1,5 @@
 name=Windows Arabic(101) Keyboard
-levels=3
+levels=2
 groups=1
 button width=110
 button height=100
