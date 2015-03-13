@@ -2,6 +2,8 @@
 #ifndef STANDALONE
 #include "application.h"
 #include "externs.h"
+#else
+#define QLOG_DEBUG() qDebug()
 #endif
 OptionsWidget::OptionsWidget(QSettings * settings,QWidget * parent) : QWidget(parent) {
   m_dirty = false;
@@ -101,6 +103,11 @@ void OptionsWidget::keySequenceChanged(const QKeySequence & /* v */) {
   setButtons(v);
   emit(modified(v));
 }
+void OptionsWidget::dateTimeChanged(const QDateTime & /* v */) {
+  bool v =  isModified();
+  setButtons(v);
+  emit(modified(v));
+}
 /*
 bool OptionsWidget::isModified()  {
   return false;
@@ -135,6 +142,10 @@ void OptionsWidget::blockAllSignals(bool block) {
   foreach(QKeySequenceEdit *  widget,keyedits) {
     widget->blockSignals(block);
   }
+  QList<QDateTimeEdit *> datetimeedits = this->findChildren<QDateTimeEdit *>();
+  foreach(QDateTimeEdit *  widget,datetimeedits) {
+    widget->blockSignals(block);
+  }
 
 }
 void OptionsWidget::setupConnections() {
@@ -166,6 +177,10 @@ void OptionsWidget::setupConnections() {
   foreach(QKeySequenceEdit *  widget,keyedits) {
     connect(widget,SIGNAL(keySequenceChanged(const QKeySequence &)),this,SLOT(keySequenceChanged(const QKeySequence &)));
   }
+  QList<QDateTimeEdit *> datetimeedits = this->findChildren<QDateTimeEdit *>();
+  foreach(QDateTimeEdit *  widget,datetimeedits) {
+    connect(widget,SIGNAL(dateTimeChanged(const QDateTime &)),this,SLOT(dateTimeChanged(const QDateTime &)));
+  }
 
   /*
   connect(<checkbox>,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
@@ -183,23 +198,50 @@ void OptionsWidget::setupConnections() {
 bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWidget * p) {
   QLineEdit * edit = qobject_cast<QLineEdit *>(p);
   if (edit) {
-    return (settings->value(key).toString() != edit->text());
+    if (settings->value(key).toString() != edit->text()) {
+      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toString() << edit->text();
+      return true;
+    }
   }
   QCheckBox * box = qobject_cast<QCheckBox *>(p);
   if (box) {
-    return (settings->value(key).toBool() != box->isChecked());
+    if (settings->value(key).toBool() != box->isChecked()) {
+      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toBool() << box->isChecked();
+      return true;
+    }
   }
   QSpinBox * spin = qobject_cast<QSpinBox *>(p);
   if (spin) {
-    return (settings->value(key).toInt() != spin->value());
+    if  (settings->value(key).toInt() != spin->value()) {
+      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toInt() << spin->value();
+      return true;
+    }
   }
   QDoubleSpinBox * dspin = qobject_cast<QDoubleSpinBox *>(p);
   if (dspin) {
-    return (settings->value(key).toDouble() != dspin->value());
+    if (settings->value(key).toDouble() != dspin->value()) {
+      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toDouble() << dspin->value();
+      return true;
+    }
   }
   QKeySequenceEdit * keyedit = qobject_cast<QKeySequenceEdit *>(p);
   if (keyedit) {
-    return (settings->value(key).toString() != keyedit->keySequence().toString());
+    QString k1 = settings->value(key).toString();
+    QString k2 = keyedit->keySequence().toString();
+    k1.remove(QChar(' '));
+    k2.remove(QChar(' '));
+    if  (k1  != k2 ) {
+      QLOG_DEBUG() << "Is modified" << key << k1 << k2;
+      return true;
+    }
+  }
+  QDateTimeEdit * datetimeedit = qobject_cast<QDateTimeEdit *>(p);
+  if (datetimeedit) {
+    if  (settings->value(key).toString() != datetimeedit->dateTime().toString()) {
+      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toString() << datetimeedit->dateTime().toString();
+      return true;
+
+    }
   }
   return false;
 }
