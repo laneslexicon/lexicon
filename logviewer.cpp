@@ -59,12 +59,12 @@ void LogViewer::readSettings() {
   m_refreshInterval = settings.value(SID_LOGGING_VIEWER_INTERVAL,1000).toInt();
 
 
-  resize(settings.value("Size", QSize(500, 700)).toSize());
-  move(settings.value("Pos", QPoint(200, 200)).toPoint());
+  resize(settings.value(SID_LOGGING_SIZE, QSize(500, 700)).toSize());
+  move(settings.value(SID_LOGGING_POS, QPoint(200, 200)).toPoint());
 
   QString filename;
   QFileInfo fi;
-  filename = settings.value("Warning",QString()).toString();
+  filename = settings.value(SID_LOGGING_ICON_WARNING,QString()).toString();
   fi.setFile(getLexicon()->getResourceFilePath(Lexicon::Image,filename));
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
@@ -72,7 +72,7 @@ void LogViewer::readSettings() {
   else {
     m_warning.addFile(fi.absoluteFilePath());
   }
-  filename = settings.value("Error",QString()).toString();
+  filename = settings.value(SID_LOGGING_ICON_ERROR,QString()).toString();
   fi.setFile(getLexicon()->getResourceFilePath(Lexicon::Image,filename));
 
   if (! fi.exists()) {
@@ -81,7 +81,7 @@ void LogViewer::readSettings() {
   else {
     m_error.addFile(fi.absoluteFilePath());
   }
-  filename = settings.value("Info",QString()).toString();
+  filename = settings.value(SID_LOGGING_ICON_INFO,QString()).toString();
   fi.setFile(getLexicon()->getResourceFilePath(Lexicon::Image,filename));
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
@@ -89,7 +89,7 @@ void LogViewer::readSettings() {
   else {
     m_info.addFile(fi.absoluteFilePath());
   }
-  filename = settings.value("Debug",QString()).toString();
+  filename = settings.value(SID_LOGGING_ICON_DEBUG,QString()).toString();
   fi.setFile(getLexicon()->getResourceFilePath(Lexicon::Image,filename));
   if (! fi.exists()) {
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(fi.absolutePath());
@@ -101,8 +101,8 @@ void LogViewer::readSettings() {
 void LogViewer::writeSettings() {
   SETTINGS
   settings.beginGroup("Logging");
-  settings.setValue("Size", size());
-  settings.setValue("Pos", pos());
+  settings.setValue(SID_LOGGING_SIZE, size());
+  settings.setValue(SID_LOGGING_POS, pos());
   settings.endGroup();
   settings.sync();
 }

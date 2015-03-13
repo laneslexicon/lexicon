@@ -215,6 +215,7 @@ They should not be translated.
 #define SID_CONTENTS_SHOWENTRY                 "Show entry"
 #define SID_CONTENTS_SHOWSUPPLEMENT            "Show supplement"
 #define SID_CONTENTS_ROMAN_ITYPES              "Verb form number Roman"
+
 #define SID_LOGGING_FILE                       "Logfile"
 #define SID_LOGGING_MAXSIZE                    "Maximum size"
 #define SID_LOGGING_LEVEL                      "Level"
@@ -222,6 +223,20 @@ They should not be translated.
 #define SID_LOGGING_VIEWER_MAXLINES            "Viewer lines"
 #define SID_LOGGING_VIEWER_INTERVAL            "Viewer refresh interval"
 #define SID_LOGGING_ROTATE                     "Rotate"
+#define SID_LOGGING_DEBUG                       "Debug"
+#define SID_LOGGING_SIZE                        "Size"
+#define SID_LOGGING_POS                         "Pos"
+#define SID_LOGGING_ICON_DEBUG                  "Debug"
+#define SID_LOGGING_ICON_INFO                  "Info"
+#define SID_LOGGING_ICON_ERROR                  "Error"
+#define SID_LOGGING_ICON_WARNING                 "Warning"
+
+#define SID_LOGGING_LEVEL                       "Level"
+#define SID_LOGGING_LOGFILE                     "Logfile"
+#define SID_LOGGING_MAXIMUM_SIZE                "Maximum size"
+#define SID_LOGGING_ROTATE                      "Rotate"
+#define SID_LOGGING_VIEWER_LINES                "Viewer lines"
+#define SID_LOGGING_VIEWER_REFRESH_INTERVAL     "Viewer refresh interval"
 
 
 #define SID_BOOKMARK_NEW_TAB                   "New tab"
@@ -261,13 +276,9 @@ They should not be translated.
 #define SID_SYSTEM_STATE                       "State"
 
 #define SID_SYSTEM_OPEN_LINK                   "Open links in current tab"
-#define SID_SYSTEM_ACTIVATE_LINK "Always Make link active"
+#define SID_SYSTEM_ACTIVATE_LINK               "Always Make link active"
 
-#define SID_SYSTEM_EXIT     "Exit"
-#define SID_SYSTEM_DEFAULT_MAP "Buckwwalter"
-
-
-
+#define SID_SYSTEM_EXIT                        "Exit"
 
 
 #define SID_MAPS_NULL_MAP_NAME                  "Native map name"
