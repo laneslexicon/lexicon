@@ -28,7 +28,9 @@ public:
   int setTheme(const QString &);
   void scanForFonts(const QDir &);
   QStringList getThemes() const;
-  QStringList getKeyboards(const QString &) const;
+  QStringList getKeyboards(int type = 0) ;
+  QString     getDefaultKeyboard();
+  bool        setDefaultKeyboard(const QString &);
   QString getResourcePath(int type);
   QString getResourceFilePath(int type,const QString & = QString());
   QString spanArabic(const QString &,const QString & which = QString());

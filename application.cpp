@@ -550,3 +550,68 @@ QStringList Lexicon::getThemes() const {
   return d.entryList(QStringList(),QDir::NoDotAndDotDot| QDir::Dirs);
 
 }
+/**
+ *
+ *
+ * @param type 0 - default,return name of keyboard
+ *             1 - return full name of ini file
+ *
+ * @return
+ */
+QStringList Lexicon::getKeyboards(int type)  {
+  QStringList keyboards;
+  QString k = getResourceFilePath(Lexicon::Keyboard);
+  QDir keydir(k);
+  QStringList filters;
+  filters << "*.ini";
+  QFileInfoList info = keydir.entryInfoList(filters);
+  for(int i=0;i < info.size();i++) {
+    if (type == 1) {
+      keyboards << info[i].absoluteFilePath();
+    }
+    else {
+      if (info[i].fileName() != "keyboard.ini") {
+        QSettings settings(info[i].absoluteFilePath(),QSettings::IniFormat);
+        settings.setIniCodec("UTF-8");
+        settings.beginGroup("Header");
+        keyboards << settings.value("name","<Unnamed keyboard>").toString();
+      }
+    }
+  }
+  return keyboards;
+}
+bool Lexicon::setDefaultKeyboard(const QString & name) {
+  QString k = getResourceFilePath(Lexicon::Keyboard);
+  QString currentKeyboard;
+  QDir keydir(k);
+  QStringList filters;
+  filters << "*.ini";
+  QFileInfoList info = keydir.entryInfoList(filters);
+  for(int i=0;i < info.size();i++) {
+    if (info[i].fileName() == "keyboard.ini") {
+      QSettings settings(info[i].absoluteFilePath(),QSettings::IniFormat);
+      settings.setIniCodec("UTF-8");
+      settings.beginGroup("System");
+      settings.setValue("Default",name);
+      return true;
+    }
+  }
+  return false;
+}
+QString Lexicon::getDefaultKeyboard()  {
+  QString k = getResourceFilePath(Lexicon::Keyboard);
+  QString currentKeyboard;
+  QDir keydir(k);
+  QStringList filters;
+  filters << "*.ini";
+  QFileInfoList info = keydir.entryInfoList(filters);
+  for(int i=0;i < info.size();i++) {
+    if (info[i].fileName() == "keyboard.ini") {
+      QSettings settings(info[i].absoluteFilePath(),QSettings::IniFormat);
+      settings.setIniCodec("UTF-8");
+      settings.beginGroup("System");
+      return settings.value("Default",QString()).toString();
+    }
+  }
+  return currentKeyboard;
+}
