@@ -1918,6 +1918,7 @@ void LanesLexicon::writeSettings() {
     settings.setValue(SID_SYSTEM_SIZE, size());
     settings.setValue(SID_SYSTEM_POS, pos());
     settings.setValue(SID_SYSTEM_CURRENT_TAB,m_tabs->currentIndex());
+    settings.setValue(SID_SYSTEM_RUN_DATE,QDateTime::currentDateTime().toString(Qt::ISODate));
     if (m_navMode == Lane::By_Root) {
       settings.setValue(SID_SYSTEM_BY_ROOT,true);
     }
