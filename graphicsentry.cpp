@@ -267,7 +267,7 @@ QString GraphicsEntry::getXsltFileName()  {
   if (fileName.isEmpty()) {
     fileName = "entry.xslt";
   }
-  QString xsltDir = getLexicon()->getResourcePath(Lexicon::XSLT);
+  QString xsltDir = getLexicon()->getResourceFilePath(Lexicon::XSLT);
   QFileInfo fi(xsltDir,fileName);
   return fi.absoluteFilePath();
 }

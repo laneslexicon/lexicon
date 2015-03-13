@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
     SplashScreen * splash = 0;
     int splashDelay = 0;
     bool makeSplash = false;
-    QString splashDir = mansur.getResourcePath(Lexicon::Splash);
+    QString splashDir = mansur.getResourceFilePath(Lexicon::Splash);
     if (splashDir.isEmpty() || ! QFileInfo::exists(splashDir)) {
       makeSplash = false;
     }

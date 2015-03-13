@@ -202,6 +202,9 @@ QString Lexicon::getResourceFilePath(int type, const QString & name) {
   if (m_settingsDir.exists(d)) {
     QDir rd = m_settingsDir;
     rd.cd(d);
+    if (name.isEmpty()) {
+      return rd.absolutePath();
+    }
     QFileInfo r(rd,name);
     if (r.exists()) {
       return r.absoluteFilePath();

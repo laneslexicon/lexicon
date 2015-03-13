@@ -50,7 +50,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_keyboardButton->setAutoDefault(false);
   m_keyboardButton->setCheckable(true);
 
-  m_keyboard = new KeyboardWidget(getLexicon()->getResourcePath(Lexicon::Keyboard),m_keyboardConfig,this);
+  m_keyboard = new KeyboardWidget(getLexicon()->getResourceFilePath(Lexicon::Keyboard),m_keyboardConfig,this);
   connect(m_findButton,SIGNAL(clicked()),this,SLOT(findTarget()));
   connect(m_hideOptionsButton,SIGNAL(clicked()),this,SLOT(hideOptions()));
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));

@@ -28,8 +28,9 @@ public:
   int setTheme(const QString &);
   void scanForFonts(const QDir &);
   QStringList getThemes() const;
+  QStringList getKeyboards(const QString &) const;
   QString getResourcePath(int type);
-  QString getResourceFilePath(int type,const QString &);
+  QString getResourceFilePath(int type,const QString & = QString());
   QString spanArabic(const QString &,const QString & which = QString());
   QString scanAndSpan(const QString &,const QString & css = QString("ar"));
   QDir themeDirectory() { return m_settingsDir; }

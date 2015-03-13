@@ -3297,7 +3297,7 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   QString iconfile;
   SETTINGS
   settings.beginGroup("Icons");
-  QString imageDirectory = getLexicon()->getResourcePath(Lexicon::Image);
+  QString imageDirectory = getLexicon()->getResourceFilePath(Lexicon::Image);
   if (imageDirectory.isEmpty() || ! QFileInfo::exists(imageDirectory)) {
     QLOG_DEBUG() << Q_FUNC_INFO << "Blank or non-existent images directory";
     return;

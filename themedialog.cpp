@@ -86,7 +86,7 @@ void ThemeDialog::onCopy() {
       return;
     }
   }
-  QString themeRoot = getLexicon()->getResourcePath(Lexicon::ThemeRoot);
+  QString themeRoot = getLexicon()->getResourceFilePath(Lexicon::ThemeRoot);
 
   QString srcFilePath = themeRoot + QDir::separator() + m_themes->currentText();
   QString tgtFilePath = themeRoot + QDir::separator() + text;
