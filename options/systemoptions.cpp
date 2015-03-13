@@ -16,7 +16,6 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
 
 
-
   m_contentsLinked = new QCheckBox;
   m_lexicon = new QLineEdit;
   m_debug = new QCheckBox;
@@ -38,6 +37,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   m_toolbarText = new QCheckBox;
   m_useNotes = new QCheckBox;
   m_notesDb = new QLineEdit;
+  m_keyboard = new QComboBox;
   QFormLayout * layout = new QFormLayout;
 
   layout->addRow(tr("Contents linked"),m_contentsLinked);
@@ -58,6 +58,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   layout->addRow(tr("Nav by root"),m_rootNavigation);
   layout->addRow(tr("Use notes"),m_useNotes);
   layout->addRow(tr("Notes db"),m_notesDb);
+  layout->addRow(tr("Keyboard"),m_keyboard);
   vlayout->addLayout(layout);
 
   vlayout->addStretch();
@@ -87,11 +88,14 @@ void SystemOptions::readSettings() {
   m_rootNavigation->setChecked(settings.value(SID_SYSTEM_BY_ROOT,true).toBool());
 
 
+#ifndef STANDALONE
+  m_keyboard->addItems(getLexicon()->getKeyboards());
+  m_keyboard->setCurrentText(getLexicon()->getDefaultKeyboard());
   QStringList themes = getLexicon()->getThemes();
   themes.sort();
   m_theme->addItems(themes);
   m_theme->setCurrentText(getLexicon()->currentTheme());
-
+#endif
   QString d = settings.value(SID_SYSTEM_RUN_DATE,QString()).toString();
   m_runDate->setDate(QDate::fromString(d,Qt::ISODate));
 
@@ -143,9 +147,12 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.beginGroup("Notes");
   settings.setValue(SID_NOTES_ENABLED,m_useNotes->isChecked());
   settings.setValue(SID_NOTES_DATABASE,m_notesDb->text());
-
+#ifndef STANDALONE
   getLexicon()->setTheme(m_theme->currentText());
+  getLexicon()->setDefaultKeyboard(m_keyboard->currentText());
+#else
 
+#endif
   m_dirty = false;
   emit(modified(false));
 }
@@ -161,6 +168,71 @@ bool SystemOptions::isModified()  {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
+  if (compare(&settings,SID_SYSTEM_CONTENTS_LINKED,m_contentsLinked)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_DATABASE,m_lexicon)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_DEBUG,m_debug)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_DOCKED,m_docked)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_CURRENT_TAB,m_focusTab)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_MINIMAL,m_minimalInterface)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_RESTORE_BOOKMARKS,m_restoreBookmarks)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_RESTORE_TABS,m_restoreTabs)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_SAVE_SETTINGS,m_saveSettings)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_SAVE_TABS,m_saveTabs)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_BY_ROOT,m_rootNavigation)) {
+    m_dirty = true;
+  }
+  /// TODO check
+  if (compare(&settings,SID_SYSTEM_RUN_DATE,m_runDate)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_INTERFACE_WARNING,m_showInterfaceWarning)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_STYLESHEET,m_css)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_SYSTEM_TITLE,m_title)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_TOOLBAR_TEXT,m_toolbarText)) {
+    m_dirty = true;
+  }
+
+  settings.endGroup();
+  settings.beginGroup("Notes");
+  if (compare(&settings,SID_NOTES_ENABLED,m_useNotes)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_NOTES_DATABASE,m_notesDb)) {
+    m_dirty = true;
+  }
+#ifndef STANDALONE
+  if (m_theme->currentText() !=   getLexicon()->getDefaultKeyboard()) {
+    m_dirty = true;
+  }
+#endif
+  QLOG_DEBUG() << Q_FUNC_INFO << m_dirty;
   return m_dirty;
 }
 void SystemOptions::onSetFont() {
