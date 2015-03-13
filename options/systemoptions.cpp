@@ -97,7 +97,7 @@ void SystemOptions::readSettings() {
   m_theme->setCurrentText(getLexicon()->currentTheme());
 #endif
   QString d = settings.value(SID_SYSTEM_RUN_DATE,QString()).toString();
-  m_runDate->setDate(QDate::fromString(d,Qt::ISODate));
+  m_runDate->setDateTime(QDateTime::fromString(d,Qt::ISODate));
 
   m_showInterfaceWarning->setChecked(settings.value(SID_SYSTEM_INTERFACE_WARNING,true).toBool());
   m_css->setText(settings.value(SID_SYSTEM_STYLESHEET,"app.css").toString());
@@ -135,7 +135,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_SYSTEM_SAVE_TABS,m_saveTabs->isChecked());
   settings.setValue(SID_SYSTEM_BY_ROOT,m_rootNavigation->isChecked());
 
-  settings.setValue(SID_SYSTEM_RUN_DATE,m_runDate->dateTime());
+  settings.setValue(SID_SYSTEM_RUN_DATE,m_runDate->dateTime().toString(Qt::ISODate));
 
   settings.setValue(SID_SYSTEM_INTERFACE_WARNING,m_showInterfaceWarning->isChecked());
   settings.setValue(SID_SYSTEM_STYLESHEET,m_css->text());
@@ -201,7 +201,6 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SYSTEM_BY_ROOT,m_rootNavigation)) {
     m_dirty = true;
   }
-  /// TODO check
   if (compare(&settings,SID_SYSTEM_RUN_DATE,m_runDate)) {
     m_dirty = true;
   }
@@ -228,11 +227,14 @@ bool SystemOptions::isModified()  {
     m_dirty = true;
   }
 #ifndef STANDALONE
-  if (m_theme->currentText() !=   getLexicon()->getDefaultKeyboard()) {
+  if (m_keyboard->currentText() !=   getLexicon()->getDefaultKeyboard()) {
     m_dirty = true;
   }
+  if (m_theme->currentText() != getLexicon()->currentTheme()) {
+    m_dirty = true;
+  }
+
 #endif
-  QLOG_DEBUG() << Q_FUNC_INFO << m_dirty;
   return m_dirty;
 }
 void SystemOptions::onSetFont() {
