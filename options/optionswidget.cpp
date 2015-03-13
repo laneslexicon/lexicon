@@ -237,8 +237,8 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   }
   QDateTimeEdit * datetimeedit = qobject_cast<QDateTimeEdit *>(p);
   if (datetimeedit) {
-    if  (settings->value(key).toString() != datetimeedit->dateTime().toString()) {
-      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toString() << datetimeedit->dateTime().toString();
+    if  (settings->value(key).toString() != datetimeedit->dateTime().toString(Qt::ISODate)) {
+      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toString() << datetimeedit->dateTime().toString(Qt::ISODate);
       return true;
 
     }
