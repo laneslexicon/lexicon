@@ -1917,6 +1917,7 @@ void LanesLexicon::writeSettings() {
     settings.setValue(SID_SYSTEM_STATE,this->saveState());
     settings.setValue(SID_SYSTEM_SIZE, size());
     settings.setValue(SID_SYSTEM_POS, pos());
+    settings.setValue(SID_SYSTEM_CURRENT_TAB,m_tabs->currentIndex());
     if (m_navMode == Lane::By_Root) {
       settings.setValue(SID_SYSTEM_BY_ROOT,true);
     }
