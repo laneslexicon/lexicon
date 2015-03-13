@@ -86,7 +86,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   }
   /// TODO
   /// maps
-  /// keyboards
   /// logging
   /// help
   /// history
@@ -149,6 +148,7 @@ void OptionsDialog::writeSettings() {
 #else
   QSettings settings(getLexicon()->settingsFileName(m_theme),QSettings::IniFormat);
 #endif
+  settings.setIniCodec("UTF-8");
   settings.beginGroup("Options");
   settings.setValue("Size", size());
   settings.setValue("Pos", pos());
@@ -169,6 +169,7 @@ void OptionsDialog::enableButtons() {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab) {
       if (tab->isModified()) {
+        QLOG_DEBUG() << Q_FUNC_INFO << QString("Modified tab: %1").arg(i);
         v = true;
       }
       if (tab == currentTab) {
