@@ -293,7 +293,14 @@ void KeyboardScene::keyPressed(GraphicsButton * button) {
     KeyboardView * k = dynamic_cast<KeyboardView *>(v[i]);
     QList<int> v = button->getKeyDef()->getValues();
     if (v.size() == 1) {
-      k->keyPressed(v[0]);
+      if (v[0] == 0) {
+        if (k->isNullKeyAllowed()) {
+          k->keyPressed(0);
+        }
+      }
+      else {
+        k->keyPressed(v[0]);
+      }
     }
     else {
       k->keyPressed(v);
@@ -333,26 +340,15 @@ void KeyboardScene::setGroup(int n) {
 KeyboardView::KeyboardView(QWidget * parent) : QGraphicsView(parent) {
   m_kbd = new KeyboardDef();
   m_scene = new KeyboardScene;
-  /// TODO get from ini ?
-  m_debug = false;
-  m_vspace = 5;
-  m_hspace = 5;
-  /**
-   * need to have a rectangle that covers the entire keyboard
-   * so we can set it background color and generally make it look pretty
-   *
-   * set key top color from the ini file
-   * set key pressed color from the ini file
-   * set the key pen from the ini file
-   *
-   */
-  //  setAlignment(Qt::AlignLeft|Qt::AlignTop);
   setScene(m_scene);
-  //  setSceneRect(QRectF());
 }
 KeyboardView::~KeyboardView() {
   delete m_kbd;
 }
+bool KeyboardView::isNullKeyAllowed() const {
+  return m_nullKeyAllowed;
+}
+
 /**
  * if variable length buttons are used, then it is the responsibility
  * of the .ini specification to make sure that buttons down't overlay
@@ -416,6 +412,8 @@ void KeyboardView::loadKeyboard(const QString & fileName) {
   QString keyboardColor = settings.value("keyboard color","darkgray").toString();
   QString css = settings.value("css",QString()).toString();
 
+  m_nullKeyAllowed = settings.value("null key",false).toBool();
+  m_debug = settings.value("debug",false).toBool();
 
   settings.endGroup();
   for(int i=0;i < m_kbd->keyCount();i++) {
@@ -442,21 +440,21 @@ void KeyboardView::loadKeyboard(const QString & fileName) {
    *  m_view->setSceneRect(m_view->sceneRect());
    */
   if (m_debug) {
-  qDebug() << "--------------------------------------------------";
-  int width  =  (m_kbd->cols() * m_buttonWidth) + (m_kbd->cols() - 1)*m_hspace;
-  int height =  (m_kbd->rows() * m_buttonHeight) + (m_kbd->rows() - 1)*m_vspace;
-  qDebug() << "Keyboard" << fileName;
-  qDebug() << QString("Rows: %1, Cols: %2, button size %3 x %4")
-    .arg(m_kbd->rows())
-    .arg(m_kbd->cols())
-    .arg(m_buttonWidth)
-    .arg(m_buttonHeight);
-  qDebug() << QString("Calculated size: %1 x %2").arg(width).arg(height);
-  QRectF r = m_scene->sceneRect();
-  //  m_scene->setSceneRect(r);
-  qDebug() << QString("Scenerect %1 x %2").arg(r.width()).arg(r.height());
-  qDebug() << "Scenerect" << r;
-  qDebug() << "--------------------------------------------------";
+    qDebug() << "--------------------------------------------------";
+    int width  =  (m_kbd->cols() * m_buttonWidth) + (m_kbd->cols() - 1)*m_hspace;
+    int height =  (m_kbd->rows() * m_buttonHeight) + (m_kbd->rows() - 1)*m_vspace;
+    qDebug() << "Keyboard" << fileName;
+    qDebug() << QString("Rows: %1, Cols: %2, button size %3 x %4")
+      .arg(m_kbd->rows())
+      .arg(m_kbd->cols())
+      .arg(m_buttonWidth)
+      .arg(m_buttonHeight);
+    qDebug() << QString("Calculated size: %1 x %2").arg(width).arg(height);
+    QRectF r = m_scene->sceneRect();
+    //  m_scene->setSceneRect(r);
+    qDebug() << QString("Scenerect %1 x %2").arg(r.width()).arg(r.height());
+    qDebug() << "Scenerect" << r;
+    qDebug() << "--------------------------------------------------";
   }
   setScene(m_scene);
   /// TODO get from ini and poss to KeyboardDef before creating buttons

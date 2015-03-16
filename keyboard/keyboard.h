@@ -91,6 +91,7 @@ class KeyboardView : public QGraphicsView   {
     void setGroup(int);
     void keyPressed(int);
     void keyPressed(QList<int>);
+    bool isNullKeyAllowed() const;
   private:
     void addButton(int row,int col,GraphicsButton *);
     QGraphicsScene * m_scene;
@@ -99,6 +100,7 @@ class KeyboardView : public QGraphicsView   {
     int m_buttonWidth;
     int m_buttonHeight;
     bool m_debug;
+    bool m_nullKeyAllowed;
     KeyboardDef * m_kbd;
  signals:
     void virtualKeyPressed(int);
