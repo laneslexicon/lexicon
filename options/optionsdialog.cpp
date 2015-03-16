@@ -8,6 +8,7 @@
 #include "findoptions.h"
 #include "bookmarkoptions.h"
 #include "systemoptions.h"
+#include "logoptions.h"
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
@@ -83,6 +84,11 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     SystemOptions * systems = new SystemOptions(useTheme,this);
     m_tabs->addTab(systems,tr("System"));
     systems->writeSettings(testFileName);
+  }
+  if (settings.value("Logging",true).toBool()) {
+    LogOptions * log = new LogOptions(useTheme,this);
+    m_tabs->addTab(log,tr("Logging"));
+    log->writeSettings(testFileName);
   }
   /// TODO
   /// maps
@@ -169,7 +175,7 @@ void OptionsDialog::enableButtons() {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab) {
       if (tab->isModified()) {
-        QLOG_DEBUG() << Q_FUNC_INFO << QString("Modified tab: %1").arg(i);
+        QLOG_DEBUG() << Q_FUNC_INFO << QString("Modified tab: %1, %2").arg(i).arg(m_tabs->tabText(i));
         v = true;
       }
       if (tab == currentTab) {

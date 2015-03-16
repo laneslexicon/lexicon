@@ -10,7 +10,8 @@ SOURCES += $$PWD/optionswidget.cpp \
            $$PWD/findoptions.cpp \
            $$PWD/popupoptions.cpp \
            $$PWD/bookmarkoptions.cpp \
-           $$PWD/systemoptions.cpp
+           $$PWD/systemoptions.cpp \
+           $$PWD/logoptions.cpp
 
 
 HEADERS += $$PWD/optionswidget.h \
@@ -24,4 +25,5 @@ HEADERS += $$PWD/optionswidget.h \
            $$PWD/findoptions.h \
            $$PWD/popupoptions.h \
            $$PWD/bookmarkoptions.h \
-           $$PWD/systemoptions.h
+           $$PWD/systemoptions.h \
+           $$PWD/logoptions.h
