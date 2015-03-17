@@ -9,6 +9,7 @@
 #include "bookmarkoptions.h"
 #include "systemoptions.h"
 #include "logoptions.h"
+#include "historyoptions.h"
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
@@ -89,6 +90,11 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     LogOptions * log = new LogOptions(useTheme,this);
     m_tabs->addTab(log,tr("Logging"));
     log->writeSettings(testFileName);
+  }
+  if (settings.value("History",true).toBool()) {
+    HistoryOptions * history = new HistoryOptions(useTheme,this);
+    m_tabs->addTab(history,tr("History"));
+    history->writeSettings(testFileName);
   }
   /// TODO
   /// maps
