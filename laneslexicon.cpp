@@ -613,6 +613,9 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_SHOW_LOGS) {
     this->onLogViewer();
   }
+  else if (key == SID_SHORTCUT_OPTIONS) {
+    this->onOptions();
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }

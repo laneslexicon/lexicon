@@ -129,6 +129,7 @@ They should not be translated.
 #define SID_SHORTCUT_ROOT_NEXT                 "Root next"
 #define SID_SHORTCUT_ROOT_PREV                 "Root prev"
 */
+#define SID_SHORTCUT_OPTIONS                   "Options"
 #define SID_SHORTCUT_PAGE_SEARCH               "Page search"
 #define SID_SHORTCUT_QUIT                      "Quit"
 #define SID_SHORTCUT_SEARCH_DELETE             "Search delete"
@@ -236,7 +237,6 @@ They should not be translated.
 #define SID_LOGGING_MAXIMUM_SIZE                "Maximum size"
 #define SID_LOGGING_ROTATE                      "Rotate"
 #define SID_LOGGING_VIEWER_LINES                "Viewer lines"
-#define SID_LOGGING_VIEWER_REFRESH_INTERVAL     "Viewer refresh interval"
 
 
 #define SID_BOOKMARK_NEW_TAB                   "New tab"
