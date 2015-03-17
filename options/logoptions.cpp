@@ -24,7 +24,8 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   m_archive = new QSpinBox ;
   m_maxLines = new QLineEdit ;
   m_maxLines->setValidator(new QIntValidator);
-  m_interval = new QSpinBox ;
+  m_interval = new QLineEdit ;
+  m_interval->setValidator(new QIntValidator);
   m_rotate = new QCheckBox ;
   m_warning = new QLineEdit ;
   m_error = new QLineEdit ;
@@ -36,7 +37,7 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   layout->addRow(tr("Log level"),m_level);
   layout->addRow(tr("Number of archives"),m_archive);
   layout->addRow(tr("Viewer lines"),m_maxLines);
-  layout->addRow(tr("Viewer refresh interval (secs)"),m_interval);
+  layout->addRow(tr("Viewer refresh interval (msecs)"),m_interval);
   layout->addRow(tr("Rotate logs"),m_rotate);
   layout->addRow(tr("Warning icon"),m_warning);
   layout->addRow(tr("Information icon"),m_info);
@@ -63,7 +64,7 @@ void LogOptions::readSettings() {
   m_level->setValue(settings.value(SID_LOGGING_LEVEL,2).toInt());
   m_archive->setValue(settings.value(SID_LOGGING_ARCHIVES,4).toInt());
   m_maxLines->setText(settings.value(SID_LOGGING_VIEWER_MAXLINES,"100").toString());
-  m_interval->setValue(settings.value(SID_LOGGING_VIEWER_INTERVAL,30).toInt());
+  m_interval->setText(settings.value(SID_LOGGING_VIEWER_INTERVAL,"10000").toString());
   m_rotate->setChecked(settings.value(SID_LOGGING_ROTATE,true).toBool());
   m_warning->setText(settings.value(SID_LOGGING_ICON_WARNING,"warn.png").toString());
   m_info->setText(settings.value(SID_LOGGING_ICON_INFO,"info.png").toString());
@@ -77,11 +78,22 @@ void LogOptions::writeSettings(const QString & fileName) {
   if (!fileName.isEmpty()) {
     f = fileName;
   }
-  qDebug() << Q_FUNC_INFO << f;
-
   QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
+
   settings.beginGroup(m_section);
+  settings.setValue(SID_LOGGING_FILE,m_file->text());
+  settings.setValue(SID_LOGGING_MAXSIZE,m_maxSize->text());
+  /// TODO check max/min
+  settings.setValue(SID_LOGGING_LEVEL,m_level->value());
+  settings.setValue(SID_LOGGING_ARCHIVES,m_archive->value());
+  settings.setValue(SID_LOGGING_VIEWER_MAXLINES,m_maxLines->text());
+  settings.setValue(SID_LOGGING_VIEWER_INTERVAL,m_interval->text());
+  settings.setValue(SID_LOGGING_ROTATE,m_rotate->isChecked());
+  settings.setValue(SID_LOGGING_ICON_WARNING,m_warning->text());
+  settings.setValue(SID_LOGGING_ICON_INFO,m_info->text());
+  settings.setValue(SID_LOGGING_ICON_ERROR,m_error->text());
+  settings.setValue(SID_LOGGING_ICON_DEBUG,m_debug->text());
 
   m_dirty = false;
   emit(modified(false));
@@ -97,6 +109,41 @@ bool LogOptions::isModified()  {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
+
+  if (compare(&settings,SID_LOGGING_FILE,m_file)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_LOGGING_MAXSIZE,m_maxSize)) {
+    m_dirty = true;
+  }
+  /// TODO check max/min
+  if (compare(&settings,SID_LOGGING_LEVEL,m_level)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_LOGGING_ARCHIVES,m_archive)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_LOGGING_VIEWER_MAXLINES,m_maxLines)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_LOGGING_VIEWER_INTERVAL,m_interval)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_LOGGING_ROTATE,m_rotate)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_LOGGING_ICON_WARNING,m_warning)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_LOGGING_ICON_INFO,m_info)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_LOGGING_ICON_ERROR,m_error)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_LOGGING_ICON_DEBUG,m_debug)) {
+    m_dirty = true;
+  }
 
   return m_dirty;
 }

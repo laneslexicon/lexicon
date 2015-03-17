@@ -20,7 +20,7 @@ class LogOptions : public OptionsWidget {
     QSpinBox  * m_level;
     QSpinBox * m_archive;
     QLineEdit * m_maxLines;
-    QSpinBox  * m_interval;
+    QLineEdit  * m_interval;
     QCheckBox * m_rotate;
     QLineEdit * m_warning;
     QLineEdit * m_error;
