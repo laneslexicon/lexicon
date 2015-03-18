@@ -199,11 +199,11 @@ foreach $line (@lines) {
   }
   push @ini , sprintf "type=%s",$keytype;
   for(my $i=0;$i <= $#values;$i++) {
-	  my $v = $values[$i];
-	  if ($v =~ /;0x/) {
-		  $v =~ s/;0x/,0x/g;
-		  $v = sprintf "\"%s\"",$v;
-	  }
+    my $v = $values[$i];
+    if ($v =~ /;0x/) {
+      $v =~ s/;0x/,0x/g;
+      $v = sprintf "\"%s\"",$v;
+    }
     push @ini , sprintf "level%d/value=%s",$i + 1,$v;
   }
   if ($count == 4) {
