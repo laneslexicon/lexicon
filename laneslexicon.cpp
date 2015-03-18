@@ -2438,11 +2438,15 @@ void LanesLexicon::restoreBookmarks() {
   QStringList keys = settings.childKeys();
   for(int i=0;i < keys.size();i++) {
     QString t = settings.value(keys[i]).toString();
-    Place p = Place::fromString(t);
-    if (p.isValid()) {
-      m_bookmarks.insert(keys[i],p);
-      addBookmarkMenuItem(keys[i]);
+    /// something was corrupting the bookmarks saved in the ini file
+    /// generating values 210000 bytes long. This caused a segfault
+    if (t.size() < 500) {
+      Place p = Place::fromString(t);
+      if (p.isValid()) {
+        m_bookmarks.insert(keys[i],p);
+        addBookmarkMenuItem(keys[i]);
 
+      }
     }
   }
 
