@@ -29,6 +29,8 @@
 #include "zoomdialog.h"
 #include "editview.h"
 #include "themedialog.h"
+#include "deletethemedialog.h"
+#include "createthemedialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -819,7 +821,10 @@ void LanesLexicon::createActions() {
 
   m_selectThemeAction = new QAction(tr("Switch"),this);
   m_editThemeAction = new QAction(tr("Edit"),this);
-
+  m_deleteThemeAction = new QAction(tr("Delete"),this);
+  m_createThemeAction = new QAction(tr("Copy"),this);
+  connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
+  connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
   connect(m_syncFromEntryAction,SIGNAL(triggered()),this,SLOT(syncFromEntry()));
   connect(m_syncFromContentsAction,SIGNAL(triggered()),this,SLOT(syncFromContents()));
 
@@ -1259,6 +1264,8 @@ void LanesLexicon::createMenus() {
   m_themeMenu->setObjectName("thememenu");
   m_themeMenu->addAction(m_selectThemeAction);
   m_themeMenu->addAction(m_editThemeAction);
+  m_themeMenu->addAction(m_deleteThemeAction);
+  m_themeMenu->addAction(m_createThemeAction);
 
   m_helpMenu = m_mainmenu->addMenu(tr("&Help"));
   m_helpMenu->setFocusPolicy(Qt::StrongFocus);
@@ -3609,29 +3616,8 @@ void LanesLexicon::onSelectTheme() {
   }
   QString theme = b->currentText();
   delete d;
-  int ret = getLexicon()->setTheme(theme);
-  if (ret != Lexicon::Ok) {
-    /// TODO say something
-    qDebug() << "Error" << ret;
-  }
-  readSettings();
-  if (! sanityCheck(1)) {
-    getLexicon()->setTheme(currentTheme);
-    readSettings();
-    return;
-  }
-  setIcons(theme);
-  loadStyleSheet();
-  setupShortcuts();
-  // reload pages
-  for(int i=0;i < m_tabs->count();i++) {
-    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
-    if (entry) {
-      entry->onReload();
-    }
-  }
-  statusMessage(QString(tr("Theme set to: %1")).arg(theme));
-  /// may need to something about printer setup
+
+  activateTheme(theme);
 }
 void LanesLexicon::onEditTheme() {
   ThemeDialog d;
@@ -3698,4 +3684,131 @@ void LanesLexicon::showHelp(const QString & section) {
     m_helpview->show();
   }
   m_helpview->showSection("idSearchConfiguration");
+}
+void LanesLexicon::onDeleteTheme() {
+  DeleteThemeDialog d;
+  if (d.exec() == QDialog::Rejected) {
+    return;
+  }
+  QPair<QString,QString> m = d.getThemes();
+  qDebug() << m;
+  QString srcFilePath = getLexicon()->getResourceFilePath(Lexicon::ThemeRoot,m.first);
+  qDebug() << "Delete" << srcFilePath;
+  activateTheme(m.second);
+  /*
+  int ix = m_themes->findText(theme);
+  if (ix != -1) {
+    m_themes->removeItem(ix);
+  }
+  bool ok = removeDir(srcFilePath);
+
+  if (!ok) {
+    QMessageBox::warning(this, tr("Theme deletion"),
+                               tr("There was an error deleting one or more files.\n"
+                                  "You may wish to manually delete them. The directory to remove is:\n") +
+                                  srcFilePath,
+                         QMessageBox::Ok);
+  }
+
+  QString warn = QString(tr("This will delete all files in\n%1\nDo you wish to continue?")).arg(srcFilePath);
+  int ret = QMessageBox::warning(this, warn
+                               QMessageBox::Yes | QMessageBox::Cancel);
+
+  */
+}
+void LanesLexicon::activateTheme(const QString & theme) {
+  QLOG_DEBUG() << Q_FUNC_INFO << theme;
+  int ret = getLexicon()->setTheme(theme);
+  if (ret != Lexicon::Ok) {
+    /// TODO say something
+    qDebug() << "Error" << ret;
+  }
+  readSettings();
+  if (! sanityCheck(1)) {
+    getLexicon()->setTheme(m_currentTheme);
+    readSettings();
+    return;
+  }
+  setIcons(theme);
+  loadStyleSheet();
+  setupShortcuts();
+  // reload pages
+  for(int i=0;i < m_tabs->count();i++) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+    if (entry) {
+      entry->onReload();
+    }
+  }
+  statusMessage(QString(tr("Theme set to: %1")).arg(theme));
+  m_currentTheme = theme;
+  /// may need to something about printer setup
+}
+bool LanesLexicon::removeDirectory(const QString & dirName){
+    bool result = true;
+
+
+    QDir dir(dirName);
+
+    if (dir.exists(dirName)) {
+        Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+          //          qDebug() << "delete" << info.absoluteFilePath();
+            if (info.isDir()) {
+                result = removeDirectory(info.absoluteFilePath());
+            }
+            else {
+                result = QFile::remove(info.absoluteFilePath());
+            }
+
+            if (!result) {
+                return result;
+            }
+        }
+        result = dir.rmdir(dirName);
+    }
+
+    return result;
+}
+void LanesLexicon::onCreateTheme() {
+  CreateThemeDialog d;
+  if (d.exec() == QDialog::Rejected) {
+    return;
+  }
+  QPair<QString,QString> m = d.getThemes();
+  qDebug() << Q_FUNC_INFO << m;
+
+  QString themeRoot = getLexicon()->getResourceFilePath(Lexicon::ThemeRoot);
+  QString srcFilePath = themeRoot + QDir::separator() + m.first;
+  QString tgtFilePath = themeRoot + QDir::separator() + m.second;
+
+  int copyCount = 0;
+  bool ok = copyRecursively(srcFilePath,tgtFilePath,&copyCount);
+  if (d.activate()) {
+    this->activateTheme(m.second);
+  }
+}
+bool LanesLexicon::copyRecursively(const QString & srcPath,const QString & targetPath,int * copyCount) {
+  QFileInfo srcFileInfo(srcPath);
+  if (srcFileInfo.isDir()) {
+    QDir targetDir(targetPath);
+    targetDir.cdUp();
+    if (!targetDir.mkdir(QFileInfo(targetPath).fileName()))
+      return false;
+    QDir sourceDir(srcPath);
+    QStringList fileNames = sourceDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
+    foreach (const QString &fileName, fileNames) {
+      const QString newSrcFilePath = srcPath + QDir::separator() + fileName;
+      const QString newTgtFilePath = targetPath + QDir::separator() + fileName;
+      if (!copyRecursively(newSrcFilePath, newTgtFilePath,copyCount))
+        return false;
+    }
+  }
+  else {
+    if (!QFile::copy(srcPath, targetPath)) {
+      return false;
+    }
+    else {
+      (*copyCount)++;
+    }
+  }
+  return true;
 }

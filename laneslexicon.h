@@ -135,6 +135,7 @@ class LanesLexicon : public QMainWindow
 
       void onSelectTheme();
       void onEditTheme();
+      void onCreateTheme();
 
       void searchForWord();
       void searchForPage();
@@ -147,6 +148,7 @@ class LanesLexicon : public QMainWindow
       void onHistorySelection();
 
       void onKeymapChanged();
+
 
       void onEditView();
 
@@ -188,6 +190,8 @@ class LanesLexicon : public QMainWindow
       void printNode(const QString &);
       void syncFromContents();
       void syncFromEntry();
+
+      void onDeleteTheme();
  protected:
       void closeEvent(QCloseEvent *);
  private:
@@ -229,6 +233,11 @@ class LanesLexicon : public QMainWindow
       void addBookmarkMenuItem(const QString & id);
 
       void enableForPage(bool);
+
+      bool removeDirectory(const QString &);
+      void activateTheme(const QString &);
+
+      bool copyRecursively(const QString &,const QString &,int *);
 
       //    QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
       /// look through all tabs for the given node, -1 if not found, else tab index
@@ -400,7 +409,8 @@ class LanesLexicon : public QMainWindow
       QAction * m_defaultScaleAction;
       QAction * m_selectThemeAction;
       QAction * m_editThemeAction;
-
+      QAction * m_deleteThemeAction;
+      QAction * m_createThemeAction;
       HistoryMaster * m_history;
       NoteMaster * m_notes;
 
