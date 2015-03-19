@@ -126,7 +126,6 @@ class GraphicsEntry : public QWidget {
     void readSettings();
     void writeDefaultSettings();
     QString readCssFromFile(const QString &name);
-    bool prepareQueries();
     bool saveLink(const QString &,const QString &);
     void reposition();
     void appendEntries(int);
@@ -203,9 +202,6 @@ class GraphicsEntry : public QWidget {
     QGraphicsScene * m_scene;
     QGraphicsTextItem * m_item;
 
-    QSqlQuery * m_nodeQuery;
-    QSqlQuery * m_rootQuery;
-    QSqlQuery * m_pageQuery;
 
     Place m_place;
 

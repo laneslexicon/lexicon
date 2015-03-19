@@ -91,7 +91,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 
 
   //  layout->addWidget(m_showPlace,0);
-  m_nodeQuery = 0;
+  //  m_nodeQuery = 0;
   setLayout(layout);
   /*
   connect(m_item,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
@@ -103,15 +103,10 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 
   //  m_xalan = getXalan();
   initXslt();
-  prepareQueries();
   m_transform = m_view->transform();
 }
 GraphicsEntry::~GraphicsEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  delete m_nodeQuery;
-  delete m_rootQuery;
-  delete m_pageQuery;
-  /// TODO xalan cleanup ?
 }
 QGraphicsView * GraphicsEntry::getView() const {
   return m_view;
@@ -576,14 +571,20 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
     QLOG_WARN() << QString("Missing link record for linkid %1").arg(t);
     return;
   }
-  m_nodeQuery->bindValue(0,node);
-  m_nodeQuery->exec();
-  if (m_nodeQuery->first()) {
-    p.setRoot(m_nodeQuery->value("root").toString());
-    p.setSupplement(m_nodeQuery->value("supplement").toInt());
-    p.setWord(m_nodeQuery->value("word").toString());
-    p.setPage(m_nodeQuery->value("page").toInt());
-    QString html =    transform(NODE_XSLT,m_nodeXslt,m_nodeQuery->value("xml").toString());
+  QSqlQuery nodeQuery;
+  bool ok = nodeQuery.prepare("select * from entry where datasource = 1 and nodeid = ?");
+  if (! ok ) {
+    QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
+  }
+
+  nodeQuery.bindValue(0,node);
+  nodeQuery.exec();
+  if (nodeQuery.first()) {
+    p.setRoot(nodeQuery.value("root").toString());
+    p.setSupplement(nodeQuery.value("supplement").toInt());
+    p.setWord(nodeQuery.value("word").toString());
+    p.setPage(nodeQuery.value("page").toInt());
+    QString html =    transform(NODE_XSLT,m_nodeXslt,nodeQuery.value("xml").toString());
     qDebug() << html;
     NodeInfo * info = new NodeInfo(this);
     info->setPlace(p);
@@ -665,25 +666,6 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
   f.close();
   return css;
 }
-bool GraphicsEntry::prepareQueries() {
-  bool ok;
-  m_pageQuery = new QSqlQuery;
-  ok = m_pageQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1 and page = ? order by nodenum asc");
-  if (! ok ) {
-    QLOG_WARN() << "page SQL prepare failed" << m_pageQuery->lastError();
-  }
-  m_nodeQuery = new QSqlQuery;
-  ok = m_nodeQuery->prepare("select * from entry where datasource = 1 and nodeid = ?");
-  if (! ok ) {
-    QLOG_WARN() << "node SQL prepare failed" << m_nodeQuery->lastError();
-  }
-  m_rootQuery = new QSqlQuery;
-  ok = m_rootQuery->prepare("select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1  and root = ? order by nodenum");
-  if (! ok ) {
-    QLOG_WARN() << "root SQL prepare failed" << m_rootQuery->lastError();
-  }
-  return ok;
-}
 /*
   Place GraphicsEntry::getXmlForPlace(const Place & p) {
   Place np = getXmlForRoot(p);
@@ -707,7 +689,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QList<EntryItem *> items;
   Place noplace;
   int supplement;
-
+  bool ok = false;
   SETTINGS
   settings.beginGroup("Entry");
   m_scale  = settings.value(SID_ENTRY_SCALE,1.0).toDouble();
@@ -725,15 +707,21 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
    * if we don't have the root, but have the node, find the root
    *
    */
+  QSqlQuery nodeQuery;
+  ok = nodeQuery.prepare("select * from entry where datasource = 1 and nodeid = ?");
+  if (! ok ) {
+    QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
+  }
+
   if (root.isEmpty() && ! node.isEmpty() ) {
-    m_nodeQuery->bindValue(0,node);
-    m_nodeQuery->exec();
-    if (m_nodeQuery->first()) {
-      root = m_nodeQuery->value("root").toString();
-      supplement = m_nodeQuery->value("supplement").toInt();
+    nodeQuery.bindValue(0,node);
+    nodeQuery.exec();
+    if (nodeQuery.first()) {
+      root = nodeQuery.value("root").toString();
+      supplement = nodeQuery.value("supplement").toInt();
       p.setNode(node);
       p.setRoot(root);
-      p.setWord(m_nodeQuery->value("word").toString());
+      p.setWord(nodeQuery.value("word").toString());
       p.setSupplement(supplement);
     }
     else {
@@ -741,6 +729,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       return noplace;
     }
   }
+  QSqlQuery rootQuery;
+  rootQuery.prepare("select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1  and root = ? order by nodenum");
+
   int quasi = 0;
   QSqlQuery quasiQuery;
   if (quasiQuery.prepare("select quasi from root where word = ? and datasource = 1")) {
@@ -753,9 +744,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   else {
     QLOG_WARN() << QString(tr("Error preparing quasi query:%1")).arg(quasiQuery.lastError().text());
   }
-  m_rootQuery->bindValue(0,root);
-  m_rootQuery->exec();
-  if (! m_rootQuery->first()) {
+  rootQuery.bindValue(0,root);
+  rootQuery.exec();
+  if (! rootQuery.first()) {
     QLOG_WARN() << QString(tr("Root not found %1")).arg(root);
     return noplace;
   }
@@ -775,8 +766,8 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     onClearScene();
   }
   rootItem->setRoot(root,true);
-  rootItem->setSupplement(m_rootQuery->value(8).toInt());
-  rootItem->setPage(m_rootQuery->value(5).toInt());
+  rootItem->setSupplement(rootQuery.value(8).toInt());
+  rootItem->setPage(rootQuery.value(5).toInt());
 
   items << rootItem;
 
@@ -785,17 +776,17 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
 
   /// now add all the entries for the root
   do  {
-    supplement = m_rootQuery->value(8).toInt();
+    supplement = rootQuery.value(8).toInt();
     QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
-      .arg(m_rootQuery->value(3).toString())
-      .arg(m_rootQuery->value(2).toString())
-      .arg(m_rootQuery->value(5).toInt())
-      .arg(m_rootQuery->value(6).toString())
-      .arg(m_rootQuery->value(8).toInt());
-    t += m_rootQuery->value(4).toString();
+      .arg(rootQuery.value(3).toString())
+      .arg(rootQuery.value(2).toString())
+      .arg(rootQuery.value(5).toInt())
+      .arg(rootQuery.value(6).toString())
+      .arg(rootQuery.value(8).toInt());
+    t += rootQuery.value(4).toString();
     t += "</word>";
     if (m_dumpXml) {
-      QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(m_rootQuery->value(7).toString()));
+      QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(rootQuery.value(7).toString()));
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {
         QTextStream out(&f);
@@ -806,7 +797,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     EntryItem * item  = createEntry(t);
     if (item != NULL) {
       if (m_dumpOutputHtml) {
-        QFileInfo fi(QDir::tempPath(),QString("%1-out.html").arg(m_rootQuery->value(7).toString()));
+        QFileInfo fi(QDir::tempPath(),QString("%1-out.html").arg(rootQuery.value(7).toString()));
         QFile f(fi.filePath());
         if (f.open(QIODevice::WriteOnly)) {
           QTextStream out(&f);
@@ -816,13 +807,13 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       }
       Place p;
       p.setSupplement(supplement);
-      p.setNode(m_rootQuery->value(7).toString());
+      p.setNode(rootQuery.value(7).toString());
       p.setRoot(root);
-      p.setWord(m_rootQuery->value(2).toString());
-      p.setPage(m_rootQuery->value(5).toInt());
+      p.setWord(rootQuery.value(2).toString());
+      p.setPage(rootQuery.value(5).toInt());
       item->setPlace(p);
       QList<Note *> notes;
-      item->setNotes();//getApp()->notes()->find(m_rootQuery->value(2).toString()));
+      item->setNotes();//getApp()->notes()->find(rootQuery.value(2).toString()));
       items << item;
       /// if we asked for a specific word/node, focus on it
       if (! node.isEmpty() && (item->getNode() == node)) {
@@ -834,7 +825,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     else {
       QLOG_DEBUG() << "Failed to create entry for:" << t;
     }
-  } while(m_rootQuery->next());
+  } while(rootQuery.next());
 
   /// TODO we've only got a root item
   if (items.size() == 1) {
@@ -923,15 +914,20 @@ Place GraphicsEntry::getPage(const Place & p) {
   EntryItem * focusItem;
   int page = p.getPage();
 
+  QSqlQuery pageQuery;
+  bool ok = pageQuery.prepare("select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1 and page = ? order by nodenum asc");
+  if (! ok ) {
+    QLOG_WARN() << "page SQL prepare failed" << pageQuery.lastError();
+  }
 
   //  qStrip << Q_FUNC_INFO << "Page" << page;
-  m_pageQuery->bindValue(0,page);
-  m_pageQuery->exec();
-  if (! m_pageQuery->first()) {
+  pageQuery.bindValue(0,page);
+  pageQuery.exec();
+  if (! pageQuery.first()) {
     QLOG_INFO() << "Page not found" << page;
     return p;
   }
-  QString node = m_pageQuery->value("nodeid").toString();
+  QString node = pageQuery.value("nodeid").toString();
 
   if (m_clearScene) {
     onClearScene();
@@ -950,9 +946,9 @@ Place GraphicsEntry::getPage(const Place & p) {
   int rootCount = 0;
   int entryCount = 0;
   do   {
-    qStrip << Q_FUNC_INFO << m_pageQuery->value("nodeid").toString();
-    int supplement = m_pageQuery->value(8).toInt();
-    QString root = m_pageQuery->value(0).toString();
+    qStrip << Q_FUNC_INFO << pageQuery.value("nodeid").toString();
+    int supplement = pageQuery.value(8).toInt();
+    QString root = pageQuery.value(0).toString();
     /// if root has changed add root XML
     if (root != lastRoot) {
       if (! lastRoot.isEmpty()) {
@@ -982,15 +978,15 @@ Place GraphicsEntry::getPage(const Place & p) {
       lastRoot = root;
     }
     QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
-      .arg(m_pageQuery->value(3).toString())
-      .arg(m_pageQuery->value(2).toString())
-      .arg(m_pageQuery->value(5).toInt())
-      .arg(m_pageQuery->value(6).toString())
-      .arg(m_pageQuery->value(8).toInt());
-    t += m_pageQuery->value(4).toString();
+      .arg(pageQuery.value(3).toString())
+      .arg(pageQuery.value(2).toString())
+      .arg(pageQuery.value(5).toInt())
+      .arg(pageQuery.value(6).toString())
+      .arg(pageQuery.value(8).toInt());
+    t += pageQuery.value(4).toString();
     t += "</word>";
     if (m_dumpXml) {
-      QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(m_pageQuery->value(7).toString()));
+      QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(pageQuery.value(7).toString()));
       QFile f(fi.filePath());
       if (f.open(QIODevice::WriteOnly)) {
         QTextStream out(&f);
@@ -1001,7 +997,7 @@ Place GraphicsEntry::getPage(const Place & p) {
     item  = createEntry(t);
     if (item != NULL) {
       if (m_dumpOutputHtml) {
-        QFileInfo fi(QDir::tempPath(),QString("%1-out.html").arg(m_pageQuery->value(7).toString()));
+        QFileInfo fi(QDir::tempPath(),QString("%1-out.html").arg(pageQuery.value(7).toString()));
         QFile f(fi.filePath());
         if (f.open(QIODevice::WriteOnly)) {
           QTextStream out(&f);
@@ -1011,17 +1007,17 @@ Place GraphicsEntry::getPage(const Place & p) {
       }
       Place p;
       p.setSupplement(supplement);
-      p.setNode(m_pageQuery->value(7).toString());
+      p.setNode(pageQuery.value(7).toString());
       p.setRoot(root);
-      p.setWord(m_pageQuery->value(2).toString());
-      p.setPage(m_pageQuery->value(5).toInt());
+      p.setWord(pageQuery.value(2).toString());
+      p.setPage(pageQuery.value(5).toInt());
       item->setPlace(p);
       item->setNotes();//getApp()->notes()->find(m_rootQuery->value(2).toString()));
       items << item;
 
       entryCount++;
     }
-  } while(m_pageQuery->next());
+  } while(pageQuery.next());
   if (items.size() == 0) {
     QLOG_INFO() << "No entries found for page" << page;
     return p;
@@ -1406,11 +1402,17 @@ void GraphicsEntry::showPerseus(const Place & p) {
     msgBox.exec();
     return;
   }
-  m_nodeQuery->bindValue(0,node);
-  m_nodeQuery->exec();
+  QSqlQuery nodeQuery;
+  bool ok = nodeQuery.prepare("select * from entry where datasource = 1 and nodeid = ?");
+  if (! ok ) {
+    QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
+  }
+
+  nodeQuery.bindValue(0,node);
+  nodeQuery.exec();
   QString xml;
-  if (m_nodeQuery->first()) {
-    xml = m_nodeQuery->value("xml").toString();
+  if (nodeQuery.first()) {
+    xml = nodeQuery.value("xml").toString();
   }
   else {
     xml = "No XML for " + node;
