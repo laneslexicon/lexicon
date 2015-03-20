@@ -47,7 +47,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_shortcutMap = NULL;
   m_bookmarkMap = NULL;
   m_helpview = NULL;
-  m_optionsDialog = NULL;
+
   createActions();
   readSettings();
 
@@ -300,10 +300,6 @@ void LanesLexicon::cleanup() {
   if (m_helpview != NULL) {
     delete m_helpview;
     m_helpview = 0;
-  }
-  if (m_optionsDialog != NULL) {
-    delete m_optionsDialog;
-    m_optionsDialog = 0;
   }
   /// TODO close notes db
   freeXslt();
@@ -822,9 +818,10 @@ void LanesLexicon::createActions() {
   m_selectThemeAction = new QAction(tr("Switch"),this);
   m_editThemeAction = new QAction(tr("Edit"),this);
   m_deleteThemeAction = new QAction(tr("Delete"),this);
-  m_createThemeAction = new QAction(tr("Copy"),this);
+  m_createThemeAction = new QAction(tr("New/Copy"),this);
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
+
   connect(m_syncFromEntryAction,SIGNAL(triggered()),this,SLOT(syncFromEntry()));
   connect(m_syncFromContentsAction,SIGNAL(triggered()),this,SLOT(syncFromContents()));
 
@@ -3511,11 +3508,13 @@ void LanesLexicon::revertEntry() {
   }
 }
 void LanesLexicon::onOptions() {
-  if (m_optionsDialog == NULL) {
-    m_optionsDialog  = new OptionsDialog(QString(),this);
-    connect(m_optionsDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
+  OptionsDialog * d  = new OptionsDialog(m_currentTheme,this);
+  connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
+  d->exec();
+  if (d->isModified()) {
+    activateTheme(m_currentTheme);
   }
-  m_optionsDialog->show();
+  delete d;
 }
 void LanesLexicon::pageSearchComplete() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());
@@ -3621,7 +3620,11 @@ void LanesLexicon::onSelectTheme() {
 }
 void LanesLexicon::onEditTheme() {
   ThemeDialog d;
-  d.exec();
+  if (d.exec() == QDialog::Rejected) {
+    return;
+  }
+  OptionsDialog opts(d.theme());
+  opts.exec();
 }
 /**
  *
