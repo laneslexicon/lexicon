@@ -25,7 +25,7 @@
  */
 OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(parent) {
   QString useTheme = theme;
-
+  setWindowTitle(QString("Edit Theme:%1").arg(theme));
 
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
@@ -40,6 +40,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   QSettings settings(getLexicon()->settingsFileName(theme),QSettings::IniFormat);
 #endif
   m_theme = useTheme;
+  m_modified = false;
   QString testFileName("xxx.ini");
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Options");
@@ -202,6 +203,7 @@ void OptionsDialog::saveChanges() {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
     if (tab) {
       tab->writeSettings();
+      m_modified = true;
     }
   }
   this->accept();
@@ -221,4 +223,7 @@ void OptionsDialog::setApplyReset(bool v) {
   btn->setEnabled(v);
   btn = m_buttons->button(QDialogButtonBox::Reset);
   btn->setEnabled(v);
+}
+bool OptionsDialog::isModified() const {
+  return m_modified;
 }

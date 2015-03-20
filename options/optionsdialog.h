@@ -15,6 +15,7 @@ class OptionsDialog : public QDialog {
   //  OptionsDialog(QWidget * parent = 0);
   OptionsDialog(const QString & theme,QWidget * parent = 0);
   ~OptionsDialog();
+  bool isModified() const;
   public slots:
     void valueChanged(bool);
     void saveChanges();
@@ -29,6 +30,7 @@ class OptionsDialog : public QDialog {
     QDialogButtonBox * m_buttons;
     QTabWidget * m_tabs;
     QString m_theme;
+    bool m_modified;
   signals:
     void showHelp(const QString &);
 };
