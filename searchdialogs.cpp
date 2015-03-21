@@ -16,7 +16,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
     setWindowTitle(tr("Search for Root"));
     break;
   case SearchOptions::Entry :
-    setWindowTitle(tr("Search for Entry"));
+    setWindowTitle(tr("Search for Head Word"));
     break;
   case SearchOptions::Word :
     setWindowTitle(tr("Search for Word"));
