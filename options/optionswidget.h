@@ -36,6 +36,7 @@ class OptionsWidget : public QWidget {
   virtual bool isModified() = 0;
   virtual void setupConnections();
   virtual void addButtons();
+  void setDebug(bool);
   void setFileName(const QString &);
   void blockAllSignals(bool block);
   virtual bool compare(const QSettings *,const QString & key, QWidget * p);
@@ -62,6 +63,7 @@ class OptionsWidget : public QWidget {
   QString m_settingsFileName;
   QLabel * m_info;
   void notifyChange();
+  bool m_debug;
  signals:
   void valueChanged();
   void modified(bool);

@@ -8,9 +8,11 @@
 OptionsWidget::OptionsWidget(QSettings * settings,QWidget * parent) : QWidget(parent) {
   m_dirty = false;
   m_settings = settings;
+  m_debug = false;
   m_btns = 0;
 }
 OptionsWidget::OptionsWidget(QWidget * parent) : QWidget(parent) {
+  m_debug = false;
   m_dirty = false;
   m_settings = 0;
   m_btns = 0;
@@ -25,6 +27,9 @@ OptionsWidget::OptionsWidget(const QString & theme,QWidget * parent) : QWidget(p
 void OptionsWidget::setFileName(const QString & theme) {
   m_settingsFileName = theme;
   m_btns = 0;
+}
+void OptionsWidget::setDebug(bool v) {
+  m_debug = v;
 }
 void OptionsWidget::addButtons() {
   m_btns = new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Reset|QDialogButtonBox::Help);
@@ -195,32 +200,49 @@ void OptionsWidget::setupConnections() {
   */
 
 }
+/**
+ * Returns true is key value does not match the widget value
+ *
+ * @param settings
+ * @param key
+ * @param p
+ *
+ * @return
+ */
 bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWidget * p) {
   QLineEdit * edit = qobject_cast<QLineEdit *>(p);
   if (edit) {
     if (settings->value(key).toString() != edit->text()) {
-      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toString() << edit->text();
+      if (m_debug) {
+        QLOG_DEBUG() << "Is modified" << key << settings->value(key).toString() << edit->text();
+      }
       return true;
     }
   }
   QCheckBox * box = qobject_cast<QCheckBox *>(p);
   if (box) {
     if (settings->value(key).toBool() != box->isChecked()) {
-      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toBool() << box->isChecked();
+      if (m_debug) {
+        QLOG_DEBUG() << "Is modified" << key << settings->value(key).toBool() << box->isChecked();
+      }
       return true;
     }
   }
   QSpinBox * spin = qobject_cast<QSpinBox *>(p);
   if (spin) {
     if  (settings->value(key).toInt() != spin->value()) {
-      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toInt() << spin->value();
+      if (m_debug) {
+        QLOG_DEBUG() << "Is modified" << key << settings->value(key).toInt() << spin->value();
+      }
       return true;
     }
   }
   QDoubleSpinBox * dspin = qobject_cast<QDoubleSpinBox *>(p);
   if (dspin) {
     if (settings->value(key).toDouble() != dspin->value()) {
-      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toDouble() << dspin->value();
+      if (m_debug) {
+        QLOG_DEBUG() << "Is modified" << key << settings->value(key).toDouble() << dspin->value();
+      }
       return true;
     }
   }
@@ -231,14 +253,18 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
     k1.remove(QChar(' '));
     k2.remove(QChar(' '));
     if  (k1  != k2 ) {
-      QLOG_DEBUG() << "Is modified" << key << k1 << k2;
+      if (m_debug) {
+        QLOG_DEBUG() << "Is modified" << key << k1 << k2;
+      }
       return true;
     }
   }
   QDateTimeEdit * datetimeedit = qobject_cast<QDateTimeEdit *>(p);
   if (datetimeedit) {
     if  (settings->value(key).toString() != datetimeedit->dateTime().toString(Qt::ISODate)) {
-      QLOG_DEBUG() << "Is modified" << key << settings->value(key).toString() << datetimeedit->dateTime().toString(Qt::ISODate);
+      if (m_debug) {
+        QLOG_DEBUG() << "Is modified" << key << settings->value(key).toString() << datetimeedit->dateTime().toString(Qt::ISODate);
+      }
       return true;
 
     }

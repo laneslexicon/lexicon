@@ -46,56 +46,66 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   settings.beginGroup("Options");
   resize(settings.value("Size", QSize(500, 700)).toSize());
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
-
+  bool debugChanges = settings.value("Debug",false).toBool();
   if (settings.value("Roots",true).toBool()) {
     RootsOptions * tree = new RootsOptions(useTheme,this);
     m_tabs->addTab(tree,tr("Contents"));
     tree->writeSettings(testFileName);
+    tree->setDebug(debugChanges);
   }
   if (settings.value("Print",true).toBool()) {
     PrintOptions * print = new PrintOptions(useTheme,this);
     m_tabs->addTab(print,tr("Printer"));
     print->writeSettings(testFileName);
+    print->setDebug(debugChanges);
   }
   if (settings.value("Shortcuts",true).toBool()) {
     ShortcutOptions * shortcut = new ShortcutOptions(useTheme,this);
     m_tabs->addTab(shortcut,tr("Shortcuts"));
     shortcut->writeSettings(testFileName);
+    shortcut->setDebug(debugChanges);
   }
   if (settings.value("Diacritics",true).toBool()) {
     DiacriticsOptions * diacritics = new DiacriticsOptions(useTheme,this);
     m_tabs->addTab(diacritics,tr("Diacritics"));
     diacritics->writeSettings(testFileName);
+    diacritics->setDebug(debugChanges);
   }
   if (settings.value("Entry",true).toBool()) {
     EntryOptions * entry = new EntryOptions(useTheme,this);
     m_tabs->addTab(entry,tr("Entry"));
     entry->writeSettings(testFileName);
+    entry->setDebug(debugChanges);
   }
   if (settings.value("Search",true).toBool()) {
     FindOptions * find = new FindOptions(useTheme,this);
     m_tabs->addTab(find,tr("Search"));
     find->writeSettings(testFileName);
+    find->setDebug(debugChanges);
   }
   if (settings.value("Bookmark",true).toBool()) {
     BookmarkOptions * bookmark = new BookmarkOptions(useTheme,this);
     m_tabs->addTab(bookmark,tr("Bookmark"));
     bookmark->writeSettings(testFileName);
+    bookmark->setDebug(debugChanges);
   }
   if (settings.value("System",true).toBool()) {
     SystemOptions * systems = new SystemOptions(useTheme,this);
     m_tabs->addTab(systems,tr("System"));
     systems->writeSettings(testFileName);
+    systems->setDebug(debugChanges);
   }
   if (settings.value("Logging",true).toBool()) {
     LogOptions * log = new LogOptions(useTheme,this);
     m_tabs->addTab(log,tr("Logging"));
     log->writeSettings(testFileName);
+    log->setDebug(debugChanges);
   }
   if (settings.value("History",true).toBool()) {
     HistoryOptions * history = new HistoryOptions(useTheme,this);
     m_tabs->addTab(history,tr("History"));
     history->writeSettings(testFileName);
+    history->setDebug(debugChanges);
   }
   /// TODO
   /// maps
