@@ -294,8 +294,15 @@ void NoteMaster::readSettings() {
   m_enabled = m_settings->value("Enabled",true).toBool();
   m_settings->endGroup();
 }
-// "select id,word,subject,create from notes"
-/// this is used by notebrowser
+/**
+ * select id,word,subject,create from notes
+ * this is used by notebrowser which deletes the query
+ *
+ *
+ * @param sql
+ *
+ * @return
+ */
 QSqlQuery * NoteMaster::getNoteList(const QString & sql) {
   QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlQuery * listQuery = new QSqlQuery(m_db);
