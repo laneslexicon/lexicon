@@ -22,7 +22,7 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_directory = new QLineEdit;
   QPushButton * directorybtn = new QPushButton(tr("Select directory"));
   QHBoxLayout * directorylayout = new QHBoxLayout;
-  connect(directorybtn,SIGNAL(clicked()),this,SLOT(onSetFile()));
+  connect(directorybtn,SIGNAL(clicked()),this,SLOT(onSetDirectory()));
   directorybtn->setProperty("SID",SID_ICON_DIRECTORY);
   m_directory->setObjectName(SID_ICON_DIRECTORY);
   directorylayout->addWidget(m_directory);
@@ -30,33 +30,80 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   layout->addRow(tr("Image directory"),directorylayout);
 
+
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  QFormLayout * leftlayout = new QFormLayout;
+
   m_about = new QLineEdit;
-  QPushButton * aboutbtn = new QPushButton(tr("Select icon"));
-  QHBoxLayout * aboutlayout = new QHBoxLayout;
-  connect(aboutbtn,SIGNAL(clicked()),this,SLOT(onSetFile()));
-  QPushButton * abouticon = new QPushButton;
-  aboutbtn->setProperty("SID",SID_ICON_ABOUT);
-  abouticon->setObjectName(SID_ICON_ABOUT);
-  m_about->setObjectName(SID_ICON_ABOUT);
-  aboutlayout->addWidget(m_about);
-  aboutlayout->addWidget(abouticon);
-  aboutlayout->addWidget(aboutbtn);
-  layout->addRow(tr("About"),aboutlayout);
-
-
+  leftlayout->addRow(tr("About"),addLine(m_about,SID_ICON_ABOUT));
   m_back = new QLineEdit;
-  QPushButton * backbtn = new QPushButton(tr("Select icon"));
-  QHBoxLayout * backlayout = new QHBoxLayout;
-  connect(backbtn,SIGNAL(clicked()),this,SLOT(onSetFile()));
+  leftlayout->addRow(tr("Back"),addLine(m_back,SID_ICON_BACK));
+  m_bookmarks = new QLineEdit;
+  leftlayout->addRow(tr("Bookmarks"),addLine(m_bookmarks,SID_ICON_BOOKMARKS));
+  m_clear = new QLineEdit;
+  leftlayout->addRow(tr("Clear"),addLine(m_clear,SID_ICON_CLEAR));
+  m_docs = new QLineEdit;
+  leftlayout->addRow(tr("Docs"),addLine(m_docs,SID_ICON_DOCS));
+  m_exit = new QLineEdit;
+  leftlayout->addRow(tr("Exit"),addLine(m_exit,SID_ICON_EXIT));
+  m_first = new QLineEdit;
+  leftlayout->addRow(tr("Clear"),addLine(m_clear,SID_ICON_CLEAR));
+  m_history = new QLineEdit;
+  leftlayout->addRow(tr("Clear"),addLine(m_clear,SID_ICON_CLEAR));
+  m_insertLink = new QLineEdit;
+  leftlayout->addRow(tr("Inser tLink"),addLine(m_insertLink,SID_ICON_INSERT_LINK));
+  m_keymaps = new QLineEdit;
+  leftlayout->addRow(tr("Keymaps"),addLine(m_keymaps,SID_ICON_KEYMAPS));
+  m_keymapsDisabled = new QLineEdit;
+  leftlayout->addRow(tr("Keymaps disabled"),addLine(m_keymapsDisabled,SID_ICON_KEYMAPS_DISABLED));
+  m_last = new QLineEdit;
+  leftlayout->addRow(tr("Last"),addLine(m_last,SID_ICON_LAST));
+  m_link = new QLineEdit;
+  leftlayout->addRow(tr("Link"),addLine(m_link,SID_ICON_LINK));
 
-  backbtn->setProperty("SID",SID_ICON_BACK);
-  m_back->setObjectName(SID_ICON_BACK);
-  backlayout->addWidget(m_back);
-  backlayout->addWidget(backbtn);
-  layout->addRow(tr("Back"),backlayout);
 
+  m_localSearch = new QLineEdit;
+  leftlayout->addRow(tr("Local search"),addLine(m_localSearch,SID_ICON_LOCAL_SEARCH));
+  m_localSearchNext = new QLineEdit;
+  leftlayout->addRow(tr("Local search next"),addLine(m_localSearchNext,SID_ICON_LOCAL_SEARCH_NEXT));
+
+
+  QFormLayout * rightlayout = new QFormLayout;
+  m_logs = new QLineEdit;
+  rightlayout->addRow(tr("Logs"),addLine(m_logs,SID_ICON_LOGS));
+  m_narrow = new QLineEdit;
+  rightlayout->addRow(tr("Narrow"),addLine(m_narrow,SID_ICON_NARROW));
+  m_next = new QLineEdit;
+  rightlayout->addRow(tr("Next"),addLine(m_next,SID_ICON_NEXT));
+  m_notes = new QLineEdit;
+  rightlayout->addRow(tr("Notes"),addLine(m_notes,SID_ICON_NOTES));
+  m_preferences = new QLineEdit;
+  rightlayout->addRow(tr("Preferences"),addLine(m_preferences,SID_ICON_PREFERENCES));
+  m_print = new QLineEdit;
+  rightlayout->addRow(tr("Print"),addLine(m_print,SID_ICON_PRINT));
+  m_search = new QLineEdit;
+  rightlayout->addRow(tr("Search"),addLine(m_search,SID_ICON_SEARCH));
+  m_syncLeft = new QLineEdit;
+  rightlayout->addRow(tr("Sync left"),addLine(m_syncLeft,SID_ICON_SYNC_LEFT));
+  m_syncRight = new QLineEdit;
+  rightlayout->addRow(tr("Sync right"),addLine(m_syncRight,SID_ICON_SYNC_RIGHT));
+  m_unlink = new QLineEdit;
+  rightlayout->addRow(tr("Unlink"),addLine(m_unlink,SID_ICON_UNLINK));
+  m_widen = new QLineEdit;
+  rightlayout->addRow(tr("Widen"),addLine(m_widen,SID_ICON_WIDEN));
+  m_zoom = new QLineEdit;
+  rightlayout->addRow(tr("Zoom"),addLine(m_zoom,SID_ICON_ZOOM));
+  m_zoomIn = new QLineEdit;
+  rightlayout->addRow(tr("Zoom in"),addLine(m_zoomIn,SID_ICON_ZOOM_IN));
+  m_zoomOut = new QLineEdit;
+  rightlayout->addRow(tr("Zoom out"),addLine(m_zoomOut,SID_ICON_ZOOM_OUT));
+
+
+  hlayout->addLayout(leftlayout);
+  hlayout->addLayout(rightlayout);
 
   vlayout->addLayout(layout);
+  vlayout->addLayout(hlayout);
   vlayout->addStretch();
   setLayout(vlayout);
   addButtons();
@@ -64,7 +111,19 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
   setupConnections();
 
 }
-
+QHBoxLayout * IconOptions::addLine(QLineEdit * edit,const QString & sid) {
+  QPushButton * btn = new QPushButton(tr("Select"));
+  QHBoxLayout * layout = new QHBoxLayout;
+  connect(btn,SIGNAL(clicked()),this,SLOT(onSetFile()));
+  QPushButton * icon = new QPushButton;
+  btn->setProperty("SID",sid);
+  icon->setObjectName(sid);
+  edit->setObjectName(sid);
+  layout->addWidget(edit);
+  layout->addWidget(icon);
+  layout->addWidget(btn);
+  return layout;
+}
 void IconOptions::readSettings() {
   qDebug() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
@@ -94,6 +153,12 @@ void IconOptions::writeSettings(const QString & fileName) {
 
   QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
+
+  settings.beginGroup("Resources");
+  settings.setValue(SID_RESOURCES_IMAGES,m_directory->text());
+  settings.endGroup();
+
+
   settings.beginGroup(m_section);
 
   settings.setValue(SID_ICON_ABOUT,m_about->text());
@@ -112,9 +177,18 @@ bool IconOptions::isModified()  {
   m_dirty = false;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
+
+  settings.beginGroup("Resources");
+  if (compare(&settings,SID_RESOURCES_IMAGES,m_directory)) {
+    m_dirty = true;
+  }
+  settings.endGroup();
   settings.beginGroup(m_section);
 
 
+  if (compare(&settings,SID_ICON_ABOUT,m_about)) {
+    m_dirty = true;
+  }
   return m_dirty;
 }
 void IconOptions::onSetFont() {
@@ -122,15 +196,27 @@ void IconOptions::onSetFont() {
 }
 void IconOptions::onSetColor() {
 }
+void IconOptions::onSetDirectory() {
+  QString d = m_directory->text();
+  QString p = getLexicon()->getResourceFilePath(Lexicon::Image);
+  QString imagedirectory = p;
+  if (! d.isEmpty()) {
+    QFileInfo fi(p,d);
+    if (fi.isDir()) {
+      imagedirectory = fi.absoluteFilePath();
+    }
+  }
+  QString fileName = QFileDialog::getExistingDirectory(this,
+                        tr("Open Image Directory"),imagedirectory);
+
+
+}
 void IconOptions::onSetFile() {
   QPushButton * btn = qobject_cast<QPushButton *>(sender());
   QString sid =  btn->property("SID").toString();
   QLineEdit * edit = this->findChild<QLineEdit *>(sid);
   if (! edit ) {
     return;
-  }
-  if (sid == SID_ICON_DIRECTORY) {
-    /// TODO QFileDialog dir only
   }
   QString d = m_directory->text();
   QString p = getLexicon()->getResourceFilePath(Lexicon::Image);
