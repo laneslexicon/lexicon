@@ -19,6 +19,7 @@
 #include <QPushButton>
 #include <QColorDialog>
 #include <QFontDialog>
+#include <QFileDialog>
 #include <QKeySequence>
 #include <QDateTimeEdit>
 #define SMALL_EDIT 30

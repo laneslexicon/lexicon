@@ -815,10 +815,10 @@ void LanesLexicon::createActions() {
 
   m_defaultScaleAction = new QAction(tr("Set default zoom"),this);
 
-  m_selectThemeAction = new QAction(tr("Switch"),this);
-  m_editThemeAction = new QAction(tr("Edit"),this);
-  m_deleteThemeAction = new QAction(tr("Delete"),this);
-  m_createThemeAction = new QAction(tr("New/Copy"),this);
+  m_selectThemeAction = new QAction(tr("&Switch"),this);
+  m_editThemeAction = new QAction(tr("&Edit"),this);
+  m_deleteThemeAction = new QAction(tr("&Delete"),this);
+  m_createThemeAction = new QAction(tr("&New/Copy"),this);
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
 
@@ -3311,27 +3311,8 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   SETTINGS
   settings.beginGroup("Icons");
   QString imageDirectory = getLexicon()->getResourceFilePath(Lexicon::Image);
-  if (imageDirectory.isEmpty() || ! QFileInfo::exists(imageDirectory)) {
-    QLOG_DEBUG() << Q_FUNC_INFO << "Blank or non-existent images directory";
-    return;
-  }
   QDir imgd(imageDirectory);
-  ok = imgd.exists();
-
-  /**
-   * this allows for a subdirectories in the main images directory. The idea is to allow
-   * for 16px,32px etc icons
-   */
-
-  QString subdir = settings.value("Directory",QString()).toString();
-  if (! subdir.isEmpty()) {
-    if (imgd.exists(subdir)) {
-      if (imgd.cd(subdir)) {
-        ok = true;
-      }
-    }
-  }
-  if ( !ok) {
+  if (!imgd.exists()) {
     QLOG_WARN() << QString(tr("Theme image directory not found : %1")).arg(imgd.absolutePath());
     return;
   }

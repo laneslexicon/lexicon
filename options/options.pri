@@ -12,7 +12,8 @@ SOURCES += $$PWD/optionswidget.cpp \
            $$PWD/bookmarkoptions.cpp \
            $$PWD/systemoptions.cpp \
            $$PWD/logoptions.cpp \
-           $$PWD/historyoptions.cpp
+           $$PWD/historyoptions.cpp \
+           $$PWD/iconoptions.cpp
 
 
 HEADERS += $$PWD/optionswidget.h \
@@ -28,4 +29,5 @@ HEADERS += $$PWD/optionswidget.h \
            $$PWD/bookmarkoptions.h \
            $$PWD/systemoptions.h \
            $$PWD/logoptions.h \
-           $$PWD/historyoptions.h
+           $$PWD/historyoptions.h \
+           $$PWD/iconoptions.h

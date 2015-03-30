@@ -10,6 +10,7 @@
 #include "systemoptions.h"
 #include "logoptions.h"
 #include "historyoptions.h"
+#include "iconoptions.h"
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
@@ -107,11 +108,16 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     history->writeSettings(testFileName);
     history->setDebug(debugChanges);
   }
+  if (settings.value("Icons",true).toBool()) {
+    IconOptions * icon = new IconOptions(useTheme,this);
+    m_tabs->addTab(icon,tr("Icons"));
+    icon->writeSettings(testFileName);
+    icon->setDebug(debugChanges);
+  }
+
   /// TODO
   /// maps
-  /// logging
   /// help
-  /// history
   /// icons
   /// themes / resources etc
 

@@ -32,7 +32,8 @@ SOURCES += main.cpp\
         bookmarkoptions.cpp \
         systemoptions.cpp \
         logoptions.cpp \
-        historyoptions.cpp
+        historyoptions.cpp \
+        iconoptions.cpp
 
 HEADERS  += mainwindow.h \
         optionswidget.h \
@@ -47,4 +48,5 @@ HEADERS  += mainwindow.h \
         bookmarkoptions.h \
         systemoptions.h \
         logoptions.h \
-        historyoptions.h
+        historyoptions.h \
+        iconoptions.h

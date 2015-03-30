@@ -303,3 +303,12 @@ They should not be translated.
 #define SID_TABS_HOME                           "home"
 
 #define SID_KEYBOARDS_CONFIG                    "Config"
+
+
+#define SID_ICON_ABOUT  "About"
+#define SID_ICON_BACK  "Back"
+#define SID_ICON_DIRECTORY "Directory"
+
+
+
+#define SID_RESOURCES_IMAGES  "Image"
