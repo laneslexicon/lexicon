@@ -730,7 +730,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
   }
   QSqlQuery rootQuery;
-  rootQuery.prepare("select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1  and root = ? order by nodenum");
+  rootQuery.prepare("select root,broot,word,bword,xml,page,itype,nodeid,supplement,headword from entry where datasource = 1  and root = ? order by nodenum");
 
   int quasi = 0;
   QSqlQuery quasiQuery;
@@ -811,6 +811,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       p.setRoot(root);
       p.setWord(rootQuery.value(2).toString());
       p.setPage(rootQuery.value(5).toInt());
+      p.setHead(rootQuery.value(9).toString());
       item->setPlace(p);
       QList<Note *> notes;
       item->setNotes();//getApp()->notes()->find(rootQuery.value(2).toString()));
