@@ -147,6 +147,9 @@ class Place    {
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
 
+  void setHead(const QString &);
+  QString getHead() const { return m_head;}
+
 
   void setWhen(const QString & t) {
     m_when = QDateTime::fromString(t);
@@ -157,6 +160,7 @@ class Place    {
   QString m_root;
   QString m_node;
   QString m_word;
+  QString m_head;
   int m_type;
   int m_action;
   int m_page;
