@@ -40,12 +40,15 @@ void Place::setPage(int p) {
   }
 }
 /**
- * Returns in order of precedence: word,root,page
+ * Returns in order of precedence: head,word,root,page
  *
  *
  * @return
  */
 QString Place::getShortText() const {
+  if (! m_head.isEmpty()) {
+    return QString(QObject::tr("%1")).arg(m_head);
+  }
   if (! m_word.isEmpty()) {
     return QString(QObject::tr("%1")).arg(m_word);
   }
