@@ -9,6 +9,7 @@ class TabWidget : public QTabWidget {
   Q_OBJECT
  public:
   TabWidget(QWidget  * parent = 0);
+  bool numberTab() const;
   public slots:
     void onTabBarClicked(int);
     void tabContentsChanged();

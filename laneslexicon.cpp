@@ -1523,6 +1523,11 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
   }
   if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
       np = entry->getXmlForRoot(p);
+      /// TODO check this and onTabsChanged
+      /// this sets the tab text to the headword
+      /// tabs->tabContentsChanged() emits signa tabsChanged()
+      /// which ends calling this->onTabsChanged()
+      // and that inserts a number in tab title
       m_tabs->setTabText(currentTab,np.getShortText());
       entry->setFocus();
       m_tabs->tabContentsChanged();
@@ -2166,12 +2171,24 @@ void LanesLexicon::rootChanged(const QString & root,const QString & /* node */) 
   m_tree->ensurePlaceVisible(p,true);
   }
 }
+/**
+ * called when user moves around the current page, ensures that the tab text
+ * and the contents are synced
+ * @param p
+ */
 void LanesLexicon::placeChanged(const Place & p) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());
   if (entry) {
     int ix = m_tabs->indexOf(entry);
     if (ix != -1) {
-      m_tabs->setTabText(ix,p.getShortText());
+      if (m_tabs->numberTab()) {
+        QString title;
+        title = QString("%1 %2").arg(ix+1).arg(p.getShortText());
+        m_tabs->setTabText(ix,title);
+      }
+      else {
+        m_tabs->setTabText(ix,p.getShortText());
+      }
     }
   }
   if (m_linkContents) {
@@ -3270,8 +3287,10 @@ void LanesLexicon::tabsChanged() {
   for(int i=0;i < m_tabs->count();i++) {
     QString t = m_tabs->tabText(i);
     t.remove(rx);
-    QString title = QString("%1  %2").arg(i+1).arg(t);
+    QString title = QString("%1 %2").arg(i+1).arg(t);
+    qDebug() << Q_FUNC_INFO << title;
     m_tabs->setTabText(i,title);
+    qDebug() << Q_FUNC_INFO << "Text now" << m_tabs->tabText(i);
   }
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {

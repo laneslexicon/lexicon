@@ -8,7 +8,7 @@
 #include "externs.h"
 TabWidget::TabWidget(QWidget * parent) : QTabWidget(parent) {
   setObjectName("tabwidget");
-  tabBar()->setObjectName("tabwidgettabs");
+  tabBar()->setObjectName("arabicpagetab");
   readSettings();
   connect(this,SIGNAL(tabBarClicked(int)),this,SLOT(onTabBarClicked(int)));
   if (m_numberTabs) {
@@ -77,4 +77,7 @@ void TabWidget::tabContentsChanged() {
 }
 void TabWidget::focusOutEvent(QFocusEvent * /* event */) {
   QLOG_DEBUG() << Q_FUNC_INFO;
+}
+bool TabWidget::numberTab() const {
+  return m_numberTabs;
 }
