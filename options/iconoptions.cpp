@@ -100,6 +100,7 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
 
   hlayout->addLayout(leftlayout);
+  hlayout->addSpacing(30);
   hlayout->addLayout(rightlayout);
 
   vlayout->addLayout(layout);
@@ -112,16 +113,14 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
 }
 QHBoxLayout * IconOptions::addLine(QLineEdit * edit,const QString & sid) {
-  QPushButton * btn = new QPushButton(tr("..."));
   QHBoxLayout * layout = new QHBoxLayout;
-  connect(btn,SIGNAL(clicked()),this,SLOT(onSetFile()));
   QPushButton * icon = new QPushButton;
-  btn->setProperty("SID",sid);
+  connect(icon,SIGNAL(clicked()),this,SLOT(onSetFile()));
+  icon->setProperty("SID",sid);
   icon->setObjectName(sid);
   edit->setObjectName(sid);
   layout->addWidget(edit);
   layout->addWidget(icon);
-  layout->addWidget(btn);
   return layout;
 }
 void IconOptions::readSettings() {
@@ -213,15 +212,50 @@ void IconOptions::writeSettings(const QString & fileName) {
   QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
 
+
   settings.beginGroup("Resources");
   settings.setValue(SID_RESOURCES_IMAGES,m_directory->text());
   settings.endGroup();
 
-
   settings.beginGroup(m_section);
 
   settings.setValue(SID_ICON_ABOUT,m_about->text());
+
   settings.setValue(SID_ICON_BACK,m_back->text());
+  settings.setValue(SID_ICON_BOOKMARKS,m_bookmarks->text());
+  settings.setValue(SID_ICON_CLEAR,m_clear->text());
+  settings.setValue(SID_ICON_DOCS,m_docs->text());
+  settings.setValue(SID_ICON_EXIT,m_exit->text());
+  settings.setValue(SID_ICON_FIRST,m_first->text());
+  settings.setValue(SID_ICON_HISTORY,m_history->text());
+
+  settings.setValue(SID_ICON_INSERT_LINK,m_insertLink->text());
+
+  settings.setValue(SID_ICON_KEYMAPS,m_keymaps->text());
+
+  settings.setValue(SID_ICON_KEYMAPS_DISABLED,m_keymapsDisabled->text());
+
+  settings.setValue(SID_ICON_LAST,m_last->text());
+  settings.setValue(SID_ICON_LINK,m_link->text());
+
+  settings.setValue(SID_ICON_LOCAL_SEARCH,m_localSearch->text());
+  settings.setValue(SID_ICON_LOCAL_SEARCH_NEXT,m_localSearchNext->text());
+  settings.setValue(SID_ICON_LOGS,m_logs->text());
+  settings.setValue(SID_ICON_NARROW,m_narrow->text());
+  settings.setValue(SID_ICON_NEXT,m_next->text());
+  settings.setValue(SID_ICON_PREFERENCES,m_preferences->text());
+  settings.setValue(SID_ICON_PRINT,m_print->text());
+  settings.setValue(SID_ICON_SEARCH,m_search->text());
+  settings.setValue(SID_ICON_SYNC_LEFT,m_syncLeft->text());
+  settings.setValue(SID_ICON_SYNC_RIGHT,m_syncRight->text());
+  settings.setValue(SID_ICON_UNLINK,m_unlink->text());
+  settings.setValue(SID_ICON_WIDEN,m_widen->text());
+  settings.setValue(SID_ICON_ZOOM,m_zoom->text());
+  settings.setValue(SID_ICON_ZOOM_IN,m_zoomIn->text());
+  settings.setValue(SID_ICON_ZOOM_OUT,m_zoomOut->text());
+
+
+
 
   m_dirty = false;
   emit(modified(false));
@@ -248,6 +282,99 @@ bool IconOptions::isModified()  {
   if (compare(&settings,SID_ICON_ABOUT,m_about)) {
     m_dirty = true;
   }
+
+  if (compare(&settings,SID_ICON_ABOUT,m_about)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ICON_BACK,m_back)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_BOOKMARKS,m_bookmarks)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_CLEAR,m_clear)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_DOCS,m_docs)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_EXIT,m_exit)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_FIRST,m_first)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_HISTORY,m_history)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ICON_INSERT_LINK,m_insertLink)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ICON_KEYMAPS,m_keymaps)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ICON_KEYMAPS_DISABLED,m_keymapsDisabled)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ICON_LAST,m_last)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_LINK,m_link)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ICON_LOCAL_SEARCH,m_localSearch)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_LOCAL_SEARCH_NEXT,m_localSearchNext)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_LOGS,m_logs)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_NARROW,m_narrow)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_NEXT,m_next)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_PREFERENCES,m_preferences)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_PRINT,m_print)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_SEARCH,m_search)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_SYNC_LEFT,m_syncLeft)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_SYNC_RIGHT,m_syncRight)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_UNLINK,m_unlink)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_WIDEN,m_widen)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_ZOOM,m_zoom)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_ZOOM_IN,m_zoomIn)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_ZOOM_OUT,m_zoomOut)) {
+    m_dirty = true;
+  }
+
+
   return m_dirty;
 }
 void IconOptions::onSetFont() {
