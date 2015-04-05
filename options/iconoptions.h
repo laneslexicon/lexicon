@@ -50,7 +50,7 @@ class IconOptions : public OptionsWidget {
     QLineEdit * m_zoom;
     QLineEdit * m_zoomIn;
     QLineEdit * m_zoomOut;
-    QString m_imageDirectory;
+
     void setIconFromField(const QLineEdit * w,const QString & );
 };
 #endif

@@ -47,9 +47,9 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_exit = new QLineEdit;
   leftlayout->addRow(tr("Exit"),addLine(m_exit,SID_ICON_EXIT));
   m_first = new QLineEdit;
-  leftlayout->addRow(tr("Clear"),addLine(m_clear,SID_ICON_CLEAR));
+  leftlayout->addRow(tr("First"),addLine(m_first,SID_ICON_FIRST));
   m_history = new QLineEdit;
-  leftlayout->addRow(tr("Clear"),addLine(m_clear,SID_ICON_CLEAR));
+  leftlayout->addRow(tr("History"),addLine(m_history,SID_ICON_HISTORY));
   m_insertLink = new QLineEdit;
   leftlayout->addRow(tr("Inser tLink"),addLine(m_insertLink,SID_ICON_INSERT_LINK));
   m_keymaps = new QLineEdit;
@@ -112,7 +112,7 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
 }
 QHBoxLayout * IconOptions::addLine(QLineEdit * edit,const QString & sid) {
-  QPushButton * btn = new QPushButton(tr("Select"));
+  QPushButton * btn = new QPushButton(tr("..."));
   QHBoxLayout * layout = new QHBoxLayout;
   connect(btn,SIGNAL(clicked()),this,SLOT(onSetFile()));
   QPushButton * icon = new QPushButton;
@@ -139,7 +139,66 @@ void IconOptions::readSettings() {
 
   m_about->setText(settings.value(SID_ICON_ABOUT,QString()).toString());
   setIconFromField(m_about,SID_ICON_ABOUT);
+
   m_back->setText(settings.value(SID_ICON_BACK,QString()).toString());
+  setIconFromField(m_back,SID_ICON_BACK);
+  m_bookmarks->setText(settings.value(SID_ICON_BOOKMARKS,QString()).toString());
+  setIconFromField(m_bookmarks,SID_ICON_BOOKMARKS);
+  m_clear->setText(settings.value(SID_ICON_CLEAR,QString()).toString());
+  setIconFromField(m_clear,SID_ICON_CLEAR);
+  m_docs->setText(settings.value(SID_ICON_DOCS,QString()).toString());
+  setIconFromField(m_docs,SID_ICON_DOCS);
+  m_exit->setText(settings.value(SID_ICON_EXIT,QString()).toString());
+  setIconFromField(m_exit,SID_ICON_EXIT);
+  m_first->setText(settings.value(SID_ICON_FIRST,QString()).toString());
+  setIconFromField(m_first,SID_ICON_FIRST);
+  m_history->setText(settings.value(SID_ICON_HISTORY,QString()).toString());
+  setIconFromField(m_history,SID_ICON_HISTORY);
+
+  m_insertLink->setText(settings.value(SID_ICON_INSERT_LINK,QString()).toString());
+  setIconFromField(m_insertLink,SID_ICON_INSERT_LINK);
+
+  m_keymaps->setText(settings.value(SID_ICON_KEYMAPS,QString()).toString());
+  setIconFromField(m_keymaps,SID_ICON_KEYMAPS);
+
+  m_keymapsDisabled->setText(settings.value(SID_ICON_KEYMAPS_DISABLED,QString()).toString());
+  setIconFromField(m_keymapsDisabled,SID_ICON_KEYMAPS_DISABLED);
+
+  m_last->setText(settings.value(SID_ICON_LAST,QString()).toString());
+  setIconFromField(m_last,SID_ICON_LAST);
+  m_link->setText(settings.value(SID_ICON_LINK,QString()).toString());
+  setIconFromField(m_link,SID_ICON_LINK);
+
+  m_localSearch->setText(settings.value(SID_ICON_LOCAL_SEARCH,QString()).toString());
+  setIconFromField(m_localSearch,SID_ICON_LOCAL_SEARCH);
+  m_localSearchNext->setText(settings.value(SID_ICON_LOCAL_SEARCH_NEXT,QString()).toString());
+  setIconFromField(m_localSearchNext,SID_ICON_LOCAL_SEARCH_NEXT);
+  m_logs->setText(settings.value(SID_ICON_LOGS,QString()).toString());
+  setIconFromField(m_logs,SID_ICON_LOGS);
+  m_narrow->setText(settings.value(SID_ICON_NARROW,QString()).toString());
+  setIconFromField(m_narrow,SID_ICON_NARROW);
+  m_next->setText(settings.value(SID_ICON_NEXT,QString()).toString());
+  setIconFromField(m_next,SID_ICON_NEXT);
+  m_preferences->setText(settings.value(SID_ICON_PREFERENCES,QString()).toString());
+  setIconFromField(m_preferences,SID_ICON_PREFERENCES);
+  m_print->setText(settings.value(SID_ICON_PRINT,QString()).toString());
+  setIconFromField(m_print,SID_ICON_PRINT);
+  m_search->setText(settings.value(SID_ICON_SEARCH,QString()).toString());
+  setIconFromField(m_search,SID_ICON_SEARCH);
+  m_syncLeft->setText(settings.value(SID_ICON_SYNC_LEFT,QString()).toString());
+  setIconFromField(m_syncLeft,SID_ICON_SYNC_LEFT);
+  m_syncRight->setText(settings.value(SID_ICON_SYNC_RIGHT,QString()).toString());
+  setIconFromField(m_syncRight,SID_ICON_SYNC_RIGHT);
+  m_unlink->setText(settings.value(SID_ICON_UNLINK,QString()).toString());
+  setIconFromField(m_unlink,SID_ICON_UNLINK);
+  m_widen->setText(settings.value(SID_ICON_WIDEN,QString()).toString());
+  setIconFromField(m_widen,SID_ICON_WIDEN);
+  m_zoom->setText(settings.value(SID_ICON_ZOOM,QString()).toString());
+  setIconFromField(m_zoom,SID_ICON_ZOOM);
+  m_zoomIn->setText(settings.value(SID_ICON_ZOOM_IN,QString()).toString());
+  setIconFromField(m_zoomIn,SID_ICON_ZOOM_IN);
+  m_zoomOut->setText(settings.value(SID_ICON_ZOOM_OUT,QString()).toString());
+  setIconFromField(m_zoomOut,SID_ICON_ZOOM_OUT);
 
 
   m_dirty = false;
