@@ -17,7 +17,7 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   QStringList keys = marks.keys();
   keys.removeOne("-here-");
   m_list = new QTableWidget(keys.size(),5);
-  m_list->setObjectName("bookmarklist");
+  m_list->setObjectName("arabicbookmarklist");
   //  HtmlDelegate * d = new HtmlDelegate(m_list);
   //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
   //  m_list->setItemDelegate(d);
