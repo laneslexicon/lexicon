@@ -49,10 +49,13 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   QVBoxLayout * vlayout = new QVBoxLayout;
   QFormLayout * layout = new QFormLayout;
 
+  QGroupBox * keybox = new QGroupBox(tr("Keyboard commands"));
+  QFormLayout * keylayout = new QFormLayout;
+
   /// Zoom
-  layout->addRow(tr("Zoom out"),m_zoomOut);
-  layout->addRow(tr("Zoom in"),m_zoomIn);
-  layout->addRow(tr("Default zoom"),m_zoom);
+  keylayout->addRow(tr("Zoom out"),m_zoomOut);
+  keylayout->addRow(tr("Zoom in"),m_zoomIn);
+
 
   /// Focus
   QGridLayout * focuslayout = new QGridLayout;
@@ -72,7 +75,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   QHBoxLayout * focuscontainer = new QHBoxLayout;
   focuscontainer->addLayout(focuslayout);
   focuscontainer->addStretch();
-  layout->addRow(tr("Page movement"),focuscontainer);
+  keylayout->addRow(tr("Page movement"),focuscontainer);
 
   /// Text size
   m_textWidth->setMaximumWidth(MEDIUM_EDIT);
@@ -80,17 +83,14 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_narrow->setMaximumWidth(SMALL_EDIT);
   m_widen->setMaximumWidth(SMALL_EDIT);
   m_step->setMaximumWidth(SMALL_EDIT);
-  layout->addRow(tr("Text width"),m_textWidth);
-  layout->addRow(tr("Text margin"),m_margin);
-  layout->addRow(tr("Widen text"),m_widen);
-  layout->addRow(tr("Narrow text"),m_narrow);
-  layout->addRow(tr("Step size"),m_step);
+  keylayout->addRow(tr("Widen text"),m_widen);
+  keylayout->addRow(tr("Narrow text"),m_narrow);
 
   // Lexicon movement
   m_back->setMaximumWidth(SMALL_EDIT);
   m_forward->setMaximumWidth(SMALL_EDIT);
-  layout->addRow(tr("Lexicon next entry"),m_forward);
-  layout->addRow(tr("Lexicon previous entry"),m_back);
+  keylayout->addRow(tr("Lexicon next entry"),m_forward);
+  keylayout->addRow(tr("Lexicon previous entry"),m_back);
 
 
 
@@ -107,17 +107,27 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   searchlayout->addWidget(new QLabel(tr("Clear highlight")));
   searchlayout->addWidget(m_clean);
   searchlayout->addStretch();
-  layout->addRow(tr("Local search"),searchlayout);
-  layout->addRow(tr("Show last search results"),m_show);
+  keylayout->addRow(tr("Local search"),searchlayout);
+  keylayout->addRow(tr("Show last search results"),m_show);
+  m_reload->setMaximumWidth(SMALL_EDIT);
+  keylayout->addRow(tr("Reload"),m_reload);
+
+  keybox->setLayout(keylayout);
+
+  QGroupBox * otherbox = new QGroupBox(tr("Other"));
+  QFormLayout * otherlayout = new QFormLayout;
+
   /// Assorted
 
-  m_reload->setMaximumWidth(SMALL_EDIT);
+
   m_show->setMaximumWidth(SMALL_EDIT);
   m_showLinkWarning->setMaximumWidth(SMALL_EDIT);
   m_highlightColor->setMaximumWidth(100);
-  layout->addRow(tr("Reload"),m_reload);
-
-  layout->addRow(tr("Show link warning"),m_showLinkWarning);
+  otherlayout->addRow(tr("Default zoom"),m_zoom);
+  otherlayout->addRow(tr("Show link warning"),m_showLinkWarning);
+  otherlayout->addRow(tr("Step size"),m_step);
+  otherlayout->addRow(tr("Text width"),m_textWidth);
+  otherlayout->addRow(tr("Text margin"),m_margin);
 
   QHBoxLayout * colorlayout = new QHBoxLayout;
   colorlayout->addWidget(m_highlightColor);
@@ -125,7 +135,8 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   connect(colorbutton,SIGNAL(clicked()),this,SLOT(onSetColor()));
   colorlayout->addWidget(colorbutton);
   colorlayout->addStretch();
-  layout->addRow(tr("Highlight color"),colorlayout);
+  otherlayout->addRow(tr("Highlight color"),colorlayout);
+
 
   /// Debug
   QHBoxLayout * debugcontainer = new QHBoxLayout;
@@ -140,9 +151,12 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   debuglayout->addWidget(m_saveXml,1,3);
   debugcontainer->addLayout(debuglayout);
   debugcontainer->addStretch();
-  layout->addRow(tr("Tech"),debugcontainer);
 
-  vlayout->addLayout(layout);
+  otherlayout->addRow(tr("Tech"),debugcontainer);
+  otherbox->setLayout(otherlayout);
+
+  vlayout->addWidget(keybox);
+  vlayout->addWidget(otherbox);
   vlayout->addStretch();
   setLayout(vlayout);
   addButtons();
