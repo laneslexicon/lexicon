@@ -90,10 +90,10 @@ int main(int argc, char *argv[])
 
     QCommandLineOption rootOption(QStringList() <<"r" << "root","make the given root the initial display","root");
     parser.addOption(rootOption);
-
+    /*
     QCommandLineOption configOption(QStringList() <<"c" << "config","use the given INI file","config");
     parser.addOption(configOption);
-
+    */
     QCommandLineOption fontOption(QStringList() << "f" << "fonts","List your systems Arabic fonts");
     parser.addOption(fontOption);
 
@@ -122,6 +122,12 @@ int main(int argc, char *argv[])
     QCommandLineOption debugOption(QStringList() << "v" << "debug","set debug option");
     parser.addOption(debugOption);
 
+    QCommandLineOption arOption(QStringList() << "a" << "arabic-font","Name of the Arabic font","arfont");
+    parser.addOption(arOption);
+
+    QCommandLineOption noguiOption(QStringList() << "g" << "no-gui","Do not show user interface");
+    parser.addOption(noguiOption);
+
     // Process the actual command line arguments
     parser.process(mansur);
     const QStringList args = parser.positionalArguments();
@@ -145,9 +151,11 @@ int main(int argc, char *argv[])
     if (parser.isSet(rootOption)) {
       options.insert(rootOption.valueName(),parser.value(rootOption));
     }
+    /*
     if (parser.isSet(configOption)) {
       options.insert(configOption.valueName(),parser.value(configOption));
     }
+    */
     if (parser.isSet(dbOption)) {
       options.insert(dbOption.valueName(),parser.value(dbOption));
     }
@@ -169,10 +177,19 @@ int main(int argc, char *argv[])
     if (parser.isSet(textWidthOption)) {
       options.insert(textWidthOption.valueName(),parser.value(textWidthOption));
     }
+    if (parser.isSet(arOption)) {
+      options.insert("arfont",parser.value(arOption));
+    }
     mansur.setOptions(options);
     ///
-    mansur.startLogging();
 
+    if (parser.isSet(arOption)) {
+      mansur.setArabicFont(parser.value(arOption));
+    }
+    if (parser.isSet(noguiOption)) {
+      return 0;
+    }
+    mansur.startLogging();
     QTranslator translator;
     QString trfile;
     if (options.contains("lang")) {

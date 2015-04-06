@@ -8,6 +8,7 @@
 #include <QSettings>
 #include <QFontDatabase>
 #include <QWidget>
+#include <QRegularExpression>
 #include <iostream>
 #include "QsLog.h"
 class Lexicon : public QApplication {
@@ -41,9 +42,12 @@ public:
   QString errorFile() const { return m_errorFile; }
   void startLogging();
   QString takeLastError();
+  QStringList setArabicFont(const QString & family = QString());
+  QStringList changeFontInSettings(const QString & family);
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:
+    QString setCssFont(const QString & css,const QString & family) const;
     QStringList m_errors;
     QString m_errorFilePath;
     QString m_errorFile;

@@ -615,3 +615,95 @@ QString Lexicon::getDefaultKeyboard()  {
   }
   return currentKeyboard;
 }
+/**
+ * This assumes the following:
+ *
+ * For entries in QSettings the key contains the word arabic (ignoring case)
+ * QSettings entries are either in the form that QFont::toString() produces
+ * or simple CSS statements containing "font-family : <font name>"
+ *
+ * For entries in any of the CSS files, the css selector for any Arabic text
+ * contains the word "Arabic" (ignoring case)  and that any font name is
+ * in a 'font-family' clause.
+ *
+ * All other entries will be ignored.
+ *
+ * @param family
+ */
+QStringList Lexicon::setArabicFont(const QString & family) {
+  qDebug() << Q_FUNC_INFO << m_options.value("arfont");
+  qDebug() << settingsFileName();
+  QStringList x = changeFontInSettings(family);
+  qDebug() << x;
+  /**
+   * Do the CSS files
+   *
+   */
+
+  QDir cssDirectory(getResourceFilePath(Lexicon::Stylesheet));
+  QStringList filters;
+  filters << "*.css";
+  QFileInfoList files =  cssDirectory.entryInfoList(filters);
+  for(int i=0;i < files.size();i++) {
+    qDebug() << files[i].absoluteFilePath();
+  }
+
+  return x;
+}
+QStringList Lexicon::changeFontInSettings(const QString & family) {
+  QStringList changedKeys;
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  QStringList keys = settings.allKeys();
+  QString v;
+  QFont font;
+  QRegularExpression re("Arabic", QRegularExpression::CaseInsensitiveOption);
+  QRegularExpression reFontString("\\d+,\\d+,\\d++");
+  QRegularExpression reCssFont("font-family", QRegularExpression::CaseInsensitiveOption);
+
+  QRegularExpressionMatch match;
+  for(int i=0;i < keys.size();i++) {
+    if (re.match(keys[i]).hasMatch()) {
+      /// We have an key/value containing "Arabic"
+      v = settings.value(keys[i]).toString();
+      qDebug() << keys[i] << v;
+      if (reFontString.match(v).hasMatch()) {
+        font.fromString(v);
+        font.setFamily(family);
+        v = font.toString();
+        settings.setValue(keys[i],v);
+        changedKeys << keys[i];
+      }
+      else if (reCssFont.match(v).hasMatch()) {
+        v  = setCssFont(v,family);
+        changedKeys << keys[i];
+        settings.setValue(keys[i],v);
+      }
+    }
+  }
+  return changedKeys;
+}
+QString Lexicon::setCssFont(const QString & src,const QString & family) const {
+  QRegularExpressionMatch m;
+  QString r;
+  QStringList v = src.split(";");
+  for(int i=0;i < v.size();i++) {
+    QStringList kv = v[i].split(":");
+    if (kv.size() == 2) {
+      QString k = kv[0];
+      QString v = kv[1];
+      if (kv[0].toLower().trimmed() == "font-family") {
+        v = "\"" + family + "\"";
+      }
+      r += k + ":" + v;
+    }
+    else {
+      r += v[i];
+    }
+    r += ";";
+  }
+  qDebug() << "before:" << src;
+  qDebug() << "after: " << r;
+  return r;
+}
