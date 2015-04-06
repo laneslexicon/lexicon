@@ -636,6 +636,7 @@ QStringList Lexicon::setArabicFont(const QString & family) {
   qDebug() << Q_FUNC_INFO << m_options.value("arfont");
   qDebug() << settingsFileName();
   QStringList x = changeFontInSettings(family);
+  qDebug() << QString("Changed %1 entries is ini file").arg(x.size());
   //  qDebug() << x;
   /**
    * Do the CSS files
@@ -647,7 +648,8 @@ QStringList Lexicon::setArabicFont(const QString & family) {
   filters << "*.css";
   QFileInfoList files =  cssDirectory.entryInfoList(filters);
   for(int i=0;i < files.size();i++) {
-    changeFontInStylesheet(files[i].absoluteFilePath(),family);
+    x = changeFontInStylesheet(files[i].absoluteFilePath(),family);
+    qDebug() << QString("Changed %1 entries is css file %2").arg(x.size()).arg(files[i].fileName());
   }
 
   return x;
@@ -655,7 +657,8 @@ QStringList Lexicon::setArabicFont(const QString & family) {
 QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QString & family) {
   qDebug() << Q_FUNC_INFO << fileName;
   QStringList changedEntries;
-
+  QRegularExpression reCss("(.+){(.+)}");
+  QRegularExpressionMatch m;
   QStringList css;
 
   QFile file(fileName);
@@ -664,19 +667,37 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
   }
   QTextStream in(&file);
   in.setCodec("UTF-8");
+  QString selector;
+  QString clause;
   while(! in.atEnd()) {
     QString line = in.readLine();
-    if (line.contains("arabic",Qt::CaseInsensitive)) {
-      css << setCssFont(line,family);
+    m = reCss.match(line);
+    if (m.lastCapturedIndex() == 2) {
+      selector = m.captured(1);
+      clause = m.captured(2);
+      //      qDebug() << m.capturedTexts();
+    }
+    if (selector.contains("arabic",Qt::CaseInsensitive)) {
+      //      qDebug() << "Before" << line;
       changedEntries << line;
-      qDebug() << "Changed:" << line;
+      line = QString("%1 { %2 }").arg(selector,setCssFont(clause,family));
+      //      qDebug() << "After:" << line;
+      css << line;
     }
     else {
       css << line;
     }
   }
   file.close();
-
+  if (! file.open(QIODevice::WriteOnly)) {
+    return QStringList();
+  }
+  QTextStream out(&file);
+  out.setCodec("UTF-8");
+  for(int i=0;i < css.size();i++) {
+    out << css[i] << endl;
+  }
+  file.close();
   return changedEntries;
 }
 QStringList Lexicon::changeFontInSettings(const QString & family) {
@@ -716,21 +737,23 @@ QStringList Lexicon::changeFontInSettings(const QString & family) {
 QString Lexicon::setCssFont(const QString & src,const QString & family) const {
   QRegularExpressionMatch m;
   QString r;
-  QStringList v = src.split(";");
-  for(int i=0;i < v.size();i++) {
-    QStringList kv = v[i].split(":");
+  QStringList parts = src.split(";",QString::SkipEmptyParts);
+  for(int i=0;i < parts.size();i++) {
+    parts[i] = parts[i].trimmed();
+    if (! parts[i].isEmpty()) {
+    QStringList kv = parts[i].split(":");
     if (kv.size() == 2) {
       QString k = kv[0];
       QString v = kv[1];
       if (kv[0].toLower().trimmed() == "font-family") {
         v = "\"" + family + "\"";
       }
-      r += k + ":" + v;
+      r += k + ":" + v + ";";
     }
     else {
-      r += v[i];
+      r += parts[i] + ";";
     }
-    r += ";";
+    }
   }
   //  qDebug() << "before:" << src;
   //  qDebug() << "after: " << r;
