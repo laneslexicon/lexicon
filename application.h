@@ -44,6 +44,7 @@ public:
   QString takeLastError();
   QStringList setArabicFont(const QString & family = QString());
   QStringList changeFontInSettings(const QString & family);
+  QStringList changeFontInStylesheet(const QString & fileName,const QString & family);
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:

@@ -626,6 +626,8 @@ QString Lexicon::getDefaultKeyboard()  {
  * contains the word "Arabic" (ignoring case)  and that any font name is
  * in a 'font-family' clause.
  *
+ * For Qt stylesheet the whole selector is scanned for 'arabic'
+ *
  * All other entries will be ignored.
  *
  * @param family
@@ -634,7 +636,7 @@ QStringList Lexicon::setArabicFont(const QString & family) {
   qDebug() << Q_FUNC_INFO << m_options.value("arfont");
   qDebug() << settingsFileName();
   QStringList x = changeFontInSettings(family);
-  qDebug() << x;
+  //  qDebug() << x;
   /**
    * Do the CSS files
    *
@@ -645,10 +647,37 @@ QStringList Lexicon::setArabicFont(const QString & family) {
   filters << "*.css";
   QFileInfoList files =  cssDirectory.entryInfoList(filters);
   for(int i=0;i < files.size();i++) {
-    qDebug() << files[i].absoluteFilePath();
+    changeFontInStylesheet(files[i].absoluteFilePath(),family);
   }
 
   return x;
+}
+QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QString & family) {
+  qDebug() << Q_FUNC_INFO << fileName;
+  QStringList changedEntries;
+
+  QStringList css;
+
+  QFile file(fileName);
+  if ( ! file.open(QIODevice::ReadOnly)) {
+    return changedEntries;
+  }
+  QTextStream in(&file);
+  in.setCodec("UTF-8");
+  while(! in.atEnd()) {
+    QString line = in.readLine();
+    if (line.contains("arabic",Qt::CaseInsensitive)) {
+      css << setCssFont(line,family);
+      changedEntries << line;
+      qDebug() << "Changed:" << line;
+    }
+    else {
+      css << line;
+    }
+  }
+  file.close();
+
+  return changedEntries;
 }
 QStringList Lexicon::changeFontInSettings(const QString & family) {
   QStringList changedKeys;
@@ -667,7 +696,7 @@ QStringList Lexicon::changeFontInSettings(const QString & family) {
     if (re.match(keys[i]).hasMatch()) {
       /// We have an key/value containing "Arabic"
       v = settings.value(keys[i]).toString();
-      qDebug() << keys[i] << v;
+      //      qDebug() << keys[i] << v;
       if (reFontString.match(v).hasMatch()) {
         font.fromString(v);
         font.setFamily(family);
@@ -703,7 +732,7 @@ QString Lexicon::setCssFont(const QString & src,const QString & family) const {
     }
     r += ";";
   }
-  qDebug() << "before:" << src;
-  qDebug() << "after: " << r;
+  //  qDebug() << "before:" << src;
+  //  qDebug() << "after: " << r;
   return r;
 }
