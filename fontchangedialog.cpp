@@ -8,6 +8,7 @@
 #define SPACING 20
 FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   readSettings();
+  m_modified = false;
   setWindowTitle(tr("Change Arabic font"));
   setObjectName("changearabicfont");
   QVBoxLayout * layout = new QVBoxLayout;
@@ -62,6 +63,7 @@ void FontChangeDialog::setCurrentFontText() {
   QStringList fonts = getLexicon()->getUsedFont();
   if (fonts.size() == 1) {
     t += tr("font is");
+    m_arabicFont->setCurrentText(fonts[0]);
   }
   else {
     t += tr("fonts are");
@@ -96,6 +98,7 @@ void FontChangeDialog::onShowAllChanged(int state) {
 void FontChangeDialog::onApply() {
   QString arabicFont = m_arabicFont->currentText();
   QStringList changes;
+
   m_changes->setEnabled(true);
 
   m_changes->clear();
@@ -122,6 +125,7 @@ void FontChangeDialog::onApply() {
     changes = getLexicon()->changeFontInSettings(arabicFont);
     m_changes->addItems(changes);
     m_changes->addItem("");
+    m_modified = true;
   }
   QDir cssDirectory(getLexicon()->getResourceFilePath(Lexicon::Stylesheet));
   QStringList filters;
@@ -150,7 +154,11 @@ void FontChangeDialog::onApply() {
       changes = getLexicon()->changeFontInStylesheet(fileName,arabicFont);
       m_changes->addItems(changes);
       m_changes->addItem("");
+      m_modified = true;
     }
   }
   setCurrentFontText();
+}
+bool FontChangeDialog::isModified() const {
+  return m_modified;
 }

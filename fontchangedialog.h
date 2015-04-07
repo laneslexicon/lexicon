@@ -20,10 +20,12 @@ class FontChangeDialog : public QDialog {
  public:
   FontChangeDialog(QWidget * parent = 0);
   QSize sizeHint() const;
+   bool isModified() const;
  public slots:
    void onFontChanged(const QString &);
    void onShowAllChanged(int);
    void onApply();
+
  private:
    void setCurrentFontText();
    //  QStringList m_arFonts;
@@ -38,5 +40,6 @@ class FontChangeDialog : public QDialog {
   QListWidget * m_changes;
   QPushButton * m_applyButton;
   QLabel * m_fontLabel;
+  bool m_modified;
 };
 #endif
