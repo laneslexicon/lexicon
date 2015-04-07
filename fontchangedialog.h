@@ -2,21 +2,18 @@
 #define __FONTCHANGEDIALOG_H__
 #include <QDialog>
 #include <QFormLayout>
-#include <QTabWidget>
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
-#include <QTableWidget>
-#include <QTableWidgetItem>
-#include <QHeaderView>
 #include <QLineEdit>
 #include <QFontDialog>
 #include <QFontDatabase>
+#include <QCheckBox>
+#include <QListWidget>
 #include <QSettings>
-#include <QTextStream>
-#include <QFile>
 #include <QLabel>
 #include <QPushButton>
 #include "QsLog.h"
+#include <QComboBox>
 class FontChangeDialog : public QDialog {
   Q_OBJECT
 
@@ -24,23 +21,17 @@ class FontChangeDialog : public QDialog {
   FontChangeDialog(QWidget * parent = 0);
   QSize sizeHint() const;
  public slots:
-  void lexiconArabicFontDialog();
-  void lexiconEnglishFontDialog();
-  void appArabicFontDialog();
-  void appNativeFontDialog();
+   void onFontChanged(const QString &);
+   void onShowAllChanged(int);
+   void onApply();
  private:
-  QStringList m_arFonts;
-  QStringList readFile(const QString &);
+   //  QStringList m_arFonts;
   void readSettings();
   void writeSettings();
-
-  QLineEdit * m_lexiconArabicFontName;
-  QLineEdit * m_lexiconArabicFontSize;
-  QLineEdit * m_lexiconEnglishFontName;
-  QLineEdit * m_lexiconEnglishFontSize;
-  QLineEdit * m_appArabicFontName;
-  QLineEdit * m_appArabicFontSize;
-  QLineEdit * m_appNativeFontName;
-  QLineEdit * m_appNativeFontSize;
+  QCheckBox * m_allFonts;
+  QComboBox * m_arabicFont;
+  QListWidget * m_changes;
+  QPushButton * m_applyButton;
+  QLabel * m_fontLabel;
 };
 #endif
