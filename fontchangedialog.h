@@ -28,7 +28,11 @@ class FontChangeDialog : public QDialog {
    //  QStringList m_arFonts;
   void readSettings();
   void writeSettings();
+  QLabel * m_currentFont;
   QCheckBox * m_allFonts;
+  QCheckBox * m_changeIni;
+  QCheckBox * m_changeApplicationCss;
+  QCheckBox * m_changeEntryCss;
   QComboBox * m_arabicFont;
   QListWidget * m_changes;
   QPushButton * m_applyButton;
