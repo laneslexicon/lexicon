@@ -1239,10 +1239,10 @@ void GraphicsEntry::prependEntries(int startPos) {
 QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
   if (xsl.isEmpty()) {
-    QLOG_WARN() << tr("No XSLT file name supplied");
+    QLOG_WARN() << tr("No XSLT supplied");
     return QString();
   }
-  if (! QFileInfo::exists(xsl)) {
+  if (type == ENTRY_XSLT && ! QFileInfo::exists(xsl)) {
     QLOG_WARN() << QString(tr("Cannot find XSLT file: %1")).arg(xsl);
     return QString();
   }
