@@ -678,17 +678,24 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
       //      qDebug() << m.capturedTexts();
     }
     if (selector.contains("arabic",Qt::CaseInsensitive)) {
-      //      qDebug() << "Before" << line;
-      changedEntries << line;
-      line = QString("%1 { %2 }").arg(selector,setCssFont(clause,family));
-      //      qDebug() << "After:" << line;
-      css << line;
+      QString t = setCssFont(clause,family);
+      line = QString("%1 { %2 }").arg(selector,t);
+      if (family.isEmpty()) {
+        changedEntries << t;
+      }
+      else {
+        changedEntries << line;
+        css << line;
+      }
     }
     else {
       css << line;
     }
   }
   file.close();
+  if (family.isEmpty()) {
+    return changedEntries;
+  }
   if (! file.open(QIODevice::WriteOnly)) {
     return QStringList();
   }
@@ -720,20 +727,38 @@ QStringList Lexicon::changeFontInSettings(const QString & family) {
       //      qDebug() << keys[i] << v;
       if (reFontString.match(v).hasMatch()) {
         font.fromString(v);
-        font.setFamily(family);
-        v = font.toString();
-        settings.setValue(keys[i],v);
-        changedKeys << keys[i];
+        if (family.isEmpty()) {
+          changedKeys << font.family();
+        }
+        else {
+          font.setFamily(family);
+          v = font.toString();
+          settings.setValue(keys[i],v);
+          changedKeys << keys[i];
+        }
       }
       else if (reCssFont.match(v).hasMatch()) {
         v  = setCssFont(v,family);
-        changedKeys << keys[i];
-        settings.setValue(keys[i],v);
+        if (family.isEmpty()) {
+          changedKeys << v;
+        }
+        else {
+          changedKeys << keys[i];
+          settings.setValue(keys[i],v);
+        }
       }
     }
   }
   return changedKeys;
 }
+/**
+ * If family is empty, return the name of font-family
+ *
+ * @param src
+ * @param family
+ *
+ * @return
+ */
 QString Lexicon::setCssFont(const QString & src,const QString & family) const {
   QRegularExpressionMatch m;
   QString r;
@@ -746,6 +771,9 @@ QString Lexicon::setCssFont(const QString & src,const QString & family) const {
       QString k = kv[0];
       QString v = kv[1];
       if (kv[0].toLower().trimmed() == "font-family") {
+        if (family.isEmpty()) {
+          return v.trimmed();
+        }
         v = "\"" + family + "\"";
       }
       r += k + ":" + v + ";";
@@ -758,4 +786,19 @@ QString Lexicon::setCssFont(const QString & src,const QString & family) const {
   //  qDebug() << "before:" << src;
   //  qDebug() << "after: " << r;
   return r;
+}
+QStringList Lexicon::getUsedFont() {
+  QStringList changes = changeFontInSettings(QString());
+  QDir cssDirectory(getResourceFilePath(Lexicon::Stylesheet));
+  QStringList filters;
+  filters << "*.css";
+  QFileInfoList files =  cssDirectory.entryInfoList(filters);
+  for(int i=0;i < files.size();i++) {
+    changes << changeFontInStylesheet(files[i].absoluteFilePath(),QString());
+  }
+  for(int i=0;i < changes.size();i++) {
+    changes[i] = changes[i].remove(QChar('"'));
+  }
+  changes.removeDuplicates();
+  return changes;
 }
