@@ -147,6 +147,7 @@ They should not be translated.
 #define SID_SHORTCUT_SYNC_CONTENTS_WITH_PAGE   "Sync contents with page"
 #define SID_SHORTCUT_TOGGLE_INTERFACE          "Toggle interface"
 #define SID_SHORTCUT_SHOW_LOGS                 "Show logs"
+#define SID_SHORTCUT_ARABIC_FONT               "Change Arabic font"
 
 #define SID_SEARCH_IGNORE_DIACRITICS           "Ignore diacritics"
 #define SID_SEARCH_TYPE_REGEX                  "Regex"
