@@ -3823,6 +3823,16 @@ bool LanesLexicon::copyRecursively(const QString & srcPath,const QString & targe
   return true;
 }
 void LanesLexicon::onChangeArabicFont() {
-  FontChangeDialog d;
-  d.exec();
+  FontChangeDialog * d = new FontChangeDialog;
+  d->exec();
+  if (d->isModified()) {
+    for(int i=0;i < m_tabs->count();i++) {
+      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+      if (entry) {
+        entry->onReload();
+      }
+    }
+    m_tree->reloadFont();
+  }
+  delete d;
 }

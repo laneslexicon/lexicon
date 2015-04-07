@@ -13,7 +13,7 @@
 #define HEAD_SUPPLEMENT_COLUMN 3
 #define NODE_COLUMN 4
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
-  setObjectName("treeroots");
+  setObjectName("arabictree");
   readSettings();
   setColumnCount(5);
   //  setDragEnabled(true);
@@ -552,4 +552,15 @@ void ContentsWidget::contextMenuEvent(QContextMenuEvent * event) {
   QString root = item->text(ROOT_COLUMN);
   QLOG_DEBUG() << "at root" << root;
 
+}
+void ContentsWidget::reloadFont() {
+  SETTINGS
+
+  settings.beginGroup("Roots");
+  QString fontString = settings.value(SID_CONTENTS_ARABIC_FONT,QString()).toString();
+  if ( ! fontString.isEmpty()) {
+    QFont f;
+    f.fromString(fontString);
+    setFont(f);
+  }
 }

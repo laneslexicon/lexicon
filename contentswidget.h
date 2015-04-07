@@ -32,6 +32,7 @@ class ContentsWidget : public QTreeWidget {
   QTreeWidgetItem * findPlace(const Place &) const;
   void ensurePlaceVisible(const Place & p, bool select = false);
   int addEntries(const QString & root,QTreeWidgetItem *);
+  void reloadFont();
   public slots:
     void nodeExpanded(QTreeWidgetItem * item);
     void nodeCollapsed(QTreeWidgetItem * item);
