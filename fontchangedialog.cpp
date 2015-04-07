@@ -51,8 +51,13 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   layout->addLayout(formlayout);
   layout->addWidget(m_changes);
   layout->addWidget(buttonBox);
+  layout->addStretch();
   setLayout(layout);
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  m_changes->addItem(tr("Changes will be detailed here"));
+  setCurrentFontText();
+}
+void FontChangeDialog::setCurrentFontText() {
   QString t = "The current Arabic ";
   QStringList fonts = getLexicon()->getUsedFont();
   if (fonts.size() == 1) {
@@ -62,12 +67,13 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
     t += tr("fonts are");
   }
   t += " " + fonts.join(",") + ".";
-
   m_currentFont->setText(t);
 }
+
 QSize FontChangeDialog::sizeHint() const {
   return QSize(600,400);
 }
+
 void FontChangeDialog::readSettings() {
 }
 void FontChangeDialog::writeSettings() {
@@ -91,6 +97,7 @@ void FontChangeDialog::onApply() {
   QString arabicFont = m_arabicFont->currentText();
   QStringList changes;
   m_changes->setEnabled(true);
+
   m_changes->clear();
   QString t;
   t = getLexicon()->currentTheme();
@@ -145,5 +152,5 @@ void FontChangeDialog::onApply() {
       m_changes->addItem("");
     }
   }
-
+  setCurrentFontText();
 }

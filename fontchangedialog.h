@@ -25,6 +25,7 @@ class FontChangeDialog : public QDialog {
    void onShowAllChanged(int);
    void onApply();
  private:
+   void setCurrentFontText();
    //  QStringList m_arFonts;
   void readSettings();
   void writeSettings();
