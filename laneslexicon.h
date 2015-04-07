@@ -192,6 +192,7 @@ class LanesLexicon : public QMainWindow
       void syncFromEntry();
 
       void onDeleteTheme();
+      void onChangeArabicFont();
  protected:
       void closeEvent(QCloseEvent *);
  private:
@@ -411,6 +412,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_editThemeAction;
       QAction * m_deleteThemeAction;
       QAction * m_createThemeAction;
+      QAction * m_changeArabicFontAction;
       HistoryMaster * m_history;
       NoteMaster * m_notes;
 

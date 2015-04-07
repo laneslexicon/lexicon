@@ -614,6 +614,9 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_OPTIONS) {
     this->onOptions();
   }
+  else if (key == SID_SHORTCUT_ARABIC_FONT) {
+    this->onChangeArabicFont();
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -819,6 +822,9 @@ void LanesLexicon::createActions() {
   m_editThemeAction = new QAction(tr("&Edit"),this);
   m_deleteThemeAction = new QAction(tr("&Delete"),this);
   m_createThemeAction = new QAction(tr("&New/Copy"),this);
+
+  m_changeArabicFontAction = new QAction(tr("Change &Arabic font"),this);
+  connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
 
@@ -1253,6 +1259,7 @@ void LanesLexicon::createMenus() {
   m_toolMenu = m_mainmenu->addMenu(tr("&Tools"));
   m_toolMenu->setFocusPolicy(Qt::StrongFocus);
   m_toolMenu->setObjectName("toolmenu");
+  m_toolMenu->addAction(m_changeArabicFontAction);
   m_toolMenu->addAction(m_logViewerAction);
   m_toolMenu->addAction(m_editViewAction);
 
@@ -3814,4 +3821,8 @@ bool LanesLexicon::copyRecursively(const QString & srcPath,const QString & targe
     }
   }
   return true;
+}
+void LanesLexicon::onChangeArabicFont() {
+  FontChangeDialog d;
+  d.exec();
 }
