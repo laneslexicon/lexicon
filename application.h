@@ -17,6 +17,7 @@ public:
   Lexicon(int & argc, char ** argv);
   enum Status { Ok, ResourceDirError, NoThemeDirectory, ThemeNotFound , SettingsNotFound};
   enum Resource { Stylesheet, Image,XSLT,Keyboard,Map,Splash,ThemeRoot};
+  enum Stylesheet { Application , Entry, Print , Node };
   QString getConfig() const;
   void setOptions(const QMap<QString,QString> &);
   QMap<QString,QString> getOptions() const;
@@ -32,6 +33,7 @@ public:
   QStringList getKeyboards(int type = 0) ;
   QString     getDefaultKeyboard();
   bool        setDefaultKeyboard(const QString &);
+  QString getStylesheetFilePath(int type);
   QString getResourcePath(int type);
   QString getResourceFilePath(int type,const QString & = QString());
   QString spanArabic(const QString &,const QString & which = QString());

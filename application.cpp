@@ -802,3 +802,30 @@ QStringList Lexicon::getUsedFont() {
   changes.removeDuplicates();
   return changes;
 }
+QString Lexicon::getStylesheetFilePath(int type) {
+  QString fileName;
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  if (type == Lexicon::Application) {
+    settings.beginGroup("System");
+    fileName = settings.value(SID_SYSTEM_STYLESHEET,"application.css").toString();
+  }
+  if (type == Lexicon::Entry) {
+    settings.beginGroup("Entry");
+    fileName = settings.value(SID_ENTRY_CSS,"entry.css").toString();
+  }
+  if (type == Lexicon::Print) {
+    settings.beginGroup("Entry");
+    fileName = settings.value(SID_ENTRY_PRINT_CSS,"entry_print.css").toString();
+  }
+  if (fileName.isEmpty()) {
+    return fileName;
+  }
+  QDir cssDirectory(getResourceFilePath(Lexicon::Stylesheet));
+  f.setFile(cssDirectory,fileName);
+  if (f.exists()) {
+    return f.absoluteFilePath();
+  }
+  return QString();
+}
