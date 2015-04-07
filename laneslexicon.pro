@@ -74,7 +74,7 @@ SOURCES += main.cpp\
         historylist.cpp \
         nodeinfo.cpp \
         fontchangedialog.cpp \
-        arabicfontdialog.cpp \
+#        arabicfontdialog.cpp \
         zoomdialog.cpp \
         editview.cpp \
         deletethemedialog.cpp \
@@ -112,7 +112,7 @@ HEADERS  += laneslexicon.h \
             historylist.h \
             nodeinfo.h \
             fontchangedialog.h \
-            arabicfontdialog.h \
+#            arabicfontdialog.h \
             zoomdialog.h \
             editview.h \
             deletethemedialog.h \
