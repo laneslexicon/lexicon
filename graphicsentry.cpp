@@ -679,6 +679,44 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
   return np;
   }
 */
+void GraphicsEntry::dumpInfo(EntryItem * item , const QString & node) {
+  QString prefix;
+  if (item->isRoot()) {
+    prefix = "root-";
+  }
+  if (m_dumpXml) {
+    QFileInfo fi(QDir::tempPath(),QString("%1%2.xml").arg(prefix).arg(node));
+    QFile f(fi.filePath());
+    if (f.open(QIODevice::WriteOnly)) {
+      QTextStream out(&f);
+      out.setCodec("UTF-8");
+      out << item->getXml();
+    }
+  }
+  if (m_dumpOutputHtml) {
+    QFileInfo fi(QDir::tempPath(),QString("%1%2-out.html").arg(prefix).arg(node));
+        QFile f(fi.filePath());
+        if (f.open(QIODevice::WriteOnly)) {
+          QTextStream out(&f);
+          out.setCodec("UTF-8");
+          out << item->getOutputHtml();
+        }
+  }
+}
+void GraphicsEntry::setItemPlace(EntryItem * item,const QSqlQuery & query) {
+  Place p;
+
+  p.setSupplement(query.value("supplement").toInt());
+  p.setNode(query.value(7).toString());
+  p.setRoot(query.value(0).toString());
+  p.setWord(query.value(2).toString());
+  p.setPage(query.value(5).toInt());
+  p.setHead(query.value(9).toString());
+  item->setPlace(p);
+  qDebug() << Q_FUNC_INFO << p.getRoot() << p.isRoot();
+  qDebug() << Q_FUNC_INFO << p;
+  qDebug() << Q_FUNC_INFO << item->isRoot();
+}
 /**
  * TODO if this is called as part of search for node it does not return
  *      the Place that matches the node, but the root
@@ -751,6 +789,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     return noplace;
   }
 
+
   QString str = QString("<word type=\"root\" ar=\"%1\" quasi=\"%2\"></word>").arg(root).arg(quasi);
 
   EntryItem * rootItem  = createEntry(str);
@@ -759,15 +798,19 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     QLOG_WARN() << QString("Error build root item for:[%1]").arg(str);
     return p;
   }
+  Place rootPlace;
+  rootPlace.setRoot(root);
+  rootPlace.setSupplement(rootQuery.value(8).toInt());
+  rootPlace.setPage(rootQuery.value(5).toInt());
+
+  rootItem->setPlace(rootPlace);
+  dumpInfo(rootItem,rootQuery.value(7).toString());
   ///
   /// this is always set. Originally planned to allow build ever longer pages
   ///
   if (m_clearScene) {
     onClearScene();
   }
-  rootItem->setRoot(root,true);
-  rootItem->setSupplement(rootQuery.value(8).toInt());
-  rootItem->setPage(rootQuery.value(5).toInt());
 
   items << rootItem;
 
@@ -785,26 +828,11 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       .arg(rootQuery.value(8).toInt());
     t += rootQuery.value(4).toString();
     t += "</word>";
-    if (m_dumpXml) {
-      QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(rootQuery.value(7).toString()));
-      QFile f(fi.filePath());
-      if (f.open(QIODevice::WriteOnly)) {
-        QTextStream out(&f);
-        out.setCodec("UTF-8");
-        out << t;
-      }
-    }
     EntryItem * item  = createEntry(t);
     if (item != NULL) {
-      if (m_dumpOutputHtml) {
-        QFileInfo fi(QDir::tempPath(),QString("%1-out.html").arg(rootQuery.value(7).toString()));
-        QFile f(fi.filePath());
-        if (f.open(QIODevice::WriteOnly)) {
-          QTextStream out(&f);
-          out.setCodec("UTF-8");
-          out << item->getOutputHtml();
-        }
-      }
+      setItemPlace(item,rootQuery);
+      dumpInfo(item,rootQuery.value(7).toString());
+      /*
       Place p;
       p.setSupplement(supplement);
       p.setNode(rootQuery.value(7).toString());
@@ -813,6 +841,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       p.setPage(rootQuery.value(5).toInt());
       p.setHead(rootQuery.value(9).toString());
       item->setPlace(p);
+      */
       QList<Note *> notes;
       item->setNotes();//getApp()->notes()->find(rootQuery.value(2).toString()));
       items << item;
