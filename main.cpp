@@ -189,6 +189,9 @@ int main(int argc, char *argv[])
     if (parser.isSet(noguiOption)) {
       return 0;
     }
+    if (parser.isSet(themeOption)) {
+      mansur.setTheme(parser.value(themeOption));
+    }
     mansur.startLogging();
     QTranslator translator;
     QString trfile;
