@@ -1283,6 +1283,7 @@ void GraphicsEntry::prependEntries(int startPos) {
  */
 QString GraphicsEntry::fixHtml(const QString & t) {
   QString html = t;
+  /*
   QRegularExpression rxStart("<!--insert_start_(\\w+)-->");
   QRegularExpressionMatch m = rxStart.match(html);
   if (m.hasMatch()) {
@@ -1292,6 +1293,14 @@ QString GraphicsEntry::fixHtml(const QString & t) {
   m = rxEnd.match(html);
   if (m.hasMatch()) {
     html.replace(m.captured(0),QString("</%1>").arg(m.captured(1)));
+  }
+  html = html.remove("\n");
+  */
+  QRegularExpression rxInsert("<!--insert{([^}]+)}-->",QRegularExpression::MultilineOption);
+  QRegularExpressionMatchIterator iter = rxInsert.globalMatch(html);
+  while(iter.hasNext()) {
+    QRegularExpressionMatch m = iter.next();
+    html.replace(m.captured(0),m.captured(1));
   }
   return html;
 }
