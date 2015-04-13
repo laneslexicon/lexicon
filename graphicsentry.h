@@ -125,6 +125,7 @@ class GraphicsEntry : public QWidget {
     QString getOutputFilename(const QString &,const QString &,const QString & node = QString());
     void readSettings();
     void writeDefaultSettings();
+    QString fixHtml(const QString &);
     QString readCssFromFile(const QString &name);
     bool saveLink(const QString &,const QString &);
     void dumpInfo(EntryItem *,const QString & node);

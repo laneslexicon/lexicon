@@ -713,9 +713,11 @@ void GraphicsEntry::setItemPlace(EntryItem * item,const QSqlQuery & query) {
   p.setPage(query.value(5).toInt());
   p.setHead(query.value(9).toString());
   item->setPlace(p);
+  /*
   qDebug() << Q_FUNC_INFO << p.getRoot() << p.isRoot();
   qDebug() << Q_FUNC_INFO << p;
   qDebug() << Q_FUNC_INFO << item->isRoot();
+  */
 }
 /**
  * TODO if this is called as part of search for node it does not return
@@ -1257,6 +1259,44 @@ void GraphicsEntry::prependEntries(int startPos) {
   }
 }
 /**
+ * This is horrible. But:
+ * (1) We are using p { line-height : 45px } to specify line-height
+ * (2) when setHtml(html) is called, our attributes are merged with ones used internally
+ *     by Qt and placed in <p style="xxxxxx line-height:45px">
+ * (3) Our css is replaced by p { some attrubutes used by qt}
+ *     and our line height spec is removed the css specification
+ * (4) If the html contains a block element (eg. <table>) then after this tag is closed
+ *      a  <p> tag will be inserted when it finds text outside of tags.
+ *
+ *      You get this:
+ *
+ *      Some text                        <p style="line-height:45px">Some text
+ *      <table>                          <table>
+ *      </table>                         </table>
+ *
+ *      more text                        <p>more text</p>
+ *                                       </p>
+ *
+ *
+ *  (5) the line-height is lost.
+ * @return
+ */
+QString GraphicsEntry::fixHtml(const QString & t) {
+  QString html = t;
+  QRegularExpression rxStart("<!--insert_start_(\\w+)-->");
+  QRegularExpressionMatch m = rxStart.match(html);
+  if (m.hasMatch()) {
+    html.replace(m.captured(0),QString("<%1>").arg(m.captured(1)));
+  }
+  QRegularExpression rxEnd("<!--insert_end_(\\w+)-->");
+  m = rxEnd.match(html);
+  if (m.hasMatch()) {
+    html.replace(m.captured(0),QString("</%1>").arg(m.captured(1)));
+  }
+  return html;
+}
+
+/**
  *
  *
  * @param type
@@ -1280,7 +1320,8 @@ QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xm
   if (ok == 0) {
     QString html = xsltTransform(type,xml);
     if (! html.isEmpty()) {
-      return html;
+
+      return fixHtml(html);
     }
     else {
       QLOG_WARN() << "Transform returned no HTML";
