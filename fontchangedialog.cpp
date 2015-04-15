@@ -1,5 +1,4 @@
 #include "fontchangedialog.h"
-#include "arabicfontdialog.h"
 #include "application.h"
 #include "definedsettings.h"
 #include "externs.h"
