@@ -917,8 +917,9 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// all items have been added and positions calculated
   ///
   m_view->setFocus();
-  m_transform = m_view->transform();
+  //m_transform = m_view->transform();
   this->setScale(m_scale);
+
   //QLOG_DEBUG() << "Scene rect" << m_scene->sceneRect();
   /// without thus centerOn() does not work properly for
   /// items added to the scene
