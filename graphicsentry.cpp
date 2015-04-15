@@ -164,7 +164,7 @@ void GraphicsEntry::readSettings() {
   else {
     m_clearScene = vn.toBool();
   }
-
+  m_offPageMovement = settings.value(SID_ENTRY_OFF_PAGE,false).toBool();
 
   /// these are set to empty to disable the feature
   m_moveFocusUpKey = settings.value(SID_ENTRY_MOVE_FOCUS_UP,QString()).toString();
@@ -358,10 +358,17 @@ void GraphicsEntry::moveFocusDown() {
   EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
   if (item) {
     int m = m_items.size() - 1;
-    for(int i=0;i < m ;i++) {
+    for(int i=0;i <= m ;i++) {
       if (m_items[i] == item) {
-        setCurrentItem(m_items[i+1]);
-        return;
+        if (i < m) {
+          setCurrentItem(m_items[i+1]);
+          return;
+        }
+        else {
+          if (m_offPageMovement) {
+            moveForward();
+          }
+        }
       }
     }
   }
@@ -370,13 +377,27 @@ void GraphicsEntry::moveFocusUp() {
   EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
   if (item) {
     int m = m_items.size();
-    for(int i=1;i < m ;i++) {
+    for(int i=0;i < m ;i++) {
       if (m_items[i] == item) {
-        setCurrentItem(m_items[i-1]);
-        return;
+        if (i > 0) {
+          setCurrentItem(m_items[i-1]);
+          return;
+        }
+        else {
+          if (m_offPageMovement) {
+            emit(prevHead(m_items[0]->getPlace()));
+          }
+          return;
+        }
       }
     }
   }
+}
+void GraphicsEntry::focusLast() {
+  if (m_items.size() > 0) {
+    setCurrentItem(m_items[m_items.size() - 1]);
+  }
+
 }
 /**
  * If no index is given:
@@ -1242,7 +1263,6 @@ void GraphicsEntry::prependEntries(int startPos) {
     }
     sz = m_items[i]->document()->size();
     if (m_items[i]->hasNotes()) {
-      QLOG_DEBUG() << "Adding note button for";
       qreal btnx;
       qreal btny;
       btnx = xpos + m_items[i]->boundingRect().width();
@@ -1283,6 +1303,8 @@ void GraphicsEntry::prependEntries(int startPos) {
  */
 QString GraphicsEntry::fixHtml(const QString & t) {
   QString html = t;
+
+
   /*
   QRegularExpression rxStart("<!--insert_start_(\\w+)-->");
   QRegularExpressionMatch m = rxStart.match(html);
@@ -1366,6 +1388,7 @@ qreal GraphicsEntry::onZoomIn() {
 }
 qreal GraphicsEntry::onZoomOut() {
   m_view->setTransform(m_transform);
+  /// TODO shouldn't this be from scaleStep
   m_scale -= .1;
   m_view->scale(m_scale,m_scale);
   return m_scale;
@@ -1545,7 +1568,6 @@ void GraphicsEntry::clearAll() {
   }
 }
 void GraphicsEntry::selectEntry() {
-  QLOG_DEBUG() << "select entry";
   EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
   if (item) {
     item->selectAll();

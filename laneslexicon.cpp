@@ -347,8 +347,11 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
           this,SLOT(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
   connect(entry,SIGNAL(nextRoot(const QString &)),this,SLOT(findNextRoot(const QString &)));
   connect(entry,SIGNAL(prevRoot(const QString &)),this,SLOT(findPrevRoot(const QString &)));
+
   connect(entry,SIGNAL(next(const Place &)),this,SLOT(moveNext(const Place &)));
   connect(entry,SIGNAL(prev(const Place &)),this,SLOT(movePrevious(const Place &)));
+  connect(entry,SIGNAL(prevHead(const Place &)),this,SLOT(movePreviousHead(const Place &)));
+
   connect(entry,SIGNAL(historyPositionChanged(int)),this,SLOT(historyPositionChanged(int)));
   connect(entry,SIGNAL(historyAddition(const Place &)),this,SLOT(historyAddition(const Place &)));
   connect(entry,SIGNAL(bookmarkAdd(const QString &,const Place &)),this,SLOT(bookmarkAdd(const QString &,const Place &)));
@@ -2632,6 +2635,24 @@ void LanesLexicon::moveNext(const Place & p) {
 void LanesLexicon::movePrevious(const Place & p) {
   if (m_navMode == Lane::By_Root) {
     findPrevRoot(p.getRoot());
+  }
+  else {
+    onPrevPage();
+  }
+}
+/**
+ * if scrolling up a page, then at the top of the page
+ * find the last headword of previous root
+ *
+ * @param p
+ */
+void LanesLexicon::movePreviousHead(const Place & p) {
+  if (m_navMode == Lane::By_Root) {
+    findPrevRoot(p.getRoot());
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+    if (entry) {
+      entry->focusLast();
+    }
   }
   else {
     onPrevPage();

@@ -81,6 +81,7 @@ class GraphicsEntry : public QWidget {
     void searchNext();
     bool hasNode(const QString &) const;
     bool focusNode(const QString &);
+    void focusLast();
     void home();
     QString getHome() const;
     void setHome(const QString &);
@@ -157,6 +158,7 @@ class GraphicsEntry : public QWidget {
     bool m_dumpXml;
     bool m_dumpHtml;
     bool m_dumpOutputHtml;
+    bool m_offPageMovement;
 
     int m_pagingDir;
     int m_entryMargin;
@@ -220,6 +222,7 @@ class GraphicsEntry : public QWidget {
     void focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason);
     void nextRoot(const QString &);
     void prevRoot(const QString &);
+    void prevHead(const Place &);
     void next(const Place &);
     void prev(const Place &);
     void cssChanged();
