@@ -2914,6 +2914,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
         m_tabs->setCurrentIndex(ix);
       }
       if (options.activateTab()) {
+        m_tabs->setCurrentIndex(ix);
         s->focusTable();
       }
       return;
