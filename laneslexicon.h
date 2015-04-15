@@ -56,7 +56,8 @@ class ArabicSearchDialog;
 class NoteMaster;
 class HistoryMaster;
 class Place;
-class ArabicSearchDialog;
+class NodeSearchDialog;
+class PageSearchDialog;
 class AppMenu;
 class InputMapper;
 class GraphicsEntry;
@@ -269,6 +270,12 @@ class LanesLexicon : public QMainWindow
       int m_lastPage;
 
       QLabel * m_placeIndicator;
+
+      ArabicSearchDialog * m_rootSearchDialog;
+      ArabicSearchDialog * m_wordSearchDialog;
+      ArabicSearchDialog * m_headSearchDialog;
+      NodeSearchDialog   * m_nodeSearchDialog;
+      PageSearchDialog   * m_pageSearchDialog;
 
       bool m_toolbarText;
       bool m_linkContents;

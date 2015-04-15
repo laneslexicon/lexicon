@@ -19,11 +19,13 @@ class ArabicSearchDialog : public QDialog {
 
  public:
   ArabicSearchDialog(int type,QWidget * parent = 0, Qt::WindowFlags f = 0);
-  QString getText();
+  ~ArabicSearchDialog();
+  QString getText() const;
   void setPrompt(const QString &);
   //  void setOptions(SearchOptions &);
-  void getOptions(SearchOptions &);
-  bool getForceLTR() ;
+  void getOptions(SearchOptions &) const;
+  bool getForceLTR() const ;
+  void setText(const QString &);
   public slots:
     virtual void showOptions(bool);
     void showKeyboard();
@@ -51,6 +53,7 @@ class NodeSearchDialog : public QDialog {
  public:
   NodeSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   QString getText() const;
+  void setText(const QString &);
   void getOptions(SearchOptions &);
   void setOptions();
   public slots:
@@ -74,6 +77,7 @@ class PageSearchDialog : public QDialog {
   int getPage() const;
   void getOptions(SearchOptions &);
   void setOptions();
+  void setText(const QString &);
   public slots:
   void checkOptions(int x = 0);
  private:

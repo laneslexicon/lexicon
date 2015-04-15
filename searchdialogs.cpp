@@ -165,7 +165,9 @@ void ArabicSearchDialog::onKeyboardShortcut(const QString & key) {
     m_moreButton->animateClick();
   }
 }
-
+ArabicSearchDialog::~ArabicSearchDialog() {
+  qDebug() << Q_FUNC_INFO;
+}
 void ArabicSearchDialog::keyboardClosed() {
   showKeyboard();
 }
@@ -198,7 +200,7 @@ void ArabicSearchDialog::showOptions(bool v) {
   /// this shrinks the dialog
   this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
-QString ArabicSearchDialog::getText() {
+QString ArabicSearchDialog::getText() const {
   QString t = m_edit->text().trimmed();
   t.remove(QChar(0x202d));
   return t;
@@ -212,14 +214,17 @@ void ArabicSearchDialog::setOptions(SearchOptions & opts) {
   m_options->setOptions(m_searchType);
 }
 */
-void ArabicSearchDialog::getOptions(SearchOptions & opts) {
+void ArabicSearchDialog::getOptions(SearchOptions & opts) const {
   m_options->getOptions(opts);
 }
 void ArabicSearchDialog::loadKeymap(const QString & mapname) {
   m_edit->activateMap(mapname,true);
 }
-bool ArabicSearchDialog::getForceLTR() {
+bool ArabicSearchDialog::getForceLTR() const {
   return m_options->getForceLTR();
+}
+void ArabicSearchDialog::setText(const QString & t) {
+  m_edit->setText(t);
 }
 /**
  *
@@ -308,6 +313,9 @@ void NodeSearchDialog::setOptions() {
 }
 void NodeSearchDialog::checkOptions(int /* state */) {
   m_switchFocus->setEnabled(m_newTab->isChecked());
+}
+void NodeSearchDialog::setText(const QString & t) {
+  m_edit->setText(t);
 }
 /**
  *
@@ -399,4 +407,7 @@ void PageSearchDialog::setOptions() {
 }
 void PageSearchDialog::checkOptions(int /* state */) {
   m_switchFocus->setEnabled(m_newTab->isChecked());
+}
+void PageSearchDialog::setText(const QString & t) {
+  m_edit->setText(t);
 }

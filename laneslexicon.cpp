@@ -48,6 +48,12 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_bookmarkMap = NULL;
   m_helpview = NULL;
 
+  m_rootSearchDialog = NULL;
+  m_wordSearchDialog = NULL;
+  m_headSearchDialog = NULL;
+  m_nodeSearchDialog = NULL;
+  m_pageSearchDialog = NULL;
+
   createActions();
   readSettings();
 
@@ -300,6 +306,27 @@ void LanesLexicon::cleanup() {
   if (m_helpview != NULL) {
     delete m_helpview;
     m_helpview = 0;
+  }
+  if (m_rootSearchDialog != NULL) {
+    delete m_rootSearchDialog;
+    m_rootSearchDialog = 0;
+  }
+  if (m_wordSearchDialog != NULL) {
+    delete m_wordSearchDialog;
+    m_wordSearchDialog = 0;
+  }
+
+  if (m_headSearchDialog != NULL) {
+    delete m_headSearchDialog;
+    m_headSearchDialog = 0;
+  }
+  if (m_nodeSearchDialog != NULL) {
+    delete m_nodeSearchDialog;
+    m_nodeSearchDialog = 0;
+  }
+  if (m_pageSearchDialog != NULL) {
+    delete m_pageSearchDialog;
+    m_pageSearchDialog = 0;
   }
   /// TODO close notes db
   freeXslt();
@@ -2792,13 +2819,16 @@ void LanesLexicon::testSlot() {
 void LanesLexicon::searchForPage() {
   int page = 0;
   SearchOptions options;
-  PageSearchDialog * d = new PageSearchDialog(this);
-  //  d->setOptions(m_searchOptions);
-  if (d->exec()) {
-      page = d->getPage();
-      d->getOptions(options);
+  if (m_pageSearchDialog == NULL) {
+    m_pageSearchDialog  = new PageSearchDialog();
   }
-  delete d;
+  else {
+    m_pageSearchDialog->setText("");
+  }
+  if (m_pageSearchDialog->exec()) {
+      page = m_pageSearchDialog->getPage();
+      m_pageSearchDialog->getOptions(options);
+  }
   if (page == 0)
     return;
 
@@ -2847,17 +2877,23 @@ void LanesLexicon::searchForPage() {
 }
 void LanesLexicon::searchForRoot() {
   int ix;
-  ArabicSearchDialog d(SearchOptions::Root,this);
+  if (m_rootSearchDialog == NULL) {
+    m_rootSearchDialog = new ArabicSearchDialog(SearchOptions::Root);
+  }
+  else {
+    m_rootSearchDialog->setText("");
+  }
+  //  ArabicSearchDialog d(SearchOptions::Root,this);
   //  d.setOptions(m_searchOptions);
-  if (d.exec()) {
-    QString t = d.getText();
+  if (m_rootSearchDialog->exec()) {
+    QString t = m_rootSearchDialog->getText();
     if (! t.isEmpty()) {
       /// TODO maybe change this to if == Latin
       if (! UcdScripts::isScript(t,"Arabic")) {
         t = convertString(t);
       }
       SearchOptions opts;
-      d.getOptions(opts);
+      m_rootSearchDialog->getOptions(opts);
       Place p;
       p.setRoot(t);
       ix = this->hasPlace(p,GraphicsEntry::RootSearch,false);
@@ -2951,39 +2987,52 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   }
 }
 void LanesLexicon::searchForWord() {
-  ArabicSearchDialog d(SearchOptions::Word,this);
+  if (m_wordSearchDialog == NULL) {
+    m_wordSearchDialog = new ArabicSearchDialog(SearchOptions::Word);
+  }
+  else {
+    m_wordSearchDialog->setText("");
+  }
   //  d.setOptions(m_searchOptions);
-  if (d.exec()) {
-    QString t = d.getText();
+  if (m_wordSearchDialog->exec()) {
+    QString t = m_wordSearchDialog->getText();
     if (! t.isEmpty()) {
-      this->search(SearchOptions::Word,&d,t);
+      this->search(SearchOptions::Word,m_wordSearchDialog,t);
     }
   }
-  d.close();
   m_searchButton->menu()->hide();
 }
 
 /// TODO these needs to search the entry looking for bareword or word
 void LanesLexicon::searchForEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Entry,this);
+  if (m_headSearchDialog == NULL) {
+    m_headSearchDialog  = new ArabicSearchDialog(SearchOptions::Entry);
+  }
+  else {
+    m_headSearchDialog->setText("");
+  }
   //  d->setOptions(m_searchOptions);
-  if (d->exec()) {
-    QString t = d->getText();
+  if (m_headSearchDialog->exec()) {
+    QString t = m_headSearchDialog->getText();
     if (! t.isEmpty()) {
-      this->search(SearchOptions::Entry,d,t);
+      this->search(SearchOptions::Entry,m_headSearchDialog,t);
     }
   }
-  delete d;
 }
 void LanesLexicon::searchForNode() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  NodeSearchDialog * d = new NodeSearchDialog(this);
-  if (d->exec()) {
-    QString t = d->getText();
+  if (m_nodeSearchDialog == NULL) {
+    m_nodeSearchDialog = new NodeSearchDialog();
+  }
+  else {
+    m_nodeSearchDialog->setText("");
+  }
+  if (m_nodeSearchDialog->exec()) {
+    QString t = m_nodeSearchDialog->getText();
     if (! t.isEmpty()) {
       SearchOptions options;
-      d->getOptions(options);
+      m_nodeSearchDialog->getOptions(options);
       Place p;
       p.setNode(t);
       int i = this->hasPlace(p,GraphicsEntry::NodeSearch,false);
@@ -3000,7 +3049,6 @@ void LanesLexicon::searchForNode() {
       }
     }
   }
-  delete d;
   m_searchButton->menu()->hide();
 }
 void LanesLexicon::pageZoomIn() {
