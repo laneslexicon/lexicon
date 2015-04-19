@@ -40,10 +40,6 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   hlayout->addStretch();
   formlayout->addRow(tr(""),hlayout);
 
-  connect(m_arabicFont,SIGNAL(currentTextChanged(const QString &)),this,SLOT(onFontChanged(const QString &)));
-
-  connect(m_allFonts,SIGNAL(stateChanged(int)),this,SLOT(onShowAllChanged(int)));
-  connect(m_applyButton,SIGNAL(clicked()),this,SLOT(onApply()));
   QDialogButtonBox *   buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
 
   connect(buttonBox,SIGNAL(rejected()),this,SLOT(reject()));
@@ -53,15 +49,20 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   layout->addWidget(buttonBox);
   layout->addStretch();
   setLayout(layout);
-  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+
   m_changes->addItem(tr("Changes will be detailed here"));
   setCurrentFontText();
+  connect(m_arabicFont,SIGNAL(currentTextChanged(const QString &)),this,SLOT(onFontChanged(const QString &)));
+  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(m_allFonts,SIGNAL(stateChanged(int)),this,SLOT(onShowAllChanged(int)));
+  connect(m_applyButton,SIGNAL(clicked()),this,SLOT(onApply()));
 }
 void FontChangeDialog::setCurrentFontText() {
   QString t = "The current Arabic ";
   QStringList fonts = getLexicon()->getUsedFont();
-  if (fonts.size() == 1) {
+  if (fonts.size() > 0) {
     t += tr("font is");
+    QLOG_DEBUG() << Q_FUNC_INFO << "Setting font to" << fonts;
     m_arabicFont->setCurrentText(fonts[0]);
   }
   else {
