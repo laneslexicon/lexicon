@@ -32,14 +32,6 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_fullHeadText = new QLineEdit;
 
 
-  /// these are for the SearchDialog box
-  /*
-  m_fullNewTab = new QCheckBox;
-  m_fullGoTab = new QCheckBox;
-  m_fullWholeWord = new QCheckBox;
-  m_fullDiacritics = new QCheckBox;
-  m_fullRegex  = new QCheckBox;
-  */
   QFormLayout * fulllayout = new QFormLayout;
   QHBoxLayout * colorlayout = new QHBoxLayout;
   colorlayout->addWidget(m_fullHeadColor);
@@ -55,14 +47,8 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   fulllayout->addRow(tr("Step size"),m_fullStep);
   fulllayout->addRow(tr("Text for head word results"),m_fullHeadText);
   fulllayout->addRow(tr("One row for each entry"),m_fullOneRow);
-  /*
-  fulllayout->addRow(tr("Whole word"),m_fullWholeWord);
-  fulllayout->addRow(tr("Ignore diacritics"),m_fullDiacritics);
-  fulllayout->addRow(tr("Regular exprssion search"),m_fullRegex);
-  fulllayout->addRow(tr("Open in new tab"),m_fullNewTab);
-  fulllayout->addRow(tr("Go to new tab"),m_fullGoTab);
-  */
   fulllayout->addRow(tr("Progress interval"),m_fullStep);
+
   QPushButton * fullbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout1 = new QHBoxLayout;
   setlayout1->addWidget(fullbtn);

@@ -12,7 +12,7 @@ DialogOptions::DialogOptions(QWidget * parent) : QDialog(parent) {
 
   layout->addRow(tr("Whole word"),m_wholeWord);
   layout->addRow(tr("Ignore diacritics"),m_diacritics);
-  layout->addRow(tr("Regular exprssion search"),m_regex);
+  layout->addRow(tr("Regular expression search"),m_regex);
   layout->addRow(tr("Force Left-to-Right input\n(for regular exprssion search)"),m_force);
   layout->addRow(tr("Open in new tab"),m_newTab);
   layout->addRow(tr("Go to new tab"),m_goTab);
