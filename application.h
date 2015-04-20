@@ -8,6 +8,7 @@
 #include <QSettings>
 #include <QFontDatabase>
 #include <QWidget>
+#include <QLineEdit>
 #include <QRegularExpression>
 #include <iostream>
 #include "QsLog.h"
@@ -39,6 +40,7 @@ public:
   QString spanArabic(const QString &,const QString & which = QString());
   QString scanAndSpan(const QString &,const QString & css = QString("ar"));
   QDir themeDirectory() { return m_settingsDir; }
+  void setCursorPosition(QWidget *,int start=0);
   QString imageDirectory();
   QString errorPath() const { return m_errorFilePath; }
   QString errorFile() const { return m_errorFile; }
