@@ -24,6 +24,9 @@ OptionsWidget::OptionsWidget(const QString & theme,QWidget * parent) : QWidget(p
   m_settingsFileName = QString("%1.ini").arg(theme);
 #endif
 }
+QSize OptionsWidget::sizeHint() const {
+  return QSize(800,400);
+}
 void OptionsWidget::setFileName(const QString & theme) {
   m_settingsFileName = theme;
   m_btns = 0;

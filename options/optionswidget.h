@@ -37,6 +37,7 @@ class OptionsWidget : public QWidget {
   virtual bool isModified() = 0;
   virtual void setupConnections();
   virtual void addButtons();
+  QSize sizeHint() const;
   void setDebug(bool);
   void setFileName(const QString &);
   void blockAllSignals(bool block);

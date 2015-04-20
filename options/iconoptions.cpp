@@ -98,14 +98,17 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_zoomOut = new QLineEdit;
   rightlayout->addRow(tr("Zoom out"),addLine(m_zoomOut,SID_ICON_ZOOM_OUT));
 
-
+  qDebug() << "Left spacing" << leftlayout->verticalSpacing();
+  qDebug() << "Right spacing" << rightlayout->verticalSpacing();
+  leftlayout->setVerticalSpacing(5);
+  rightlayout->setVerticalSpacing(5);
   hlayout->addLayout(leftlayout);
   hlayout->addSpacing(30);
   hlayout->addLayout(rightlayout);
 
   vlayout->addLayout(layout);
   vlayout->addLayout(hlayout);
-  vlayout->addStretch();
+  //  vlayout->addStretch();
   setLayout(vlayout);
   addButtons();
   readSettings();

@@ -53,7 +53,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   QPushButton * fullbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout1 = new QHBoxLayout;
   setlayout1->addWidget(fullbtn);
-  setlayout1->addStretch();
+  //  setlayout1->addStretch();
   fulllayout->addRow(tr("Search dialog options"),setlayout1);
   fulllayout->addRow(tr("Debug"),m_fullDebug);
 
@@ -86,7 +86,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   QPushButton * headbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout2 = new QHBoxLayout;
   setlayout2->addWidget(headbtn);
-  setlayout2->addStretch();
+  //  setlayout2->addStretch();
   headlayout->addRow(tr("Search dialog options"),setlayout2);
   connect(headbtn,SIGNAL(clicked()),this,SLOT(onHeadDialog()));
 
@@ -107,7 +107,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   QPushButton * localbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout3 = new QHBoxLayout;
   setlayout3->addWidget(localbtn);
-  setlayout3->addStretch();
+  //  setlayout3->addStretch();
   locallayout->addRow(tr("Search dialog options"),setlayout3);
   connect(localbtn,SIGNAL(clicked()),this,SLOT(onLocalDialog()));
 
@@ -142,8 +142,12 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
 
   layout->addWidget(fullbox);
-  layout->addWidget(headbox);
-  layout->addWidget(localbox);
+  QHBoxLayout * hlayoutsearches = new QHBoxLayout;
+  hlayoutsearches->addWidget(headbox);
+  hlayoutsearches->addWidget(localbox);
+
+  layout->addLayout(hlayoutsearches);//Widget(headbox);
+  //  layout->addWidget(localbox);
   layout->addWidget(otherbox);
 
   setLayout(layout);

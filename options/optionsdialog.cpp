@@ -45,7 +45,8 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   QString testFileName("xxx.ini");
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Options");
-  resize(settings.value("Size", QSize(500, 700)).toSize());
+  //resize(QSize(600, 400));
+  resize(settings.value("Size", QSize(600, 400)).toSize());
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
   bool debugChanges = settings.value("Debug",false).toBool();
   if (settings.value("Roots",true).toBool()) {
