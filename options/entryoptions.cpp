@@ -3,6 +3,7 @@
 #include "QsLog.h"
 #ifndef STANDALONE
 #include "application.h"
+#include "externs.h"
 #endif
 /**
  * Not done:
@@ -162,7 +163,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   addButtons();
   readSettings();
   setupConnections();
-
+  getLexicon()->setCursorPosition(this);
 }
 
 void EntryOptions::readSettings() {

@@ -4,6 +4,7 @@
 #include "popupoptions.h"
 #ifndef STANDALONE
 #include "application.h"
+#include "externs.h"
 #endif
 /**
  * Not done:
@@ -149,7 +150,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   addButtons();
   readSettings();
   setupConnections();
-
+  getLexicon()->setCursorPosition(this);
 }
 
 void FindOptions::readSettings() {
