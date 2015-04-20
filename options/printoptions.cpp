@@ -15,11 +15,12 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
   */
   m_section = "Printer";
 
-  QVBoxLayout * vlayout = new QVBoxLayout;
-  QFormLayout * formlayout = new QFormLayout;
-
   m_dialogButton  = new QPushButton(tr("Click to change print options"),this);
   connect(m_dialogButton,SIGNAL(clicked()),this,SLOT(onPrintDialog()));
+
+  QHBoxLayout * printbtnlayout = new QHBoxLayout;
+  printbtnlayout->addWidget(m_dialogButton);
+  printbtnlayout->addStretch();
 
   m_directoryButton = new QPushButton(tr("Select directory"),this);
   connect(m_directoryButton,SIGNAL(clicked()),this,SLOT(onDirectory()));
@@ -58,22 +59,35 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(m_pdfDirectory);
   hlayout->addWidget(m_directoryButton);
+  hlayout->addStretch();
 
-  formlayout->addRow(new QLabel("<em>" + tr("Printer options") + "</em>"));
-  formlayout->addRow(m_dialogButton);
-  formlayout->addRow(tr("Name"),m_printerName);
-  formlayout->addRow(tr("Orientation"),m_orientation);
-  formlayout->addRow(tr("Paper size"),m_paperSize);
-  formlayout->addRow(tr("Resolution"),m_resolution);
-  formlayout->addRow(tr("Copies"),m_copyCount);
-  formlayout->addRow(tr("Full page"),m_fullPage);
-  formlayout->addRow(new QLabel("<em>" + tr("Usage options") + "</em>"));
+  QVBoxLayout * vlayout = new QVBoxLayout;
+
+
+  QGroupBox * printerbox = new QGroupBox(tr("Printer properties"));
+  QFormLayout * printerlayout = new QFormLayout;
+
+  printerlayout->addRow("",printbtnlayout);
+  printerlayout->addRow(tr("Name"),m_printerName);
+  printerlayout->addRow(tr("Orientation"),m_orientation);
+  printerlayout->addRow(tr("Paper size"),m_paperSize);
+  printerlayout->addRow(tr("Resolution"),m_resolution);
+  printerlayout->addRow(tr("Copies"),m_copyCount);
+  printerlayout->addRow(tr("Full page"),m_fullPage);
+  printerbox->setLayout(printerlayout);
+
+  QGroupBox * usagebox = new QGroupBox(tr("Other options"));
+  QFormLayout * formlayout = new QFormLayout;
+
   formlayout->addRow(tr("PDF output"),m_pdfOutput);
   formlayout->addRow(tr("PDF directory"),hlayout);
   formlayout->addRow(tr("Auto name PDF"),m_pdfAutoName);
   formlayout->addRow(tr("Naming method"),m_pdfName);
   formlayout->addRow(tr("Set as default"),m_alwaysUse);
-  vlayout->addLayout(formlayout);
+  usagebox->setLayout(formlayout);
+
+  vlayout->addWidget(printerbox);
+  vlayout->addWidget(usagebox);
 
   setLayout(vlayout);
   addButtons();
