@@ -24,7 +24,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_fullStep = new QSpinBox;
 
   m_fullFragmentSize->setMaximumWidth(MEDIUM_EDIT);
-  m_fullStep->setMaximumWidth(MEDIUM_EDIT);
+  //  m_fullStep->setMaximumWidth(MEDIUM_EDIT);
   m_fullStep->setSingleStep(25);
  //  m_fullViewerWidth = new QLineEdit;
   //  m_fullViewerHeight = new QLineEdit;
@@ -41,11 +41,9 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   colorlayout->addWidget(colorbutton);
   colorlayout->addStretch();
 
-
   fulllayout->addRow(tr("Include head words in\nsearch results"),m_fullIncludeHeads);
   fulllayout->addRow(tr("Fragment size"),m_fullFragmentSize);
   fulllayout->addRow(tr("Head word background colour"),colorlayout);
-  fulllayout->addRow(tr("Step size"),m_fullStep);
   fulllayout->addRow(tr("Text for head word results"),m_fullHeadText);
   fulllayout->addRow(tr("One row for each entry"),m_fullOneRow);
   fulllayout->addRow(tr("Progress interval"),m_fullStep);
@@ -149,12 +147,12 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   layout->addLayout(hlayoutsearches);//Widget(headbox);
   //  layout->addWidget(localbox);
   layout->addWidget(otherbox);
-
+  layout->addStretch();
   setLayout(layout);
   addButtons();
   readSettings();
   setupConnections();
-  getLexicon()->setCursorPosition(this);
+  //  getLexicon()->setCursorPosition(this);
 }
 
 void FindOptions::readSettings() {

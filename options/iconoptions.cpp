@@ -108,7 +108,7 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   vlayout->addLayout(layout);
   vlayout->addLayout(hlayout);
-  //  vlayout->addStretch();
+  vlayout->addStretch();
   setLayout(vlayout);
   addButtons();
   readSettings();

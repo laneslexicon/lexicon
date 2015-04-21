@@ -90,7 +90,7 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   addButtons();
   readSettings();
   setupConnections();
-  getLexicon()->setCursorPosition(this);
+  //  getLexicon()->setCursorPosition(this);
 }
 void RootsOptions::readSettings() {
   qDebug() << Q_FUNC_INFO << m_settingsFileName;

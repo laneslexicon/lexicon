@@ -163,7 +163,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   addButtons();
   readSettings();
   setupConnections();
-  getLexicon()->setCursorPosition(this);
+  //  getLexicon()->setCursorPosition(this);
 }
 
 void EntryOptions::readSettings() {

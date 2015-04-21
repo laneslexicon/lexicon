@@ -167,11 +167,11 @@ void HistoryOptions::onSetFont() {
     QFont font = d->currentFont();
     if (isList) {
       m_listFont->setText(font.toString());
-      m_listFont->setCursorPosition(0);
+      //      m_listFont->setCursorPosition(0);
     }
     else {
       m_menuFont->setText(font.toString());
-      m_menuFont->setCursorPosition(0);
+      //      m_menuFont->setCursorPosition(0);
     }
   }
   delete d;
