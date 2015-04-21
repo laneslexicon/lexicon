@@ -115,7 +115,9 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     icon->writeSettings(testFileName);
     icon->setDebug(debugChanges);
   }
-
+  for(int i=0;i < m_tabs->count();i++) {
+    getLexicon()->setCursorPosition(m_tabs->widget(i));
+  }
   /// TODO
   /// maps
   /// help
