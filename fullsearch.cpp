@@ -36,6 +36,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   //QVBoxLayout * layout = new QVBoxLayout;
   /// add the target
   m_findTarget = new ImLineEdit;
+  getLexicon()->adjustHeight(m_findTarget);
   QString mapname = getApp()->getActiveKeymap();
   QString mapfile = getApp()->getKeymapFileName(mapname);
   if (! mapfile.isEmpty()) {

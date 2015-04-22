@@ -922,14 +922,50 @@ QString Lexicon::getCssSpecification(const QString & selector) {
   }
   return css;
 }
-
-void Lexicon::setEditFont(QWidget * w) {
-  QString css = getCssSpecification("arabicedit");
+/**
+ * This is because on OSX QLineEdit does not automatically adjust its height
+ * so that the text is all visible
+ * @param w
+ * @param t
+ */
+void Lexicon::adjustHeight(QWidget * w) {
+  QFileInfo fi(m_settingsDir,m_configFile);
+  QSettings settings(fi.absoluteFilePath(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup("HeightAdjustment");
+  QStringList groups = settings.childGroups();
+  for(int i=0;i < groups.size();i++) {
+    settings.beginGroup(groups[i]);
+    QStringList selectors = settings.value("Selectors").toStringList();
+    QString sampleText = settings.value("Sample").toString();
+    for(int j=0;j < selectors.size();j++) {
+      if (! selectors[j].isEmpty()) {
+        setEditFont(w,selectors[j],sampleText);
+      }
+    }
+    settings.endGroup();
+  }
+}
+void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t) {
+  qDebug() << Q_FUNC_INFO << selector << t;
+  QString css = getCssSpecification("ImLineEdit");
   if (css.isEmpty()) {
     return;
   }
-  QFont f = fontFromCss(css);
-  w->setFont(f);
+  QString sample = t;
+  if (sample.isEmpty()) {
+    sample = "أٌل";
+  }
+  QLineEdit * edit = qobject_cast<QLineEdit *>(w);
+  if (edit) {
+    QFont f = fontFromCss(css);
+    QFontMetrics fm(f);
+    QSize sz = fm.size(Qt::TextSingleLine,sample);
+    if (sz.height() > 0) {
+      edit->setMinimumHeight(sz.height() + 4);
+      //      qDebug() << Q_FUNC_INFO << "set mininum height" << edit->minimumHeight();
+    }
+  }
   /*
   QList<QLineEdit *> edits = w->findChildren<QLineEdit *>();
   foreach(QLineEdit *  widget,edits) {

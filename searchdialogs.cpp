@@ -35,7 +35,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_edit = new ImLineEdit;
 
   m_edit->readSettings(getLexicon()->settingsFileName());
-  getLexicon()->setEditFont(m_edit);
+  getLexicon()->adjustHeight(m_edit);
   QString mapname = getApp()->getActiveKeymap();
   QString mapfile = getApp()->getKeymapFileName(mapname);
   if (! mapfile.isEmpty()) {
