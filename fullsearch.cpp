@@ -13,9 +13,15 @@
 #include "htmldelegate.h"
 #include "definedsettings.h"
 #include "externs.h"
+#define ROOT_COLUMN 0
+#define HEAD_COLUMN 1
 #define NODE_COLUMN 2
-#define POSITION_COLUMN 3
-#define CONTEXT_COLUMN 4
+#define VOL_COLUMN 3
+#define POSITION_COLUMN 4
+#define CONTEXT_COLUMN 5
+#define COLUMN_COUNT 6
+
+
 /// TODO
 /// some function pass SearchOptions - can we use the class member
 /**
@@ -61,15 +67,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   targetlayout->addWidget(m_keyboardButton);
   targetlayout->addWidget(m_hideOptionsButton);
 
-  QStringList headers;
-  headers << tr("Root") << tr("Entry") <<  tr("Node");
-  if (m_singleRow) {
-    headers << tr("Occurs");
-  }
-  else {
-    headers << tr("Position");
-  }
-  headers << tr("Context");
+  QStringList headers = this->columnHeadings();
   m_defaultOptions.setSearchScope(SearchOptions::Word);
   m_search = new SearchOptionsWidget(m_defaultOptions,this);
 
@@ -78,7 +76,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   //  QWidget * container = new QWidget;
   m_container = new QVBoxLayout;
   m_rxlist = new FocusTable;
-  m_rxlist->setColumnCount(5);
+  m_rxlist->setColumnCount(COLUMN_COUNT);
   m_rxlist->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_rxlist->setSelectionMode(QAbstractItemView::SingleSelection);
 
@@ -121,6 +119,25 @@ FullSearchWidget::~FullSearchWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
 
+QStringList FullSearchWidget::columnHeadings() {
+  QStringList h;
+  for(int i=0;i < COLUMN_COUNT;i++) {
+    h << "";
+  }
+  h[ROOT_COLUMN] = tr("Root");
+
+  h[HEAD_COLUMN] = tr("Entry");
+  h[NODE_COLUMN] =  tr("Node");
+  if (m_singleRow) {
+    h[POSITION_COLUMN] = tr("Occurs");
+  }
+  else {
+    h[POSITION_COLUMN] = tr("Position");
+  }
+  h[CONTEXT_COLUMN] = tr("Context");
+  h[VOL_COLUMN] = tr("Vol/Page");
+  return h;
+}
 void FullSearchWidget::itemChanged(QTableWidgetItem * /* item */,QTableWidgetItem * /* prev */) {
   QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "NOSHOW we should not be here";
 /*  bool isHead = false;
@@ -331,9 +348,9 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
 
   QString pattern;
   m_currentRx = rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
-  QString sql("select id,word,root,entry,node,nodenum from xref where datasource = 1 order by nodenum asc");
+  QString sql("select id,word,root,entry,node,nodenum,page from xref where datasource = 1 order by nodenum asc");
   if (m_query.prepare(sql)) {
-    sql = "select root,word,xml from entry where datasource = 1 and nodeid = ?";
+    sql = "select root,word,xml,page from entry where datasource = 1 and nodeid = ?";
     if (! m_nodeQuery.prepare(sql)) {
       QLOG_WARN() << QString("SQL prepare error %1 : %2")
         .arg(sql)
@@ -361,7 +378,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   QString node;
   QString root;
   QString headword;
-
+  int page;
   /// Added QEventLoop because under OSX nothing was shown
   /// the loop was finished
   QEventLoop ep;
@@ -390,6 +407,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     }
 
     QString word = m_query.value("word").toString();
+    page = m_query.value("page").toInt();
     /// strip diacritics if required
     if (replaceSearch && (options.getSearchType() == SearchOptions::Normal)) {
       if (options.ignoreDiacritics())
@@ -409,7 +427,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
         }
         if (headword.indexOf(rx) != -1) {
           if (options.includeHeads()) {
-            int row = addRow(root,m_nodeQuery.value("word").toString(),node,m_headText,-1);
+            int row = addRow(root,m_nodeQuery.value("word").toString(),node,m_headText,-1,page);
             QTableWidgetItem * item = m_rxlist->item(row,NODE_COLUMN);
             item->setData(Qt::UserRole,true);
             headCount++;
@@ -430,13 +448,13 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
             if (m_fragments.size() > 0) {
               if (m_singleRow) {
                 QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[0]);
-                addRow(root,headword,node,html,m_fragments.size());
+                addRow(root,headword,node,html,m_fragments.size(),page);
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
                     QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
-                    addRow(root,headword,node,html,i);
+                    addRow(root,headword,node,html,i,page);
                   }
                 }
               }
@@ -466,10 +484,11 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
   m_resultsText->show();
 
-  m_rxlist->resizeColumnToContents(0);
-  m_rxlist->resizeColumnToContents(2);
-  m_rxlist->resizeColumnToContents(3);
-  m_rxlist->resizeColumnToContents(4);
+  m_rxlist->resizeColumnToContents(ROOT_COLUMN);
+  m_rxlist->resizeColumnToContents(NODE_COLUMN);
+  m_rxlist->resizeColumnToContents(POSITION_COLUMN);
+  m_rxlist->resizeColumnToContents(CONTEXT_COLUMN);
+  m_rxlist->resizeColumnToContents(VOL_COLUMN);
   this->show();
   /*
   else {
@@ -544,7 +563,7 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
   }
   return t;
 }
-int FullSearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos) {
+int FullSearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos,int page) {
   QTableWidgetItem * item;
 
   int row = m_rxlist->rowCount();
@@ -552,12 +571,12 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
   item = new QTableWidgetItem(root);
   item->setFont(m_resultsFont);
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-  m_rxlist->setItem(row,0,item);
+  m_rxlist->setItem(row,ROOT_COLUMN,item);
 
   item = new QTableWidgetItem(headword);
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
   item->setFont(m_resultsFont);
-  m_rxlist->setItem(row,1,item);
+  m_rxlist->setItem(row,HEAD_COLUMN,item);
 
   item = new QTableWidgetItem(node);
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
@@ -589,6 +608,12 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
   }
   else {
     m_rxlist->setItem(row,CONTEXT_COLUMN,new QTableWidgetItem(text));
+  }
+  int vol = Place::volume(page);
+  if (vol > 0) {
+    item = new QTableWidgetItem(QString("%1/%2").arg(vol).arg(page));
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_rxlist->setItem(row,VOL_COLUMN,item);
   }
 
   return row;
@@ -905,7 +930,7 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   QString node;
   QString root;
   QString headword;
-
+  int page;
   /// Added QEventLoop because under OSX nothing was shown
   /// the loop was finished
   QEventLoop ep;
@@ -934,9 +959,10 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
     headword = m_query.value("word").toString();
     root = m_query.value("root").toString();
     node = m_query.value("nodeid").toString();
+    page = m_query.value("page").toInt();
     if (headword.indexOf(rx) != -1) {
       if (options.includeHeads()) {
-        int row = addRow(root,headword,node,m_headText,0);
+        int row = addRow(root,headword,node,m_headText,0,page);
         headCount++;
         if (m_headBackgroundColor.isValid()) {
           QBrush b(m_headBackgroundColor);
@@ -954,13 +980,13 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
               entryCount++;
               if (m_singleRow) {
                 QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[0]);
-                addRow(root,headword,node,html,m_fragments.size());
+                addRow(root,headword,node,html,m_fragments.size(),page);
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
                     QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
-                    addRow(root,headword,node,html,i);
+                    addRow(root,headword,node,html,i,page);
                   }
                 }
               }

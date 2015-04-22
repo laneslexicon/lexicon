@@ -61,11 +61,12 @@ class FullSearchWidget : public QWidget
     //   void eventFilter(QObject *,QEvent *);
  private:
     void readSettings();
+    QStringList columnHeadings();
     QString buildText(int,int,int,int);
     bool readCssFromFile(const QString &);
     int getMaxRecords(const QString & tablename);
     bool eventFilter(QObject * target,QEvent * event);
-    int addRow(const QString &,const QString &,const QString &,const QString &,int);
+    int addRow(const QString &,const QString &,const QString &,const QString &,int,int);
     void getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & rx = QRegExp());
     QTextDocument * fetchDocument(const QString & node);
     QString transform(const QString & xml);
