@@ -835,3 +835,105 @@ void Lexicon::setCursorPosition(QWidget * w,int pos) {
     widget->setCursorPosition(pos);
   }
 }
+QFont Lexicon::fontFromCss(const QString & src) {
+  QFont f;
+  QString family;
+  QString fontSize;
+  QString css = src;
+
+  css.remove("{");
+  css.remove("}");
+  QStringList parts = css.split(";",QString::SkipEmptyParts);
+  for(int i=0;i < parts.size();i++) {
+    parts[i] = parts[i].trimmed();
+    if (! parts[i].isEmpty()) {
+      QStringList kv = parts[i].split(":");
+      if (kv.size() == 2) {
+        QString k = kv[0];
+        QString v = kv[1];
+        if (kv[0].toLower().trimmed() == "font-family") {
+          family =  v.trimmed();
+        }
+        if (kv[0].toLower().trimmed() == "font-size") {
+          fontSize =  v.trimmed();
+        }
+      }
+    }
+  }
+  family.remove("\"");
+  QRegularExpression sizeRx("(\\d+)([^\\d]*)");
+  QRegularExpressionMatch m;
+  m = sizeRx.match(fontSize);
+  if (m.hasMatch()) {
+    QStringList captured = m.capturedTexts();
+    bool ok = false;
+    int sz = captured[1].toInt(&ok);
+    if (ok) {
+      if (captured.size() == 3) {
+        if (captured[2].contains("px")) {
+          f.setPixelSize(sz);
+        }
+        else if (captured[2].contains("pt")) {
+          f.setPointSize(sz);
+        }
+        else {
+          f.setPixelSize(sz);
+        }
+      }
+    }
+    f.setFamily(family);
+  }
+
+  return f;
+}
+QString Lexicon::getCssSpecification(const QString & selector) {
+  QString css;
+  QString fileName = getStylesheetFilePath(Lexicon::Application);
+  QFile file(fileName);
+  if (! file.open(QIODevice::ReadOnly)) {
+    return css;
+  }
+  QTextStream in(&file);
+  QString clause;
+  bool ok = false;
+  QRegularExpression rx("(^[^\\s]+)\\s");
+  QRegularExpressionMatch m;
+  while(! in.atEnd() && ! ok ) {
+    QString s;
+    QString line = in.readLine();
+    m = rx.match(line);
+    if (m.hasMatch()) {
+      s = m.captured(1);
+    }
+    if (s.contains(selector)) {
+      qDebug() << Q_FUNC_INFO << "Found" << s;
+      while(! line.contains("{") && ! line.contains("}") && ! in.atEnd()) {
+        line += in.readLine();
+      }
+      if (line.contains("{") &&  line.contains("}")) {
+        ok = true;
+        css = line.remove(s).trimmed();
+      }
+    }
+  }
+  file.close();
+  if (! ok ) {
+    return css;
+  }
+  return css;
+}
+
+void Lexicon::setEditFont(QWidget * w) {
+  QString css = getCssSpecification("arabicedit");
+  if (css.isEmpty()) {
+    return;
+  }
+  QFont f = fontFromCss(css);
+  w->setFont(f);
+  /*
+  QList<QLineEdit *> edits = w->findChildren<QLineEdit *>();
+  foreach(QLineEdit *  widget,edits) {
+    widget->setFont(f);
+  }
+  */
+}

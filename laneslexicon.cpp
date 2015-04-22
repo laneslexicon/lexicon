@@ -1718,7 +1718,7 @@ void LanesLexicon::onTest() {
       .arg(p.getNode())
       .arg(p.getSupplement());
   }
-  if (1) {
+  if (0) {
     FontChangeDialog * d = new FontChangeDialog(this);
     d->exec();
     delete d;
@@ -1732,6 +1732,9 @@ void LanesLexicon::onTest() {
     m_editView->show();
   }
   addShortcut("Search node","Ctrl+S,X",true);
+  }
+  if (1) {
+    getLexicon()->getCssSpecification("ImLineEdit#arabicedit");
   }
 }
 /**
