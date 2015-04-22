@@ -200,7 +200,16 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
                             .arg(m_target)));
   v->setPattern(m_currentRx);
   v->setCSS(m_currentCSS);
-  v->setHeader(m_nodeQuery.value("root").toString(),m_nodeQuery.value("word").toString(),node);
+  /**
+   * get the page, check it is for a valid volume and pass it if it is, otherwise passs 0
+   *
+   */
+
+  int page = m_nodeQuery.value("page").toInt();
+  if (Place::volume(page) == 0) {
+    page = 0;
+  }
+  v->setHeader(m_nodeQuery.value("root").toString(),m_nodeQuery.value("word").toString(),node,page);
   /// has to be call before setHtml otherwise it will select the first occurence
   if (! isHead ) {
     v->setStartPosition(pos);
@@ -892,10 +901,10 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   }
   QLOG_DEBUG() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
   m_currentRx = rx;
-  QString sql("select root,word,nodeid,xml from entry where datasource = 1 order by nodenum asc");
+  QString sql("select root,word,nodeid,xml,page from entry where datasource = 1 order by nodenum asc");
   if (m_query.prepare(sql)) {
-    sql = "select root,word,xml from entry where datasource = 1 and nodeid = ?";
-    if (! m_nodeQuery.prepare("select root,word,xml from entry where datasource = 1 and nodeid = ?")) {
+    sql = "select root,word,xml,page from entry where datasource = 1 and nodeid = ?";
+    if (! m_nodeQuery.prepare("select root,word,xml,page from entry where datasource = 1 and nodeid = ?")) {
       QLOG_WARN() << QString("SQL prepare error %1 : %2")
         .arg(sql)
         .arg(m_nodeQuery.lastError().text());

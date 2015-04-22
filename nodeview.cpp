@@ -2,6 +2,7 @@
 #include "application.h"
 #include "definedsettings.h"
 #include "externs.h"
+#include "place.h"
 NodeView::NodeView(QWidget * parent)
   : QDialog(parent) {
 
@@ -23,12 +24,14 @@ NodeView::NodeView(QWidget * parent)
   m_rlabel->setFont(f);
   m_hlabel = new QLabel("",this);
   m_hlabel->setFont(f);
+  m_pageLabel = new QLabel("",this);
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(new QLabel(tr("Root"),this));
   hlayout->addWidget(m_rlabel);
   hlayout->addWidget(new QLabel(tr("Entry"),this));
   hlayout->addWidget(m_hlabel);
   hlayout->addStretch();
+  hlayout->addWidget(m_pageLabel);
 
   m_browser = new QTextBrowser;
   //  m_browser->setHtml(html);
@@ -100,10 +103,13 @@ void NodeView::accept() {
 void NodeView::reject() {
   QDialog::reject();
 }
- void NodeView::setHeader(const QString & root,const QString & head,const QString & node) {
+void NodeView::setHeader(const QString & root,const QString & head,const QString & node,int page) {
   m_rlabel->setText(root);
   m_hlabel->setText(head);
   m_node = node;
+  if (page > 0) {
+    m_pageLabel->setText(QString("(v%1/%2)").arg(Place::volume(page)).arg(page));
+  }
 }
 void NodeView::setCSS(const QString & css) {
   m_css = css;
