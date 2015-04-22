@@ -7,7 +7,11 @@
 #include "searchoptionswidget.h"
 #include "definedsettings.h"
 #include "externs.h"
+#define ROOT_COLUMN 0
+#define ENTRY_COLUMN 1
 #define NODE_COLUMN 2
+#define VOL_COLUMN 3
+#define COLUMN_COUNT 4
 /// TODO
 /// some of these functions pass SearchOptions - why can't we use the class member
 extern LanesLexicon * getApp();
@@ -18,11 +22,11 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   QWidget * container = new QWidget;
   QVBoxLayout * containerlayout = new QVBoxLayout;
   m_list = new FocusTable;
-  m_list->setColumnCount(3);
+  m_list->setColumnCount(COLUMN_COUNT);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QStringList headers;
-  headers << tr("Root") << tr("Entry") << tr("Node");
+  headers << tr("Root") << tr("Entry") << tr("Node") << tr("Vol/Page");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -224,7 +228,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   m_target = target;
   m_searchOptions = options;
   QString sql;
-  sql = "select id,word,root,nodeid,nodenum,headword from entry where datasource = 1 order by nodenum asc";
+  sql = "select id,word,root,nodeid,nodenum,headword,page from entry where datasource = 1 order by nodenum asc";
 
   rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   m_currentRx = rx;
@@ -260,9 +264,11 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   QString node;
   QString word;
   QString headword;
+  int page;
   while(m_query.next() & ! m_cancelSearch) {
     count++;
     node = m_query.value("nodeid").toString();
+    page = m_query.value("page").toInt();
     headword = word = m_query.value("headword").toString();
     /// strip diacritics if required
     if (options.getSearchType() == SearchOptions::Normal) {
@@ -277,16 +283,25 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
       item = new QTableWidgetItem(m_query.value("root").toString());
       item->setFont(m_resultsFont);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-      m_list->setItem(row,0,item);
+      m_list->setItem(row,ROOT_COLUMN,item);
 
       item = new QTableWidgetItem(headword);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       item->setFont(m_resultsFont);
-      m_list->setItem(row,1,item);
+      m_list->setItem(row,ENTRY_COLUMN,item);
 
       item = new QTableWidgetItem(node);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,NODE_COLUMN,item);
+
+      int vol = Place::volume(page);
+      if (vol > 0) {
+        item = new QTableWidgetItem(QString("%1/%2").arg(vol).arg(page));
+        item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+        m_list->setItem(row,VOL_COLUMN,item);
+      }
+
+
     }
     if ((count % m_stepCount) == 0) {
       pd->setValue(count);
