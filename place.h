@@ -58,6 +58,7 @@ class Place    {
   static Place fromRoot(const QString &);
   static Place fromNode(const QString &);
   static Place fromPage(int);
+  static int   volume(int);
   QString getText(bool pageOnlyMode = false) const;
   QString getShortText() const;
   QString toString() const;

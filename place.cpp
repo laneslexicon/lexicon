@@ -30,6 +30,14 @@ bool Place::isRoot() const {
   |      7 |       2478 |      2749 |
   |      8 |       2751 |      3064 |
 */
+int Place::volume(int p) {
+  for(int i=0; i < 8;i++) {
+    if (p <= Place::m_vols[i]) {
+      return (i + 1);
+    }
+  }
+  return 0;
+}
 void Place::setPage(int p) {
   m_page = p;
   for(int i=0; i < 8;i++) {
