@@ -76,19 +76,21 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
   printerlayout->addRow(tr("Full page"),m_fullPage);
   printerbox->setLayout(printerlayout);
 
-  QGroupBox * usagebox = new QGroupBox(tr("Other options"));
+  QGroupBox * usagebox = new QGroupBox(tr("PDF options"));
   QFormLayout * formlayout = new QFormLayout;
 
   formlayout->addRow(tr("PDF output"),m_pdfOutput);
   formlayout->addRow(tr("PDF directory"),hlayout);
   formlayout->addRow(tr("Auto name PDF"),m_pdfAutoName);
   formlayout->addRow(tr("Naming method"),m_pdfName);
-  formlayout->addRow(tr("Set as default"),m_alwaysUse);
+
   usagebox->setLayout(formlayout);
 
+  QFormLayout * uselayout = new QFormLayout;
+  uselayout->addRow(tr("Use these settings and do not prompt for printer settings"),m_alwaysUse);
   vlayout->addWidget(printerbox);
   vlayout->addWidget(usagebox);
-
+  vlayout->addLayout(uselayout);
   setLayout(vlayout);
   addButtons();
   setupPaperSize();
