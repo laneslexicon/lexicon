@@ -86,7 +86,7 @@ void NodeView::setPreferredSize(const QString & szStr) {
 }
 
 void NodeView::print() {
-  qDebug() << Q_FUNC_INFO;
+  emit(printNode(m_node));
 }
 void NodeView::openEntry() {
   emit(openNode(m_node));

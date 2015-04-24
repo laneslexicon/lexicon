@@ -2939,6 +2939,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       s->setForceLTR(d->getForceLTR());
       s->findTarget(true);
       connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+      connect(s,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
       int c = this->getSearchCount();
       if (options.newTab()) {
         ix++;
@@ -3565,9 +3566,74 @@ void LanesLexicon::sync() {
     }
   }
 }
+/**
+ * printNode signal can be from graphicsentry (via context menu)
+ * or from fullsearchwidget -> nodeview -> print
+ *
+ * From nodeview, there is no guarantee that the node is currently
+ * visible, so we have extra work to do.
+ *
+ * @param node
+ */
 void LanesLexicon::printNode(const QString & node) {
   QLOG_DEBUG() << Q_FUNC_INFO << node;
-  printCurrentPage(node);
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(sender());
+  if (entry) {
+    printCurrentPage(node);
+    return;
+  }
+  FullSearchWidget * search = qobject_cast<FullSearchWidget *>(sender());
+  if (! search) {
+    return;
+  }
+  Place p;
+  p.setNode(node);
+  int i = this->hasPlace(p,GraphicsEntry::NodeSearch,false);
+  if (i != -1) {
+    entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(1));
+    if (entry) {
+      printNodeView(entry,node);
+      return;
+    }
+  }
+  /// create a graphicsentry so we can print the node
+  bool h = history()->enabled();
+  history()->setEnabled(false);
+  entry = new GraphicsEntry();
+  p = entry->getXmlForRoot(p);
+  if (! p.isValid()) {
+    QMessageBox msgBox;
+    msgBox.setText(QString(tr("Node not found: %1")).arg(node));
+    msgBox.exec();
+  }
+  else {
+    printNodeView(entry,node);
+
+  }
+  delete entry;
+  history()->setEnabled(h);
+}
+void LanesLexicon::printNodeView(GraphicsEntry * entry,const QString & node) {
+
+  SETTINGS
+  settings.beginGroup("Printer");
+  m_printerReUse = settings.value(SID_PRINTER_USE).toBool();
+
+  if (! m_printer.isValid())
+    m_printerReUse = false;
+
+
+  if ( m_printerReUse ) {
+    entry->print(m_printer,node);
+    return;
+  }
+
+  QPrintDialog printDialog(&m_printer, this);
+  if (printDialog.exec() == QDialog::Accepted) {
+    if (m_printer.isValid()) {
+      entry->print(m_printer,node);
+    }
+  }
 }
 void LanesLexicon::reloadEntry(const QString & css,const QString & xslt) {
   QLOG_DEBUG() << Q_FUNC_INFO;

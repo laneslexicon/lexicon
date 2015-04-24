@@ -53,5 +53,6 @@ class NodeView : public QDialog {
     int m_positionIndex;
  signals:
     void openNode(const QString & node);
+    void printNode(const QString & node);
 };
 #endif

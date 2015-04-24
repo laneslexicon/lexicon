@@ -115,5 +115,6 @@ class FullSearchWidget : public QWidget
     void showNode(const QString &);
     void setProgressMax(int);
     void setProgressValue(int);
+    void printNode(const QString &);
 };
 #endif

@@ -221,6 +221,7 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   v->raise();
   v->activateWindow();
   connect(v,SIGNAL(openNode(const QString &)),this,SIGNAL(showNode(const QString &)));
+  connect(v,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
 }
 bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
   if (event->type() == QEvent::KeyPress) {

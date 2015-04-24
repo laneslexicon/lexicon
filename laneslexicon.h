@@ -190,6 +190,7 @@ class LanesLexicon : public QMainWindow
       void showSearchNode(const QString &);
       void convertToEntry();
       void printNode(const QString &);
+      void printNodeView(GraphicsEntry *,const QString &);
       void syncFromContents();
       void syncFromEntry();
 
