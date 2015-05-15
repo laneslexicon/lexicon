@@ -1,6 +1,10 @@
 #include "imeditoroptions.h"
 #include "scripts.h"
 #include "inputmapper.h"
+#ifdef LANE
+#include "application.h"
+#include "externs.h"
+#endif
 /**
  *
  *
@@ -239,7 +243,11 @@ ImEditorOptions::ImEditorOptions(QWidget * parent) : QDialog(parent) {
 void ImEditorOptions::readSettings() {
   QString str;
   QStringList keys;
-  QSettings settings("settings.ini",QSettings::IniFormat);
+  QString settingsFileName("editor.ini");
+#ifdef LANE
+  settingsFileName = getLexicon()->editorSettingsFileName();
+#endif
+  QSettings settings(settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   qDebug() << settings.allKeys();
   settings.beginGroup("Options");
@@ -305,7 +313,15 @@ void ImEditorOptions::readSettings() {
 void ImEditorOptions::writeSettings() {
   QString str;
   QStringList keys;
-  QSettings settings("settings.ini",QSettings::IniFormat);
+
+  QString settingsFileName("editor.ini");
+#ifdef LANE
+  settingsFileName = getLexicon()->editorSettingsFileName();
+#endif
+  QSettings settings(settingsFileName,QSettings::IniFormat);
+
+
+
   settings.setIniCodec("UTF-8");
   qDebug() << settings.allKeys();
   settings.beginGroup("System");

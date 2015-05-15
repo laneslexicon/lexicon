@@ -3,6 +3,10 @@
 #include "scripts.h"
 #include "showmapwidget.h"
 #include "imeditoroptions.h"
+#ifdef LANE
+#include "application.h"
+#include "externs.h"
+#endif
 ImEditor::ImEditor(QWidget * parent) : QWidget(parent) {
   m_mapSignals = new QSignalMapper(this);
   m_edit = new ImEdit;
@@ -51,20 +55,26 @@ ImEditor::ImEditor(QWidget * parent) : QWidget(parent) {
 }
 ImEditor::~ImEditor() {
   qDebug() << Q_FUNC_INFO;
-
-  QSettings settings("settings.ini",QSettings::IniFormat);
+  QString settingsFileName("editor.ini");
+#ifdef LANE
+  settingsFileName = getLexicon()->editorSettingsFileName();
+#endif
+  QSettings settings(settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Editor");
   settings.setValue("Size",this->size());
   settings.setValue("Position",this->pos());
-  /*
-  while(m_helpWindows.size() > 0) {
-    ShowMapWidget * w = m_helpWindows.takeFirst();
-    qDebug() << "Closing" << w->map();
-    w->close();
-    delete w;
+}
+void ImEditor::hideHelp() {
+  qDebug() << Q_FUNC_INFO;
+  QWidgetList widgets = QApplication::topLevelWidgets();
+
+  for(int i=0;i < widgets.size();i++) {
+    ShowMapWidget * w = qobject_cast<ShowMapWidget *>(widgets[i]);
+    if (w)  {
+      w->hide();
+    }
   }
-  */
 }
 void ImEditor::createActions() {
   m_openAction = new QAction(tr("Open"),this);
@@ -125,7 +135,12 @@ void ImEditor::readSettings() {
   QString str;
   QShortcut * cut;
   QStringList keys;
-  QSettings settings("settings.ini",QSettings::IniFormat);
+  QString settingsFileName("editor.ini");
+#ifdef LANE
+  settingsFileName = getLexicon()->editorSettingsFileName();
+#endif
+  qDebug() << Q_FUNC_INFO << settingsFileName;
+  QSettings settings(settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("System");
   m_edit->setDebug(settings.value("Debug",false).toBool());
@@ -169,19 +184,19 @@ void ImEditor::readSettings() {
     QFileInfo fi(str);
     if (fi.exists()) {
       m_edit->loadMap(str);
-    }
-    m_mapBox->addItem(maps[i]);
-    str = settings.value("Shortcut").toString();
-    if (! str.isEmpty()) {
-      QShortcut * cut = new QShortcut(QKeySequence(str),this);
-      connect(cut, SIGNAL(activated()), m_mapSignals, SLOT(map()));
-      m_mapSignals->setMapping(cut, maps[i]);
-      m_mapToScript.insert(maps[i],m_edit->getScript(maps[i]));
-    }
-    str = settings.value("Help").toString();
-    if (! str.isEmpty()) {
-      m_mapHelp.insert(maps[i],str);
-      m_helpBox->addItem(maps[i]);
+      m_mapBox->addItem(maps[i]);
+      str = settings.value("Shortcut").toString();
+      if (! str.isEmpty()) {
+        QShortcut * cut = new QShortcut(QKeySequence(str),this);
+        connect(cut, SIGNAL(activated()), m_mapSignals, SLOT(map()));
+        m_mapSignals->setMapping(cut, maps[i]);
+        m_mapToScript.insert(maps[i],m_edit->getScript(maps[i]));
+      }
+      str = settings.value("Help").toString();
+      if (! str.isEmpty()) {
+        m_mapHelp.insert(maps[i],str);
+        m_helpBox->addItem(maps[i]);
+      }
     }
     settings.endGroup();
   }
@@ -197,13 +212,19 @@ void ImEditor::readSettings() {
   connect(m_mapSignals, SIGNAL(mapped(const QString &)),
           this, SLOT(onMap(const QString &)));
 
+  /*
   QFont f;
   f.fromString(m_scriptFonts.value("Latin"));
   m_edit->setDocFont(f);
-
+  */
+  if (m_mapBox->count() == 0) {
+    m_helpBox->hide();
+  }
+  /*
   qDebug() << m_scriptFonts;
   qDebug() << m_mapToScript;
   qDebug() << m_mapHelp;
+  */
 }
 void ImEditor::onMap(const QString & m) {
   qDebug() << Q_FUNC_INFO << QString("Current script %1, requested map %2").arg(m_currentScript).arg(m);
@@ -285,7 +306,7 @@ void ImEditor::onFont() {
   }
 
   if (m_autoSaveSettings) {
-    QSettings settings("settings.ini",QSettings::IniFormat);
+    QSettings settings("editor.ini",QSettings::IniFormat);
     settings.setIniCodec("UTF-8");
     settings.beginGroup("Edit");
     settings.setValue("Font",font.toString());
@@ -305,7 +326,7 @@ void ImEditor::onFont() {
  *
  */
 void ImEditor::onSave() {
-  qDebug() << m_formats;
+  qDebug() << Q_FUNC_INFO << m_formats << sender();
   QString formats = QString(tr("Documents (%1)")).arg(m_formats.join(" "));
 
   if (m_documentFileName.isEmpty()) {
@@ -573,9 +594,10 @@ void ImEditor::onShowHelp(const QString & mapname) {
   for(int i=0;i < widgets.size();i++) {
     ShowMapWidget * w = qobject_cast<ShowMapWidget *>(widgets[i]);
     if (w && (w->map() == map))  {
-        w->raise();
-        return;
-      }
+      w->show();
+      w->raise();
+      return;
+    }
   }
 
 

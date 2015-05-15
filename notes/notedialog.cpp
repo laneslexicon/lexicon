@@ -1,5 +1,6 @@
 #include "notedialog.h"
 #include "notes.h"
+#include "imeditor.h"
 #ifndef TEST_FRAMEWORK
 #include "laneslexicon.h"
 #endif
@@ -38,18 +39,17 @@ NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
   this->setup();
   /// set values from note
   m_subject->setText(m_subjectText);
-  m_note->setText(m_noteText);
+  m_note->edit()->setText(m_noteText);
   m_type->setCurrentIndex(m_type->findData(m_noteType));
   m_note->setFocus();
   setWindowTitle(m_subject->text());
 }
 void NoteDialog::setup() {
+  QVBoxLayout * mainlayout = new QVBoxLayout;
   QFormLayout * layout = new QFormLayout;
   m_subject = new QLineEdit(this);
 
-  m_note = new QTextEdit(this);
-
-
+  m_note = new ImEditor(this);
   m_moreButton = new QPushButton(tr("&More"));
   m_moreButton->setCheckable(true);
   m_moreButton->setAutoDefault(false);
@@ -85,7 +85,9 @@ void NoteDialog::setup() {
   layout->addRow(m_buttonBox);
   layout->addRow(m_moreButtonBox);
   //  layout->addWidget(m_moreButtonBox);
-  setLayout(layout);
+
+  mainlayout->addLayout(layout);
+  setLayout(mainlayout);
   //  setWindowFlags(Qt::CustomizeWindowHint);
   setSizeGripEnabled(true);
   m_changed = false;
@@ -98,6 +100,14 @@ void NoteDialog::setup() {
   int h = this->frameGeometry().height();
 
   m_keyboard->move(p.x(),p.y() + h);
+  /* tried the following but it didn't work
+  bool ok = disconnect(m_note->saveAction(), &QAction::triggered,
+             m_note, &ImEditor::onSave );
+  qDebug() << "Disconnect" << ok;
+  */
+  disconnect(m_note->saveAction(), SIGNAL(triggered()),
+                  m_note, SLOT(onSave()));
+  connect(m_note->saveAction(),SIGNAL(triggered()),this,SLOT(save()));
 }
 void NoteDialog::showOptions(bool v) {
   if (v)
@@ -107,10 +117,10 @@ void NoteDialog::showOptions(bool v) {
 }
 void NoteDialog::setModified(bool v) {
   m_changed = v;
-  m_note->document()->setModified(v);
+  m_note->edit()->document()->setModified(v);
 }
 QSize NoteDialog::sizeHint() const {
-  QSize sz(300,300);
+  QSize sz(600,300);
   return sz;
 }
 void NoteDialog::closeEvent(QCloseEvent * event) {
@@ -132,6 +142,7 @@ void NoteDialog::closeEvent(QCloseEvent * event) {
       }
     }
   }
+
   QDialog::closeEvent(event);
 }
 NoteDialog::~NoteDialog() {
@@ -144,7 +155,7 @@ void NoteDialog::setSubject(const QString & text) {
   m_changed = true;
 }
 bool NoteDialog::isModified() const {
-  if (m_changed || m_note->document()->isModified())
+  if (m_changed || m_note->edit()->document()->isModified())
     return true;
 
   return false;
@@ -171,12 +182,13 @@ void NoteDialog::showKeyboard() {
 
 }
 void NoteDialog::cancel() {
-  m_note->setText(m_noteText);
+  m_note->edit()->setText(m_noteText);
   m_subject->setText(m_subjectText);
   m_changed = false;
   if (m_attached)
     showKeyboard();
 
+  m_note->hideHelp();
   this->reject();
 }
 void NoteDialog::save() {
@@ -186,7 +198,7 @@ void NoteDialog::save() {
   n->setId(m_id);
   n->setWord(m_word);
   n->setSubject(m_subject->text());
-  n->setNote(m_note->toPlainText());
+  n->setNote(m_note->edit()->toPlainText());
   n->setType(m_type->currentData().toInt());
   if (m_attached) {
     showKeyboard();
@@ -196,13 +208,14 @@ void NoteDialog::save() {
   delete n;
   if (ok) {
     m_changed = false;
-    m_note->document()->setModified(false);
+    m_note->edit()->document()->setModified(false);
     m_subjectText = m_subject->text();
-    m_noteText = m_note->toPlainText();
+    m_noteText = m_note->edit()->toPlainText();
     m_noteType =  m_type->currentData().toInt();
 
     emit(noteSaved(ok));
   }
+  m_note->hideHelp();
   this->accept();
 }
 void NoteDialog::print() {
@@ -215,7 +228,7 @@ void NoteDialog::print() {
     //  printer->setOutputFileName();
     //    QPainter painter(&m_printer);
     //    painter.setRenderHint(QPainter::Antialiasing);
-    m_note->print(&printer);
+    m_note->edit()->print(&printer);
   }
 }
 void NoteDialog::onTypeChange(int ix) {

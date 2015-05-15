@@ -54,8 +54,11 @@ class ImEditor : public QWidget {
  public:
   ImEditor(QWidget * parent = 0);
   ImEdit * edit() { return m_edit;}
+  QAction * saveAction() { return m_saveAction; }
+
   ~ImEditor();
   public slots:
+    void hideHelp();
     void onInsertChar();
     void logMessage(const QString &);
     void onPrinterSetup();
@@ -107,5 +110,7 @@ class ImEditor : public QWidget {
     QMap<QString,QString> m_scriptFonts;
     QMap<QString,QString> m_mapToScript;
     QMap<QString,QString> m_mapHelp;
+ signals:
+    void save();
 };
 #endif

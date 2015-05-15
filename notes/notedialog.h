@@ -26,7 +26,7 @@
 #include "notes.h"
 #include "imedit.h"
 #include "keyboardwidget.h"
-
+#include "imeditor.h"
 class NoteDialog : public QDialog {
   Q_OBJECT
  public:
@@ -37,7 +37,7 @@ class NoteDialog : public QDialog {
   void setSubject(const QString &);
   void setModified(bool);
   bool isModified() const;
-  QString getNote() { return m_note->toPlainText();}
+  QString getNote() { return m_note->edit()->toPlainText();}
   void setAutosave(bool v) { m_autosave = v;}
   public slots:
     void showOptions(bool);
@@ -57,7 +57,7 @@ class NoteDialog : public QDialog {
   Place m_place;
   KeyboardWidget * m_keyboard;
   QLineEdit * m_subject;
-  QTextEdit * m_note;
+  ImEditor * m_note;
   QLineEdit * m_tags;
   QPushButton * m_keyboardButton;
   QPushButton * m_moreButton;

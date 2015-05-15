@@ -26,6 +26,7 @@ win32 {
   LIBS += -Lc:/Users/andrewsg/xslt/lib -llibxml2 -llibxslt
 }
 DEFINES += USE_LIBXSLT
+DEFINES += LANE
 }
 xalan {
 INCLUDEPATH += /usr/include/xalanc/PlatformSupport
