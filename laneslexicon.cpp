@@ -1383,12 +1383,12 @@ void LanesLexicon::onKeymapChanged() {
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {
-      w->activateMap(m_currentMap,true);
+      w->setCurrentMap(m_currentMap,true);
     }
     else {
       ImEdit * imedit = qobject_cast<ImEdit *>(widget);
       if (imedit) {
-        imedit->activateMap(m_currentMap,true);
+        imedit->setCurrentMap(m_currentMap,true);
       }
     }
   }
@@ -1898,8 +1898,8 @@ void LanesLexicon::readSettings() {
     v = getLexicon()->getResourceFilePath(Lexicon::Map,v);
     QFile file(v);
     if ( file.exists() ) {
-      if (! im_load_map_from_json(m_mapper,v.toUtf8().constData(),groups[i].toUtf8().constData())) {
-        QLOG_WARN() << QString(tr("Error loading <%1> from file <%2>")).arg(groups[i]).arg(v);
+      if (im_load_map_from_json(m_mapper,v.toUtf8().constData(),groups[i].toUtf8().constData()) == -1) {
+        QLOG_WARN() << QString(tr("Error loading map <%1> from file <%2>")).arg(groups[i]).arg(v);
       }
       else {
         m_maps.insert(groups[i],v);

@@ -9,16 +9,19 @@ MainWindow::MainWindow(QWidget *parent) :
   m_edit = new ImEdit;
   m_edit->setDebug(true);
   m_edit->loadMap("buckwalter-1.4.js","Buckwalter");
-  m_edit->activateMap("Buckwalter");
+  m_edit->setCurrentMap("Buckwalter");
   QString ltr(QChar(0x202d));
 
   m_edit->setPlainText(ltr);
   m_lineEdit = new ImLineEdit;
-  m_lineEdit->loadMap("buckwalter-1.4.js","Buckwalter");
-  m_lineEdit->activateMap("Buckwalter");
-  m_lineEdit->setForceLTR(true);
   m_lineEdit->setDebug(true);
-  m_lineEdit->readSettings("default.ini");
+  m_lineEdit->loadMap("../buckwalter-1.6.js","Buckwalter");
+  m_lineEdit->loadMap("../perseus.js","Perseus");
+  m_lineEdit->loadMap("../ugaritic.js","Ugaritic");
+  m_lineEdit->setCurrentMap("Ugaritic");
+  m_lineEdit->setForceLTR(false);
+  //  m_lineEdit->readSettings("default.ini");
+  connect(m_lineEdit,SIGNAL(logMessage(const QString &)),this,SLOT(logMessage(const QString &)));
   QFont f("Amiri",30);
   m_lineEdit->setFont(f);
   QWidget * w = new QWidget;
@@ -35,6 +38,9 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
   qDebug() << "main window destructor";
+}
+void MainWindow::logMessage(const QString & t) {
+  qDebug() << t;
 }
 void MainWindow::createActions() {
   m_exitAction = new QAction(tr("Exit"),this);

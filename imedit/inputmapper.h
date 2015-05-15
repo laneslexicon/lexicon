@@ -7,6 +7,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QMap>
+#include <QVariant>
 // changed  gunichar -> int
 class im_char {
  public:
@@ -25,21 +27,23 @@ class InputMapper {
  public:
   InputMapper();
 
-  QList<KeyMap *> maps;
+  QList<KeyMap *> m_maps;
   int pv;      // previous char only set when the key has been processed
   bool hasMap(const QString &) const;
   void getMapNames(QStringList &);
-  QStringList getMaps(const QString & script = QString()) const;
+  QStringList getMaps();
+  QStringList maps(const QString & script = QString()) const;
   void getScripts(QStringList &);
-  QStringList getScripts() const;
+  QStringList scripts() const;
   void setDebug(bool v) { m_debug = v;}
   QString getScript(const QString & map);
   bool m_debug;
 };
 InputMapper * im_new();
 void im_free(InputMapper *);
-bool im_load_map_from_json(InputMapper * map,const char * filename,const char * mapname = 0);
+int im_load_map_from_json(InputMapper * map,const char * filename,const char * mapname = 0);
 KeyMap * im_get_map(InputMapper *,const QString &);
+KeyMap * im_get_map(InputMapper * im,int ix);
 im_char * im_convert(InputMapper *,const QString & ,int current,int prev);
 void load_properties(KeyMap *,QJsonObject);
 void load_koi(KeyMap *,QJsonObject);
@@ -50,7 +54,7 @@ KeyInput * get_key_item(QJsonObject);
 bool im_match_diacritics(KeyEntry *,QStringList &) ;
 int im_search(KeyMap *,KeyInput *,KeyEntry *,int);
 QString im_convert_string(InputMapper * im,const QString & mapping,const QString & source,bool * ok = 0);
-
+QVariant im_get_property(InputMapper *, const QString & map,const QString &);
 /*
 gboolean im_has_map(InputMapper *,gchar *);
 im_char * im_convert(InputMapper *,gchar *,gchar current,gunichar prev);

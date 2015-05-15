@@ -5,7 +5,7 @@
 #include <QHash>
 #include <QStringList>
 #include <QList>
-
+#include <QVariant>
 class KeyInput {
  public:
   QString source;
@@ -51,6 +51,8 @@ class  KeyMap {
   QHash<int,KeyEntry *> combinations;
   QHash<int,KeyInput *> koi;
   QHash<QString,int> unicode;
+  QHash<QString,QVariant> m_properties;
+  QString getName() const { return name;}
   QString language;
   QString name;
   QString parseDate;

@@ -34,43 +34,44 @@ public:
     QFont & getDocFont() {
       return m_docFont;
     }
-    void setDebug(bool v) {
-      m_debug = v;
-    }
+    void setDebug(bool v);
+    QString getScript(const QString & mapname) const;
+    QString currentMap() const;
     void getMapNames(QStringList & m);
-    void activateMap(const QString &,bool enable = true);
+    bool isMappingEnabled() const { return m_enabled; }
     void getScriptNames(QStringList &);
-    void setScript(const QString & script);
     QString currentScript();
     QString convertString(const QString & source);
-    QStringlist supportedScripts() const;
- private:
+    QStringList scripts() const;
     InputMapper * mapper;
-    bool mapEnabled;
+ private:
     ushort prev_char;
     QFont m_docFont;
     bool m_debug;
+    bool m_enabled;
+    bool m_discard;
     QString m_activeMap;
     QString m_nullMap;
-    bool m_enabled;
+
 protected:
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void focusOutEvent(QFocusEvent *);
     virtual void focusInEvent(QFocusEvent *);
     void scrollContentsBy(int,int);
-    void enableMapping(bool);
+
     void dragEnterEvent(QDragEnterEvent *);
     void dropEvent(QDropEvent *);
 public slots:
   //    void showContextMenu(const QPoint &);
+    void enableMapping(bool);
     void actionChangeMap();
     void actionSetFont();
     void actionInsertUnicode();
     void actionDeleteUnicode();
-    void setMapname(const QString &);
-    void setEnabled(bool);
+    bool setCurrentMap(const QString &,bool enable = true);
  signals:
   void fontChanged();
+  void charInserted(int,int);
   void logMessage(const QString &);
   void mapChanged(const QString &);
   void currentScript(const QString &);

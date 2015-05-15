@@ -40,7 +40,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   QString mapfile = getApp()->getKeymapFileName(mapname);
   if (! mapfile.isEmpty()) {
     m_edit->loadMap(mapfile,mapname);
-    m_edit->activateMap(mapname,true);
+    m_edit->setCurrentMap(mapname,true);
   }
   m_prompt->setBuddy(m_edit);
   m_findButton = new QPushButton(tr("&Find"));
@@ -82,7 +82,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   connect(m_options,SIGNAL(loadKeymap(const QString &)),this,SLOT(loadKeymap(const QString &)));
 
   QStringList maps = m_edit->getMaps();
-  QString map = m_edit->getActiveMap();
+  QString map = m_edit->currentMap();
   if (map.isEmpty()) {
     map = m_edit->getNullMap();
   }
@@ -219,7 +219,7 @@ void ArabicSearchDialog::getOptions(SearchOptions & opts) const {
   m_options->getOptions(opts);
 }
 void ArabicSearchDialog::loadKeymap(const QString & mapname) {
-  m_edit->activateMap(mapname,true);
+  m_edit->setCurrentMap(mapname,true);
 }
 bool ArabicSearchDialog::getForceLTR() const {
   return m_options->getForceLTR();

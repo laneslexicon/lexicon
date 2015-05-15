@@ -460,25 +460,25 @@ InputMapper::InputMapper() {
 }
 void im_free(InputMapper * im) {
   // g_ptr_array_free(im->maps,TRUE);
-  for (int i=0;i < im->maps.size();i++) {
-    delete im->maps[i];
+  for (int i=0;i < im->m_maps.size();i++) {
+    delete im->m_maps[i];
   }
   delete im;
 }
 
 InputMapper * im_new() {
   InputMapper * im = new InputMapper();
-  //  im->maps = g_ptr_array_new();
+  //  im->m_maps = g_ptr_array_new();
   //  im->pv = 0;
-  //  g_ptr_array_set_free_func(im->maps,(GDestroyNotify)km_free);
+  //  g_ptr_array_set_free_func(im->m_maps,(GDestroyNotify)km_free);
 
   return im;
 }
-bool im_load_map_from_json(InputMapper * im,const char * filename,const char  * mapname) {
+int im_load_map_from_json(InputMapper * im,const char * filename,const char  * mapname) {
    QJsonValue v;
   bool ok = true;
  QFile file;
-
+ int ret = -1;
 
 //  setAttribute(Qt::WA_InputMethodEnabled,true);
   file.setFileName(filename);
@@ -498,8 +498,8 @@ bool im_load_map_from_json(InputMapper * im,const char * filename,const char  * 
   if (im->m_debug) {
     qDebug() << Q_FUNC_INFO << "loaded map" << mapname << m->name;
   }
-  im->maps.append(m);
-  return ok;
+  im->m_maps.append(m);
+  return im->m_maps.size() - 1;
 }
 void load_properties(KeyMap * map,const QJsonObject node) {
 
@@ -529,6 +529,7 @@ void load_properties(KeyMap * map,const QJsonObject node) {
     else if (p == "version") {
       map->version = node.value(p).toString();
     }
+    map->m_properties.insert(p,node.value(p).toVariant());
   }
 }
 void load_combinations(KeyMap * map,QJsonObject node) {
@@ -613,10 +614,16 @@ void load_unicode(KeyMap * map,QJsonObject node) {
   }
 }
 KeyMap * im_get_map(InputMapper * im,const QString & mapname) {
-  for(int i=0; i < im->maps.size();i++) {
-    if (im->maps[i]->name.toCaseFolded() == mapname.toCaseFolded())  {
-      return im->maps[i];
+  for(int i=0; i < im->m_maps.size();i++) {
+    if (im->m_maps[i]->name.toCaseFolded() == mapname.toCaseFolded())  {
+      return im->m_maps[i];
     }
+  }
+  return NULL;
+}
+KeyMap * im_get_map(InputMapper * im,int ix) {
+  if (ix < im->m_maps.size()) {
+    return im->m_maps[ix];
   }
   return NULL;
 }
@@ -674,6 +681,13 @@ im_char * im_convert(InputMapper * im,const QString & mapname,int curr_char, int
     }
   }
   return ret;
+}
+QVariant im_get_property(InputMapper * im,const QString & mapname,const QString & key) {
+  KeyMap * map = im_get_map(im,mapname);
+  if (! map ) {
+    return QVariant();
+  }
+  return map->m_properties.value(key);
 }
 int im_search(KeyMap * map,KeyInput * ki,KeyEntry * ke,int /* pchar */) {
   int ret = 0;
@@ -758,46 +772,54 @@ QString im_convert_string(InputMapper * im,const QString & mapping,const QString
   return retval;
 }
 bool InputMapper::hasMap(const QString & name) const {
-  for(int i=0;i < maps.size();i++)  {
-    if (name.toCaseFolded() == maps[i]->name.toCaseFolded()) {
+  for(int i=0;i < m_maps.size();i++)  {
+    if (name.toCaseFolded() == m_maps[i]->name.toCaseFolded()) {
       return true;
     }
   }
   return false;
 }
 void InputMapper::getMapNames(QStringList & m) {
-  for(int i=0;i < maps.size();i++)  {
-    m.append(maps[i]->name);
+  for(int i=0;i < m_maps.size();i++)  {
+    m.append(m_maps[i]->name);
   }
 }
-QStringList InputMapper::getMaps(const QString & script) const {
+QStringList InputMapper::getMaps() {
   QStringList mapnames;
-  for(int i=0;i < maps.size();i++)  {
+  for(int i=0;i < m_maps.size();i++)  {
+    mapnames << m_maps[i]->name;
+  }
+  return mapnames;
+}
+QStringList InputMapper::maps(const QString & script) const {
+  QStringList mapnames;
+  for(int i=0;i < m_maps.size();i++)  {
     if (script.isEmpty()) {
-      mapnames << maps[i]->name;
+      mapnames << m_maps[i]->name;
     }
-    else if (maps[i]->script() == script) {
-      mapnames << maps[i]->name;
+    else if (m_maps[i]->script == script) {
+      mapnames << m_maps[i]->name;
     }
   }
   return mapnames;
 }
 void InputMapper::getScripts(QStringList & s) {
-  for(int i=0;i < maps.size();i++)  {
-    s.append(maps[i]->script);
+  for(int i=0;i < m_maps.size();i++)  {
+    s.append(m_maps[i]->script);
   }
 }
-QStringList  InputMapper::getScripts() const {
+QStringList InputMapper::scripts() const {
   QStringList s;
-  for(int i=0;i < maps.size();i++)  {
-    s << maps[i]->script;
+  for(int i=0;i < m_maps.size();i++)  {
+    s << m_maps[i]->script;
   }
+  s.removeDuplicates();
   return s;
 }
 QString InputMapper::getScript(const QString & mapname) {
-  for(int i=0;i < maps.size();i++)  {
-    if (maps[i]->name == mapname) {
-      return maps[i]->script;
+  for(int i=0;i < m_maps.size();i++)  {
+    if (m_maps[i]->name == mapname) {
+      return m_maps[i]->script;
     }
   }
   return QString();

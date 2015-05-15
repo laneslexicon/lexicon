@@ -36,6 +36,7 @@ public:
     QSize sizeHint() const;
 private slots:
     void on_actionExit();
+    void logMessage(const QString &);
 private:
     void createActions();
     void createToolBar();

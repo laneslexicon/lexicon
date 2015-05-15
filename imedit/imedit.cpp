@@ -6,21 +6,27 @@ ImEdit::ImEdit(QWidget * parent)
 {
   m_debug = false;
   mapper = im_new();
-  mapEnabled = true;
   prev_char = 0;
   m_enabled = true;
+  m_discard = false;
 }
 ImEdit::~ImEdit() {
   im_free(mapper);
+}
+void ImEdit::setDebug(bool v) {
+  m_debug = v;
 }
 void ImEdit::getMapNames(QStringList & m) {
       mapper->getMapNames(m);
 }
 QString ImEdit::currentScript() {
-  if ( ! mapEnabled ) {
-    return QString();
-  }
   return mapper->getScript(m_activeMap);
+}
+QString ImEdit::getScript(const QString & mapname) const {
+  return mapper->getScript(mapname);
+}
+QString ImEdit::currentMap() const {
+  return m_activeMap;
 }
 QString ImEdit::convertString(const QString & str) {
   bool ok;
@@ -35,9 +41,6 @@ QString ImEdit::convertString(const QString & str) {
     return QString();
   }
 }
-QStringList ImEdit::supportedScripts() const {
-  return mapper->getScripts();
-}
 /**
  *
  *
@@ -47,6 +50,7 @@ QStringList ImEdit::supportedScripts() const {
  * @return
  */
 bool ImEdit::loadMap(const QString & fileName,const QString & mapname) {
+  qDebug() << Q_FUNC_INFO;
   QFile f(fileName);
   if (!f.open(QIODevice::ReadOnly)) {
     emit(logMessage(QString("Error loading file %1: %2 ").arg(fileName).arg(f.errorString())));
@@ -60,28 +64,51 @@ bool ImEdit::loadMap(const QString & fileName,const QString & mapname) {
   }
   return true;
 }
-void ImEdit::activateMap(const QString & name,bool activate) {
-  if (! activate ) {
-    m_activeMap.clear();
-    return;
-  }
-
-  if (mapper->hasMap(name) && activate) {
-    m_activeMap = name;
-    return;
-  }
+/**
+ * Set the current map and activate it
+ *
+ * @param map name of map
+ *
+ * @return true if successful otherwise false
+ */
+/**
+ * set the current
+ *
+ * @param name
+ * @param enable
+ *
+ * @return true if ok, false otherwise
+ */
+bool ImEdit::setCurrentMap(const QString & name,bool enable) {
   if (! mapper->hasMap(name)) {
+    return false;
+  }
+  if ((name == "-none-") || name.isEmpty()) {
     m_activeMap.clear();
   }
+  else {
+    m_activeMap = name;
+  }
+  m_enabled = enable;
+  QVariant v = im_get_property(this->mapper,name,"discard");
+  if (! v.isValid()) {
+    m_discard = false;
+  }
+  else {
+    m_discard = v.toBool();
+  }
+  return true;
 }
-void ImEdit::setEnabled(bool v) {
+void ImEdit::enableMapping(bool v) {
   m_enabled = v;
 }
 void ImEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
-  //  qDebug() << "keypress" << mapEnabled << mapname;;
-  if (!m_enabled )
+  int pos = this->textCursor().position();
+  if (!m_enabled ) {
+    emit(charInserted(event->text().unicode()->unicode(),pos));
     return QTextEdit::keyPressEvent(event);
+  }
 
   if (event->modifiers() & Qt::ControlModifier) {
     return QTextEdit::keyPressEvent(event);
@@ -91,10 +118,12 @@ void ImEdit::keyPressEvent(QKeyEvent * event) {
     QTextStream out(&t);
     out << "ImEdit in: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << event->key() << " " << UcdScripts::getScript(event->key());
     out.reset();
-    out << " " << event->text();
+    out << "  " << event->text();
     emit(logMessage(t)); //QString("ImEdit got: %1 %2").arg(event->key()).arg(qPrintable(event->text()))));
   }
-  if ((! mapEnabled) ||   m_activeMap.isEmpty() ||  m_activeMap.isNull())   {
+
+  if (m_activeMap.isEmpty() ||  m_activeMap.isNull())   {
+    emit(charInserted(event->text().unicode()->unicode(),pos));
     return QTextEdit::keyPressEvent(event);
   }
 
@@ -107,15 +136,27 @@ void ImEdit::keyPressEvent(QKeyEvent * event) {
     }
     return QTextEdit::keyPressEvent(event);
   }
+
   im_char * cc = im_convert(this->mapper,this->m_activeMap.toUtf8().constData(),uc->unicode(),prev_char);
+  /**
+   * when entering characters above xffff (e.g Ugaritic character 0x1038e
+   * QChar cannot be used, so we go for wide character
+   */
+
   if (cc->processed) {
     event->ignore();
+    wchar_t wc(cc->uc);
+    cc->c = QString::fromWCharArray(&wc,1);
     QKeyEvent * nevent = new QKeyEvent(QEvent::KeyPress, cc->uc, Qt::NoModifier,cc->c);
     prev_char = cc->uc;
     if (cc->consume) {
       this->textCursor().deletePreviousChar();
     }
-    QTextEdit::keyPressEvent(nevent);
+    ///   why was I originally using the event queue ?
+    ///   for wide characters we have to insert them directly, the event queue route
+    ///   doesn't work
+        this->textCursor().insertText(cc->c);
+    //    QTextEdit::keyPressEvent(nevent);
     if (m_debug) {
       QString t;
       QTextStream out(&t);
@@ -125,31 +166,21 @@ void ImEdit::keyPressEvent(QKeyEvent * event) {
       emit(logMessage(t)); //QString("ImEdit out: %1 %2").arg(nevent->key()).arg(qPrintable(nevent->text()))));
     }
     //     QApplication::postEvent(event->target, nevent);
+    emit(charInserted(cc->uc,pos));
     return;
   }
-  else {
+  /// what to do with not process characters
+  if (! m_discard ) {
     prev_char = pc;
+    emit(charInserted(prev_char,pos));
     emit(logMessage("character not processed"));
     QTextEdit::keyPressEvent(event);
+    return;
   }
-}
-void ImEdit::setMapname(const QString & name) {
-  //  qDebug() << "setting map to:" << name;
-  m_activeMap = name;
-  bool v = true;
-  if (name == "-none-") {
-    v = false;
-  }
-  enableMapping(v);
-  qDebug() << Q_FUNC_INFO << "m_activeMap" << name << v << mapper->getScript(name);
-  emit(mapChanged(name));
-  if (v) {
-    QString s = mapper->getScript(name);
-    emit(currentScript(s));
-  }
-}
-void ImEdit::enableMapping(bool v) {
-  mapEnabled = v;
+  /// only discard characters, not things like backspace
+
+  QTextEdit::keyPressEvent(event);
+
 }
 /**
  * changes map via context menu
@@ -159,7 +190,7 @@ void ImEdit::actionChangeMap() {
   qDebug() << Q_FUNC_INFO;
   QAction * action = (QAction *)QObject::sender();
   QString m = action->data().toString();
-  setMapname(m);
+  setCurrentMap(m);
 }
 /**
  * changes font via context menu
@@ -223,9 +254,8 @@ void ImEdit::scrollContentsBy(int dx,int dy) {
   QTextEdit::scrollContentsBy(dx,dy);
   emit(scrollby());
 }
-void ImEdit::setScript(const QString & script) {
-
-
+QStringList ImEdit::scripts() const {
+  return mapper->scripts();
 }
 void ImEdit::getScriptNames(QStringList & m) {
   QStringList s;

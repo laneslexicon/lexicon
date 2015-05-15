@@ -1,0 +1,15 @@
+<RCC>
+<qresource>
+<file>png/font16.png</file>
+<file>png/open16.png</file>
+<file>png/save16.png</file>
+<file>png/saveas16.png</file>
+<file>png/print16.png</file>
+<file>png/printoptions16.png</file>
+<file>png/printers16.png</file>
+<file>png/insert-text16.png</file>
+<file>png/insert-block16.png</file>
+<file>png/preferences16.png</file>
+<file>png/arrow-down16.png</file>
+</qresource>
+</RCC>
