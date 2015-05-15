@@ -35,6 +35,9 @@ QString ImEdit::convertString(const QString & str) {
     return QString();
   }
 }
+QStringList ImEdit::supportedScripts() const {
+  return mapper->getScripts();
+}
 /**
  *
  *
@@ -219,6 +222,10 @@ void ImEdit::dropEvent(QDropEvent * event) {
 void ImEdit::scrollContentsBy(int dx,int dy) {
   QTextEdit::scrollContentsBy(dx,dy);
   emit(scrollby());
+}
+void ImEdit::setScript(const QString & script) {
+
+
 }
 void ImEdit::getScriptNames(QStringList & m) {
   QStringList s;

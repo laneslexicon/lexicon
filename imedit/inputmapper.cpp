@@ -770,10 +770,15 @@ void InputMapper::getMapNames(QStringList & m) {
     m.append(maps[i]->name);
   }
 }
-QStringList InputMapper::getMaps() {
+QStringList InputMapper::getMaps(const QString & script) const {
   QStringList mapnames;
   for(int i=0;i < maps.size();i++)  {
-    mapnames << maps[i]->name;
+    if (script.isEmpty()) {
+      mapnames << maps[i]->name;
+    }
+    else if (maps[i]->script() == script) {
+      mapnames << maps[i]->name;
+    }
   }
   return mapnames;
 }
@@ -781,6 +786,13 @@ void InputMapper::getScripts(QStringList & s) {
   for(int i=0;i < maps.size();i++)  {
     s.append(maps[i]->script);
   }
+}
+QStringList  InputMapper::getScripts() const {
+  QStringList s;
+  for(int i=0;i < maps.size();i++)  {
+    s << maps[i]->script;
+  }
+  return s;
 }
 QString InputMapper::getScript(const QString & mapname) {
   for(int i=0;i < maps.size();i++)  {

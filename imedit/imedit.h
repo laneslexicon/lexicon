@@ -30,7 +30,7 @@ public:
     ~ImEdit();
     //    void setMapname(const QString &);
     void setDocFont(const QFont &);
-    bool loadMap(const QString & filename,const QString  & mapname);
+    bool loadMap(const QString & filename,const QString  & mapname = QString());
     QFont & getDocFont() {
       return m_docFont;
     }
@@ -40,8 +40,10 @@ public:
     void getMapNames(QStringList & m);
     void activateMap(const QString &,bool enable = true);
     void getScriptNames(QStringList &);
+    void setScript(const QString & script);
     QString currentScript();
     QString convertString(const QString & source);
+    QStringlist supportedScripts() const;
  private:
     InputMapper * mapper;
     bool mapEnabled;
