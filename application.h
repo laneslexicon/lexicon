@@ -24,6 +24,7 @@ public:
   QMap<QString,QString> getOptions() const;
   QSettings * getSettings();
   QString settingsFileName(const QString & theme = QString());
+  QString editorSettingsFileName(const QString & theme = QString());
   QVariant getValue(const QString & group,const QString & key);
   bool     getBool(const QString & group,const QString & key);
   QString currentTheme() const { return m_currentTheme;}

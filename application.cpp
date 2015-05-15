@@ -337,6 +337,24 @@ QSettings * Lexicon::getSettings() {
   return settings;
 }
 /**
+ * returns the name of imeditor's ini file
+ *
+ * @param theme
+ *
+ * @return
+ */
+QString Lexicon::editorSettingsFileName(const QString & theme) {
+  if (theme.isEmpty()) {
+    QFileInfo f(m_settingsDir,"editor.ini");
+    return f.absoluteFilePath();
+  }
+  QDir d = QDir::current();
+  if (! d.cd(m_themeDirectory)) {
+    return QString();
+  }
+  return d.absoluteFilePath("editor.ini");
+}
+/**
  * Returns the filename of the active settings file if no theme is supplied
  * otherwise returns the filename of supplied theme
  *
