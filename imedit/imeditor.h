@@ -66,6 +66,7 @@ class ImEditor : public QWidget {
     void onMap(const QString &);
     void onFont();
     void onOpen();
+    void onImport();
     void onSave();
     void onSaveAs();
     void onPrint();
@@ -87,6 +88,7 @@ class ImEditor : public QWidget {
     void readSettings();
     QAction * m_fontAction;
     QAction * m_openAction;
+    QAction * m_importAction;
     QAction * m_saveAction;
     QAction * m_saveAsAction;
     QAction * m_printAction;

@@ -7,6 +7,7 @@
 #include "notes.h"
 #include "xsltsupport.h"
 #include "noteview.h"
+#include "notedialog.h"
 #include "place.h"
 extern NoteMaster * getNotes();
 extern QSettings * getSettings();
@@ -22,6 +23,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   QStyle * style = m_list->style();
   style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   this->setStyle(style);
+  /*
   QSplitter * splitter = new QSplitter(Qt::Vertical);
   QWidget * container  = new QWidget(this);
   QFormLayout * containerlayout = new QFormLayout;
@@ -36,7 +38,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   QSizePolicy policy = m_note->sizePolicy();
   policy.setVerticalStretch(1);
   m_note->setSizePolicy(policy);
-
+  */
   QHBoxLayout * btnlayout = new QHBoxLayout;
   m_printButton = new QPushButton(tr("&Print"));
   m_deleteButton = new QPushButton(tr("&Delete"));
@@ -45,21 +47,22 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   btnlayout->addWidget(m_printButton);
   btnlayout->addWidget(m_deleteButton);
   btnlayout->addWidget(m_viewButton);
+  btnlayout->addStretch();
 
+  //  containerlayout->addRow("Subject",m_subject);
+  //  containerlayout->addRow("Note",m_note);
+  //  containerlayout->addRow("Type",m_type);
 
-  containerlayout->addRow("Subject",m_subject);
-  containerlayout->addRow("Note",m_note);
-  containerlayout->addRow("Type",m_type);
+  //  containerlayout->addRow(btnlayout);
+  //  container->setLayout(containerlayout);
+  //  container->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-  containerlayout->addRow(btnlayout);
-  container->setLayout(containerlayout);
-  container->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-  splitter->addWidget(m_list);
-  splitter->addWidget(container);
-  splitter->setStretchFactor(0,0);
-  splitter->setStretchFactor(1,1);
-  layout->addWidget(splitter);
+  //  splitter->addWidget(m_list);
+  //  splitter->addWidget(container);
+  //  splitter->setStretchFactor(0,0);
+  //  splitter->setStretchFactor(1,1);
+  layout->addWidget(m_list);
+  layout->addLayout(btnlayout);
   m_list->adjustSize();//resizeColumnsToContents();
 
   setLayout(layout);
@@ -144,9 +147,12 @@ void NoteBrowser::onCellClicked(int row,int /* column */) {
     NoteMaster * notes = ::getNotes();
     Note * note = notes->findOne(id);
     if (note) {
-      m_subject->setText(note->getSubject());
-      m_note->setText(note->getNote());
-      m_type->setCurrentIndex(m_type->findData(note->getType()));
+      NoteDialog * dlg = new  NoteDialog(note,this);
+
+      //      m_subject->setText(note->getSubject());
+      //      m_note->setText(note->getNote());
+      //      m_type->setCurrentIndex(m_type->findData(note->getType()));
+      dlg->exec();
     }
   }
   m_deleteButton->setEnabled(true);

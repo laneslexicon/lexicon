@@ -2921,6 +2921,8 @@ void LanesLexicon::searchForRoot() {
       }
     }
   }
+  /// TODO handle keyboard visibility as the the search dialog is only ever closed
+  /// at the end
 }
 /**
  * TODO

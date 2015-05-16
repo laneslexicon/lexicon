@@ -35,7 +35,7 @@ LIBS += -lxalan-c -lxalanMsg -lxerces-c -lxerces-depdom
 DEFINES += USE_XALAN
 }
 INCLUDEPATH += ./qslog
-
+RESOURCES += laneslexicon.qrc
 #LIBS +=   -lboost_thread-mt -lboost_system -lboost_filesystem
 TRANSLATIONS = laneslexicon_de.ts laneslexicon_fr.ts
 MOC_DIR = ./moc

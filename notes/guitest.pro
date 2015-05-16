@@ -31,6 +31,7 @@ win32 {
   LIBS += -Lc:/Users/andrewsg/xslt/lib -llibxml2 -llibxslt
 }
 }
+RESOURCES += laneslexicon.qrc
 INCLUDEPATH += /usr/include/libxml2 /usr/local/include/libxml2
 INCLUDEPATH += /usr/local/include
 LIBS += -L $$[QT_INSTALL_LIBS]  -lxml2 -lxslt

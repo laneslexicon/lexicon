@@ -191,7 +191,6 @@ class GraphicsEntry : public QWidget {
     QString m_currentHtml;
     QString m_pattern;
     QString m_highlightColorName;
-    QString m_notesIcon;
     QRegExp m_currentSearchRx;
 
     QList<EntryItem *> m_items;

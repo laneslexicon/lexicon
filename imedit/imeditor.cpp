@@ -81,6 +81,10 @@ void ImEditor::createActions() {
   m_openAction->setIcon(QPixmap(":/png/open16.png"));
   connect(m_openAction,SIGNAL(triggered()),this,SLOT(onOpen()));
 
+  m_importAction = new QAction(tr("Import"),this);
+  m_importAction->setIcon(QPixmap(":/png/document-import16.png"));
+  connect(m_importAction,SIGNAL(triggered()),this,SLOT(onImport()));
+
   m_printAction = new QAction(tr("Print"),this);
   m_printAction->setIcon(QPixmap(":/png/print16.png"));
   connect(m_printAction,SIGNAL(triggered()),this,SLOT(onPrint()));
@@ -117,6 +121,7 @@ void ImEditor::createToolbar() {
   m_toolbar = new QToolBar(this);
 
   m_toolbar->addAction(m_openAction);
+  m_toolbar->addAction(m_importAction);
   m_toolbar->addAction(m_saveAction);
   m_toolbar->addAction(m_saveAsAction);
   m_toolbar->addAction(m_printAction);
@@ -375,6 +380,35 @@ void ImEditor::onSaveAs() {
   w.setFormat(suffix.toLatin1());
   w.setFileName(fileName);
   w.write(m_edit->document());
+}
+void ImEditor::onImport() {
+ QString fileName = QFileDialog::getOpenFileName(this,
+     tr("Import Document"), ".", tr("Documents (*.odf *.html *.txt)"));
+
+ if (fileName.isEmpty()) {
+   return;
+ }
+ QFile file(fileName);
+ if (! file.open(QIODevice::ReadOnly)) {
+   return;
+ }
+ QTextStream in(&file);
+ QString str = in.readAll();
+ file.close();
+ QFileInfo fi(fileName);
+ QTextCursor cursor = m_edit->textCursor();
+ if (fi.suffix().toLower() == "html") {
+   cursor.insertHtml(str);
+ }
+ else {
+   cursor.insertText(str);
+ }
+ if (m_documentFileName.isEmpty()) {
+   m_documentFileName = fileName;
+ }
+ this->scan();
+ setWindowTitle(fileName);
+ qDebug() << "Curent map" << m_edit->currentMap();
 }
 void ImEditor::onOpen() {
  QString fileName = QFileDialog::getOpenFileName(this,

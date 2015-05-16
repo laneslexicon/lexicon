@@ -249,9 +249,9 @@ void GraphicsEntry::readSettings() {
     m_activateLink = vn.toBool();
   }
   settings.endGroup();
-  settings.beginGroup("Icons");
-  m_notesIcon = settings.value("Notes","notes-0.xpm").toString();
-  m_notesIcon = getLexicon()->getResourceFilePath(Lexicon::Image,m_notesIcon);
+  //  settings.beginGroup("Icons");
+  //  m_notesIcon = settings.value("Notes","notes-0.xpm").toString();
+  //  m_notesIcon = getLexicon()->getResourceFilePath(Lexicon::Image,m_notesIcon);
 
 }
 QString GraphicsEntry::getXsltFileName()  {
@@ -1222,7 +1222,7 @@ void GraphicsEntry::appendEntries(int startPos) {
       btny = ypos;// + sz.height();
 
       ToolButtonData  * notesBtn = new ToolButtonData(i);
-      notesBtn->setIcon(QIcon(m_notesIcon));
+      notesBtn->setIcon(QIcon(QPixmap(":/notes.png")));//m_notesIcon));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
@@ -1269,7 +1269,7 @@ void GraphicsEntry::prependEntries(int startPos) {
       btnx = xpos + m_items[i]->boundingRect().width();
       btny = ypos;// + sz.height();
       ToolButtonData  * notesBtn = new ToolButtonData(i);
-      notesBtn->setIcon(QIcon(m_notesIcon));
+      notesBtn->setIcon(QIcon(QPixmap(":/notes.png")));//m_notesIcon));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
@@ -1736,7 +1736,7 @@ void GraphicsEntry::addButtonDecoration(bool ok) {
       btny = pos.y();// + sz.height();
 
       ToolButtonData  * notesBtn = new ToolButtonData(i);
-      notesBtn->setIcon(QIcon(m_notesIcon));
+      notesBtn->setIcon(QIcon(QPixmap(":/notes.png")));//m_notesIcon));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
