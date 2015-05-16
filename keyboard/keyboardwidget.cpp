@@ -15,7 +15,10 @@ KeyboardWidget::KeyboardWidget(const QString & d,const QString & config,QWidget 
   m_keyboardDirectory = d;
   this->setup();
 }
-void KeyboardWidget::setup() {
+/**
+ *
+ *
+ */void KeyboardWidget::setup() {
   m_target = 0;
   setWindowTitle(tr("Virtual Keyboard"));
   readSettings();
@@ -23,7 +26,6 @@ void KeyboardWidget::setup() {
   m_keyboards = new QComboBox(this);
   m_view = new KeyboardView(this);
   m_view->setStyleSheet("border-style : 2px solid black");
-  //  m_view->setAlignment(Qt::AlignLeft|Qt::AlignTop);
 
   loadDefinitions();
 
@@ -129,10 +131,15 @@ void KeyboardWidget::autoScale() {
     m_view->fitInView(m_view->sceneRect(), Qt::IgnoreAspectRatio);
 
 }
-void KeyboardWidget::showKeyboard() {
-  this->show();
-  //  this->raise();
-  this->activateWindow();
+void KeyboardWidget::showKeyboard(bool show) {
+  if (show) {
+    this->show();
+    this->activateWindow();
+  }
+  else {
+    this->hide();
+    this->lower();
+  }
 }
 /**
  * successive calls to attach(QWidget *) with the same widget

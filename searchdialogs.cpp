@@ -172,6 +172,11 @@ ArabicSearchDialog::~ArabicSearchDialog() {
 void ArabicSearchDialog::keyboardClosed() {
   showKeyboard();
 }
+void ArabicSearchDialog::hideKeyboard() {
+  if (m_attached) {
+    this->showKeyboard();
+  }
+}
 void ArabicSearchDialog::showKeyboard() {
   if (! m_attached) {
     m_keyboard->attach(m_edit);

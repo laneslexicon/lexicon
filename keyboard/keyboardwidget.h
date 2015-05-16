@@ -40,7 +40,7 @@ class KeyboardWidget : public QDialog {
    void virtualKeyPressed(int);
    void virtualKeyPressed(QList<int>);
    void loadKeyboard(int);
-   void showKeyboard();
+   void showKeyboard(bool show = true);
    void attach(QWidget *);
    void detach();
    void onKeyboardShortcut();

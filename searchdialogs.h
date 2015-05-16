@@ -26,6 +26,7 @@ class ArabicSearchDialog : public QDialog {
   void getOptions(SearchOptions &) const;
   bool getForceLTR() const ;
   void setText(const QString &);
+  void hideKeyboard();
   public slots:
     virtual void showOptions(bool);
     void showKeyboard();

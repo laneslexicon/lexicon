@@ -2923,6 +2923,7 @@ void LanesLexicon::searchForRoot() {
   }
   /// TODO handle keyboard visibility as the the search dialog is only ever closed
   /// at the end
+  m_rootSearchDialog->hideKeyboard();
 }
 /**
  * TODO
@@ -3007,6 +3008,7 @@ void LanesLexicon::searchForWord() {
     }
   }
   m_searchButton->menu()->hide();
+  m_wordSearchDialog->hideKeyboard();
 }
 
 /// TODO these needs to search the entry looking for bareword or word
@@ -3025,6 +3027,7 @@ void LanesLexicon::searchForEntry() {
       this->search(SearchOptions::Entry,m_headSearchDialog,t);
     }
   }
+  m_headSearchDialog->hideKeyboard();
 }
 void LanesLexicon::searchForNode() {
   QLOG_DEBUG() << Q_FUNC_INFO;
