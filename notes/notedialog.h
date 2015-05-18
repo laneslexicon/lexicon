@@ -16,6 +16,8 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QDialog>
+#include <QRadioButton>
+#include <QGroupBox>
 #include <QDialogButtonBox>
 #include <QMessageBox>
 #include <QSqlDatabase>
@@ -27,6 +29,7 @@
 #include "imedit.h"
 #include "keyboardwidget.h"
 #include "imeditor.h"
+class ImLineEdit;
 class NoteDialog : public QDialog {
   Q_OBJECT
  public:
@@ -45,7 +48,7 @@ class NoteDialog : public QDialog {
     void cancel();
     void save();
     void print();
-    void onTypeChange(int);
+    //    void onTypeChange(int);
  protected:
   void closeEvent(QCloseEvent *);
  private:
@@ -56,7 +59,7 @@ class NoteDialog : public QDialog {
 
   Place m_place;
   KeyboardWidget * m_keyboard;
-  QLineEdit * m_subject;
+  ImLineEdit * m_subject;
   ImEditor * m_note;
   QLineEdit * m_tags;
   QPushButton * m_keyboardButton;
@@ -69,6 +72,8 @@ class NoteDialog : public QDialog {
   QString m_subjectText;
   QString m_noteText;
   QString m_word;
+  QRadioButton * m_typeUser;
+  QRadioButton * m_typeSystem;
   int m_id;
   int m_noteType;
  signals:

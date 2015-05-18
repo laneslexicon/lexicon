@@ -1,8 +1,12 @@
 #include "notedialog.h"
 #include "notes.h"
 #include "imeditor.h"
+#include "imlineedit.h"
 #ifndef TEST_FRAMEWORK
+#include "application.h"
 #include "laneslexicon.h"
+#include "externs.h"
+#include "definedsettings.h"
 #endif
 extern NoteMaster * getNotes();
 /**
@@ -16,9 +20,16 @@ NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
   m_place = p;
   m_word = p.getWord();
   this->setup();
+  m_noteType = Note::User;
   setWindowTitle(m_subject->text());
   setObjectName("notedialog");
   /// set values from place
+  if (m_noteType == Note::User) {
+    m_typeUser->setChecked(true);
+  }
+  else {
+    m_typeSystem->setChecked(true);
+  }
   m_subject->setText(p.getShortText());
   m_note->setFocus();
 }
@@ -40,14 +51,19 @@ NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
   /// set values from note
   m_subject->setText(m_subjectText);
   m_note->edit()->setText(m_noteText);
-  m_type->setCurrentIndex(m_type->findData(m_noteType));
+  if (m_noteType == Note::User) {
+    m_typeUser->setChecked(true);
+  }
+  else {
+    m_typeSystem->setChecked(true);
+  }
   m_note->setFocus();
   setWindowTitle(m_subject->text());
 }
 void NoteDialog::setup() {
   QVBoxLayout * mainlayout = new QVBoxLayout;
-  QFormLayout * layout = new QFormLayout;
-  m_subject = new QLineEdit(this);
+  //  QFormLayout * layout = new QFormLayout;
+  m_subject = new ImLineEdit(this);
 
   m_note = new ImEditor(this);
   m_moreButton = new QPushButton(tr("&More"));
@@ -74,19 +90,21 @@ void NoteDialog::setup() {
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
   connect(m_printButton,SIGNAL(clicked()),this,SLOT(print()));
 
-  m_type = new QComboBox;
-  m_type->insertItem(0,tr("User"),Note::User);
-  m_type->insertItem(1,tr("System"),Note::Error);
-  m_type->setCurrentIndex(0);
-  connect(m_type,SIGNAL(currentIndexChanged(int)),this,SLOT(onTypeChange(int)));
-  layout->addRow(tr("Subject"),m_subject);
-  layout->addRow(tr("Note"),m_note);
-  layout->addRow(tr("Type"),m_type);
-  layout->addRow(m_buttonBox);
-  layout->addRow(m_moreButtonBox);
-  //  layout->addWidget(m_moreButtonBox);
+  m_typeSystem = new QRadioButton(tr("System"),this);
+  m_typeUser  = new QRadioButton(tr("User"),this);
 
-  mainlayout->addLayout(layout);
+  QHBoxLayout * typelayout = new QHBoxLayout;
+  typelayout->addWidget(new QLabel(tr("Subject")));
+  typelayout->addWidget(m_subject);
+  typelayout->addWidget(new QLabel(tr("Note ype")));
+  typelayout->addWidget(m_typeUser);
+  typelayout->addWidget(m_typeSystem);
+
+  mainlayout->addLayout(typelayout);
+  mainlayout->addWidget(m_note);
+  mainlayout->addWidget(m_buttonBox);
+  mainlayout->addWidget(m_moreButtonBox);
+
   setLayout(mainlayout);
   //  setWindowFlags(Qt::CustomizeWindowHint);
   setSizeGripEnabled(true);
@@ -94,7 +112,14 @@ void NoteDialog::setup() {
   m_autosave = false;
   setWindowTitle(m_subject->text());
   m_attached = false;
+#ifndef TEST_FRAMEWORK
+  SETTINGS
+  settings.beginGroup("Keyboards");
+  QString keyboardConfig = settings.value(SID_KEYBOARDS_CONFIG,"keyboard.ini").toString();
+  m_keyboard = new KeyboardWidget(getLexicon()->getResourceFilePath(Lexicon::Keyboard),keyboardConfig,this);
+#else
   m_keyboard = new KeyboardWidget(this);
+#endif
   QPoint p = this->pos();
 
   int h = this->frameGeometry().height();
@@ -161,6 +186,7 @@ bool NoteDialog::isModified() const {
   return false;
 }
 void NoteDialog::showKeyboard() {
+  /*
   m_keyboard->attach(m_note);
   m_attached = ! m_attached;
   if (m_attached) {
@@ -179,6 +205,26 @@ void NoteDialog::showKeyboard() {
   }
   else
     m_keyboardButton->setText(tr("Show keyboard"));
+  */
+  if (! m_attached) {
+    m_keyboard->attach(m_note->edit());
+    m_keyboardButton->setText(tr("Hide &keyboard"));
+    QPoint p;
+    p = m_keyboard->currentPosition();
+    if (p.isNull()) {
+      p = this->pos();
+      int h = this->frameGeometry().height();
+      p.setX(p.x() - 50);
+      p.setY(p.y() + h);
+    }
+    m_keyboard->move(p);
+    m_attached = true;
+  }
+  else {
+    m_keyboard->detach();
+    m_keyboardButton->setText(tr("Show &keyboard"));
+    m_attached = false;
+  }
 
 }
 void NoteDialog::cancel() {
@@ -199,7 +245,12 @@ void NoteDialog::save() {
   n->setWord(m_word);
   n->setSubject(m_subject->text());
   n->setNote(m_note->edit()->toPlainText());
-  n->setType(m_type->currentData().toInt());
+  if (m_typeUser->isChecked()) {
+      n->setType(Note::User);
+  }
+  else {
+      n->setType(Note::System);
+  }
   if (m_attached) {
     showKeyboard();
   }
@@ -211,7 +262,7 @@ void NoteDialog::save() {
     m_note->edit()->document()->setModified(false);
     m_subjectText = m_subject->text();
     m_noteText = m_note->edit()->toPlainText();
-    m_noteType =  m_type->currentData().toInt();
+    //    m_noteType =  m_type->currentData().toInt();
 
     emit(noteSaved(ok));
   }
@@ -231,6 +282,7 @@ void NoteDialog::print() {
     m_note->edit()->print(&printer);
   }
 }
+/*
 void NoteDialog::onTypeChange(int ix) {
   if (ix == -1)
     return;
@@ -240,3 +292,4 @@ void NoteDialog::onTypeChange(int ix) {
     m_changed = true;
   }
 }
+*/

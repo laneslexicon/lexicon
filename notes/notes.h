@@ -15,7 +15,7 @@ class Note  {
  public:
   Note(int type = Note::User);
   Note(const Note &);
-  enum Type { User, Error };
+  enum Type { User, System };
 
   void setSubject(const QString & text) { m_subject = text;};
   void setPlace(const Place & p) { m_place = p;}
