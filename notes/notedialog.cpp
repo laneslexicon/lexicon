@@ -96,7 +96,7 @@ void NoteDialog::setup() {
   QHBoxLayout * typelayout = new QHBoxLayout;
   typelayout->addWidget(new QLabel(tr("Subject")));
   typelayout->addWidget(m_subject);
-  typelayout->addWidget(new QLabel(tr("Note ype")));
+  typelayout->addWidget(new QLabel(tr("Note type")));
   typelayout->addWidget(m_typeUser);
   typelayout->addWidget(m_typeSystem);
 
@@ -117,6 +117,13 @@ void NoteDialog::setup() {
   settings.beginGroup("Keyboards");
   QString keyboardConfig = settings.value(SID_KEYBOARDS_CONFIG,"keyboard.ini").toString();
   m_keyboard = new KeyboardWidget(getLexicon()->getResourceFilePath(Lexicon::Keyboard),keyboardConfig,this);
+  m_note->hideMaps();
+  m_note->hidePrint();
+  settings.endGroup();
+  settings.beginGroup("Notes");
+  m_note->hideMaps(settings.value(SID_NOTES_SHOW_KEYMAPS,false).toBool());
+  m_note->hidePrint(settings.value(SID_NOTES_SHOW_PRINT,false).toBool());
+  settings.endGroup();
 #else
   m_keyboard = new KeyboardWidget(this);
 #endif
@@ -133,6 +140,7 @@ void NoteDialog::setup() {
   disconnect(m_note->saveAction(), SIGNAL(triggered()),
                   m_note, SLOT(onSave()));
   connect(m_note->saveAction(),SIGNAL(triggered()),this,SLOT(save()));
+
 }
 void NoteDialog::showOptions(bool v) {
   if (v)

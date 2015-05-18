@@ -51,7 +51,8 @@ They should not be translated.
 
 #define SID_NOTES_ENABLED "Enabled"
 #define SID_NOTES_DATABASE "Database"
-
+#define SID_NOTES_SHOW_KEYMAPS  "Show keymaps"
+#define SID_NOTES_SHOW_PRINT  "Show print"
 
 //#define SID_SHORTCUT_COLLAPSE_ALL "Collapse all"
 

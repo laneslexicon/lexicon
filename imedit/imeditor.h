@@ -59,6 +59,8 @@ class ImEditor : public QWidget {
   ~ImEditor();
   public slots:
     void hideHelp();
+    void hideMaps(bool hide = false);
+    void hidePrint(bool hide = false);
     void onInsertChar();
     void logMessage(const QString &);
     void onPrinterSetup();
@@ -96,6 +98,8 @@ class ImEditor : public QWidget {
     QAction * m_printOptionsAction;
     QAction * m_insertBlockAction;
     QAction * m_insertCharAction;
+    QAction * m_mapBoxAction;
+    QAction * m_mapHelpAction;
     QSignalMapper * m_mapSignals;
     QStringList m_formats;
     bool m_autoSaveSettings;

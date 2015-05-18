@@ -131,10 +131,14 @@ void ImEditor::createToolbar() {
   m_toolbar->addAction(m_insertBlockAction);
   m_toolbar->addAction(m_optionsAction);
   m_toolbar->addSeparator();
-  m_toolbar->addWidget(new QLabel(tr(" Maps  ")));
-  m_toolbar->addWidget(m_mapBox);
-  m_toolbar->addWidget(new QLabel(tr("  Help  ")));
-  m_toolbar->addWidget(m_helpBox);
+  QWidget * w = new QWidget;
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  hlayout->addWidget(new QLabel(tr(" Maps  ")));
+  hlayout->addWidget(m_mapBox);
+  hlayout->addWidget(new QLabel(tr("  Help  ")));
+  hlayout->addWidget(m_helpBox);
+  w->setLayout(hlayout);
+  m_mapBoxAction = m_toolbar->addWidget(w);
 }
 void ImEditor::readSettings() {
   QString str;
@@ -230,6 +234,13 @@ void ImEditor::readSettings() {
   qDebug() << m_mapToScript;
   qDebug() << m_mapHelp;
   */
+}
+void ImEditor::hideMaps(bool show) {
+  m_mapBoxAction->setVisible(show);
+}
+void ImEditor::hidePrint(bool show) {
+  m_printAction->setVisible(show);
+  m_printOptionsAction->setVisible(show);
 }
 void ImEditor::onMap(const QString & m) {
   qDebug() << Q_FUNC_INFO << QString("Current script %1, requested map %2").arg(m_currentScript).arg(m);
