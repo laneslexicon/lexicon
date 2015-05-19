@@ -42,6 +42,7 @@ class NoteDialog : public QDialog {
   bool isModified() const;
   QString getNote() { return m_note->edit()->toPlainText();}
   void setAutosave(bool v) { m_autosave = v;}
+  enum { AttachSubject,AttachNote };
   public slots:
     void showOptions(bool);
     void showKeyboard();
@@ -53,11 +54,12 @@ class NoteDialog : public QDialog {
  protected:
   void closeEvent(QCloseEvent *);
  private:
+  void positionKeyboard();
   void setup();
   bool m_attached;
   bool m_changed;
   bool m_autosave;
-
+  int m_attachedEdit;
   Place m_place;
   KeyboardWidget * m_keyboard;
   ImLineEdit * m_subject;

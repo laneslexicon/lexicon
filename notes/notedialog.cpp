@@ -116,7 +116,8 @@ void NoteDialog::setup() {
   SETTINGS
   settings.beginGroup("Keyboards");
   QString keyboardConfig = settings.value(SID_KEYBOARDS_CONFIG,"keyboard.ini").toString();
-  m_keyboard = new KeyboardWidget(getLexicon()->getResourceFilePath(Lexicon::Keyboard),keyboardConfig,this);
+  m_keyboard = new KeyboardWidget(getLexicon()->getResourceFilePath(Lexicon::Keyboard),keyboardConfig);
+
   m_note->hideMaps();
   m_note->hidePrint();
   settings.endGroup();
@@ -142,6 +143,7 @@ void NoteDialog::setup() {
   connect(m_note->saveAction(),SIGNAL(triggered()),this,SLOT(save()));
   connect(m_note,SIGNAL(editFocus(int)),this,SLOT(focusChanged(int)));
   connect(m_subject,SIGNAL(gotFocus(int)),this,SLOT(focusChanged(int)));
+  m_attachedEdit = NoteDialog::AttachNote;
 }
 void NoteDialog::showOptions(bool v) {
   if (v)
@@ -195,29 +197,25 @@ bool NoteDialog::isModified() const {
   return false;
 }
 void NoteDialog::showKeyboard() {
-  /*
-  m_keyboard->attach(m_note);
-  m_attached = ! m_attached;
-  if (m_attached) {
-    m_keyboardButton->setText(tr("Hide keyboard"));
-    QPoint p;
-    p = m_keyboard->currentPosition();
-    if (p.isNull()) {
-      p = this->pos();
-      int h = this->frameGeometry().height();
-    /// TODO adjust this
-      m_keyboard->move(p.x() - 50,p.y() + h);
+  if (! m_attached) {
+    if (m_attachedEdit == NoteDialog::AttachNote) {
+      m_keyboard->attach(m_note->edit());
     }
     else {
-      m_keyboard->move(p);
+      m_keyboard->attach(m_subject);
     }
-  }
-  else
-    m_keyboardButton->setText(tr("Show keyboard"));
-  */
-  if (! m_attached) {
-    m_keyboard->attach(m_note->edit());
     m_keyboardButton->setText(tr("Hide &keyboard"));
+    m_attached = true;
+    this->positionKeyboard();
+  }
+  else {
+    m_keyboard->detach();
+    m_keyboardButton->setText(tr("Show &keyboard"));
+    m_attached = false;
+  }
+
+}
+void NoteDialog::positionKeyboard() {
     QPoint p;
     p = m_keyboard->currentPosition();
     if (p.isNull()) {
@@ -227,14 +225,6 @@ void NoteDialog::showKeyboard() {
       p.setY(p.y() + h);
     }
     m_keyboard->move(p);
-    m_attached = true;
-  }
-  else {
-    m_keyboard->detach();
-    m_keyboardButton->setText(tr("Show &keyboard"));
-    m_attached = false;
-  }
-
 }
 void NoteDialog::cancel() {
   m_note->edit()->setText(m_noteText);
@@ -271,8 +261,6 @@ void NoteDialog::save() {
     m_note->edit()->document()->setModified(false);
     m_subjectText = m_subject->text();
     m_noteText = m_note->edit()->toPlainText();
-    //    m_noteType =  m_type->currentData().toInt();
-
     emit(noteSaved(ok));
   }
   m_note->hideHelp();
@@ -303,6 +291,20 @@ void NoteDialog::onTypeChange(int ix) {
 }
 */
 void NoteDialog::focusChanged(int reason) {
-  qDebug() << Q_FUNC_INFO << reason;
-
+  ImLineEdit * e = qobject_cast<ImLineEdit *>(sender());
+  if (e){
+    m_attachedEdit = NoteDialog::AttachSubject;
+  }
+  ImEditor * d = qobject_cast<ImEditor *>(sender());
+  if (d) {
+    m_attachedEdit = NoteDialog::AttachNote;
+  }
+  if ( m_attached) {
+    if (m_attachedEdit == NoteDialog::AttachNote) {
+      m_keyboard->attach(m_note->edit());
+    }
+    else {
+      m_keyboard->attach(m_subject);
+    }
+  }
 }

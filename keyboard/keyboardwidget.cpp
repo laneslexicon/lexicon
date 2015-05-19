@@ -132,6 +132,7 @@ void KeyboardWidget::autoScale() {
 
 }
 void KeyboardWidget::showKeyboard(bool show) {
+  qDebug() << Q_FUNC_INFO << this->isModal();
   if (show) {
     this->show();
     this->activateWindow();
