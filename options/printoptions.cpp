@@ -98,36 +98,60 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
   setupConnections();
 }
 void PrintOptions::onPrintDialog() {
-  QPrintDialog d(&m_printer);
+  QList<QPrinterInfo> printers = QPrinterInfo::availablePrinters();
+  if (printers.size() == 0) {
+    QMessageBox msgBox;
+    msgBox.setText(tr("No printers are available."));
+    msgBox.setInformativeText(tr("All printing will be to PDF"));
+    msgBox.exec();
+    m_pdfOutput->setChecked(true);
+    return;
+  }
+  QPrinter * p = new QPrinter();
+  QPrintDialog * d = new QPrintDialog(p,this);
+  d->setWindowModality(Qt::WindowModal);
+  d->setWindowTitle("Set and Configure Printer");
+  d->open(this,SLOT(onPrinterSetup()));
+
+
+}
+void PrintOptions::onPrinterSetup() {
   QString t;
-  if (d.exec() == QDialog::Accepted) {
-    m_copyCount->setText(QString("%1").arg(m_printer.copyCount()));
-    m_resolution->setText(QString("%1").arg(m_printer.resolution()));
-    if (m_paper.contains(m_printer.paperSize())) {
-      t = m_paper.value(m_printer.paperSize());
+  QPrintDialog * d = qobject_cast<QPrintDialog *>(sender());
+  if (! d ) {
+    return;
+  }
+  if (d->result() == QDialog::Rejected) {
+    return;
+  }
+  QPrinter * printer = d->printer();
+    m_copyCount->setText(QString("%1").arg(printer->copyCount()));
+    m_resolution->setText(QString("%1").arg(printer->resolution()));
+    if (m_paper.contains(printer->paperSize())) {
+      t = m_paper.value(printer->paperSize());
       m_paperSize->setText(t);
-      m_papersz = m_printer.paperSize();
+      m_papersz = printer->paperSize();
     }
     else {
-      m_paperSize->setText(QString("%1").arg(m_printer.paperSize()));
+      m_paperSize->setText(QString("%1").arg(printer->paperSize()));
     }
-    m_orientationNum = m_printer.orientation();
+    m_orientationNum = printer->orientation();
     if (m_orientationNum == QPrinter::Portrait) {
       m_orientation->setText("Portrait");
     }
     else {
       m_orientation->setText("Landscape");
     }
-    m_printerName->setText(QString("%1").arg(m_printer.printerName()));
-    m_fullPage->setChecked(m_printer.fullPage());
+    m_printerName->setText(QString("%1").arg(printer->printerName()));
+    m_fullPage->setChecked(printer->fullPage());
 
-    if (m_printer.outputFormat() == QPrinter::PdfFormat) {
+    if (printer->outputFormat() == QPrinter::PdfFormat) {
       m_pdfOutput->setChecked(true);
     }
     else {
       m_pdfOutput->setChecked(false);
     }
-  }
+    delete printer;
 }
 void PrintOptions::readSettings() {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);

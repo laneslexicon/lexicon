@@ -486,10 +486,7 @@ void ImEditor::onPrint() {
   m_edit->document()->print(m_printer);
 }
 void ImEditor::onPrinters() {
-  qDebug() << Q_FUNC_INFO;
-  qDebug() << "Printer names" << QPrinterInfo::availablePrinterNames();
   QList<QPrinterInfo> printers = QPrinterInfo::availablePrinters();
-  qDebug() << "Size" << printers.size();
   if (printers.size() == 0) {
     QMessageBox msgBox;
     msgBox.setText(tr("No printers are available."));

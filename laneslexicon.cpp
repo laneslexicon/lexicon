@@ -3104,7 +3104,12 @@ void LanesLexicon::printCurrentPage(const QString & node) {
     entry->print(m_printer,node);
     return;
   }
-
+  QList<QPrinterInfo> printers = QPrinterInfo::availablePrinters();
+  if (printers.size() == 0) {
+    m_printer.setOutputFormat(QPrinter::PdfFormat);
+    entry->print(m_printer,node);
+    return;
+  }
   QPrintDialog printDialog(&m_printer, this);
   if (printDialog.exec() == QDialog::Accepted) {
     if (m_printer.isValid()) {
@@ -3629,6 +3634,12 @@ void LanesLexicon::printNodeView(GraphicsEntry * entry,const QString & node) {
 
 
   if ( m_printerReUse ) {
+    entry->print(m_printer,node);
+    return;
+  }
+  QList<QPrinterInfo> printers = QPrinterInfo::availablePrinters();
+  if (printers.size() == 0) {
+    m_printer.setOutputFormat(QPrinter::PdfFormat);
     entry->print(m_printer,node);
     return;
   }

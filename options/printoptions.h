@@ -7,7 +7,8 @@
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QComboBox>
-
+#include <QPrinterInfo>
+#include <QMessageBox>
 class PrintOptions : public OptionsWidget {
   Q_OBJECT
 
@@ -19,6 +20,7 @@ class PrintOptions : public OptionsWidget {
     void readSettings();
     void onPrintDialog();
     void onDirectory();
+    void onPrinterSetup();
  private:
     QLineEdit * m_copyCount;
     QLineEdit * m_resolution;
@@ -32,7 +34,7 @@ class PrintOptions : public OptionsWidget {
     QLineEdit * m_pdfDirectory;
     QPushButton * m_dialogButton;;
     QPushButton * m_directoryButton;
-    QPrinter m_printer;
+    //    QPrinter * m_printer;
     QCheckBox * m_pdfAutoName;
     QMap<int,QString> m_paper;
     int m_papersz;
