@@ -6,6 +6,7 @@
 #include "laneslexicon.h"
 #include "searchoptionswidget.h"
 #include "definedsettings.h"
+#include "definedsql.h"
 #include "externs.h"
 #define ROOT_COLUMN 0
 #define ENTRY_COLUMN 1
@@ -227,15 +228,14 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   bool replaceSearch = true;
   m_target = target;
   m_searchOptions = options;
-  QString sql;
-  sql = "select id,word,root,nodeid,nodenum,headword,page from entry where datasource = 1 order by nodenum asc";
+  QString sql(SQL_FIND_ENTRY_HEADWORD);
 
   rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   m_currentRx = rx;
 
   bool ok = false;
   if (m_query.prepare(sql)) {
-    if (m_nodeQuery.prepare("select * from entry where datasource = 1 and nodeid = ?")) {
+    if (m_nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE)) {
       ok = true;
     }
   }

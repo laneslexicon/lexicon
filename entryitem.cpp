@@ -110,7 +110,6 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   c.setPosition(document()->documentLayout()->hitTest(event->pos(), Qt::FuzzyHit));
   c.select(QTextCursor::WordUnderCursor);
 
-  //  QLOG_DEBUG() << "selected text:" << c.selectedText() << c.charFormat().anchorHref();
   QString f = c.selection().toHtml();
   QRegExp rx("<!--StartFragment--><a\\s+href=\"\\d+\\.\\d+\\.\\d+\\.\\d+\\?([^\"]+)\">");
   if (rx.indexIn(f) != -1) {

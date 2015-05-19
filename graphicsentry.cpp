@@ -13,6 +13,7 @@
 #include "searchoptionswidget.h"
 #include "externs.h"
 #include "nodeinfo.h"
+#include "definedsql.h"
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
   setObjectName("toolbuttondata");
@@ -468,7 +469,7 @@ void GraphicsEntry::linkActivated(const QString & link) {
     if (msg.startsWith("golink")) {
       msg.remove("golink=");
       QSqlQuery query;
-      query.prepare("select tonode from links where linkid = ?");
+      query.prepare(SQL_LINKTO_NODE);
       query.bindValue(0,msg);
       query.exec();
       if (query.first()) {
@@ -491,7 +492,7 @@ void GraphicsEntry::linkActivated(const QString & link) {
     if (msg.startsWith("root=")) {
       msg.remove("root=");
       QSqlQuery query;
-      query.prepare("select word from root where bword = ?");
+      query.prepare(SQL_LINK_ROOT_FIND);
       query.bindValue(0,msg);
       query.exec();
       if (query.first()) {
@@ -542,7 +543,7 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
   }
   t.remove("golink=");
   QSqlQuery query;
-  query.prepare("select tonode from links where linkid = ?");
+  query.prepare(SQL_LINKTO_NODE);
   query.bindValue(0,t);
   query.exec();
   if (query.first()) {
@@ -553,7 +554,7 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
     return;
   }
   QSqlQuery nodeQuery;
-  bool ok = nodeQuery.prepare("select * from entry where datasource = 1 and nodeid = ?");
+  bool ok = nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE);
   if (! ok ) {
     QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
   }
@@ -717,7 +718,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
    *
    */
   QSqlQuery nodeQuery;
-  ok = nodeQuery.prepare("select * from entry where datasource = 1 and nodeid = ?");
+  ok = nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE);
   if (! ok ) {
     QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
   }
@@ -739,11 +740,11 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
   }
   QSqlQuery rootQuery;
-  rootQuery.prepare("select root,broot,word,bword,xml,page,itype,nodeid,supplement,headword from entry where datasource = 1  and root = ? order by nodenum");
+  rootQuery.prepare(SQL_FIND_ROOT);
 
   int quasi = 0;
   QSqlQuery quasiQuery;
-  if (quasiQuery.prepare("select quasi from root where word = ? and datasource = 1")) {
+  if (quasiQuery.prepare(SQL_QUASI_FIND_BY_WORD)) {
     quasiQuery.bindValue(0,root);
     quasiQuery.exec();
     if (quasiQuery.first()) {
@@ -917,7 +918,7 @@ Place GraphicsEntry::getPage(const Place & p) {
   int page = p.getPage();
 
   QSqlQuery pageQuery;
-  bool ok = pageQuery.prepare("select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1 and page = ? order by nodenum asc");
+  bool ok = pageQuery.prepare(SQL_ROOT_FOR_PAGE);
   if (! ok ) {
     QLOG_WARN() << "page SQL prepare failed" << pageQuery.lastError();
   }
@@ -941,8 +942,6 @@ Place GraphicsEntry::getPage(const Place & p) {
   }
 
   QString lastRoot;
-  // "select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource =  // 1 and page = ? order by nodenum asc");
-
 
   int rootCount = 0;
   int entryCount = 0;
@@ -955,7 +954,7 @@ Place GraphicsEntry::getPage(const Place & p) {
       if (! lastRoot.isEmpty()) {
         QSqlQuery quasiQuery;
         int quasi = 0;
-        if (quasiQuery.prepare("select quasi from root where word = ? and datasource = 1")) {
+        if (quasiQuery.prepare(SQL_QUASI_FIND_BY_WORD)) {
           quasiQuery.bindValue(0,root);
           quasiQuery.exec();
           if (quasiQuery.first()) {
@@ -1454,7 +1453,7 @@ void GraphicsEntry::showPerseus(const Place & p) {
     return;
   }
   QSqlQuery nodeQuery;
-  bool ok = nodeQuery.prepare("select * from entry where datasource = 1 and nodeid = ?");
+  bool ok = nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE);
   if (! ok ) {
     QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
   }
@@ -1988,7 +1987,7 @@ QString GraphicsEntry::getPageInfo(bool summary) {
   html += ROW(tr("Nodes"),QString("%1 - %2").arg(firstNode).arg(lastPlace.getNode()));
   html += ROW(tr("Date"),QDateTime::currentDateTime().toString(Qt::ISODate));
   QSqlQuery query;
-  if (query.prepare("select createversion,createdate,xmlversion,dbid from lexicon")) {
+  if (query.prepare(SQL_FIND_VERSION)) {
     query.exec();
     if (query.first()) {
       html += ROW("","");
@@ -2205,22 +2204,22 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
   QLOG_DEBUG() << "Point link word" << params[1];
   QLOG_DEBUG() << "To word" << targetWord;
   QSqlQuery findLink;
-  if (! findLink.prepare("select id,linkid,fromnode,tonode,link from links where datasource = 1 and linkid = ?")) {
+  if (! findLink.prepare(SQL_FIND_NODE_FOR_LINK)) {
     QLOG_WARN() << findLink.lastError().text();
     return;
   }
   QSqlQuery updateLink;
-  if (! updateLink.prepare("update links set tonode = ?, matchtype = 100 where datasource = 1 and link = ?")) {
+  if (! updateLink.prepare(SQL_UPDATE_LINK_TO_NODE)) {
     QLOG_WARN() << updateLink.lastError().text();
     return;
   }
   QSqlQuery nodefind;
-  if (! nodefind.prepare("select xml from entry where nodeid = ?")) {
+  if (! nodefind.prepare(SQL_GET_XML_FOR_NODE)) {
     QLOG_WARN() << nodefind.lastError().text();
     return;
   }
   QSqlQuery nodeupdate;
-  if (! nodeupdate.prepare("update entry set xml = ? where nodeid = ?")) {
+  if (! nodeupdate.prepare(SQL_UPDATE_XML_FOR_NODE)) {
     QLOG_WARN() << nodeupdate.lastError().text();
     return;
   }

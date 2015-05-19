@@ -7,6 +7,7 @@
 #include <QMimeData>
 #include <QPixmap>
 #include "externs.h"
+#include "definedsql.h"
 #define ROOT_COLUMN 0
 #define WORD_COLUMN 1
 #define HEADWORD_COLUMN 2
@@ -94,11 +95,11 @@ void ContentsWidget::loadContents() {
   QSqlQuery letterQuery;
 
 
-  if (! m_entryQuery.prepare("select word,itype,bword,nodeid,supplement,headword from entry where datasource = 1 and root = ? order by nodenum asc")) {
+  if (! m_entryQuery.prepare(SQL_FIND_ENTRIES_FOR_ROOT)) {
     QLOG_WARN() << QString(tr("Entry SQL prepare failed:%1")).arg(m_entryQuery.lastError().text());
   }
 
-  QString sql = "select distinct letter from root where datasource = 1 order by letter";
+  QString sql(SQL_FIND_LETTERS);
   if ( ! letterQuery.prepare(sql)) {
     QLOG_WARN() << QString(tr("Error preparing letter query SQL:%1")).arg(letterQuery.lastError().text());
     return;
@@ -106,7 +107,7 @@ void ContentsWidget::loadContents() {
   letterQuery.exec();
 
   QSqlQuery rootQuery;
-  sql = "select word,supplement from root where letter = ? and datasource = 1 order by word,supplement";
+  sql = SQL_FIND_WORDS_FOR_ROOT;
   if (! rootQuery.prepare(sql)) {
     QLOG_WARN() << QString(tr("Error preparing root query SQL:%1")).arg(rootQuery.lastError().text());
     return;

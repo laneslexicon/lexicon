@@ -1,6 +1,7 @@
 #include "history.h"
 #include "externs.h"
 #include "definedsettings.h"
+#include "definedsql.h"
 HistoryEvent::HistoryEvent() {
   m_when = QDateTime::currentDateTime();
   m_id = -1;
@@ -36,16 +37,16 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
   m_lastQuery = QSqlQuery(m_db);
   m_firstQuery = QSqlQuery(m_db);
   if (
-      m_addQuery.prepare(QString("insert into history (datasource,node,word,root,supplement,page,vol,timewhen) values (1,?,?,?,?,?,?,?)")) &&
-      m_backQuery.prepare(QString("select %1 from history where id <= ? order by id desc").arg(fields)) &&
-      m_forQuery.prepare(QString("select %1 from history where id > ? order by id asc").arg(fields)) &&
-      m_lastQuery.prepare(QString("select %1 from history where id = (select max(id) from history)").arg(fields)) &&
-      m_firstQuery.prepare(QString("select %1 from history order by id asc limit 1").arg(fields)) &&
-      m_listQuery.prepare(QString("select %1 from history order by id desc limit %2").arg(fields).arg(m_size)) &&
-      m_getQuery.prepare(QString("select %1 from history where id = ?").arg(fields)))
+      m_addQuery.prepare(QString(SQL_ADD_HISTORY)) &&
+      m_backQuery.prepare(QString(SQL_PREV_HISTORY).arg(fields)) &&
+      m_forQuery.prepare(QString(SQL_NEXT_HISTORY).arg(fields)) &&
+      m_lastQuery.prepare(QString(SQL_LAST_HISTORY).arg(fields)) &&
+      m_firstQuery.prepare(QString(SQL_FIRST_HISTORY).arg(fields)) &&
+      m_listQuery.prepare(QString(SQL_LIST_HISTORY).arg(fields).arg(m_size)) &&
+      m_getQuery.prepare(QString(SQL_GET_HISTORY).arg(fields)))
     {
       QSqlQuery mq(m_db);
-      mq.exec("select max(id) from history");
+      mq.exec(SQL_GET_MAX_HISTORY);
       if (mq.first()) {
         m_lastId = mq.value(0).toInt();
       }

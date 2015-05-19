@@ -12,6 +12,7 @@
 #include "xsltsupport.h"
 #include "htmldelegate.h"
 #include "definedsettings.h"
+#include "definedsql.h"
 #include "externs.h"
 #define ROOT_COLUMN 0
 #define HEAD_COLUMN 1
@@ -359,9 +360,9 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
 
   QString pattern;
   m_currentRx = rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
-  QString sql("select id,word,root,entry,node,nodenum,page from xref where datasource = 1 order by nodenum asc");
+  QString sql(SQL_FIND_XREF_ENTRIES);
   if (m_query.prepare(sql)) {
-    sql = "select root,word,xml,page from entry where datasource = 1 and nodeid = ?";
+    sql = SQL_FIND_ENTRY_DETAILS;
     if (! m_nodeQuery.prepare(sql)) {
       QLOG_WARN() << QString("SQL prepare error %1 : %2")
         .arg(sql)
@@ -779,7 +780,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
 }
 int FullSearchWidget::getMaxRecords(const QString & table) {
   bool ok = false;
-  QString sql = QString("select id from %1 order by id desc limit 1").arg(table);
+  QString sql = QString(SQL_FIND_MAXIMUM).arg(table);
   QSqlQuery maxq(sql);
   int max;
   if (maxq.exec() && maxq.next())
@@ -903,10 +904,10 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   }
   QLOG_DEBUG() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
   m_currentRx = rx;
-  QString sql("select root,word,nodeid,xml,page from entry where datasource = 1 order by nodenum asc");
+  QString sql(SQL_REGEX_FIND_ENTRY_DETAILS);
   if (m_query.prepare(sql)) {
-    sql = "select root,word,xml,page from entry where datasource = 1 and nodeid = ?";
-    if (! m_nodeQuery.prepare("select root,word,xml,page from entry where datasource = 1 and nodeid = ?")) {
+    sql = SQL_FIND_ENTRY_DETAILS;// "select root,word,xml,page from entry where datasource = 1 and nodeid = ?";
+    if (! m_nodeQuery.prepare(sql)) {
       QLOG_WARN() << QString("SQL prepare error %1 : %2")
         .arg(sql)
         .arg(m_nodeQuery.lastError().text());

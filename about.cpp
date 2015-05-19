@@ -1,5 +1,6 @@
 #include "about.h"
 #include "version.h"
+#include "definedsql.h"
 AboutDialog::AboutDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   QTabWidget * tabs = new QTabWidget(this);
@@ -21,7 +22,7 @@ QSize AboutDialog::sizeHint() const {
 }
 
 QWidget * AboutDialog::buildTechTab() {
-  QString sql = "select sourceid,description,createversion,createdate,xmlversion,dbid from lexicon where sourceid = 1";
+  QString sql(SQL_GET_INFO);
 
   QSqlQuery query;
   if (! query.prepare(sql)) {

@@ -1,0 +1,50 @@
+#ifndef _DEFINEDSQL_H_
+#define _DEFINEDSQL_H_
+#define SQL_FIRST_ROOT "select root,page from entry where datasource = 1 and type = 0 order by nodenum limit 5;"
+#define SQL_LAST_ROOT "select root,page from entry where datasource = 1 and type = 0 order by nodenum desc limit 5;"
+#define SQL_PAGE_FIND "select root,nodeid from entry where page = %1 order by nodenum asc"
+#define SQL_LINKTO_NODE "select tonode from links where linkid = ?"
+#define SQL_LINK_ROOT_FIND "select word from root where bword = ?"
+#define SQL_FIND_ENTRY_BY_NODE "select * from entry where datasource = 1 and nodeid = ?"
+#define SQL_FIND_ROOT "select root,broot,word,bword,xml,page,itype,nodeid,supplement,headword from entry where datasource = 1  and root = ? order by nodenum"
+#define SQL_QUASI_FIND_BY_WORD "select quasi from root where word = ? and datasource = 1"
+#define SQL_ROOT_FOR_PAGE "select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1 and page = ? order by nodenum asc"
+#define SQL_FIND_VERSION "select createversion,createdate,xmlversion,dbid from lexicon"
+
+#define SQL_FIND_NODE_FOR_LINK "select id,linkid,fromnode,tonode,link from links where datasource = 1 and linkid = ?"
+#define SQL_UPDATE_LINK_TO_NODE "update links set tonode = ?, matchtype = 100 where datasource = 1 and link = ?"
+#define SQL_GET_XML_FOR_NODE "select xml from entry where nodeid = ?"
+#define SQL_UPDATE_XML_FOR_NODE "update entry set xml = ? where nodeid = ?"
+/*
+  contentswidget.cpp
+ */
+#define SQL_FIND_ENTRIES_FOR_ROOT "select word,itype,bword,nodeid,supplement,headword from entry where datasource = 1 and root = ? order by nodenum asc"
+
+#define SQL_FIND_LETTERS "select distinct letter from root where datasource = 1 order by letter"
+#define SQL_FIND_WORDS_FOR_ROOT "select word,supplement from root where letter = ? and datasource = 1 order by word,supplement"
+
+/* fullsearch.cpp */
+
+#define SQL_FIND_XREF_ENTRIES "select id,word,root,entry,node,nodenum,page from xref where datasource = 1 order by nodenum asc"
+
+#define SQL_FIND_ENTRY_DETAILS "select root,word,xml,page from entry where datasource = 1 and nodeid = ?"
+#define SQL_FIND_MAXIMUM "select id from %1 order by id desc limit 1"
+
+#define SQL_REGEX_FIND_ENTRY_DETAILS "select root,word,nodeid,xml,page from entry where datasource = 1 order by nodenum asc"
+
+/* headsearch.cpp */
+#define SQL_FIND_ENTRY_HEADWORD "select id,word,root,nodeid,nodenum,headword,page from entry where datasource = 1 order by nodenum asc"
+
+
+#define SQL_ADD_HISTORY "insert into history (datasource,node,word,root,supplement,page,vol,timewhen) values (1,?,?,?,?,?,?,?)"
+#define SQL_PREV_HISTORY "select %1 from history where id <= ? order by id desc"
+#define SQL_NEXT_HISTORY "select %1 from history where id > ? order by id asc"
+#define SQL_LAST_HISTORY "select %1 from history where id = (select max(id) from history)"
+#define SQL_FIRST_HISTORY "select %1 from history order by id asc limit 1"
+#define SQL_LIST_HISTORY "select %1 from history order by id desc limit %2"
+#define SQL_GET_HISTORY "select %1 from history where id = ?"
+#define SQL_GET_MAX_HISTORY "select max(id) from history"
+
+/* about.cpp */
+#define SQL_GET_INFO "select sourceid,description,createversion,createdate,xmlversion,dbid from lexicon where sourceid = 1"
+#endif

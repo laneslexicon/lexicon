@@ -31,6 +31,7 @@
 #include "themedialog.h"
 #include "deletethemedialog.h"
 #include "createthemedialog.h"
+#include "definedsql.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -2242,7 +2243,7 @@ void LanesLexicon::placeChanged(const Place & p) {
  ****************************************************************************************************/
 void LanesLexicon::getFirstAndLast() {
   QSqlQuery query;
-  bool ok = query.prepare("select root,page from entry where datasource = 1 and type = 0 order by nodenum limit 5;");
+  bool ok = query.prepare(SQL_FIRST_ROOT);
   if (! ok ) {
     QLOG_DEBUG() << QString(tr("First root SQL prepare failed: %1")).arg(query.lastError().text());
   }
@@ -2251,7 +2252,7 @@ void LanesLexicon::getFirstAndLast() {
     m_firstRoot = query.value(0).toString();
     m_firstPage = query.value(1).toInt();
   }
-  ok = query.prepare("select root,page from entry where datasource = 1 and type = 0 order by nodenum desc limit 5;");
+  ok = query.prepare(SQL_LAST_ROOT);
   if (! ok ) {
     QLOG_DEBUG() << QString(tr("Last root SQL prepare failed: %1")).arg(query.lastError().text());
   }
@@ -2839,7 +2840,7 @@ void LanesLexicon::searchForPage() {
   QString root;
   QString node;
   QString sql;
-  sql = QString("select root,nodeid from entry where page = %1 order by nodenum asc").arg(page);
+  sql = QString(SQL_PAGE_FIND).arg(page);
 
   QSqlQuery q(m_db);
   if (! q.prepare(sql)) {
