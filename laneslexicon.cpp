@@ -2197,7 +2197,7 @@ void LanesLexicon::onLastRoot() {
   p.setRoot(m_lastRoot);
   showPlace(p,false,true);
   if (m_linkContents) {
-  m_tree->ensurePlaceVisible(p);
+    m_tree->ensurePlaceVisible(p);
   }
 }
 /********************************************************************************
@@ -2242,7 +2242,7 @@ void LanesLexicon::placeChanged(const Place & p) {
  ****************************************************************************************************/
 void LanesLexicon::getFirstAndLast() {
   QSqlQuery query;
-  bool ok = query.prepare("select root,page from entry where datasource = 1 order by nodenum limit 5;");
+  bool ok = query.prepare("select root,page from entry where datasource = 1 and type = 0 order by nodenum limit 5;");
   if (! ok ) {
     QLOG_DEBUG() << QString(tr("First root SQL prepare failed: %1")).arg(query.lastError().text());
   }
@@ -2251,14 +2251,15 @@ void LanesLexicon::getFirstAndLast() {
     m_firstRoot = query.value(0).toString();
     m_firstPage = query.value(1).toInt();
   }
-  ok = query.prepare("select root,page from entry where datasource = 1 order by nodenum desc limit 5;");
+  ok = query.prepare("select root,page from entry where datasource = 1 and type = 0 order by nodenum desc limit 5;");
   if (! ok ) {
-    QLOG_DEBUG() << QString(tr("Lastt root SQL prepare failed: %1")).arg(query.lastError().text());
+    QLOG_DEBUG() << QString(tr("Last root SQL prepare failed: %1")).arg(query.lastError().text());
   }
   query.exec();
   if (query.first()) {
     m_lastRoot = query.value(0).toString();
     m_lastPage = query.value(1).toInt();
+    qDebug() << "Last root" << m_lastRoot << "Page" << m_lastPage;
   }
 }
 void LanesLexicon::onGoToPage(const Place & p) {
