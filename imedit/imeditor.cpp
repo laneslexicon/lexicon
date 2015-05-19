@@ -482,7 +482,6 @@ void ImEditor::onPrint() {
   if (! f.exists()) {
     m_printer->setOutputFileName(outputFile);
   }
-  qDebug() << "Printing to" << outputFile;
   m_edit->document()->print(m_printer);
 }
 void ImEditor::onPrinters() {
@@ -659,8 +658,13 @@ void ImEditor::onPrinterSetup() {
     return;
   }
   QPrinter * printer = dlg->printer();
-  delete m_printer;
-  m_printer = printer;
+  if (dlg->result() == QDialog::Accepted) {
+    delete m_printer;
+    m_printer = printer;
+  }
+  else {
+    delete printer;
+  }
 }
 void ImEditor::onInsertBlock() {
   QTextCursor cursor =  m_edit->textCursor();

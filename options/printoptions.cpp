@@ -125,7 +125,7 @@ void PrintOptions::onPrinterSetup() {
     return;
   }
   QPrinter * printer = d->printer();
-    if (printer->outputFormat() != QPrinter::PdfFormat) {
+  if (printer->outputFormat() != QPrinter::PdfFormat) {
     m_copyCount->setText(QString("%1").arg(printer->copyCount()));
     m_resolution->setText(QString("%1").arg(printer->resolution()));
     if (m_paper.contains(printer->paperSize())) {
@@ -145,14 +145,14 @@ void PrintOptions::onPrinterSetup() {
     }
     m_printerName->setText(QString("%1").arg(printer->printerName()));
     m_fullPage->setChecked(printer->fullPage());
-    }
-    if (printer->outputFormat() == QPrinter::PdfFormat) {
-      m_pdfOutput->setChecked(true);
-    }
-    else {
-      m_pdfOutput->setChecked(false);
-    }
-    delete printer;
+  }
+  if (printer->outputFormat() == QPrinter::PdfFormat) {
+    m_pdfOutput->setChecked(true);
+  }
+  else {
+    m_pdfOutput->setChecked(false);
+  }
+  delete printer;
 }
 void PrintOptions::readSettings() {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);

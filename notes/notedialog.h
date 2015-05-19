@@ -50,7 +50,7 @@ class NoteDialog : public QDialog {
     void save();
     void print();
     void focusChanged(int);
-    //    void onTypeChange(int);
+    void onPrinterSetup();
  protected:
   void closeEvent(QCloseEvent *);
  private:

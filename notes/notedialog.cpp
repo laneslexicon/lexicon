@@ -267,17 +267,34 @@ void NoteDialog::save() {
   this->accept();
 }
 void NoteDialog::print() {
-  QPrinter printer;
-  QPrintDialog printDialog(&printer, this);
-  if (printDialog.exec() == QDialog::Accepted) {
-    // print ...
+  QList<QPrinterInfo> printers = QPrinterInfo::availablePrinters();
 
-    //  printer->setPaperSize(QPrinter::A4);
-    //  printer->setOutputFileName();
-    //    QPainter painter(&m_printer);
-    //    painter.setRenderHint(QPainter::Antialiasing);
-    m_note->edit()->print(&printer);
+  QPrinter * printer = new QPrinter();
+  if (printers.size() == 0) {
+    printer->setOutputFormat(QPrinter::PdfFormat);
+    m_note->edit()->print(printer);
+    delete printer;
+    return;
   }
+
+  QPrintDialog * d = new QPrintDialog(printer,this);
+  d->setWindowModality(Qt::WindowModal);
+  d->setWindowTitle("Set and Configure Printer");
+  d->open(this,SLOT(onPrinterSetup()));
+}
+void NoteDialog::onPrinterSetup() {
+  QPrintDialog * d = qobject_cast<QPrintDialog *>(sender());
+  if (! d ) {
+    return;
+  }
+  if (d->result() == QDialog::Rejected) {
+    delete d;
+    return;
+  }
+  QPrinter * printer = d->printer();
+  m_note->edit()->print(printer);
+  delete printer;
+
 }
 /*
 void NoteDialog::onTypeChange(int ix) {
