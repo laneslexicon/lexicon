@@ -278,3 +278,7 @@ void ImLineEdit::setForceLTR(bool v) {
 void ImLineEdit::onTextChanged(const QString & /* t */) {
   this->setForceLTR(m_forceLTR);
 }
+void ImLineEdit::focusInEvent(QFocusEvent * event ) {
+  emit(gotFocus(event->reason()));
+  QLineEdit::focusInEvent(event);
+}

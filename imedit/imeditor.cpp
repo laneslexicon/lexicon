@@ -36,6 +36,7 @@ ImEditor::ImEditor(QWidget * parent) : QWidget(parent) {
   connect(m_edit,SIGNAL(charInserted(int,int)),this,SLOT(charInserted(int,int)));
   connect(m_edit,SIGNAL(cursorPositionChanged()),this,SLOT(cursorPositionChanged()));
   connect(m_edit,SIGNAL(logMessage(const QString &)),this,SLOT(logMessage(const QString &)));
+  connect(m_edit,SIGNAL(gotFocus(int)),this,SIGNAL(editFocus(int)));
   QLocale l;
   QString script = QLocale::scriptToString(l.script());
   if (! m_scriptFonts.contains(script)) {

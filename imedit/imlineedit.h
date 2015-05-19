@@ -51,8 +51,10 @@ class ImLineEdit : public QLineEdit {
     bool m_keymapsEnabled;
   protected:
     virtual void keyPressEvent(QKeyEvent *e);
+    virtual void focusInEvent(QFocusEvent *);
    signals:
       void logMessage(const QString &);
+      void gotFocus(int);
 
 
 };

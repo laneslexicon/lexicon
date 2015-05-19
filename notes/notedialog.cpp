@@ -140,7 +140,8 @@ void NoteDialog::setup() {
   disconnect(m_note->saveAction(), SIGNAL(triggered()),
                   m_note, SLOT(onSave()));
   connect(m_note->saveAction(),SIGNAL(triggered()),this,SLOT(save()));
-
+  connect(m_note,SIGNAL(editFocus(int)),this,SLOT(focusChanged(int)));
+  connect(m_subject,SIGNAL(gotFocus(int)),this,SLOT(focusChanged(int)));
 }
 void NoteDialog::showOptions(bool v) {
   if (v)
@@ -301,3 +302,7 @@ void NoteDialog::onTypeChange(int ix) {
   }
 }
 */
+void NoteDialog::focusChanged(int reason) {
+  qDebug() << Q_FUNC_INFO << reason;
+
+}

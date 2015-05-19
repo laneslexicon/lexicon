@@ -118,5 +118,6 @@ class ImEditor : public QWidget {
     QMap<QString,QString> m_mapHelp;
  signals:
     void save();
+    void editFocus(int);
 };
 #endif

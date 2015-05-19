@@ -48,6 +48,7 @@ class NoteDialog : public QDialog {
     void cancel();
     void save();
     void print();
+    void focusChanged(int);
     //    void onTypeChange(int);
  protected:
   void closeEvent(QCloseEvent *);

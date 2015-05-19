@@ -77,6 +77,7 @@ public slots:
   void currentScript(const QString &);
   void scrollby();
   void tabPressed();
+  void gotFocus(int);
   void editingFinished(); // added for QItemDelegate subclass
 };
 

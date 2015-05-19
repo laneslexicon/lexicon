@@ -283,6 +283,7 @@ void ImEdit::focusOutEvent(QFocusEvent * event ) {
 }
 void ImEdit::focusInEvent(QFocusEvent * event ) {
   setCursorWidth(1);
+  emit(gotFocus(event->reason()));
   QTextEdit::focusInEvent(event);
 }
 #ifdef WITH_WRAPPED_EDIT
