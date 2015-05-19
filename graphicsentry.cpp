@@ -21,33 +21,6 @@ ToolButtonData::~ToolButtonData() {
 
 }
 /**
- * NOT NEEDED
- *
- * @param scene
- * @param parent
-
- LaneGraphicsView::LaneGraphicsView(QGraphicsScene * scene,GraphicsEntry * parent) :
- QGraphicsView(scene,parent) {
- setObjectName("lexicongraphicsview");
- setFocusPolicy(Qt::StrongFocus);
- setAlignment(Qt::AlignLeft|Qt::AlignTop);
- }
- /// TODO get rid of this
- void LaneGraphicsView::scrollContentsBy(int dx,int dy) {
- QGraphicsView::scrollContentsBy(dx,dy);
- }
- void LaneGraphicsView::keyPressEvent(QKeyEvent * event) {
-
- QGraphicsView::keyPressEvent(event);
- }
- void LaneGraphicsView::focusInEvent(QFocusEvent * event) {
- QGraphicsView::focusInEvent(event);
- }
- void LaneGraphicsView::focusOutEvent(QFocusEvent * event) {
- QGraphicsView::focusOutEvent(event);
- }
-*/
-/**
  * (the QSqlQuery instances rely on the default connection being to
  * to the lexicon)
  *
@@ -69,15 +42,12 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_view = new QGraphicsView(m_scene,this);
 
   m_view->setFocusPolicy(Qt::StrongFocus);
-  //  m_view->setFocusProxy(this);
   m_view->setSceneRect(m_scene->sceneRect());
   m_view->setAlignment(Qt::AlignTop);
   m_highlightCount = 0;
   m_findCount = 0;
 
   m_view->setInteractive(true);
-  //  m_view->setAlignment(Qt::AlignLeft);
-  ///
   /*  TODO what is this for ? Commented out on 16th Jan
       (adding the dummy item)
 
@@ -90,18 +60,11 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   layout->addWidget(m_view);
 
 
-  //  layout->addWidget(m_showPlace,0);
-  //  m_nodeQuery = 0;
   setLayout(layout);
-  /*
-  connect(m_item,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
-  connect(m_item,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
 
-  */
   connect(m_scene,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
           this,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
-  //  m_xalan = getXalan();
   initXslt();
   m_transform = m_view->transform();
 }
@@ -545,7 +508,6 @@ void GraphicsEntry::linkActivated(const QString & link) {
   }
   else {
     /// TODO check this is no longer used
-    QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "NOSHOW activate link";
     QString node(link);
     /// remove the leading #
     node.remove(0,1);
@@ -564,8 +526,6 @@ void GraphicsEntry::linkHovered(const QString & link) {
   }
   else {
     gi->setCursor(QCursor(Qt::PointingHandCursor));
-    QLOG_DEBUG() << Q_FUNC_INFO << link;
-    QLOG_DEBUG() << QApplication::keyboardModifiers();
   }
 }
 void GraphicsEntry::showLinkDetails(const QString  & link) {
@@ -687,19 +647,7 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
   f.close();
   return css;
 }
-/*
-  Place GraphicsEntry::getXmlForPlace(const Place & p) {
-  Place np = getXmlForRoot(p);
-  if (np.isValid()) {
-  if (np.getRoot() != m_place.getRoot()) {
-  emit(placeChanged(np));
-  }
-  m_place = np;
-  //    m_showPlace->setPlace(m_place);
-  }
-  return np;
-  }
-*/
+
 void GraphicsEntry::dumpInfo(EntryItem * item , const QString & node) {
   QString prefix;
   if (item->isRoot()) {
@@ -974,7 +922,6 @@ Place GraphicsEntry::getPage(const Place & p) {
     QLOG_WARN() << "page SQL prepare failed" << pageQuery.lastError();
   }
 
-  //  qStrip << Q_FUNC_INFO << "Page" << page;
   pageQuery.bindValue(0,page);
   pageQuery.exec();
   if (! pageQuery.first()) {
@@ -1542,7 +1489,6 @@ void GraphicsEntry::showHtml() {
 }
 void GraphicsEntry::updateCurrentPlace(const Place &  p ) {
   m_place = p;
-  QLOG_DEBUG() << Q_FUNC_INFO;
   emit(placeChanged(p));
 }
 /**
@@ -1652,7 +1598,7 @@ void GraphicsEntry::clearHighlights(bool keepResults) {
   m_highlightCount = 0;
 }
 void GraphicsEntry::shiftFocus() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
+  //  QLOG_DEBUG() << Q_FUNC_INFO;
   QGraphicsItem * item = m_scene->focusItem();
   if ( !item  && (m_items.size() > 0)) {
     item = m_items[0];
@@ -1733,17 +1679,17 @@ void GraphicsEntry::addButtonDecoration(bool ok) {
       qreal btny;
       QPointF pos = item->pos();
       btnx = pos.x() + item->boundingRect().width();
-      btny = pos.y();// + sz.height();
+      btny = pos.y();
 
       ToolButtonData  * notesBtn = new ToolButtonData(i);
-      notesBtn->setIcon(QIcon(QPixmap(":/notes.png")));//m_notesIcon));
+      notesBtn->setIcon(QIcon(QPixmap(":/notes.png")));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
       connect(notesBtn,SIGNAL(clicked()),this,SLOT(notesButtonPressed()));
       m_items[i]->setProxy(pushButton);
       Place p = item->getPlace();
-      item->setNotes();//getApp()->notes()->find(p.getWord()));
+      item->setNotes();
     }
   }
 
@@ -1769,10 +1715,8 @@ void GraphicsEntry::focusPlace() {
  * @param item
  */
 void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
-  QLOG_DEBUG() << Q_FUNC_INFO;
   m_view->setFocus();
   m_view->ensureVisible(item);
-  /// call scene->setFocusItem results in a call to updateCurrentPlace
   m_scene->setFocusItem(item);
   EntryItem * entry = dynamic_cast<EntryItem *>(item);
   if (entry) {

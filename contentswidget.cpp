@@ -332,7 +332,6 @@ void ContentsWidget::toggleExpand() {
  * @param select
  */
 void ContentsWidget::ensurePlaceVisible(const Place & p, bool select) {
-  QLOG_DEBUG() << Q_FUNC_INFO << p << select;
   QString root = p.getRoot();
   int supplement = p.getSupplement();
   QTreeWidgetItem * item;
@@ -387,7 +386,6 @@ QTreeWidgetItem * ContentsWidget::findPlace(const Place & p) const {
   }
 
   QList<QTreeWidgetItem *> items = this->findItems(target,Qt::MatchRecursive,column);
-  QLOG_DEBUG() << Q_FUNC_INFO << target << items.size();
   /// TODO multiple items, for supplement ?
   if (items.size() > 0) {
     item = items[0];

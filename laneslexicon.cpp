@@ -3373,15 +3373,15 @@ void LanesLexicon::localSearchShow() {
   }
 }
 void LanesLexicon::tabsChanged() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
+  //  QLOG_DEBUG() << Q_FUNC_INFO;
   QRegExp rx("^\\d+");
   for(int i=0;i < m_tabs->count();i++) {
     QString t = m_tabs->tabText(i);
     t.remove(rx);
     QString title = QString("%1 %2").arg(i+1).arg(t);
-    qDebug() << Q_FUNC_INFO << title;
+    //    qDebug() << Q_FUNC_INFO << title;
     m_tabs->setTabText(i,title);
-    qDebug() << Q_FUNC_INFO << "Text now" << m_tabs->tabText(i);
+    //    qDebug() << Q_FUNC_INFO << "Text now" << m_tabs->tabText(i);
   }
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {

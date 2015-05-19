@@ -76,7 +76,7 @@ void TabWidget::tabContentsChanged() {
   }
 }
 void TabWidget::focusOutEvent(QFocusEvent * /* event */) {
-  QLOG_DEBUG() << Q_FUNC_INFO;
+  //  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 bool TabWidget::numberTab() const {
   return m_numberTabs;
