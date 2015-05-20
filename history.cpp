@@ -291,7 +291,7 @@ bool HistoryMaster::clear() {
      return true;
    }
    QSqlQuery qry(m_db);
-   if (qry.prepare("delete from history")) {
+   if (qry.prepare(SQL_DELETE_HISTORY)) {
      return qry.exec();
    }
    else {

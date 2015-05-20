@@ -1,8 +1,9 @@
 #include "noteswidget.h"
+#include "definedsql.h"
 EditableSqlModel::EditableSqlModel(QObject *parent)
     : QSqlQueryModel(parent)
 {
-  m_baseQuery  = "select id,nodeid,word,note,tag from notes";
+  m_baseQuery  = SQL_GET_NOTES;
   createConnection();
 }
 
@@ -70,7 +71,7 @@ void EditableSqlModel::refresh()
 }
 void EditableSqlModel::addNote(const QString & node,const QString & word,const QString & note,const QString & tag) {
   QSqlQuery query(m_db);
-  query.prepare("insert into notes (nodeid,word,note,tag) values (?,?,?,?)");
+  query.prepare(SQL_INSERT_NOTE_DETAILS);
   query.addBindValue(node);
   query.addBindValue(word);
   query.addBindValue(note);
@@ -82,7 +83,7 @@ void EditableSqlModel::addNote(const QString & node,const QString & word,const Q
 bool EditableSqlModel::updateNote(int id, const QString & note)
 {
   QSqlQuery query(m_db);
-  query.prepare("update notes set note = ? where id = ?");
+  query.prepare(SQL_UPDATE_NOTE_TEXT);
     query.addBindValue(note);
     query.addBindValue(id);
     return query.exec();
@@ -91,7 +92,7 @@ bool EditableSqlModel::updateNote(int id, const QString & note)
 bool EditableSqlModel::updateTag(int id, const QString & tag)
 {
   QSqlQuery query(m_db);
-    query.prepare("update notes set tag = ? where id = ?");
+    query.prepare(SQL_UPDATE_NOTE_TAG);
     query.addBindValue(tag);
     query.addBindValue(id);
     return query.exec();
@@ -133,7 +134,7 @@ NotesWidget::NotesWidget(QWidget * parent) : QWidget(parent) {
 
 }
 QWidget * NotesWidget::createQueryWidget() {
-  m_baseQuery  = "select id,nodeid,word,note,tag from notes";
+  m_baseQuery  = SQL_GET_NOTES;
   //  m_model = new QSqlQueryModel;
   m_model = new EditableSqlModel;
   m_view = new QTableView;

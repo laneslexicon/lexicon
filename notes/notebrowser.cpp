@@ -9,6 +9,7 @@
 #include "noteview.h"
 #include "notedialog.h"
 #include "place.h"
+#include "definedsql.h"
 extern NoteMaster * getNotes();
 extern QSettings * getSettings();
 #define COL_WITH_ID 1
@@ -96,7 +97,7 @@ void NoteBrowser::loadNotes() {
 
   QTableWidgetItem * item;
 
-  QString sql = QString("select id,word,subject,created,amended,substr(note,1,%1) from notes").arg(NOTE_SUBSTR_LENGTH);
+  QString sql = QString(SQL_LIST_NOTES).arg(NOTE_SUBSTR_LENGTH);
   QSqlQuery  * q = notes->getNoteList(sql);
   while(q->next()) {
     QString word = q->value("word").toString();
@@ -237,14 +238,14 @@ void NoteBrowser::showEntry(const Place & p) {
   QLOG_DEBUG() << Q_FUNC_INFO  << p.getNode() << "root" << p.getRoot() << "word" << p.getWord();
   QSqlQuery query;
   if (! p.getNode().isEmpty()) {
-    ok = query.prepare("select root,word,xml from entry where datasource = 1 and nodeid = ?");
+    ok = query.prepare(SQL_GET_NODE_FOR_NOTE);
     if (ok) {
       query.bindValue(0,p.getNode());
       query.exec();
     }
   }
   else if (! p.getWord().isEmpty()) {
-    ok = query.prepare("select root,word,xml from entry where datasource = 1 and word = ?");
+    ok = query.prepare(SQL_GET_WORD_FOR_NOTE);
     if (ok) {
       query.bindValue(0,p.getWord());
       query.exec();

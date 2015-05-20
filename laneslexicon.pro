@@ -118,4 +118,5 @@ HEADERS  += laneslexicon.h \
             editview.h \
             deletethemedialog.h \
             createthemedialog.h \
-            themedialog.h
+            themedialog.h \
+            definedsql.h

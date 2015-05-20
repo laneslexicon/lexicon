@@ -1,5 +1,5 @@
 #include "notes.h"
-
+#include "definedsql.h"
 Note::Note(int type) {
   m_id = -1;
   m_type = type;
@@ -149,8 +149,7 @@ bool NoteMaster::save(Note * n) {
   }
   if (n->getId() == -1) {     // add note
     QSqlQuery  query(m_db);
-    ok = query.prepare("insert into notes (datasource,word,place,subject,note,created,type) \
-           values (:datasource,:word,:place,:subject,:note,:created,:type)");
+    ok = query.prepare(SQL_INSERT_NOTE);
     if (!ok) {
       QLOG_WARN() << "Save prepare note error" << query.lastError().text();
       return false;
@@ -184,7 +183,7 @@ bool NoteMaster::save(Note * n) {
   }
   else {
     QSqlQuery query(m_db);
-    ok =  query.prepare("update notes set subject = ?, note = ?, amended = ? where id = ?");
+    ok =  query.prepare(SQL_UPDATE_NOTE);
     if (!ok) {
       QLOG_WARN() << "SQL update prepare error" << query.lastError().text();
       return false;
@@ -224,7 +223,7 @@ QList<Note *> NoteMaster::find(const QString & word) {
     return notes;
   }
   QSqlQuery query(m_db);
-  ok = query.prepare("select id,word,place,subject,note,created,amended,type from notes where word = ?");
+  ok = query.prepare(SQL_GET_NOTES_FOR_WORD);
   if (!ok) {
     QLOG_WARN() << "SQL find error" << query.lastError().text();
     return notes;
@@ -260,7 +259,7 @@ Note * NoteMaster::findOne(int id) {
   }
   QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlQuery query(m_db);
-  ok = query.prepare("select word,place,subject,note,created,amended,type from notes where id = ?");
+  ok = query.prepare(SQL_GET_NOTE_BY_ID);
   if (!ok) {
     QLOG_WARN() << "SQL findOne error" << query.lastError().text();
     return note;

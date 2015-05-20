@@ -35,6 +35,7 @@
 /* headsearch.cpp */
 #define SQL_FIND_ENTRY_HEADWORD "select id,word,root,nodeid,nodenum,headword,page from entry where datasource = 1 order by nodenum asc"
 
+/* history */
 
 #define SQL_ADD_HISTORY "insert into history (datasource,node,word,root,supplement,page,vol,timewhen) values (1,?,?,?,?,?,?,?)"
 #define SQL_PREV_HISTORY "select %1 from history where id <= ? order by id desc"
@@ -44,7 +45,27 @@
 #define SQL_LIST_HISTORY "select %1 from history order by id desc limit %2"
 #define SQL_GET_HISTORY "select %1 from history where id = ?"
 #define SQL_GET_MAX_HISTORY "select max(id) from history"
+#define SQL_DELETE_HISTORY "delete from history"
 
 /* about.cpp */
 #define SQL_GET_INFO "select sourceid,description,createversion,createdate,xmlversion,dbid from lexicon where sourceid = 1"
+
+/* notebrowser.cpp */
+#define SQL_LIST_NOTES "select id,word,subject,created,amended,substr(note,1,%1) from notes"
+#define SQL_GET_NODE_FOR_NOTE "select root,word,xml from entry where datasource = 1 and nodeid = ?"
+#define SQL_GET_WORD_FOR_NOTE "select root,word,xml from entry where datasource = 1 and word = ?"
+
+/* notes.cpp */
+
+#define SQL_GET_NOTES_FOR_WORD "select id,word,place,subject,note,created,amended,type from notes where word = ?"
+#define SQL_GET_NOTE_BY_ID "select word,place,subject,note,created,amended,type from notes where id = ?"
+
+#define SQL_INSERT_NOTE "insert into notes (datasource,word,place,subject,note,created,type) values (:datasource,:word,:place,:subject,:note,:created,:type)"
+#define SQL_UPDATE_NOTE "update notes set subject = ?, note = ?, amended = ? where id = ?"
+
+/* noteswidget.cpp */
+#define SQL_GET_NOTES "select id,nodeid,word,note,tag from notes"
+#define SQL_UPDATE_NOTE_TEXT "update notes set note = ? where id = ?"
+#define SQL_INSERT_NOTE_DETAILS "insert into notes (nodeid,word,note,tag) values (?,?,?,?)"
+#define SQL_UPDATE_NOTE_TAG "update notes set tag = ? where id = ?"
 #endif
