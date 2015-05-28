@@ -2036,9 +2036,30 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
     if (node.isEmpty() || (node == m_items[i]->getPlace().getNode())) {
       /// without the trimmed() the printing of the root causes problems
       QString t = m_items[i]->getOutputHtml().trimmed();
-      t.remove("<html><body>");
-      t.remove("</body></html>");
+      t.remove("<html>");
+      t.remove("</html>");
+      t.remove("<body>");
+      t.remove("</body>");
       html += t;
+    }
+  }
+  html.replace("<body","<div");
+  html.replace("</body>","</div>");
+  html.remove(QChar(0x200e));
+  if (m_dumpOutputHtml) {
+    QString n;
+    if (node.isEmpty()) {
+      n = m_items[1]->getPlace().getNode();
+    }
+    else {
+      n = node;
+    }
+    QFileInfo fi(QDir::tempPath(),QString("print-%1.html").arg(n));
+    QFile f(fi.filePath());
+    if (f.open(QIODevice::WriteOnly)) {
+      QTextStream out(&f);
+      out.setCodec("UTF-8");
+      out << html;
     }
   }
 
