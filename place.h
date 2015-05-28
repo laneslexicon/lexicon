@@ -140,11 +140,12 @@ class Place    {
   bool isSupplement() { return (m_supplement == 1);}
 
   int getPage() const { return m_page;}
+  int page() const { return m_page;}
   void setPage(int i);
 
   void setVol(int i) { m_vol = i; }
   int getVol() const { return m_vol;}
-
+  int volume() const { return m_vol;}
   QString getNode() const { return m_node;}
   QString getWord() const { return m_word;}
 

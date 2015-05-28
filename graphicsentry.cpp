@@ -1963,6 +1963,7 @@ QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & 
 QString GraphicsEntry::getPageInfo(bool summary) {
   Place firstPlace;
   QString firstNode;
+
   for(int i=0;(i < m_items.size()) && ! firstPlace.isValid();i++) {
     firstPlace = m_items[i]->getPlace();
   }
@@ -1975,15 +1976,31 @@ QString GraphicsEntry::getPageInfo(bool summary) {
   html += ROW("","");
 
   html += ROW(tr("Root"),QString("<span class=\"arabic\">%1</span>").arg(firstPlace.getRoot()));
-  html += ROW(tr("Volume"),QString("%1").arg(firstPlace.getVol()));
-  html += ROW(tr("First page"),QString("%1").arg(firstPlace.getPage()));
-
+  QMultiMap<int,int> pages;
+  int page,vol;
+  for(int i=1; i < m_items.size();i++) {
+    page = m_items[i]->getPlace().page();
+    vol = m_items[i]->getPlace().volume();
+    pages.insert(vol,page);
+  }
+  qDebug() << pages;
+  QList<int> vols = pages.uniqueKeys();
+  for(int i=0;i < vols.size();i++) {
+    QList<int> p = pages.values(vols[i]);
+    QStringList str;
+    for(int j=0;j < p.size();j++) {
+      str << QString("%1").arg(p[j]);
+    }
+    str.removeDuplicates();
+    html += ROW(QString(tr("Volume %1")).arg(vols[i]),QString("%1").arg(str.join(",")));
+    //    html += ROW(tr("First page"),QString("%1").arg(firstPlace.getPage()));
+  }
   Place lastPlace;
   for(int i=m_items.size() - 1;(i >= 0) && ! lastPlace.isValid();i--) {
     lastPlace = m_items[i]->getPlace();
   }
 
-  html += ROW(tr("Last page"),QString("%1").arg(lastPlace.getPage()));
+  //  html += ROW(tr("Last page"),QString("%1").arg(lastPlace.getPage()));
   html += ROW(tr("Nodes"),QString("%1 - %2").arg(firstNode).arg(lastPlace.getNode()));
   html += ROW(tr("Date"),QDateTime::currentDateTime().toString(Qt::ISODate));
   QSqlQuery query;
@@ -1999,19 +2016,21 @@ QString GraphicsEntry::getPageInfo(bool summary) {
       html += ROW(tr("Dbid"),query.value("dbid").toString());
     }
   }
-
-  Place p;
+  html += "</table>";
+  html += "<br/>";
+#define ROW4(a,b,c,d)    "<tr><td width=\"10%\">" + QString(a) + "</td><td width=\"10%\">" + QString(b) + "</td><td width=\"10%\">" + QString(c) + "</td> <td width=\"%70\">" + QString(d) + "</td></tr>"
   if (! summary ) {
-    html += ROW("","");
-    html += ROW("<b>" + tr("Node details") + "</b>","");
-    html += ROW("","");
+    Place p;
+    html += "<table class=\"pageinfo\" style=\"width:100%\">";
+    html += "<p class=\"entrydetails\">Entry details</p>";
+    html += ROW4(tr("Volume"),tr("Page"),tr("Node"),tr("Head word"));
+    html += ROW4("","","","");
     for(int i=1; i < m_items.size();i++) {
       p = m_items[i]->getPlace();
-      html += ROW(p.getNode(),QString("<span class=\"arabic\">%1</span>").arg(p.getWord()));
+      html += ROW4(QString("%1").arg(p.volume()),QString("%1").arg(p.page()),p.getNode(),QString("<span class=\"arabic\">%1</span>").arg(p.getWord()));
     }
-
+    html += "</table>";
   }
-  html += "</table>";
   return html;
 }
 /**
