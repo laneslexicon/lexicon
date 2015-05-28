@@ -51,32 +51,30 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   QFormLayout * layout = new QFormLayout;
 
   QGroupBox * keybox = new QGroupBox(tr("Keyboard commands"));
-  QFormLayout * keylayout = new QFormLayout;
+  //  QFormLayout * keylayout = new QFormLayout;
+  QGridLayout * keylayout = new QGridLayout;
 
   /// Zoom
-  keylayout->addRow(tr("Zoom out"),m_zoomOut);
-  keylayout->addRow(tr("Zoom in"),m_zoomIn);
+  keylayout->addWidget(new QLabel(tr("Zoom out")),0,0);
+  keylayout->addWidget(m_zoomOut,0,1);
+
+  keylayout->addWidget(new QLabel(tr("Zoom in")),1,0);
+  keylayout->addWidget(m_zoomIn,1,1);
 
 
   /// Focus
-  QGridLayout * focuslayout = new QGridLayout;
   m_home->setMaximumWidth(SMALL_EDIT);
   m_mark->setMaximumWidth(SMALL_EDIT);
   m_focusUp->setMaximumWidth(SMALL_EDIT);
   m_focusDown->setMaximumWidth(SMALL_EDIT);
-  focuslayout->addWidget(new QLabel(tr("Up")),0,0);
-  focuslayout->addWidget(m_focusUp,0,1);
-  focuslayout->addWidget(new QLabel(tr("Down")),0,2);
-  focuslayout->addWidget(m_focusDown,0,3);
-  focuslayout->addItem(new QSpacerItem(SMALL_EDIT,SMALL_EDIT),0,4);
-  focuslayout->addWidget(new QLabel(tr("Home")),1,0);
-  focuslayout->addWidget(m_home,1,1);
-  focuslayout->addWidget(new QLabel(tr("Mark")),1,2);
-  focuslayout->addWidget(m_mark,1,3);
-  QHBoxLayout * focuscontainer = new QHBoxLayout;
-  focuscontainer->addLayout(focuslayout);
-  focuscontainer->addStretch();
-  keylayout->addRow(tr("Page movement"),focuscontainer);
+  keylayout->addWidget(new QLabel(tr("Move up")),2,0);
+  keylayout->addWidget(m_focusUp,2,1);
+  keylayout->addWidget(new QLabel(tr("Move down")),3,0);
+  keylayout->addWidget(m_focusDown,3,1);
+  keylayout->addWidget(new QLabel(tr("Home")),4,0);
+  keylayout->addWidget(m_home,4,1);
+  keylayout->addWidget(new QLabel(tr("Mark current entry as home")),5,0);
+  keylayout->addWidget(m_mark,5,1);
 
   /// Text size
   m_textWidth->setMaximumWidth(MEDIUM_EDIT);
@@ -84,15 +82,18 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_narrow->setMaximumWidth(SMALL_EDIT);
   m_widen->setMaximumWidth(SMALL_EDIT);
   m_step->setMaximumWidth(SMALL_EDIT);
-  keylayout->addRow(tr("Widen text"),m_widen);
-  keylayout->addRow(tr("Narrow text"),m_narrow);
+  keylayout->addWidget(new QLabel(tr("Widen text")),6,0);
+  keylayout->addWidget(m_widen,6,1);
+  keylayout->addWidget(new QLabel("Narrow text"),7,0);
+  keylayout->addWidget(m_narrow,7,1);
 
   // Lexicon movement
   m_back->setMaximumWidth(SMALL_EDIT);
   m_forward->setMaximumWidth(SMALL_EDIT);
-  keylayout->addRow(tr("Lexicon next entry"),m_forward);
-  keylayout->addRow(tr("Lexicon previous entry"),m_back);
-
+  keylayout->addWidget(new QLabel(tr("Next root")),0,2);
+  keylayout->addWidget(m_forward,0,3);
+  keylayout->addWidget(new QLabel(tr("Previous root")),1,2);
+  keylayout->addWidget(m_back,1,3);
 
 
 
@@ -101,20 +102,20 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_find->setMaximumWidth(SMALL_EDIT);
   m_findNext->setMaximumWidth(SMALL_EDIT);
   m_clean->setMaximumWidth(SMALL_EDIT);
-  searchlayout->addWidget(new QLabel(tr("Find")));
-  searchlayout->addWidget(m_find);
-  searchlayout->addWidget(new QLabel(tr("Find next")));
-  searchlayout->addWidget(m_findNext);
-  searchlayout->addWidget(new QLabel(tr("Clear highlight")));
-  searchlayout->addWidget(m_clean);
-  searchlayout->addStretch();
-  keylayout->addRow(tr("Local search"),searchlayout);
-  keylayout->addRow(tr("Show last search results"),m_show);
+  keylayout->addWidget(new QLabel(tr("Find")),2,2);
+  keylayout->addWidget(m_find,2,3);
+  keylayout->addWidget(new QLabel(tr("Find next")),3,2);
+  keylayout->addWidget(m_findNext,3,3);
+  keylayout->addWidget(new QLabel(tr("Clear highlight")),4,2);
+  keylayout->addWidget(m_clean,4,3);
+  keylayout->addWidget(new QLabel(tr("Show last search results")),5,2);
+  keylayout->addWidget(m_show,5,3);
   m_reload->setMaximumWidth(SMALL_EDIT);
-  keylayout->addRow(tr("Reload"),m_reload);
+  keylayout->addWidget(new QLabel(tr("Reload page")),6,2);
+  keylayout->addWidget(m_reload,6,3);
 
+  keylayout->setHorizontalSpacing(100);
   keybox->setLayout(keylayout);
-
   QGroupBox * otherbox = new QGroupBox(tr("Other"));
   QFormLayout * otherlayout = new QFormLayout;
 
