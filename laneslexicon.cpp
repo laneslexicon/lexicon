@@ -1338,12 +1338,13 @@ void LanesLexicon::createStatusBar() {
 
   m_linkButton = new QToolButton(this);
   m_linkButton->setDefaultAction(m_linkAction);
+  m_linkButton->setToolTip(tr("Click to link/unlink contents with page"));
   //  m_linkButton->setEnabled(m_linkContents);
   if (m_linkContents) {
-    m_linkButton->setText(tr("Unlink"));
+    m_linkButton->setText(tr("Contents linked"));
   }
   else {
-    m_linkButton->setText(tr("Link"));
+    m_linkButton->setText(tr("Contents not linked"));
   }
 
 
@@ -1398,10 +1399,10 @@ void LanesLexicon::onLinkChanged() {
   m_linkContents = ! m_linkContents;
   m_linkAction->setChecked(m_linkContents);
   if (m_linkContents) {
-    m_linkButton->setText(tr("Unlink"));
+    m_linkButton->setText(tr("Contents linked"));
   }
   else {
-    m_linkButton->setText(tr("Link"));
+    m_linkButton->setText(tr("Contents not linked"));
   }
 }
 QSize LanesLexicon::sizeHint() const {
