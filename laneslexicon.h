@@ -48,9 +48,6 @@
 #include <QPainter>
 #include "place.h"
 #include "searchoptionswidget.h"
-#ifndef qStrip
-#define qStrip qDebug()
-#endif
 
 class ArabicSearchDialog;
 class NoteMaster;

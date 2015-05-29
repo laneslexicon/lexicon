@@ -335,7 +335,6 @@ void LanesLexicon::cleanup() {
   QLOG_DEBUG() << Q_FUNC_INFO << "exit";
 }
 void LanesLexicon::onSetInterface(bool triggered) {
-  qStrip << Q_FUNC_INFO << "got action for set interface" << triggered;
   bool v = m_minimalAction->isChecked();
   QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
   for(int i=0;i < toolbars.size();i++) {
@@ -1612,12 +1611,11 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
     case Qt::Key_Tab: {
-      qStrip << Q_FUNC_INFO << "got tab" << target->objectName() << target->metaObject()->className();
+      QLOG_DEBUG() << Q_FUNC_INFO << "got tab" << target->objectName() << target->metaObject()->className();
         if (target == m_tabs) {
 
         }
         else if (target == m_tabs->tabBar()) {
-          qStrip << "Focus given to menu";
           m_exitButton->setFocus();
           return true;
         }
@@ -1628,7 +1626,6 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
         break;
     }
       case Qt::Key_Left:
-        qStrip << Q_FUNC_INFO << "got left" << target->objectName() << target->metaObject()->className();
         break;
         /*
       case Qt::Key_T: {

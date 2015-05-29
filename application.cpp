@@ -233,7 +233,7 @@ QString Lexicon::takeLastError() {
  * @return
  */
 QString Lexicon::imageDirectory() {
-  qDebug() << Q_FUNC_INFO << "NOSHOW we should not be here";
+  QLOG_DEBUG() << Q_FUNC_INFO << "NOSHOW we should not be here";
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
@@ -252,6 +252,14 @@ void Lexicon::startLogging() {
   int archiveCount = settings->value(SID_LOGGING_ARCHIVES,4).toInt();
   bool rotate = settings->value(SID_LOGGING_ROTATE,true).toBool();
   delete settings;
+  if (m_options.contains("loglevel")) {
+    QString v = m_options.value("loglevel");
+    bool ok = true;
+    int x = v.toInt(&ok);
+    if (ok) {
+      loglevel = x;
+    }
+  }
   /// we need some settings that make sense
   if (logfile.isEmpty()) {
     logfile = "log.txt";
@@ -260,7 +268,7 @@ void Lexicon::startLogging() {
     maxsize = 64000;
   }
     QsLogging::Logger& logger = QsLogging::Logger::instance();
-    logger.setLoggingLevel(QsLogging::TraceLevel);
+    logger.setLoggingLevel(QsLogging::OffLevel);
     switch(loglevel) {
     case 0  : { logger.setLoggingLevel(QsLogging::TraceLevel) ; break; }
     case 1  : { logger.setLoggingLevel(QsLogging::DebugLevel) ; break; }
@@ -281,8 +289,8 @@ void Lexicon::startLogging() {
    logger.addDestination(debugDestination);
    logger.addDestination(fileDestination);
 
-   QLOG_INFO() << "Program started";
    QLOG_INFO() << "Built with Qt" << QT_VERSION_STR << "running on" << qVersion();
+   QLOG_INFO() << "Program started";
 }
 QString Lexicon::getConfig() const {
   return m_configFile;
@@ -650,23 +658,6 @@ QString Lexicon::getDefaultKeyboard()  {
  *
  * @param family
  */
-QStringList Lexicon::setArabicFont(const QString & family) {
-  QStringList x = changeFontInSettings(family);
-  /**
-   * Do the CSS files
-   *
-   */
-
-  QDir cssDirectory(getResourceFilePath(Lexicon::Stylesheet));
-  QStringList filters;
-  filters << "*.css";
-  QFileInfoList files =  cssDirectory.entryInfoList(filters);
-  for(int i=0;i < files.size();i++) {
-    x = changeFontInStylesheet(files[i].absoluteFilePath(),family);
-    }
-
-  return x;
-}
 QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QString & family) {
   QStringList changedEntries;
   QRegularExpression reCss("(.+){(.+)}");
@@ -687,7 +678,6 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
     if (m.lastCapturedIndex() == 2) {
       selector = m.captured(1);
       clause = m.captured(2);
-      //      qDebug() << m.capturedTexts();
     }
     if (selector.contains("arabic",Qt::CaseInsensitive)) {
       QString t = setCssFont(clause,family);

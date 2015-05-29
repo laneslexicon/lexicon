@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
     parser.addOption(dbOption);
 
 
-    QCommandLineOption langOption(QStringList() <<"l" << "lang","use the specified language","lang");
+    QCommandLineOption langOption(QStringList() <<"e" << "lang","use the specified language","lang");
     parser.addOption(langOption);
 
     QCommandLineOption nosaveOption(QStringList() << "x" << "no-save","do not save the settings");
@@ -119,14 +119,8 @@ int main(int argc, char *argv[])
     QCommandLineOption nosplashOption(QStringList() << "p" << "no-splash","do not show splash screen");
     parser.addOption(nosplashOption);
 
-    QCommandLineOption debugOption(QStringList() << "v" << "debug","set debug option");
-    parser.addOption(debugOption);
-
-    QCommandLineOption arOption(QStringList() << "a" << "arabic-font","Name of the Arabic font","arfont");
-    parser.addOption(arOption);
-
-    QCommandLineOption noguiOption(QStringList() << "g" << "no-gui","Do not show user interface");
-    parser.addOption(noguiOption);
+    QCommandLineOption logOption(QStringList() << "l" << "log-level","set logging level","loglevel");
+    parser.addOption(logOption);
 
     // Process the actual command line arguments
     parser.process(mansur);
@@ -171,24 +165,13 @@ int main(int argc, char *argv[])
     if (parser.isSet(notabsOption)) {
       options.insert("notabs","");
     }
-    if (parser.isSet(debugOption)) {
-      options.insert("debug","");
+    if (parser.isSet(logOption)) {
+      options.insert("loglevel",parser.value(logOption));
     }
     if (parser.isSet(textWidthOption)) {
       options.insert(textWidthOption.valueName(),parser.value(textWidthOption));
     }
-    if (parser.isSet(arOption)) {
-      options.insert("arfont",parser.value(arOption));
-    }
     mansur.setOptions(options);
-    ///
-
-    if (parser.isSet(arOption)) {
-      mansur.setArabicFont(parser.value(arOption));
-    }
-    if (parser.isSet(noguiOption)) {
-      return 0;
-    }
     if (parser.isSet(themeOption)) {
       mansur.setTheme(parser.value(themeOption));
     }
