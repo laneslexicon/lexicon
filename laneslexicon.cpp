@@ -2686,7 +2686,7 @@ void LanesLexicon::movePreviousHead(const Place & p) {
   }
 }
 void LanesLexicon::setStatus(const QString & txt) {
-  QLOG_INFO() << txt;
+  QLOG_INFO() << txt.toLocal8Bit().constData();
   statusBar()->showMessage(txt);
 }
 /**
