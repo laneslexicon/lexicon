@@ -234,16 +234,8 @@ They should not be translated.
 #define SID_LOGGING_DEBUG                       "Debug"
 #define SID_LOGGING_SIZE                        "Size"
 #define SID_LOGGING_POS                         "Pos"
-#define SID_LOGGING_ICON_DEBUG                  "Debug"
-#define SID_LOGGING_ICON_INFO                  "Info"
-#define SID_LOGGING_ICON_ERROR                  "Error"
-#define SID_LOGGING_ICON_WARNING                 "Warning"
-
-#define SID_LOGGING_LEVEL                       "Level"
-#define SID_LOGGING_LOGFILE                     "Logfile"
+//#define SID_LOGGING_LOGFILE                     "Logfile"
 #define SID_LOGGING_MAXIMUM_SIZE                "Maximum size"
-#define SID_LOGGING_ROTATE                      "Rotate"
-#define SID_LOGGING_VIEWER_LINES                "Viewer lines"
 
 
 #define SID_BOOKMARK_NEW_TAB                   "New tab"

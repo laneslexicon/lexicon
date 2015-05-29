@@ -22,6 +22,7 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   m_maxSize->setValidator(new QIntValidator);
   m_level = new QComboBox ;
   QStringList levels;
+  // these have to be in this order for it to work
   levels << tr("Trace") << tr("Debug") << tr("Info") << tr("Warn") << tr("Error");
   levels << tr("Fatal") << tr("Off");
   for(int i=0; i < levels.size();i++) {
@@ -33,10 +34,6 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   m_interval = new QLineEdit ;
   m_interval->setValidator(new QIntValidator);
   m_rotate = new QCheckBox ;
-  m_warning = new QLineEdit ;
-  m_error = new QLineEdit ;
-  m_debug = new QLineEdit ;
-  m_info = new QLineEdit ;
 
   layout->addRow(tr("File name"),m_file);
   layout->addRow(tr("Maximum file size (bytes)"),m_maxSize);
@@ -45,10 +42,7 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   layout->addRow(tr("Viewer lines"),m_maxLines);
   layout->addRow(tr("Viewer refresh interval (msecs)"),m_interval);
   layout->addRow(tr("Rotate logs"),m_rotate);
-  layout->addRow(tr("Warning icon"),m_warning);
-  layout->addRow(tr("Information icon"),m_info);
-  layout->addRow(tr("Error icon"),m_error);
-  layout->addRow(tr("Debug icon"),m_debug);
+
   vlayout->addLayout(layout);
   vlayout->addStretch();
   setLayout(vlayout);
@@ -73,10 +67,6 @@ void LogOptions::readSettings() {
   m_maxLines->setText(settings.value(SID_LOGGING_VIEWER_MAXLINES,"100").toString());
   m_interval->setText(settings.value(SID_LOGGING_VIEWER_INTERVAL,"10000").toString());
   m_rotate->setChecked(settings.value(SID_LOGGING_ROTATE,true).toBool());
-  m_warning->setText(settings.value(SID_LOGGING_ICON_WARNING,"warn.png").toString());
-  m_info->setText(settings.value(SID_LOGGING_ICON_INFO,"info.png").toString());
-  m_error->setText(settings.value(SID_LOGGING_ICON_ERROR,"error.png").toString());
-  m_debug->setText(settings.value(SID_LOGGING_ICON_DEBUG,"debug.png").toString());
 
   m_dirty = false;
 }
@@ -97,10 +87,6 @@ void LogOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_LOGGING_VIEWER_MAXLINES,m_maxLines->text());
   settings.setValue(SID_LOGGING_VIEWER_INTERVAL,m_interval->text());
   settings.setValue(SID_LOGGING_ROTATE,m_rotate->isChecked());
-  settings.setValue(SID_LOGGING_ICON_WARNING,m_warning->text());
-  settings.setValue(SID_LOGGING_ICON_INFO,m_info->text());
-  settings.setValue(SID_LOGGING_ICON_ERROR,m_error->text());
-  settings.setValue(SID_LOGGING_ICON_DEBUG,m_debug->text());
 
   m_dirty = false;
   emit(modified(false));
@@ -137,18 +123,6 @@ bool LogOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_LOGGING_ROTATE,m_rotate)) {
-    m_dirty = true;
-  }
-  if (compare(&settings,SID_LOGGING_ICON_WARNING,m_warning)) {
-    m_dirty = true;
-  }
-  if (compare(&settings,SID_LOGGING_ICON_INFO,m_info)) {
-    m_dirty = true;
-  }
-  if (compare(&settings,SID_LOGGING_ICON_ERROR,m_error)) {
-    m_dirty = true;
-  }
-  if (compare(&settings,SID_LOGGING_ICON_DEBUG,m_debug)) {
     m_dirty = true;
   }
 

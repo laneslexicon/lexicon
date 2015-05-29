@@ -23,9 +23,5 @@ class LogOptions : public OptionsWidget {
     QLineEdit * m_maxLines;
     QLineEdit  * m_interval;
     QCheckBox * m_rotate;
-    QLineEdit * m_warning;
-    QLineEdit * m_error;
-    QLineEdit * m_debug;
-    QLineEdit * m_info;
 };
 #endif
