@@ -44,6 +44,7 @@ class KeyboardWidget : public QDialog {
    void attach(QWidget *);
    void detach();
    void onKeyboardShortcut();
+   void autoScale();
  private:
    void setup();
    void readSettings();
@@ -59,7 +60,7 @@ class KeyboardWidget : public QDialog {
 
    QWidget * m_target;
    QTransform m_transform;
-   void autoScale();
+
  signals:
     void closed();
     void attached();

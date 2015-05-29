@@ -216,6 +216,7 @@ void NoteDialog::showKeyboard() {
     }
     m_keyboardButton->setText(tr("Hide &keyboard"));
     m_attached = true;
+    m_keyboard->autoScale();
     this->positionKeyboard();
   }
   else {

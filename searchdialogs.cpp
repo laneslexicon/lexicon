@@ -178,6 +178,7 @@ void ArabicSearchDialog::hideKeyboard() {
 void ArabicSearchDialog::showKeyboard() {
   if (! m_attached) {
     m_keyboard->attach(m_edit);
+    m_keyboard->autoScale();
     m_keyboardButton->setText(tr("Hide &keyboard"));
     QPoint p;
     p = m_keyboard->currentPosition();

@@ -858,6 +858,7 @@ void FullSearchWidget::showKeyboard() {
       p.setX(p.x() - 50);
       p.setY(p.y() + 50);
     }
+    m_keyboard->autoScale();
     m_keyboard->move(p);
     m_attached = true;
   }
