@@ -43,6 +43,7 @@ void OptionsWidget::addButtons() {
   connect(m_btns->button(QDialogButtonBox::Save),SIGNAL(clicked()),this,SLOT(onSave()));
   connect(m_btns->button(QDialogButtonBox::Reset),SIGNAL(clicked()),this,SLOT(onReset()));
   connect(m_btns->button(QDialogButtonBox::Help),SIGNAL(clicked()),this,SLOT(onHelp()));
+  m_btns->button(QDialogButtonBox::Help)->setEnabled(false);
 }
 void OptionsWidget::onSave() {
   writeSettings();
