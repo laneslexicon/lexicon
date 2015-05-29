@@ -873,6 +873,9 @@ void LanesLexicon::createActions() {
 
 }
 void LanesLexicon::createToolBar() {
+  QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
+  qDebug() << cmdOptions;
+
   QToolBar * m_mainbar = addToolBar("Main");
   m_mainbar->setObjectName("maintoolbar");
 
@@ -882,7 +885,7 @@ void LanesLexicon::createToolBar() {
   m_exitButton->setFocusPolicy(Qt::StrongFocus);
   m_mainbar->addWidget(m_exitButton);
 
-  if (m_debug) {
+  if (cmdOptions.contains("enabletest")) {
     m_mainbar->addAction(m_testAction);
   }
 

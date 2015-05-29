@@ -122,6 +122,8 @@ int main(int argc, char *argv[])
     QCommandLineOption logOption(QStringList() << "l" << "log-level","set logging level","loglevel");
     parser.addOption(logOption);
 
+    QCommandLineOption enableTestOption(QStringList() << "b" << "enable-test","enable test");
+    parser.addOption(enableTestOption);
     // Process the actual command line arguments
     parser.process(mansur);
     const QStringList args = parser.positionalArguments();
@@ -170,6 +172,9 @@ int main(int argc, char *argv[])
     }
     if (parser.isSet(textWidthOption)) {
       options.insert(textWidthOption.valueName(),parser.value(textWidthOption));
+    }
+    if (parser.isSet(enableTestOption)) {
+      options.insert("enabletest","");
     }
     mansur.setOptions(options);
     if (parser.isSet(themeOption)) {
