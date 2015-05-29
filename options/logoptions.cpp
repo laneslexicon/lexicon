@@ -20,7 +20,13 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   m_file = new QLineEdit ;
   m_maxSize = new QLineEdit ;
   m_maxSize->setValidator(new QIntValidator);
-  m_level = new QSpinBox ;
+  m_level = new QComboBox ;
+  QStringList levels;
+  levels << tr("Trace") << tr("Debug") << tr("Info") << tr("Warn") << tr("Error");
+  levels << tr("Fatal") << tr("Off");
+  for(int i=0; i < levels.size();i++) {
+    m_level->addItem(levels[i],i);
+  }
   m_archive = new QSpinBox ;
   m_maxLines = new QLineEdit ;
   m_maxLines->setValidator(new QIntValidator);
@@ -60,7 +66,9 @@ void LogOptions::readSettings() {
   m_file->setText(settings.value(SID_LOGGING_FILE,"log.txt").toString());
   m_maxSize->setText(settings.value(SID_LOGGING_MAXSIZE,"64000").toString());
   /// TODO check max/min
-  m_level->setValue(settings.value(SID_LOGGING_LEVEL,2).toInt());
+  int m = settings.value(SID_LOGGING_LEVEL,2).toInt();
+  int ix = m_level->findData(m);
+  m_level->setCurrentIndex(ix);
   m_archive->setValue(settings.value(SID_LOGGING_ARCHIVES,4).toInt());
   m_maxLines->setText(settings.value(SID_LOGGING_VIEWER_MAXLINES,"100").toString());
   m_interval->setText(settings.value(SID_LOGGING_VIEWER_INTERVAL,"10000").toString());
@@ -84,7 +92,7 @@ void LogOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_LOGGING_FILE,m_file->text());
   settings.setValue(SID_LOGGING_MAXSIZE,m_maxSize->text());
   /// TODO check max/min
-  settings.setValue(SID_LOGGING_LEVEL,m_level->value());
+  settings.setValue(SID_LOGGING_LEVEL,m_level->currentData().toInt());
   settings.setValue(SID_LOGGING_ARCHIVES,m_archive->value());
   settings.setValue(SID_LOGGING_VIEWER_MAXLINES,m_maxLines->text());
   settings.setValue(SID_LOGGING_VIEWER_INTERVAL,m_interval->text());

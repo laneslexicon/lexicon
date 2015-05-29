@@ -3,6 +3,7 @@
 #include "optionswidget.h"
 #include <QFontDialog>
 #include <QPushButton>
+#include <QComboBox>
 class LogOptions : public OptionsWidget {
   Q_OBJECT
 
@@ -17,7 +18,7 @@ class LogOptions : public OptionsWidget {
  private:
     QLineEdit * m_file;
     QLineEdit * m_maxSize;
-    QSpinBox  * m_level;
+    QComboBox  * m_level;
     QSpinBox * m_archive;
     QLineEdit * m_maxLines;
     QLineEdit  * m_interval;
