@@ -42,6 +42,9 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   if (! m_showHeadWord ) {
     this->hideColumn(HEADWORD_COLUMN);
   }
+  if (! m_showNode ) {
+    this->hideColumn(NODE_COLUMN);
+  }
   if (! m_showSupplement) {
     this->hideColumn(HEAD_SUPPLEMENT_COLUMN);
   }
@@ -80,6 +83,7 @@ void ContentsWidget::readSettings() {
   /// head is the single word version
   m_showHeadWord = settings.value(SID_CONTENTS_SHOWHEAD,false).toBool();
   m_showEntryWord = settings.value(SID_CONTENTS_SHOWENTRY,false).toBool();
+  m_showNode = settings.value(SID_CONTENTS_SHOWNODE,false).toBool();
   m_debug = settings.value(SID_CONTENTS_DEBUG,false).toBool();
   m_moveDown = settings.value(SID_CONTENTS_MOVE_DOWN,"s").toString();
   m_moveUp = settings.value(SID_CONTENTS_MOVE_UP,"w").toString();

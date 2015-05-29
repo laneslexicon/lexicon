@@ -50,6 +50,7 @@ class ContentsWidget : public QTreeWidget {
   bool m_debug;
   bool m_showHeadWord;
   bool m_showEntryWord;
+  bool m_showNode;
   bool m_showSupplement;
   bool m_romanItypes;
   /// this is the background color of the select item when the window

@@ -33,11 +33,13 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_doubleClick = new QCheckBox;
   m_showHeadColumn = new QCheckBox;
   m_showEntryColumn = new QCheckBox;
+  m_showNodeColumn = new QCheckBox;
   m_romanItypes = new QCheckBox;
   m_debug = new QCheckBox;
 
   formlayout->addRow(tr("Show head word"),m_showHeadColumn);
   formlayout->addRow(tr("Show multi-head word"),m_showEntryColumn);
+  formlayout->addRow(tr("Show node"),m_showNodeColumn);
   formlayout->addRow(tr("Verb form number in Roman format"),m_romanItypes);
   formlayout->addRow(tr("Move up"),m_moveUp);
   formlayout->addRow(tr("Move down"),m_moveDown);
@@ -107,6 +109,7 @@ void RootsOptions::readSettings() {
 
   m_showHeadColumn->setChecked(settings.value(SID_CONTENTS_SHOWHEAD,true).toBool());
   m_showEntryColumn->setChecked(settings.value(SID_CONTENTS_SHOWENTRY,false).toBool());
+  m_showNodeColumn->setChecked(settings.value(SID_CONTENTS_SHOWNODE,false).toBool());
   m_romanItypes->setChecked(settings.value(SID_CONTENTS_ROMAN_ITYPES,false).toBool());
 
   settings.endGroup();
@@ -122,6 +125,7 @@ void RootsOptions::writeSettings(const QString & fileName) {
   settings.beginGroup(m_section);
   settings.setValue(SID_CONTENTS_SHOWHEAD,m_showHeadColumn->isChecked());
   settings.setValue(SID_CONTENTS_SHOWENTRY,m_showEntryColumn->isChecked());
+  settings.setValue(SID_CONTENTS_SHOWNODE,m_showNodeColumn->isChecked());
   settings.setValue(SID_CONTENTS_ROMAN_ITYPES,m_romanItypes->isChecked());
   settings.setValue(SID_CONTENTS_DEBUG,m_debug->isChecked());
   settings.setValue(SID_CONTENTS_MOVE_UP,m_moveUp->text());
@@ -150,6 +154,9 @@ bool RootsOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_CONTENTS_SHOWENTRY,m_showEntryColumn)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_CONTENTS_SHOWNODE,m_showNodeColumn)) {
     m_dirty = true;
   }
   if (compare(&settings,SID_CONTENTS_ROMAN_ITYPES,m_romanItypes)) {
