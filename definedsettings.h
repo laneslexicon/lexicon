@@ -37,6 +37,9 @@ They should not be translated.
 #define SID_ENTRY_TEXT_WIDTH "Text width"
 #define SID_ENTRY_WIDEN   "Widen"
 
+#define SID_ENTRY_PRINT_NOTES  "Print Notes"
+#define SID_ENTRY_PRINT_NODES  "Print Nodes"
+#define SID_ENTRY_PRINT_INFO   "Print Info"
 #define SID_ENTRY_ZOOM_IN "Zoom in"
 #define SID_ENTRY_ZOOM_OUT "Zoom out"
 #define SID_ENTRY_PRINT_CSS "Print Css"
@@ -342,3 +345,8 @@ They should not be translated.
 
 
 #define SID_RESOURCES_IMAGES  "Image"
+
+
+#define SID_ALWAYS 0
+#define SID_NEVER  1
+#define SID_PROMPT 2

@@ -47,6 +47,26 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_zoomOut = new QLineEdit ;
   m_zoomOut->setMaximumWidth(SMALL_EDIT);
 
+  m_printNotes = new QComboBox;
+  m_printInfo = new QComboBox;
+  m_printNodes = new QComboBox;
+
+
+  m_printNotes->addItem(tr("Always"),SID_ALWAYS);
+  m_printNodes->addItem(tr("Always"),SID_ALWAYS);
+  m_printInfo->addItem(tr("Always"),SID_ALWAYS);
+  m_printNotes->addItem(tr("Never"),SID_NEVER);
+  m_printNodes->addItem(tr("Never"),SID_NEVER);
+  m_printInfo->addItem(tr("Never"),SID_NEVER);
+  m_printNotes->addItem(tr("Prompt"),SID_PROMPT);
+  m_printNodes->addItem(tr("Prompt"),SID_PROMPT);
+  m_printInfo->addItem(tr("Prompt"),SID_PROMPT);
+
+
+  m_printNotes->setMaximumWidth(VLARGE_EDIT);
+  m_printInfo->setMaximumWidth(VLARGE_EDIT);
+  m_printNodes->setMaximumWidth(VLARGE_EDIT);
+
   QVBoxLayout * vlayout = new QVBoxLayout;
   QFormLayout * layout = new QFormLayout;
 
@@ -116,6 +136,14 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   keylayout->setHorizontalSpacing(100);
   keybox->setLayout(keylayout);
+
+  QGroupBox * printbox  = new QGroupBox(tr("Print"));
+  QFormLayout * printlayout = new QFormLayout;
+  printlayout->addRow(tr("Print notes"),m_printNotes);
+  printlayout->addRow(tr("Print system info"),m_printInfo);
+  printlayout->addRow(tr("Print node summary"),m_printNodes);
+  printbox->setLayout(printlayout);
+
   QGroupBox * otherbox = new QGroupBox(tr("Other"));
   QFormLayout * otherlayout = new QFormLayout;
 
@@ -158,6 +186,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   otherbox->setLayout(otherlayout);
 
   vlayout->addWidget(keybox);
+  vlayout->addWidget(printbox);
   vlayout->addWidget(otherbox);
   vlayout->addStretch();
   setLayout(vlayout);
@@ -198,6 +227,19 @@ void EntryOptions::readSettings() {
   m_zoom->setValue(settings.value(SID_ENTRY_SCALE).toDouble());
   m_zoomIn->setText(settings.value(SID_ENTRY_ZOOM_IN).toString());
   m_zoomOut->setText(settings.value(SID_ENTRY_ZOOM_OUT).toString());
+  int ix;
+  int x;
+  x = settings.value(SID_ENTRY_PRINT_NOTES,SID_ALWAYS).toInt();
+  ix = m_printNotes->findData(x);
+  m_printNotes->setCurrentIndex(ix);
+
+  x = settings.value(SID_ENTRY_PRINT_NODES,SID_ALWAYS).toInt();
+  ix = m_printNodes->findData(x);
+  m_printNodes->setCurrentIndex(ix);
+
+  x = settings.value(SID_ENTRY_PRINT_INFO,SID_ALWAYS).toInt();
+  ix = m_printInfo->findData(x);
+  m_printInfo->setCurrentIndex(ix);
 
   m_dirty = false;
 }
@@ -236,6 +278,9 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ENTRY_SCALE,m_zoom->value());
   settings.setValue(SID_ENTRY_ZOOM_IN,m_zoomIn->text());
   settings.setValue(SID_ENTRY_ZOOM_OUT,m_zoomOut->text());
+  settings.setValue(SID_ENTRY_PRINT_NOTES,m_printNotes->currentData());
+  settings.setValue(SID_ENTRY_PRINT_NODES,m_printNodes->currentData());
+  settings.setValue(SID_ENTRY_PRINT_INFO,m_printInfo->currentData());
   m_dirty = false;
   emit(modified(false));
 }
@@ -351,7 +396,15 @@ bool EntryOptions::isModified()  {
   if (compare(&settings,SID_ENTRY_ZOOM_OUT,m_zoomOut)) {
     m_dirty = true;
   }
-
+  if (compare(&settings,SID_ENTRY_PRINT_NOTES,m_printNotes)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ENTRY_PRINT_NODES,m_printNodes)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ENTRY_PRINT_INFO,m_printInfo)) {
+    m_dirty = true;
+  }
   return m_dirty;
 }
 void EntryOptions::onSetFont() {

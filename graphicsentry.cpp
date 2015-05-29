@@ -1922,8 +1922,11 @@ bool GraphicsEntry::hasMoreFinds() const {
 bool GraphicsEntry::hasHighlights() const {
   return (m_highlightCount > 0);
 }
-QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & method,const QString & node) {
+QString GraphicsEntry::getOutputFilename(const QString & pdfdir,bool autoname,const QString & method,const QString & node) {
   QString base;
+  if (autoname == false) {
+    return QFileDialog::getSaveFileName(this,tr("PDF name"),pdfdir,tr("PDF (*.pdf)"));
+  }
   if (method == "node") {
     if (!node.isEmpty()) {
       base = node;
@@ -1960,17 +1963,18 @@ QString GraphicsEntry::getOutputFilename(const QString & pdfdir,const QString & 
 }
 #define ROW(a,b)    "<tr><td width=\"30%\">" + QString(a) + "</td><td width=\"%70\">" + QString(b) + "</td></tr>"
 
-QString GraphicsEntry::getPageInfo(bool summary) {
+QString GraphicsEntry::getPageInfo(bool sysinfo,bool nodesummary) {
   Place firstPlace;
   QString firstNode;
-
+  QString html;
+  if (sysinfo) {
   for(int i=0;(i < m_items.size()) && ! firstPlace.isValid();i++) {
     firstPlace = m_items[i]->getPlace();
   }
   for(int i=0;(i < m_items.size()) && firstNode.isEmpty();i++) {
     firstNode = m_items[i]->getPlace().getNode();
   }
-  QString html;
+
   html += "<table class=\"pageinfo\" style=\"width:100%\">";
   html += ROW("<b>" + tr("Entry information") + "</b>","");
   html += ROW("","");
@@ -1983,7 +1987,6 @@ QString GraphicsEntry::getPageInfo(bool summary) {
     vol = m_items[i]->getPlace().volume();
     pages.insert(vol,page);
   }
-  qDebug() << pages;
   QList<int> vols = pages.uniqueKeys();
   for(int i=0;i < vols.size();i++) {
     QList<int> p = pages.values(vols[i]);
@@ -1993,14 +1996,12 @@ QString GraphicsEntry::getPageInfo(bool summary) {
     }
     str.removeDuplicates();
     html += ROW(QString(tr("Volume %1")).arg(vols[i]),QString("%1").arg(str.join(",")));
-    //    html += ROW(tr("First page"),QString("%1").arg(firstPlace.getPage()));
   }
   Place lastPlace;
   for(int i=m_items.size() - 1;(i >= 0) && ! lastPlace.isValid();i--) {
     lastPlace = m_items[i]->getPlace();
   }
 
-  //  html += ROW(tr("Last page"),QString("%1").arg(lastPlace.getPage()));
   html += ROW(tr("Nodes"),QString("%1 - %2").arg(firstNode).arg(lastPlace.getNode()));
   html += ROW(tr("Date"),QDateTime::currentDateTime().toString(Qt::ISODate));
   QSqlQuery query;
@@ -2017,9 +2018,10 @@ QString GraphicsEntry::getPageInfo(bool summary) {
     }
   }
   html += "</table>";
+  }
   html += "<br/>";
 #define ROW4(a,b,c,d)    "<tr><td width=\"10%\">" + QString(a) + "</td><td width=\"10%\">" + QString(b) + "</td><td width=\"10%\">" + QString(c) + "</td> <td width=\"%70\">" + QString(d) + "</td></tr>"
-  if (! summary ) {
+  if (nodesummary ) {
     Place p;
     html += "<table class=\"pageinfo\" style=\"width:100%\">";
     html += "<p class=\"entrydetails\">Entry details</p>";
@@ -2043,13 +2045,19 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   SETTINGS
   settings.beginGroup("Printer");
   bool pdfoutput = settings.value(SID_PRINTER_OUTPUT_PDF).toBool();
+  bool printerReUse = settings.value(SID_PRINTER_USE).toBool();
 
-  if (pdfoutput) {
+  if (printerReUse && pdfoutput) {
     QString pdfdir = settings.value(SID_PRINTER_PDF_DIRECTORY).toString();
     QString filename;
-    filename = getOutputFilename(pdfdir,settings.value(SID_PRINTER_AUTONAME_METHOD).toString(),node);
+    filename = getOutputFilename(pdfdir,settings.value(SID_PRINTER_AUTONAME_PDF).toBool(),
+                                 settings.value(SID_PRINTER_AUTONAME_METHOD).toString(),node);
+    if (filename.isEmpty()) {
+      return;
+    }
     printer.setOutputFileName(filename);
   }
+  settings.endGroup();
   QString html; // = "<html><body>";
   for(int i=0;i < m_items.size();i++) {
     if (node.isEmpty() || (node == m_items[i]->getPlace().getNode())) {
@@ -2086,8 +2094,58 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   doc.setDefaultStyleSheet(m_printCss);
   doc.setHtml(html); // + "</body></html>");
   doc.setDefaultTextOption(m_textOption);
-  if (1) {
-    QString note;
+  settings.beginGroup("Entry");
+  /// TODO prompt if any = SID_PROMPT
+  int printNotes = settings.value(SID_ENTRY_PRINT_NOTES,-1).toInt();
+  int printNodes = settings.value(SID_ENTRY_PRINT_NODES,-1).toInt();
+  int printInfo = settings.value(SID_ENTRY_PRINT_INFO,-1).toInt();
+  settings.endGroup();
+  bool pNotes = false;
+  bool pNodes = false;
+  bool pInfo = false;
+  if (printNotes == SID_ALWAYS) {
+    pNotes = true;
+  }
+  if (printNodes == SID_ALWAYS) {
+    pNodes = true;
+  }
+  if (printInfo == SID_ALWAYS) {
+    pInfo = true;
+  }
+  if ((printInfo == SID_PROMPT) ||
+      (printNotes == SID_PROMPT) ||
+      (printNodes == SID_PROMPT)) {
+    QDialog * d = new QDialog;
+    d->setWindowTitle(tr("Print options"));
+    QCheckBox * n = new QCheckBox(tr("Print notes"));
+    QCheckBox * t = new QCheckBox(tr("Print node summary"));
+    QCheckBox * i = new QCheckBox(tr("Print system information"));
+    QVBoxLayout * layout = new QVBoxLayout;
+    if (printInfo == SID_ALWAYS) {
+      i->setChecked(true);
+    }
+    if (printNotes == SID_ALWAYS) {
+      n->setChecked(true);
+    }
+    if (printNodes == SID_ALWAYS) {
+      t->setChecked(true);
+    }
+    layout->addWidget(n);
+    layout->addWidget(i);
+    layout->addWidget(t);
+
+    QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(btns,SIGNAL(accepted()),d,SLOT(accept()));
+    layout->addWidget(btns);
+    d->setLayout(layout);
+    d->exec();
+    pInfo = i->isChecked();
+    pNotes = n->isChecked();
+    pNodes = t->isChecked();
+    delete d;
+  }
+  if  (pNotes) {
+      QString note;
     for(int i=0;i < m_items.size();i++) {
       if (node.isEmpty() || (node == m_items[i]->getPlace().getNode())) {
         QList<Note *> notes = m_items[i]->getNotes();
@@ -2107,15 +2165,15 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
       cursor.insertHtml(note);
     }
   }
-  /// TODO this needs to be dependant on something
-  if (1) {
+
+  if (pInfo || pNodes) {
     QTextCursor cursor(&doc);
     cursor.movePosition(QTextCursor::End);
     QTextBlockFormat format;
     format.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
     cursor.insertBlock(format);
     //    html += "<hr/>";
-    cursor.insertHtml(getPageInfo(false));
+    cursor.insertHtml(getPageInfo(pInfo,pNodes));
   }
   doc.print(&printer);
   if (printer.outputFormat() == QPrinter::NativeFormat) {

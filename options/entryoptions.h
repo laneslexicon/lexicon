@@ -3,6 +3,7 @@
 #include "optionswidget.h"
 #include <QFontDialog>
 #include <QPushButton>
+
 class EntryOptions : public OptionsWidget {
   Q_OBJECT
 
@@ -33,6 +34,9 @@ class EntryOptions : public OptionsWidget {
     QCheckBox * m_saveXml;
     QCheckBox * m_saveOutputHtml;
     QLineEdit * m_show;
+    QComboBox * m_printNotes;
+    QComboBox * m_printInfo;
+    QComboBox * m_printNodes;
     QCheckBox * m_showLinkWarning;
     QLineEdit * m_step;
     QLineEdit * m_highlightColor;

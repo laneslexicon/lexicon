@@ -66,7 +66,7 @@ class GraphicsEntry : public QWidget {
     void setPagingBackward() {
       m_pagingDir = 1;
     }
-    QString getPageInfo(bool summary);
+    QString getPageInfo(bool sys,bool summary);
     qreal getScale() { return m_scale;}
     void setScale(qreal v, bool use = true);
     int getTextWidth() const { return m_textWidth; }
@@ -123,7 +123,7 @@ class GraphicsEntry : public QWidget {
     void centerOnSearchResult(int,int);
     QString lastRoot();
     QString firstRoot();
-    QString getOutputFilename(const QString &,const QString &,const QString & node = QString());
+    QString getOutputFilename(const QString &,bool, const QString &,const QString & node = QString());
     void readSettings();
     void writeDefaultSettings();
     QString fixHtml(const QString &);

@@ -272,6 +272,13 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
 
     }
   }
+  QComboBox * combo = qobject_cast<QComboBox *>(p);
+  if (combo) {
+    QVariant v = combo->currentData();
+    if (settings->value(key) != v) {
+      return true;
+    }
+  }
   return false;
 }
 void OptionsWidget::onHelp() {
