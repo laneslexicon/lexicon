@@ -30,7 +30,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
 
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
-#ifdef STANDALONE
+#ifndef LANE
   QSettings testSettings("config.ini",QSettings::IniFormat);
   if (useTheme.isEmpty()) {
     useTheme = testSettings.value("Theme").toString();
@@ -40,79 +40,103 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
 #else
   QSettings settings(getLexicon()->settingsFileName(theme),QSettings::IniFormat);
 #endif
+
   m_theme = useTheme;
   m_modified = false;
-  QString testFileName("xxx.ini");
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Options");
+  QString testFileName(".vanilla.ini");
   //resize(QSize(600, 400));
   resize(settings.value("Size", QSize(600, 400)).toSize());
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
   bool debugChanges = settings.value("Debug",false).toBool();
+  bool writeTest = settings.value("Create",false).toBool();
   if (settings.value("Roots",true).toBool()) {
     RootsOptions * tree = new RootsOptions(useTheme,this);
     m_tabs->addTab(tree,tr("Contents"));
-    tree->writeSettings(testFileName);
+    if (writeTest) {
+      tree->writeSettings(testFileName);
+    }
     tree->setDebug(debugChanges);
   }
   if (settings.value("Print",true).toBool()) {
     PrintOptions * print = new PrintOptions(useTheme,this);
     m_tabs->addTab(print,tr("Printer"));
-    print->writeSettings(testFileName);
+    if (writeTest) {
+      print->writeSettings(testFileName);
+    }
     print->setDebug(debugChanges);
   }
   if (settings.value("Shortcuts",true).toBool()) {
     ShortcutOptions * shortcut = new ShortcutOptions(useTheme,this);
     m_tabs->addTab(shortcut,tr("Shortcuts"));
-    shortcut->writeSettings(testFileName);
+    if (writeTest) {
+      shortcut->writeSettings(testFileName);
+    }
     shortcut->setDebug(debugChanges);
   }
   if (settings.value("Diacritics",true).toBool()) {
     DiacriticsOptions * diacritics = new DiacriticsOptions(useTheme,this);
     m_tabs->addTab(diacritics,tr("Diacritics"));
-    diacritics->writeSettings(testFileName);
+    if (writeTest) {
+      diacritics->writeSettings(testFileName);
+    }
     diacritics->setDebug(debugChanges);
   }
   if (settings.value("Entry",true).toBool()) {
     EntryOptions * entry = new EntryOptions(useTheme,this);
     m_tabs->addTab(entry,tr("Entry"));
-    entry->writeSettings(testFileName);
+    if (writeTest) {
+      entry->writeSettings(testFileName);
+    }
     entry->setDebug(debugChanges);
   }
   if (settings.value("Search",true).toBool()) {
     FindOptions * find = new FindOptions(useTheme,this);
     m_tabs->addTab(find,tr("Search"));
-    find->writeSettings(testFileName);
+    if (writeTest) {
+      find->writeSettings(testFileName);
+    }
     find->setDebug(debugChanges);
   }
   if (settings.value("Bookmark",true).toBool()) {
     BookmarkOptions * bookmark = new BookmarkOptions(useTheme,this);
     m_tabs->addTab(bookmark,tr("Bookmark"));
-    bookmark->writeSettings(testFileName);
+    if (writeTest) {
+      bookmark->writeSettings(testFileName);
+    }
     bookmark->setDebug(debugChanges);
   }
   if (settings.value("System",true).toBool()) {
     SystemOptions * systems = new SystemOptions(useTheme,this);
     m_tabs->addTab(systems,tr("System"));
-    systems->writeSettings(testFileName);
+    if (writeTest) {
+      systems->writeSettings(testFileName);
+    }
     systems->setDebug(debugChanges);
   }
   if (settings.value("Logging",true).toBool()) {
     LogOptions * log = new LogOptions(useTheme,this);
     m_tabs->addTab(log,tr("Logging"));
-    log->writeSettings(testFileName);
+    if (writeTest) {
+      log->writeSettings(testFileName);
+    }
     log->setDebug(debugChanges);
   }
   if (settings.value("History",true).toBool()) {
     HistoryOptions * history = new HistoryOptions(useTheme,this);
     m_tabs->addTab(history,tr("History"));
-    history->writeSettings(testFileName);
+    if (writeTest) {
+      history->writeSettings(testFileName);
+    }
     history->setDebug(debugChanges);
   }
   if (settings.value("Icons",true).toBool()) {
     IconOptions * icon = new IconOptions(useTheme,this);
     m_tabs->addTab(icon,tr("Icons"));
-    icon->writeSettings(testFileName);
+    if (writeTest) {
+      icon->writeSettings(testFileName);
+    }
     icon->setDebug(debugChanges);
   }
   for(int i=0;i < m_tabs->count();i++) {
