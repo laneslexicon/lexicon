@@ -228,8 +228,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 LanesLexicon::~LanesLexicon()
 {
-  /// TODO make this check something has changed or give
-  /// option to save settings ?
   //  cleanup();
 }
 void LanesLexicon::showStartupEntry() {
@@ -742,26 +740,26 @@ void LanesLexicon::loadStyleSheet() {
 void LanesLexicon::createActions() {
   QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
 
-  m_exitAction = new QAction(tr("Exit"),this);
+  m_exitAction = new QAction(tr("E&xit"),this);
   connect(m_exitAction,SIGNAL(triggered()),this,SLOT(onExit()));
 
-  m_editViewAction = new QAction(tr("Edit view"),this);
+  m_editViewAction = new QAction(tr("&Edit view"),this);
   connect(m_editViewAction,SIGNAL(triggered()),this,SLOT(onEditView()));
 
-  m_minimalAction = new QAction(tr("Minimal interface"),this);
+  m_minimalAction = new QAction(tr("&Minimal interface"),this);
   m_minimalAction->setCheckable(true);
   connect(m_minimalAction,SIGNAL(triggered(bool)),this,SLOT(onSetInterface(bool)));
 
   m_optionsAction = new QAction(tr("&Preferences"),this);
   connect(m_optionsAction,SIGNAL(triggered()),this,SLOT(onOptions()));
 
-  m_logViewerAction = new QAction(tr("View logs"),this);
+  m_logViewerAction = new QAction(tr("&View logs"),this);
   connect(m_logViewerAction,SIGNAL(triggered()),this,SLOT(onLogViewer()));
 
-  m_clearHistoryAction = new QAction(tr("Clear"),this);
+  m_clearHistoryAction = new QAction(tr("&Clear"),this);
   connect(m_clearHistoryAction,SIGNAL(triggered()),this,SLOT(onClearHistory()));
 
-  m_showHistoryAction = new QAction(tr("List"),this);
+  m_showHistoryAction = new QAction(tr("&List"),this);
   connect(m_showHistoryAction,SIGNAL(triggered()),this,SLOT(onShowHistory()));
 
   m_testAction = new QAction(tr("Test"),this);
@@ -770,10 +768,10 @@ void LanesLexicon::createActions() {
 
   m_historyAction = new QAction(tr("History"),this);
 
-  m_navNextAction = new QAction(tr("Next"),this);
-  m_navPrevAction = new QAction(tr("Back"),this);
-  m_navFirstAction = new QAction(tr("First"),this);
-  m_navLastAction = new QAction(tr("Last"),this);
+  m_navNextAction = new QAction(tr("&Next"),this);
+  m_navPrevAction = new QAction(tr("&Back"),this);
+  m_navFirstAction = new QAction(tr("&First"),this);
+  m_navLastAction = new QAction(tr("&Last"),this);
 
   connect(m_navNextAction,SIGNAL(triggered()),this,SLOT(onNavNext()));
   connect(m_navPrevAction,SIGNAL(triggered()),this,SLOT(onNavPrev()));
@@ -781,8 +779,8 @@ void LanesLexicon::createActions() {
   connect(m_navLastAction,SIGNAL(triggered()),this,SLOT(onNavLast()));
 
 
-  m_docAction = new QAction(tr("Documentation"),this);
-  m_aboutAction = new QAction(tr("About"),this);
+  m_docAction = new QAction(tr("&Documentation"),this);
+  m_aboutAction = new QAction(tr("&About"),this);
   m_bookmarkAction = new QAction(tr("Bookmarks"),this);
 
   //  m_navigationAction = new QAction(tr("Move"),this);
@@ -791,14 +789,14 @@ void LanesLexicon::createActions() {
 
 
   m_moveGroup = new QActionGroup(this);
-  m_navModeRootAction = new QAction(tr("By root"),this);
+  m_navModeRootAction = new QAction(tr("By &root"),this);
 
   m_navModeRootAction->setData(Lane::By_Root);
   m_navModeRootAction->setCheckable(true);
   if (m_navMode == Lane::By_Root) {
     m_navModeRootAction->setChecked(true);
   }
-  m_navModePageAction = new QAction(tr("By page"),this);
+  m_navModePageAction = new QAction(tr("By &page"),this);
   m_navModePageAction->setData(Lane::By_Page);
   m_navModePageAction->setCheckable(true);
   if (m_navMode == Lane::By_Page) {
@@ -823,28 +821,28 @@ void LanesLexicon::createActions() {
   m_searchEntryAction = new QAction(tr("For &head word"),this);
   connect(m_searchEntryAction,SIGNAL(triggered()),this,SLOT(searchForEntry()));
 
-  m_zoomInAction = new QAction(tr("Zoom in"),this);
-  m_zoomOutAction =  new QAction(tr("Zoom out"),this);
-  m_widenAction = new QAction(tr("Widen text"),this);
-  m_narrowAction = new QAction(tr("Narrow text"),this);
-  m_printAction = new QAction(tr("Print"),this);
-  m_localSearchAction = new QAction(tr("Search page"),this);
-  m_localSearchNextAction = new QAction(tr("Search next"),this);
+  m_zoomInAction = new QAction(tr("Zoom &in"),this);
+  m_zoomOutAction =  new QAction(tr("Zoom &out"),this);
+  m_widenAction = new QAction(tr("&Widen text"),this);
+  m_narrowAction = new QAction(tr("&Narrow text"),this);
+  m_printAction = new QAction(tr("&Print"),this);
+  m_localSearchAction = new QAction(tr("&Search page"),this);
+  m_localSearchNextAction = new QAction(tr("Search ne&xt"),this);
   m_localSearchNextAction->setEnabled(false);
-  m_clearAction = new QAction(tr("Clear"),this);
+  m_clearAction = new QAction(tr("&Clear"),this);
   m_convertToEntryAction = new QAction(tr("Convert"),this);
   m_clearAction->setEnabled(false);
 
   m_keymapsAction = new QAction(tr("Keymaps"),this);
 
-  m_linkAction = new QAction(tr("Link contents"),this);
+  m_linkAction = new QAction(tr("&Link contents"),this);
   m_linkAction->setCheckable(true);
   m_linkAction->setChecked(m_linkContents);
 
-  m_syncFromEntryAction = new QAction(tr("Align contents with entry"),this);
-  m_syncFromContentsAction = new QAction(tr("Align entry with contents"),this);
+  m_syncFromEntryAction = new QAction(tr("Align &contents with entry"),this);
+  m_syncFromContentsAction = new QAction(tr("Align &entry with contents"),this);
 
-  m_defaultScaleAction = new QAction(tr("Set default zoom"),this);
+  m_defaultScaleAction = new QAction(tr("Set default &zoom"),this);
 
   m_selectThemeAction = new QAction(tr("&Switch"),this);
   m_editThemeAction = new QAction(tr("&Edit"),this);
@@ -953,6 +951,7 @@ void LanesLexicon::createToolBar() {
   m_navigationModeMenu->addAction(m_navModeRootAction);
   m_navigationModeMenu->addAction(m_navModePageAction);
   m_navigationButton = new QToolButton(m_navigation);
+  m_navigationButton->setObjectName("navigationby");
   m_navigationButton->setMenu(m_navigationModeMenu);
   m_navigationButton->setText(tr("Move by"));
   m_navigationButton->setFocusPolicy(Qt::StrongFocus);
@@ -2541,7 +2540,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
     connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
     m_bookmarkMap->setMapping(sc,QString("add-%1").arg(ids.at(i).toUpper()));
   }
-  m_bookmarkAddAction = new QAction(tr("Add"),this);
+  m_bookmarkAddAction = new QAction(tr("&Add"),this);
 
   key = settings.value(SID_BOOKMARK_JUMP,"Ctrl+J").toString();
   for(int i=0;i < ids.size();i++) {
@@ -2558,7 +2557,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
     connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
     m_bookmarkMap->setMapping(sc,QString("jump-%1").arg(ids.at(i).toUpper()));
   }
-  m_bookmarkJumpAction = new QAction(tr("Jump"),this);
+  m_bookmarkJumpAction = new QAction(tr("&Jump"),this);
 
   QShortcut * sc;
   key = settings.value(SID_BOOKMARK_LIST,"Ctrl+B,Ctrl+L").toString();
@@ -2567,7 +2566,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
   connect(sc,SIGNAL(activatedAmbiguously()),m_bookmarkMap,SLOT(map()));
   sc->setContext(Qt::ApplicationShortcut);
   m_bookmarkMap->setMapping(sc,QString("list"));
-  m_bookmarkListAction = new QAction(tr("List"),this);
+  m_bookmarkListAction = new QAction(tr("&List"),this);
   m_bookmarkListAction->setShortcut(sc->key());
   m_bookmarkListAction->setShortcutContext(Qt::WidgetShortcut);
   connect(m_bookmarkListAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
@@ -2577,7 +2576,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
     sc->setContext(Qt::ApplicationShortcut);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
   m_bookmarkMap->setMapping(sc,QString("revert"));
-  m_bookmarkRevertAction = new QAction(tr("Revert"),this);
+  m_bookmarkRevertAction = new QAction(tr("&Revert"),this);
   m_bookmarkRevertAction->setShortcut(sc->key());
   m_bookmarkRevertAction->setShortcutContext(Qt::WidgetShortcut);
   connect(m_bookmarkRevertAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
@@ -2587,7 +2586,7 @@ void LanesLexicon::setupBookmarkShortcuts() {
     sc->setContext(Qt::ApplicationShortcut);
   connect(sc,SIGNAL(activated()),m_bookmarkMap,SLOT(map()));
   m_bookmarkMap->setMapping(sc,QString("clear"));
-  m_bookmarkClearAction = new QAction(tr("Clear"),this);
+  m_bookmarkClearAction = new QAction(tr("&Clear"),this);
   m_bookmarkClearAction->setShortcut(sc->key());
   m_bookmarkClearAction->setShortcutContext(Qt::WidgetShortcut);
   connect(m_bookmarkClearAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
@@ -3410,7 +3409,6 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
  */
 void LanesLexicon::setIcons(const QString & /* theme */) {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  bool ok = true;
   QString iconfile;
   SETTINGS
   settings.beginGroup("Icons");
@@ -3933,7 +3931,7 @@ void LanesLexicon::onCreateTheme() {
   QString tgtFilePath = themeRoot + QDir::separator() + m.second;
 
   int copyCount = 0;
-  bool ok = copyRecursively(srcFilePath,tgtFilePath,&copyCount);
+  copyRecursively(srcFilePath,tgtFilePath,&copyCount);
   if (d.activate()) {
     this->activateTheme(m.second);
   }
