@@ -93,7 +93,6 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   //  getLexicon()->setCursorPosition(this);
 }
 void RootsOptions::readSettings() {
-  qDebug() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
@@ -175,7 +174,6 @@ bool RootsOptions::isModified()  {
     m_dirty = true;
   }
   settings.endGroup();
-  qDebug() << Q_FUNC_INFO << m_dirty;
   return m_dirty;
 }
 void RootsOptions::onSetFont() {

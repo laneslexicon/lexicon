@@ -110,7 +110,6 @@ QList<int> KeyDef::getValues() {
 void KeyDef::setValues(const QString & /* name */,QSettings & settings,QSettings & specials) {
   QRegExp lx("level(\\d+)");
   QRegExp gx("group(\\d+)");
-  //  qDebug() << "Loading key" << name;
 
   m_row = settings.value("row",-1).toInt();
   m_col = settings.value("col",-1).toInt();
@@ -118,7 +117,6 @@ void KeyDef::setValues(const QString & /* name */,QSettings & settings,QSettings
   m_toggle = settings.value("toggle",0).toBool();
   m_name = settings.value("name",QString()).toString();
   m_span = settings.value("span",1.0).toDouble();
-  //  qDebug() << m_name << m_toggle << m_sticky;
   m_type = KeyDef::Unknown;
 
   QString v = settings.value("type",QString()).toString();
@@ -208,7 +206,6 @@ void KeyDef::setLevelValues(int group,int level,QSettings & settings,QSettings &
   QRegExp nx("^\\d+$");
   QRegExp hx("^0x[0-9,a-f,A-F]+");
   QPair<int,int> k(group,level);
-  //  qDebug() << "setting values" << QString("%1 : %2").arg(group).arg(level) << settings.allKeys();
   QStringList keys  = settings.allKeys();
   if (m_type == KeyDef::Char) {
     if (keys.contains("value")) {
@@ -236,7 +233,6 @@ void KeyDef::setLevelValues(int group,int level,QSettings & settings,QSettings &
           for(int  i=0;i < chars.size();i++) {
             if (hx.indexIn(chars[i]) != -1) {
               m_values.insert(k,chars[i].toInt(&ok,0));
-              //              qDebug() << "key" << i << chars[i] << chars[i].toInt(&ok,0);
             }
           }
         }

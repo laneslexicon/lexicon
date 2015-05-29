@@ -59,7 +59,6 @@ BookmarkOptions::BookmarkOptions(const QString & theme,QWidget * parent) : Optio
 }
 
 void BookmarkOptions::readSettings() {
-  qDebug() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
@@ -96,7 +95,6 @@ void BookmarkOptions::writeSettings(const QString & fileName) {
   if (!fileName.isEmpty()) {
     f = fileName;
   }
-  qDebug() << Q_FUNC_INFO << f;
 
   QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");

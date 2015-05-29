@@ -6,6 +6,9 @@
 #ifdef LANE
 #include "application.h"
 #include "externs.h"
+#include "QsLog.h"
+#else
+#define QLOG_DEBUG() qDebug()
 #endif
 ImEditor::ImEditor(QWidget * parent) : QWidget(parent) {
   m_mapSignals = new QSignalMapper(this);
@@ -55,7 +58,7 @@ ImEditor::ImEditor(QWidget * parent) : QWidget(parent) {
   this->cursorPositionChanged();
 }
 ImEditor::~ImEditor() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QString settingsFileName("editor.ini");
 #ifdef LANE
   settingsFileName = getLexicon()->editorSettingsFileName();
@@ -67,7 +70,7 @@ ImEditor::~ImEditor() {
   settings.setValue("Position",this->pos());
 }
 void ImEditor::hideHelp() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QWidgetList widgets = QApplication::topLevelWidgets();
 
   for(int i=0;i < widgets.size();i++) {
@@ -149,7 +152,7 @@ void ImEditor::readSettings() {
 #ifdef LANE
   settingsFileName = getLexicon()->editorSettingsFileName();
 #endif
-  qDebug() << Q_FUNC_INFO << settingsFileName;
+  QLOG_DEBUG() << Q_FUNC_INFO << settingsFileName;
   QSettings settings(settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("System");
@@ -231,9 +234,9 @@ void ImEditor::readSettings() {
     m_helpBox->hide();
   }
   /*
-  qDebug() << m_scriptFonts;
-  qDebug() << m_mapToScript;
-  qDebug() << m_mapHelp;
+  QLOG_DEBUG() << m_scriptFonts;
+  QLOG_DEBUG() << m_mapToScript;
+  QLOG_DEBUG() << m_mapHelp;
   */
 }
 void ImEditor::hideMaps(bool show) {
@@ -244,7 +247,7 @@ void ImEditor::hidePrint(bool show) {
   m_printOptionsAction->setVisible(show);
 }
 void ImEditor::onMap(const QString & m) {
-  qDebug() << Q_FUNC_INFO << QString("Current script %1, requested map %2").arg(m_currentScript).arg(m);
+  QLOG_DEBUG() << Q_FUNC_INFO << QString("Current script %1, requested map %2").arg(m_currentScript).arg(m);
   if (m == m_mapOffValue) {
     m_edit->enableMapping(false);
     /// this needs to come from somewhere
@@ -285,13 +288,13 @@ void ImEditor::setCharFormat(const QString & mapname) {
   m_currentScript = script;
 }
 void ImEditor::onFont() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QTextCursor c = m_edit->textCursor();
   QFont charFont;
   if (c.hasSelection()) {
     charFont = c.charFormat().font();
-    qDebug() << "Selection font" << c.charFormat().fontFamily();
-    qDebug() << "Start/End/Pos" << c.selectionStart() << c.selectionEnd() << c.position();
+    QLOG_DEBUG() << "Selection font" << c.charFormat().fontFamily();
+    QLOG_DEBUG() << "Start/End/Pos" << c.selectionStart() << c.selectionEnd() << c.position();
     /*
     QTextCursor cursor = m_edit->textCursor();
     int startPos = cursor.selectionStart();
@@ -305,10 +308,10 @@ void ImEditor::onFont() {
           f << cursor.charFormat().fontFamily();
       }
     }
-    qDebug() << "families" << f;
+    QLOG_DEBUG() << "families" << f;
     */
-    qDebug() << "charfont" << charFont.toString();
-    qDebug() << QString("[%1][Bold=%2][Italic=%3]").arg(charFont.family())
+    QLOG_DEBUG() << "charfont" << charFont.toString();
+    QLOG_DEBUG() << QString("[%1][Bold=%2][Italic=%3]").arg(charFont.family())
       .arg(charFont.bold()).arg(charFont.italic());
   }
   QFont font;
@@ -343,7 +346,7 @@ void ImEditor::onFont() {
  *
  */
 void ImEditor::onSave() {
-  qDebug() << Q_FUNC_INFO << m_formats << sender();
+  QLOG_DEBUG() << Q_FUNC_INFO << m_formats << sender();
   QString formats = QString(tr("Documents (%1)")).arg(m_formats.join(" "));
 
   if (m_documentFileName.isEmpty()) {
@@ -359,7 +362,7 @@ void ImEditor::onSave() {
   if (! m_formats.contains(suffix)) {
     suffix = suffix.toLower();
     if (! m_formats.contains(suffix)) {
-      qDebug() << "Unsupported format";
+      QLOG_DEBUG() << "Unsupported format";
       suffix = "html";
     }
 
@@ -383,7 +386,7 @@ void ImEditor::onSaveAs() {
   if (! m_formats.contains(suffix)) {
     suffix = suffix.toLower();
     if (! m_formats.contains(suffix)) {
-      qDebug() << "Unsupported format";
+      QLOG_DEBUG() << "Unsupported format";
       suffix = "html";
     }
 
@@ -420,7 +423,7 @@ void ImEditor::onImport() {
  }
  this->scan();
  setWindowTitle(fileName);
- qDebug() << "Curent map" << m_edit->currentMap();
+ QLOG_DEBUG() << "Curent map" << m_edit->currentMap();
 }
 void ImEditor::onOpen() {
  QString fileName = QFileDialog::getOpenFileName(this,
@@ -446,10 +449,10 @@ void ImEditor::onOpen() {
  m_documentFileName = fileName;
  this->scan();
  setWindowTitle(fileName);
- qDebug() << "Curent map" << m_edit->currentMap();
+ QLOG_DEBUG() << "Curent map" << m_edit->currentMap();
 }
 void ImEditor::onPrint() {
-  qDebug() << Q_FUNC_INFO << m_printer->printerName();
+  QLOG_DEBUG() << Q_FUNC_INFO << m_printer->printerName();
   if (!m_printer->isValid()) {
     this->onPrinters();
   }
@@ -501,17 +504,17 @@ void ImEditor::onPrinters() {
   printDialog->open(this,SLOT(onPrinterSetup()));
 }
 void ImEditor::charInserted(int unicode,int position) {
-  //  qDebug() << Q_FUNC_INFO << unicode << QChar(unicode) << UcdScripts::getScript(unicode) << position;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << unicode << QChar(unicode) << UcdScripts::getScript(unicode) << position;
   QString family = m_edit->textCursor().charFormat().fontFamily();
   QString script = UcdScripts::getScript(unicode);
-  //  qDebug() << Q_FUNC_INFO << QString("[%1][%2][%3][%4]").arg(m_currentScript).arg(script).arg(QChar(unicode)).arg(family);
-  //  qDebug() << Q_FUNC_INFO << QString("Cursor font [%1]").arg(family);
+  //  QLOG_DEBUG() << Q_FUNC_INFO << QString("[%1][%2][%3][%4]").arg(m_currentScript).arg(script).arg(QChar(unicode)).arg(family);
+  //  QLOG_DEBUG() << Q_FUNC_INFO << QString("Cursor font [%1]").arg(family);
   if (!m_scriptFonts.contains(script)) {
     return;
   }
 
   if (script != m_currentScript) {
-    qDebug() << "Font mismatch" << m_currentScript << script;
+    QLOG_DEBUG() << "Font mismatch" << m_currentScript << script;
     //    m_currentScript = script;
   }
   /*
@@ -532,7 +535,7 @@ void ImEditor::charInserted(int unicode,int position) {
       //      cursor.movePosition(QTextCursor::NextCharacter);
       //      cursor.setCharFormat(fmt);
       m_edit->setTextCursor(cursor);
-      qDebug() << "Switch font to" << f.family() << pos << script;
+      QLOG_DEBUG() << "Switch font to" << f.family() << pos << script;
       m_currentScript = script;
     }
   }
@@ -554,7 +557,7 @@ void ImEditor::cursorPositionChanged() {
     fmt.setFont(f);
     cursor.setCharFormat(fmt);
     m_edit->setTextCursor(cursor);
-    qDebug() << Q_FUNC_INFO << "changed format";
+    QLOG_DEBUG() << Q_FUNC_INFO << "changed format";
   }
 
 }
@@ -573,7 +576,7 @@ void ImEditor::scan() {
       m << qMakePair(i,script);
     }
   }
-  qDebug() << m;
+  QLOG_DEBUG() << m;
   if (m.size() == 0) {
     return;
   }
@@ -621,12 +624,12 @@ void ImEditor::scan() {
   }
 }
 void ImEditor::onMapHelp() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QString map = m_edit->currentMap();
   this->onShowHelp(map);
 }
 void ImEditor::onShowHelp(const QString & mapname) {
-  qDebug() << Q_FUNC_INFO << mapname;
+  QLOG_DEBUG() << Q_FUNC_INFO << mapname;
   QString map = mapname;
   if (mapname.isEmpty()) {
     map = m_edit->currentMap();
@@ -669,22 +672,22 @@ void ImEditor::onPrinterSetup() {
 void ImEditor::onInsertBlock() {
   QTextCursor cursor =  m_edit->textCursor();
   QTextCharFormat fmt = cursor.charFormat();
-  qDebug() << "Char format" << fmt.fontFamily();
+  QLOG_DEBUG() << "Char format" << fmt.fontFamily();
   cursor.insertBlock();
   QTextBlock block = cursor.block();
   //  block.clearLayout();
   /// for this to work, the script named in the map file
   /// has to match the script
   QLocale m(m_edit->currentScript());
-  //  qDebug() << "Locale text direction" << m.textDirection();
-  //  qDebug() << "Block text directiont" << block.textDirection();
-  //  qDebug() << "Left to right" << (block.textDirection() == Qt::LeftToRight);
+  //  QLOG_DEBUG() << "Locale text direction" << m.textDirection();
+  //  QLOG_DEBUG() << "Block text directiont" << block.textDirection();
+  //  QLOG_DEBUG() << "Left to right" << (block.textDirection() == Qt::LeftToRight);
   QTextBlockFormat blockfmt = block.blockFormat();
   blockfmt.setLayoutDirection(m.textDirection());
   cursor.setBlockFormat(blockfmt);
 }
 void ImEditor::logMessage(const QString & t) {
-  qDebug() << t;
+  QLOG_DEBUG() << t;
 }
 void ImEditor::onInsertChar() {
   bool ok;
@@ -701,7 +704,7 @@ void ImEditor::onInsertChar() {
     cursor.insertText(QString::fromWCharArray(&wc,1));
   }
   else {
-    qDebug() << "Conversion error";
+    QLOG_DEBUG() << "Conversion error";
   }
 }
 void ImEditor::onOptions() {

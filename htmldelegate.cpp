@@ -1,9 +1,9 @@
 #include "htmldelegate.h"
 HtmlDelegate::HtmlDelegate(QObject * parent) : QStyledItemDelegate(parent) {
-  //  qDebug() << Q_FUNC_INFO;
+
 }
 HtmlDelegate::~HtmlDelegate() {
-  //  qDebug() << __FILE__ << Q_FUNC_INFO;
+
 }
 void HtmlDelegate::setStyleSheet(const QString & str) {
   m_stylesheet = str;

@@ -1,5 +1,8 @@
 #include "keyboard.h"
 #include "keyboardwidget.h"
+#ifdef STANDALONE
+#define QLOG_DEBUG() qDebug()
+#endif
 /**
  *
  *
@@ -54,7 +57,7 @@ void KeyboardWidget::addShortcut(const QString & keys) {
 void KeyboardWidget::onKeyboardShortcut() {
   QAction * action = qobject_cast<QAction *>(sender());
   if (action) {
-    //    qDebug() << Q_FUNC_INFO << action->shortcut().toString();
+    //    QLOG_DEBUG() << Q_FUNC_INFO << action->shortcut().toString();
     emit(keyboardShortcut(action->shortcut().toString()));
     }
 }
@@ -114,7 +117,7 @@ void KeyboardWidget::loadKeyboard(int /*ix */) {
 void KeyboardWidget::resizeEvent(QResizeEvent * /* event */) {
   this->autoScale();
   //  m_currentSize = event->size();
-  //  qDebug() << "current size" << m_currentSize;
+  //  QLOG_DEBUG() << "current size" << m_currentSize;
 }
 void KeyboardWidget::closeEvent(QCloseEvent * /* event */) {
   this->hide();
@@ -132,7 +135,7 @@ void KeyboardWidget::autoScale() {
 
 }
 void KeyboardWidget::showKeyboard(bool show) {
-  qDebug() << Q_FUNC_INFO << this->isModal();
+  QLOG_DEBUG() << Q_FUNC_INFO << this->isModal();
   if (show) {
     this->show();
     this->activateWindow();
@@ -165,7 +168,7 @@ void KeyboardWidget::detach() {
  * @param k
  */
 void KeyboardWidget::virtualKeyPressed(int k) {
-  //  qDebug() << Q_FUNC_INFO << k << QChar(k);
+  //  QLOG_DEBUG() << Q_FUNC_INFO << k << QChar(k);
   if (m_target == 0) {
     return;
   }
@@ -174,7 +177,7 @@ void KeyboardWidget::virtualKeyPressed(int k) {
   QApplication::postEvent(m_target,event);
 }
 void KeyboardWidget::virtualKeyPressed(QList<int> k) {
-  qDebug() << Q_FUNC_INFO << k;
+  QLOG_DEBUG() << Q_FUNC_INFO << k;
   if (m_target == 0) {
     return;
   }
@@ -185,10 +188,10 @@ void KeyboardWidget::virtualKeyPressed(QList<int> k) {
   }
 }
 void KeyboardWidget::readSettings() {
-  qDebug() << Q_FUNC_INFO << m_keyboardDirectory << m_keyboardConfig;
+  QLOG_DEBUG() << Q_FUNC_INFO << m_keyboardDirectory << m_keyboardConfig;
   QFileInfo fi(m_keyboardDirectory,m_keyboardConfig);
   QSettings settings(fi.absoluteFilePath(),QSettings::IniFormat);
-  qDebug() << Q_FUNC_INFO << settings.fileName();
+  QLOG_DEBUG() << Q_FUNC_INFO << settings.fileName();
   settings.setIniCodec("UTF-8");
   settings.beginGroup("System");
   m_defaultKeyboard = settings.value("Default",QString()).toString();

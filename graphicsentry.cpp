@@ -567,7 +567,6 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
     p.setWord(nodeQuery.value("word").toString());
     p.setPage(nodeQuery.value("page").toInt());
     QString html =    transform(NODE_XSLT,m_nodeXslt,nodeQuery.value("xml").toString());
-    qDebug() << html;
     NodeInfo * info = new NodeInfo(this);
     info->setPlace(p);
     info->setCss(m_currentCss);
@@ -683,11 +682,6 @@ void GraphicsEntry::setItemPlace(EntryItem * item,const QSqlQuery & query) {
   p.setPage(query.value(5).toInt());
   p.setHead(query.value(9).toString());
   item->setPlace(p);
-  /*
-  qDebug() << Q_FUNC_INFO << p.getRoot() << p.isRoot();
-  qDebug() << Q_FUNC_INFO << p;
-  qDebug() << Q_FUNC_INFO << item->isRoot();
-  */
 }
 /**
  * TODO if this is called as part of search for node it does not return
@@ -706,7 +700,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (m_scale == 0) {
     m_scale = 1.0;
   }
-  qDebug() << Q_FUNC_INFO << __LINE__ << dp;
 
   EntryItem * centerItem;
 
@@ -1888,13 +1881,6 @@ void GraphicsEntry::centerOnSearchResult(int itemIndex,int ix) {
     qreal h = m_items[itemIndex]->boundingRect().height();
     qreal dy = (h * (qreal)pos)/(qreal)charCount;
     QPointF p = m_items[itemIndex]->scenePos();
-    /*
-    qDebug() << m_items[itemIndex]->boundingRect().height() << m_view->height();
-    qDebug() << "Character count" << charCount;
-    qDebug() << "Position" << pos;
-    qDebug() << "Scene pos of item" << p;
-    QLOG_DEBUG() << "adjusting pos" << dy;
-    */
     p.setY(p.y() + dy);
     m_view->centerOn(p);
   }

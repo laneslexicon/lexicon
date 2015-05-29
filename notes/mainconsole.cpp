@@ -17,7 +17,6 @@ int main(int argc, char *argv[])
   optmap.insert("-f",1);
   while( ! cmdargs.isEmpty()) {
     QString opt = cmdargs.takeFirst();
-    //    qDebug() << "arg" << opt;
     if (optmap.contains(opt)) {
       int argcount = optmap.value(opt);
       QStringList optargs;
@@ -25,9 +24,6 @@ int main(int argc, char *argv[])
         optargs << cmdargs.takeFirst();
       }
       task.set(opt,optargs);
-      if (opt == "-h") {
-        qDebug() << "you need help";
-      }
     }
   }
   QTimer::singleShot(0, &task, SLOT(run()));

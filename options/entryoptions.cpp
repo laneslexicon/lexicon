@@ -197,8 +197,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 }
 
 void EntryOptions::readSettings() {
-  qDebug() << Q_FUNC_INFO << m_settingsFileName;
-  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+    QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
   m_back->setText(settings.value(SID_ENTRY_BACK).toString());

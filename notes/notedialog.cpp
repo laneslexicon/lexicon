@@ -136,7 +136,7 @@ void NoteDialog::setup() {
   /* tried the following but it didn't work
   bool ok = disconnect(m_note->saveAction(), &QAction::triggered,
              m_note, &ImEditor::onSave );
-  qDebug() << "Disconnect" << ok;
+
   */
   disconnect(m_note->saveAction(), SIGNAL(triggered()),
                   m_note, SLOT(onSave()));
@@ -237,7 +237,6 @@ void NoteDialog::cancel() {
   this->reject();
 }
 void NoteDialog::save() {
-  qDebug() << Q_FUNC_INFO;
   Note * n = new Note();
   n->setPlace(m_place);
   n->setId(m_id);

@@ -146,7 +146,6 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_moreButton->setVisible(false);
 }
 void ArabicSearchDialog::onKeyboardShortcut(const QString & key) {
-  qDebug() << Q_FUNC_INFO << key;
   if (key == m_keyboardButton->shortcut().toString()) {
       showKeyboard();
       return;
@@ -167,7 +166,6 @@ void ArabicSearchDialog::onKeyboardShortcut(const QString & key) {
   }
 }
 ArabicSearchDialog::~ArabicSearchDialog() {
-  qDebug() << Q_FUNC_INFO;
 }
 void ArabicSearchDialog::keyboardClosed() {
   showKeyboard();

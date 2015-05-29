@@ -306,7 +306,6 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString 
   else {
     rx.setPattern(target);
   }
-  qDebug() << Q_FUNC_INFO << rx.pattern();
   return rx;
 }
 void SearchOptionsWidget::getOptions(SearchOptions & opts) const {

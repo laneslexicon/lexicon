@@ -1,5 +1,5 @@
 #include "notebrowser.h"
-#ifndef TEST_FRAMEWORK
+#ifdef LANE
 #include "laneslexicon.h"
 #include "graphicsentry.h"
 #endif
@@ -217,7 +217,7 @@ bool NoteBrowser::eventFilter(QObject * target,QEvent * event) {
   return false;
 }
 void NoteBrowser::onViewClicked() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QMap<int,int> rowmap = getRowIdMap();
 
   if (rowmap.size() == 0)

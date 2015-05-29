@@ -132,16 +132,6 @@ void DiacriticsOptions::readSettings() {
     }
   }
   settings.endGroup();
-
-  /// Test code
-  /*
-  QString rx = QString("[\\x%1]*").arg(points.join("\\x"));
-  QRegExp p(rx);
-  QRegExp rxclass("[\\x064b\\x0671\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670]*");
-  qDebug() << p.pattern();
-  qDebug() << rxclass.pattern();
-  qDebug() << "Rx match" << (p.pattern() == rxclass.pattern());
-  */
 }
 void DiacriticsOptions::writeSettings(const QString & fileName) {
   QString f = m_settingsFileName;
@@ -181,7 +171,6 @@ bool DiacriticsOptions::isModified()  {
   QList<int> saved_cp;
   QList<int> selected_cp;
   QString hex;
-  qDebug() << Q_FUNC_INFO;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

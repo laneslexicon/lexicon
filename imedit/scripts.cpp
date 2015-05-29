@@ -5348,12 +5348,10 @@ void UcdScripts::split() {
   for(int i=0;i < m_target.size();i++) {
     QChar c = m_target.at(i);
     QString script = UcdScripts::getScript(c.unicode());
-    //    qDebug("%d %d [%s] [%s]", i,c.unicode(), qPrintable(current),qPrintable(script));
     if (! m_skip.exactMatch(script) )
       if (script != current) {
         if (! current.isEmpty()) {
           QString chunk = m_target.mid(offset,i - offset);
-          //          qDebug() << current << chunk;
           m_scripts.append(qMakePair(current,chunk.trimmed()));
           offset = i;
         }
@@ -5362,12 +5360,9 @@ void UcdScripts::split() {
       else {
       }
     else {
-      //      qDebug() << "skipping";
     }
   }
-  //  qDebug() << "adding last chunk" << current << offset;
   QString chunk = m_target.mid(offset);
-  //  qDebug() << "got chunk" << chunk;
   if (! chunk.isEmpty()) {
     m_scripts.append(qMakePair(current,chunk.trimmed()));
   }

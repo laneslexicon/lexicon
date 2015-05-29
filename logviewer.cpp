@@ -48,7 +48,6 @@ LogViewer::LogViewer(QWidget * parent) : QWidget(parent) {
   connect(m_pauseButton,SIGNAL(clicked()),this,SLOT(onPause()));
   connect(m_closeButton,SIGNAL(clicked()),this,SLOT(onClose()));
   m_timer.start(m_refreshInterval);
-  qDebug() << Q_FUNC_INFO << "exit";
 }
 void LogViewer::readSettings() {
   QLOG_DEBUG() << Q_FUNC_INFO;

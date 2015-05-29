@@ -283,13 +283,7 @@ int EntryItem::showHighlight(int index) {
   if ((index >= 0) && (index < m_highlights.size())) {
     c.setPosition(m_highlights[index]);
     t = m_finds.value(m_highlights[index]);
-    /*
-    qDebug() << Q_FUNC_INFO << c.position() << t.size();
-    qDebug() << m_finds;
-    qDebug() << m_highlights;
-    */
     c.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,t.size());
-    //    c.select(QTextCursor::WordUnderCursor);
     QTextCharFormat fmt = c.charFormat();
     fmt.setBackground(QColor(m_backgroundColorName));
     c.setCharFormat(fmt);

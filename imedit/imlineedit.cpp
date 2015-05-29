@@ -4,6 +4,11 @@
 #define SID_MAPS_NULL_MAP_NAME "Null map name"
 #define SID_MAPS_ENABLED  "Map enabled"
 #define SID_MAPS_DEBUG    "Debug"
+#ifdef LANE
+#include "QsLog.h"
+#else
+#define QLOG_DEBUG() qDebug()
+#endif
 ImLineEdit::ImLineEdit(QWidget * parent)
   : QLineEdit(parent)
 {
@@ -15,7 +20,7 @@ ImLineEdit::ImLineEdit(QWidget * parent)
   m_keymapsEnabled = true;
   m_discard = false;
   m_enabled = true;
-  this->setText("كتب");
+  //  this->setText("كتب");
   connect(this,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
   //this->setText("abcd");
 }
@@ -38,7 +43,7 @@ QString ImLineEdit::getNullMap() const {
   return m_nullMap;
 }
 bool ImLineEdit::loadMap(const QString & filename,const QString & mapname) {
-  qDebug() << Q_FUNC_INFO << filename << mapname;
+  QLOG_DEBUG() << Q_FUNC_INFO << filename << mapname;
   QFile f(filename);
   if (!f.open(QIODevice::ReadOnly)) {
     // TODO emit(logMessage(QString("Error loading file %1: %2 ").arg(fileName).arg(f.errorString())));
@@ -193,7 +198,7 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   }
   /*
   ushort pc;
-  qDebug() << Q_FUNC_INFO << QString("Debug:%1, Enabled : %2, Map : %3").arg(m_debug).arg(m_enabled).arg(m_activeMap);
+  QLOG_DEBUG() << Q_FUNC_INFO << QString("Debug:%1, Enabled : %2, Map : %3").arg(m_debug).arg(m_enabled).arg(m_activeMap);
   if (event->modifiers() & Qt::ControlModifier) {
     return QLineEdit::keyPressEvent(event);
   }
@@ -207,14 +212,14 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
     out << "ImLineEdit in: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << event->key() << " " << UcdScripts::getScript(event->key());
     out.reset();
     out << " " << event->text();
-    qDebug() << t;
+    QLOG_DEBUG() << t;
   }
   if ( m_debug && m_activeMap.isEmpty()) {
-    qDebug() << Q_FUNC_INFO << "keymaps enabled" << m_keymapsEnabled << "no active map";
+    QLOG_DEBUG() << Q_FUNC_INFO << "keymaps enabled" << m_keymapsEnabled << "no active map";
     return QLineEdit::keyPressEvent(event);
   }
   if (m_debug)
-    qDebug() << this->text() << this->text().size() << this->cursorPosition();
+    QLOG_DEBUG() << this->text() << this->text().size() << this->cursorPosition();
 
   if ((m_forceLTR) && (this->cursorPosition() == 1)) {
     if (UcdScripts::getScript(event->key()) == "Unknown") {
@@ -245,7 +250,7 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
       out << "ImLineEdit out: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << nevent->key();
       out.reset();
       out << nevent->text();
-      qDebug() << t;
+      QLOG_DEBUG() << t;
     }
     return;
   }

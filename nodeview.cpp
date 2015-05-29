@@ -135,9 +135,6 @@ void NodeView::setHtml(const QString & html) {
     m_findNextButton->setEnabled(true);
   }
 
-  //  c = m_browser->document()->find(m_pattern,m_positions[0]);
-  //  m_browser->setTextCursor(c);
-  //  qDebug() << Q_FUNC_INFO << m_positions;
 }
 void NodeView::findFirst() {
   if (m_positions.size() == 0) {

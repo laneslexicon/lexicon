@@ -156,7 +156,6 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 }
 
 void FindOptions::readSettings() {
-  qDebug() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("FullSearch");

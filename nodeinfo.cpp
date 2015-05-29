@@ -83,11 +83,6 @@ void NodeInfo::setPreferredSize(const QString & szStr) {
     }
   }
 }
-/*
-void NodeInfo::print() {
-  qDebug() << Q_FUNC_INFO;
-}
-*/
 void NodeInfo::openEntry() {
   emit(openNode(m_node));
 }

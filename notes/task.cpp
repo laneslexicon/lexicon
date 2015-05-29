@@ -1,13 +1,10 @@
 #include "task.h"
 #include "notes.h"
 void Task::run() {
-  qDebug() << "opts" << m_opts.keys();
-
 
   NoteMaster notes;
   bool ok;
   ok = notes.openDb();
-  qDebug() << "Open db" << ok;
 
   QSqlQuery * query = notes.getNoteList("select id,word from notes");
   while(query->next()) {

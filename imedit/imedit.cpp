@@ -1,6 +1,11 @@
 #include "imedit.h"
 #include "inputmapper.h"
 #include "scripts.h"
+#ifndef LANE
+#define QLOG_DEBUG() qDebug()
+#else
+#include "QsLog.h"
+#endif
 ImEdit::ImEdit(QWidget * parent)
   : QTextEdit(parent)
 {
@@ -37,7 +42,6 @@ QString ImEdit::convertString(const QString & str) {
     return t;
   }
   else {
-    qDebug() << "error converting string";
     return QString();
   }
 }
@@ -50,7 +54,7 @@ QString ImEdit::convertString(const QString & str) {
  * @return
  */
 bool ImEdit::loadMap(const QString & fileName,const QString & mapname) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QFile f(fileName);
   if (!f.open(QIODevice::ReadOnly)) {
     emit(logMessage(QString("Error loading file %1: %2 ").arg(fileName).arg(f.errorString())));
@@ -187,7 +191,7 @@ void ImEdit::keyPressEvent(QKeyEvent * event) {
  *
  */
 void ImEdit::actionChangeMap() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QAction * action = (QAction *)QObject::sender();
   QString m = action->data().toString();
   setCurrentMap(m);
@@ -222,12 +226,12 @@ void ImEdit::actionInsertUnicode() {
     QAction * action = (QAction *)QObject::sender();
     QString m = action->data().toString();
     if (! m_unicode.contains(m)) {
-    qDebug() << "ERROR: insert undefined unicode entry" << m;
+    QLOG_DEBUG() << "ERROR: insert undefined unicode entry" << m;
     return;
     }
     UnicodeEntry * u = m_unicode.value(m);
     // get the hex value and insert it
-    qDebug() << "insert unicode" << u->m_name << u->m_value;
+    QLOG_DEBUG() << "insert unicode" << u->m_name << u->m_value;
     //  QKeyEvent * nevent = new QKeyEvent(QEvent::KeyPress, cc->uc, Qt::NoModifier,cc->c);
     //  QTextEdit::keyPressEvent(nevent);
     QTextCursor cursor = textCursor();
@@ -238,7 +242,7 @@ void ImEdit::actionInsertUnicode() {
 void ImEdit::actionDeleteUnicode() {
   /*
     QAction * action = (QAction *)QObject::sender();
-    qDebug() << "delete at" << m_hudPos << m_hudChar;
+    QLOG_DEBUG() << "delete at" << m_hudPos << m_hudChar;
     QTextCursor cstart = cursorForPosition(QPoint(0,0));
     cstart.setPosition(m_hudPos);
     cstart.deleteChar();
@@ -270,7 +274,7 @@ void ImEdit::getScriptNames(QStringList & m) {
   }
 }
 void ImEdit::focusOutEvent(QFocusEvent * event ) {
-  qDebug() << Q_FUNC_INFO << event->reason();
+  QLOG_DEBUG() << Q_FUNC_INFO << event->reason();
 
   //  if (event->reason() == Qt::TabFocusReason) {
   //    emit tabPressed();
@@ -330,24 +334,24 @@ WrappedEdit::WrappedEdit(QWidget * parent) : QWidget(parent) {
   connect(m_edit,SIGNAL(textChanged()),this,SIGNAL(dataChanged()));
 }
 WrappedEdit::~WrappedEdit() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 void WrappedEdit::toggleMap(const QString & map) {
-  //  qDebug() << Q_FUNC_INFO << m_name << "current map" << m_currentMap;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << m_name << "current map" << m_currentMap;
   if (m_currentMap == "-none-") {
     m_currentMap = map;
   }
   else {
     m_currentMap = "-none-";
   }
-  //  qDebug() << Q_FUNC_INFO << "setting map to" << m_currentMap;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << "setting map to" << m_currentMap;
   m_edit->setMapname(m_currentMap);
 }
 void WrappedEdit::shortcutActivated() {
   QShortcut * s = (QShortcut *)QObject::sender();
 
   QString map = m_options.isShortcut(s->key());
-  //  qDebug() << Q_FUNC_INFO << s->key().toString() << "got map" << map;
+  //  QLOG_DEBUG() << Q_FUNC_INFO << s->key().toString() << "got map" << map;
   if (! map.isEmpty()) {
     toggleMap(map);
   }
@@ -369,7 +373,7 @@ void WrappedEdit::actionChangeMap() {
   toggleMap(mapname);
 }
 void WrappedEdit::showContextMenu(const QPoint & pt) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QMenu * menu =  m_edit->createStandardContextMenu(pt);
   buildContextMenu(menu);
   menu->exec(mapToGlobal(pt));
@@ -404,7 +408,7 @@ void WrappedEdit::actionChangeFont() {
     //     m_docFont = font;
     m_docFontString = font.toString();
     m_edit->setDocFont(font);
-    qDebug() << Q_FUNC_INFO << m_docFontString;
+    QLOG_DEBUG() << Q_FUNC_INFO << m_docFontString;
     emit(fontChanged());
   } else {
     // the user canceled the dialog; font is set to the initial
@@ -457,11 +461,11 @@ void HudEdit::buildContextMenu(QMenu * menu) {
   }
 
   if (m_hudCharCount > 0) {
-    qDebug() << "hudchar count" << m_hudCharCount;
+    QLOG_DEBUG() << "hudchar count" << m_hudCharCount;
     QAction * delAll = new QAction("Remove all HUD chars",menu);
     menu->addAction(delAll);
   }
-  qDebug() << "hud char" << m_isHudChar << m_hudChar;
+  QLOG_DEBUG() << "hud char" << m_isHudChar << m_hudChar;
   if (m_isHudChar) {
     UnicodeEntry * u = m_unicode.value(QString(m_hudChar));
     if (u) {
@@ -479,13 +483,13 @@ void HudEdit::buildContextMenu(QMenu * menu) {
       menu->addAction(delAction);
     }
     else {
-      qDebug() << "no unicode entry for" << m_hudChar;
+      QLOG_DEBUG() << "no unicode entry for" << m_hudChar;
     }
   }
 }
 
 HudEdit::~HudEdit() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   /*
     QStringList k = m_unicode.keys();
     for(int i=0;i < k.size();i++) {

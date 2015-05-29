@@ -29,10 +29,8 @@ double ZoomDialog::value() {
 void ZoomDialog::applyChanged(int state) {
   if (state == Qt::Checked) {
     connect(m_spinner,SIGNAL(valueChanged(double)),this,SIGNAL(valueChanged(double)));
-    qDebug() << "checked";
   }
   else {
     disconnect(m_spinner,SIGNAL(valueChanged(double)),this,SIGNAL(valueChanged(double)));
-    qDebug() << "unchecked";
   }
 }

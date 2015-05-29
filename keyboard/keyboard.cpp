@@ -1,4 +1,9 @@
 #include "keyboard.h"
+#ifdef STANDALONE
+#define QLOG_DEBUG() qDebug()
+#else
+#include "QsLog.h"
+#endif
 /**
  *
  *
@@ -170,8 +175,6 @@ QGraphicsTextItem * GraphicsButton::decorateKey(const QRectF & cell,int group,in
       script = "default";
     }
   }
-  //  qDebug() << "Get scripts" << QString(" target [%1] end").arg(text) << script << scriptCount;
-  //  qDebug() << QString("target [%1], script").arg(text) << script << scriptCount;
   script = script.toCaseFolded();
   if (! m_css.isEmpty())
     item->document()->setDefaultStyleSheet(m_css);
@@ -287,7 +290,6 @@ void GraphicsButton::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)  {
 KeyboardScene::KeyboardScene(QObject * parent) : QGraphicsScene(parent) {
 }
 void KeyboardScene::keyPressed(GraphicsButton * button) {
-  //  qDebug() << "Pressed key" << button->getKeyDef()->getName();
   QList<QGraphicsView *> v = this->views();
   for(int i=0;i < v.size();i++) {
     KeyboardView * k = dynamic_cast<KeyboardView *>(v[i]);
@@ -440,21 +442,19 @@ void KeyboardView::loadKeyboard(const QString & fileName) {
    *  m_view->setSceneRect(m_view->sceneRect());
    */
   if (m_debug) {
-    qDebug() << "--------------------------------------------------";
     int width  =  (m_kbd->cols() * m_buttonWidth) + (m_kbd->cols() - 1)*m_hspace;
     int height =  (m_kbd->rows() * m_buttonHeight) + (m_kbd->rows() - 1)*m_vspace;
-    qDebug() << "Keyboard" << fileName;
-    qDebug() << QString("Rows: %1, Cols: %2, button size %3 x %4")
+    QLOG_DEBUG() << QString("Rows: %1, Cols: %2, button size %3 x %4")
       .arg(m_kbd->rows())
       .arg(m_kbd->cols())
       .arg(m_buttonWidth)
       .arg(m_buttonHeight);
-    qDebug() << QString("Calculated size: %1 x %2").arg(width).arg(height);
+    QLOG_DEBUG() << QString("Calculated size: %1 x %2").arg(width).arg(height);
     QRectF r = m_scene->sceneRect();
     //  m_scene->setSceneRect(r);
-    qDebug() << QString("Scenerect %1 x %2").arg(r.width()).arg(r.height());
-    qDebug() << "Scenerect" << r;
-    qDebug() << "--------------------------------------------------";
+    QLOG_DEBUG() << QString("Scenerect %1 x %2").arg(r.width()).arg(r.height());
+    QLOG_DEBUG() << "Scenerect" << r;
+    QLOG_DEBUG() << "--------------------------------------------------";
   }
   setScene(m_scene);
   /// TODO get from ini and poss to KeyboardDef before creating buttons

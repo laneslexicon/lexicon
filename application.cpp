@@ -651,11 +651,7 @@ QString Lexicon::getDefaultKeyboard()  {
  * @param family
  */
 QStringList Lexicon::setArabicFont(const QString & family) {
-  qDebug() << Q_FUNC_INFO << m_options.value("arfont");
-  qDebug() << settingsFileName();
   QStringList x = changeFontInSettings(family);
-  qDebug() << QString("Changed %1 entries is ini file").arg(x.size());
-  //  qDebug() << x;
   /**
    * Do the CSS files
    *
@@ -667,13 +663,11 @@ QStringList Lexicon::setArabicFont(const QString & family) {
   QFileInfoList files =  cssDirectory.entryInfoList(filters);
   for(int i=0;i < files.size();i++) {
     x = changeFontInStylesheet(files[i].absoluteFilePath(),family);
-    qDebug() << QString("Changed %1 entries is css file %2").arg(x.size()).arg(files[i].fileName());
-  }
+    }
 
   return x;
 }
 QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QString & family) {
-  qDebug() << Q_FUNC_INFO << fileName;
   QStringList changedEntries;
   QRegularExpression reCss("(.+){(.+)}");
   QRegularExpressionMatch m;
@@ -740,9 +734,7 @@ QStringList Lexicon::changeFontInSettings(const QString & family) {
   QRegularExpressionMatch match;
   for(int i=0;i < keys.size();i++) {
     if (re.match(keys[i]).hasMatch()) {
-      /// We have an key/value containing "Arabic"
       v = settings.value(keys[i]).toString();
-      //      qDebug() << keys[i] << v;
       if (reFontString.match(v).hasMatch()) {
         font.fromString(v);
         if (family.isEmpty()) {
@@ -801,8 +793,6 @@ QString Lexicon::setCssFont(const QString & src,const QString & family) const {
     }
     }
   }
-  //  qDebug() << "before:" << src;
-  //  qDebug() << "after: " << r;
   return r;
 }
 QStringList Lexicon::getUsedFont() {
@@ -924,7 +914,6 @@ QString Lexicon::getCssSpecification(const QString & selector) {
       s = m.captured(1);
     }
     if (s.contains(selector)) {
-      qDebug() << Q_FUNC_INFO << "Found" << s;
       while(! line.contains("{") && ! line.contains("}") && ! in.atEnd()) {
         line += in.readLine();
       }
@@ -965,7 +954,6 @@ void Lexicon::adjustHeight(QWidget * w) {
   }
 }
 void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t) {
-  qDebug() << Q_FUNC_INFO << selector << t;
   QString css = getCssSpecification("ImLineEdit");
   if (css.isEmpty()) {
     return;
@@ -981,7 +969,6 @@ void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t
     QSize sz = fm.size(Qt::TextSingleLine,sample);
     if (sz.height() > 0) {
       edit->setMinimumHeight(sz.height() + 4);
-      //      qDebug() << Q_FUNC_INFO << "set mininum height" << edit->minimumHeight();
     }
   }
   /*

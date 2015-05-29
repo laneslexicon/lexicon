@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-  qDebug() << "main window destructor";
+
 }
 void MainWindow::createActions() {
   m_exitAction = new QAction(tr("Exit"),this);

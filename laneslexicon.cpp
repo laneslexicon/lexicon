@@ -605,9 +605,7 @@ void LanesLexicon::shortcut(const QString & key) {
     showNoteBrowser();
   }
   else if (key == SID_SHORTCUT_DELETE_TAB) {
-    qDebug() << Q_FUNC_INFO << __LINE__;
     this->onCloseTab(m_tabs->currentIndex());
-    qDebug() << Q_FUNC_INFO << __LINE__;
   }
   else if (key == SID_SHORTCUT_DELETE_OTHER_TABS) {
     this->onCloseOtherTabs();
@@ -2261,7 +2259,6 @@ void LanesLexicon::getFirstAndLast() {
   if (query.first()) {
     m_lastRoot = query.value(0).toString();
     m_lastPage = query.value(1).toInt();
-    qDebug() << "Last root" << m_lastRoot << "Page" << m_lastPage;
   }
 }
 void LanesLexicon::onGoToPage(const Place & p) {
@@ -2800,7 +2797,6 @@ void LanesLexicon::onShowHistory() {
 void LanesLexicon::onDocs() {
   if (m_helpview == NULL) {
     m_helpview = new HelpWidget();
-    qDebug() << "Create help view";
   }
   if (m_helpview->isHidden()) {
     m_helpview->show();
@@ -3382,9 +3378,7 @@ void LanesLexicon::tabsChanged() {
     QString t = m_tabs->tabText(i);
     t.remove(rx);
     QString title = QString("%1 %2").arg(i+1).arg(t);
-    //    qDebug() << Q_FUNC_INFO << title;
     m_tabs->setTabText(i,title);
-    //    qDebug() << Q_FUNC_INFO << "Text now" << m_tabs->tabText(i);
   }
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
@@ -3846,7 +3840,6 @@ void LanesLexicon::showHelp(const QString & section) {
   QLOG_DEBUG() << Q_FUNC_INFO << section;
   if (m_helpview == NULL) {
     m_helpview = new HelpWidget();
-    qDebug() << "Create help view";
   }
   if (m_helpview->isHidden()) {
     m_helpview->show();
@@ -3859,9 +3852,7 @@ void LanesLexicon::onDeleteTheme() {
     return;
   }
   QPair<QString,QString> m = d.getThemes();
-  qDebug() << m;
   QString srcFilePath = getLexicon()->getResourceFilePath(Lexicon::ThemeRoot,m.first);
-  qDebug() << "Delete" << srcFilePath;
   activateTheme(m.second);
   /*
   int ix = m_themes->findText(theme);
@@ -3889,7 +3880,6 @@ void LanesLexicon::activateTheme(const QString & theme) {
   int ret = getLexicon()->setTheme(theme);
   if (ret != Lexicon::Ok) {
     /// TODO say something
-    qDebug() << "Error" << ret;
   }
   readSettings();
   if (! sanityCheck(1)) {
@@ -3919,7 +3909,6 @@ bool LanesLexicon::removeDirectory(const QString & dirName){
 
     if (dir.exists(dirName)) {
         Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
-          //          qDebug() << "delete" << info.absoluteFilePath();
             if (info.isDir()) {
                 result = removeDirectory(info.absoluteFilePath());
             }
@@ -3942,8 +3931,6 @@ void LanesLexicon::onCreateTheme() {
     return;
   }
   QPair<QString,QString> m = d.getThemes();
-  qDebug() << Q_FUNC_INFO << m;
-
   QString themeRoot = getLexicon()->getResourceFilePath(Lexicon::ThemeRoot);
   QString srcFilePath = themeRoot + QDir::separator() + m.first;
   QString tgtFilePath = themeRoot + QDir::separator() + m.second;

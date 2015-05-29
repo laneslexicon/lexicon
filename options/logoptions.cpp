@@ -53,7 +53,6 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
 }
 
 void LogOptions::readSettings() {
-  qDebug() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

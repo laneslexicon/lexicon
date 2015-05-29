@@ -2,6 +2,11 @@
 #include "keymap.h"
 #include <QDebug>
 #include <QJsonArray>
+#ifdef LANE
+#include "QsLog.h"
+#else
+#define QLOG_DEBUG() qDebug()
+#endif
 /*
 im_char * im_char_new() {
   im_char * c = g_new(im_char,1);
@@ -496,7 +501,7 @@ int im_load_map_from_json(InputMapper * im,const char * filename,const char  * m
     m->name = QString(mapname);
   }
   if (im->m_debug) {
-    qDebug() << Q_FUNC_INFO << "loaded map" << mapname << m->name;
+    QLOG_DEBUG() << Q_FUNC_INFO << "loaded map" << mapname << m->name;
   }
   im->m_maps.append(m);
   return im->m_maps.size() - 1;
@@ -510,11 +515,11 @@ void load_properties(KeyMap * map,const QJsonObject node) {
       load_combinations(map,node.value(p).toObject());
     }
     if (p == "koi") {
-      //      qDebug() << "loading koi";
+      //      QLOG_DEBUG() << "loading koi";
       load_koi(map,node.value(p).toObject());
     }
     if (p == "unicode")  {
-      //      qDebug() << "loading unicode";
+      //      QLOG_DEBUG() << "loading unicode";
       load_unicode(map,node.value(p).toObject());
     }
     else if (p == "name") {
@@ -533,12 +538,12 @@ void load_properties(KeyMap * map,const QJsonObject node) {
   }
 }
 void load_combinations(KeyMap * map,QJsonObject node) {
-  //  qDebug() << "loading combinations";
+  //  QLOG_DEBUG() << "loading combinations";
   QStringList list = node.keys();
   for (int i=0;i < list.size();i++) {
     QString p = list[i];
     QJsonObject jsnode = node.value(p).toObject();
-    //    qDebug() << "Adding" << p.toInt();
+    //    QLOG_DEBUG() << "Adding" << p.toInt();
     KeyEntry * ke = get_key_entry(jsnode);
     km_add_keyentry(map,p.toInt(),ke);
   }
@@ -574,7 +579,7 @@ KeyEntry * get_key_entry(QJsonObject node) {
       k->parent = (int)node.value(p).toDouble();
     }
   }
-  //  qDebug() << "ke" << k->base << k->combined.size() << k->diacritics.size() << k->parent;
+  //  QLOG_DEBUG() << "ke" << k->base << k->combined.size() << k->diacritics.size() << k->parent;
   return k;
 }
 void load_koi(KeyMap * map,QJsonObject node) {
@@ -583,7 +588,7 @@ void load_koi(KeyMap * map,QJsonObject node) {
     QString p = list[i];
     QJsonObject jsnode = node.value(p).toObject();
     KeyInput * ke = get_key_item(jsnode);
-    //    qDebug() << "added koi" << p.toInt() << ke->source << ke->target << ke->type;
+    //    QLOG_DEBUG() << "added koi" << p.toInt() << ke->source << ke->target << ke->type;
     km_add_koi(map,p.toInt(),ke);
   }
 }
@@ -609,7 +614,7 @@ void load_unicode(KeyMap * map,QJsonObject node) {
   for(int i=0;i < list.size();i++) {
     QString p = list[i];
     int  v  = (int)node.value(p).toDouble();
-    //      qDebug() << "add unicode" << p << v;
+    //      QLOG_DEBUG() << "add unicode" << p << v;
       km_add_unicode(map,p,v);
   }
 }
@@ -634,7 +639,7 @@ void im_char_set(InputMapper * /* m */,im_char * ic,QString c, int v,bool consum
   ic->processed = true;
 }
 im_char * im_convert(InputMapper * im,const QString & mapname,int curr_char, int prev_char) {
-  //  qDebug() << "im_convert" << mapname << curr_char << prev_char;
+  //  QLOG_DEBUG() << "im_convert" << mapname << curr_char << prev_char;
   im_char * ret = new im_char();
   im_char_set(im,ret,QString(curr_char),curr_char,false);
   ret->iv = curr_char;
@@ -646,7 +651,7 @@ im_char * im_convert(InputMapper * im,const QString & mapname,int curr_char, int
     return ret;
   }
   KeyInput * ki;
-  //  qDebug() << "searching koi for " << curr_char;
+  //  QLOG_DEBUG() << "searching koi for " << curr_char;
   if (map->koi.contains(curr_char)) {
     //    g_debug("Found key of interest");
     ki = map->koi.value(curr_char);
@@ -664,7 +669,7 @@ im_char * im_convert(InputMapper * im,const QString & mapname,int curr_char, int
       // ret->uc = u;
       //      ret->c = g_ucs4_to_utf8(&u,1,NULL,NULL,&error);
       im_char_set(im,ret,QString(u),u,false);
-      //      qDebug() << QString(curr_char) << " ==>" << QString(u);
+      //      QLOG_DEBUG() << QString(curr_char) << " ==>" << QString(u);
     }
     else {
     }
@@ -714,7 +719,7 @@ int im_search(KeyMap * map,KeyInput * ki,KeyEntry * ke,int /* pchar */) {
     KeyEntry * k = km_get_combination_entry(map,kv);
     if (k) {
       if (im_match_diacritics(k,dc)) {
-        //     qDebug() << "Found " << kv;
+        //     QLOG_DEBUG() << "Found " << kv;
         ret = kv;
       }
     }
@@ -735,11 +740,11 @@ bool im_match_diacritics(KeyEntry * k,QStringList & d) {
 }
 QString im_convert_string(InputMapper * im,const QString & mapping,const QString & source, bool * ok) {
   QString retval;
-  //  qDebug() <<  Q_FUNC_INFO << mapping << source;
+  //  QLOG_DEBUG() <<  Q_FUNC_INFO << mapping << source;
   QString mname(mapping);
   KeyMap * map = im_get_map(im,mname);
   if (map == NULL) {
- //   qDebug() << "map not found";
+ //   QLOG_DEBUG() << "map not found";
     return retval;
   }
   QList<int>  ustr;
@@ -752,7 +757,7 @@ QString im_convert_string(InputMapper * im,const QString & mapping,const QString
       if ((! cc->processed ) &&
           (c != ' '))
         { // indicates possible incorrect char
-        qDebug() << "convert error" << source << "at" << c;
+        QLOG_DEBUG() << "convert error" << source << "at" << c;
         *ok = false;
       }
       else {

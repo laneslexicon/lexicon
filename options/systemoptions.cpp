@@ -70,7 +70,6 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 }
 
 void SystemOptions::readSettings() {
-  qDebug() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

@@ -43,7 +43,6 @@ void EditPage::reset() {
   //  m_buttons->button(QDialogButtonBox::Reset)->setEnabled(false);
 }
 void EditPage::restore() {
-  qDebug() << Q_FUNC_INFO;
   m_lines.clear();
   this->readFile(m_fileName);
   m_text->setPlainText(m_lines.join("\n"));
@@ -88,7 +87,6 @@ void EditPage::readFile(const QString & name) {
 bool EditPage::writeFile() {
   QFile f(m_fileName);
   if (! f.open(QIODevice::WriteOnly)) {
-    qDebug() << Q_FUNC_INFO << m_fileName;
     QString msg = QString(tr("Cannot open file %1 for writing: %2\n")).arg(m_fileName).arg(qPrintable(f.errorString()));
     QString title;
     if (m_type == EDIT_CSS) {
@@ -161,7 +159,6 @@ EditView::~EditView() {
   writeSettings();
 }
 void EditView::accept() {
-  qDebug() << Q_FUNC_INFO;
   if (m_cssEditor->writeFile() &&
       m_xsltEditor->writeFile()) {
     m_buttons->button(QDialogButtonBox::Save)->setEnabled(false);
@@ -170,9 +167,6 @@ void EditView::accept() {
 
 }
 void EditView::reject() {
-  qDebug() << Q_FUNC_INFO;
-  //  m_cssEditor->restore();
-  //  m_xsltEditor->restore();
   this->hide();
 }
 void EditView::modified(int type,bool isDirty) {

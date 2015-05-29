@@ -11,7 +11,6 @@ ShowMapWidget::ShowMapWidget(QWidget * parent) : QDialog(parent) {
   connect(m_buttons->button(QDialogButtonBox::Close),SIGNAL(clicked()),this,SLOT(accept()));
 }
 ShowMapWidget::~ShowMapWidget() {
-  qDebug() << Q_FUNC_INFO;
 }
 void ShowMapWidget::setMapName(const QString & name) {
   m_map = name;
@@ -20,7 +19,6 @@ QString ShowMapWidget::map() const {
   return m_map;
 }
 void ShowMapWidget::focusOutEvent(QFocusEvent * /* event */) {
-  qDebug() << Q_FUNC_INFO;
   this->lower();
 }
 void ShowMapWidget::loadHtml(const QString & fileName) {

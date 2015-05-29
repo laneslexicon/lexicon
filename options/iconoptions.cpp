@@ -98,8 +98,6 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_zoomOut = new QLineEdit;
   rightlayout->addRow(tr("Zoom out"),addLine(m_zoomOut,SID_ICON_ZOOM_OUT));
 
-  qDebug() << "Left spacing" << leftlayout->verticalSpacing();
-  qDebug() << "Right spacing" << rightlayout->verticalSpacing();
   leftlayout->setVerticalSpacing(5);
   rightlayout->setVerticalSpacing(5);
   hlayout->addLayout(leftlayout);
@@ -127,7 +125,6 @@ QHBoxLayout * IconOptions::addLine(QLineEdit * edit,const QString & sid) {
   return layout;
 }
 void IconOptions::readSettings() {
-  qDebug() << Q_FUNC_INFO << m_settingsFileName;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
 
@@ -210,7 +207,6 @@ void IconOptions::writeSettings(const QString & fileName) {
   if (!fileName.isEmpty()) {
     f = fileName;
   }
-  qDebug() << Q_FUNC_INFO << f;
 
   QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
@@ -432,22 +428,14 @@ void IconOptions::onSetFile() {
  setIconFromField(edit,sid);
 }
 void IconOptions::onSetIcon(const QString & sid,const QString & fileName) {
-  qDebug() << Q_FUNC_INFO << sid << fileName;
   QPushButton * btn = this->findChild<QPushButton *>(sid);
   if (btn) {
     btn->setIcon(QIcon(fileName));
   }
   else {
-    qDebug() << "Cannot find icon button";
   }
 }
 void IconOptions::setIconFromField(const QLineEdit * edit, const QString & sid) {
-  qDebug() << Q_FUNC_INFO;
-  qDebug() << "themeroot" << getLexicon()->getResourceFilePath(Lexicon::ThemeRoot);
-  qDebug() << "Image root" << getLexicon()->getResourceFilePath(Lexicon::Image);
-  qDebug() << "Theme Directory" << getLexicon()->themeDirectory().absolutePath();
-  qDebug() << "Image setting" << m_directory->text();
-
   QDir themeDirectory = getLexicon()->themeDirectory();
   QDir imagedirectory;
 
@@ -459,20 +447,16 @@ void IconOptions::setIconFromField(const QLineEdit * edit, const QString & sid) 
     if (themeDirectory.cd(m_directory->text())) {
       /// good to go
       imagedirectory = themeDirectory;
-      qDebug() << "cd down to" << themeDirectory.absolutePath();
     }
     else {
-      qDebug() << "Could not cd to" << m_directory->text();
     }
   }
   else {
     imagedirectory = im.dir();
   }
-  qDebug() << ">>>>>" << imagedirectory.absolutePath();
   QString name = edit->text();
   QFileInfo f(name);
   if (f.isRelative()) {
-    qDebug() << "Using relative path";
     QFileInfo fi(imagedirectory,name);
     name = fi.absoluteFilePath();
   }
