@@ -32,10 +32,7 @@
  */
 FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
-  //  setMaxRecords();
   m_attached = false;
-  //QVBoxLayout * layout = new QVBoxLayout;
-  /// add the target
   m_findTarget = new ImLineEdit;
   getLexicon()->adjustHeight(m_findTarget);
   QString mapname = getApp()->getActiveKeymap();
@@ -45,9 +42,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
     m_findTarget->setCurrentMap(mapname,true);
   }
 
-  //  QSettings * settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
   m_findTarget->readSettings(getLexicon()->settingsFileName());
-  //  m_findTarget->activateMap(getApp()->getActiveKeymap(),true);
 
   m_findButton = new QPushButton(tr("F&ind"));
   m_findButton->setDefault(true);
@@ -91,7 +86,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
     d->setStyleSheet(m_spanStyle);
   }
   //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
-  m_rxlist->setItemDelegateForColumn(4,d);
+  m_rxlist->setItemDelegateForColumn(CONTEXT_COLUMN,d);
 
   //QStyle * style = m_list->style();
   //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
@@ -142,32 +137,7 @@ QStringList FullSearchWidget::columnHeadings() {
 }
 void FullSearchWidget::itemChanged(QTableWidgetItem * /* item */,QTableWidgetItem * /* prev */) {
   QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "NOSHOW we should not be here";
-/*  bool isHead = false;
-  /// get the node
-  item = item->tableWidget()->item(item->row(),NODE_COLUMN);
-  if (item->data(Qt::UserRole).toBool()) {
-    isHead = true;
-  }
-  QString node = item->text();
-  m_nodeQuery.bindValue(0,node);
-  m_nodeQuery.exec();
-  /// missing node
-  if ( ! m_nodeQuery.first()) {
-    QLOG_WARN() << "No record for node" << node;
-    return;
-  }
-  /// TODO make this a QSettings option or dialog option
-  Place np;
-  np.setNode(node);
-  //  np.setNodeOnly(true);
-  Place p = m_text->getXmlForRoot(np);
-  if (p.isValid()) {
-    m_text->highlight(m_target);
-  }
-  else {
-    QLOG_DEBUG() << "Invalid place returned for node" << node;
-  }
-*/
+
 }
 
 void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {

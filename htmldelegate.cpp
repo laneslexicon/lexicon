@@ -12,7 +12,7 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 {
   QTextDocument document;
   if (m_stylesheet.size() > 0) {
-    document.setDefaultStyleSheet(m_stylesheet);;
+    document.setDefaultStyleSheet(m_stylesheet);
   }
   //  document.setDocumentMargin(2);
   QVariant value = index.data(Qt::DisplayRole);
@@ -22,7 +22,8 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     t.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     myOption.displayAlignment = Qt::AlignLeft|Qt::AlignVCenter;
     document.setDefaultTextOption(t);
-    document.setHtml(value.toString());
+    QString html = "<body>" + value.toString() + "</body>";
+    document.setHtml(html);
     //QTableWidget * table = qobject_cast<QTableWidget *>(this->parent());
     QRectF r = myOption.rect;
     r.setX(0);
