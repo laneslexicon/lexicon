@@ -213,9 +213,6 @@ void GraphicsEntry::readSettings() {
     m_activateLink = vn.toBool();
   }
   settings.endGroup();
-  //  settings.beginGroup("Icons");
-  //  m_notesIcon = settings.value("Notes","notes-0.xpm").toString();
-  //  m_notesIcon = getLexicon()->getResourceFilePath(Lexicon::Image,m_notesIcon);
 
 }
 QString GraphicsEntry::getXsltFileName()  {
