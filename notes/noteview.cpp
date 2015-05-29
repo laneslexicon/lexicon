@@ -68,7 +68,6 @@ NoteView::NoteView(QWidget * parent)
   setLayout(layout);
 }
 NoteView::~NoteView() {
-  qDebug() << Q_FUNC_INFO;
 }
 void NoteView::setPreferredSize(const QString & szStr) {
   m_size.setWidth(400);

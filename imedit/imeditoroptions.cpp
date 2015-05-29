@@ -249,7 +249,6 @@ void ImEditorOptions::readSettings() {
 #endif
   QSettings settings(settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
-  qDebug() << settings.allKeys();
   settings.beginGroup("Options");
   QSize sz = settings.value("Size",QSize()).toSize();
   if (! sz.isNull()) {
@@ -323,7 +322,6 @@ void ImEditorOptions::writeSettings() {
 
 
   settings.setIniCodec("UTF-8");
-  qDebug() << settings.allKeys();
   settings.beginGroup("System");
 
   settings.setValue("Prompt font",m_promptFont->isChecked());

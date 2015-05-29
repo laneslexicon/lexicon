@@ -37,7 +37,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-  qDebug() << "main window destructor";
 }
 void MainWindow::logMessage(const QString & t) {
   qDebug() << t;

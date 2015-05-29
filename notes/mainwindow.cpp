@@ -23,7 +23,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_db = QSqlDatabase::addDatabase("QSQLITE");
     m_db.setDatabaseName(dbname);
     ok = m_db.open();
-    qDebug() << "db open" << ok;
   }
   m_browser = new NoteBrowser;
   setCentralWidget(m_browser);
@@ -35,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-  qDebug() << "main window destructor";
 }
 NoteMaster * MainWindow::getNotes() {
   return m_notes;
