@@ -5,6 +5,7 @@
 #include "externs.h"
 #include "definedsettings.h"
 LogViewer::LogViewer(QWidget * parent) : QWidget(parent) {
+  this->setWindowTitle(tr("Log Viewer"));
   this->setObjectName("logviewer");
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;

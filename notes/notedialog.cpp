@@ -21,7 +21,6 @@ NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
   m_word = p.getWord();
   this->setup();
   m_noteType = Note::User;
-  setWindowTitle(m_subject->text());
   setObjectName("notedialog");
   /// set values from place
   if (m_noteType == Note::User) {
@@ -32,6 +31,12 @@ NoteDialog::NoteDialog(const Place & p,QWidget * parent) : QDialog(parent) {
   }
   m_subject->setText(p.getShortText());
   m_note->setFocus();
+  if (m_subject->text().isEmpty()) {
+    setWindowTitle(tr("Add Note"));
+  }
+  else {
+    setWindowTitle(m_subject->text());
+  }
 }
 /**
  * This constructor is used when updating a note
@@ -58,7 +63,12 @@ NoteDialog::NoteDialog(Note * note ,QWidget * parent) : QDialog(parent) {
     m_typeSystem->setChecked(true);
   }
   m_note->setFocus();
-  setWindowTitle(m_subject->text());
+  if (m_subject->text().isEmpty()) {
+    setWindowTitle(tr("Add Note"));
+  }
+  else {
+    setWindowTitle(m_subject->text());
+  }
 }
 void NoteDialog::setup() {
   QVBoxLayout * mainlayout = new QVBoxLayout;

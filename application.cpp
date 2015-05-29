@@ -17,10 +17,10 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
     std::cout << errmsg.toLocal8Bit().data() << std::endl;
     m_status = Lexicon::ResourceDirError;
   }
-  QDir fonts(resourceDir + QDir::separator() + "fonts");
-  if (fonts.exists()) {
-    scanForFonts(fonts);
-  }
+  //  QDir fonts(resourceDir + QDir::separator() + "fonts");
+  //  if (fonts.exists()) {
+  //    scanForFonts(fonts);
+  //  }
 
   addLibraryPath(resourceDir + QDir::separator() + "lib");
 
@@ -34,7 +34,7 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
   settings->beginGroup("System");
   m_themeDirectory = settings->value("Theme directory","themes").toString();
-  m_currentTheme =  settings->value("Theme","oxygen").toString();
+  m_currentTheme =  settings->value("Theme","default").toString();
   /// check the theme directory exists
   QDir d = QDir::current();
   if (! d.cd(m_themeDirectory)) {
@@ -288,8 +288,8 @@ void Lexicon::startLogging() {
       QsLogging::DestinationFactory::MakeDebugOutputDestination() );
    logger.addDestination(debugDestination);
    logger.addDestination(fileDestination);
-
-   QLOG_INFO() << "Built with Qt" << QT_VERSION_STR << "running on" << qVersion();
+   QLOG_INFO() << QDateTime::currentDateTime().toLocalTime().toString().toLocal8Bit().constData();
+   QLOG_INFO() << "Built with Qt" << QT_VERSION_STR;
    QLOG_INFO() << "Program started";
 }
 QString Lexicon::getConfig() const {
@@ -429,10 +429,29 @@ void Lexicon::scanForFonts(const QDir & dir)
         }
       }
    }
-   while(fonts.size() > 0) {
-     QFontDatabase::addApplicationFont(fonts.takeFirst());
+   QString fileName;
+   int ret;
+   int foundFonts = fonts.size();
+   int loadedFonts = 0;
+   int failedFonts = 0;
+   if (fonts.size() > 0) {
+     QLOG_INFO() << tr("Registering fonts");
    }
+   while(fonts.size() > 0) {
+     fileName = fonts.takeFirst();
+     ret = QFontDatabase::addApplicationFont(fileName);
+     if (ret == -1) {
+       QLOG_WARN() << QString(tr("Unable to load font:%1")).arg(fileName);
+       failedFonts++;
+     }
+     else {
+       QLOG_INFO() << QString(tr("Added font: %1")).arg(fileName);
+       loadedFonts++;
+     }
+   }
+   QLOG_DEBUG() << QString("Fonts found %1, loaded %2, failed %3").arg(foundFonts).arg(loadedFonts).arg(failedFonts);
 }
+
 /**
  * This is for mixed language text and will wrap any Arabic in a <span>
  * with the class given by the css parameter. It embeds the style information

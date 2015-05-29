@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QLineEdit>
 #include <QRegularExpression>
+#include <QDateTime>
 #include <iostream>
 #include "QsLog.h"
 class Lexicon : public QApplication {

@@ -181,6 +181,8 @@ int main(int argc, char *argv[])
       mansur.setTheme(parser.value(themeOption));
     }
     mansur.startLogging();
+    /// we should be in the Resources directory
+    mansur.scanForFonts(QDir("fonts"));
     QTranslator translator;
     QString trfile;
     if (options.contains("lang")) {

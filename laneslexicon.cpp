@@ -221,9 +221,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 
 
-  QLOG_DEBUG() << "-----------------------";
-  QLOG_DEBUG() << "Initialisation complete";
-  QLOG_DEBUG() << "-----------------------";
+  QLOG_INFO() << "-----------------------";
+  QLOG_INFO() << "Initialisation complete";
+  QLOG_INFO() << "-----------------------";
 }
 
 LanesLexicon::~LanesLexicon()
@@ -327,6 +327,7 @@ void LanesLexicon::cleanup() {
     delete m_pageSearchDialog;
     m_pageSearchDialog = 0;
   }
+  QFontDatabase::removeAllApplicationFonts();
   /// TODO close notes db
   freeXslt();
   im_free(m_mapper);
