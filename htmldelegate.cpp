@@ -22,7 +22,7 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     t.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     myOption.displayAlignment = Qt::AlignLeft|Qt::AlignVCenter;
     document.setDefaultTextOption(t);
-    QString html = "<body>" + value.toString() + "</body>";
+    QString html = "<body class=\"context\">" + value.toString() + "</body>";
     document.setHtml(html);
     //QTableWidget * table = qobject_cast<QTableWidget *>(this->parent());
     QRectF r = myOption.rect;

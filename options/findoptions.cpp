@@ -24,11 +24,9 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_fullStep = new QSpinBox;
 
   m_fullFragmentSize->setMaximumWidth(MEDIUM_EDIT);
-  //  m_fullStep->setMaximumWidth(MEDIUM_EDIT);
   m_fullStep->setSingleStep(25);
- //  m_fullViewerWidth = new QLineEdit;
-  //  m_fullViewerHeight = new QLineEdit;
-  //  m_fullXslt = new QLineEdit;
+  m_contextStyle = new QLineEdit;
+
   m_fullHeadColor = new QLineEdit;
   m_fullHeadText = new QLineEdit;
 
@@ -43,6 +41,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   fulllayout->addRow(tr("Include head words in\nsearch results"),m_fullIncludeHeads);
   fulllayout->addRow(tr("Fragment size"),m_fullFragmentSize);
+  fulllayout->addRow(tr("Context style"),m_contextStyle);
   fulllayout->addRow(tr("Head word background colour"),colorlayout);
   fulllayout->addRow(tr("Text for head word results"),m_fullHeadText);
   fulllayout->addRow(tr("One row for each entry"),m_fullOneRow);
@@ -166,7 +165,7 @@ void FindOptions::readSettings() {
   m_fullOneRow->setChecked(settings.value(SID_FULLSEARCH_ONE_ROW,true).toBool());
   m_fullStep->setValue(settings.value(SID_FULLSEARCH_STEP,50).toInt());
   m_fullHeadColor->setText(settings.value(SID_FULLSEARCH_HEAD_BACKGROUND).toString());
-
+  m_contextStyle->setText(settings.value(SID_FULLSEARCH_CONTEXT_STYLE).toString());
 
   m_fullNewTab     = settings.value(SID_FULLSEARCH_NEW_TAB,true).toBool();
   m_fullGoTab      = settings.value(SID_FULLSEARCH_GO_TAB,true).toBool();
@@ -239,6 +238,7 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_FULLSEARCH_ONE_ROW,m_fullOneRow->isChecked());
   settings.setValue(SID_FULLSEARCH_STEP,m_fullStep->value());
   settings.setValue(SID_FULLSEARCH_HEAD_BACKGROUND,m_fullHeadColor->text());
+  settings.setValue(SID_FULLSEARCH_CONTEXT_STYLE,m_contextStyle->text());
 
 
   settings.setValue(SID_FULLSEARCH_NEW_TAB,m_fullNewTab);
@@ -301,67 +301,57 @@ bool FindOptions::isModified()  {
 
   if (compare(&settings,SID_FULLSEARCH_DEBUG,m_fullDebug))  {
     m_dirty = true;
-    return true;
   }
 
 
   if (compare(&settings,SID_FULLSEARCH_FRAGMENT_SIZE,m_fullFragmentSize)) {
     m_dirty = true;
-    return true;
+  }
+
+  if (compare(&settings,SID_FULLSEARCH_CONTEXT_STYLE,m_contextStyle)) {
+    m_dirty = true;
   }
 
 
   if (compare(&settings,SID_FULLSEARCH_INCLUDE_HEADS,m_fullIncludeHeads)) {
     m_dirty = true;
-    return true;
   }
 
 
   if (compare(&settings,SID_FULLSEARCH_ONE_ROW,m_fullOneRow)) {
     m_dirty = true;
-    return true;
   }
 
   if (compare(&settings,SID_FULLSEARCH_STEP,m_fullStep)) {
     m_dirty = true;
-    return true;
   }
 
   if (compare(&settings,SID_FULLSEARCH_HEAD_BACKGROUND,m_fullHeadColor)) {
     m_dirty = true;
-    return true;
   }
-
-
 
   if (m_fullNewTab     != settings.value(SID_FULLSEARCH_NEW_TAB,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_fullGoTab      != settings.value(SID_FULLSEARCH_GO_TAB,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_fullWholeWord  != settings.value(SID_FULLSEARCH_WHOLE_WORD,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_fullDiacritics != settings.value(SID_FULLSEARCH_DIACRITICS,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_fullRegex      != settings.value(SID_FULLSEARCH_TYPE_REGEX,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_fullForce      != settings.value(SID_FULLSEARCH_FORCE,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
 
@@ -370,52 +360,42 @@ bool FindOptions::isModified()  {
 
   if (compare(&settings,SID_HEADSEARCH_DEBUG,m_headDebug)) {
     m_dirty = true;
-    return true;
   }
 
   if (compare(&settings,SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical)) {
     m_dirty = true;
-    return true;
   }
 
   if (compare(&settings,SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable)) {
     m_dirty = true;
-    return true;
   }
 
   if (compare(&settings,SID_HEADSEARCH_STEP,m_headStep)) {
     m_dirty = true;
-    return true;
   }
 
   if (m_headNewTab     != settings.value(SID_HEADSEARCH_NEW_TAB,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_headGoTab      != settings.value(SID_HEADSEARCH_GO_TAB,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_headWholeWord  != settings.value(SID_HEADSEARCH_WHOLE_WORD,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_headDiacritics != settings.value(SID_HEADSEARCH_DIACRITICS,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_headRegex      != settings.value(SID_HEADSEARCH_TYPE_REGEX,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_headForce      != settings.value(SID_HEADSEARCH_FORCE,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
 
@@ -424,27 +404,22 @@ bool FindOptions::isModified()  {
 
   if (compare(&settings,SID_LOCALSEARCH_SHOW_ALL,m_localShowAll)) {
     m_dirty = true;
-    return true;
   }
 
   if (m_localWholeWord  != settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_localDiacritics != settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_localRegex      != settings.value(SID_LOCALSEARCH_TYPE_REGEX,true).toBool()) {
     m_dirty = true;
-    return true;
   }
 
   if (m_localForce      != settings.value(SID_LOCALSEARCH_FORCE,true).toBool()) {
     m_dirty = true;
-    return true;
   }
   settings.endGroup();
   settings.beginGroup("Search");
@@ -452,27 +427,21 @@ bool FindOptions::isModified()  {
 
   if (compare(&settings,SID_NODESEARCH_NEW_TAB,m_nodeNew)) {
     m_dirty = true;
-    return true;
   }
   if (compare(&settings,SID_NODESEARCH_GO_TAB,m_nodeGo)) {
     m_dirty = true;
-    return true;
   }
   if (compare(&settings,SID_PAGESEARCH_NEW_TAB,m_pageNew)) {
     m_dirty = true;
-    return true;
   }
   if (compare(&settings,SID_PAGESEARCH_GO_TAB,m_pageGo)) {
     m_dirty = true;
-    return true;
   }
   if (compare(&settings,SID_ROOTSEARCH_NEW_TAB,m_rootNew)) {
     m_dirty = true;
-    return true;
   }
   if (compare(&settings,SID_ROOTSEARCH_GO_TAB,m_rootGo)) {
     m_dirty = true;
-    return true;
   }
 
   return m_dirty;

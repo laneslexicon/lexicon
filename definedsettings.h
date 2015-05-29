@@ -157,7 +157,7 @@ They should not be translated.
 #define SID_SEARCH_IGNORE_DIACRITICS           "Ignore diacritics"
 #define SID_SEARCH_TYPE_REGEX                  "Regex"
 #define SID_SEARCH_WHOLE_WORD                  "Whole word"
-#define SID_SEARCH_ARABIC_CONTEXT_STYLE        "Arabic context style"
+
 #define SID_SEARCH_DIACRITICS                  "Diacritics"
 
 #define SID_HEADSEARCH_RESULTS_FONT            "Results Arabic font"
@@ -195,7 +195,7 @@ They should not be translated.
 #define SID_FULLSEARCH_NEW_TAB                 "New tab"
 #define SID_FULLSEARCH_GO_TAB                  "Activate tab"
 #define SID_FULLSEARCH_FORCE                   "Force LTR"
-
+#define SID_FULLSEARCH_CONTEXT_STYLE           "Context style"
 
 #define SID_ROOTSEARCH_NEW_TAB                 "Root new tab"
 #define SID_ROOTSEARCH_GO_TAB                  "Root activate tab"
