@@ -52,9 +52,9 @@ NodeInfo::NodeInfo(QWidget * parent)
   connect(button,SIGNAL(clicked()),this,SLOT(print()));
   buttonBox->addButton(button,QDialogButtonBox::ActionRole);
   */
-  button = new QPushButton(tr("&Go"));
+  button = new QPushButton(tr("&Show in tab"));
   buttonBox->addButton(button,QDialogButtonBox::ActionRole);
-  connect(button,SIGNAL(clicked()),this,SLOT(openEntry()));
+  connect(button,SIGNAL(clicked()),this,SLOT(accept()));
 
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -84,6 +84,7 @@ void NodeInfo::setPreferredSize(const QString & szStr) {
   }
 }
 void NodeInfo::openEntry() {
+  /// Not used
   emit(openNode(m_node));
 }
 QSize NodeInfo::sizeHint() const {

@@ -176,7 +176,9 @@ void GraphicsEntry::readSettings() {
   if (nodePath.isEmpty()) {
     QLOG_WARN() << QString(tr("Cannot find required node XSLT file: %1")).arg(getLexicon()->takeLastError());
   }
-
+  else {
+    m_nodeXslt = nodePath;
+  }
   settings.endGroup();
 
   settings.beginGroup("Notes");
@@ -565,11 +567,14 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
     p.setPage(nodeQuery.value("page").toInt());
     QString html =    transform(NODE_XSLT,m_nodeXslt,nodeQuery.value("xml").toString());
     NodeInfo * info = new NodeInfo(this);
+    info->setWindowTitle(tr("Link target"));
     info->setPlace(p);
     info->setCss(m_currentCss);
     info->setHtml(html);
-    if (info->exec()) {
-      delete info;
+    int ret = info->exec();
+    delete info;
+    if (ret == QDialog::Accepted) {
+      emit(gotoNode(Place::fromNode(node),true,true));
     }
   }
   else {
