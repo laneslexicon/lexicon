@@ -406,23 +406,23 @@ void Lexicon::onFocusChange(QWidget * old, QWidget * now) {
     QLOG_DEBUG() << old->metaObject()->className() << "--->" << now->metaObject()->className();
   }
 }
+/**
+ * addApplicationFont only supports TrueType and OpenType fonts so do a simple check
+ * May fail on X11 without fontconfig
+ *
+ * @param dir
+ */
 void Lexicon::scanForFonts(const QDir & dir)
 {
   QDir d(dir);
-  QStringList filters;
   QStringList fonts;
-  filters << "*.otf" << "*.ttf";
-  d.setNameFilters(filters);
-
-  fonts << d.entryList();
-
    QDirIterator iterator(d.absolutePath(), QDirIterator::Subdirectories);
    while (iterator.hasNext()) {
       iterator.next();
       QDir d(iterator.path());
       //      d.setNameFilters(filters);
       if (! iterator.fileInfo().isDir()) {
-        QString f = iterator.filePath(); //<< d.entryList();
+        QString f = iterator.filePath();
         if (f.endsWith(".ttf") || f.endsWith(".otf")) {
           fonts << f;
 
@@ -434,9 +434,6 @@ void Lexicon::scanForFonts(const QDir & dir)
    int foundFonts = fonts.size();
    int loadedFonts = 0;
    int failedFonts = 0;
-   if (fonts.size() > 0) {
-     QLOG_INFO() << tr("Registering fonts");
-   }
    while(fonts.size() > 0) {
      fileName = fonts.takeFirst();
      ret = QFontDatabase::addApplicationFont(fileName);
@@ -445,7 +442,6 @@ void Lexicon::scanForFonts(const QDir & dir)
        failedFonts++;
      }
      else {
-       QLOG_INFO() << QString(tr("Added font: %1")).arg(fileName);
        loadedFonts++;
      }
    }
