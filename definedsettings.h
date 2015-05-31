@@ -56,7 +56,8 @@ They should not be translated.
 #define SID_NOTES_DATABASE "Database"
 #define SID_NOTES_SHOW_KEYMAPS  "Show keymaps"
 #define SID_NOTES_SHOW_PRINT  "Show print"
-
+#define SID_NOTES_COLUMNS "Columns"
+#define SID_NOTES_CONTEXT_STYLE "Context style"
 //#define SID_SHORTCUT_COLLAPSE_ALL "Collapse all"
 
 #define SID_HISTORY_ENABLED          "Enabled"
@@ -343,3 +344,6 @@ They should not be translated.
 #define SID_ALWAYS 0
 #define SID_NEVER  1
 #define SID_PROMPT 2
+
+
+#define SID_NOTES

@@ -317,17 +317,16 @@ void NoteBrowser::readSettings() {
   SETTINGS
 
   settings.beginGroup("Notes");
-  m_style = settings.value("Context style",QString()).toString();
+  m_style = settings.value(SID_NOTES_CONTEXT_STYLE,QString()).toString();
   settings.endGroup();
+
   settings.beginGroup("Entry");
   QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
-
-
   readCssFromFile(css);
   settings.endGroup();
-  settings.beginGroup("FullSearch");
-  m_xsltSource = settings.value("XSLT",QString("node.xslt")).toString();
-  m_debug = settings.value("Debug",false).toBool();
+
+  settings.beginGroup("XSLT");
+  m_xsltSource = settings.value("Node",QString("node.xslt")).toString();
   settings.endGroup();
 
 }
@@ -364,5 +363,5 @@ NoteBrowser::~NoteBrowser() {
   SETTINGS
 
   settings.beginGroup("Notes");
-  settings.setValue("Columns",colwidths);
+  settings.setValue(SID_NOTES_COLUMNS,colwidths);
 }
