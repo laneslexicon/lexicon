@@ -45,10 +45,12 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   m_printButton = new QPushButton(tr("&Print"));
   m_deleteButton = new QPushButton(tr("&Delete"));
   m_viewButton = new QPushButton(tr("&View entry"));
+  m_refreshButton = new QPushButton(tr("&Refresh"));
 
   btnlayout->addWidget(m_printButton);
   btnlayout->addWidget(m_deleteButton);
   btnlayout->addWidget(m_viewButton);
+  btnlayout->addWidget(m_refreshButton);
   btnlayout->addStretch();
 
   layout->addWidget(m_list);
@@ -66,10 +68,12 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   connect(m_list,SIGNAL(cellClicked(int,int)),this,SLOT(onCellClicked(int,int)));
   connect(m_deleteButton,SIGNAL(clicked()),this,SLOT(onDeleteClicked()));
   connect(m_viewButton,SIGNAL(clicked()),this,SLOT(onViewClicked()));
+  connect(m_refreshButton,SIGNAL(clicked()),this,SLOT(loadNotes()));
   initXslt();
 }
 void NoteBrowser::loadNotes() {
   NoteMaster * notes = ::getNotes();
+  m_list->setRowCount(0);
   m_list->setColumnCount(5);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::ExtendedSelection);

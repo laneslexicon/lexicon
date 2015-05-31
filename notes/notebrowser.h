@@ -55,6 +55,7 @@ class NoteBrowser : public QWidget {
     QPushButton * m_newBtn;
     QPushButton * m_showBtn;
     QPushButton * m_saveBtn;
+    QPushButton * m_refreshButton;
     QPushButton * m_deleteButton;
     QPushButton * m_printButton;
     QPushButton * m_viewButton;

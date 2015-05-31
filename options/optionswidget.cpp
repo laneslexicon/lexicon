@@ -297,7 +297,6 @@ void OptionsWidget::setLineEditSize(int size) {
 }
 void OptionsWidget::setKeySequenceEditSize(int size) {
   QList<QKeySequenceEdit *> edits = this->findChildren<QKeySequenceEdit *>();
-  qDebug() << Q_FUNC_INFO << edits.size();
   foreach(QKeySequenceEdit *  widget,edits) {
 #ifdef Q_OS_OSX
     widget->setMinimumWidth(size);
