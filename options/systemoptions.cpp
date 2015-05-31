@@ -19,11 +19,11 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   m_contentsLinked = new QCheckBox;
   m_lexicon = new QLineEdit;
-  m_lexicon->setMinimumWidth(VLARGE_EDIT);
+  //  this->setControlSize(m_lexicon,VLARGE_EDIT);
   m_debug = new QCheckBox;
   m_docked = new QCheckBox;
   m_focusTab = new QLineEdit;
-  m_focusTab->setMinimumWidth(LARGE_EDIT);
+  //  this->setControlSize(m_focusTab,LARGE_EDIT);
   m_minimalInterface = new QCheckBox;
   m_restoreBookmarks = new QCheckBox;
   m_restoreTabs = new QCheckBox;
@@ -32,21 +32,19 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   m_rootNavigation = new QCheckBox;
   // Root mod
   m_runDate = new QDateTimeEdit;
-  m_runDate->setMinimumWidth(VLARGE_EDIT);
+  this->setControlSize(m_runDate,LARGE_EDIT);
+
   // Save boo
   m_showInterfaceWarning = new QCheckBox;
   m_css = new QLineEdit;
-  m_css->setMinimumWidth(VLARGE_EDIT);
   m_theme = new QComboBox;
-  m_theme->setMinimumWidth(VLARGE_EDIT);
+
   m_title = new QLineEdit;
-  m_title->setMinimumWidth(VLARGE_EDIT);
+
   m_toolbarText = new QCheckBox;
   m_useNotes = new QCheckBox;
   m_notesDb = new QLineEdit;
-  m_notesDb->setMinimumWidth(VLARGE_EDIT);
   m_keyboard = new QComboBox;
-  m_keyboard->setMinimumWidth(VLARGE_EDIT);
   QFormLayout * layout = new QFormLayout;
 
   layout->addRow(tr("Contents linked"),m_contentsLinked);
@@ -75,7 +73,8 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   addButtons();
   readSettings();
   setupConnections();
-
+  this->setLineEditSize(VLARGE_EDIT);
+  this->setComboSize(VLARGE_EDIT);
 }
 
 void SystemOptions::readSettings() {

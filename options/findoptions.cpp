@@ -19,17 +19,18 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   m_fullDebug = new QCheckBox;
   m_fullFragmentSize = new QSpinBox;
-  m_fullFragmentSize->setMinimumWidth(LARGE_EDIT);
+  this->setControlSize(m_fullFragmentSize,LARGE_EDIT);
   m_fullIncludeHeads = new QCheckBox;
   m_fullOneRow = new QCheckBox;
   m_fullStep = new QSpinBox;
 
-  m_fullFragmentSize->setMinimumWidth(MEDIUM_EDIT);
+  this->setControlSize(m_fullFragmentSize,MEDIUM_EDIT);
   m_fullStep->setSingleStep(25);
+  this->setControlSize(m_fullStep,MEDIUM_EDIT);
   m_contextStyle = new QLineEdit;
 
   m_fullHeadColor = new QLineEdit;
-  m_fullHeadColor->setMinimumWidth(VLARGE_EDIT);
+  this->setControlSize(m_fullHeadColor,VLARGE_EDIT);
   m_fullHeadText = new QLineEdit;
 
 
@@ -50,7 +51,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   fulllayout->addRow(tr("Progress interval"),m_fullStep);
 
   QPushButton * fullbtn = new QPushButton(tr("Set"));
-  fullbtn->setMinimumWidth(MEDIUM_EDIT);
+  this->setControlSize(fullbtn,MEDIUM_EDIT);
   QHBoxLayout * setlayout1 = new QHBoxLayout;
   setlayout1->addWidget(fullbtn);
   //  setlayout1->addStretch();
@@ -67,10 +68,10 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   QGroupBox * headbox = new QGroupBox(tr("Head word search"));
   m_headDebug = new QCheckBox;
   m_headStep = new QSpinBox;
-  m_headStep->setMinimumWidth(MEDIUM_EDIT);
+  this->setControlSize(m_headStep,MEDIUM_EDIT);
   m_headVertical = new QCheckBox;
   m_headFocusTable = new QCheckBox;
-  m_headStep->setMinimumWidth(MEDIUM_EDIT);
+  this->setControlSize(m_headStep,MEDIUM_EDIT);
   m_headStep->setSingleStep(25);
   /*
   m_headNewTab = new QCheckBox;
@@ -91,9 +92,6 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   headlayout->addRow(tr("Search dialog options"),setlayout2);
   connect(headbtn,SIGNAL(clicked()),this,SLOT(onHeadDialog()));
 
-
-  //  headlayout->addRow(tr("Open in new tab"),m_headNewTab);
-  //  headlayout->addRow(tr("Go to new tab"),m_headGoTab);
   headlayout->addRow(tr("Debug"),m_headDebug);
   headbox->setLayout(headlayout);
 
@@ -515,6 +513,7 @@ void FindOptions::onSetColor() {
 }
 void FindOptions::onFullDialog() {
   DialogOptions d;
+  d.setWindowTitle(tr("Search Options"));
   d.setChecked(DialogOptions::Tab,m_fullNewTab);
   d.setChecked(DialogOptions::Go,m_fullGoTab);
   d.setChecked(DialogOptions::Whole,m_fullWholeWord);
@@ -535,6 +534,7 @@ void FindOptions::onFullDialog() {
 }
 void FindOptions::onHeadDialog() {
   DialogOptions d;
+  d.setWindowTitle(tr("Search Options"));
   d.setChecked(DialogOptions::Tab,m_headNewTab);
   d.setChecked(DialogOptions::Go,m_headGoTab);
   d.setChecked(DialogOptions::Whole,m_headWholeWord);
@@ -555,6 +555,7 @@ void FindOptions::onHeadDialog() {
 }
 void FindOptions::onLocalDialog() {
   DialogOptions d;
+  d.setWindowTitle(tr("Search Options"));
   d.enableOption(DialogOptions::Tab,false);
   d.enableOption(DialogOptions::Go,false);
   d.setChecked(DialogOptions::Whole,m_localWholeWord);

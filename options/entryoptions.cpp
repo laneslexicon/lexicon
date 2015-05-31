@@ -39,13 +39,13 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_widen = new QLineEdit ;
 
   m_zoom = new QDoubleSpinBox ;
-  m_zoom->setMinimumWidth(75);
+  this->setControlSize(m_zoom,75);
   m_zoom->setDecimals(2);
   m_zoom->setSingleStep(0.01);
   m_zoomIn = new QLineEdit ;
-  m_zoomIn->setMinimumWidth(SMALL_EDIT);
+  this->setControlSize(m_zoomIn,SMALL_EDIT);
   m_zoomOut = new QLineEdit ;
-  m_zoomOut->setMinimumWidth(SMALL_EDIT);
+  this->setControlSize(m_zoomOut,SMALL_EDIT);
 
   m_printNotes = new QComboBox;
   m_printInfo = new QComboBox;
@@ -62,11 +62,11 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_printNodes->addItem(tr("Prompt"),SID_PROMPT);
   m_printInfo->addItem(tr("Prompt"),SID_PROMPT);
 
-
+  /*
   m_printNotes->setMinimumWidth(VLARGE_EDIT);
   m_printInfo->setMinimumWidth(VLARGE_EDIT);
   m_printNodes->setMinimumWidth(VLARGE_EDIT);
-
+  */
   QVBoxLayout * vlayout = new QVBoxLayout;
   QFormLayout * layout = new QFormLayout;
 
@@ -83,10 +83,10 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
 
   /// Focus
-  m_home->setMinimumWidth(SMALL_EDIT);
-  m_mark->setMinimumWidth(SMALL_EDIT);
-  m_focusUp->setMinimumWidth(SMALL_EDIT);
-  m_focusDown->setMinimumWidth(SMALL_EDIT);
+  this->setControlSize(m_home,SMALL_EDIT);
+  this->setControlSize(m_mark,SMALL_EDIT);
+  this->setControlSize(m_focusUp,SMALL_EDIT);
+  this->setControlSize(m_focusDown,SMALL_EDIT);
   keylayout->addWidget(new QLabel(tr("Move up")),2,0);
   keylayout->addWidget(m_focusUp,2,1);
   keylayout->addWidget(new QLabel(tr("Move down")),3,0);
@@ -97,19 +97,19 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   keylayout->addWidget(m_mark,5,1);
 
   /// Text size
-  m_textWidth->setMinimumWidth(MEDIUM_EDIT);
-  m_margin->setMinimumWidth(MEDIUM_EDIT);
-  m_narrow->setMinimumWidth(SMALL_EDIT);
-  m_widen->setMinimumWidth(SMALL_EDIT);
-  m_step->setMinimumWidth(SMALL_EDIT);
+  this->setControlSize(m_textWidth,MEDIUM_EDIT);
+  this->setControlSize(m_margin,MEDIUM_EDIT);
+  this->setControlSize(m_narrow,SMALL_EDIT);
+  this->setControlSize(m_widen,SMALL_EDIT);
+  this->setControlSize(m_step,SMALL_EDIT);
   keylayout->addWidget(new QLabel(tr("Widen text")),6,0);
   keylayout->addWidget(m_widen,6,1);
   keylayout->addWidget(new QLabel("Narrow text"),7,0);
   keylayout->addWidget(m_narrow,7,1);
 
   // Lexicon movement
-  m_back->setMinimumWidth(SMALL_EDIT);
-  m_forward->setMinimumWidth(SMALL_EDIT);
+  this->setControlSize(m_back,SMALL_EDIT);
+  this->setControlSize(m_forward,SMALL_EDIT);
   keylayout->addWidget(new QLabel(tr("Next root")),0,2);
   keylayout->addWidget(m_forward,0,3);
   keylayout->addWidget(new QLabel(tr("Previous root")),1,2);
@@ -119,9 +119,9 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   /// Local search
   QHBoxLayout * searchlayout = new QHBoxLayout;
-  m_find->setMinimumWidth(SMALL_EDIT);
-  m_findNext->setMinimumWidth(SMALL_EDIT);
-  m_clean->setMinimumWidth(SMALL_EDIT);
+  this->setControlSize(m_find,SMALL_EDIT);
+  this->setControlSize(m_findNext,SMALL_EDIT);
+  this->setControlSize(m_clean,SMALL_EDIT);
   keylayout->addWidget(new QLabel(tr("Find")),2,2);
   keylayout->addWidget(m_find,2,3);
   keylayout->addWidget(new QLabel(tr("Find next")),3,2);
@@ -130,7 +130,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   keylayout->addWidget(m_clean,4,3);
   keylayout->addWidget(new QLabel(tr("Show last search results")),5,2);
   keylayout->addWidget(m_show,5,3);
-  m_reload->setMinimumWidth(SMALL_EDIT);
+  this->setControlSize(m_reload,SMALL_EDIT);
   keylayout->addWidget(new QLabel(tr("Reload page")),6,2);
   keylayout->addWidget(m_reload,6,3);
 
@@ -150,9 +150,10 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   /// Assorted
 
 
-  m_show->setMinimumWidth(SMALL_EDIT);
-  m_showLinkWarning->setMinimumWidth(SMALL_EDIT);
-  m_highlightColor->setMinimumWidth(100);
+  this->setControlSize(m_show,SMALL_EDIT);
+  this->setControlSize(m_showLinkWarning,SMALL_EDIT);
+  this->setControlSize(m_highlightColor,LARGE_EDIT);
+
   otherlayout->addRow(tr("Default zoom"),m_zoom);
   otherlayout->addRow(tr("Show link warning"),m_showLinkWarning);
   otherlayout->addRow(tr("Step size"),m_step);
@@ -193,6 +194,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   addButtons();
   readSettings();
   setupConnections();
+  this->setComboSize(VLARGE_EDIT);
   //  getLexicon()->setCursorPosition(this);
 }
 

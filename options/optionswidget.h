@@ -45,6 +45,7 @@ class OptionsWidget : public QWidget {
   virtual void setLineEditSize(int);
   virtual void setKeySequenceEditSize(int);
   virtual void setComboSize(int);
+  virtual void setControlSize(QWidget *,int);
   public slots:
     virtual void onSave();
     virtual void onReset();
