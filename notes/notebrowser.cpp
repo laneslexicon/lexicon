@@ -2,8 +2,12 @@
 #ifdef LANE
 #include "laneslexicon.h"
 #include "graphicsentry.h"
+#include "application.h"
+#include "externs.h"
+#include "definedsettings.h"
 #endif
 #include "QsLog.h"
+#include "htmldelegate.h"
 #include "notes.h"
 #include "xsltsupport.h"
 #include "noteview.h"
@@ -12,7 +16,13 @@
 #include "definedsql.h"
 extern NoteMaster * getNotes();
 extern QSettings * getSettings();
+#define ID_COLUMN 0
 #define COL_WITH_ID 1
+#define WORD_COLUMN 1
+#define AMENDED_COLUMN 2
+#define DATE_COLUMN 2
+#define SUBJECT_COLUMN 3
+#define NOTE_COLUMN 4
 #define NOTE_SUBSTR_LENGTH 30
 
 NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
@@ -21,25 +31,16 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QTableWidget;
   m_list->installEventFilter(this);
+  HtmlDelegate * d = new HtmlDelegate;
+  d->setStyleSheet(m_style);
+  m_list->setItemDelegateForColumn(COL_WITH_ID,d);
+  m_list->setItemDelegateForColumn(SUBJECT_COLUMN,d);
+
+  m_list->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   QStyle * style = m_list->style();
   style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   this->setStyle(style);
-  /*
-  QSplitter * splitter = new QSplitter(Qt::Vertical);
-  QWidget * container  = new QWidget(this);
-  QFormLayout * containerlayout = new QFormLayout;
-  m_subject = new QLineEdit;
-  m_note = new QTextEdit;
 
-  m_type = new QComboBox;
-  m_type->insertItem(0,tr("User"),Note::User);
-  m_type->insertItem(1,tr("System"),Note::Error);
-  m_type->setCurrentIndex(0);
-
-  QSizePolicy policy = m_note->sizePolicy();
-  policy.setVerticalStretch(1);
-  m_note->setSizePolicy(policy);
-  */
   QHBoxLayout * btnlayout = new QHBoxLayout;
   m_printButton = new QPushButton(tr("&Print"));
   m_deleteButton = new QPushButton(tr("&Delete"));
@@ -50,31 +51,14 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   btnlayout->addWidget(m_viewButton);
   btnlayout->addStretch();
 
-  //  containerlayout->addRow("Subject",m_subject);
-  //  containerlayout->addRow("Note",m_note);
-  //  containerlayout->addRow("Type",m_type);
-
-  //  containerlayout->addRow(btnlayout);
-  //  container->setLayout(containerlayout);
-  //  container->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-  //  splitter->addWidget(m_list);
-  //  splitter->addWidget(container);
-  //  splitter->setStretchFactor(0,0);
-  //  splitter->setStretchFactor(1,1);
   layout->addWidget(m_list);
   layout->addLayout(btnlayout);
   m_list->adjustSize();//resizeColumnsToContents();
 
   setLayout(layout);
-  //connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
-  //      this,SLOT(itemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
-//  connect(m_list,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
-//          this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
-  /// show the first item in the list
-  /// TODO decide who gets focus and select the first row
-  /// TODO if table loses focus, change the background selection color
+
   loadNotes();
+
   m_deleteButton->setEnabled(false);
   m_printButton->setEnabled(false);
   m_viewButton->setEnabled(false);
@@ -101,6 +85,7 @@ void NoteBrowser::loadNotes() {
   QSqlQuery  * q = notes->getNoteList(sql);
   while(q->next()) {
     QString word = q->value("word").toString();
+    word = qobject_cast<Lexicon *>(qApp)->scanAndSpan(word);
     int row = m_list->rowCount();
     m_list->insertRow(row);
     item = new QTableWidgetItem(q->value("id").toString());
@@ -108,8 +93,7 @@ void NoteBrowser::loadNotes() {
 
     item = new QTableWidgetItem(word);
     item->setData(Qt::UserRole,q->value("id").toInt());
-    //      item->setFont(m_resultsFont);
-    //      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    //    item->setFont(m_arabicFont);
     m_list->setItem(row,COL_WITH_ID,item);
 
     QString when;
@@ -121,21 +105,53 @@ void NoteBrowser::loadNotes() {
     item = new QTableWidgetItem(d.toString( Qt::SystemLocaleShortDate));
     //      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,2,item);
+    QString subject = q->value("subject").toString();
+    subject = qobject_cast<Lexicon *>(qApp)->scanAndSpan(subject);
 
-    item = new QTableWidgetItem(q->value("subject").toString());
+    item = new QTableWidgetItem(subject);
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     //      item->setFont(m_resultsFont);
-    m_list->setItem(row,3,item);
+    m_list->setItem(row,SUBJECT_COLUMN,item);
 
     item = new QTableWidgetItem(q->value(5).toString());
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     //      item->setFont(m_resultsFont);
-    m_list->setItem(row,4,item);
+    m_list->setItem(row,NOTE_COLUMN,item);
   }
   if (m_list->rowCount() > 0) {
     m_list->itemDoubleClicked(m_list->item(0,0));
-    m_list->resizeColumnsToContents();
+
   }
+  /**
+   * having to do this because the html elements do not appear to
+   * report their size correctly (too large)
+   */
+
+
+
+  SETTINGS
+
+  settings.beginGroup("Notes");
+  if (settings.contains("Columns")) {
+    bool ok;
+    QList<QVariant> cols = settings.value("Columns").toList();
+    if (cols.size() > 0) {
+      for(int i=0;i < cols.size();i++) {
+        int sz = cols[i].toInt(&ok);
+        if (ok) {
+          m_list->setColumnWidth(i,sz);
+        }
+      }
+    }
+  }
+  else {
+    m_list->resizeColumnToContents(ID_COLUMN);
+    m_list->resizeColumnToContents(DATE_COLUMN);
+    m_list->resizeColumnToContents(NOTE_COLUMN);
+    m_list->setColumnWidth(WORD_COLUMN,settings.value("Word column",200).toInt());
+    m_list->setColumnWidth(SUBJECT_COLUMN,settings.value("Subject column",300).toInt());
+  }
+
   q->finish();
   delete q;
 }
@@ -298,44 +314,55 @@ QString NoteBrowser::transform(const QString & xml) {
 }
 /// TODO change group
 void NoteBrowser::readSettings() {
-  QSettings * settings = ::getSettings();
-  settings->setIniCodec("UTF-8");
-  settings->beginGroup("Notes");
-   QString f = settings->value("Font",QString()).toString();
-  if (! f.isEmpty()) {
-    //    m_resultsFont.fromString(f);
-  }
-  settings->endGroup();
-  settings->beginGroup("Entry");
-  QString css = settings->value("CSS",QString("entry.css")).toString();
+  SETTINGS
+
+  settings.beginGroup("Notes");
+  m_style = settings.value("Context style",QString()).toString();
+  settings.endGroup();
+  settings.beginGroup("Entry");
+  QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
+
+
   readCssFromFile(css);
-  settings->endGroup();
-  settings->beginGroup("FullSearch");
-  m_xsltSource = settings->value("XSLT",QString("node.xslt")).toString();
-  m_debug = settings->value("Debug",false).toBool();
-  settings->endGroup();
-  delete settings;
+  settings.endGroup();
+  settings.beginGroup("FullSearch");
+  m_xsltSource = settings.value("XSLT",QString("node.xslt")).toString();
+  m_debug = settings.value("Debug",false).toBool();
+  settings.endGroup();
+
 }
 bool NoteBrowser::readCssFromFile(const QString & name) {
-  QFile f(name);
-  if (! f.open(QIODevice::ReadOnly)) {
-    QLOG_WARN()  << "Cannot open CSS file for reading: " << name
-                 << f.errorString();
+  QString css;
+  if (name.isEmpty()) {
     return false;
+  }
+  QString filename = getLexicon()->getResourceFilePath(Lexicon::Stylesheet,name);
+  if (filename.isEmpty()) {
+    QString err = getLexicon()->takeLastError();
+    QLOG_WARN() << QString(tr("Unable to open entry stylesheet: %1")).arg(err);
+    return false;
+  }
 
+  QFile f(filename);
+  if (! f.open(QIODevice::ReadOnly)) {
+    QLOG_WARN()  << QString(tr("I/O Error opening CSS file for reading: %1 - %2"))
+      .arg(filename)
+      .arg(f.errorString());
+    return false;
   }
   QTextStream in(&f);
-  QString css;
-  QString t;
-  while( ! in.atEnd()) {
-    t = in.readLine();
-    if (! t.startsWith("-")) {
-      css += t;
-    }
-  }
+  css = in.readAll();
   f.close();
-  if (! css.isEmpty()) {
-    m_css = css;
-  }
+  m_css = css;
   return true;
+}
+NoteBrowser::~NoteBrowser() {
+  QList<QVariant> colwidths;
+  for(int i=0;i < m_list->columnCount();i++) {
+    colwidths << QVariant(m_list->columnWidth(i));
+  }
+  SETTINGS
+
+  settings.beginGroup("Notes");
+  settings.setValue("Columns",colwidths);
 }

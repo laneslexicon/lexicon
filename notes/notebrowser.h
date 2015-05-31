@@ -28,7 +28,7 @@ class NoteBrowser : public QWidget {
  public:
 
   NoteBrowser(QWidget * parent = 0);
-  //  ~NotesWidget();
+  ~NoteBrowser();
   public slots:
     //   void onNoteSelected(int );
     void onCellClicked(int,int);
@@ -45,7 +45,7 @@ class NoteBrowser : public QWidget {
     QString m_css;
     QString m_xsltSource;
     QString transform(const QString & xml);
-
+    QString m_style;
     QMap<int,int> getRowIdMap();
     QTableWidget * m_list;
     QTextEdit * m_note;
