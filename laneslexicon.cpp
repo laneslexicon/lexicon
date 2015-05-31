@@ -2777,7 +2777,8 @@ void LanesLexicon::onNavigationMenuChanged(QAction * action) {
   m_navigationButton->menu()->hide();
 }
 void LanesLexicon::onClearHistory() {
-  QLOG_DEBUG() << Q_FUNC_INFO <<  m_history->clear();
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  m_history->clear();
   setStatus(tr("History cleared"));
   setupHistory();
 }
