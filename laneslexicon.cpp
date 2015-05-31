@@ -1539,10 +1539,13 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
   if (currentTab == -1) {
     createTab = true;
   }
-  else {
+  if (!createTab)  {
     /// if current widget not graphicsentry, set createtab
     entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(currentTab));
     if (! entry ) {
+      QWidget * w = m_tabs->currentWidget();
+      m_tabs->removeTab(currentTab);
+      delete w;
       createTab = true;
     }
   }
