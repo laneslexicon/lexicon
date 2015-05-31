@@ -19,17 +19,17 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   m_fullDebug = new QCheckBox;
   m_fullFragmentSize = new QSpinBox;
-  m_fullFragmentSize->setMaximumWidth(LARGE_EDIT);
+  m_fullFragmentSize->setMinimumWidth(LARGE_EDIT);
   m_fullIncludeHeads = new QCheckBox;
   m_fullOneRow = new QCheckBox;
   m_fullStep = new QSpinBox;
 
-  m_fullFragmentSize->setMaximumWidth(MEDIUM_EDIT);
+  m_fullFragmentSize->setMinimumWidth(MEDIUM_EDIT);
   m_fullStep->setSingleStep(25);
   m_contextStyle = new QLineEdit;
 
   m_fullHeadColor = new QLineEdit;
-  m_fullHeadColor->setMaximumWidth(VLARGE_EDIT);
+  m_fullHeadColor->setMinimumWidth(VLARGE_EDIT);
   m_fullHeadText = new QLineEdit;
 
 
@@ -50,7 +50,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   fulllayout->addRow(tr("Progress interval"),m_fullStep);
 
   QPushButton * fullbtn = new QPushButton(tr("Set"));
-  fullbtn->setMaximumWidth(MEDIUM_EDIT);
+  fullbtn->setMinimumWidth(MEDIUM_EDIT);
   QHBoxLayout * setlayout1 = new QHBoxLayout;
   setlayout1->addWidget(fullbtn);
   //  setlayout1->addStretch();
@@ -67,10 +67,10 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   QGroupBox * headbox = new QGroupBox(tr("Head word search"));
   m_headDebug = new QCheckBox;
   m_headStep = new QSpinBox;
-  m_headStep->setMaximumWidth(MEDIUM_EDIT);
+  m_headStep->setMinimumWidth(MEDIUM_EDIT);
   m_headVertical = new QCheckBox;
   m_headFocusTable = new QCheckBox;
-  m_headStep->setMaximumWidth(MEDIUM_EDIT);
+  m_headStep->setMinimumWidth(MEDIUM_EDIT);
   m_headStep->setSingleStep(25);
   /*
   m_headNewTab = new QCheckBox;

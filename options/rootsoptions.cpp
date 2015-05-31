@@ -21,12 +21,15 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   m_moveDown = new QLineEdit;
   m_moveDown->setMaxLength(1);
+  m_moveDown->setMinimumWidth(SMALL_EDIT);
   m_moveDown->setMaximumWidth(SMALL_EDIT);
   m_moveUp = new QLineEdit;
   m_moveUp->setMaxLength(1);
+  m_moveUp->setMinimumWidth(SMALL_EDIT);
   m_moveUp->setMaximumWidth(SMALL_EDIT);
   m_expand = new QLineEdit;
   m_expand->setMaxLength(1);
+  m_expand->setMinimumWidth(SMALL_EDIT);
   m_expand->setMaximumWidth(SMALL_EDIT);
 
   m_singleClick = new QCheckBox;
@@ -50,7 +53,7 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   QHBoxLayout * hlayout1 = new QHBoxLayout;
   m_standardFont = new QLineEdit;
-  m_standardFont->setMaximumWidth(VLARGE_EDIT);
+  m_standardFont->setMinimumWidth(VLARGE_EDIT);
   m_standardButton = new QPushButton(tr("Click to set font"));
   hlayout1->addWidget(m_standardFont);
   hlayout1->addWidget(m_standardButton);
@@ -58,7 +61,7 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   QHBoxLayout * hlayout2 = new QHBoxLayout;
   m_arabicFont = new QLineEdit;
-  m_arabicFont->setMaximumWidth(VLARGE_EDIT);
+  m_arabicFont->setMinimumWidth(VLARGE_EDIT);
   m_arabicButton = new QPushButton(tr("Click to set font"));
   hlayout2->addWidget(m_arabicFont);
   hlayout2->addWidget(m_arabicButton);

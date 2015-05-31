@@ -288,19 +288,19 @@ void OptionsWidget::onHelp() {
 void OptionsWidget::setLineEditSize(int size) {
   QList<QLineEdit *> edits = this->findChildren<QLineEdit *>();
   foreach(QLineEdit *  widget,edits) {
-    widget->setMaximumWidth(size);
+    widget->setMinimumWidth(size);
   }
 }
 void OptionsWidget::setKeySequenceEditSize(int size) {
   QList<QKeySequenceEdit *> edits = this->findChildren<QKeySequenceEdit *>();
   qDebug() << Q_FUNC_INFO << edits.size();
   foreach(QKeySequenceEdit *  widget,edits) {
-    widget->setMaximumWidth(size);
+    widget->setMinimumWidth(size);
   }
 }
 void OptionsWidget::setComboSize(int size) {
   QList<QComboBox *> edits = this->findChildren<QComboBox *>();
   foreach(QComboBox *  widget,edits) {
-    widget->setMaximumWidth(size);
+    widget->setMinimumWidth(size);
   }
 }
