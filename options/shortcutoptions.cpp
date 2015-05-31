@@ -59,10 +59,12 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
   m_info->setText(html.join(""));
   vlayout->addWidget(m_info);
 
+
   setLayout(vlayout);
   addButtons();
   readSettings();
   setupConnections();
+  this->setKeySequenceEditSize(VLARGE_EDIT);
 }
 /**
  * compare the key sequences with what's in the QSettings

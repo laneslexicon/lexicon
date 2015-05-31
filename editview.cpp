@@ -131,7 +131,7 @@ EditView::EditView(QWidget * parent) : QWidget(parent) {
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_tabs = new QTabWidget;
-
+  m_tabs->setObjectName("edittabs");
   m_cssEditor = new EditPage(EDIT_CSS);
   //  m_cssEditor->setText(m_css.join("\n"));
   m_tabs->addTab(m_cssEditor,tr("CSS"));

@@ -55,7 +55,9 @@ BookmarkOptions::BookmarkOptions(const QString & theme,QWidget * parent) : Optio
   addButtons();
   readSettings();
   setupConnections();
-
+  this->setKeySequenceEditSize(VLARGE_EDIT);
+  m_id->setMaximumWidth(VLARGE_EDIT);
+  m_font->setMaximumWidth(VLARGE_EDIT);
 }
 
 void BookmarkOptions::readSettings() {

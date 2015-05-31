@@ -285,3 +285,22 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
 void OptionsWidget::onHelp() {
   emit(showHelp(m_section));
 }
+void OptionsWidget::setLineEditSize(int size) {
+  QList<QLineEdit *> edits = this->findChildren<QLineEdit *>();
+  foreach(QLineEdit *  widget,edits) {
+    widget->setMaximumWidth(size);
+  }
+}
+void OptionsWidget::setKeySequenceEditSize(int size) {
+  QList<QKeySequenceEdit *> edits = this->findChildren<QKeySequenceEdit *>();
+  qDebug() << Q_FUNC_INFO << edits.size();
+  foreach(QKeySequenceEdit *  widget,edits) {
+    widget->setMaximumWidth(size);
+  }
+}
+void OptionsWidget::setComboSize(int size) {
+  QList<QComboBox *> edits = this->findChildren<QComboBox *>();
+  foreach(QComboBox *  widget,edits) {
+    widget->setMaximumWidth(size);
+  }
+}

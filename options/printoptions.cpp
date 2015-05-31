@@ -96,6 +96,8 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
   setupPaperSize();
   readSettings();
   setupConnections();
+  this->setLineEditSize(VLARGE_EDIT);
+  this->setComboSize(VLARGE_EDIT);
 }
 void PrintOptions::onPrintDialog() {
   QList<QPrinterInfo> printers = QPrinterInfo::availablePrinters();

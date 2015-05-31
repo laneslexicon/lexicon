@@ -24,8 +24,8 @@
 #include <QDateTimeEdit>
 #define SMALL_EDIT 30
 #define MEDIUM_EDIT 50
-#define LARGE_EDIT 60
-#define VLARGE_EDIT 150
+#define LARGE_EDIT 100
+#define VLARGE_EDIT 300
 
 class OptionsWidget : public QWidget {
   Q_OBJECT
@@ -42,6 +42,9 @@ class OptionsWidget : public QWidget {
   void setFileName(const QString &);
   void blockAllSignals(bool block);
   virtual bool compare(const QSettings *,const QString & key, QWidget * p);
+  virtual void setLineEditSize(int);
+  virtual void setKeySequenceEditSize(int);
+  virtual void setComboSize(int);
   public slots:
     virtual void onSave();
     virtual void onReset();

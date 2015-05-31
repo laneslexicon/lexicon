@@ -5,6 +5,7 @@
 #include "application.h"
 #include "externs.h"
 #endif
+
 /**
  *
  * @param theme
@@ -18,9 +19,11 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   m_contentsLinked = new QCheckBox;
   m_lexicon = new QLineEdit;
+  m_lexicon->setMaximumWidth(VLARGE_EDIT);
   m_debug = new QCheckBox;
   m_docked = new QCheckBox;
   m_focusTab = new QLineEdit;
+  m_focusTab->setMaximumWidth(LARGE_EDIT);
   m_minimalInterface = new QCheckBox;
   m_restoreBookmarks = new QCheckBox;
   m_restoreTabs = new QCheckBox;
@@ -29,15 +32,21 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   m_rootNavigation = new QCheckBox;
   // Root mod
   m_runDate = new QDateTimeEdit;
+  m_runDate->setMaximumWidth(VLARGE_EDIT);
   // Save boo
   m_showInterfaceWarning = new QCheckBox;
   m_css = new QLineEdit;
+  m_css->setMaximumWidth(VLARGE_EDIT);
   m_theme = new QComboBox;
+  m_theme->setMaximumWidth(VLARGE_EDIT);
   m_title = new QLineEdit;
+  m_title->setMaximumWidth(VLARGE_EDIT);
   m_toolbarText = new QCheckBox;
   m_useNotes = new QCheckBox;
   m_notesDb = new QLineEdit;
+  m_notesDb->setMaximumWidth(VLARGE_EDIT);
   m_keyboard = new QComboBox;
+  m_keyboard->setMaximumWidth(VLARGE_EDIT);
   QFormLayout * layout = new QFormLayout;
 
   layout->addRow(tr("Contents linked"),m_contentsLinked);

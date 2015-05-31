@@ -8,6 +8,7 @@
 AboutDialog::AboutDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   QTabWidget * tabs = new QTabWidget(this);
+  tabs->setObjectName("aboutabs");
   QWidget * tab;
 
   tab = this->buildTechTab();

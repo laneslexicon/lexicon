@@ -29,6 +29,7 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
     m_level->addItem(levels[i],i);
   }
   m_archive = new QSpinBox ;
+  m_archive->setMaximumWidth(MEDIUM_EDIT);
   m_maxLines = new QLineEdit ;
   m_maxLines->setValidator(new QIntValidator);
   m_interval = new QLineEdit ;
@@ -49,7 +50,8 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   addButtons();
   readSettings();
   setupConnections();
-
+  this->setLineEditSize(VLARGE_EDIT);
+  this->setComboSize(VLARGE_EDIT);
 }
 
 void LogOptions::readSettings() {

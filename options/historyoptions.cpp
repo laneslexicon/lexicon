@@ -60,6 +60,7 @@ HistoryOptions::HistoryOptions(const QString & theme,QWidget * parent) : Options
   addButtons();
   readSettings();
   setupConnections();
+  this->setLineEditSize(VLARGE_EDIT);
 
 }
 

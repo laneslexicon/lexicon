@@ -30,6 +30,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
 
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
+  m_tabs->setObjectName("optionstab");
 #ifndef LANE
   QSettings testSettings("config.ini",QSettings::IniFormat);
   if (useTheme.isEmpty()) {
@@ -51,6 +52,14 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
   bool debugChanges = settings.value("Debug",false).toBool();
   bool writeTest = settings.value("Create",false).toBool();
+  if (settings.value("System",true).toBool()) {
+    SystemOptions * systems = new SystemOptions(useTheme,this);
+    m_tabs->addTab(systems,tr("System"));
+    if (writeTest) {
+      systems->writeSettings(testFileName);
+    }
+    systems->setDebug(debugChanges);
+  }
   if (settings.value("Roots",true).toBool()) {
     RootsOptions * tree = new RootsOptions(useTheme,this);
     m_tabs->addTab(tree,tr("Contents"));
@@ -106,14 +115,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
       bookmark->writeSettings(testFileName);
     }
     bookmark->setDebug(debugChanges);
-  }
-  if (settings.value("System",true).toBool()) {
-    SystemOptions * systems = new SystemOptions(useTheme,this);
-    m_tabs->addTab(systems,tr("System"));
-    if (writeTest) {
-      systems->writeSettings(testFileName);
-    }
-    systems->setDebug(debugChanges);
   }
   if (settings.value("Logging",true).toBool()) {
     LogOptions * log = new LogOptions(useTheme,this);
