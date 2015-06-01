@@ -90,7 +90,7 @@ void ImLineEdit::shortcutActivated() {
  *
  * It no longer loads the maps, but only sets up the shortcut
  * @param settings
- */
+
 void ImLineEdit::readSettings(const QString & fileName) {
   QSettings settings(fileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
@@ -122,6 +122,7 @@ void ImLineEdit::readSettings(const QString & fileName) {
     settings.endGroup();
   }
 }
+*/
 void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
   int pos = this->cursorPosition();

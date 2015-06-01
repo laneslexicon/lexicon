@@ -27,7 +27,7 @@ class ImLineEdit : public QLineEdit {
     //    QString getNullMap() const;
     void setDebug(bool v);
     bool isMappingEnabled() const { return m_enabled; }
-    void readSettings(const QString & filePath = QString());
+    //    void readSettings(const QString & filePath = QString());
     public slots:
     bool loadMap(const QString & filename,const QString & mapname = QString());
 

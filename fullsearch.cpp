@@ -42,7 +42,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
     m_findTarget->setCurrentMap(mapname);
   }
 
-  m_findTarget->readSettings(getLexicon()->settingsFileName());
+  //  m_findTarget->readSettings(getLexicon()->settingsFileName());
 
   m_findButton = new QPushButton(tr("F&ind"));
   m_findButton->setDefault(true);

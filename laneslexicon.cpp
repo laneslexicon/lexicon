@@ -32,6 +32,7 @@
 #include "deletethemedialog.h"
 #include "createthemedialog.h"
 #include "definedsql.h"
+#include "showmapwidget.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -327,6 +328,14 @@ void LanesLexicon::cleanup() {
     delete m_pageSearchDialog;
     m_pageSearchDialog = 0;
   }
+  QWidgetList widgets = QApplication::topLevelWidgets();
+  for(int i=0;i < widgets.size();i++) {
+    ShowMapWidget * w = qobject_cast<ShowMapWidget *>(widgets[i]);
+    if (w) {
+      w->close();
+    }
+  }
+
   QFontDatabase::removeAllApplicationFonts();
   /// TODO close notes db
   freeXslt();
@@ -616,6 +625,9 @@ void LanesLexicon::shortcut(const QString & key) {
   }
   else if (key == SID_SHORTCUT_KEYMAPS_DISABLE) {
     this->enableKeymaps(false);
+  }
+  else if (key == SID_SHORTCUT_KEYMAPS_HELP) {
+    this->onKeymapHelp();
   }
   else if (key == SID_SHORTCUT_SEARCH_DELETE) {
     this->deleteSearch();
@@ -1909,19 +1921,27 @@ void LanesLexicon::readSettings() {
     settings.beginGroup(groups[i]);
     v = settings.value("file",QString()).toString();
     if (!v.isEmpty()) {
-    v = getLexicon()->getResourceFilePath(Lexicon::Map,v);
-    QFile file(v);
-    if ( file.exists() ) {
-      if (im_load_map_from_json(m_mapper,v.toUtf8().constData(),groups[i].toUtf8().constData()) == -1) {
-        QLOG_WARN() << QString(tr("Error loading map <%1> from file <%2>")).arg(groups[i]).arg(v);
+      v = getLexicon()->getResourceFilePath(Lexicon::Map,v);
+      QFile file(v);
+      if ( file.exists() ) {
+        if (im_load_map_from_json(m_mapper,v.toUtf8().constData(),groups[i].toUtf8().constData()) == -1) {
+          QLOG_WARN() << QString(tr("Error loading map <%1> from file <%2>")).arg(groups[i]).arg(v);
+        }
+        else {
+          m_maps.insert(groups[i],v);
+        }
       }
       else {
-        m_maps.insert(groups[i],v);
+        QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(groups[i]).arg(v);
       }
     }
-    else {
-      QLOG_WARN() << QString(tr("Could not load <%1> from file <%2> - file not found")).arg(groups[i]).arg(v);
-    }
+    v = settings.value("help",QString()).toString();
+    if (!v.isEmpty()) {
+      v = getLexicon()->getResourceFilePath(Lexicon::Map,v);
+      QFile file(v);
+      if ( file.exists() ) {
+           m_mapHelp.insert(groups[i],v);
+      }
     }
     settings.endGroup();
   }
@@ -4011,4 +4031,30 @@ void LanesLexicon::onChangeArabicFont() {
     m_tree->reloadFont();
   }
   delete d;
+}
+void LanesLexicon::onKeymapHelp(const QString & mapname) {
+  QLOG_DEBUG() << Q_FUNC_INFO << mapname;
+  QString map = mapname;
+  if (mapname.isEmpty()) {
+    map = m_currentMap;
+  }
+  QWidgetList widgets = QApplication::topLevelWidgets();
+
+  for(int i=0;i < widgets.size();i++) {
+    ShowMapWidget * w = qobject_cast<ShowMapWidget *>(widgets[i]);
+    if (w && (w->map() == map))  {
+      w->show();
+      w->raise();
+      return;
+    }
+  }
+
+
+  if (m_mapHelp.contains(map)) {
+    QString fileName = m_mapHelp.value(map);
+    ShowMapWidget * w = new ShowMapWidget();
+    w->setMapName(map);
+    w->loadHtml(fileName);
+    w->show();
+  }
 }

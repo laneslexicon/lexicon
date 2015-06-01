@@ -113,6 +113,7 @@ They should not be translated.
 #define SID_SHORTCUT_HISTORY_DISABLE           "History disable"
 #define SID_SHORTCUT_KEYMAPS_DISABLE           "Keymaps disable"
 #define SID_SHORTCUT_KEYMAPS_ENABLE            "Keymaps enable"
+#define SID_SHORTCUT_KEYMAPS_HELP              "Keymaps help"
 #define SID_SHORTCUT_LOCAL_SEARCH              "Local search"
 #define SID_SHORTCUT_LOCAL_SEARCH_CLEAR        "Local search clear"
 #define SID_SHORTCUT_LOCAL_SEARCH_FIND         "Local search find"

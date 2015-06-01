@@ -148,7 +148,7 @@ class LanesLexicon : public QMainWindow
       void onHistorySelection();
 
       void onKeymapChanged();
-
+      void onKeymapHelp(const QString & map = QString());
 
       void onEditView();
 
@@ -306,6 +306,7 @@ class LanesLexicon : public QMainWindow
       InputMapper * m_mapper;
 
       QMap<QString,QString> m_maps;
+      QMap<QString,QString> m_mapHelp;
 
       QSignalMapper * m_shortcutMap;
       QSignalMapper * m_bookmarkMap;
