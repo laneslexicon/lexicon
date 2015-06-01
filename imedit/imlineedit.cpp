@@ -38,9 +38,9 @@ QStringList ImLineEdit::getMaps() const {
 QString ImLineEdit::currentMap() const {
 return m_activeMap;
 }
-QString ImLineEdit::getNullMap() const {
-  return m_nullMap;
-}
+//QString ImLineEdit::getNullMap() const {
+//  return m_nullMap;
+//}
 bool ImLineEdit::loadMap(const QString & filename,const QString & mapname) {
   QLOG_DEBUG() << Q_FUNC_INFO << filename << mapname;
   QFile f(filename);
@@ -96,7 +96,7 @@ void ImLineEdit::readSettings(const QString & fileName) {
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Maps");
   qDebug() << settings.childKeys();
-  m_nullMap = settings.value(SID_MAPS_NULL_MAP_NAME,"Native").toString();
+  //  m_nullMap = settings.value(SID_MAPS_NULL_MAP_NAME,"Native").toString();
   m_enabled = settings.value(SID_MAPS_ENABLED,true).toBool();
   qDebug() << Q_FUNC_INFO << fileName << "Enabled" << m_enabled;
   //  m_debug = settings.value(SID_MAPS_DEBUG,false).toBool();

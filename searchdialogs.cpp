@@ -43,6 +43,9 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
     m_edit->loadMap(mapfile,mapname);
     m_edit->setCurrentMap(mapname);
   }
+  else {
+    getApp()->enableKeymaps(false);
+  }
   m_prompt->setBuddy(m_edit);
   m_findButton = new QPushButton(tr("&Find"));
   m_findButton->setDefault(true);
@@ -84,10 +87,12 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->currentMap();
+  /*
   if (map.isEmpty()) {
     map = m_edit->getNullMap();
   }
   maps << m_edit->getNullMap();
+  */
   m_options->addKeymaps(map,maps);
   m_options->setOptions(m_searchType);
 

@@ -1314,7 +1314,6 @@ void LanesLexicon::createStatusBar() {
 
   m_keymapsButton = new QToolButton(this);
   QStringList maps =  m_maps.keys();
-  maps << m_nullMap;
   QMenu * menu = new QMenu(this);
   for(int i=0;i < maps.size();i++) {
     QAction * action  = menu->addAction(maps[i]);
@@ -1327,7 +1326,7 @@ void LanesLexicon::createStatusBar() {
 
   }
   if (maps.size() == 1) {
-    m_keymapsButton->setEnabled(false);
+    //    m_keymapsButton->setEnabled(false);
   }
   m_keymapsButton->setDefaultAction(m_keymapsAction);
   m_keymapsButton->setMenu(menu);
@@ -1369,29 +1368,43 @@ void LanesLexicon::onKeymapChanged() {
   QAction * action = qobject_cast<QAction *>(sender());
   if (! action)
     return;
-  m_currentMap = action->data().toString();
-  QLOG_DEBUG() << Q_FUNC_INFO << "map set to" << m_currentMap;
+  m_currentMap.clear();// = action->data().toString();
+
+  bool enabled = false;
   QList<QAction *> actions = m_keymapsButton->menu()->actions();
   for(int i=0;i < actions.size();i++) {
+    if (actions[i]->isChecked()) {
+      enabled = true;
+      m_currentMap = actions[i]->data().toString();
+    }
+    /*
     if (actions[i]->data().toString() == m_currentMap) {
       actions[i]->setChecked(true);
     }
     else {
       actions[i]->setChecked(false);
     }
+    */
   }
+  this->enableKeymaps(enabled);
+  /*
+  QLOG_DEBUG() << Q_FUNC_INFO << "map set to" << m_currentMap << "enabled" << enabled;
+  m_keymapsEnabled = enabled;
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {
+      w->enableMapping(enabled);
       w->setCurrentMap(m_currentMap);
     }
     else {
       ImEdit * imedit = qobject_cast<ImEdit *>(widget);
       if (imedit) {
+        imedit->enableMapping(enabled);
         imedit->setCurrentMap(m_currentMap);
       }
     }
   }
+  */
 }
 void LanesLexicon::onLinkChanged() {
   m_linkContents = ! m_linkContents;
@@ -1831,7 +1844,7 @@ void LanesLexicon::readSettings() {
   settings.beginGroup("Maps");
 
   m_keymapsEnabled = settings.value(SID_MAPS_ENABLED,false).toBool();
-  m_nullMap = settings.value( SID_MAPS_NULL_MAP_NAME,"Native").toString();
+
   m_currentMap = settings.value(SID_MAPS_CURRENT_MAP,"Native").toString();
 
   settings.endGroup();
@@ -1913,7 +1926,7 @@ void LanesLexicon::readSettings() {
     settings.endGroup();
   }
   settings.endGroup();
-  if ((m_currentMap != m_nullMap) && ! m_maps.contains(m_currentMap) ) {
+  if ((! m_currentMap.isEmpty()) && ! m_maps.contains(m_currentMap) ) {
     QLOG_WARN() << QString(tr("Default map <%1> not found in settings")).arg(m_currentMap);
   }
 }
@@ -2721,7 +2734,7 @@ void LanesLexicon::updateStatusBar() {
     m_placeIndicator->setText("");
 
   }
-  m_keymapsButton->setEnabled(m_keymapsEnabled);
+  //  m_keymapsButton->setEnabled(m_keymapsEnabled);
 }
 /**
  * navigation mode can be changed:
@@ -3283,8 +3296,8 @@ void LanesLexicon::convertToEntry() {
 }
 void LanesLexicon::enableKeymaps(bool v) {
   m_keymapsEnabled = v;
-  QLOG_DEBUG() << Q_FUNC_INFO << v;
-  m_keymapsButton->setEnabled(v);
+  QLOG_DEBUG() << Q_FUNC_INFO << v << m_maps << m_currentMap;
+  //  m_keymapsButton->setEnabled(v);
   QString tip;
   if (m_keymapsEnabled)
     tip = QString(tr("Keymaps, enabled"));
@@ -3310,6 +3323,21 @@ void LanesLexicon::enableKeymaps(bool v) {
       }
     }
   }
+  QList<QAction *> actions = m_keymapsButton->menu()->actions();
+  for(int i=0;i < actions.size();i++) {
+    if (!v) {
+      actions[i]->setChecked(false);
+    }
+    else {
+      if (actions[i]->data().toString() == m_currentMap) {
+        actions[i]->setChecked(true);
+      }
+      else {
+        actions[i]->setChecked(false);
+      }
+    }
+  }
+
   //  m_searchOptions.setKeymaps(v);
   setStatus(tip);
   SETTINGS

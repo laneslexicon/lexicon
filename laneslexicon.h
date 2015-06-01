@@ -86,6 +86,7 @@ class LanesLexicon : public QMainWindow
     int hasPlace(const Place & p,int searchtype,bool setFocus);
     Place showPlace(const Place &,bool newTab,bool activate);
     void setStatus(const QString &);
+      void enableKeymaps(bool);
     //    void saveNote(Note *);
     private slots:
       void onLogViewer();
@@ -223,7 +224,7 @@ class LanesLexicon : public QMainWindow
       void createMenus();
       void createStatusBar();
 
-      void enableKeymaps(bool);
+
       bool m_keymapsEnabled;
       bool eventFilter(QObject * target, QEvent *);
       bool openDatabase(const QString &);
@@ -251,7 +252,7 @@ class LanesLexicon : public QMainWindow
       QString m_applicationCssFile;
       QString m_printPdfLocation;
       QString m_currentTheme;
-      QString m_nullMap;
+
       QString m_currentMap;
       QString m_dbName;
       QString m_notesDbName;

@@ -281,7 +281,6 @@ They should not be translated.
 #define SID_SYSTEM_EXIT                        "Exit"
 
 
-#define SID_MAPS_NULL_MAP_NAME                  "Native map name"
 #define SID_MAPS_CURRENT_MAP                    "Current map"
 #define SID_MAPS_ENABLED                        "Enabled"
 #define SID_MAPS_DEBUG                          "Debug"

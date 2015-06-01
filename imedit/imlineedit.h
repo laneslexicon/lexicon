@@ -24,7 +24,7 @@ class ImLineEdit : public QLineEdit {
     ~ImLineEdit();
     QStringList getMaps() const;
     QString currentMap() const;
-    QString getNullMap() const;
+    //    QString getNullMap() const;
     void setDebug(bool v);
     bool isMappingEnabled() const { return m_enabled; }
     void readSettings(const QString & filePath = QString());
@@ -43,7 +43,7 @@ class ImLineEdit : public QLineEdit {
     ushort m_prev_char;
 
     QString m_activeMap;
-    QString m_nullMap;
+    //    QString m_nullMap;
     bool m_discard;
     bool m_enabled;
     bool m_debug;
