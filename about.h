@@ -11,6 +11,8 @@
 #include <QTableWidgetItem>
 #include <QHeaderView>
 #include <QLineEdit>
+#include <QLabel>
+#include <QCheckBox>
 #include "QsLog.h"
 class AboutDialog : public QDialog {
   Q_OBJECT
@@ -20,5 +22,6 @@ class AboutDialog : public QDialog {
   QSize sizeHint() const;
  private:
   QWidget * buildTechTab();
+  QWidget * buildSystemTab();
 };
 #endif

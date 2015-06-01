@@ -79,6 +79,7 @@ class LanesLexicon : public QMainWindow
   QString convertString(const QString &) const;
   QString getActiveKeymap() const;
   QString getKeymapFileName(const QString &) const;
+  bool keymapsEnabled() const { return m_keymapsEnabled;}
   QMapIterator<QString,QString> getMapIterator();
   HistoryMaster * history();
   NoteMaster * notes();

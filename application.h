@@ -11,6 +11,7 @@
 #include <QLineEdit>
 #include <QRegularExpression>
 #include <QDateTime>
+#include <QSysInfo>
 #include <iostream>
 #include "QsLog.h"
 class Lexicon : public QApplication {
