@@ -27,8 +27,14 @@ AboutDialog::AboutDialog(QWidget * parent) : QDialog(parent) {
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   getLexicon()->setCursorPosition(this,0);
   QList<QLineEdit *> edits = this->findChildren<QLineEdit *>();
+  int size = 400;
   foreach(QLineEdit *  widget,edits) {
     widget->setReadOnly(true);
+#ifdef Q_OS_OSX
+    widget->setMinimumWidth(size);
+#else
+    widget->setMaximumWidth(size);
+#endif
   }
 }
 QSize AboutDialog::sizeHint() const {
