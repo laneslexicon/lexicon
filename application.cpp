@@ -445,7 +445,6 @@ void Lexicon::scanForFonts(const QDir & dir)
        loadedFonts++;
      }
    }
-   QLOG_DEBUG() << QString("Fonts found %1, loaded %2, failed %3").arg(foundFonts).arg(loadedFonts).arg(failedFonts);
 }
 
 /**

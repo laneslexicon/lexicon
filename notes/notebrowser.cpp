@@ -30,6 +30,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_list = new QTableWidget;
+  m_list->setObjectName("notetable");
   m_list->installEventFilter(this);
   HtmlDelegate * d = new HtmlDelegate;
   d->setStyleSheet(m_style);
@@ -169,10 +170,6 @@ void NoteBrowser::onCellClicked(int row,int /* column */) {
     Note * note = notes->findOne(id);
     if (note) {
       NoteDialog * dlg = new  NoteDialog(note,this);
-
-      //      m_subject->setText(note->getSubject());
-      //      m_note->setText(note->getNote());
-      //      m_type->setCurrentIndex(m_type->findData(note->getType()));
       dlg->exec();
     }
   }

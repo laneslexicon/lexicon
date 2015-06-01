@@ -875,8 +875,6 @@ void LanesLexicon::createActions() {
 }
 void LanesLexicon::createToolBar() {
   QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
-  qDebug() << cmdOptions;
-
   QToolBar * m_mainbar = addToolBar("Main");
   m_mainbar->setObjectName("maintoolbar");
 
