@@ -1383,12 +1383,12 @@ void LanesLexicon::onKeymapChanged() {
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {
-      w->setCurrentMap(m_currentMap,true);
+      w->setCurrentMap(m_currentMap);
     }
     else {
       ImEdit * imedit = qobject_cast<ImEdit *>(widget);
       if (imedit) {
-        imedit->setCurrentMap(m_currentMap,true);
+        imedit->setCurrentMap(m_currentMap);
       }
     }
   }
@@ -3295,12 +3295,12 @@ void LanesLexicon::enableKeymaps(bool v) {
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {
-      w->setEnabled(v);
+      w->enableMapping(v);
     }
     else {
       ImEdit * imedit = qobject_cast<ImEdit *>(widget);
       if (imedit) {
-        imedit->setEnabled(v);
+        imedit->enableMapping(v);
       }
       else {
         SearchOptionsWidget * search = qobject_cast<SearchOptionsWidget *>(widget);

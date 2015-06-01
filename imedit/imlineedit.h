@@ -36,7 +36,7 @@ class ImLineEdit : public QLineEdit {
     void setForceLTR(bool);
     void onTextChanged(const QString &);
     public slots:
-      bool setCurrentMap(const QString &,bool enable = true);
+      bool setCurrentMap(const QString &);//,bool enable = true);
       void enableMapping(bool);
   private:
     InputMapper * m_mapper;
@@ -48,7 +48,6 @@ class ImLineEdit : public QLineEdit {
     bool m_enabled;
     bool m_debug;
     bool m_forceLTR;
-    bool m_keymapsEnabled;
   protected:
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void focusInEvent(QFocusEvent *);

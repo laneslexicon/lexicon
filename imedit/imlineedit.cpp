@@ -17,7 +17,6 @@ ImLineEdit::ImLineEdit(QWidget * parent)
   m_prev_char = 0;
   m_debug = false;
   m_forceLTR = false;
-  m_keymapsEnabled = true;
   m_discard = false;
   m_enabled = true;
   //  this->setText("كتب");
@@ -57,7 +56,7 @@ bool ImLineEdit::loadMap(const QString & filename,const QString & mapname) {
   }
   return true;
 }
-bool ImLineEdit::setCurrentMap(const QString & name,bool activate) {
+bool ImLineEdit::setCurrentMap(const QString & name) {
   if (! m_mapper->hasMap(name)) {
     return false;
   }
@@ -67,7 +66,7 @@ bool ImLineEdit::setCurrentMap(const QString & name,bool activate) {
   else {
     m_activeMap = name;
   }
-  m_enabled = activate;
+
   QVariant v = im_get_property(this->m_mapper,name,"discard");
   if (! v.isValid()) {
     m_discard = false;
@@ -94,10 +93,12 @@ void ImLineEdit::shortcutActivated() {
  */
 void ImLineEdit::readSettings(const QString & fileName) {
   QSettings settings(fileName,QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
   settings.beginGroup("Maps");
+  qDebug() << settings.childKeys();
   m_nullMap = settings.value(SID_MAPS_NULL_MAP_NAME,"Native").toString();
-  m_keymapsEnabled = settings.value(SID_MAPS_ENABLED,false).toBool();
-
+  m_enabled = settings.value(SID_MAPS_ENABLED,true).toBool();
+  qDebug() << Q_FUNC_INFO << fileName << "Enabled" << m_enabled;
   //  m_debug = settings.value(SID_MAPS_DEBUG,false).toBool();
   QStringList groups = settings.childGroups();
   for(int i=0;i < groups.size();i++) {

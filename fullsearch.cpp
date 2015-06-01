@@ -39,7 +39,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   QString mapfile = getApp()->getKeymapFileName(mapname);
   if (! mapfile.isEmpty()) {
     m_findTarget->loadMap(mapfile,mapname);
-    m_findTarget->setCurrentMap(mapname,true);
+    m_findTarget->setCurrentMap(mapname);
   }
 
   m_findTarget->readSettings(getLexicon()->settingsFileName());

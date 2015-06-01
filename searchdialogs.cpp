@@ -34,13 +34,14 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
 
-  m_edit->readSettings(getLexicon()->settingsFileName());
+  //  m_edit->readSettings(getLexicon()->settingsFileName());
   getLexicon()->adjustHeight(m_edit);
   QString mapname = getApp()->getActiveKeymap();
   QString mapfile = getApp()->getKeymapFileName(mapname);
+
   if (! mapfile.isEmpty()) {
     m_edit->loadMap(mapfile,mapname);
-    m_edit->setCurrentMap(mapname,true);
+    m_edit->setCurrentMap(mapname);
   }
   m_prompt->setBuddy(m_edit);
   m_findButton = new QPushButton(tr("&Find"));
@@ -136,6 +137,9 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
       m_keyboard->addShortcut(k);
     }
   }
+  settings.endGroup();
+  settings.beginGroup("Maps");
+  m_edit->enableMapping(settings.value(SID_MAPS_ENABLED,false).toBool());
  QPoint p = this->pos();
   int h = this->frameGeometry().height();
   //  QLOG_DEBUG() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
@@ -223,7 +227,7 @@ void ArabicSearchDialog::getOptions(SearchOptions & opts) const {
   m_options->getOptions(opts);
 }
 void ArabicSearchDialog::loadKeymap(const QString & mapname) {
-  m_edit->setCurrentMap(mapname,true);
+  m_edit->setCurrentMap(mapname);
 }
 bool ArabicSearchDialog::getForceLTR() const {
   return m_options->getForceLTR();
