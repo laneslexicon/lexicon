@@ -1385,38 +1385,20 @@ void LanesLexicon::onKeymapChanged() {
   bool enabled = false;
   QList<QAction *> actions = m_keymapsButton->menu()->actions();
   for(int i=0;i < actions.size();i++) {
-    if (actions[i]->isChecked()) {
-      enabled = true;
-      m_currentMap = actions[i]->data().toString();
-    }
-    /*
-    if (actions[i]->data().toString() == m_currentMap) {
-      actions[i]->setChecked(true);
+    actions[i]->blockSignals(true);
+    qDebug() << Q_FUNC_INFO << i << actions[i]->data().toString() << actions[i]->isChecked();
+    if (action == actions[i]) {
+      if (actions[i]->isChecked()) {
+        enabled = true;
+        m_currentMap = actions[i]->data().toString();
+      }
     }
     else {
       actions[i]->setChecked(false);
     }
-    */
+    actions[i]->blockSignals(false);
   }
   this->enableKeymaps(enabled);
-  /*
-  QLOG_DEBUG() << Q_FUNC_INFO << "map set to" << m_currentMap << "enabled" << enabled;
-  m_keymapsEnabled = enabled;
-  foreach (QWidget *widget, QApplication::allWidgets()) {
-    ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
-    if (w) {
-      w->enableMapping(enabled);
-      w->setCurrentMap(m_currentMap);
-    }
-    else {
-      ImEdit * imedit = qobject_cast<ImEdit *>(widget);
-      if (imedit) {
-        imedit->enableMapping(enabled);
-        imedit->setCurrentMap(m_currentMap);
-      }
-    }
-  }
-  */
 }
 void LanesLexicon::onLinkChanged() {
   m_linkContents = ! m_linkContents;
@@ -3315,9 +3297,11 @@ void LanesLexicon::convertToEntry() {
   }
 }
 void LanesLexicon::enableKeymaps(bool v) {
+  bool ok;
   m_keymapsEnabled = v;
-  QLOG_DEBUG() << Q_FUNC_INFO << v << m_maps << m_currentMap;
-  //  m_keymapsButton->setEnabled(v);
+  //  QLOG_DEBUG() << Q_FUNC_INFO << v << m_maps;
+  QLOG_DEBUG() << Q_FUNC_INFO << "Current map" << m_currentMap;
+
   QString tip;
   if (m_keymapsEnabled)
     tip = QString(tr("Keymaps, enabled"));
@@ -3328,12 +3312,24 @@ void LanesLexicon::enableKeymaps(bool v) {
   foreach (QWidget *widget, QApplication::allWidgets()) {
     ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
     if (w) {
-      w->enableMapping(v);
+      ok = w->setCurrentMap(m_currentMap);
+      if (! ok ) {
+        QLOG_WARN() << QString(tr("Error loading map: %1")).arg(m_currentMap);
+      }
+      else {
+        w->enableMapping(v);
+      }
     }
     else {
       ImEdit * imedit = qobject_cast<ImEdit *>(widget);
       if (imedit) {
-        imedit->enableMapping(v);
+        ok = imedit->setCurrentMap(m_currentMap);
+        if (! ok ) {
+          QLOG_WARN() << QString(tr("Error loading map: %1")).arg(m_currentMap);
+        }
+        else {
+          imedit->enableMapping(v);
+        }
       }
       else {
         SearchOptionsWidget * search = qobject_cast<SearchOptionsWidget *>(widget);
@@ -3345,6 +3341,7 @@ void LanesLexicon::enableKeymaps(bool v) {
   }
   QList<QAction *> actions = m_keymapsButton->menu()->actions();
   for(int i=0;i < actions.size();i++) {
+    actions[i]->blockSignals(true);
     if (!v) {
       actions[i]->setChecked(false);
     }
@@ -3356,6 +3353,7 @@ void LanesLexicon::enableKeymaps(bool v) {
         actions[i]->setChecked(false);
       }
     }
+    actions[i]->blockSignals(false);
   }
 
   //  m_searchOptions.setKeymaps(v);
@@ -3372,6 +3370,10 @@ QString LanesLexicon::getKeymapFileName(const QString & mapname) const {
     return m_maps.value(mapname);
   }
   return QString();
+}
+QMapIterator<QString,QString> LanesLexicon::getMapIterator() {
+  QMapIterator<QString,QString> iter(m_maps);
+  return iter;
 }
 void LanesLexicon::deleteSearch() {
   //  if (! p.isValid()) {

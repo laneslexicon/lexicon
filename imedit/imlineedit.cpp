@@ -42,7 +42,6 @@ return m_activeMap;
 //  return m_nullMap;
 //}
 bool ImLineEdit::loadMap(const QString & filename,const QString & mapname) {
-  QLOG_DEBUG() << Q_FUNC_INFO << filename << mapname;
   QFile f(filename);
   if (!f.open(QIODevice::ReadOnly)) {
     // TODO emit(logMessage(QString("Error loading file %1: %2 ").arg(fileName).arg(f.errorString())));
@@ -140,7 +139,7 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
     out << "ImEdit in: 0x" << qSetFieldWidth(4) << qSetPadChar(QChar('0')) << hex << event->key() << " " << UcdScripts::getScript(event->key());
     out.reset();
     out << "  " << event->text();
-    emit(logMessage(t)); //QString("ImEdit got: %1 %2").arg(event->key()).arg(qPrintable(event->text()))));
+    emit(logMessage(t));
   }
 
   if (m_activeMap.isEmpty() ||  m_activeMap.isNull())   {
