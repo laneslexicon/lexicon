@@ -91,6 +91,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
                                 Qt::RightDockWidgetArea);
     m_treeDock->setWidget(m_tree);
     addDockWidget(Qt::LeftDockWidgetArea, m_treeDock);
+    m_treeDock->installEventFilter(this);
     setCentralWidget(m_tabs);
   }
   else {
@@ -863,6 +864,8 @@ void LanesLexicon::createActions() {
   m_createThemeAction = new QAction(tr("&New/Copy"),this);
 
   m_changeArabicFontAction = new QAction(tr("Change &Arabic font"),this);
+
+  m_showContentsAction = new QAction(tr("Show &contents"),this);
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
@@ -883,6 +886,7 @@ void LanesLexicon::createActions() {
   connect(m_selectThemeAction,SIGNAL(triggered()),this,SLOT(onSelectTheme()));
   connect(m_editThemeAction,SIGNAL(triggered()),this,SLOT(onEditTheme()));
 
+  connect(m_showContentsAction,SIGNAL(triggered()),this,SLOT(onShowContents()));
 
 }
 void LanesLexicon::createToolBar() {
@@ -1246,7 +1250,8 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_syncFromEntryAction);
   m_viewMenu->addAction(m_linkAction);
   m_viewMenu->addAction(m_defaultScaleAction);
-
+  m_viewMenu->addAction(m_showContentsAction);
+  m_showContentsAction->setEnabled(false);
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -1617,7 +1622,9 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
  * @return
  */
 bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
-
+  if ((event->type() == QEvent::Close) && (target == m_treeDock)) {
+    m_showContentsAction->setEnabled(true);
+  }
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
@@ -4059,4 +4066,8 @@ void LanesLexicon::onKeymapHelp(const QString & mapname) {
     w->loadHtml(fileName);
     w->show();
   }
+}
+void LanesLexicon::onShowContents() {
+  m_treeDock->show();
+  m_showContentsAction->setEnabled(false;)
 }
