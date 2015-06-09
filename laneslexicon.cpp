@@ -4069,5 +4069,5 @@ void LanesLexicon::onKeymapHelp(const QString & mapname) {
 }
 void LanesLexicon::onShowContents() {
   m_treeDock->show();
-  m_showContentsAction->setEnabled(false;)
+  m_showContentsAction->setEnabled(false);
 }
