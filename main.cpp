@@ -238,6 +238,7 @@ int main(int argc, char *argv[])
         QString f = d.absolutePath()  + QDir::separator() + images[ix];
         QPixmap pixmap(f);
         splash = new SplashScreen(pixmap);
+        splash->setWindowTitle(QObject::tr("Lane's Arabic-English Lexicon"));
         splash->show();
       }
       else {
