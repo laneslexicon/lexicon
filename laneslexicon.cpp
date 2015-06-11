@@ -207,9 +207,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   /*
   QList<QShortcut *> edits = this->findChildren<QShortcut *>();
   foreach(QShortcut *  widget,edits) {
-    //    QLOG_DEBUG() << widget->key().toString();
+    QLOG_DEBUG() << widget->key().toString();
   }
-  edits.clear()
+  edits.clear();
   */
 
   /**
@@ -219,7 +219,8 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
    */
 
 
- QTimer::singleShot(200, this, SLOT(syncFromEntry()));
+ QTimer::singleShot(200, this, SLOT(onReady()));
+
 
 
 
@@ -260,10 +261,7 @@ void LanesLexicon::showStartupEntry() {
   }
 }
 /**
- * Only call restoreState() if we have a valid size setting otherwise
- * restoring the state will set the width for the child windows which may
- * not look so good. (This will only happen if we've been manually editing
- * the INI file.)
+
  */
 void LanesLexicon::restoreSavedState() {
   SETTINGS
@@ -865,7 +863,7 @@ void LanesLexicon::createActions() {
 
   m_changeArabicFontAction = new QAction(tr("Change &Arabic font"),this);
 
-  m_showContentsAction = new QAction(tr("Show &contents"),this);
+  m_showContentsAction = new QAction(tr("Hide &contents"),this);
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
@@ -1251,7 +1249,6 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_linkAction);
   m_viewMenu->addAction(m_defaultScaleAction);
   m_viewMenu->addAction(m_showContentsAction);
-  m_showContentsAction->setEnabled(false);
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -1623,7 +1620,7 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
  */
 bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
   if ((event->type() == QEvent::Close) && (target == m_treeDock)) {
-    m_showContentsAction->setEnabled(true);
+    m_showContentsAction->setText(tr("&Show contents"));
   }
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
@@ -3598,6 +3595,7 @@ void LanesLexicon::syncFromContents() {
  */
 void LanesLexicon::syncFromEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if ( ! entry )
     return;
@@ -4068,6 +4066,37 @@ void LanesLexicon::onKeymapHelp(const QString & mapname) {
   }
 }
 void LanesLexicon::onShowContents() {
-  m_treeDock->show();
-  m_showContentsAction->setEnabled(false);
+  QWidget * w;
+  if (m_docked) {
+    w = m_treeDock;
+  }
+  else {
+    w = m_tree;
+  }
+  if (w->isVisible()) {
+    w->hide();
+    m_showContentsAction->setText(tr("&Show contents"));//Enabled(false);
+  }
+  else {
+    w->show();
+    m_showContentsAction->setText(tr("&Hide contents"));//Enabled(false);
+  }
+}
+void LanesLexicon::onReady() {
+  QWidget * w;
+  if (m_docked) {
+    w = m_treeDock;
+  }
+  else {
+    w = m_tree;
+  }
+
+  if (w->isVisible()) {
+    m_showContentsAction->setText(tr("&Hide contents"));//Enabled(false);
+  }
+  else {
+    m_showContentsAction->setText(tr("&Show contents"));//Enabled(false);
+  }
+
+  syncFromEntry();
 }

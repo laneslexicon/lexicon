@@ -91,6 +91,7 @@ class LanesLexicon : public QMainWindow
       void enableKeymaps(bool);
     //    void saveNote(Note *);
     private slots:
+      void onReady();
       void onLogViewer();
       void onLinkChanged();
       void testSlot();
