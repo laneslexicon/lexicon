@@ -124,6 +124,11 @@ int main(int argc, char *argv[])
 
     QCommandLineOption enableTestOption(QStringList() << "b" << "enable-test","enable test");
     parser.addOption(enableTestOption);
+
+    parser.addOption(enableTestOption);
+    QCommandLineOption noRestoreState(QStringList() << "a" << "no-restore-state","Do not restore saved state");
+
+    parser.addOption(noRestoreState);
     // Process the actual command line arguments
     parser.process(mansur);
     const QStringList args = parser.positionalArguments();
@@ -175,6 +180,9 @@ int main(int argc, char *argv[])
     }
     if (parser.isSet(enableTestOption)) {
       options.insert("enabletest","");
+    }
+    if (parser.isSet(noRestoreState)) {
+      options.insert("nostate","");
     }
     mansur.setOptions(options);
     if (parser.isSet(themeOption)) {

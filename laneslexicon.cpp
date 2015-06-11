@@ -173,8 +173,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 
   onSetInterface();
-
-  restoreSavedState();
+    restoreSavedState();
   /// without this, the QSplashScreen is the active window
 
   //  m_tabs->currentWidget()->setFocus();
@@ -267,9 +266,14 @@ void LanesLexicon::restoreSavedState() {
   SETTINGS
 
   settings.beginGroup("System");
-  resize(settings.value(SID_SYSTEM_SIZE,QSize(800,860)).toSize());
-  move(settings.value(SID_SYSTEM_POS,QSize(200,80)).toPoint());
-  this->restoreState(settings.value(SID_SYSTEM_STATE).toByteArray());
+  QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
+  if (! cmdOptions.contains("nostate"))
+    this->restoreState(settings.value(SID_SYSTEM_STATE).toByteArray());
+
+
+  resize(settings.value(SID_SYSTEM_SIZE,QSize(800,950)).toSize());
+  move(settings.value(SID_SYSTEM_POS,QSize(450,20)).toPoint());
+
 
 }
 void LanesLexicon::closeEvent(QCloseEvent * event) {
@@ -1413,7 +1417,7 @@ void LanesLexicon::onLinkChanged() {
   }
 }
 QSize LanesLexicon::sizeHint() const {
-  return QSize(800,600);
+  return QSize(800,950);
 }
 void LanesLexicon::onHistorySelection() {
   QAction * action = static_cast<QAction *>(QObject::sender());
@@ -4083,6 +4087,9 @@ void LanesLexicon::onShowContents() {
   }
 }
 void LanesLexicon::onReady() {
+
+
+
   QWidget * w;
   if (m_docked) {
     w = m_treeDock;
