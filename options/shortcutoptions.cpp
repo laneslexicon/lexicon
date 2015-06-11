@@ -13,7 +13,7 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
   QVBoxLayout * vlayout = new QVBoxLayout;
 
   QStringList keys;
-  keys << SID_SHORTCUT_CONTENTS_COLLAPSE_ALL << SID_SHORTCUT_CONTENTS_COLLAPSE_LETTER;
+  keys << SID_SHORTCUT_CONTENTS_COLLAPSE_ALL << SID_SHORTCUT_CONTENTS_COLLAPSE_LETTER << SID_SHORTCUT_CONTENTS_SHOW;
   addTab("Contents",keys);
   keys.clear();
 
