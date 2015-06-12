@@ -42,8 +42,10 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   QSettings settings(getLexicon()->settingsFileName(theme),QSettings::IniFormat);
 #endif
 
+  m_tempFileName = getLexicon()->copyToTemp(settings.fileName());
   m_theme = useTheme;
   m_modified = false;
+  m_hasChanges = false;
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Options");
   QString testFileName(".vanilla.ini");
@@ -155,7 +157,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
 
 
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save
-                                     | QDialogButtonBox::Cancel
+                                     | QDialogButtonBox::Close
                                    // | QDialogButtonBox::Apply
                                      | QDialogButtonBox::Reset
                                      );
@@ -181,9 +183,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   vlayout->addWidget(m_buttons);
   setLayout(vlayout);
   QPushButton * btn;
-  //  btn = m_buttons->button(QDialogButtonBox::Apply);
-  //  btn->setEnabled(false);
-  //  connect(btn,SIGNAL(clicked()),this,SLOT(applyChanges()));
+
   btn = m_buttons->button(QDialogButtonBox::Reset);
   btn->setEnabled(false);
   connect(btn,SIGNAL(clicked()),this,SLOT(resetChanges()));
@@ -199,6 +199,9 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
 }
 OptionsDialog::~OptionsDialog() {
   writeSettings();
+  if (! m_tempFileName.isEmpty()) {
+    QFile::remove(m_tempFileName);
+  }
 }
 void OptionsDialog::writeSettings() {
 #ifdef STANDALONE
@@ -212,14 +215,6 @@ void OptionsDialog::writeSettings() {
   settings.setValue("Pos", pos());
   settings.endGroup();
 }
-
-void OptionsDialog::applyChanges() {
-  OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
-  if (tab) {
-    tab->writeSettings();
-    this->enableButtons();
-  }
-}
 void OptionsDialog::enableButtons() {
   bool v = false;
   OptionsWidget * currentTab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
@@ -228,16 +223,19 @@ void OptionsDialog::enableButtons() {
     if (tab) {
       if (tab->isModified()) {
         QLOG_DEBUG() << Q_FUNC_INFO << QString("Modified tab: %1, %2").arg(i).arg(m_tabs->tabText(i));
-        v = true;
-      }
-      if (tab == currentTab) {
-        this->setApplyReset(tab->isModified());
+        m_hasChanges = v = true;
       }
     }
   }
   QPushButton * btn = m_buttons->button(QDialogButtonBox::Save);
   if (btn) {
     btn->setEnabled(v);
+  }
+  if (v && ! m_tempFileName.isEmpty()) {
+    btn = m_buttons->button(QDialogButtonBox::Reset);
+    if (btn) {
+      btn->setEnabled(m_hasChanges);
+    }
   }
 }
 void OptionsDialog::valueChanged(bool /* v */) {
@@ -246,30 +244,75 @@ void OptionsDialog::valueChanged(bool /* v */) {
 void OptionsDialog::saveChanges() {
   for(int i=0;i < m_tabs->count();i++) {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
-    if (tab) {
+    if (tab && tab->isModified()) {
+      tab->blockSignals(true);
       tab->writeSettings();
       m_modified = false;
+      tab->blockSignals(false);
     }
   }
   this->accept();
 }
 void OptionsDialog::resetChanges() {
-  OptionsWidget * w = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
-  if (w) {
-    w->readSettings();
-    this->enableButtons();
+  bool ok = false;
+  QLOG_DEBUG() << Q_FUNC_INFO << m_tempFileName;
+  if (m_tempFileName.isEmpty()) {
+    return;
   }
+  if (! QFile::exists(m_tempFileName)) {
+    return;
+  }
+#ifndef LANE
+  QString fileName = QString("%1.ini").arg(m_theme);
+#else
+  QString fileName = getLexicon()->settingsFileName(m_theme);
+#endif
+  QString tempFile = getLexicon()->copyToTemp(fileName);
+  if (tempFile.isEmpty()) {
+    QLOG_WARN() << QString(tr("Unable to create temporary file for reset: %1")).arg(tempFile);
+    return;
+  }
+  if (QFile::remove(fileName)) {
+    if  (QFile::copy(m_tempFileName,fileName)) {
+      ok = true;
+      qDebug() << QString(tr("Restored settings file from [%1] to [%2]"))
+        .arg(m_tempFileName)
+        .arg(fileName);
+    }
+    else {
+      qDebug() << Q_FUNC_INFO << "Restore failed";
+    }
+  }
+  else {
+    qDebug() << Q_FUNC_INFO << "Remove failed";
+  }
+
+  QFile::remove(tempFile);
+  if (! ok ) {
+    return;
+  }
+  for(int i=0;i < m_tabs->count();i++) {
+    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
+    if (tab) {
+      tab->blockSignals(true);
+      tab->readSettings();
+      m_modified = false;
+      tab->blockSignals(false);
+    }
+  }
+  enableButtons();
 }
 void OptionsDialog::currentChanged(int /* ix */) {
   enableButtons();
 }
+/*
 void OptionsDialog::setApplyReset(bool v) {
   QPushButton * btn;
-  //  QPushButton * btn = m_buttons->button(QDialogButtonBox::Apply);
-  //  btn->setEnabled(v);
   btn = m_buttons->button(QDialogButtonBox::Reset);
+  if (m_tempFile
   btn->setEnabled(v);
 }
+*/
 bool OptionsDialog::isModified() const {
   return m_modified;
 }

@@ -20,17 +20,18 @@ class OptionsDialog : public QDialog {
     void valueChanged(bool);
     void saveChanges();
     void resetChanges();
-    void applyChanges();
     void currentChanged(int);
  private:
     void setup();
     void writeSettings();
     void enableButtons();
-    void setApplyReset(bool);
+    //    void setApplyReset(bool);
     QDialogButtonBox * m_buttons;
     QTabWidget * m_tabs;
     QString m_theme;
     bool m_modified;
+    bool m_hasChanges;
+    QString m_tempFileName;
   signals:
     void showHelp(const QString &);
 };
