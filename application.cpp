@@ -983,3 +983,15 @@ void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t
   }
   */
 }
+QString Lexicon::copyToTemp(const QString & fileName) {
+  QString tempFileName;
+  QTemporaryFile * f = new QTemporaryFile;
+  if (f && f->open()) {
+    tempFileName = f->fileName();
+    delete f;
+  }
+  if (QFile::copy(fileName,tempFileName)) {
+    return tempFileName;
+  }
+  return QString();
+}

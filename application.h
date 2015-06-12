@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QTemporaryFile>
 #include <QDebug>
 #include <QSettings>
 #include <QFontDatabase>
@@ -38,6 +39,7 @@ public:
   QString     getDefaultKeyboard();
   bool        setDefaultKeyboard(const QString &);
   QString getStylesheetFilePath(int type);
+  QString copyToTemp(const QString &);
   //  QString getResourcePath(int type);
   QString getResourceFilePath(int type,const QString & = QString());
   QString spanArabic(const QString &,const QString & which = QString());
