@@ -346,4 +346,4 @@ They should not be translated.
 #define SID_PROMPT 2
 
 
-#define SID_NOTES
+//#define SID_NOTES

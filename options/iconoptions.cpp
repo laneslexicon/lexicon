@@ -199,6 +199,9 @@ void IconOptions::readSettings() {
   m_zoomOut->setText(settings.value(SID_ICON_ZOOM_OUT,QString()).toString());
   setIconFromField(m_zoomOut,SID_ICON_ZOOM_OUT);
 
+  m_notes->setText(settings.value(SID_ICON_NOTES,QString()).toString());
+  setIconFromField(m_notes,SID_ICON_NOTES);
+
 
   m_dirty = false;
 }
@@ -250,6 +253,7 @@ void IconOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ICON_ZOOM,m_zoom->text());
   settings.setValue(SID_ICON_ZOOM_IN,m_zoomIn->text());
   settings.setValue(SID_ICON_ZOOM_OUT,m_zoomOut->text());
+  settings.setValue(SID_ICON_NOTES,m_notes->text());
 
   m_dirty = false;
   settings.sync();
@@ -366,6 +370,9 @@ bool IconOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_ICON_ZOOM_OUT,m_zoomOut)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_NOTES,m_notes)) {
     m_dirty = true;
   }
 
