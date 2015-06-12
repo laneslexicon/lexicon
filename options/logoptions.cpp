@@ -89,7 +89,7 @@ void LogOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_LOGGING_VIEWER_MAXLINES,m_maxLines->text());
   settings.setValue(SID_LOGGING_VIEWER_INTERVAL,m_interval->text());
   settings.setValue(SID_LOGGING_ROTATE,m_rotate->isChecked());
-
+  settings.sync();
   m_dirty = false;
   emit(modified(false));
 }

@@ -107,6 +107,8 @@ void ShortcutOptions::writeSettings(const QString & fileName) {
   settings.beginGroup(m_section);
   //  m_settings->setValue(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL,m_collapseAll->keySequence().toString());
   settings.endGroup();
+  settings.sync();
+  m_dirty = false;
   emit(modified(false));
 
 }

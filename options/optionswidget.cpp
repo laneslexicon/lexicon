@@ -5,16 +5,9 @@
 #else
 #define QLOG_DEBUG() qDebug()
 #endif
-OptionsWidget::OptionsWidget(QSettings * settings,QWidget * parent) : QWidget(parent) {
-  m_dirty = false;
-  m_settings = settings;
-  m_debug = false;
-  m_btns = 0;
-}
 OptionsWidget::OptionsWidget(QWidget * parent) : QWidget(parent) {
   m_debug = false;
   m_dirty = false;
-  m_settings = 0;
   m_btns = 0;
 }
 OptionsWidget::OptionsWidget(const QString & theme,QWidget * parent) : QWidget(parent) {

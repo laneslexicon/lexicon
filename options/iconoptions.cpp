@@ -210,8 +210,6 @@ void IconOptions::writeSettings(const QString & fileName) {
 
   QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
-  qDebug() << Q_FUNC_INFO << f;
-
   settings.beginGroup("Resources");
   settings.setValue(SID_RESOURCES_IMAGES,m_directory->text());
   settings.endGroup();
@@ -254,6 +252,7 @@ void IconOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ICON_ZOOM_OUT,m_zoomOut->text());
 
   m_dirty = false;
+  settings.sync();
   emit(modified(false));
 }
 /**

@@ -160,6 +160,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
 #else
 
 #endif
+  settings.sync();
   m_dirty = false;
   emit(modified(false));
 }

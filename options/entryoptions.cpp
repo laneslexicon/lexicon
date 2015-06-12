@@ -282,6 +282,7 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ENTRY_PRINT_NOTES,m_printNotes->currentData());
   settings.setValue(SID_ENTRY_PRINT_NODES,m_printNodes->currentData());
   settings.setValue(SID_ENTRY_PRINT_INFO,m_printInfo->currentData());
+  settings.sync();
   m_dirty = false;
   emit(modified(false));
 }

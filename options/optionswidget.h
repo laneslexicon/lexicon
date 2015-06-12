@@ -30,7 +30,7 @@
 class OptionsWidget : public QWidget {
   Q_OBJECT
  public:
-  OptionsWidget(QSettings * settings = 0,QWidget * parent = 0);
+  //  OptionsWidget(QSettings * settings = 0,QWidget * parent = 0);
   OptionsWidget(const QString & theme,QWidget * parent = 0);
   OptionsWidget(QWidget * parent = 0);
   ~OptionsWidget();
@@ -64,7 +64,7 @@ class OptionsWidget : public QWidget {
  protected:
   bool m_dirty;
   QDialogButtonBox * m_btns;
-  QSettings * m_settings;
+  //  QSettings * m_settings;
   QString m_section;
   QString m_settingsFileName;
   QLabel * m_info;

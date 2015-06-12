@@ -162,6 +162,7 @@ void DiacriticsOptions::writeSettings(const QString & fileName) {
       hexstr.clear();
   }
   settings.endGroup();
+  settings.sync();
   emit(modified(false));
 }
 bool DiacriticsOptions::isModified()  {

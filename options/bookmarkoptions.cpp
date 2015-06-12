@@ -112,7 +112,7 @@ void BookmarkOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_BOOKMARK_GO_TAB,m_goTab->isChecked());
   settings.setValue(SID_BOOKMARK_ID,m_id->text());
   settings.setValue(SID_BOOKMARK_ARABIC_FONT,m_font->text());
-
+  settings.sync();
   m_dirty = false;
   emit(modified(false));
 }

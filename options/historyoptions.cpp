@@ -98,7 +98,7 @@ void HistoryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_HISTORY_DUPLICATE_DEPTH,m_duplicateDepth->text());
   settings.setValue(SID_HISTORY_SIZE,m_size->text());
   settings.setValue(SID_HISTORY_LIST_ARABIC_FONT,m_listFont->text());
-
+  settings.sync();
   m_dirty = false;
   emit(modified(false));
 }

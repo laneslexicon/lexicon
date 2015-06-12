@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
 #include <QPushButton>
-class RootsOptions;
+//class RootsOptions;
 
 class OptionsDialog : public QDialog {
   Q_OBJECT
