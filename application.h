@@ -38,7 +38,7 @@ public:
   QString     getDefaultKeyboard();
   bool        setDefaultKeyboard(const QString &);
   QString getStylesheetFilePath(int type);
-  QString getResourcePath(int type);
+  //  QString getResourcePath(int type);
   QString getResourceFilePath(int type,const QString & = QString());
   QString spanArabic(const QString &,const QString & which = QString());
   QString scanAndSpan(const QString &,const QString & css = QString("ar"));

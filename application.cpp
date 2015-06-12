@@ -62,7 +62,7 @@ bool Lexicon::isOk() const {
  * @param name If empty return the path to the directory of the required item type
  *
  * @return
- */
+
 QString Lexicon::getResourcePath(int type) {
   QFile file;
   QFileInfo f(m_settingsDir,m_configFile);
@@ -136,6 +136,7 @@ QString Lexicon::getResourcePath(int type) {
   }
   return QString();
 }
+*/
 QString Lexicon::getResourceFilePath(int type, const QString & name) {
   QFile file;
   QFileInfo f(m_settingsDir,m_configFile);
