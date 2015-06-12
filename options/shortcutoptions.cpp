@@ -66,10 +66,6 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
   setupConnections();
   this->setKeySequenceEditSize(VLARGE_EDIT);
 }
-/**
- * compare the key sequences with what's in the QSettings
- *
- */
 
 void ShortcutOptions::readSettings() {
   QString key;
@@ -94,7 +90,7 @@ void ShortcutOptions::readSettings() {
   settings.endGroup();
 }
 /**
- * TODO not complete
+ *
  *
  */
 void ShortcutOptions::writeSettings(const QString & fileName) {
@@ -105,26 +101,45 @@ void ShortcutOptions::writeSettings(const QString & fileName) {
   QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
-  //  m_settings->setValue(SID_SHORTCUT_CONTENTS_COLLAPSE_ALL,m_collapseAll->keySequence().toString());
+  for(int i=0;i < m_tabs->count();i++) {
+    QWidget * w = m_tabs->widget(i);
+    QList<QKeySequenceEdit *> edits = w->findChildren<QKeySequenceEdit *>();
+    foreach(QKeySequenceEdit *  widget,edits) {
+      QString key = widget->objectName();
+      QString value = widget->keySequence().toString();
+      value.remove(QChar(' '));
+      settings.setValue(key,value);
+    }
+  }
   settings.endGroup();
   settings.sync();
   m_dirty = false;
   emit(modified(false));
 
 }
+/**
+ * compare the key sequences with what's in the QSettings
+ *
+ */
 bool ShortcutOptions::isModified()  {
   QString key;
   QString value;
+  QString oldValue;
   m_dirty = false;
+  QSettings settings(m_settingsFileName,QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  settings.beginGroup(m_section);
 
   for(int i=0;i < m_tabs->count();i++) {
     QWidget * w = m_tabs->widget(i);
     QList<QKeySequenceEdit *> edits = w->findChildren<QKeySequenceEdit *>();
     foreach(QKeySequenceEdit *  widget,edits) {
       key = widget->objectName();
+      oldValue = settings.value(key,QString()).toString();
+      oldValue.remove(QChar(' '));
       value = widget->keySequence().toString();
       value.remove(QChar(' '));
-      if (value != m_values.value(key)) {
+      if (value != oldValue) {
         m_dirty = true;
       }
     }
