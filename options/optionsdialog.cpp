@@ -156,7 +156,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
 
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save
                                      | QDialogButtonBox::Cancel
-                                     | QDialogButtonBox::Apply
+                                   // | QDialogButtonBox::Apply
                                      | QDialogButtonBox::Reset
                                      );
 
@@ -180,9 +180,10 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   vlayout->addWidget(m_tabs);
   vlayout->addWidget(m_buttons);
   setLayout(vlayout);
-  QPushButton * btn = m_buttons->button(QDialogButtonBox::Apply);
-  btn->setEnabled(false);
-  connect(btn,SIGNAL(clicked()),this,SLOT(applyChanges()));
+  QPushButton * btn;
+  //  btn = m_buttons->button(QDialogButtonBox::Apply);
+  //  btn->setEnabled(false);
+  //  connect(btn,SIGNAL(clicked()),this,SLOT(applyChanges()));
   btn = m_buttons->button(QDialogButtonBox::Reset);
   btn->setEnabled(false);
   connect(btn,SIGNAL(clicked()),this,SLOT(resetChanges()));
@@ -244,10 +245,10 @@ void OptionsDialog::valueChanged(bool /* v */) {
 }
 void OptionsDialog::saveChanges() {
   for(int i=0;i < m_tabs->count();i++) {
-    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
+    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab) {
       tab->writeSettings();
-      m_modified = true;
+      m_modified = false;
     }
   }
   this->accept();
@@ -263,8 +264,9 @@ void OptionsDialog::currentChanged(int /* ix */) {
   enableButtons();
 }
 void OptionsDialog::setApplyReset(bool v) {
-  QPushButton * btn = m_buttons->button(QDialogButtonBox::Apply);
-  btn->setEnabled(v);
+  QPushButton * btn;
+  //  QPushButton * btn = m_buttons->button(QDialogButtonBox::Apply);
+  //  btn->setEnabled(v);
   btn = m_buttons->button(QDialogButtonBox::Reset);
   btn->setEnabled(v);
 }
