@@ -210,7 +210,7 @@ void IconOptions::writeSettings(const QString & fileName) {
 
   QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
-
+  qDebug() << Q_FUNC_INFO << f;
 
   settings.beginGroup("Resources");
   settings.setValue(SID_RESOURCES_IMAGES,m_directory->text());
@@ -254,7 +254,8 @@ void IconOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ICON_ZOOM_OUT,m_zoomOut->text());
 
 
-
+  settings.sync();
+  qDebug() << Q_FUNC_INFO << "Synched";
 
   m_dirty = false;
   emit(modified(false));
@@ -416,14 +417,10 @@ void IconOptions::onSetFile() {
             tr("Open Image"),imagedirectory , tr("Image Files (*.*)"));
 
 
+  QDir id(imagedirectory);
+
   if (! fileName.isEmpty()) {
-    if (fileName.startsWith(imagedirectory)) {
-      QString s = QString("%1%2").arg(imagedirectory).arg(QDir::separator());;
-      edit->setText(fileName.remove(s));
-    }
-    else {
-      edit->setText(fileName);
-    }
+    edit->setText(id.relativeFilePath(fileName));
   }
  setIconFromField(edit,sid);
 }
