@@ -253,10 +253,6 @@ void IconOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ICON_ZOOM_IN,m_zoomIn->text());
   settings.setValue(SID_ICON_ZOOM_OUT,m_zoomOut->text());
 
-
-  settings.sync();
-  qDebug() << Q_FUNC_INFO << "Synched";
-
   m_dirty = false;
   emit(modified(false));
 }

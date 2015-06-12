@@ -3474,11 +3474,12 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
  * @param theme
  */
 void LanesLexicon::setIcons(const QString & /* theme */) {
-  QLOG_DEBUG() << Q_FUNC_INFO;
+
   QString iconfile;
   SETTINGS
   settings.beginGroup("Icons");
   QString imageDirectory = getLexicon()->getResourceFilePath(Lexicon::Image);
+  QLOG_DEBUG() << Q_FUNC_INFO << imageDirectory;
   QDir imgd(imageDirectory);
   if (!imgd.exists()) {
     QLOG_WARN() << QString(tr("Theme image directory not found : %1")).arg(imgd.absolutePath());
