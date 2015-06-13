@@ -15,6 +15,7 @@
 #include "splashscreen.h"
 #include "definedsettings.h"
 #include <iostream>
+#include "optionsdialog.h"
 #include "externs.h"
 #ifdef __APPLE__
 int RandomUnder(int topPlusOne)
@@ -85,48 +86,48 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addVersionOption();
      // An option with a value
-    QCommandLineOption nodeOption(QStringList() <<"n" << "node","make the given node the initial display","node");
+    QCommandLineOption nodeOption(QStringList() <<"n" << "node",QObject::tr("Show the supplied node"),"node");
     parser.addOption(nodeOption);
 
-    QCommandLineOption rootOption(QStringList() <<"r" << "root","make the given root the initial display","root");
+    QCommandLineOption rootOption(QStringList() <<"r" << "root",QObject::tr("Show the supplied root"),"root");
     parser.addOption(rootOption);
-    /*
-    QCommandLineOption configOption(QStringList() <<"c" << "config","use the given INI file","config");
+
+    QCommandLineOption configOption(QStringList() <<"c" << "config",QObject::tr("Run configuration"));
     parser.addOption(configOption);
-    */
-    QCommandLineOption fontOption(QStringList() << "f" << "fonts","List your systems Arabic fonts");
+
+    QCommandLineOption fontOption(QStringList() << "f" << "fonts",QObject::tr("List your systems Arabic fonts"));
     parser.addOption(fontOption);
 
-    QCommandLineOption dbOption(QStringList() << "d" << "dbname","use the specified database","db");
+    QCommandLineOption dbOption(QStringList() << "d" << "dbname",QObject::tr("Use the specified database"),"db");
     parser.addOption(dbOption);
 
 
-    QCommandLineOption langOption(QStringList() <<"e" << "lang","use the specified language","lang");
+    QCommandLineOption langOption(QStringList() <<"e" << "lang",QObject::tr("Use the specified language"),"lang");
     parser.addOption(langOption);
 
-    QCommandLineOption nosaveOption(QStringList() << "x" << "no-save","do not save the settings");
+    QCommandLineOption nosaveOption(QStringList() << "x" << "no-save",QObject::tr("Do not save the settings"));
     parser.addOption(nosaveOption);
 
-    QCommandLineOption notabsOption(QStringList() << "s" << "no-restore","do not restore tabs");
+    QCommandLineOption notabsOption(QStringList() << "s" << "no-restore",QObject::tr("Do not restore tabs"));
     parser.addOption(notabsOption);
 
-    QCommandLineOption themeOption(QStringList() << "t" << "theme","use given theme","theme");
+    QCommandLineOption themeOption(QStringList() << "t" << "theme",QObject::tr("Use given theme"),"theme");
     parser.addOption(themeOption);
 
-    QCommandLineOption textWidthOption(QStringList() << "w" << "text-width","set textwidth","textwidth");
+    QCommandLineOption textWidthOption(QStringList() << "w" << "text-width",QObject::tr("Set textwidth"),"textwidth");
     parser.addOption(textWidthOption);
 
-    QCommandLineOption nosplashOption(QStringList() << "p" << "no-splash","do not show splash screen");
+    QCommandLineOption nosplashOption(QStringList() << "p" << "no-splash",QObject::tr("Do not show splash screen"));
     parser.addOption(nosplashOption);
 
-    QCommandLineOption logOption(QStringList() << "l" << "log-level","set logging level","loglevel");
+    QCommandLineOption logOption(QStringList() << "l" << "log-level",QObject::tr("Set logging level 0 (most) - 6 (none)"),"loglevel");
     parser.addOption(logOption);
 
-    QCommandLineOption enableTestOption(QStringList() << "b" << "enable-test","enable test");
+    QCommandLineOption enableTestOption(QStringList() << "b" << "enable-test",QObject::tr("enable test"));
     parser.addOption(enableTestOption);
 
     parser.addOption(enableTestOption);
-    QCommandLineOption noRestoreState(QStringList() << "a" << "no-restore-state","Do not restore saved state");
+    QCommandLineOption noRestoreState(QStringList() << "a" << "no-restore-state",QObject::tr("Do not restore saved state"));
 
     parser.addOption(noRestoreState);
     // Process the actual command line arguments
@@ -226,6 +227,9 @@ int main(int argc, char *argv[])
         makeSplash = false;
       }
     }
+    if (parser.isSet(configOption)) {
+      makeSplash = false;
+    }
     if (makeSplash) {
       QDir d(splashDir);
       QList<QByteArray> formats =  QImageReader::supportedImageFormats();
@@ -254,19 +258,25 @@ int main(int argc, char *argv[])
       }
     }
     mansur.processEvents();
-
-    LanesLexicon *  w = new LanesLexicon;
-    if (w->isOk()) {
-      w->show();
-      if (makeSplash) {
-        splash->setWidget(w);
-        QTimer::singleShot(splashDelay * 1000, splash, SLOT(pausedFinish()));
-      }
+    if (parser.isSet(configOption)) {
+      OptionsDialog * d = new OptionsDialog(mansur.currentTheme());
+      d->show();
       ret = mansur.exec();
     }
     else {
-      mansur.quit();
-      return 0;
+      LanesLexicon *  w = new LanesLexicon;
+      if (w->isOk()) {
+        w->show();
+        if (makeSplash) {
+          splash->setWidget(w);
+          QTimer::singleShot(splashDelay * 1000, splash, SLOT(pausedFinish()));
+        }
+        ret = mansur.exec();
+      }
+      else {
+        mansur.quit();
+        return 0;
+      }
     }
     return ret;
 }
