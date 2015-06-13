@@ -18,6 +18,7 @@ class SystemOptions : public OptionsWidget {
     void onSetDatabase();
     void onSetCss();
     void onSetNotesDatabase();
+    void onSetHistoryDatabase();
  private:
     //    QLineEdit * m_arabicFont;
     //    QLineEdit * m_color;
@@ -40,6 +41,8 @@ class SystemOptions : public OptionsWidget {
     QCheckBox * m_saveTabs;
     QCheckBox * m_showInterfaceWarning;
     QLineEdit * m_css;
+    QLineEdit * m_historyDb;
+    QCheckBox * m_history;
     QComboBox * m_theme;
     QComboBox * m_keyboard;
     QLineEdit * m_title;

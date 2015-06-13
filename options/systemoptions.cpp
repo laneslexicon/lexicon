@@ -42,6 +42,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   // Save boo
   m_showInterfaceWarning = new QCheckBox;
+
   m_css = new QLineEdit;
   QHBoxLayout * csslayout = new QHBoxLayout;
   QPushButton * cssbutton = new QPushButton(tr("..."));
@@ -66,33 +67,54 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   noteslayout->addStretch();
   connect(notesbutton,SIGNAL(clicked()),this,SLOT(onSetNotesDatabase()));
 
+  m_historyDb = new QLineEdit;
+  QHBoxLayout * historylayout = new QHBoxLayout;
+  QPushButton * historybutton = new QPushButton(tr("..."));
+  historylayout->addWidget(m_historyDb);
+  historylayout->addWidget(historybutton);
+  historylayout->addStretch();
+  connect(historybutton,SIGNAL(clicked()),this,SLOT(onSetHistoryDatabase()));
+
   m_keyboard = new QComboBox;
 
   m_splashScreen = new QCheckBox;
-  QFormLayout * layout = new QFormLayout;
+
+  QGroupBox * dbgroup = new QGroupBox(tr("Databases"));
+  QFormLayout * dblayout = new QFormLayout;
+  dblayout->addRow(tr("Lexicon"),lexiconlayout);
+  dblayout->addRow(tr("Notes"),noteslayout);
+  dblayout->addRow(tr("History"),historylayout);
+  dbgroup->setLayout(dblayout);
 
 
-  layout->addRow(tr("Database"),lexiconlayout);
-  layout->addRow(tr("Debug"),m_debug);
-  layout->addRow(tr("Docked"),m_docked);
-  layout->addRow(tr("Current tab"),m_focusTab);
-  layout->addRow(tr("Contents linked"),m_contentsLinked);
-  layout->addRow(tr("Minimal interface"),m_minimalInterface);
-  layout->addRow(tr("Restore bookmarks"),m_restoreBookmarks);
-  layout->addRow(tr("Restore tab"),m_restoreTabs);
-  layout->addRow(tr("Save settings"),m_saveSettings);
-  layout->addRow(tr("Run date"),m_runDate);
-  layout->addRow(tr("Show interface warning"),m_showInterfaceWarning);
-  layout->addRow(tr("Application stylesheet"),csslayout);
-  layout->addRow(tr("Theme"),m_theme);
-  layout->addRow(tr("Title"),m_title);
-  layout->addRow(tr("Toolbar text"),m_toolbarText);
-  layout->addRow(tr("Nav by root"),m_rootNavigation);
-  layout->addRow(tr("Use notes"),m_useNotes);
-  layout->addRow(tr("Notes db"),noteslayout);
-  layout->addRow(tr("Keyboard"),m_keyboard);
-  layout->addRow(tr("Show splash scrren"),m_splashScreen);
-  vlayout->addLayout(layout);
+  QGroupBox * othergroup = new QGroupBox(tr("Options"));
+  QFormLayout * optionlayout = new QFormLayout;
+
+
+
+  optionlayout->addRow(tr("Debug"),m_debug);
+  optionlayout->addRow(tr("Docked"),m_docked);
+  optionlayout->addRow(tr("Current tab"),m_focusTab);
+  optionlayout->addRow(tr("Contents linked"),m_contentsLinked);
+  optionlayout->addRow(tr("Minimal interface"),m_minimalInterface);
+  optionlayout->addRow(tr("Restore bookmarks"),m_restoreBookmarks);
+  optionlayout->addRow(tr("Restore tab"),m_restoreTabs);
+  optionlayout->addRow(tr("Save settings"),m_saveSettings);
+  optionlayout->addRow(tr("Run date"),m_runDate);
+  optionlayout->addRow(tr("Show interface warning"),m_showInterfaceWarning);
+  optionlayout->addRow(tr("Application stylesheet"),csslayout);
+  optionlayout->addRow(tr("Theme"),m_theme);
+  optionlayout->addRow(tr("Title"),m_title);
+  optionlayout->addRow(tr("Toolbar text"),m_toolbarText);
+  optionlayout->addRow(tr("Nav by root"),m_rootNavigation);
+  optionlayout->addRow(tr("Use notes"),m_useNotes);
+
+  optionlayout->addRow(tr("Keyboard"),m_keyboard);
+  optionlayout->addRow(tr("Show splash screen"),m_splashScreen);
+  othergroup->setLayout(optionlayout);
+
+  vlayout->addWidget(dbgroup);
+  vlayout->addWidget(othergroup);
 
   vlayout->addStretch();
   setLayout(vlayout);
@@ -145,6 +167,9 @@ void SystemOptions::readSettings() {
   settings.endGroup();
   settings.beginGroup("Splash");
   m_splashScreen->setChecked(settings.value(SID_SPLASH_ENABLED,true).toBool());
+  settings.endGroup();
+  settings.beginGroup("History");
+  m_historyDb->setText(settings.value(SID_HISTORY_DATABASE,"history.sqlite").toString());
 
 
   m_dirty = false;
@@ -193,6 +218,9 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.endGroup();
   settings.beginGroup("Splash");
   settings.setValue(SID_SPLASH_ENABLED,m_splashScreen->isChecked());
+  settings.endGroup();
+  settings.beginGroup("History");
+  settings.setValue(SID_HISTORY_DATABASE,m_historyDb->text());
   settings.sync();
   m_dirty = false;
   emit(modified(false));
@@ -280,6 +308,11 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SPLASH_ENABLED,m_splashScreen)) {
     m_dirty = true;
   }
+  settings.endGroup();
+  settings.beginGroup("History");
+  if (compare(&settings,SID_HISTORY_DATABASE,m_historyDb)) {
+    m_dirty = true;
+  }
 
 
   return m_dirty;
@@ -352,6 +385,15 @@ void SystemOptions::onSetNotesDatabase() {
     return;
   }
   m_notesDb->setText(QDir::current().relativeFilePath(fileName));
+}
+void SystemOptions::onSetHistoryDatabase() {
+  QString fileName = QFileDialog::getOpenFileName(this,
+    tr("Select history database"), ".", tr("SQLite db (*.db *.sqlite)"));
+
+  if (fileName.isEmpty()) {
+    return;
+  }
+  m_historyDb->setText(QDir::current().relativeFilePath(fileName));
 }
 void SystemOptions::onSetCss() {
   QString cssDirectory = getLexicon()->getResourceFilePath(Lexicon::Stylesheet);

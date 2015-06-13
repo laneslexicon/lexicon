@@ -18,7 +18,7 @@ HistoryOptions::HistoryOptions(const QString & theme,QWidget * parent) : Options
   QFormLayout * layout = new QFormLayout;
 
   m_enabled = new QCheckBox ;
-  m_database = new QLineEdit ;
+  //  m_database = new QLineEdit ;
   m_menuFont = new QLineEdit;
   m_newTab = new QCheckBox ;
   m_goTab = new QCheckBox ;
@@ -29,7 +29,7 @@ HistoryOptions::HistoryOptions(const QString & theme,QWidget * parent) : Options
   m_listFont = new QLineEdit;
 
  layout->addRow(tr("Enabled"),m_enabled);
- layout->addRow(tr("Database"),m_database);
+ // layout->addRow(tr("Database"),m_database);
 
  QHBoxLayout * hlayout1 = new QHBoxLayout;
  m_menuButton = new QPushButton(tr("Click to set font"));
@@ -70,7 +70,7 @@ void HistoryOptions::readSettings() {
   settings.beginGroup(m_section);
 
   m_enabled->setChecked(settings.value(SID_HISTORY_ENABLED,true).toBool());
-  m_database->setText(settings.value(SID_HISTORY_DATABASE,"history.sqlite").toString());
+  //  m_database->setText(settings.value(SID_HISTORY_DATABASE,"history.sqlite").toString());
   m_menuFont->setText(settings.value(SID_HISTORY_MENU_ARABIC_FONT,QString()).toString());
   m_newTab->setChecked(settings.value(SID_HISTORY_NEW_TAB,true).toBool());
   m_goTab->setChecked(settings.value(SID_HISTORY_GO_TAB,true).toBool());
@@ -91,7 +91,7 @@ void HistoryOptions::writeSettings(const QString & fileName) {
   settings.beginGroup(m_section);
 
   settings.setValue(SID_HISTORY_ENABLED,m_enabled->isChecked());
-  settings.setValue(SID_HISTORY_DATABASE,m_database->text());
+  //  settings.setValue(SID_HISTORY_DATABASE,m_database->text());
   settings.setValue(SID_HISTORY_MENU_ARABIC_FONT,m_menuFont->text());
   settings.setValue(SID_HISTORY_NEW_TAB,m_newTab->isChecked());
   settings.setValue(SID_HISTORY_GO_TAB,m_goTab->isChecked());
@@ -117,9 +117,9 @@ bool HistoryOptions::isModified()  {
   if (compare(&settings,SID_HISTORY_ENABLED,m_enabled)){
     m_dirty = true;
   }
-  if (compare(&settings,SID_HISTORY_DATABASE,m_database)) {
-    m_dirty = true;
-  }
+  //  if (compare(&settings,SID_HISTORY_DATABASE,m_database)) {
+  //    m_dirty = true;
+  //  }
   if (compare(&settings,SID_HISTORY_MENU_ARABIC_FONT,m_menuFont)) {
     m_dirty = true;
   }
