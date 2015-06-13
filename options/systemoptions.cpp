@@ -38,11 +38,19 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   m_rootNavigation = new QCheckBox;
   // Root mod
   m_runDate = new QDateTimeEdit;
-  this->setControlSize(m_runDate,LARGE_EDIT);
+  this->setControlSize(m_runDate,VLARGE_EDIT);
 
   // Save boo
   m_showInterfaceWarning = new QCheckBox;
   m_css = new QLineEdit;
+  QHBoxLayout * csslayout = new QHBoxLayout;
+  QPushButton * cssbutton = new QPushButton(tr("..."));
+  csslayout->addWidget(m_css);
+  csslayout->addWidget(cssbutton);
+  csslayout->addStretch();
+  connect(cssbutton,SIGNAL(clicked()),this,SLOT(onSetCss()));
+
+
   m_theme = new QComboBox;
 
   m_title = new QLineEdit;
@@ -67,7 +75,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   layout->addRow(tr("Save settings"),m_saveSettings);
   layout->addRow(tr("Run date"),m_runDate);
   layout->addRow(tr("Show interface warning"),m_showInterfaceWarning);
-  layout->addRow(tr("Application stylesheet"),m_css);
+  layout->addRow(tr("Application stylesheet"),csslayout);
   layout->addRow(tr("Theme"),m_theme);
   layout->addRow(tr("Title"),m_title);
   layout->addRow(tr("Toolbar text"),m_toolbarText);
@@ -321,7 +329,7 @@ void SystemOptions::onSetColor() {
 }
 void SystemOptions::onSetDatabase() {
   QString fileName = QFileDialog::getOpenFileName(this,
-    tr("Select databasee"), ".", tr("SQLite db (*.db *.sqlite)"));
+    tr("Select database"), ".", tr("SQLite db (*.db *.sqlite)"));
 
   if (fileName.isEmpty()) {
     return;
@@ -329,4 +337,14 @@ void SystemOptions::onSetDatabase() {
   m_lexicon->setText(QDir::current().relativeFilePath(fileName));
 }
 void SystemOptions::onSetCss() {
+  QString cssDirectory = getLexicon()->getResourceFilePath(Lexicon::Stylesheet);
+  QString fileName = QFileDialog::getOpenFileName(this,
+    tr("Select application stylesheet"), cssDirectory, tr("CSS (*.css)"));
+
+  if (fileName.isEmpty()) {
+    return;
+  }
+
+  QDir d(cssDirectory);
+  m_css->setText(d.relativeFilePath(fileName));
 }
