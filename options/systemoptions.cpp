@@ -19,6 +19,12 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   m_contentsLinked = new QCheckBox;
   m_lexicon = new QLineEdit;
+  QPushButton * lexiconbutton = new QPushButton(tr("..."));
+  QHBoxLayout * lexiconlayout = new QHBoxLayout;
+  connect(lexiconbutton,SIGNAL(clicked()),this,SLOT(onSetDatabase()));
+  lexiconlayout->addWidget(m_lexicon);
+  lexiconlayout->addWidget(lexiconbutton);
+  lexiconlayout->addStretch();
   //  this->setControlSize(m_lexicon,VLARGE_EDIT);
   m_debug = new QCheckBox;
   m_docked = new QCheckBox;
@@ -49,11 +55,12 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   m_splashScreen = new QCheckBox;
   QFormLayout * layout = new QFormLayout;
 
-  layout->addRow(tr("Contents linked"),m_contentsLinked);
-  layout->addRow(tr("Database"),m_lexicon);
+
+  layout->addRow(tr("Database"),lexiconlayout);
   layout->addRow(tr("Debug"),m_debug);
   layout->addRow(tr("Docked"),m_docked);
   layout->addRow(tr("Current tab"),m_focusTab);
+  layout->addRow(tr("Contents linked"),m_contentsLinked);
   layout->addRow(tr("Minimal interface"),m_minimalInterface);
   layout->addRow(tr("Restore bookmarks"),m_restoreBookmarks);
   layout->addRow(tr("Restore tab"),m_restoreTabs);
@@ -311,4 +318,15 @@ void SystemOptions::onSetColor() {
   }
   m_highlightColor->setText(d.currentColor().name());
   */
+}
+void SystemOptions::onSetDatabase() {
+  QString fileName = QFileDialog::getOpenFileName(this,
+    tr("Select databasee"), ".", tr("SQLite db (*.db *.sqlite)"));
+
+  if (fileName.isEmpty()) {
+    return;
+  }
+  m_lexicon->setText(QDir::current().relativeFilePath(fileName));
+}
+void SystemOptions::onSetCss() {
 }

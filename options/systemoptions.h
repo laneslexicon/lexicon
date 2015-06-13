@@ -3,7 +3,7 @@
 #include "optionswidget.h"
 #include <QFontDialog>
 #include <QPushButton>
-
+#include <QFileDialog>
 class SystemOptions : public OptionsWidget {
   Q_OBJECT
 
@@ -15,6 +15,8 @@ class SystemOptions : public OptionsWidget {
     bool isModified();
     void onSetFont();
     void onSetColor();
+    void onSetDatabase();
+    void onSetCss();
  private:
     //    QLineEdit * m_arabicFont;
     //    QLineEdit * m_color;
