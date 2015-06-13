@@ -14,7 +14,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = laneslexicon
 TEMPLATE = app
 ! exists ("version.cpp") {
-   system(cp dummy_version.cpp version.cpp)
+  ! win32 {
+      system(cp dummy_version.cpp version.cpp)
+   }
+    win32 {
+    system(copy dummy_version.cpp version.cpp)
+   }
 }
 libxslt {
 ! win32 {
@@ -22,6 +27,10 @@ libxslt {
   LIBS += -L $$[QT_INSTALL_LIBS] -lxml2 -lxslt
 }
 win32 {
+INCLUDEPATH += "\Users\andrewsg\My Documents\libxml2-2.7.8.win32\include"
+INCLUDEPATH += "\Users\andrewsg\My Documents\libxslt-1.1.26.win32\include"
+LIBS += -L"\Users\andrewsg\My Documents\libxml2-2.7.8.win32\lib" -llibxml2
+LIBS += -L"\Users\andrewsg\My Documents\libxslt-1.1.26.win32\lib" -llibxslt
   INCLUDEPATH += c:/Users/andrewsg/xslt/include
   LIBS += -Lc:/Users/andrewsg/xslt/lib -llibxml2 -llibxslt
 }
