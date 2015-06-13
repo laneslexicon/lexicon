@@ -57,7 +57,15 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   m_toolbarText = new QCheckBox;
   m_useNotes = new QCheckBox;
+
   m_notesDb = new QLineEdit;
+  QHBoxLayout * noteslayout = new QHBoxLayout;
+  QPushButton * notesbutton = new QPushButton(tr("..."));
+  noteslayout->addWidget(m_notesDb);
+  noteslayout->addWidget(notesbutton);
+  noteslayout->addStretch();
+  connect(notesbutton,SIGNAL(clicked()),this,SLOT(onSetNotesDatabase()));
+
   m_keyboard = new QComboBox;
 
   m_splashScreen = new QCheckBox;
@@ -81,7 +89,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   layout->addRow(tr("Toolbar text"),m_toolbarText);
   layout->addRow(tr("Nav by root"),m_rootNavigation);
   layout->addRow(tr("Use notes"),m_useNotes);
-  layout->addRow(tr("Notes db"),m_notesDb);
+  layout->addRow(tr("Notes db"),noteslayout);
   layout->addRow(tr("Keyboard"),m_keyboard);
   layout->addRow(tr("Show splash scrren"),m_splashScreen);
   vlayout->addLayout(layout);
@@ -335,6 +343,15 @@ void SystemOptions::onSetDatabase() {
     return;
   }
   m_lexicon->setText(QDir::current().relativeFilePath(fileName));
+}
+void SystemOptions::onSetNotesDatabase() {
+  QString fileName = QFileDialog::getOpenFileName(this,
+    tr("Select notes database"), ".", tr("SQLite db (*.db *.sqlite)"));
+
+  if (fileName.isEmpty()) {
+    return;
+  }
+  m_notesDb->setText(QDir::current().relativeFilePath(fileName));
 }
 void SystemOptions::onSetCss() {
   QString cssDirectory = getLexicon()->getResourceFilePath(Lexicon::Stylesheet);

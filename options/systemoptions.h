@@ -17,6 +17,7 @@ class SystemOptions : public OptionsWidget {
     void onSetColor();
     void onSetDatabase();
     void onSetCss();
+    void onSetNotesDatabase();
  private:
     //    QLineEdit * m_arabicFont;
     //    QLineEdit * m_color;
