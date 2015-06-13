@@ -43,6 +43,7 @@ class SystemOptions : public OptionsWidget {
     QCheckBox * m_toolbarText;
     QCheckBox * m_useNotes;
     QLineEdit * m_notesDb;
+    QCheckBox * m_splashScreen;
 
 };
 #endif

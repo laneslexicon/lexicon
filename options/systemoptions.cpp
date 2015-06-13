@@ -45,6 +45,8 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   m_useNotes = new QCheckBox;
   m_notesDb = new QLineEdit;
   m_keyboard = new QComboBox;
+
+  m_splashScreen = new QCheckBox;
   QFormLayout * layout = new QFormLayout;
 
   layout->addRow(tr("Contents linked"),m_contentsLinked);
@@ -66,6 +68,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   layout->addRow(tr("Use notes"),m_useNotes);
   layout->addRow(tr("Notes db"),m_notesDb);
   layout->addRow(tr("Keyboard"),m_keyboard);
+  layout->addRow(tr("Show splash scrren"),m_splashScreen);
   vlayout->addLayout(layout);
 
   vlayout->addStretch();
@@ -116,6 +119,10 @@ void SystemOptions::readSettings() {
   settings.beginGroup("Notes");
   m_useNotes->setChecked(settings.value(SID_NOTES_ENABLED,false).toBool());
   m_notesDb->setText(settings.value(SID_NOTES_DATABASE,"notes.sqlite").toString());
+  settings.endGroup();
+  settings.beginGroup("Splash");
+  m_splashScreen->setChecked(settings.value(SID_SPLASH_ENABLED,true).toBool());
+
 
   m_dirty = false;
 }
@@ -160,6 +167,9 @@ void SystemOptions::writeSettings(const QString & fileName) {
 #else
 
 #endif
+  settings.endGroup();
+  settings.beginGroup("Splash");
+  settings.setValue(SID_SPLASH_ENABLED,m_splashScreen->isChecked());
   settings.sync();
   m_dirty = false;
   emit(modified(false));
@@ -234,15 +244,21 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_NOTES_DATABASE,m_notesDb)) {
     m_dirty = true;
   }
-#ifndef STANDALONE
+#ifdef LANE
   if (m_keyboard->currentText() !=   getLexicon()->getDefaultKeyboard()) {
     m_dirty = true;
   }
   if (m_theme->currentText() != getLexicon()->currentTheme()) {
     m_dirty = true;
   }
-
 #endif
+  settings.endGroup();
+  settings.beginGroup("Splash");
+  if (compare(&settings,SID_SPLASH_ENABLED,m_splashScreen)) {
+    m_dirty = true;
+  }
+
+
   return m_dirty;
 }
 void SystemOptions::onSetFont() {
