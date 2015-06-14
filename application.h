@@ -58,7 +58,7 @@ public:
   void adjustHeight(QWidget *);
   QString getCssSpecification(const QString & selector) ;
   QFont fontFromCss(const QString & css);
-  void setEditFont(QWidget *,const QString & selector,const QString & sample = QString());
+  void setEditFont(QWidget *,const QString & selector,const QString & sample = QString(),int margin = 4);
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:

@@ -936,7 +936,12 @@ QString Lexicon::getCssSpecification(const QString & selector) {
 }
 /**
  * This is because on OSX QLineEdit does not automatically adjust its height
- * so that the text is all visible
+ * to ensure that all the text.
+ *
+ * We get the CSS from the application stylesheet for the selectors listed in the
+ * INI file and extract the font. Then use QFontMetrics to work out the height and
+ * adjust according
+ *
  * @param w
  * @param t
  */
@@ -945,26 +950,50 @@ void Lexicon::adjustHeight(QWidget * w) {
   QSettings settings(fi.absoluteFilePath(),QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("HeightAdjustment");
+  if (! settings.value("Use",true).toBool()) {
+    return;
+  }
   QStringList groups = settings.childGroups();
   for(int i=0;i < groups.size();i++) {
     settings.beginGroup(groups[i]);
     QStringList selectors = settings.value("Selectors").toStringList();
     QString sampleText = settings.value("Sample").toString();
+    int margin = settings.value("Margin",4).toInt();
     for(int j=0;j < selectors.size();j++) {
       if (! selectors[j].isEmpty()) {
-        setEditFont(w,selectors[j],sampleText);
+        setEditFont(w,selectors[j],sampleText,margin);
       }
     }
     settings.endGroup();
   }
 }
-void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t) {
+void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t,int margin) {
   QString css = getCssSpecification("ImLineEdit");
   if (css.isEmpty()) {
     return;
   }
   QString sample = t;
-  if (sample.isEmpty()) {
+  int arCount = 0;
+  /**
+   * The ini file sometimes becomes corrupted like this:
+   [HeightAdjustment]
+   1\Sample=ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ£ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
+   1\Selectors=ImLineEdit, arabicedit
+
+   *
+   * I believe the problem was caused by multiple writes in the optionsdialog and that this is fixed by
+   * doing a settings.sync().
+   *
+   * Anyway, the problem has not happened since the fix, but leaving this here anyway.
+   */
+
+  for(int i=0;i < sample.size();i++) {
+    if (sample[i].script() == QChar::Script_Arabic) {
+      arCount++;
+    }
+  }
+
+  if (sample.isEmpty() || (! sample.isEmpty() && arCount == 0)) {
     sample = "أٌل";
   }
   QLineEdit * edit = qobject_cast<QLineEdit *>(w);
@@ -973,7 +1002,7 @@ void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t
     QFontMetrics fm(f);
     QSize sz = fm.size(Qt::TextSingleLine,sample);
     if (sz.height() > 0) {
-      edit->setMinimumHeight(sz.height() + 4);
+      edit->setMinimumHeight(sz.height() + margin);
     }
   }
   /*
