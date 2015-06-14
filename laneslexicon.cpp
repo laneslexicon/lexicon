@@ -2071,6 +2071,10 @@ void LanesLexicon::restoreTabs() {
       if ( !ok ) {
         scale = 1.0;
       }
+      if (v.size() > 100) {
+        QLOG_WARN() << QString(tr("Tab %1 is invalid, restore skipped [Size=%2]")).arg(i).arg(v.size());
+        v = "";
+      }
       Place p = Place::fromString(v);
       int tw;
       if (! cmdOptions.contains("textwidth")) {
