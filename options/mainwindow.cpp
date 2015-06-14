@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 {
   QSettings * settings = new QSettings("default.ini",QSettings::IniFormat);
+  settings->setIniCodec("UTF-8");
   QVBoxLayout * layout = new QVBoxLayout;
   QWidget * w = new QWidget;
   w->setLayout(layout);
