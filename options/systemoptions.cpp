@@ -180,6 +180,12 @@ void SystemOptions::writeSettings(const QString & fileName) {
     f = fileName;
   }
   qDebug() << Q_FUNC_INFO << f;
+#ifdef LANE
+  getLexicon()->setTheme(m_theme->currentText());
+  getLexicon()->setDefaultKeyboard(m_keyboard->currentText());
+#else
+
+#endif
 
   QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
@@ -209,18 +215,20 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.beginGroup("Notes");
   settings.setValue(SID_NOTES_ENABLED,m_useNotes->isChecked());
   settings.setValue(SID_NOTES_DATABASE,m_notesDb->text());
-#ifndef STANDALONE
-  getLexicon()->setTheme(m_theme->currentText());
-  getLexicon()->setDefaultKeyboard(m_keyboard->currentText());
-#else
+  /*
 
-#endif
+    This was originally here and caused corruption to any arabic
+    text in the ini file.
+
+  getLexicon()->setDefaultKeyboard(m_keyboard->currentText());
+  */
   settings.endGroup();
   settings.beginGroup("Splash");
   settings.setValue(SID_SPLASH_ENABLED,m_splashScreen->isChecked());
   settings.endGroup();
   settings.beginGroup("History");
   settings.setValue(SID_HISTORY_DATABASE,m_historyDb->text());
+  qDebug() << Q_FUNC_INFO << settings.format() << settings.iniCodec()->name();
   settings.sync();
   m_dirty = false;
   emit(modified(false));
