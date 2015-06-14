@@ -28,5 +28,8 @@ void Task::run() {
   QList<Note *> x = notes.find("word1");
   qDebug() << "Word count" << x.size();
 
+
+
+
   emit(finished());
 }

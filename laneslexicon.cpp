@@ -82,6 +82,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_history->setEnabled(m_historyEnabled);
 
   QSettings * settings  = (qobject_cast<Lexicon *>(qApp))->getSettings();
+  settings->setIniCodec("UTF-8");
   m_notes = new NoteMaster(settings);
 
   if (m_docked) {
@@ -754,7 +755,7 @@ void LanesLexicon::loadStyleSheet() {
 }
 
 void LanesLexicon::createActions() {
-  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+  //  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
 
   m_exitAction = new QAction(tr("E&xit"),this);
   connect(m_exitAction,SIGNAL(triggered()),this,SLOT(onExit()));

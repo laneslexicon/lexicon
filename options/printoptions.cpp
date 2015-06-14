@@ -188,7 +188,6 @@ void PrintOptions::writeSettings(const QString & fileName) {
   QSettings settings(f,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
-
   settings.setValue(SID_PRINTER_NAME,m_printerName->text());
   settings.setValue(SID_PRINTER_ORIENTATION,m_orientation->text());
   settings.setValue(SID_PRINTER_RESOLUTION,m_resolution->text());

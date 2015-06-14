@@ -191,8 +191,8 @@ void KeyboardWidget::readSettings() {
   QLOG_DEBUG() << Q_FUNC_INFO << m_keyboardDirectory << m_keyboardConfig;
   QFileInfo fi(m_keyboardDirectory,m_keyboardConfig);
   QSettings settings(fi.absoluteFilePath(),QSettings::IniFormat);
-  QLOG_DEBUG() << Q_FUNC_INFO << settings.fileName();
   settings.setIniCodec("UTF-8");
+  QLOG_DEBUG() << Q_FUNC_INFO << settings.fileName();
   settings.beginGroup("System");
   m_defaultKeyboard = settings.value("Default",QString()).toString();
   m_keepAspectRatio = settings.value("Keep aspect ratio",false).toBool();

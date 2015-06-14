@@ -347,6 +347,7 @@ double KeyboardDef::cols() {
  */
 void KeyboardDef::load(const QString & name) {
   QSettings sp(name,QSettings::IniFormat);
+  sp.setIniCodec("UTF-8");
   sp.beginGroup("CharacterCodes");
   QSettings settings(name,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");

@@ -248,6 +248,7 @@ QString Lexicon::imageDirectory() {
 }
 void Lexicon::startLogging() {
   QSettings * settings = getSettings();
+  settings->setIniCodec("UTF-8");
   settings->beginGroup("Logging");
   QString logfile = settings->value(SID_LOGGING_FILE,"log.txt").toString();
   int loglevel = settings->value(SID_LOGGING_LEVEL,2).toInt();
@@ -321,6 +322,7 @@ int Lexicon::setTheme(const QString & theme) {
   m_settingsDir = d;
 
   QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
+  settings->setIniCodec("UTF-8");
   settings->beginGroup("System");
   settings->setValue("Theme",theme);
   return Lexicon::Ok;
@@ -340,7 +342,8 @@ QMap<QString,QString> Lexicon::getOptions() const  {
 
 QSettings * Lexicon::getSettings() {
   if (m_configFile.isEmpty()) {
-    return new QSettings;
+    QSettings * s = new QSettings;
+    s->setIniCodec("UTF-8");
   }
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings * settings = new QSettings(f.absoluteFilePath(),QSettings::IniFormat);
@@ -539,10 +542,11 @@ QString Lexicon::scanAndSpan(const QString & str,const QString & css) {
 QString Lexicon::spanArabic(const QString & ar,const QString & spanstyle) {
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings s(f.absoluteFilePath(),QSettings::IniFormat);
+  s.setIniCodec("UTF-8");
   QString fontFamily;
   int fontSize = 10;
   QString style;
-  s.setIniCodec("UTF-8");
+
   if ( ! spanstyle.isEmpty() ) {
     s.beginGroup("SpannedText");
     s.beginGroup("Arabic");
