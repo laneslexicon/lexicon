@@ -1163,7 +1163,7 @@ void GraphicsEntry::appendEntries(int startPos) {
       btny = ypos;// + sz.height();
 
       ToolButtonData  * notesBtn = new ToolButtonData(i);
-      notesBtn->setIcon(QIcon(QPixmap(":/notes.png")));//m_notesIcon));
+      notesBtn->setIcon(QIcon(QPixmap(":/qrc/notes.png")));//m_notesIcon));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
@@ -1210,7 +1210,7 @@ void GraphicsEntry::prependEntries(int startPos) {
       btnx = xpos + m_items[i]->boundingRect().width();
       btny = ypos;// + sz.height();
       ToolButtonData  * notesBtn = new ToolButtonData(i);
-      notesBtn->setIcon(QIcon(QPixmap(":/notes.png")));//m_notesIcon));
+      notesBtn->setIcon(QIcon(QPixmap(":/qrc/notes.png")));//m_notesIcon));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);
@@ -1676,7 +1676,7 @@ void GraphicsEntry::addButtonDecoration(bool ok) {
       btny = pos.y();
 
       ToolButtonData  * notesBtn = new ToolButtonData(i);
-      notesBtn->setIcon(QIcon(QPixmap(":/notes.png")));
+      notesBtn->setIcon(QIcon(QPixmap(":/qrc/notes.png")));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
       QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
       pushButton->setPos(btnx,btny);

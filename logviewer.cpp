@@ -62,10 +62,10 @@ void LogViewer::readSettings() {
   resize(settings.value(SID_LOGGING_SIZE, QSize(500, 700)).toSize());
   move(settings.value(SID_LOGGING_POS, QPoint(200, 200)).toPoint());
 
-  m_warning = QIcon(QPixmap(":/symbol-warning.png"));
-  m_error = QIcon(QPixmap(":/symbol-error.png"));
-  m_info = QIcon(QPixmap(":/symbol-information.png"));
-  m_debug = QIcon(QPixmap(":/symbol-debug.png"));
+  m_warning = QIcon(QPixmap(":/qrc/symbol-warning.png"));
+  m_error = QIcon(QPixmap(":/qrc/symbol-error.png"));
+  m_info = QIcon(QPixmap(":/qrc/symbol-information.png"));
+  m_debug = QIcon(QPixmap(":/qrc/symbol-debug.png"));
 }
 void LogViewer::writeSettings() {
   SETTINGS
