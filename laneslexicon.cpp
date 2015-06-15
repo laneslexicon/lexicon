@@ -2825,8 +2825,15 @@ void LanesLexicon::onShowHistory() {
   return;
 }
 void LanesLexicon::onDocs() {
-  QMessageBox::information(NULL,tr("Information"),tr("Not yet implemented"));
-  return;
+
+  SETTINGS
+
+  settings.beginGroup("System");
+  if (settings.value("NoDocs",false).toBool()) {
+    QMessageBox::information(NULL,tr("Information"),tr("Not yet implemented"));
+    return;
+  }
+
   if (m_helpview == NULL) {
     m_helpview = new HelpWidget();
   }
