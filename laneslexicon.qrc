@@ -1,9 +1,9 @@
 <RCC>
 <qresource>
-<file>notes.png</file>
-<file>symbol-error.png</file>
-<file>symbol-warning.png</file>
-<file>symbol-information.png</file>
-<file>symbol-debug.png</file>
+<file>qrc/notes.png</file>
+<file>qrc/symbol-error.png</file>
+<file>qrc/symbol-warning.png</file>
+<file>qrc/symbol-information.png</file>
+<file>qrc/symbol-debug.png</file>
 </qresource>
 </RCC>
