@@ -1,4 +1,4 @@
- #include "fullsearch.h"
+#include "fullsearch.h"
 #include "searchoptionswidget.h"
 #include "graphicsentry.h"
 #include "application.h"
@@ -892,14 +892,12 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
     return;
   }
   if (m_debug) {
-    m_rxlist->showColumn(2);
-    m_rxlist->showColumn(3);
+    m_rxlist->showColumn(NODE_COLUMN);
   }
   else {
-    m_rxlist->hideColumn(2);
-    m_rxlist->hideColumn(3);
+    m_rxlist->hideColumn(NODE_COLUMN);
   }
-  m_rxlist->showColumn(4);
+  //  m_rxlist->showColumn(4);
   m_rxlist->setRowCount(0);
   //  m_rxlist->hide();
 
