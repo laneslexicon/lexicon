@@ -270,6 +270,7 @@ class LanesLexicon : public QMainWindow
       int m_navMode;
       int m_firstPage;
       int m_lastPage;
+      int m_messageInterval;
 
       QLabel * m_placeIndicator;
 

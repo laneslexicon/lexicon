@@ -1852,6 +1852,8 @@ void LanesLexicon::readSettings() {
   m_linkContents = settings.value(SID_SYSTEM_CONTENTS_LINKED,false).toBool();
   m_linkAction->setChecked(m_linkContents);
 
+  m_messageInterval = settings.value(SID_SYSTEM_MESSAGE_TIMEOUT,5000).toInt();
+
   settings.endGroup();
 
   settings.beginGroup("Maps");
@@ -2729,7 +2731,7 @@ void LanesLexicon::movePreviousHead(const Place & p) {
 }
 void LanesLexicon::setStatus(const QString & txt) {
   QLOG_INFO() << txt.toLocal8Bit().constData();
-  statusBar()->showMessage(txt);
+  statusBar()->showMessage(txt,m_messageInterval);
 }
 /**
  * Use the spanArabic function to set the font

@@ -280,7 +280,7 @@ They should not be translated.
 #define SID_SYSTEM_ACTIVATE_LINK               "Always Make link active"
 
 #define SID_SYSTEM_EXIT                        "Exit"
-
+#define SID_SYSTEM_MESSAGE_TIMEOUT             "Message time"
 
 #define SID_MAPS_CURRENT_MAP                    "Current map"
 #define SID_MAPS_ENABLED                        "Enabled"
