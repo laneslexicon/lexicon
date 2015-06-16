@@ -55,6 +55,7 @@ class FullSearchWidget : public QWidget
     void findTarget(bool show=false);
     void cancelSearch();
     void showKeyboard();
+    void onExport();
  protected:
     void focusInEvent(QFocusEvent *);
     void focusOutEvent(QFocusEvent *);
@@ -100,6 +101,7 @@ class FullSearchWidget : public QWidget
     QString m_spanStyle;
     QString m_keyboardConfig;
     QLabel * m_resultsText;
+    QPushButton * m_exportButton;
     QSpacerItem * m_spacer;
     QVBoxLayout * m_container;
     FocusTable * m_rxlist;

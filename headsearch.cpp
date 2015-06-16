@@ -8,11 +8,12 @@
 #include "definedsettings.h"
 #include "definedsql.h"
 #include "externs.h"
-#define ROOT_COLUMN 0
-#define ENTRY_COLUMN 1
-#define NODE_COLUMN 2
-#define VOL_COLUMN 3
-#define COLUMN_COUNT 4
+#define SELECT_COLUMN 0
+#define ROOT_COLUMN 1
+#define ENTRY_COLUMN 2
+#define NODE_COLUMN 3
+#define VOL_COLUMN 4
+#define COLUMN_COUNT 5
 /// TODO
 /// some of these functions pass SearchOptions - why can't we use the class member
 extern LanesLexicon * getApp();
@@ -280,6 +281,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
     if (word.indexOf(rx) != -1) {
       int row = m_list->rowCount();
       m_list->insertRow(row);
+      m_list->setCellWidget(row,SELECT_COLUMN,new QCheckBox);
       item = new QTableWidgetItem(m_query.value("root").toString());
       item->setFont(m_resultsFont);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
@@ -326,7 +328,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
 }
 void HeadSearchWidget::showFirst() {
   if (m_list->rowCount() > 0) {
-    QTableWidgetItem * item = m_list->item(0,0);
+    QTableWidgetItem * item = m_list->item(0,ROOT_COLUMN);
     this->itemChanged(item,0);
     QFocusEvent * e = new QFocusEvent(QEvent::FocusOut);
     QApplication::postEvent(m_list,e);

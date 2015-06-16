@@ -14,13 +14,14 @@
 #include "definedsettings.h"
 #include "definedsql.h"
 #include "externs.h"
-#define ROOT_COLUMN 0
-#define HEAD_COLUMN 1
-#define NODE_COLUMN 2
-#define VOL_COLUMN 3
-#define POSITION_COLUMN 4
-#define CONTEXT_COLUMN 5
-#define COLUMN_COUNT 6
+#define SELECT_COLUMN 0
+#define ROOT_COLUMN 1
+#define HEAD_COLUMN 2
+#define NODE_COLUMN 3
+#define VOL_COLUMN 4
+#define POSITION_COLUMN 5
+#define CONTEXT_COLUMN 6
+#define COLUMN_COUNT 7
 
 
 /// TODO
@@ -92,8 +93,13 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   m_progress = new QProgressBar;
   m_progress->hide();
+  QHBoxLayout * resultslayout = new QHBoxLayout;
   m_resultsText = new QLabel("");
   m_resultsText->hide();
+  m_exportButton = new QPushButton(tr("Export results"));
+  resultslayout->addWidget(m_resultsText);
+  resultslayout->addStretch();
+  resultslayout->addWidget(m_exportButton);
   m_container->addLayout(targetlayout);
   m_container->addWidget(m_search);
   m_spacer = new QSpacerItem(0, 20,QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
@@ -101,7 +107,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_container->addSpacerItem(m_spacer);
 
   m_container->addWidget(m_rxlist);
-  m_container->addWidget(m_resultsText);
+  m_container->addLayout(resultslayout);
 
   setLayout(m_container);
   connect(m_rxlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
@@ -111,6 +117,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_search->setVisible(false);
   m_rxlist->hide();
   this->setFocus();
+  connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
 }
 FullSearchWidget::~FullSearchWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -121,6 +128,7 @@ QStringList FullSearchWidget::columnHeadings() {
   for(int i=0;i < COLUMN_COUNT;i++) {
     h << "";
   }
+  h[SELECT_COLUMN] = "";
   h[ROOT_COLUMN] = tr("Root");
 
   h[HEAD_COLUMN] = tr("Entry");
@@ -460,12 +468,17 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     m_rxlist->show();
     m_rxlist->selectRow(0);
     m_rxlist->setFocus();
+    m_exportButton->setEnabled(true);
+  }
+  else {
+    m_exportButton->setEnabled(false);
   }
 
 
   m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
   m_resultsText->show();
 
+  m_rxlist->resizeColumnToContents(SELECT_COLUMN);
   m_rxlist->resizeColumnToContents(ROOT_COLUMN);
   m_rxlist->resizeColumnToContents(NODE_COLUMN);
   m_rxlist->resizeColumnToContents(POSITION_COLUMN);
@@ -550,6 +563,8 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
 
   int row = m_rxlist->rowCount();
   m_rxlist->insertRow(row);
+  m_rxlist->setCellWidget(row,SELECT_COLUMN,new QCheckBox);
+
   item = new QTableWidgetItem(root);
   item->setFont(m_resultsFont);
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
@@ -988,15 +1003,20 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
     m_rxlist->show();
     m_rxlist->selectRow(0);
     m_rxlist->setFocus();
+    m_exportButton->setEnabled(true);
+  }
+  else {
+    m_exportButton->setEnabled(false);
   }
   //  m_resultsText->setText(QString("Search for %1, returned %2 results").arg(target).arg(m_rxlist->rowCount()));
   m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
   m_resultsText->show();
-
-  m_rxlist->resizeColumnToContents(0);
-  m_rxlist->resizeColumnToContents(2);
-  m_rxlist->resizeColumnToContents(3);
-  m_rxlist->resizeColumnToContents(4);
+  m_rxlist->resizeColumnToContents(SELECT_COLUMN);
+  m_rxlist->resizeColumnToContents(ROOT_COLUMN);
+  m_rxlist->resizeColumnToContents(NODE_COLUMN);
+  m_rxlist->resizeColumnToContents(POSITION_COLUMN);
+  m_rxlist->resizeColumnToContents(CONTEXT_COLUMN);
+  m_rxlist->resizeColumnToContents(VOL_COLUMN);
   this->show();
   /*
   else {
@@ -1011,3 +1031,6 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
 void FullSearchWidget::setForceLTR(bool v) {
    m_findTarget->setForceLTR(v);
  }
+void FullSearchWidget::onExport() {
+  m_rxlist->exportResults();
+}

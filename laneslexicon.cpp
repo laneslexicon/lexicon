@@ -33,6 +33,7 @@
 #include "createthemedialog.h"
 #include "definedsql.h"
 #include "showmapwidget.h"
+#include "exportsearchdialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -1750,8 +1751,17 @@ void LanesLexicon::onTest() {
   }
   addShortcut("Search node","Ctrl+S,X",true);
   }
-  if (1) {
+  if (0) {
     getLexicon()->getCssSpecification("ImLineEdit#arabicedit");
+  }
+  if (1) {
+    ExportSearchDialog * d = new ExportSearchDialog(QStringList() << "One" << "Two" << "Three" << "Four" << "Five" << "Six");
+    if (d->exec() == QDialog::Accepted) {
+      if (d->saveSettings()) {
+        d->writeSettings();
+      }
+    }
+    delete d;
   }
 }
 /**

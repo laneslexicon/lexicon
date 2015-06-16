@@ -341,6 +341,15 @@ They should not be translated.
 #define SID_RESOURCES_IMAGES  "Image"
 
 
+#define SID_EXPORT_SEARCH_COLUMNS     "Columns"
+#define SID_EXPORT_SEARCH_SEPARATOR   "Separator"
+#define SID_EXPORT_SEARCH_ROWS        "All Rows"
+#define SID_EXPORT_SEARCH_FILENAME    "File"
+#define SID_EXPORT_SEARCH_SIZE    "Size"
+#define SID_EXPORT_SEARCH_POS    "Pos"
+#define SID_EXPORT_SEARCH_SAVE    "Save settings"
+#define SID_EXPORT_SEARCH_HEADERS "Headers"
+
 #define SID_ALWAYS 0
 #define SID_NEVER  1
 #define SID_PROMPT 2

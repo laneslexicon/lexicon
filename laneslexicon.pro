@@ -89,7 +89,8 @@ SOURCES += main.cpp\
         editview.cpp \
         deletethemedialog.cpp \
         createthemedialog.cpp \
-        themedialog.cpp
+        themedialog.cpp \
+        exportsearchdialog.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -128,4 +129,5 @@ HEADERS  += laneslexicon.h \
             deletethemedialog.h \
             createthemedialog.h \
             themedialog.h \
-            definedsql.h
+            definedsql.h \
+            exportsearchdialog.h
