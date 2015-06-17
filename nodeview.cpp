@@ -8,30 +8,30 @@ NodeView::NodeView(QWidget * parent)
 
   SETTINGS
   settings.beginGroup("Node");
-  QString fontString = settings.value(SID_NODE_ARABIC_FONT).toString();
+  //  QString fontString = settings.value(SID_NODE_ARABIC_FONT).toString();
   QString sz = settings.value(SID_NODE_VIEWER_SIZE,QString()).toString();
   if (! sz.isEmpty())
     this->setPreferredSize(sz);
 
   m_startPosition = 0;
-  QFont f;
-  if (! fontString.isEmpty())
-    f.fromString(fontString);
+  //  QFont f;
+  //  if (! fontString.isEmpty())
+  //    f.fromString(fontString);
   setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
   setSizeGripEnabled(true);
   QVBoxLayout * layout = new QVBoxLayout;
   m_rlabel = new QLabel("",this);
-  m_rlabel->setFont(f);
+  //  m_rlabel->setFont(f);
   m_hlabel = new QLabel("",this);
-  m_hlabel->setFont(f);
+  //  m_hlabel->setFont(f);
   m_pageLabel = new QLabel("",this);
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(new QLabel(tr("Root"),this));
   hlayout->addWidget(m_rlabel);
   hlayout->addWidget(new QLabel(tr("Entry"),this));
   hlayout->addWidget(m_hlabel);
-  hlayout->addStretch();
   hlayout->addWidget(m_pageLabel);
+  hlayout->addStretch();
 
   m_browser = new QTextBrowser;
   //  m_browser->setHtml(html);
@@ -104,8 +104,8 @@ void NodeView::reject() {
   QDialog::reject();
 }
 void NodeView::setHeader(const QString & root,const QString & head,const QString & node,int page) {
-  m_rlabel->setText(root);
-  m_hlabel->setText(head);
+  m_rlabel->setText(getLexicon()->spanArabic(root,"nodeview"));
+  m_hlabel->setText(getLexicon()->spanArabic(head,"nodeview"));
   m_node = node;
   if (page > 0) {
     m_pageLabel->setText(QString("(v%1/%2)").arg(Place::volume(page)).arg(page));
