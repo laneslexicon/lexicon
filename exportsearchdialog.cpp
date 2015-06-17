@@ -3,6 +3,7 @@
 #include "externs.h"
 #include "definedsettings.h"
 ExportSearchDialog::ExportSearchDialog(const QStringList & columns,QWidget * parent) : QDialog(parent) {
+  setWindowTitle(tr("Export Options"));
   m_columnLabels = columns;
   QVBoxLayout * layout = new QVBoxLayout;
   QGroupBox * columnbox = new QGroupBox(tr("Columns"));
