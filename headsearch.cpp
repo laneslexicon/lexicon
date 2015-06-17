@@ -281,7 +281,8 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
     if (word.indexOf(rx) != -1) {
       int row = m_list->rowCount();
       m_list->insertRow(row);
-      m_list->setCellWidget(row,SELECT_COLUMN,new QCheckBox);
+      m_list->setCellWidget(row,SELECT_COLUMN,new CheckBoxTableItem);
+
       item = new QTableWidgetItem(m_query.value("root").toString());
       item->setFont(m_resultsFont);
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);

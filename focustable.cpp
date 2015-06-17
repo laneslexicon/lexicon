@@ -3,6 +3,22 @@
 #include "QsLog.h"
 #include "externs.h"
 #define SELECT_COLUMN 0
+CheckBoxTableItem::CheckBoxTableItem(QWidget * parent) : QWidget(parent) {
+  m_checkbox = new QCheckBox;
+  QHBoxLayout * boxlayout = new QHBoxLayout;
+  boxlayout->addWidget(m_checkbox);
+  boxlayout->setAlignment(Qt::AlignCenter);
+  boxlayout->setContentsMargins(0,0,0,0);
+  setLayout(boxlayout);
+}
+bool CheckBoxTableItem::isChecked() const {
+  return m_checkbox->isChecked();
+}
+/**
+ *
+ *
+ * @param parent
+ */
 FocusTable::FocusTable(QWidget * parent) : QTableWidget(parent) {
 }
 void FocusTable::focusInEvent(QFocusEvent * event) {
@@ -65,7 +81,7 @@ void FocusTable::exportResults() {
       ok = true;
     }
     else {
-      QCheckBox * m = qobject_cast<QCheckBox *>(this->cellWidget(i,SELECT_COLUMN));
+      CheckBoxTableItem * m = qobject_cast<CheckBoxTableItem *>(this->cellWidget(i,SELECT_COLUMN));
       if (m && m->isChecked()) {
         ok = true;
       }

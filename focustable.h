@@ -5,6 +5,17 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QCheckBox>
+#include <QHBoxLayout>
+class CheckBoxTableItem : public QWidget {
+  Q_OBJECT
+ public:
+  CheckBoxTableItem(QWidget * parent = 0);
+  bool isChecked() const;
+ private:
+  QCheckBox * m_checkbox;
+
+};
 class FocusTable : public QTableWidget {
     Q_OBJECT
  public:

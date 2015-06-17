@@ -563,8 +563,19 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
 
   int row = m_rxlist->rowCount();
   m_rxlist->insertRow(row);
-  m_rxlist->setCellWidget(row,SELECT_COLUMN,new QCheckBox);
+  /*
+  QWidget * w = new QWidget;
+  QHBoxLayout * boxlayout = new QHBoxLayout;
+  boxlayout->addWidget(new QCheckBox);
+  boxlayout->setAlignment(Qt::AlignCenter);
+  boxlayout->setContentsMargins(0,0,0,0);
+  w->setLayout(boxlayout);
 
+  m_rxlist->setCellWidget(row,SELECT_COLUMN,w);
+  */
+  m_rxlist->setCellWidget(row,SELECT_COLUMN,new CheckBoxTableItem);
+
+  //  m_rxlist->setCellWidget(row,SELECT_COLUMN,new QCheckBox);
   item = new QTableWidgetItem(root);
   item->setFont(m_resultsFont);
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
