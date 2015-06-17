@@ -795,7 +795,8 @@ QString Lexicon::setCssFont(const QString & src,const QString & family) const {
         if (family.isEmpty()) {
           return v.trimmed();
         }
-        v = "\"" + family + "\"";
+        //        v = "\"" + family + "\"";
+        v = family;
       }
       r += k + ":" + v + ";";
     }
@@ -987,10 +988,7 @@ void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t
    1\Selectors=ImLineEdit, arabicedit
 
    *
-   * I believe the problem was caused by multiple writes in the optionsdialog and that this is fixed by
-   * doing a settings.sync().
    *
-   * Anyway, the problem has not happened since the fix, but leaving this here anyway.
    */
 
   for(int i=0;i < sample.size();i++) {
