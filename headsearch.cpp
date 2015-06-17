@@ -8,6 +8,7 @@
 #include "definedsettings.h"
 #include "definedsql.h"
 #include "externs.h"
+#include "scripts.h"
 #define SELECT_COLUMN 0
 #define ROOT_COLUMN 1
 #define ENTRY_COLUMN 2
@@ -28,7 +29,7 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QStringList headers;
-  headers << tr("Root") << tr("Entry") << tr("Node") << tr("Vol/Page");
+  headers << "" << tr("Root") << tr("Entry") << tr("Node") << tr("Vol/Page");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -73,7 +74,8 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   splitter->setStretchFactor(0,0);
   splitter->setStretchFactor(1,1);
   layout->addWidget(splitter);
-  m_list->adjustSize();//resizeColumnsToContents();
+  m_list->adjustSize();
+  m_list->resizeColumnToContents(SELECT_COLUMN);
 
   setLayout(layout);
   //connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
@@ -84,7 +86,7 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   /// TODO decide who gets focus and select the first row
   /// TODO if table loses focus, change the background selection color
   if (m_list->rowCount() > 0)
-    m_list->itemDoubleClicked(m_list->item(0,0));
+    m_list->itemDoubleClicked(m_list->item(0,NODE_COLUMN));
 
   if (m_focusTable)
     m_list->setFocus();
@@ -99,7 +101,7 @@ int HeadSearchWidget::count() {
 }
 void HeadSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
   /// get the node
-  item = item->tableWidget()->item(item->row(),2);
+  item = item->tableWidget()->item(item->row(),NODE_COLUMN);
   QString node = item->text();
   m_nodeQuery.bindValue(0,node);
   m_nodeQuery.exec();
@@ -123,7 +125,7 @@ void HeadSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /*
 void HeadSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   /// get the node
   QLOG_DEBUG() << Q_FUNC_INFO << "row" << item->row();
-  item = item->tableWidget()->item(item->row(),2);
+  item = item->tableWidget()->item(item->row(),NODE_COLUMN);
   QString node = item->text();
   m_nodeQuery.bindValue(0,node);
   m_nodeQuery.exec();
@@ -310,7 +312,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
       pd->setValue(count);
     }
   }
-  QString ar = getLexicon()->spanArabic(m_target);
+  QString ar = getLexicon()->spanArabic(m_target,"searchresult");
   /// need the <body> otherwise it's treated as plain text
   QString html =  QString(tr("<body><p>Search for:%1</p></body>")).arg(ar);
   m_searchTitle->setText(html);
@@ -349,6 +351,16 @@ QString HeadSearchWidget::buildText(const SearchOptions & options) {
   int findCount = m_list->rowCount();
 
   //t = QString(tr("Search for %1")).arg(m_target);
+  QString targetText;
+  if (options.getSearchType() != SearchOptions::Regex) {
+    if (UcdScripts::isScript(m_target,"Arabic")) {
+      targetText = getLexicon()->spanArabic(m_target,"searchresults");
+  }
+    else {
+      targetText = m_target;
+    }
+  }
+
   switch(findCount) {
   case 0:
     p1 = QString(tr("No items found"));
