@@ -526,13 +526,21 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
   else {
     p2 = "ies";
   }
-  /// TODO allow for Arabic font
+
+  QString targetText;
+  if (UcdScripts::isScript(m_target,"Arabic")) {
+    targetText = getLexicon()->spanArabic(m_target,"searchresults");
+  }
+  else {
+    targetText = m_target;
+  }
+
   if (findCount == 0) {
-    t = QString(tr("Search for \"%1\", %2")).arg(m_target).arg(p1);
+    t = QString(tr("Search for \"%1\", %2")).arg(targetText).arg(p1);
   }
   else {
     t = QString(tr("Search for \"%1\", found %2 match%3 in %4 entr%5"))
-      .arg(m_target)
+      .arg(targetText)
       .arg(findCount)
       .arg(p1)
       .arg(entryCount)
