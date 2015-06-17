@@ -28,9 +28,9 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->setColumnCount(COLUMN_COUNT);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  QStringList headers;
-  headers << "" << tr("Root") << tr("Entry") << tr("Node") << tr("Vol/Page");
-  m_list->setHorizontalHeaderLabels(headers);
+
+  m_columns << "" << tr("Root") << tr("Entry") << tr("Node") << tr("Vol/Page");
+  m_list->setHorizontalHeaderLabels(m_columns);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_list->installEventFilter(this);
@@ -41,15 +41,22 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_searchTitle->hide();
   m_resultsText = new QLabel("");
   m_resultsText->hide();
-  m_convertButton = new QPushButton("&Close results list");
+  m_convertButton = new QPushButton(tr("&Close results list"));
   m_convertButton->hide();
+
+  m_exportButton = new QPushButton(tr("&Export results"));
+  m_exportButton->hide();
+
   connect(m_convertButton,SIGNAL(clicked()),this,SLOT(onRemoveResults()));
+  connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
+
   containerlayout->addWidget(m_searchTitle);
   containerlayout->addWidget(m_list);
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(m_resultsText);
   hlayout->addStretch();
   hlayout->addWidget(m_convertButton);
+  hlayout->addWidget(m_exportButton);
   //  containerlayout->addWidget(m_resultsText);
   //  resultslayout->addStretch();
   //  containerlayout->addWidget(m_convertButton);
@@ -85,8 +92,15 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   /// show the first item in the list
   /// TODO decide who gets focus and select the first row
   /// TODO if table loses focus, change the background selection color
-  if (m_list->rowCount() > 0)
+  if (m_list->rowCount() > 0) {
     m_list->itemDoubleClicked(m_list->item(0,NODE_COLUMN));
+    m_exportButton->setEnabled(true);
+    m_exportButton->setVisible(true);
+  }
+  else {
+    m_exportButton->setEnabled(false);
+    m_exportButton->setVisible(false);
+  }
 
   if (m_focusTable)
     m_list->setFocus();
@@ -325,6 +339,13 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
     m_list->selectRow(0);
     m_list->setFocus();
     m_list->adjustSize();
+    m_list->itemDoubleClicked(m_list->item(0,NODE_COLUMN));
+    m_exportButton->setEnabled(true);
+    m_exportButton->setVisible(true);
+  }
+  else {
+    m_exportButton->setEnabled(false);
+    m_exportButton->setVisible(false);
   }
   delete pd;
 
@@ -453,4 +474,7 @@ void HeadSearchWidget::onRemoveResults() {
 }
 Place HeadSearchWidget::getPlace() {
   return m_entry->getPlace();
+}
+void HeadSearchWidget::onExport() {
+  m_list->exportResults();
 }

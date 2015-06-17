@@ -44,11 +44,13 @@ class HeadSearchWidget : public QWidget
    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);
    void onRemoveResults();
+   void onExport();
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);
 
  private:
+   QStringList m_columns;
    void readSettings();
    bool eventFilter(QObject * target,QEvent * event);
    bool m_focusTable;
@@ -70,6 +72,7 @@ class HeadSearchWidget : public QWidget
    bool m_debug;
    bool m_verticalLayout;
    QPushButton * m_convertButton;
+   QPushButton * m_exportButton;
  signals:
    void searchResult(const QString &);
    void deleteSearch();
