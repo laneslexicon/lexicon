@@ -3033,7 +3033,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
         this->onCloseTab(ix);
       }
       m_tabs->insertTab(ix,s,QString(tr("Head word search for %1")).arg(target));
-      if (!options.newTab()) {
+      if (options.activateTab()) {
         m_tabs->setCurrentIndex(ix);
       }
 
