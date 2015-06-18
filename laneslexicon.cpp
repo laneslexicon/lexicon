@@ -2988,29 +2988,35 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
 
   if (searchType == SearchOptions::Word) {
     FullSearchWidget * s = new FullSearchWidget;
-      s->setSearch(t,options);
-      s->setForceLTR(d->getForceLTR());
-      s->findTarget(true);
-      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
-      connect(s,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
-      int c = this->getSearchCount();
-      if (options.newTab()) {
-        ix++;
-      }
-      else {
-        this->onCloseTab(ix);
-      }
+    s->setSearch(t,options);
+    s->setForceLTR(d->getForceLTR());
+    s->findTarget(true);
+    connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+    connect(s,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
+    int c = this->getSearchCount();
+    if (options.newTab()) {
+      ix++;
+    }
+    else {
+      this->onCloseTab(ix);
+    }
+    m_tabs->insertTab(ix,s,QString(tr("Search %1")).arg(c+1));
+    /// deleting old tab changes current index
+    if (!options.newTab()) {
+      m_tabs->setCurrentIndex(ix);
+    }
+    if (options.activateTab()) {
+      m_tabs->setCurrentIndex(ix);
+    }
 
-      m_tabs->insertTab(ix,s,QString(tr("Search %1")).arg(c+1));
-      /// deleting old tab changes current index
-      if (!options.newTab()) {
-        m_tabs->setCurrentIndex(ix);
-      }
-      if (options.activateTab()) {
-        m_tabs->setCurrentIndex(ix);
-        s->focusTable();
-      }
-      return;
+    /// this shifts focus from ContentsWidget (how it got focus is a mystery)
+    ///
+    if (options.newTab() && ! options.activateTab()) {
+    }
+    else {
+      s->setFocus(Qt::OtherFocusReason);
+    }
+    return;
   }
   if (searchType == SearchOptions::Entry) {
       HeadSearchWidget * s = new HeadSearchWidget(this);
@@ -3036,11 +3042,9 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       if (options.activateTab()) {
         m_tabs->setCurrentIndex(ix);
       }
-
       setSignals(s->getEntry());
-      //      if (options.activateTab()) {
-        s->showFirst();
-        //      }
+      s->showFirst();
+
   }
 }
 void LanesLexicon::searchForWord() {

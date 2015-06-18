@@ -110,14 +110,15 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_container->addLayout(resultslayout);
 
   setLayout(m_container);
+  connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
   connect(m_rxlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
   initXslt();
   //  m_search->setOptions(m_defaultOptions);
   m_search->setVisible(false);
   m_rxlist->hide();
+
   this->setFocus();
-  connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
 }
 FullSearchWidget::~FullSearchWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -227,7 +228,8 @@ bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
     case Qt::Key_Return:
     case Qt::Key_Space: {
       //        if (keyEvent->modifiers() && Qt::ControlModifier) {
-      QTableWidgetItem * item = m_rxlist->currentItem();
+      int currentRow = m_rxlist->currentRow();
+      QTableWidgetItem * item = m_rxlist->item(currentRow,NODE_COLUMN);
       if (item)
         m_rxlist->itemDoubleClicked(item);
 
@@ -354,12 +356,6 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
       .arg(m_query.lastError().text());
     return;
   }
-  if (m_debug) {
-    m_rxlist->showColumn(NODE_COLUMN);
-  }
-  else {
-    m_rxlist->hideColumn(NODE_COLUMN);
-  }
   m_rxlist->setRowCount(0);
   int headCount = 0;
   int textCount = 0;
@@ -374,12 +370,14 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   QEventLoop ep;
   QProgressDialog * pd = 0;
   int max = this->getMaxRecords("xref");
+
   if (m_showProgressDialog) {
     pd = new QProgressDialog("Searching...", "Cancel", 0,max, getApp());
     connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
     pd->setWindowModality(Qt::WindowModal);
     pd->show();
   }
+
   m_progress->setMaximum(max);
   m_cancelSearch = false;
   m_query.exec();
@@ -395,7 +393,6 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
       //      emit(setProgressValue(readCount));
       ep.processEvents();
     }
-
     QString word = m_query.value("word").toString();
     page = m_query.value("page").toInt();
     /// strip diacritics if required
@@ -430,7 +427,6 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
           }
         }
         headword = m_nodeQuery.value("word").toString();
-
         QString xml = m_nodeQuery.value("xml").toString();
         QTextDocument * doc  = fetchDocument(xml);
           if (doc->characterCount() > 0) {
@@ -463,37 +459,38 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     delete pd;
   }
 
-  if (m_rxlist->rowCount() > 0) {
-    m_container->removeItem(m_spacer);
-    m_rxlist->show();
-    m_rxlist->selectRow(0);
-    m_rxlist->setFocus();
-    m_exportButton->setEnabled(true);
-  }
-  else {
-    m_exportButton->setEnabled(false);
-  }
-
 
   m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
   m_resultsText->show();
+  if (m_rxlist->rowCount() > 0) {
 
-  m_rxlist->resizeColumnToContents(SELECT_COLUMN);
-  m_rxlist->resizeColumnToContents(ROOT_COLUMN);
-  m_rxlist->resizeColumnToContents(NODE_COLUMN);
-  m_rxlist->resizeColumnToContents(POSITION_COLUMN);
-  m_rxlist->resizeColumnToContents(CONTEXT_COLUMN);
-  m_rxlist->resizeColumnToContents(VOL_COLUMN);
-  this->show();
-  /*
-  else {
-    QMessageBox msgBox;
-    msgBox.setObjectName("wordnotfound");
-    msgBox.setTextFormat(Qt::RichText);
-    msgBox.setText(QString(tr("Word not found")));
-    msgBox.exec();
+    m_rxlist->resizeColumnToContents(SELECT_COLUMN);
+    m_rxlist->resizeColumnToContents(ROOT_COLUMN);
+    if (m_debug) {
+      m_rxlist->showColumn(NODE_COLUMN);
+    }
+    else {
+      m_rxlist->resizeColumnToContents(NODE_COLUMN);
+      m_rxlist->hideColumn(NODE_COLUMN);
+    }
+
+    m_rxlist->resizeColumnToContents(POSITION_COLUMN);
+    m_rxlist->resizeColumnToContents(VOL_COLUMN);
+    m_rxlist->resizeColumnToContents(CONTEXT_COLUMN);
+
+
+    m_exportButton->setEnabled(true);
+    m_container->removeItem(m_spacer);
+    m_rxlist->show();
+    m_rxlist->selectRow(0);
+    m_rxlist->setFocus(Qt::OtherFocusReason);
+
   }
-  */
+  else {
+    m_findTarget->setFocus(Qt::OtherFocusReason);
+    m_exportButton->setEnabled(false);
+  }
+  qDebug() << Q_FUNC_INFO << "Exit";
 }
 /**
  *
@@ -567,23 +564,14 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
   return t;
 }
 int FullSearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos,int page) {
+
   QTableWidgetItem * item;
 
   int row = m_rxlist->rowCount();
   m_rxlist->insertRow(row);
-  /*
-  QWidget * w = new QWidget;
-  QHBoxLayout * boxlayout = new QHBoxLayout;
-  boxlayout->addWidget(new QCheckBox);
-  boxlayout->setAlignment(Qt::AlignCenter);
-  boxlayout->setContentsMargins(0,0,0,0);
-  w->setLayout(boxlayout);
 
-  m_rxlist->setCellWidget(row,SELECT_COLUMN,w);
-  */
   m_rxlist->setCellWidget(row,SELECT_COLUMN,new CheckBoxTableItem);
 
-  //  m_rxlist->setCellWidget(row,SELECT_COLUMN,new QCheckBox);
   item = new QTableWidgetItem(root);
   item->setFont(m_resultsFont);
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
@@ -631,7 +619,6 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_rxlist->setItem(row,VOL_COLUMN,item);
   }
-
   return row;
 }
 QTextDocument * FullSearchWidget::fetchDocument(const QString & xml) {
@@ -820,17 +807,18 @@ bool FullSearchWidget::readCssFromFile(const QString & name) {
   }
   return true;
 }
-void FullSearchWidget::focusInEvent(QFocusEvent * event) {
-  QLOG_DEBUG() << Q_FUNC_INFO << event;
-  if (event->reason() == Qt::OtherFocusReason) {
+void FullSearchWidget::selectFocus() {
     if (m_rxlist->rowCount() > 0) {
-      m_rxlist->setFocus();
+      m_rxlist->setFocus(Qt::OtherFocusReason);
 
     }
     else {
-      m_findTarget->setFocus();
+      m_findTarget->setFocus(Qt::OtherFocusReason);
     }
-  }
+}
+void FullSearchWidget::focusInEvent(QFocusEvent * event) {
+  QLOG_DEBUG() << Q_FUNC_INFO << event;
+  this->selectFocus();
   QWidget::focusInEvent(event);
 }
 void FullSearchWidget::focusOutEvent(QFocusEvent * event) {

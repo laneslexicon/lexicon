@@ -20,6 +20,7 @@ bool CheckBoxTableItem::isChecked() const {
  * @param parent
  */
 FocusTable::FocusTable(QWidget * parent) : QTableWidget(parent) {
+  setFocusPolicy(Qt::StrongFocus);
 }
 void FocusTable::focusInEvent(QFocusEvent * event) {
   this->setStyleSheet("");
