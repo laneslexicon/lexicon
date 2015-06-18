@@ -3242,6 +3242,11 @@ void LanesLexicon::currentTabChanged(int ix) {
     this->enableForPage(true);
     return;
   }
+  FullSearchWidget * full = qobject_cast<FullSearchWidget *>(m_tabs->currentWidget());
+  if (full)  {
+    full->selectFocus();
+  }
+
   this->enableForPage(false);
 
 }
