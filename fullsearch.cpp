@@ -708,34 +708,14 @@ void FullSearchWidget::readSettings() {
 }
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
   QRegExp rx;
-  QString pattern;
-  QRegExp rxclass(m_diacritics);
+  //  QString pattern;
+  //  QRegExp rxclass(m_diacritics);
 
   if (options.getSearchType() == SearchOptions::Regex) {
-    pattern = target;
+    rx.setPattern(target);
   }
   else {
-    if (options.ignoreDiacritics()) {
-      QString ar(m_diacritics);
-      QStringList cc = target.split("");
-      QString brx = "";
-      for(int i=0;i < cc.size();i++) {
-        pattern += cc[i] + ar;
-      }
-    }
-    else {
-      pattern = target;
-    }
-    if (options.wholeWordMatch()) {
-      pattern = "\\b" + pattern + "\\b";
-    }
-  }
-  //  QLOG_DEBUG() << "Pattern" << pattern;
-  if (! regex.isEmpty()) {
-    rx.setPattern(regex.pattern());
-  }
-  else {
-    rx.setPattern(pattern);
+    rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   }
 
   m_fragments.clear();
