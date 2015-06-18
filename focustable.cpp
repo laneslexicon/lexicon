@@ -91,7 +91,7 @@ void FocusTable::exportResults() {
       for(int j=0;j < cols.size();j++) {
         QTableWidgetItem * item = this->item(i,cols[j]);
         if (item) {
-          out << item->text() << sep;
+          out << removeSpan(item->text()) << sep;
         }
         else {
           //          qDebug() << "No item at" << i << j;
@@ -103,4 +103,10 @@ void FocusTable::exportResults() {
   }
   file.close();
   statusMessage(QString(tr("Exported search results to file: %1 (%2 lines)")).arg(exportFileName).arg(writeCount));
+}
+QString FocusTable::removeSpan(const QString & str) {
+  QString t = str;
+  t.remove(QRegularExpression("<span[^>]+>"));
+  t.remove(QRegularExpression("</span>"));
+  return t;
 }

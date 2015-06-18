@@ -25,5 +25,8 @@ class FocusTable : public QTableWidget {
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);
+ private:
+   QString removeSpan(const QString &);
+
 };
 #endif
