@@ -3044,6 +3044,11 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       }
       setSignals(s->getEntry());
       s->showFirst();
+      if (options.newTab() && ! options.activateTab()) {
+      }
+      else {
+        s->setFocus(Qt::OtherFocusReason);
+      }
 
   }
 }

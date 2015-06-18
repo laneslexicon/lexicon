@@ -414,28 +414,22 @@ QString HeadSearchWidget::buildText(const SearchOptions & options) {
 void HeadSearchWidget::focusTable() {
   m_list->setFocus();
 }
+void HeadSearchWidget::selectFocus() {
+  if (m_list->rowCount() > 0) {
+    m_list->setFocus();
+
+  }
+  else {
+    //    m_findTarget->setFocus();
+  }
+}
 void HeadSearchWidget::focusInEvent(QFocusEvent * event) {
   QLOG_DEBUG() << Q_FUNC_INFO << event;
-  if (event->reason() == Qt::OtherFocusReason) {
-    if (m_list->rowCount() > 0) {
-      m_list->setFocus();
-
-    }
-    //    else {
-    //      m_findTarget->setFocus();
-    //    }
-  }
+  this->selectFocus();
   QWidget::focusInEvent(event);
 }
 void HeadSearchWidget::focusOutEvent(QFocusEvent * event) {
   QLOG_DEBUG() << Q_FUNC_INFO << event;
-  /*
-  if (event->reason() == Qt::OtherFocusReason) {
-    if (m_rxlist->rowCount() > 0)
-      m_rxlist->setStyleSheet("QTableView { selection-background-color : green}"); //%1}").arg("lightgray"));
-    m_rxlist->repaint();
-  }
-  */
   QWidget::focusOutEvent(event);
 }
 void HeadSearchWidget::cancelSearch() {

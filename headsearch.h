@@ -45,6 +45,7 @@ class HeadSearchWidget : public QWidget
    void itemDoubleClicked(QTableWidgetItem *);
    void onRemoveResults();
    void onExport();
+   void selectFocus();
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);
