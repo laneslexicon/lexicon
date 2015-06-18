@@ -73,6 +73,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_headFocusTable = new QCheckBox;
   this->setControlSize(m_headStep,MEDIUM_EDIT);
   m_headStep->setSingleStep(25);
+  m_headSingleClick = new QCheckBox;
   /*
   m_headNewTab = new QCheckBox;
   m_headGoTab = new QCheckBox;
@@ -84,7 +85,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   headlayout->addRow(tr("Vertical layout"),m_headVertical);
   headlayout->addRow(tr("Step interval"),m_headStep);
   headlayout->addRow(tr("Initial focus on results"),m_headFocusTable);
-
+  headlayout->addRow(tr("Single click to activate"),m_headSingleClick);
   QPushButton * headbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout2 = new QHBoxLayout;
   setlayout2->addWidget(headbtn);
@@ -181,6 +182,7 @@ void FindOptions::readSettings() {
   // head word search
 
   m_headDebug->setChecked(settings.value(SID_HEADSEARCH_DEBUG,false).toBool());
+  m_headSingleClick->setChecked(settings.value(SID_HEADSEARCH_SINGLE_CLICK,true).toBool());
   m_headVertical->setChecked(settings.value(SID_HEADSEARCH_VERTICAL_LAYOUT,true).toBool());
   m_headFocusTable->setChecked(settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool());
   m_headStep->setValue(settings.value(SID_HEADSEARCH_STEP,50).toInt());
@@ -191,6 +193,7 @@ void FindOptions::readSettings() {
   m_headDiacritics = settings.value(SID_HEADSEARCH_DIACRITICS,true).toBool();
   m_headRegex      = settings.value(SID_HEADSEARCH_TYPE_REGEX,true).toBool();
   m_headForce      = settings.value(SID_HEADSEARCH_FORCE,true).toBool();
+
 
   //  m_viewerSize = settings.value(SID_FULLSEARCH_VIEWER_SIZE,QSize(600,400)).toSize();
 
@@ -252,10 +255,11 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.endGroup();
   settings.beginGroup("HeadSearch");
 
-  settings.value(SID_HEADSEARCH_DEBUG,m_headDebug->isChecked());
-  settings.value(SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical->isChecked());
-  settings.value(SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable->isChecked());
-  settings.value(SID_HEADSEARCH_STEP,m_headStep->value());
+  settings.setValue(SID_HEADSEARCH_DEBUG,m_headDebug->isChecked());
+  settings.setValue(SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical->isChecked());
+  settings.setValue(SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable->isChecked());
+  settings.setValue(SID_HEADSEARCH_STEP,m_headStep->value());
+  settings.setValue(SID_HEADSEARCH_SINGLE_CLICK,m_headSingleClick->isChecked());
 
   settings.setValue(SID_HEADSEARCH_NEW_TAB,m_headNewTab);
   settings.setValue(SID_HEADSEARCH_GO_TAB,m_headGoTab);
@@ -263,6 +267,7 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_HEADSEARCH_DIACRITICS,m_headDiacritics);
   settings.setValue(SID_HEADSEARCH_TYPE_REGEX,m_headRegex);
   settings.setValue(SID_HEADSEARCH_FORCE,m_headForce);
+
 
   settings.endGroup();
   settings.beginGroup("LocalSearch");
@@ -278,12 +283,12 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.endGroup();
   settings.beginGroup("Search");
 
-  settings.value(SID_NODESEARCH_NEW_TAB,m_nodeNew->isChecked());
-  settings.value(SID_NODESEARCH_GO_TAB,m_nodeGo->isChecked());
-  settings.value(SID_PAGESEARCH_NEW_TAB,m_pageNew->isChecked());
-  settings.value(SID_PAGESEARCH_GO_TAB,m_pageGo->isChecked());
-  settings.value(SID_ROOTSEARCH_NEW_TAB,m_rootNew->isChecked());
-  settings.value(SID_ROOTSEARCH_GO_TAB,m_rootGo->isChecked());
+  settings.setValue(SID_NODESEARCH_NEW_TAB,m_nodeNew->isChecked());
+  settings.setValue(SID_NODESEARCH_GO_TAB,m_nodeGo->isChecked());
+  settings.setValue(SID_PAGESEARCH_NEW_TAB,m_pageNew->isChecked());
+  settings.setValue(SID_PAGESEARCH_GO_TAB,m_pageGo->isChecked());
+  settings.setValue(SID_ROOTSEARCH_NEW_TAB,m_rootNew->isChecked());
+  settings.setValue(SID_ROOTSEARCH_GO_TAB,m_rootGo->isChecked());
 
   settings.sync();
   settings.endGroup();
@@ -361,6 +366,9 @@ bool FindOptions::isModified()  {
   settings.beginGroup("HeadSearch");
 
   if (compare(&settings,SID_HEADSEARCH_DEBUG,m_headDebug)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_HEADSEARCH_SINGLE_CLICK,m_headSingleClick)) {
     m_dirty = true;
   }
 

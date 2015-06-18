@@ -85,8 +85,6 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->resizeColumnToContents(SELECT_COLUMN);
 
   setLayout(layout);
-  //connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
-  //      this,SLOT(itemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
   connect(m_list,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
   /// show the first item in the list
@@ -101,6 +99,11 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
     m_exportButton->setEnabled(false);
     m_exportButton->setVisible(false);
   }
+  if (m_singleClick) {
+    connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
+          this,SLOT(viewedItemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
+  }
+  connect(m_list,SIGNAL(itemChanged(QTableWidgetItem)),this,SLOT(itemChanged(QTableWidgetItem *)));
 
   if (m_focusTable)
     m_list->setFocus();
@@ -113,10 +116,13 @@ GraphicsEntry * HeadSearchWidget::getEntry() {
 int HeadSearchWidget::count() {
   return m_list->rowCount();
 }
-void HeadSearchWidget::itemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
-  /// get the node
+void HeadSearchWidget::itemChanged(QTableWidgetItem * /*item */) {
+}
+void HeadSearchWidget::viewedItemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
+
   item = item->tableWidget()->item(item->row(),NODE_COLUMN);
   QString node = item->text();
+  QLOG_DEBUG() << Q_FUNC_INFO << node;
   m_nodeQuery.bindValue(0,node);
   m_nodeQuery.exec();
   /// missing node
@@ -353,7 +359,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
 void HeadSearchWidget::showFirst() {
   if (m_list->rowCount() > 0) {
     QTableWidgetItem * item = m_list->item(0,ROOT_COLUMN);
-    this->itemChanged(item,0);
+    this->viewedItemChanged(item,0);
     QFocusEvent * e = new QFocusEvent(QEvent::FocusOut);
     QApplication::postEvent(m_list,e);
     //    m_list->selectRow(0);
@@ -447,6 +453,8 @@ void HeadSearchWidget::readSettings() {
   m_debug = settings.value(SID_HEADSEARCH_DEBUG,false).toBool();
   m_verticalLayout = settings.value(SID_HEADSEARCH_VERTICAL_LAYOUT,true).toBool();
   m_focusTable = settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool();
+  m_singleClick = settings.value(SID_HEADSEARCH_SINGLE_CLICK,true).toBool();
+
   settings.endGroup();
   settings.beginGroup("Diacritics");
   QStringList keys = settings.childKeys();

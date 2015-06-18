@@ -43,7 +43,7 @@ class FindOptions : public OptionsWidget {
     QSpinBox  * m_headStep;
     QCheckBox * m_headVertical;
     QCheckBox * m_headFocusTable;
-
+    QCheckBox * m_headSingleClick;
     bool m_headWholeWord;
     bool m_headDiacritics;
     bool m_headRegex;

@@ -41,7 +41,8 @@ class HeadSearchWidget : public QWidget
    void focusTable();
  public slots:
    void cancelSearch();
-   void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
+   void viewedItemChanged(QTableWidgetItem *,QTableWidgetItem *);
+   void itemChanged(QTableWidgetItem *);
    void itemDoubleClicked(QTableWidgetItem *);
    void onRemoveResults();
    void onExport();
@@ -69,6 +70,7 @@ class HeadSearchWidget : public QWidget
    GraphicsEntry * m_entry;
 /// for Arabic font from QSettings
    QFont m_resultsFont;
+   bool m_singleClick;
    bool m_cancelSearch;
    bool m_debug;
    bool m_verticalLayout;
