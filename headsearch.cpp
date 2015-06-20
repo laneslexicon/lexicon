@@ -283,6 +283,7 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   m_query.exec();
   QTableWidgetItem * item;
   int count = 0;
+  /// TODO get count of entry items instead of hard coding 48000
   QProgressDialog *  pd = new QProgressDialog(tr("Searching..."), tr("Cancel"), 0,48000, getApp());
   connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
   pd->setWindowModality(Qt::WindowModal);
