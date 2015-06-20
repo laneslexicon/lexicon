@@ -241,10 +241,7 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
 void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions & options) {
   QRegExp rx;
 
-  //  QRegExp rxclass1("[\\x064b\\x064c\\x064d\\x064e\\x064f\\x0650\\x0651\\x0652\\x0670\\x0671]*");
-
   QRegExp rxclass(m_diacritics);
-
   QString target = searchtarget;
   target.remove(QChar(0x202d));
 
@@ -256,15 +253,23 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   m_currentRx = rx;
 
-  bool ok = false;
+  bool ok = true;
   if (m_query.prepare(sql)) {
-    if (m_nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE)) {
-      ok = true;
+    if (! m_nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE)) {
+      QLOG_WARN() << QString(tr("SQL Error on %1: %2"))
+        .arg("SQL_FIND_ENTRY_BY_NODE")
+        .arg(m_nodeQuery.lastError().text());
+      ok = false;
     }
   }
+  else {
+      QLOG_WARN() << QString(tr("SQL Error on %1: %2"))
+        .arg("SQL_FIND_ENTRY_HEADWORD")
+        .arg(m_query.lastError().text());
+      ok = false;
+   }
   if (! ok ) {
-    QLOG_WARN() << "Error prepare SQL" << sql;
-    return;
+     return;
   }
   m_list->setRowCount(0);
 
@@ -278,10 +283,9 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   m_query.exec();
   QTableWidgetItem * item;
   int count = 0;
-  QProgressDialog *  pd = new QProgressDialog("Searching...", "Cancel", 0,48000, getApp());
+  QProgressDialog *  pd = new QProgressDialog(tr("Searching..."), tr("Cancel"), 0,48000, getApp());
   connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
   pd->setWindowModality(Qt::WindowModal);
-  //  pd->setMinimumDuration(0);
   pd->show();
   m_cancelSearch = false;
   QString node;
