@@ -2,6 +2,7 @@
 #include "application.h"
 #include "externs.h"
 #include "definedsettings.h"
+#include "QsLog.h"
 HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   m_view = new QWebView(this);
@@ -15,15 +16,18 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   connect(m_view,SIGNAL(linkClicked(const QUrl &)),this,SLOT(linkclick(const QUrl &)));
   connect(btns, SIGNAL(rejected()), this, SLOT(onClose()));
   readSettings();
+  if (m_currentPage.isEmpty()) {
+    if (m_helpRoot.endsWith(QDir::separator())) {
+      m_helpRoot.chop(1);
+    }
+    QFileInfo fi(m_helpRoot + QDir::separator() + "index.html");
 
-  QFileInfo fi(m_helpRoot + "/index.html");
-  qDebug() << fi.absoluteFilePath();
-  //m_view->load(QUrl("file:///site/lane/preface/index.html"));
-  m_view->load(QUrl("file://" + fi.absoluteFilePath()));
+    m_view->load(QUrl("file://" + fi.absoluteFilePath()));
+  }
+  m_view->load(m_currentPage);
+
   m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-  // QUrl::fromLocalFile("file:///hello.html"));
-  qDebug() << m_view->url();
-
+  QLOG_DEBUG() << Q_FUNC_INFO << "Documentation opened at" << m_view->url();
 }
 HelpView::~HelpView() {
   qDebug() << Q_FUNC_INFO;
@@ -37,7 +41,7 @@ void HelpView::linkclick(const QUrl & url) {
     str.chop(1);
   }
   QUrl f("file://" + str + QDir::separator() + "index.html");
-  qDebug() << f;
+  QLOG_DEBUG() << Q_FUNC_INFO << f;
   m_view->load(f);
 
 }
@@ -59,6 +63,7 @@ void HelpView::writeSettings() {
   settings.beginGroup("Help");
   settings.setValue(SID_HELP_SIZE, size());
   settings.setValue(SID_HELP_POS, pos());
+  settings.setValue(SID_HELP_URL, m_view->url());
   settings.endGroup();
 
 }
