@@ -3,7 +3,7 @@
 #
 #-------------------------------------------------
 QT       += core gui printsupport
-#QT       += webkitwidgets
+QT       += webkitwidgets
 QT       += sql
 QT       += help
 CONFIG   += debug
@@ -90,7 +90,8 @@ SOURCES += main.cpp\
         deletethemedialog.cpp \
         createthemedialog.cpp \
         themedialog.cpp \
-        exportsearchdialog.cpp
+        exportsearchdialog.cpp \
+        helpview.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -130,4 +131,5 @@ HEADERS  += laneslexicon.h \
             createthemedialog.h \
             themedialog.h \
             definedsql.h \
-            exportsearchdialog.h
+            exportsearchdialog.h \
+            helpview.h

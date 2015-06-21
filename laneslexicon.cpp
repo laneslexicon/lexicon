@@ -34,6 +34,7 @@
 #include "definedsql.h"
 #include "showmapwidget.h"
 #include "exportsearchdialog.h"
+#include "helpview.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -2847,7 +2848,7 @@ void LanesLexicon::onDocs() {
   }
 
   if (m_helpview == NULL) {
-    m_helpview = new HelpWidget();
+    m_helpview = new HelpView();
   }
   if (m_helpview->isHidden()) {
     m_helpview->show();
@@ -3940,12 +3941,12 @@ bool LanesLexicon::sanityCheck(int type) {
 void LanesLexicon::showHelp(const QString & section) {
   QLOG_DEBUG() << Q_FUNC_INFO << section;
   if (m_helpview == NULL) {
-    m_helpview = new HelpWidget();
+    m_helpview = new HelpView();
   }
   if (m_helpview->isHidden()) {
     m_helpview->show();
   }
-  m_helpview->showSection("idSearchConfiguration");
+  //  m_helpview->showSection("idSearchConfiguration");
 }
 void LanesLexicon::onDeleteTheme() {
   DeleteThemeDialog d;
