@@ -22,7 +22,7 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
     }
     QFileInfo fi(m_helpRoot + QDir::separator() + "index.html");
 
-    m_view->load(QUrl("file://" + fi.absoluteFilePath()));
+    m_view->load(QUrl("file:///" + fi.absoluteFilePath()));
   }
   m_view->load(m_currentPage);
 
@@ -40,7 +40,7 @@ void HelpView::linkclick(const QUrl & url) {
   if (str.endsWith(QDir::separator())) {
     str.chop(1);
   }
-  QUrl f("file://" + str + QDir::separator() + "index.html");
+  QUrl f("file:///" + str + QDir::separator() + "index.html");
   QLOG_DEBUG() << Q_FUNC_INFO << f;
   m_view->load(f);
 
