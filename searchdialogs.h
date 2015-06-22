@@ -33,6 +33,7 @@ class ArabicSearchDialog : public QDialog {
     void loadKeymap(const QString &);
     void keyboardClosed();
     void onKeyboardShortcut(const QString &);
+    void onHelp();
  protected:
     int m_searchType;
     int m_count;
@@ -46,6 +47,8 @@ class ArabicSearchDialog : public QDialog {
     QPushButton * m_findButton;
     QPushButton * m_keyboardButton;
     SearchOptionsWidget  * m_options;
+ signals:
+    void showHelp(const  QString &);
 };
 
 class NodeSearchDialog : public QDialog {
@@ -59,6 +62,8 @@ class NodeSearchDialog : public QDialog {
   void setOptions();
   public slots:
   void checkOptions(int x = 0);
+  public slots:
+    void onHelp();
  private:
   void readSettings();
     int m_searchType;
@@ -69,6 +74,8 @@ class NodeSearchDialog : public QDialog {
   QDialogButtonBox * m_buttonBox;
   QPushButton * m_findButton;
   QWidget * m_options;
+ signals:
+    void showHelp(const  QString &);
 };
 class PageSearchDialog : public QDialog {
   Q_OBJECT
@@ -81,6 +88,8 @@ class PageSearchDialog : public QDialog {
   void setText(const QString &);
   public slots:
   void checkOptions(int x = 0);
+  public slots:
+    void onHelp();
  private:
   void readSettings();
   int m_searchType;
@@ -91,5 +100,7 @@ class PageSearchDialog : public QDialog {
   QDialogButtonBox * m_buttonBox;
   QPushButton * m_findButton;
   QWidget * m_options;
+ signals:
+    void showHelp(const  QString &);
 };
 #endif

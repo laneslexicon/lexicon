@@ -41,7 +41,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 
   m_scene = new QGraphicsScene(this);
   m_view = new QGraphicsView(m_scene,this);
-
+  m_view->setObjectName("entryview");
   m_view->setFocusPolicy(Qt::StrongFocus);
   m_view->setSceneRect(m_scene->sceneRect());
   m_view->setAlignment(Qt::AlignTop);

@@ -671,6 +671,7 @@ void LanesLexicon::shortcut(const QString & key) {
 }
 /**
  * setup the shortcuts from the conf
+ * the help shortcut is created in readSettings
  * TODO don't think we need the update stuff since the old shortcuts are
  * being deleted.
  */
@@ -704,6 +705,7 @@ void LanesLexicon::setupShortcuts() {
   }
   settings.endGroup();
   m_shortcutMap->blockSignals(false);
+
 }
 void LanesLexicon::addShortcut(const QString & name,const QString & k,bool update) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << name << k << update;
@@ -1678,6 +1680,7 @@ void LanesLexicon::onEditView() {
   if (m_editView == 0) {
     m_editView = new EditView;
     connect(m_editView,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
+    connect(m_editView,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   }
   m_editView->show();
 }
@@ -1698,6 +1701,7 @@ void LanesLexicon::onTest() {
     s->setOptions(options);
     //    s->setOptions(0);
     ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Word);
+    connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
     d->exec();
   }
   if (0) {
@@ -1854,6 +1858,13 @@ void LanesLexicon::readSettings() {
   m_linkAction->setChecked(m_linkContents);
 
   m_messageInterval = settings.value(SID_SYSTEM_MESSAGE_TIMEOUT,5000).toInt();
+
+  v = settings.value(SID_SYSTEM_HELP,"F1").toString();
+  m_helpRequested = new QShortcut(QKeySequence(v),this);
+  m_helpRequested->setContext(Qt::ApplicationShortcut);
+
+  connect(m_helpRequested,SIGNAL(activated()),this,SLOT(onDocs()));
+
 
   settings.endGroup();
 
@@ -2846,6 +2857,23 @@ void LanesLexicon::onDocs() {
     QMessageBox::information(NULL,tr("Information"),tr("Not yet implemented"));
     return;
   }
+  QWidget * w;
+  w = QApplication::activeWindow();
+  if (w) {
+    qDebug() << "Active window" << w->objectName() << w->metaObject()->className();
+  }
+  w = QApplication::focusWidget();
+  if (w) {
+    qDebug() << "Focus widget" << w->objectName() << w->metaObject()->className();
+  }
+  w = QApplication::activeModalWidget();
+  if (w) {
+    qDebug() << "Active modal widget" << w->objectName() << w->metaObject()->className();
+  }
+  w = QApplication::activePopupWidget();
+  if (w) {
+    qDebug() << "Active popup widget" << w->objectName() << w->metaObject()->className();
+  }
 
   if (m_helpview == NULL) {
     m_helpview = new HelpView();
@@ -2875,6 +2903,7 @@ void LanesLexicon::searchForPage() {
   SearchOptions options;
   if (m_pageSearchDialog == NULL) {
     m_pageSearchDialog  = new PageSearchDialog();
+    connect(m_pageSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   }
   else {
     m_pageSearchDialog->setText("");
@@ -2933,6 +2962,7 @@ void LanesLexicon::searchForRoot() {
   int ix;
   if (m_rootSearchDialog == NULL) {
     m_rootSearchDialog = new ArabicSearchDialog(SearchOptions::Root);
+    connect(m_rootSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   }
   else {
     m_rootSearchDialog->setText("");
@@ -3056,6 +3086,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
 void LanesLexicon::searchForWord() {
   if (m_wordSearchDialog == NULL) {
     m_wordSearchDialog = new ArabicSearchDialog(SearchOptions::Word);
+    connect(m_wordSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   }
   else {
     m_wordSearchDialog->setText("");
@@ -3076,6 +3107,8 @@ void LanesLexicon::searchForEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   if (m_headSearchDialog == NULL) {
     m_headSearchDialog  = new ArabicSearchDialog(SearchOptions::Entry);
+    connect(m_headSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
+
   }
   else {
     m_headSearchDialog->setText("");
@@ -3093,6 +3126,7 @@ void LanesLexicon::searchForNode() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   if (m_nodeSearchDialog == NULL) {
     m_nodeSearchDialog = new NodeSearchDialog();
+    connect(m_nodeSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   }
   else {
     m_nodeSearchDialog->setText("");
@@ -3938,6 +3972,11 @@ bool LanesLexicon::sanityCheck(int type) {
   }
   return true;
 }
+/**
+ * This is called from the OptionsDialog help button
+ *
+ * @param section
+ */
 void LanesLexicon::showHelp(const QString & section) {
   QLOG_DEBUG() << Q_FUNC_INFO << section;
   if (m_helpview == NULL) {
@@ -4071,6 +4110,7 @@ bool LanesLexicon::copyRecursively(const QString & srcPath,const QString & targe
 }
 void LanesLexicon::onChangeArabicFont() {
   FontChangeDialog * d = new FontChangeDialog;
+  connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   d->exec();
   if (d->isModified()) {
     for(int i=0;i < m_tabs->count();i++) {

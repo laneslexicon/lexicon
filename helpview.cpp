@@ -15,6 +15,8 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
 
   connect(m_view,SIGNAL(linkClicked(const QUrl &)),this,SLOT(linkclick(const QUrl &)));
   connect(btns, SIGNAL(rejected()), this, SLOT(onClose()));
+  connect(m_view,SIGNAL(loadProgress(int)),this,SLOT(loadProgress(int)));
+
   readSettings();
   if (m_currentPage.isEmpty()) {
     if (m_helpRoot.endsWith(QDir::separator())) {
@@ -66,4 +68,8 @@ void HelpView::writeSettings() {
   settings.setValue(SID_HELP_URL, m_view->url());
   settings.endGroup();
 
+}
+void HelpView::loadProgress(int x) {
+
+  qDebug() << Q_FUNC_INFO << x;
 }

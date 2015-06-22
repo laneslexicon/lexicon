@@ -11,9 +11,11 @@ EditPage::EditPage(int type,QWidget * parent) : QWidget(parent) {
   m_text = new QPlainTextEdit;
   if (type == EDIT_CSS) {
     m_useOther = new QCheckBox(tr("Use edited XSLT"));
+    setObjectName("editcss");
   }
   else {
     m_useOther = new QCheckBox(tr("Use edited CSS"));
+    setObjectName("editxslt");
   }
 
   m_buttons =   new QDialogButtonBox(QDialogButtonBox::Apply|QDialogButtonBox::RestoreDefaults,this);
@@ -140,6 +142,10 @@ EditView::EditView(QWidget * parent) : QWidget(parent) {
   //  m_xsltEditor->setText(m_xslt.join("\n"));
   m_tabs->addTab(m_xsltEditor,tr("XSLT"));
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
+
+  QPushButton * helpbutton = m_buttons->addButton(QDialogButtonBox::Help);
+  connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
+
   layout->addWidget(m_tabs);
   layout->addWidget(m_buttons);
   connect(m_buttons,SIGNAL(accepted()),this,SLOT(accept()));
@@ -223,4 +229,7 @@ void EditView::apply(int type,bool useEdited) {
   if (! css.isEmpty() && ! xslt.isEmpty()) {
     emit(reload(css,xslt));
   }
+}
+void EditView::onHelp() {
+  emit(showHelp(m_tabs->currentWidget()->objectName()));
 }

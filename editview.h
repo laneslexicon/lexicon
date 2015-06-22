@@ -59,6 +59,7 @@ class EditView : public QWidget {
     void reject();
     void apply(int,bool);
     void modified(int,bool);
+    void onHelp();
  protected:
   QSize sizeHint() const;
  private:
@@ -72,5 +73,6 @@ class EditView : public QWidget {
   bool m_xsltModified;
  signals:
       void reload(const QString &,const QString &);
+      void showHelp(const QString &);
 };
 #endif

@@ -73,6 +73,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   QPushButton * button = m_buttonBox->addButton(QDialogButtonBox::Cancel);
   button->setText(tr("&Cancel"));
   m_buttonBox->addButton(m_moreButton, QDialogButtonBox::ActionRole);
+
   if (searchType == SearchOptions::Word) {
     m_moreButton->setVisible(true);
   }
@@ -80,7 +81,8 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
     m_moreButton->setVisible(false);
   }
   m_buttonBox->addButton(m_keyboardButton,QDialogButtonBox::ActionRole);
-
+  QPushButton * helpbutton = m_buttonBox->addButton(QDialogButtonBox::Help);
+  connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
   m_findButton->setFocus();
 
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
@@ -248,6 +250,9 @@ bool ArabicSearchDialog::getForceLTR() const {
 void ArabicSearchDialog::setText(const QString & t) {
   m_edit->setText(t);
 }
+void ArabicSearchDialog::onHelp() {
+  emit(showHelp(QString("search-%1").arg(m_searchType)));
+}
 /**
  *
  *pp
@@ -257,6 +262,7 @@ void ArabicSearchDialog::setText(const QString & t) {
 NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   setWindowTitle(tr("Search for node"));
+  m_searchType = SearchOptions::Node;
 
   m_prompt = new QLabel(tr("Find &node"));
   m_edit = new QLineEdit;
@@ -275,6 +281,8 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_buttonBox = new QDialogButtonBox(Qt::Vertical);
   m_buttonBox->addButton(m_findButton, QDialogButtonBox::AcceptRole);
   m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
+  QPushButton * helpbutton = m_buttonBox->addButton(QDialogButtonBox::Help);
+  connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
 
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -339,6 +347,10 @@ void NodeSearchDialog::checkOptions(int /* state */) {
 void NodeSearchDialog::setText(const QString & t) {
   m_edit->setText(t);
 }
+void NodeSearchDialog::onHelp() {
+  emit(showHelp(QString("search-%1").arg(m_searchType)));
+}
+
 /**
  *
  *
@@ -348,6 +360,7 @@ void NodeSearchDialog::setText(const QString & t) {
 PageSearchDialog::PageSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   setWindowTitle(tr("Search for page"));
+  m_searchType = SearchOptions::Page;
 
   m_prompt = new QLabel(tr("Find &page"));
   m_edit = new QLineEdit;
@@ -368,6 +381,8 @@ PageSearchDialog::PageSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_buttonBox = new QDialogButtonBox(Qt::Vertical);
   m_buttonBox->addButton(m_findButton, QDialogButtonBox::AcceptRole);
   m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
+  QPushButton * helpbutton = m_buttonBox->addButton(QDialogButtonBox::Help);
+  connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
 
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -432,4 +447,7 @@ void PageSearchDialog::checkOptions(int /* state */) {
 }
 void PageSearchDialog::setText(const QString & t) {
   m_edit->setText(t);
+}
+void PageSearchDialog::onHelp() {
+  emit(showHelp(QString("search-%1").arg(m_searchType)));
 }

@@ -22,6 +22,7 @@ class HelpView : public QWidget {
   public slots:
     void linkclick(const QUrl &);
     void onClose();
+    void loadProgress(int);
  private:
     void readSettings();
     void writeSettings();

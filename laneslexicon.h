@@ -430,7 +430,7 @@ class LanesLexicon : public QMainWindow
       HistoryMaster * m_history;
       NoteMaster * m_notes;
 
-
+      QShortcut * m_helpRequested;
  signals:
       void nodeActivated(const QString & node,const QString & word);
 };

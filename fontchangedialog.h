@@ -25,7 +25,7 @@ class FontChangeDialog : public QDialog {
    void onFontChanged(const QString &);
    void onShowAllChanged(int);
    void onApply();
-
+   void onHelp();
  private:
    void setCurrentFontText();
    //  QStringList m_arFonts;
@@ -41,5 +41,7 @@ class FontChangeDialog : public QDialog {
   QPushButton * m_applyButton;
   QLabel * m_fontLabel;
   bool m_modified;
+ signals:
+  void showHelp(const QString &);
 };
 #endif

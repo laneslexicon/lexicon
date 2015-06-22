@@ -42,6 +42,9 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
 
   QDialogButtonBox *   buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
 
+  QPushButton * helpbutton = buttonBox->addButton(QDialogButtonBox::Help);
+  connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
+
   connect(buttonBox,SIGNAL(rejected()),this,SLOT(reject()));
   layout->addWidget(m_currentFont);
   layout->addLayout(formlayout);
@@ -161,4 +164,7 @@ void FontChangeDialog::onApply() {
 }
 bool FontChangeDialog::isModified() const {
   return m_modified;
+}
+void FontChangeDialog::onHelp() {
+  emit(showHelp(this->objectName()));
 }
