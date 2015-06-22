@@ -11,11 +11,19 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   layout->addWidget(m_view);
   layout->addWidget(btns);
   setLayout(layout);
-  m_view->show();
+  m_initialPage = true;
+  m_timer = 0;
+  m_progress = 0;
 
   connect(m_view,SIGNAL(linkClicked(const QUrl &)),this,SLOT(linkclick(const QUrl &)));
   connect(btns, SIGNAL(rejected()), this, SLOT(onClose()));
   connect(m_view,SIGNAL(loadProgress(int)),this,SLOT(loadProgress(int)));
+  connect(m_view,SIGNAL(loadStarted()),this,SLOT(loadStarted()));
+  connect(m_view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
+  if (m_initialPage) {
+    this->hide();
+    m_view->hide();
+  }
 
   readSettings();
   if (m_currentPage.isEmpty()) {
@@ -69,7 +77,39 @@ void HelpView::writeSettings() {
   settings.endGroup();
 
 }
+/**
+ * The first load can take sometimes take a few seconds so we are showing
+ * a progress dialog when
+ *
+ * @param x
+ */
 void HelpView::loadProgress(int x) {
-
-  qDebug() << Q_FUNC_INFO << x;
+  if (m_progress) {
+    m_progress->setValue(x);
+  }
+}
+void HelpView::loadStarted() {
+  if (m_initialPage) {
+    m_progress = new QProgressDialog("Loading ...", "Cancel", 0, 100);
+    m_progress->setCancelButton(0);
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(perform()));
+    m_timer->start(0);
+    m_progress->show();
+  }
+}
+void HelpView::loadFinished(bool ok) {
+  if (m_initialPage) {
+    m_view->show();
+    m_initialPage = false;
+    m_timer->stop();
+    delete m_progress;
+    delete m_timer;
+    m_timer = 0;
+    m_progress = 0;
+  }
+  this->show();
+}
+bool HelpView::isLoaded() {
+  return ! m_initialPage;
 }

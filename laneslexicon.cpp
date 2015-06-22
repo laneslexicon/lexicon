@@ -2878,11 +2878,13 @@ void LanesLexicon::onDocs() {
   if (m_helpview == NULL) {
     m_helpview = new HelpView();
   }
-  if (m_helpview->isHidden()) {
-    m_helpview->show();
-  }
-  else {
-    m_helpview->hide();
+  if (m_helpview->isLoaded()) {
+    if (m_helpview->isHidden()) {
+      m_helpview->show();
+    }
+    else {
+      m_helpview->hide();
+    }
   }
   //   m_tabs->setCurrentIndex(m_tabs->addTab(w,"Docs"));
    return;

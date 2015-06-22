@@ -13,20 +13,28 @@
 #include <QUrl>
 #include <QFile>
 #include <QDialogButtonBox>
+#include <QProgressDialog>
+#include <QTimer>
 class HelpView : public QWidget {
   Q_OBJECT
  public:
   HelpView(QWidget * parent = 0);
   ~HelpView();
   QWebView * m_view;
+  bool isLoaded();
   public slots:
     void linkclick(const QUrl &);
     void onClose();
     void loadProgress(int);
+    void loadFinished(bool);
+    void loadStarted();
  private:
     void readSettings();
     void writeSettings();
     QString m_helpRoot;
     QUrl m_currentPage;
+    QProgressDialog * m_progress;
+    bool m_initialPage;
+    QTimer * m_timer;
 };
 #endif // MAINWINDOW_H
