@@ -67,8 +67,12 @@ void HelpView::linkclick(const QUrl & url) {
   if (str.endsWith(QDir::separator())) {
     str.chop(1);
   }
-  QUrl f("file:///" + str + QDir::separator() + "index.html");
-  QLOG_DEBUG() << Q_FUNC_INFO << f;
+  QRegExp rx("^/+");
+  str.remove(rx);
+
+  QString prefix;
+  prefix = "file:///";
+  QUrl f(prefix + str + QDir::separator() + "index.html");
   m_view->load(f);
 
 }
@@ -110,7 +114,7 @@ void HelpView::loadStarted() {
     m_progress = new QProgressDialog("Loading ...", "Cancel", 0, 100);
     m_progress->setCancelButton(0);
     m_timer = new QTimer(this);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(perform()));
+    //    connect(m_timer, SIGNAL(timeout()), this, SLOT(perform()));
     m_timer->start(0);
     m_progress->show();
   }
