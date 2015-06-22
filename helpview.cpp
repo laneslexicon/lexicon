@@ -26,18 +26,35 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   }
 
   readSettings();
-  if (m_currentPage.isEmpty()) {
+  /**
+   * check the current page points to an actual file. e.g. when the saved page url is out
+   * of date after documentation changes
+   *
+   * If there is a problem loading the page, it seems to default to about:blank, so
+   * check for this as well.
+   */
+
+  if (! m_currentPage.isEmpty()) {
+    QFileInfo cp(m_currentPage.toLocalFile());
+    if (! cp.exists()) {
+      m_currentPage.clear();
+    }
+  }
+  if (m_currentPage.isEmpty() || (m_currentPage == QUrl("about:blank"))) {
     if (m_helpRoot.endsWith(QDir::separator())) {
       m_helpRoot.chop(1);
     }
     QFileInfo fi(m_helpRoot + QDir::separator() + "index.html");
 
+    QLOG_DEBUG() << Q_FUNC_INFO << "Loading" << fi.absoluteFilePath();
     m_view->load(QUrl("file:///" + fi.absoluteFilePath()));
   }
-  m_view->load(m_currentPage);
+  else {
+
+    m_view->load(m_currentPage);
+  }
 
   m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-  QLOG_DEBUG() << Q_FUNC_INFO << "Documentation opened at" << m_view->url();
 }
 HelpView::~HelpView() {
   qDebug() << Q_FUNC_INFO;
@@ -78,8 +95,8 @@ void HelpView::writeSettings() {
 
 }
 /**
- * The first load can take sometimes take a few seconds so we are showing
- * a progress dialog when
+ * The first load can sometimes take a few seconds so we are showing
+ * a progress dialog
  *
  * @param x
  */
@@ -109,6 +126,7 @@ void HelpView::loadFinished(bool ok) {
     m_progress = 0;
   }
   this->show();
+  m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 }
 bool HelpView::isLoaded() {
   return ! m_initialPage;
