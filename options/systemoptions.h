@@ -19,12 +19,13 @@ class SystemOptions : public OptionsWidget {
     void onSetCss();
     void onSetNotesDatabase();
     void onSetHistoryDatabase();
+    void onOfflineLocation();
  private:
     //    QLineEdit * m_arabicFont;
     //    QLineEdit * m_color;
     QCheckBox * m_contentsLinked;
     QLineEdit * m_lexicon;
-    QCheckBox * m_debug;
+    QCheckBox * m_debugOption;
     QCheckBox * m_docked;
     QLineEdit * m_focusTab;
     QCheckBox * m_rootNavigation;
@@ -51,5 +52,10 @@ class SystemOptions : public OptionsWidget {
     QLineEdit * m_notesDb;
     QCheckBox * m_splashScreen;
 
+    QLineEdit * m_onlineUrl;
+    QLineEdit * m_onlineCurrentPage;
+    QLineEdit * m_offlineLocation;
+    QLineEdit * m_offlineCurrentPage;
+    QCheckBox * m_localDocs;
 };
 #endif

@@ -302,7 +302,7 @@ They should not be translated.
 #define SID_HELP_ONLINE_PREFIX                  "Online prefix"
 #define SID_HELP_ONLINE_LOCATION                "Online location"
 
-#define SID_HELP_LOCAL                          "Offline"
+#define SID_HELP_LOCAL                          "Local docs"
 
 #define SID_EDITVIEW_SIZE                       "Size"
 #define SID_EDITVIEW_POS                       "Pos"

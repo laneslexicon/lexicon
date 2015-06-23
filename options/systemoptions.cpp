@@ -26,7 +26,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   lexiconlayout->addWidget(lexiconbutton);
   lexiconlayout->addStretch();
   //  this->setControlSize(m_lexicon,VLARGE_EDIT);
-  m_debug = new QCheckBox;
+  m_debugOption = new QCheckBox;
   m_docked = new QCheckBox;
   m_focusTab = new QLineEdit;
   //  this->setControlSize(m_focusTab,LARGE_EDIT);
@@ -92,7 +92,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
 
 
-  optionlayout->addRow(tr("Debug"),m_debug);
+  optionlayout->addRow(tr("Debug"),m_debugOption);
   optionlayout->addRow(tr("Docked"),m_docked);
   optionlayout->addRow(tr("Current tab"),m_focusTab);
   optionlayout->addRow(tr("Contents linked"),m_contentsLinked);
@@ -113,8 +113,32 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   optionlayout->addRow(tr("Show splash screen"),m_splashScreen);
   othergroup->setLayout(optionlayout);
 
+
+  m_onlineUrl = new QLineEdit;
+  m_onlineCurrentPage = new QLineEdit;
+  m_offlineLocation = new QLineEdit;
+  QHBoxLayout * locationlayout = new QHBoxLayout;
+  QPushButton * locationbutton = new QPushButton(tr("..."));
+  locationlayout->addWidget(m_offlineLocation);
+  locationlayout->addWidget(locationbutton);
+  locationlayout->addStretch();
+  connect(locationbutton,SIGNAL(clicked()),this,SLOT(onOfflineLocation()));
+  m_offlineCurrentPage = new QLineEdit;
+  m_localDocs = new QCheckBox;
+  QGroupBox * docgroup = new QGroupBox(tr("Documentation"));
+  QFormLayout * doclayout = new QFormLayout;
+  doclayout->addRow(tr("Online URL"),m_onlineUrl);
+  doclayout->addRow(tr("Online current page"),m_onlineCurrentPage);
+  doclayout->addRow(tr("Offline location"),locationlayout);
+  doclayout->addRow(tr("Offline current page"),m_offlineCurrentPage);
+  doclayout->addRow(tr("Local documentation"),m_localDocs);
+
+  docgroup->setLayout(doclayout);
+
+
   vlayout->addWidget(dbgroup);
   vlayout->addWidget(othergroup);
+  vlayout->addWidget(docgroup);
 
   vlayout->addStretch();
   setLayout(vlayout);
@@ -123,6 +147,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   setupConnections();
   this->setLineEditSize(VLARGE_EDIT);
   this->setComboSize(VLARGE_EDIT);
+  m_debug = true;
 }
 
 void SystemOptions::readSettings() {
@@ -132,7 +157,7 @@ void SystemOptions::readSettings() {
 
   m_contentsLinked->setChecked(settings.value(SID_SYSTEM_CONTENTS_LINKED,true).toBool());
   m_lexicon->setText(settings.value(SID_SYSTEM_DATABASE,"lexicon.sqlite").toString());
-  m_debug->setChecked(settings.value(SID_SYSTEM_DEBUG,true).toBool());
+  m_debugOption->setChecked(settings.value(SID_SYSTEM_DEBUG,true).toBool());
   m_docked->setChecked(settings.value(SID_SYSTEM_DOCKED,true).toBool());
   m_focusTab->setText(settings.value(SID_SYSTEM_CURRENT_TAB,"0").toString());
   m_minimalInterface->setChecked(settings.value(SID_SYSTEM_MINIMAL,true).toBool());
@@ -170,7 +195,16 @@ void SystemOptions::readSettings() {
   settings.endGroup();
   settings.beginGroup("History");
   m_historyDb->setText(settings.value(SID_HISTORY_DATABASE,"history.sqlite").toString());
+  settings.endGroup();
+  settings.beginGroup("Help");
+  m_onlineUrl->setText(settings.value(SID_HELP_ONLINE_PREFIX).toString());
+  m_onlineCurrentPage->setText(settings.value(SID_HELP_ONLINE_URL,QUrl()).toUrl().toString());
+  m_offlineLocation->setText(settings.value(SID_HELP_LOCAL_LOCATION,"site").toString());
 
+  QDir dd(m_offlineLocation->text());
+  QUrl u = settings.value(SID_HELP_LOCAL_URL,QUrl()).toUrl();
+  m_offlineCurrentPage->setText(dd.relativeFilePath(u.fileName()));
+  m_localDocs->setChecked(settings.value(SID_HELP_LOCAL,true).toBool());
 
   m_dirty = false;
 }
@@ -193,7 +227,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
 
   settings.setValue(SID_SYSTEM_CONTENTS_LINKED,  m_contentsLinked->isChecked());
   settings.setValue(SID_SYSTEM_DATABASE,m_lexicon->text());
-  settings.setValue(SID_SYSTEM_DEBUG,m_debug->isChecked());
+  settings.setValue(SID_SYSTEM_DEBUG,m_debugOption->isChecked());
   settings.setValue(SID_SYSTEM_DOCKED,m_docked->isChecked());
   settings.setValue(SID_SYSTEM_CURRENT_TAB,m_focusTab->text());
   settings.setValue(SID_SYSTEM_MINIMAL,m_minimalInterface->isChecked());
@@ -228,8 +262,17 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.endGroup();
   settings.beginGroup("History");
   settings.setValue(SID_HISTORY_DATABASE,m_historyDb->text());
-  qDebug() << Q_FUNC_INFO << settings.format() << settings.iniCodec()->name();
-  settings.sync();
+  settings.endGroup();
+
+  settings.beginGroup("Help");
+  settings.setValue(SID_HELP_ONLINE_PREFIX,m_onlineUrl->text());
+  settings.setValue(SID_HELP_ONLINE_URL,QUrl(m_onlineCurrentPage->text()));
+  settings.setValue(SID_HELP_LOCAL_LOCATION,m_offlineLocation->text());
+  QFileInfo fi(QDir(m_offlineLocation->text()),m_offlineCurrentPage->text());
+  settings.setValue(SID_HELP_LOCAL_URL,QUrl::fromLocalFile(fi.absoluteFilePath()));
+  settings.setValue(SID_HELP_LOCAL,m_localDocs->isChecked());
+
+   settings.sync();
   m_dirty = false;
   emit(modified(false));
 }
@@ -251,7 +294,7 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SYSTEM_DATABASE,m_lexicon)) {
     m_dirty = true;
   }
-  if (compare(&settings,SID_SYSTEM_DEBUG,m_debug)) {
+  if (compare(&settings,SID_SYSTEM_DEBUG,m_debugOption)) {
     m_dirty = true;
   }
   if (compare(&settings,SID_SYSTEM_DOCKED,m_docked)) {
@@ -319,6 +362,30 @@ bool SystemOptions::isModified()  {
   settings.endGroup();
   settings.beginGroup("History");
   if (compare(&settings,SID_HISTORY_DATABASE,m_historyDb)) {
+    m_dirty = true;
+  }
+  settings.endGroup();
+  settings.beginGroup("Help");
+  if (compare(&settings,SID_HELP_ONLINE_PREFIX,m_onlineUrl)) {
+    m_dirty = true;
+  }
+  /// check this
+  if (compare(&settings,SID_HELP_ONLINE_URL,m_onlineCurrentPage)) {
+   m_dirty = true;
+   }
+  if (compare(&settings,SID_HELP_LOCAL_LOCATION,m_offlineLocation)) {
+    m_dirty = true;
+  }
+  QDir dd(m_offlineLocation->text());
+  QUrl u = settings.value(SID_HELP_LOCAL_URL,QUrl()).toUrl();
+  QString str = dd.relativeFilePath(u.fileName());
+  if (str != m_offlineCurrentPage->text()) {
+    m_dirty = true;
+    if (m_debug) {
+      QLOG_DEBUG() << "Is Modified" << SID_HELP_LOCAL_URL << str << m_offlineCurrentPage->text();
+    }
+  }
+  if (compare(&settings,SID_HELP_LOCAL,m_localDocs)) {
     m_dirty = true;
   }
 
@@ -414,4 +481,14 @@ void SystemOptions::onSetCss() {
 
   QDir d(cssDirectory);
   m_css->setText(d.relativeFilePath(fileName));
+}
+void SystemOptions::onOfflineLocation() {
+  QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                  ".",
+                                                  QFileDialog::ShowDirsOnly
+                                                  | QFileDialog::DontResolveSymlinks);
+  if (dir.isEmpty()) {
+    return;
+  }
+  m_offlineLocation->setText(dir);
 }
