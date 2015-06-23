@@ -12,6 +12,7 @@
 #include "historyoptions.h"
 #include "iconoptions.h"
 #include "QsLog.h"
+#include "definedsettings.h"
 #ifndef STANDALONE
 #include "application.h"
 #include "externs.h"
@@ -47,12 +48,13 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   m_modified = false;
   m_hasChanges = false;
   settings.setIniCodec("UTF-8");
+  settings.beginGroup("System");
+  m_debug = settings.value(SID_SYSTEM_DEBUG,false).toBool();
   settings.beginGroup("Options");
   QString testFileName(".vanilla.ini");
   //resize(QSize(600, 400));
   resize(settings.value("Size", QSize(600, 400)).toSize());
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
-  bool debugChanges = settings.value("Debug",false).toBool();
   bool writeTest = settings.value("Create",false).toBool();
   if (settings.value("System",true).toBool()) {
     SystemOptions * systems = new SystemOptions(useTheme,this);
@@ -60,7 +62,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       systems->writeSettings(testFileName);
     }
-    systems->setDebug(debugChanges);
   }
   if (settings.value("Roots",true).toBool()) {
     RootsOptions * tree = new RootsOptions(useTheme,this);
@@ -68,7 +69,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       tree->writeSettings(testFileName);
     }
-    tree->setDebug(debugChanges);
   }
   if (settings.value("Print",true).toBool()) {
     PrintOptions * print = new PrintOptions(useTheme,this);
@@ -76,7 +76,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       print->writeSettings(testFileName);
     }
-    print->setDebug(debugChanges);
   }
   if (settings.value("Shortcuts",true).toBool()) {
     ShortcutOptions * shortcut = new ShortcutOptions(useTheme,this);
@@ -84,7 +83,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       shortcut->writeSettings(testFileName);
     }
-    shortcut->setDebug(debugChanges);
   }
   if (settings.value("Diacritics",true).toBool()) {
     DiacriticsOptions * diacritics = new DiacriticsOptions(useTheme,this);
@@ -92,7 +90,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       diacritics->writeSettings(testFileName);
     }
-    diacritics->setDebug(debugChanges);
   }
   if (settings.value("Entry",true).toBool()) {
     EntryOptions * entry = new EntryOptions(useTheme,this);
@@ -100,7 +97,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       entry->writeSettings(testFileName);
     }
-    entry->setDebug(debugChanges);
   }
   if (settings.value("Search",true).toBool()) {
     FindOptions * find = new FindOptions(useTheme,this);
@@ -108,7 +104,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       find->writeSettings(testFileName);
     }
-    find->setDebug(debugChanges);
   }
   if (settings.value("Bookmark",true).toBool()) {
     BookmarkOptions * bookmark = new BookmarkOptions(useTheme,this);
@@ -116,7 +111,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       bookmark->writeSettings(testFileName);
     }
-    bookmark->setDebug(debugChanges);
   }
   if (settings.value("Logging",true).toBool()) {
     LogOptions * log = new LogOptions(useTheme,this);
@@ -124,7 +118,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       log->writeSettings(testFileName);
     }
-    log->setDebug(debugChanges);
   }
   if (settings.value("History",true).toBool()) {
     HistoryOptions * history = new HistoryOptions(useTheme,this);
@@ -132,7 +125,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       history->writeSettings(testFileName);
     }
-    history->setDebug(debugChanges);
   }
   if (settings.value("Icons",true).toBool()) {
     IconOptions * icon = new IconOptions(useTheme,this);
@@ -140,7 +132,6 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     if (writeTest) {
       icon->writeSettings(testFileName);
     }
-    icon->setDebug(debugChanges);
   }
   for(int i=0;i < m_tabs->count();i++) {
     getLexicon()->setCursorPosition(m_tabs->widget(i));
@@ -221,6 +212,7 @@ void OptionsDialog::enableButtons() {
   for(int i=0;i < m_tabs->count();i++) {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab) {
+      tab->setDebug(m_debug);
       if (tab->isModified()) {
         QLOG_DEBUG() << Q_FUNC_INFO << QString("Modified tab: %1, %2").arg(i).arg(m_tabs->tabText(i));
         m_hasChanges = v = true;

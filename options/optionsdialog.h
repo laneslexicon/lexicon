@@ -31,6 +31,7 @@ class OptionsDialog : public QDialog {
     QString m_theme;
     bool m_modified;
     bool m_hasChanges;
+    bool m_debug;
     QString m_tempFileName;
   signals:
     void showHelp(const QString &);
