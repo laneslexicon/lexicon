@@ -1,9 +1,11 @@
 #include "optionswidget.h"
-#ifndef STANDALONE
+#ifdef LANE
 #include "application.h"
 #include "externs.h"
+#include "QsLog.h"
 #else
 #define QLOG_DEBUG() qDebug()
+#define QLOG_INFO() qDebug()
 #endif
 OptionsWidget::OptionsWidget(QWidget * parent) : QWidget(parent) {
   m_debug = false;
@@ -11,7 +13,7 @@ OptionsWidget::OptionsWidget(QWidget * parent) : QWidget(parent) {
   m_btns = 0;
 }
 OptionsWidget::OptionsWidget(const QString & theme,QWidget * parent) : QWidget(parent) {
-#ifndef STANDALONE
+#ifdef LANE
   m_settingsFileName = getLexicon()->settingsFileName(theme);
 #else
   m_settingsFileName = QString("%1.ini").arg(theme);
@@ -211,7 +213,7 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   if (edit) {
     if (settings->value(key).toString() != edit->text()) {
       if (m_debug) {
-        QLOG_DEBUG() << "Is modified" << key << settings->value(key).toString() << edit->text();
+        QLOG_INFO() << "Is modified" << key << settings->value(key).toString() << edit->text();
       }
       return true;
     }
@@ -220,7 +222,7 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   if (box) {
     if (settings->value(key).toBool() != box->isChecked()) {
       if (m_debug) {
-        QLOG_DEBUG() << "Is modified" << key << settings->value(key).toBool() << box->isChecked();
+        QLOG_INFO() << "Is modified" << key << settings->value(key).toBool() << box->isChecked();
       }
       return true;
     }
@@ -229,7 +231,7 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   if (spin) {
     if  (settings->value(key).toInt() != spin->value()) {
       if (m_debug) {
-        QLOG_DEBUG() << "Is modified" << key << settings->value(key).toInt() << spin->value();
+        QLOG_INFO() << "Is modified" << key << settings->value(key).toInt() << spin->value();
       }
       return true;
     }
@@ -238,7 +240,7 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   if (dspin) {
     if (settings->value(key).toDouble() != dspin->value()) {
       if (m_debug) {
-        QLOG_DEBUG() << "Is modified" << key << settings->value(key).toDouble() << dspin->value();
+        QLOG_INFO() << "Is modified" << key << settings->value(key).toDouble() << dspin->value();
       }
       return true;
     }
@@ -251,7 +253,7 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
     k2.remove(QChar(' '));
     if  (k1  != k2 ) {
       if (m_debug) {
-        QLOG_DEBUG() << "Is modified" << key << k1 << k2;
+        QLOG_INFO() << "Is modified" << key << k1 << k2;
       }
       return true;
     }
@@ -260,7 +262,7 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   if (datetimeedit) {
     if  (settings->value(key).toString() != datetimeedit->dateTime().toString(Qt::ISODate)) {
       if (m_debug) {
-        QLOG_DEBUG() << "Is modified" << key << settings->value(key).toString() << datetimeedit->dateTime().toString(Qt::ISODate);
+        QLOG_INFO() << "Is modified" << key << settings->value(key).toString() << datetimeedit->dateTime().toString(Qt::ISODate);
       }
       return true;
 
