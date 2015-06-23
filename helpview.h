@@ -28,11 +28,21 @@ class HelpView : public QWidget {
     void loadProgress(int);
     void loadFinished(bool);
     void loadStarted();
+    void onCancel();
+ protected:
+    void showEvent(QShowEvent *);
  private:
     void readSettings();
     void writeSettings();
-    QString m_helpRoot;
-    QUrl m_currentPage;
+    QString m_localPrefix;
+    QString m_localRoot;
+    QUrl m_currentLocalPage;
+
+    QString m_onlinePrefix;
+    QString m_onlineRoot;
+    QUrl m_currentOnlinePage;
+
+    bool m_localSource;
     QProgressDialog * m_progress;
     bool m_initialPage;
     QTimer * m_timer;

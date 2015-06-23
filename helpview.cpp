@@ -34,26 +34,46 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
    * check for this as well.
    */
 
-  if (! m_currentPage.isEmpty()) {
-    QFileInfo cp(m_currentPage.toLocalFile());
+  if (m_localSource && ! m_currentLocalPage.isEmpty()) {
+    QFileInfo cp(m_currentLocalPage.toLocalFile());
     if (! cp.exists()) {
-      m_currentPage.clear();
+      m_currentLocalPage.clear();
     }
   }
-  if (m_currentPage.isEmpty() || (m_currentPage == QUrl("about:blank"))) {
-    if (m_helpRoot.endsWith(QDir::separator())) {
-      m_helpRoot.chop(1);
-    }
-    QFileInfo fi(m_helpRoot + QDir::separator() + "index.html");
-
-    QLOG_DEBUG() << Q_FUNC_INFO << "Loading" << fi.absoluteFilePath();
-    m_view->load(QUrl("file:///" + fi.absoluteFilePath()));
+  //  m_localPrefix = "file:///";
+  //  m_localPrefix = "http://127.0.0.1:8000/";
+  QString prefix;
+  QString location;
+  QUrl startPage;
+  if (m_localSource) {
+    prefix = m_localPrefix;
+    location = m_localRoot;
+    startPage = m_currentLocalPage;
   }
   else {
-
-    m_view->load(m_currentPage);
+    prefix = m_onlinePrefix;
+    location = m_onlineRoot;
+    startPage = m_currentOnlinePage;
   }
+  qDebug() << "Offline" << m_localSource;
+  qDebug() << "Prefix" << prefix;
+  qDebug() << "Location" << location;
 
+  if (startPage.isEmpty() || (startPage == QUrl("about:blank"))) {
+    if (m_localSource) {
+      if (location.endsWith(QDir::separator())) {
+        location.chop(1);
+      }
+      QFileInfo fi(m_localRoot + QDir::separator() + "index.html");
+      QLOG_DEBUG() << Q_FUNC_INFO << "Loading" << fi.absoluteFilePath();
+      startPage = QUrl(m_localPrefix + fi.absoluteFilePath());
+    }
+    else {
+      startPage = QUrl(prefix + "/" + "index.html");
+    }
+  }
+  qDebug() << "Start page" << startPage;
+  m_view->load(startPage);
   m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 }
 HelpView::~HelpView() {
@@ -63,18 +83,12 @@ HelpView::~HelpView() {
 void HelpView::linkclick(const QUrl & url) {
   qDebug() << Q_FUNC_INFO << url;
 
-  QString str = url.toLocalFile();
+  QString str = url.toString();
   if (str.endsWith(QDir::separator())) {
     str.chop(1);
   }
-  QRegExp rx("^/+");
-  str.remove(rx);
-
-  QString prefix;
-  prefix = "file:///";
-  QUrl f(prefix + str + QDir::separator() + "index.html");
+  QUrl f(str + QDir::separator() + "index.html");
   m_view->load(f);
-
 }
 void HelpView::onClose() {
   this->hide();
@@ -83,8 +97,16 @@ void HelpView::readSettings() {
   SETTINGS
 
   settings.beginGroup("Help");
-  m_helpRoot = settings.value(SID_HELP_LOCATION,"site").toString();
-  m_currentPage = settings.value(SID_HELP_URL,QUrl()).toUrl();
+  m_localSource = settings.value(SID_HELP_LOCAL,true).toBool();
+
+
+  m_localRoot = settings.value(SID_HELP_LOCAL_LOCATION,"site").toString();
+  m_localPrefix = settings.value(SID_HELP_LOCAL_PREFIX,"file://").toString();
+  m_currentLocalPage = settings.value(SID_HELP_LOCAL_URL,QUrl()).toUrl();
+
+  m_onlineRoot = settings.value(SID_HELP_ONLINE_LOCATION,QString()).toString();
+  m_onlinePrefix = settings.value(SID_HELP_ONLINE_PREFIX,"http://").toString();
+  m_currentOnlinePage = settings.value(SID_HELP_ONLINE_URL,QUrl()).toUrl();
   resize(settings.value(SID_HELP_SIZE,QSize(800,600)).toSize());
   move(settings.value(SID_HELP_POS,QSize(450,20)).toPoint());
 }
@@ -94,7 +116,12 @@ void HelpView::writeSettings() {
   settings.beginGroup("Help");
   settings.setValue(SID_HELP_SIZE, size());
   settings.setValue(SID_HELP_POS, pos());
-  settings.setValue(SID_HELP_URL, m_view->url());
+  if (m_localSource) {
+    settings.setValue(SID_HELP_LOCAL_URL, m_view->url());
+  }
+  else {
+    settings.setValue(SID_HELP_ONLINE_URL, m_view->url());
+  }
   settings.endGroup();
 
 }
@@ -112,9 +139,9 @@ void HelpView::loadProgress(int x) {
 void HelpView::loadStarted() {
   if (m_initialPage) {
     m_progress = new QProgressDialog("Loading ...", "Cancel", 0, 100);
-    m_progress->setCancelButton(0);
+    //    m_progress->setCancelButton(0);
     m_timer = new QTimer(this);
-    //    connect(m_timer, SIGNAL(timeout()), this, SLOT(perform()));
+    connect(m_progress, SIGNAL(canceled()), this, SLOT(onCancel()));
     m_timer->start(0);
     m_progress->show();
   }
@@ -134,4 +161,19 @@ void HelpView::loadFinished(bool ok) {
 }
 bool HelpView::isLoaded() {
   return ! m_initialPage;
+}
+void HelpView::onCancel() {
+    m_initialPage = true;
+    m_timer->stop();
+    delete m_progress;
+    delete m_timer;
+    m_timer = 0;
+    m_progress = 0;
+    this->hide();
+    /// TODO need to either delete the window
+    /// or some way or other force a reload when
+}
+void HelpView::showEvent(QShowEvent * event) {
+  qDebug() << Q_FUNC_INFO << m_initialPage;
+  QWidget::showEvent(event);
 }

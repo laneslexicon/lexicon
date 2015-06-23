@@ -293,8 +293,17 @@ They should not be translated.
 #define SID_HELP_SIZE                           "Size"
 #define SID_HELP_POS                            "Pos"
 #define SID_HELP_COLLECTION                     "Help collection"
-#define SID_HELP_LOCATION                       "Location"
-#define SID_HELP_URL                            "Current URL"
+
+#define SID_HELP_LOCAL_URL                      "Current local URL"
+#define SID_HELP_LOCAL_PREFIX                   "Local prefix"
+#define SID_HELP_LOCAL_LOCATION                 "Local location"
+
+#define SID_HELP_ONLINE_URL                     "Current online URL"
+#define SID_HELP_ONLINE_PREFIX                  "Online prefix"
+#define SID_HELP_ONLINE_LOCATION                "Online location"
+
+#define SID_HELP_LOCAL                          "Offline"
+
 #define SID_EDITVIEW_SIZE                       "Size"
 #define SID_EDITVIEW_POS                       "Pos"
 
