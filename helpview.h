@@ -21,7 +21,8 @@ class HelpView : public QWidget {
   HelpView(QWidget * parent = 0);
   ~HelpView();
   QWebView * m_view;
-  bool isLoaded();
+  bool isLoaded() const;
+  bool isOffline() const;
   public slots:
     void linkclick(const QUrl &);
     void onClose();
@@ -46,5 +47,7 @@ class HelpView : public QWidget {
     QProgressDialog * m_progress;
     bool m_initialPage;
     QTimer * m_timer;
+ signals:
+    void finished(bool);
 };
 #endif // MAINWINDOW_H

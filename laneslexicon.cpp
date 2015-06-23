@@ -2857,6 +2857,7 @@ void LanesLexicon::onDocs() {
     QMessageBox::information(NULL,tr("Information"),tr("Not yet implemented"));
     return;
   }
+  /*
   QWidget * w;
   w = QApplication::activeWindow();
   if (w) {
@@ -2874,20 +2875,41 @@ void LanesLexicon::onDocs() {
   if (w) {
     qDebug() << "Active popup widget" << w->objectName() << w->metaObject()->className();
   }
-
+  */
   if (m_helpview == NULL) {
     m_helpview = new HelpView();
+    connect(m_helpview,SIGNAL(finished(bool)),this,SLOT(onHelpLoaded(bool)));
   }
-  if (m_helpview->isLoaded()) {
-    if (m_helpview->isHidden()) {
-      m_helpview->show();
-    }
-    else {
-      m_helpview->hide();
+  else {
+    if (m_helpview->isLoaded()) {
+      if (m_helpview->isHidden()) {
+        m_helpview->show();
+      }
+      else {
+        m_helpview->hide();
+      }
     }
   }
   //   m_tabs->setCurrentIndex(m_tabs->addTab(w,"Docs"));
    return;
+}
+void LanesLexicon::onHelpLoaded(bool ok) {
+  qDebug() << Q_FUNC_INFO << ok;
+  if (! ok ) {
+    QString docSource;
+    if (m_helpview->isOffline()) {
+      docSource = "local";
+    }
+    else {
+      docSource = "online";
+    }
+    delete m_helpview;
+    m_helpview = NULL;
+    QMessageBox::warning(this, tr("Documentation Error"),
+                         QString(tr("There was a problem loading the %1 documentation.\n"
+                                    "Check the settings and try again.")).arg(docSource),
+                         QMessageBox::Ok);
+  }
 }
 void LanesLexicon::onAbout() {
   AboutDialog d;

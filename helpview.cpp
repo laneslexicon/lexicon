@@ -158,9 +158,13 @@ void HelpView::loadFinished(bool ok) {
   }
   this->show();
   m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  emit(finished(ok));
 }
-bool HelpView::isLoaded() {
+bool HelpView::isLoaded() const {
   return ! m_initialPage;
+}
+bool HelpView::isOffline() const {
+  return m_localSource;
 }
 void HelpView::onCancel() {
     m_initialPage = true;
@@ -172,6 +176,7 @@ void HelpView::onCancel() {
     this->hide();
     /// TODO need to either delete the window
     /// or some way or other force a reload when
+    emit(finished(false));
 }
 void HelpView::showEvent(QShowEvent * event) {
   qDebug() << Q_FUNC_INFO << m_initialPage;
