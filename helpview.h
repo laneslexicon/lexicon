@@ -6,6 +6,8 @@
 #include <QVBoxLayout>
 #include <QSettings>
 #include <QtWebKitWidgets/QWebView>
+#include <QtWebKitWidgets/QWebPage>
+#include <QWebHistoryItem>
 #include <QUrl>
 #include <QFile>
 #include <QFileInfo>
@@ -14,6 +16,8 @@
 #include <QFile>
 #include <QDialogButtonBox>
 #include <QProgressDialog>
+#include <QPushButton>
+
 #include <QTimer>
 class HelpView : public QWidget {
   Q_OBJECT
@@ -30,9 +34,13 @@ class HelpView : public QWidget {
     void loadFinished(bool);
     void loadStarted();
     void onCancel();
+    void onPageBack();
+    void onPageForward();
  protected:
     void showEvent(QShowEvent *);
  private:
+    QPushButton * m_forwardButton;
+    QPushButton * m_backButton;
     void readSettings();
     void writeSettings();
     QString m_localPrefix;

@@ -5,6 +5,19 @@
 #include "QsLog.h"
 HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
+
+  m_forwardButton = new QPushButton(">");
+  m_backButton = new QPushButton("<");
+
+  connect(m_forwardButton,SIGNAL(clicked()),this,SLOT(onPageForward()));
+  connect(m_backButton,SIGNAL(clicked()),this,SLOT(onPageBack()));
+  QHBoxLayout * btnlayout = new QHBoxLayout;
+  btnlayout->addWidget(m_backButton);
+  btnlayout->addWidget(m_forwardButton);
+  btnlayout->addStretch();
+  layout->addLayout(btnlayout);
+
+
   m_view = new QWebView(this);
 
   QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Close);
@@ -55,10 +68,11 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
     location = m_onlineRoot;
     startPage = m_currentOnlinePage;
   }
+  /*
   qDebug() << "Offline" << m_localSource;
   qDebug() << "Prefix" << prefix;
   qDebug() << "Location" << location;
-
+  */
   if (startPage.isEmpty() || (startPage == QUrl("about:blank"))) {
     if (m_localSource) {
       if (location.endsWith(QDir::separator())) {
@@ -75,6 +89,8 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   qDebug() << "Start page" << startPage;
   m_view->load(startPage);
   m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  m_forwardButton->setEnabled(false);
+  m_backButton->setEnabled(false);
 }
 HelpView::~HelpView() {
   qDebug() << Q_FUNC_INFO;
@@ -158,6 +174,14 @@ void HelpView::loadFinished(bool ok) {
   }
   this->show();
   m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  /*
+  QList<QWebHistoryItem> h = m_view->page()->history()->items();
+  for(int i=0;i < h.size();i++) {
+    qDebug() << h[i].url();
+  }
+  */
+  m_forwardButton->setEnabled(m_view->page()->history()->canGoForward());
+  m_backButton->setEnabled(m_view->page()->history()->canGoBack());
   emit(finished(ok));
 }
 bool HelpView::isLoaded() const {
@@ -181,4 +205,14 @@ void HelpView::onCancel() {
 void HelpView::showEvent(QShowEvent * event) {
   qDebug() << Q_FUNC_INFO << m_initialPage;
   QWidget::showEvent(event);
+}
+void HelpView::onPageForward() {
+  if (m_view->page()->history()->canGoForward()) {
+    m_view->page()->history()->forward();
+  }
+}
+void HelpView::onPageBack() {
+  if (m_view->page()->history()->canGoBack()) {
+    m_view->page()->history()->back();
+  }
 }
