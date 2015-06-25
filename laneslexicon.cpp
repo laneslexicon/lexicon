@@ -174,6 +174,14 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   setupHistory();
 
+  // load the sitemap
+  QSettings sitemap("sitemap.ini",QSettings::IniFormat);
+  sitemap.setIniCodec("UTF-8");
+  sitemap.beginGroup("Site Map");
+  QStringList keys = sitemap.childKeys();
+  for(int i=0;i < keys.size();i++) {
+    m_siteMap.insert(keys[i],sitemap.value(keys[i]).toString());
+  }
 
   onSetInterface();
     restoreSavedState();
@@ -2857,28 +2865,29 @@ void LanesLexicon::onDocs() {
     QMessageBox::information(NULL,tr("Information"),tr("Not yet implemented"));
     return;
   }
-  /*
   QWidget * w;
   w = QApplication::activeWindow();
   if (w) {
-    qDebug() << "Active window" << w->objectName() << w->metaObject()->className();
+    qDebug() << Q_FUNC_INFO  << "Active window" << w->objectName() << w->metaObject()->className();
   }
   w = QApplication::focusWidget();
   if (w) {
-    qDebug() << "Focus widget" << w->objectName() << w->metaObject()->className();
+    qDebug() << Q_FUNC_INFO  << "Focus widget" << w->objectName() << w->metaObject()->className();
   }
   w = QApplication::activeModalWidget();
   if (w) {
-    qDebug() << "Active modal widget" << w->objectName() << w->metaObject()->className();
+    qDebug() << Q_FUNC_INFO  << "Active modal widget" << w->objectName() << w->metaObject()->className();
   }
   w = QApplication::activePopupWidget();
   if (w) {
-    qDebug() << "Active popup widget" << w->objectName() << w->metaObject()->className();
+    qDebug() << Q_FUNC_INFO  << "Active popup widget" << w->objectName() << w->metaObject()->className();
   }
-  */
+
   if (m_helpview == NULL) {
     m_helpview = new HelpView();
     connect(m_helpview,SIGNAL(finished(bool)),this,SLOT(onHelpLoaded(bool)));
+    //    connect(m_helpview,SIGNAL(helpSystemLoaded(bool)),this,SLOT(onHelpSystemLoaded(bool)));
+    m_helpview->loadHelpSystem();
   }
   else {
     if (m_helpview->isLoaded()) {
@@ -2893,23 +2902,41 @@ void LanesLexicon::onDocs() {
   //   m_tabs->setCurrentIndex(m_tabs->addTab(w,"Docs"));
    return;
 }
+/**
+ * HelpView emits signal when pageLoaded() is done
+ *
+ * @param ok
+ */
 void LanesLexicon::onHelpLoaded(bool ok) {
-  qDebug() << Q_FUNC_INFO << ok;
   if (! ok ) {
-    QString docSource;
-    if (m_helpview->isOffline()) {
-      docSource = "local";
+    /// check that the initial page has loaded
+    /// if that has failed, then warn the user
+    if (! m_helpview->isLoaded()) {
+      QString docSource;
+      if (m_helpview->isOffline()) {
+        docSource = "local";
+      }
+      else {
+        docSource = "online";
+      }
+      delete m_helpview;
+      m_helpview = NULL;
+      QMessageBox::warning(this, tr("Documentation Error"),
+                           QString(tr("There was a problem loading the %1 documentation.\n"
+                                      "Check the settings and try again.")).arg(docSource),
+                           QMessageBox::Ok);
+      return;
     }
     else {
-      docSource = "online";
+      /// this is more of a 404 error with an individual page
+      QMessageBox::warning(this, tr("Documentation Error"),
+                           QString(tr("There was a problem loading the page:\n"
+                                      "%1")).arg(m_helpview->lastWishes().toString()),
+                           QMessageBox::Ok);
+      QLOG_WARN() << "Error loading page"  << m_helpview->lastWishes();
     }
-    delete m_helpview;
-    m_helpview = NULL;
-    QMessageBox::warning(this, tr("Documentation Error"),
-                         QString(tr("There was a problem loading the %1 documentation.\n"
-                                    "Check the settings and try again.")).arg(docSource),
-                         QMessageBox::Ok);
   }
+  m_helpview->activateWindow();
 }
 void LanesLexicon::onAbout() {
   AboutDialog d;
@@ -4005,11 +4032,16 @@ void LanesLexicon::showHelp(const QString & section) {
   QLOG_DEBUG() << Q_FUNC_INFO << section;
   if (m_helpview == NULL) {
     m_helpview = new HelpView();
+    connect(m_helpview,SIGNAL(finished(bool)),this,SLOT(onHelpLoaded(bool)));
+    //    connect(m_helpview,SIGNAL(helpSystemLoaded(bool)),this,SLOT(onHelpSystemLoaded(bool)));
+    m_helpview->loadHelpSystem();
   }
-  if (m_helpview->isHidden()) {
-    m_helpview->show();
+  //  if (m_helpview->isHidden()) {
+  //    m_helpview->show();
+  //  }
+  if (m_siteMap.contains(section)) {
+    m_helpview->showSection(m_siteMap.value(section));
   }
-  //  m_helpview->showSection("idSearchConfiguration");
 }
 void LanesLexicon::onDeleteTheme() {
   DeleteThemeDialog d;

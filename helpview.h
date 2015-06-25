@@ -27,6 +27,8 @@ class HelpView : public QWidget {
   QWebView * m_view;
   bool isLoaded() const;
   bool isOffline() const;
+  QUrl lastWishes() const;
+  bool loadHelpSystem();
   public slots:
     void linkclick(const QUrl &);
     void onClose();
@@ -36,6 +38,7 @@ class HelpView : public QWidget {
     void onCancel();
     void onPageBack();
     void onPageForward();
+    void showSection(const QString &);
  protected:
     void showEvent(QShowEvent *);
  private:
@@ -46,16 +49,17 @@ class HelpView : public QWidget {
     QString m_localPrefix;
     QString m_localRoot;
     QUrl m_currentLocalPage;
-
+    QList<QUrl> m_stack;
     QString m_onlinePrefix;
     QString m_onlineRoot;
     QUrl m_currentOnlinePage;
-
+    QUrl m_currentUrl;
     bool m_localSource;
     QProgressDialog * m_progress;
     bool m_initialPage;
     QTimer * m_timer;
  signals:
     void finished(bool);
+    void helpSystemLoaded(bool);
 };
 #endif // MAINWINDOW_H

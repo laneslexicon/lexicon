@@ -39,6 +39,8 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   }
 
   readSettings();
+}
+bool HelpView::loadHelpSystem() {
   /**
    * check the current page points to an actual file. e.g. when the saved page url is out
    * of date after documentation changes
@@ -79,25 +81,25 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
         location.chop(1);
       }
       QFileInfo fi(m_localRoot + QDir::separator() + "index.html");
-      QLOG_DEBUG() << Q_FUNC_INFO << "Loading" << fi.absoluteFilePath();
       startPage = QUrl(m_localPrefix + fi.absoluteFilePath());
     }
     else {
       startPage = QUrl(prefix + "/" + "index.html");
     }
   }
-  qDebug() << "Start page" << startPage;
+  QLOG_DEBUG() << Q_FUNC_INFO << "Loading initial page" << startPage;
   m_view->load(startPage);
   m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
   m_forwardButton->setEnabled(false);
   m_backButton->setEnabled(false);
+  return true;
 }
 HelpView::~HelpView() {
   qDebug() << Q_FUNC_INFO;
   writeSettings();
 }
 void HelpView::linkclick(const QUrl & url) {
-  qDebug() << Q_FUNC_INFO << url;
+  QLOG_DEBUG() << Q_FUNC_INFO << url;
 
   QString str = url.toString();
   if (str.endsWith(QDir::separator())) {
@@ -171,18 +173,21 @@ void HelpView::loadFinished(bool ok) {
     delete m_timer;
     m_timer = 0;
     m_progress = 0;
+    if (m_stack.size() > 0) {
+      m_view->load(m_stack.takeFirst());
+    }
+    emit(helpSystemLoaded(ok));
   }
-  this->show();
-  m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-  /*
-  QList<QWebHistoryItem> h = m_view->page()->history()->items();
-  for(int i=0;i < h.size();i++) {
-    qDebug() << h[i].url();
+  if (ok) {
+    this->show();
+    m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    m_forwardButton->setEnabled(m_view->page()->history()->canGoForward());
+    m_backButton->setEnabled(m_view->page()->history()->canGoBack());
   }
-  */
-  m_forwardButton->setEnabled(m_view->page()->history()->canGoForward());
-  m_backButton->setEnabled(m_view->page()->history()->canGoBack());
-  emit(finished(ok));
+  qDebug() << Q_FUNC_INFO << m_view->url() << ok;
+  if (! m_initialPage ) {
+    emit(finished(ok));
+  }
 }
 bool HelpView::isLoaded() const {
   return ! m_initialPage;
@@ -198,12 +203,10 @@ void HelpView::onCancel() {
     m_timer = 0;
     m_progress = 0;
     this->hide();
-    /// TODO need to either delete the window
-    /// or some way or other force a reload when
     emit(finished(false));
 }
 void HelpView::showEvent(QShowEvent * event) {
-  qDebug() << Q_FUNC_INFO << m_initialPage;
+  //  qDebug() << Q_FUNC_INFO << m_initialPage;
   QWidget::showEvent(event);
 }
 void HelpView::onPageForward() {
@@ -215,4 +218,41 @@ void HelpView::onPageBack() {
   if (m_view->page()->history()->canGoBack()) {
     m_view->page()->history()->back();
   }
+}
+void HelpView::showSection(const QString & section) {
+  QUrl startPage;
+  QString prefix;
+  QString location;
+
+  if (m_localSource) {
+    prefix = m_localPrefix;
+    location = m_localRoot;
+  }
+  else {
+    prefix = m_onlinePrefix;
+    location = m_onlineRoot;
+  }
+  if (m_localSource) {
+    if (location.endsWith(QDir::separator())) {
+      location.chop(1);
+    }
+    QFileInfo fi(m_localRoot + QDir::separator() + section);
+    QLOG_DEBUG() << Q_FUNC_INFO << "Loading" << fi.absoluteFilePath();
+    startPage = QUrl(m_localPrefix + fi.absoluteFilePath());
+  }
+  else {
+    startPage = QUrl(prefix + "/" + section);
+  }
+  QLOG_DEBUG() << Q_FUNC_INFO << "Loading section" << section << startPage;
+  /// save the requested url so if it fails
+  m_currentUrl = startPage;
+  if ( m_initialPage ) {
+    m_stack << m_currentUrl;
+    return;
+  }
+  m_view->load(startPage);
+  m_view->show();
+}
+QUrl  HelpView::lastWishes() const {
+  return m_currentUrl;
 }

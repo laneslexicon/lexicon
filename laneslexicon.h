@@ -432,6 +432,7 @@ class LanesLexicon : public QMainWindow
       NoteMaster * m_notes;
 
       QShortcut * m_helpRequested;
+      QMap<QString,QString> m_siteMap;
  signals:
       void nodeActivated(const QString & node,const QString & word);
 };
