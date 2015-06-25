@@ -20,6 +20,7 @@ class SystemOptions : public OptionsWidget {
     void onSetNotesDatabase();
     void onSetHistoryDatabase();
     void onOfflineLocation();
+    void onHelp();
  private:
     //    QLineEdit * m_arabicFont;
     //    QLineEdit * m_color;

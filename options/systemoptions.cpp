@@ -492,3 +492,7 @@ void SystemOptions::onOfflineLocation() {
   }
   m_offlineLocation->setText(dir);
 }
+void SystemOptions::onHelp() {
+  qDebug() << Q_FUNC_INFO;
+  emit(showHelp("System"));
+}

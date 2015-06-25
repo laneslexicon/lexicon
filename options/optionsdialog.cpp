@@ -135,6 +135,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   }
   for(int i=0;i < m_tabs->count();i++) {
     getLexicon()->setCursorPosition(m_tabs->widget(i));
+    //   connect(m_tabs->widget(i),SIGNAL(showHelp(const QString &)),this,SIGNAL(showHelp(const QString &)));
   }
   /// TODO
   /// maps
