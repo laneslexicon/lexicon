@@ -1420,14 +1420,17 @@ void LanesLexicon::onKeymapChanged() {
   this->enableKeymaps(enabled);
 }
 void LanesLexicon::onLinkChanged() {
+  QString str;
   m_linkContents = ! m_linkContents;
   m_linkAction->setChecked(m_linkContents);
   if (m_linkContents) {
-    m_linkButton->setText(tr("Contents linked"));
+    str = tr("Contents are linked");
   }
   else {
-    m_linkButton->setText(tr("Contents not linked"));
+    str = tr("Contents are not linked");
   }
+  m_linkButton->setText(str);
+  setStatus(str);
 }
 QSize LanesLexicon::sizeHint() const {
   return QSize(800,950);
@@ -3700,6 +3703,7 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   if (!iconfile.isEmpty() && imgd.exists(iconfile)) {
     icon.addPixmap(imgd.absoluteFilePath(iconfile),QIcon::Normal,QIcon::Off);
   }
+  m_linkAction->setIcon(icon);
 }
 /**
  * show current contents item as page
