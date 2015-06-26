@@ -1584,10 +1584,16 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
     entry->installEventFilter(this);
     entry->getView()->installEventFilter(this);
     np = entry->getXmlForRoot(p);
-    int ix = m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
-    if (activateTab) {
-      m_tabs->setCurrentIndex(ix);
+    if (np.isValid()) {
+      int ix = m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
+      if (activateTab) {
+        m_tabs->setCurrentIndex(ix);
+      }
     }
+    else {
+      delete entry;
+    }
+
     return np;
   }
   if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
@@ -1597,15 +1603,18 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
       /// tabs->tabContentsChanged() emits signa tabsChanged()
       /// which ends calling this->onTabsChanged()
       // and that inserts a number in tab title
-      m_tabs->setTabText(currentTab,np.getShortText());
-      entry->setFocus();
-      m_tabs->tabContentsChanged();
+      if (np.isValid()) {
+        m_tabs->setTabText(currentTab,np.getShortText());
+        entry->setFocus();
+        m_tabs->tabContentsChanged();
+      }
     }
     else {
       return p;
     }
  return np;
 }
+/*
 Place LanesLexicon::showPlace(const Place & p,int options) {
   QLOG_DEBUG() << Q_FUNC_INFO << p;
   bool createTab = false;
@@ -1614,6 +1623,7 @@ Place LanesLexicon::showPlace(const Place & p,int options) {
   activateTab = options && Lane::Switch_Tab;
   return showPlace(p,createTab,activateTab);
 }
+*/
 /**
  * when user clicks on item reason Qt::MouseFocusReason
  * when setFocus called it is Qt::OtherFocusReason
@@ -3393,12 +3403,14 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
  * Can be invoked by: NodeView,FullSearchWidget
  *
  * @param node
- */
+
 void LanesLexicon::showSearchNode(const QString & node) {
+  QLOG_DEBUG() << Q_FUNC_INFO << node;
   Place p;
   p.setNode(node);
   this->showPlace(p,Lane::Create_Tab);
 }
+*/
 int LanesLexicon::getSearchCount() {
   int c = 0;
   for(int i=0;i < m_tabs->count();i++) {

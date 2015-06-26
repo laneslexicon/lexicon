@@ -190,7 +190,7 @@ class LanesLexicon : public QMainWindow
       void pageSearchComplete();
       void pageSearchStart();
       /// from FullSearchWidget
-      void showSearchNode(const QString &);
+      //      void showSearchNode(const QString &);
       void convertToEntry();
       void printNode(const QString &);
       void printNodeView(GraphicsEntry *,const QString &);
@@ -208,7 +208,7 @@ class LanesLexicon : public QMainWindow
       void restoreSavedState();
       void cleanup();
       void search(int searchType,ArabicSearchDialog *,const QString &);
-      Place showPlace(const Place &,int);
+      //      Place showPlace(const Place &,int);
 
       void updateStatusBar();
       void updateMenu();
