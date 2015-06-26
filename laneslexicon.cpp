@@ -3587,12 +3587,18 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
   QDir d(imgdir);
   QFileInfo fi(d,iconfile);
   if (! fi.exists()) {
-    QLOG_WARN() << "Icon not found" << imgdir << iconfile;
+    QLOG_WARN() << QString(tr("Icon not found:%1")).arg(iconfile);
     return;
+  }
+  if (m_debug) {
+    QLOG_DEBUG() << QString(" %1").arg(iconfile);
   }
   QIcon icon(fi.absoluteFilePath());
   if (! icon.isNull()) {
     action->setIcon(icon);
+  }
+  else {
+    QLOG_WARN() << QString(tr("Error loading %1 : icon is invalid")).arg(iconfile);
   }
 }
 /**
@@ -3612,7 +3618,9 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
     QLOG_WARN() << QString(tr("Theme image directory not found : %1")).arg(imgd.absolutePath());
     return;
   }
-
+  if (m_debug) {
+    QLOG_DEBUG() << tr("Loading icons:");
+  }
 
   QString imgdir = imgd.absolutePath();
   iconfile = settings.value("Exit",QString()).toString();
