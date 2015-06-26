@@ -11,6 +11,7 @@
  * @param parent
  */
 IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
+  setObjectName("iconoptions");
   m_section = "Icons";
 
 

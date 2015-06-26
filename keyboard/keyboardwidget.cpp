@@ -9,11 +9,13 @@
  * @param parent
  */
 KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
+  setObjectName("keyboardwidget");
   m_keyboardConfig = "keyboard.ini";
   m_keyboardDirectory = ".";
   this->setup();
 }
 KeyboardWidget::KeyboardWidget(const QString & d,const QString & config,QWidget * parent) : QDialog(parent) {
+  setObjectName("keyboardwidget");
   m_keyboardConfig = config;
   m_keyboardDirectory = d;
   this->setup();

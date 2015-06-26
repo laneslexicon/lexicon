@@ -7,6 +7,7 @@ NodeView::NodeView(QWidget * parent)
   : QDialog(parent) {
 
   SETTINGS
+
   settings.beginGroup("Node");
   //  QString fontString = settings.value(SID_NODE_ARABIC_FONT).toString();
   QString sz = settings.value(SID_NODE_VIEWER_SIZE,QString()).toString();
@@ -14,6 +15,7 @@ NodeView::NodeView(QWidget * parent)
     this->setPreferredSize(sz);
 
   m_startPosition = 0;
+  setObjectName("nodeview");
   //  QFont f;
   //  if (! fontString.isEmpty())
   //    f.fromString(fontString);

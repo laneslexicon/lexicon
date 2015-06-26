@@ -11,7 +11,7 @@
  */
 HistoryOptions::HistoryOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
   m_section = "History";
-
+  setObjectName("historyoptions");
 
   QVBoxLayout * vlayout = new QVBoxLayout;
 

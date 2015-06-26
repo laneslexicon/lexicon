@@ -9,6 +9,8 @@ extern NoteMaster * getNotes();
 extern QSettings * getSettings();
 NoteView::NoteView(QWidget * parent)
   : QDialog(parent) {
+  setObjectName("noteview");
+  setWindowTitle(tr("Notes"));
   QSettings * settings = ::getSettings();
   settings->setIniCodec("UTF-8");
   settings->beginGroup("System");

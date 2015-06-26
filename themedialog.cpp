@@ -6,6 +6,7 @@
 ThemeDialog::ThemeDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * vlayout = new QVBoxLayout;
   setWindowTitle(tr("Edit Theme"));
+  setObjectName("themedialog");
   m_themes = new QComboBox;
   QStringList themes = getLexicon()->getThemes();
   themes.sort();

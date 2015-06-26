@@ -1,5 +1,6 @@
 #include "popupoptions.h"
 DialogOptions::DialogOptions(QWidget * parent) : QDialog(parent) {
+  setObjectName("dialogoptions");
   QVBoxLayout * vlayout = new QVBoxLayout;
   QFormLayout * layout = new QFormLayout;
 

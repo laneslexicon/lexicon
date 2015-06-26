@@ -12,7 +12,8 @@
  */
 EditMapDialog::EditMapDialog(QWidget * parent) : QDialog(parent) {
   m_file = new QLineEdit;
-
+  setObjectName("editmapdialog");
+  setWindowTitle(tr("Map Settings"));
   QRegExpValidator * rxv = new QRegExpValidator();
   QRegExp rx("\\S+");
   rxv->setRegExp(rx);            // one or more non-whitespace characters

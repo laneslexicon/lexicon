@@ -6,6 +6,7 @@ CreateThemeDialog::CreateThemeDialog(QWidget * parent) : QDialog(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
 
   setWindowTitle(tr("Create Theme"));
+  setObjectName("createthemedialog");
   m_themes = new QComboBox;
   QStringList themes = getLexicon()->getThemes();
   themes.sort();

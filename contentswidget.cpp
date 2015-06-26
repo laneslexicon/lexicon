@@ -14,7 +14,7 @@
 #define HEAD_SUPPLEMENT_COLUMN 3
 #define NODE_COLUMN 4
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
-  setObjectName("arabictree");
+  setObjectName("contentswidget");
   readSettings();
   setColumnCount(5);
   //  setDragEnabled(true);

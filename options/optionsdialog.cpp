@@ -28,7 +28,7 @@
 OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(parent) {
   QString useTheme = theme;
   setWindowTitle(QString("Edit Theme:%1").arg(theme));
-
+  setObjectName("optionsdialog");
   QVBoxLayout * vlayout = new QVBoxLayout;
   m_tabs = new QTabWidget;
   m_tabs->setObjectName("optionstab");

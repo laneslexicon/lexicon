@@ -130,6 +130,7 @@ void EditPage::readSettings() {
  */
 EditView::EditView(QWidget * parent) : QWidget(parent) {
   setWindowTitle(tr("CSS/XSLT Editor"));
+  setObjectName("editview");
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_tabs = new QTabWidget;

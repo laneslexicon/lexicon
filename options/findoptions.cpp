@@ -13,6 +13,7 @@
  * @param parent
  */
 FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
+  setObjectName("findoptions");
   m_section = "FullSearch";
   QVBoxLayout * layout = new QVBoxLayout;
   QGroupBox * fullbox = new QGroupBox(tr("Full text search"));

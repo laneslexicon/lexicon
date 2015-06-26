@@ -11,6 +11,7 @@
 #define QLOG_DEBUG() qDebug()
 #endif
 ImEditor::ImEditor(QWidget * parent) : QWidget(parent) {
+  setObjectName("imeditor");
   m_mapSignals = new QSignalMapper(this);
   m_edit = new ImEdit;
 

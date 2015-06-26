@@ -13,6 +13,7 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
 #endif
   */
+  setObjectName("printoptions");
   m_section = "Printer";
 
   m_dialogButton  = new QPushButton(tr("Click to change print options"),this);

@@ -9,6 +9,7 @@ extern Lexicon * getLexicon();
 
 ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
+  setObjectName("arabicsearchdialog");
   m_searchType = searchType;
   QLOG_DEBUG() << Q_FUNC_INFO << searchType;
   switch(searchType) {

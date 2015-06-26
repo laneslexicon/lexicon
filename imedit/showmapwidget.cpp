@@ -1,6 +1,7 @@
 #include "showmapwidget.h"
 ShowMapWidget::ShowMapWidget(QWidget * parent) : QDialog(parent) {
   setAttribute(Qt::WA_DeleteOnClose,true);
+  setObjectName("showmapwidget");
   QVBoxLayout * layout = new QVBoxLayout;
   m_html = new QTextEdit;
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Close);

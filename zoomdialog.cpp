@@ -2,6 +2,7 @@
 #include "graphicsentry.h"
 ZoomDialog::ZoomDialog(qreal v,QWidget * parent) : QDialog(parent) {
   setWindowTitle(tr("Adjust default zoom"));
+  setObjectName("zoomdialog");
   QVBoxLayout * layout = new QVBoxLayout;
   m_spinner = new QDoubleSpinBox;
   m_spinner->setDecimals(2);

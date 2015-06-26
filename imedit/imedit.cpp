@@ -9,6 +9,7 @@
 ImEdit::ImEdit(QWidget * parent)
   : QTextEdit(parent)
 {
+  setObjectName("imedit");
   m_debug = false;
   mapper = im_new();
   prev_char = 0;

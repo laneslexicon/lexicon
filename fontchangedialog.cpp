@@ -9,7 +9,7 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   readSettings();
   m_modified = false;
   setWindowTitle(tr("Change Arabic font"));
-  setObjectName("changearabicfont");
+  setObjectName("fontchangedialog");
   QVBoxLayout * layout = new QVBoxLayout;
 
   QFormLayout * formlayout = new QFormLayout;

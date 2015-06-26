@@ -33,6 +33,8 @@
  */
 FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
+  setWindowTitle(tr("Search for Arabic word"));
+  setObjectName("fullsearchwidget");
   m_attached = false;
   m_findTarget = new ImLineEdit;
   getLexicon()->adjustHeight(m_findTarget);

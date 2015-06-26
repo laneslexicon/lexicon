@@ -14,6 +14,7 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   : QDialog(parent) {
   readSettings();
   setWindowTitle(tr("Current Bookmarks"));
+  setObjectName("bookmarkwidget");
   QStringList keys = marks.keys();
   keys.removeOne("-here-");
   m_list = new QTableWidget(keys.size(),5);

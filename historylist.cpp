@@ -10,6 +10,7 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   : QDialog(parent) {
   readSettings();
   setWindowTitle(tr("Current History"));
+  setObjectName("historywidget");
   QList<HistoryEvent *> events = history->getHistory();
   m_list = new QTableWidget(events.size(),5);
   m_list->setObjectName("historylist");

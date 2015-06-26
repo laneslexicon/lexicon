@@ -14,6 +14,7 @@
  * @param parent
  */
 RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
+  setObjectName("rootsoptions");
   m_section = "Roots";
 
   QVBoxLayout * vlayout = new QVBoxLayout;

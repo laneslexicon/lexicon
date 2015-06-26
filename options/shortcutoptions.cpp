@@ -6,6 +6,7 @@
 #include "externs.h"
 #endif
 ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
+  setObjectName("shortcutoptions");
   m_section = "Shortcut";
 
   m_tabs = new QTabWidget;

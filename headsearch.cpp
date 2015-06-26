@@ -22,6 +22,7 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   setWindowTitle(tr("Search for Head Word"));
+  setObjectName("headsearchwidget");
   QWidget * container = new QWidget;
   QVBoxLayout * containerlayout = new QVBoxLayout;
   m_list = new FocusTable;

@@ -12,6 +12,7 @@
  * @param parent
  */
 EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
+  setObjectName("entryoptions");
   m_section = "Entry";
 
   m_back = new QLineEdit ;

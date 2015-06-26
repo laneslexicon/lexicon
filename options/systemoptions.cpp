@@ -14,7 +14,7 @@
 SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
   m_section = "System";
   QVBoxLayout * vlayout = new QVBoxLayout;
-
+  setObjectName("systemoptions");
 
 
   m_contentsLinked = new QCheckBox;

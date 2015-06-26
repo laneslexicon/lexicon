@@ -66,7 +66,7 @@ class ContentsWidget : public QTreeWidget {
  protected:
   virtual void 	keyPressEvent(QKeyEvent * event);
  signals:
-  void itemActivated(QTreeWidgetItem *,int /* not used */);
+  //  void itemActivated(QTreeWidgetItem *,int /* not used */);
   void atEnd();
   void atStart();
 };

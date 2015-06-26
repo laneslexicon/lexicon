@@ -123,6 +123,7 @@ bool EditableSqlModel::createConnection() {
  */
 
 NotesWidget::NotesWidget(QWidget * parent) : QWidget(parent) {
+  setObjectName("noteswidget");
   QVBoxLayout * layout = new QVBoxLayout;
   QSplitter * splitter = new QSplitter(Qt::Vertical);
   splitter->addWidget(createQueryWidget());

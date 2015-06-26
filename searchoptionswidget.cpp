@@ -15,6 +15,7 @@
  */
 SearchOptionsWidget::SearchOptionsWidget(int searchFor,QWidget * parent) : QWidget(parent) {
   QLOG_DEBUG()  << Q_FUNC_INFO << searchFor;
+  setObjectName("searchoptionswidget");
   m_options.setSearchScope(searchFor);
   m_more = false;
   m_hasMaps = false;
@@ -23,6 +24,7 @@ SearchOptionsWidget::SearchOptionsWidget(int searchFor,QWidget * parent) : QWidg
 }
 SearchOptionsWidget::SearchOptionsWidget(SearchOptions & options,QWidget * parent) : QWidget(parent) {
   QLOG_DEBUG() << Q_FUNC_INFO << options.getSearchScope();
+  setObjectName("searchoptionswidget");
   m_more = false;
   m_options = options;
   m_hasMaps = false;

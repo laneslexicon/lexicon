@@ -11,6 +11,8 @@
 NodeInfo::NodeInfo(QWidget * parent)
   : QDialog(parent) {
 
+  setObjectName("nodeinfo");
+
   SETTINGS
   settings.beginGroup("Node");
   QString fontString = settings.value(SID_NODE_ARABIC_FONT).toString();

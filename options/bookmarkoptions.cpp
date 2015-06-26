@@ -11,7 +11,7 @@
  */
 BookmarkOptions::BookmarkOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
   m_section = "Bookmark";
-
+  setObjectName("bookmarkoptions");
   m_id = new QLineEdit;
   m_font = new QLineEdit;
   m_add = new QKeySequenceEdit;

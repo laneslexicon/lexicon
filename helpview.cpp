@@ -4,8 +4,10 @@
 #include "definedsettings.h"
 #include "QsLog.h"
 HelpView::HelpView(QWidget * parent) : QWidget(parent) {
+  setObjectName("helpview");
+  setWindowTitle(tr("Documentation"));
   QVBoxLayout * layout = new QVBoxLayout;
-
+  /// TODO need icons
   m_forwardButton = new QPushButton(">");
   m_backButton = new QPushButton("<");
 

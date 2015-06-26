@@ -10,6 +10,7 @@
  * @param parent
  */
 LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
+  setObjectName("logoptions");
   m_section = "Logging";
 
 

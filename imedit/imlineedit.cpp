@@ -12,7 +12,7 @@
 ImLineEdit::ImLineEdit(QWidget * parent)
   : QLineEdit(parent)
 {
-  setObjectName("arabicedit");
+  setObjectName("imlineedit");
   m_mapper = im_new();
   m_prev_char = 0;
   m_debug = false;
