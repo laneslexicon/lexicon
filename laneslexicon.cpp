@@ -908,7 +908,7 @@ void LanesLexicon::createToolBar() {
   QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
   QToolBar * m_mainbar = addToolBar("Main");
   m_mainbar->setObjectName("maintoolbar");
-
+  m_mainbar->setIconSize(m_toolbarIconSize);
   m_exitButton = new QToolButton(m_mainbar);
   m_exitButton->setText(tr("Exit"));
   m_exitButton->setDefaultAction(m_exitAction);
@@ -972,12 +972,12 @@ void LanesLexicon::createToolBar() {
   m_mainbar->addWidget(m_logButton);
 
   m_mainbar->setFloatable(true);
-  //  m_mainbar->setIconSize(m_toolbarIconSize);
   //  addToolBarBreak();
 
   m_navigation = addToolBar(tr("Navigation"));
+  m_navigation->setIconSize(m_toolbarIconSize);
   m_navigation->setObjectName("navigationtoolbar");
-  //  m_navigation->setIconSize(m_toolbarIconSize);
+
   m_navigation->setFloatable(true);
 
   m_navigationModeMenu = new QMenu(m_navigation);
@@ -988,12 +988,15 @@ void LanesLexicon::createToolBar() {
   m_navigationButton->setMenu(m_navigationModeMenu);
   m_navigationButton->setText(tr("Move by"));
   m_navigationButton->setFocusPolicy(Qt::StrongFocus);
+  /*
   if (m_navMode == Lane::By_Root) {
     m_navigationButton->setDefaultAction(m_navModeRootAction);
   }
   else {
     m_navigationButton->setDefaultAction(m_navModePageAction);
   }
+  */
+
   m_navigationButton->setPopupMode(QToolButton::InstantPopup);
   m_navigation->addWidget(m_navigationButton);
 
@@ -1025,8 +1028,9 @@ void LanesLexicon::createToolBar() {
 
 
   m_entrybar = addToolBar(tr("Page"));
+  m_entrybar->setIconSize(m_toolbarIconSize);
+
   m_entrybar->setObjectName("pagetoolbar");
-  //  m_entrybar->setIconSize(m_toolbarIconSize);
 
   m_zoomInButton = new QToolButton(m_entrybar);
   m_zoomInButton->setDefaultAction(m_zoomInAction);
@@ -1871,7 +1875,7 @@ void LanesLexicon::readSettings() {
   v = settings.value(SID_SYSTEM_TITLE,tr("Lane's Arabic-English Lexicon")).toString();
   this->setWindowTitle(v);
 
-  //  m_toolbarIconSize = settings.value(SID_SYSTEM_ICON_SIZE,QSize(16,16)).toSize();
+  m_toolbarIconSize = settings.value(SID_SYSTEM_ICON_SIZE,QSize(16,16)).toSize();
 
 
 
@@ -3712,6 +3716,12 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   iconfile = settings.value("Sync left",QString()).toString();
   setIcon(m_syncFromEntryAction,imgdir,iconfile);
 
+  iconfile = settings.value("Navigation",QString()).toString();
+  setIcon(m_navModeRootAction,imgdir,iconfile);
+
+  iconfile = settings.value("Page navigation",QString()).toString();
+  setIcon(m_navModePageAction,imgdir,iconfile);
+    //  m_navigationModeMenu->addAction(m_navModePageAction);
 
   QIcon icon;
   iconfile = settings.value("Link",QString()).toString();
