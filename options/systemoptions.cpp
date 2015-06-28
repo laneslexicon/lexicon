@@ -1,10 +1,11 @@
 #include "systemoptions.h"
 #include "definedsettings.h"
 #include "QsLog.h"
-#ifndef STANDALONE
+#ifdef LANE
 #include "application.h"
 #include "externs.h"
 #endif
+#define VERTICAL_SPACING 2
 
 /**
  *
@@ -84,7 +85,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   dblayout->addRow(tr("Lexicon"),lexiconlayout);
   dblayout->addRow(tr("Notes"),noteslayout);
   dblayout->addRow(tr("History"),historylayout);
-  dblayout->setVerticalSpacing(2);
+  dblayout->setVerticalSpacing(VERTICAL_SPACING);
   dbgroup->setLayout(dblayout);
 
 
@@ -112,7 +113,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   optionlayout->addRow(tr("Keyboard"),m_keyboard);
   optionlayout->addRow(tr("Show splash screen"),m_splashScreen);
-  optionlayout->setVerticalSpacing(2);
+  optionlayout->setVerticalSpacing(VERTICAL_SPACING);
   othergroup->setLayout(optionlayout);
 
 
@@ -123,6 +124,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   QPushButton * locationbutton = new QPushButton(tr("..."));
   locationlayout->addWidget(m_offlineLocation);
   locationlayout->addWidget(locationbutton);
+  locationlayout->addStretch();
 
   connect(locationbutton,SIGNAL(clicked()),this,SLOT(onOfflineLocation()));
   m_offlineCurrentPage = new QLineEdit;
@@ -134,7 +136,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   doclayout->addRow(tr("Offline location"),locationlayout);
   doclayout->addRow(tr("Offline current page"),m_offlineCurrentPage);
   doclayout->addRow(tr("Local documentation"),m_localDocs);
-  doclayout->setVerticalSpacing(2);
+  doclayout->setVerticalSpacing(VERTICAL_SPACING);
   docgroup->setLayout(doclayout);
 
 
