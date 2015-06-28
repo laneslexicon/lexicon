@@ -84,6 +84,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   dblayout->addRow(tr("Lexicon"),lexiconlayout);
   dblayout->addRow(tr("Notes"),noteslayout);
   dblayout->addRow(tr("History"),historylayout);
+  dblayout->setVerticalSpacing(2);
   dbgroup->setLayout(dblayout);
 
 
@@ -111,6 +112,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   optionlayout->addRow(tr("Keyboard"),m_keyboard);
   optionlayout->addRow(tr("Show splash screen"),m_splashScreen);
+  optionlayout->setVerticalSpacing(2);
   othergroup->setLayout(optionlayout);
 
 
@@ -121,7 +123,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   QPushButton * locationbutton = new QPushButton(tr("..."));
   locationlayout->addWidget(m_offlineLocation);
   locationlayout->addWidget(locationbutton);
-  locationlayout->addStretch();
+
   connect(locationbutton,SIGNAL(clicked()),this,SLOT(onOfflineLocation()));
   m_offlineCurrentPage = new QLineEdit;
   m_localDocs = new QCheckBox;
@@ -132,7 +134,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   doclayout->addRow(tr("Offline location"),locationlayout);
   doclayout->addRow(tr("Offline current page"),m_offlineCurrentPage);
   doclayout->addRow(tr("Local documentation"),m_localDocs);
-
+  doclayout->setVerticalSpacing(2);
   docgroup->setLayout(doclayout);
 
 
