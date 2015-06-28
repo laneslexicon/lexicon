@@ -880,7 +880,8 @@ void LanesLexicon::createActions() {
 
   m_changeArabicFontAction = new QAction(tr("Change &Arabic font"),this);
 
-  m_showContentsAction = new QAction(tr("Hide &contents"),this);
+  m_showContentsAction = new QAction(tr("Show &contents"),this);
+  m_showContentsAction->setCheckable(true);
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
@@ -1653,9 +1654,9 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
  * @return
  */
 bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
-  if ((event->type() == QEvent::Close) && (target == m_treeDock)) {
-    m_showContentsAction->setText(tr("&Show contents"));
-  }
+  //  if ((event->type() == QEvent::Close) && (target == m_treeDock)) {
+  //    m_showContentsAction->setText(tr("&Show contents"));
+  //  }
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
@@ -4247,19 +4248,16 @@ void LanesLexicon::onShowContents() {
   else {
     w = m_tree;
   }
-  if (w->isVisible()) {
+  if (! m_showContentsAction->isChecked()) {
     w->hide();
-    m_showContentsAction->setText(tr("&Show contents"));//Enabled(false);
+    //    m_showContentsAction->setText(tr("&Show contents"));//Enabled(false);
   }
   else {
     w->show();
-    m_showContentsAction->setText(tr("&Hide contents"));//Enabled(false);
+    //    m_showContentsAction->setText(tr("&Hide contents"));//Enabled(false);
   }
 }
 void LanesLexicon::onReady() {
-
-
-
   QWidget * w;
   if (m_docked) {
     w = m_treeDock;
@@ -4268,12 +4266,7 @@ void LanesLexicon::onReady() {
     w = m_tree;
   }
 
-  if (w->isVisible()) {
-    m_showContentsAction->setText(tr("&Hide contents"));//Enabled(false);
-  }
-  else {
-    m_showContentsAction->setText(tr("&Show contents"));//Enabled(false);
-  }
+  m_showContentsAction->setChecked(w->isVisible());
 
   syncFromEntry();
 }
