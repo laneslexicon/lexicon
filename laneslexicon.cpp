@@ -882,6 +882,11 @@ void LanesLexicon::createActions() {
 
   m_showContentsAction = new QAction(tr("Show &contents"),this);
   m_showContentsAction->setCheckable(true);
+
+  m_showToolbarAction = new QAction(tr("Show &toolbar"),this);
+  m_showToolbarAction->setCheckable(true);
+
+
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
@@ -903,11 +908,12 @@ void LanesLexicon::createActions() {
   connect(m_editThemeAction,SIGNAL(triggered()),this,SLOT(onEditTheme()));
 
   connect(m_showContentsAction,SIGNAL(triggered()),this,SLOT(onShowContents()));
+  connect(m_showToolbarAction,SIGNAL(triggered()),this,SLOT(onShowToolbar()));
 
 }
 void LanesLexicon::createToolBar() {
   QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
-  QToolBar * m_mainbar = addToolBar("Main");
+  m_mainbar = addToolBar("Main");
   m_mainbar->setObjectName("maintoolbar");
   m_mainbar->setIconSize(m_toolbarIconSize);
   m_exitButton = new QToolButton(m_mainbar);
@@ -1271,6 +1277,7 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_linkAction);
   m_viewMenu->addAction(m_defaultScaleAction);
   m_viewMenu->addAction(m_showContentsAction);
+  m_viewMenu->addAction(m_showToolbarAction);
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -4257,6 +4264,20 @@ void LanesLexicon::onShowContents() {
     //    m_showContentsAction->setText(tr("&Hide contents"));//Enabled(false);
   }
 }
+void LanesLexicon::onShowToolbar() {
+  if (! m_showToolbarAction->isChecked()) {
+    m_mainbar->hide();
+    m_navigation->hide();
+    m_entrybar->hide();
+    //    m_showContentsAction->setText(tr("&Show contents"));//Enabled(false);
+  }
+  else {
+    m_mainbar->show();
+    m_navigation->show();
+    m_entrybar->show();
+    //    m_showContentsAction->setText(tr("&Hide contents"));//Enabled(false);
+  }
+}
 void LanesLexicon::onReady() {
   QWidget * w;
   if (m_docked) {
@@ -4265,8 +4286,9 @@ void LanesLexicon::onReady() {
   else {
     w = m_tree;
   }
-
-  m_showContentsAction->setChecked(w->isVisible());
-
+  if (w) {
+    m_showContentsAction->setChecked(w->isVisible());
+  }
+  m_showToolbarAction->setChecked(m_mainbar->isVisible());
   syncFromEntry();
 }
