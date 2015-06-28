@@ -47,12 +47,13 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   m_theme = useTheme;
   m_modified = false;
   m_hasChanges = false;
+  QString testFileName(".vanilla.ini");
   settings.setIniCodec("UTF-8");
   settings.beginGroup("System");
   m_debug = settings.value(SID_SYSTEM_DEBUG,false).toBool();
   settings.beginGroup("Options");
-  QString testFileName(".vanilla.ini");
-  //resize(QSize(600, 400));
+
+  //  resize(QSize(600, 400));
   resize(settings.value("Size", QSize(600, 400)).toSize());
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
   bool writeTest = settings.value("Create",false).toBool();
@@ -135,18 +136,9 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   }
   for(int i=0;i < m_tabs->count();i++) {
     getLexicon()->setCursorPosition(m_tabs->widget(i));
-    //   connect(m_tabs->widget(i),SIGNAL(showHelp(const QString &)),this,SIGNAL(showHelp(const QString &)));
   }
   /// TODO
-  /// maps
-  /// help
-  /// icons
-  /// themes / resources etc
-
-
-
-
-
+  /// maps ?
 
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save
                                      | QDialogButtonBox::Close
@@ -157,14 +149,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(currentChanged(int)));
   connect(m_buttons, SIGNAL(accepted()), this, SLOT(saveChanges()));
   connect(m_buttons, SIGNAL(rejected()), this, SLOT(reject()));
-  /*
-  connect(tree,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
-  connect(print,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
-  connect(diacritics,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
-  connect(entry,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
-  connect(find,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
-  connect(find,SIGNAL(showHelp(const QString &)),this,SIGNAL(showHelp(const QString &)));
-  */
+
   for(int i=0;i < m_tabs->count();i++) {
     OptionsWidget * w = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     connect(w,SIGNAL(modified(bool)),this,SLOT(valueChanged(bool)));
@@ -188,6 +173,11 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     settings.endGroup();
     group = settings.group();
   }
+  settings.beginGroup("Options");
+
+  QSize sz = settings.value("Size", QSize(600, 950)).toSize();
+  resize(sz);
+  move(settings.value("Pos", QPoint(200, 200)).toPoint());
 }
 OptionsDialog::~OptionsDialog() {
   writeSettings();
