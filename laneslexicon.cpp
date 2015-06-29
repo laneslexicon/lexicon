@@ -67,7 +67,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   loadStyleSheet();
 
   m_tree = new ContentsWidget(this);
-  m_tree->setObjectName("treeRoots");
+  m_tree->setObjectName("treeroots");
   m_tree->installEventFilter(this);
   m_tabs = new TabWidget(this);
   m_tabs->setTabsClosable(true);
@@ -184,7 +184,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
 
   onSetInterface();
-    restoreSavedState();
+  restoreSavedState();
   /// without this, the QSplashScreen is the active window
 
   //  m_tabs->currentWidget()->setFocus();
@@ -1376,8 +1376,14 @@ void LanesLexicon::createStatusBar() {
     connect(action,SIGNAL(triggered()),this,SLOT(onKeymapChanged()));
 
   }
-  if (maps.size() == 1) {
+  if (maps.size() > 0) {
     //    m_keymapsButton->setEnabled(false);
+    QAction * action = menu->addAction(tr("Enabled"));
+    action->setCheckable(true);
+    action->setData("_ENABLE_");
+    action->setChecked(m_keymapsEnabled);
+    connect(action,SIGNAL(triggered()),this,SLOT(onKeymapChanged()));
+
   }
   m_keymapsButton->setDefaultAction(m_keymapsAction);
   m_keymapsButton->setMenu(menu);
@@ -1389,9 +1395,11 @@ void LanesLexicon::createStatusBar() {
   m_linkButton->setToolTip(tr("Click to link/unlink contents with page"));
   //  m_linkButton->setEnabled(m_linkContents);
   if (m_linkContents) {
+    m_linkButton->setToolTip(tr("Contents are linked. Click to unlink"));
     m_linkButton->setText(tr("Contents linked"));
   }
   else {
+    m_linkButton->setToolTip(tr("Contents are not linked. Click to link"));
     m_linkButton->setText(tr("Contents not linked"));
   }
 
@@ -1419,23 +1427,41 @@ void LanesLexicon::onKeymapChanged() {
   QAction * action = qobject_cast<QAction *>(sender());
   if (! action)
     return;
+
+
+  if (action->data().toString() == "_ENABLE_") {
+    action->blockSignals(true);
+    this->enableKeymaps(action->isChecked());
+    QList<QAction *> actions = m_keymapsButton->menu()->actions();
+    for(int i=0;i < actions.size();i++) {
+      if (actions[i] != action) {
+        actions[i]->blockSignals(true);
+        actions[i]->setEnabled(action->isChecked());
+        actions[i]->blockSignals(false);
+      }
+    }
+    action->blockSignals(false);
+    return;
+  }
   m_currentMap.clear();// = action->data().toString();
 
   bool enabled = false;
   QList<QAction *> actions = m_keymapsButton->menu()->actions();
   for(int i=0;i < actions.size();i++) {
-    actions[i]->blockSignals(true);
-    qDebug() << Q_FUNC_INFO << i << actions[i]->data().toString() << actions[i]->isChecked();
-    if (action == actions[i]) {
-      if (actions[i]->isChecked()) {
-        enabled = true;
-        m_currentMap = actions[i]->data().toString();
+    if (actions[i]->data().toString() != "_ENABLE_") {
+      actions[i]->blockSignals(true);
+      QLOG_DEBUG() << Q_FUNC_INFO << i << actions[i]->data().toString() << actions[i]->isChecked();
+      if (action == actions[i]) {
+        if (actions[i]->isChecked()) {
+          enabled = true;
+          m_currentMap = actions[i]->data().toString();
+        }
       }
+      else {
+        actions[i]->setChecked(false);
+      }
+      actions[i]->blockSignals(false);
     }
-    else {
-      actions[i]->setChecked(false);
-    }
-    actions[i]->blockSignals(false);
   }
   this->enableKeymaps(enabled);
 }
@@ -1444,12 +1470,13 @@ void LanesLexicon::onLinkChanged() {
   m_linkContents = ! m_linkContents;
   m_linkAction->setChecked(m_linkContents);
   if (m_linkContents) {
-    str = tr("Contents are linked");
+    m_linkButton->setToolTip(tr("Contents are linked. Click to unlink"));
+    m_linkButton->setText(tr("Contents linked"));
   }
   else {
-    str = tr("Contents are not linked");
+    m_linkButton->setToolTip(tr("Contents are not linked. Click to link"));
+    m_linkButton->setText(tr("Contents not linked"));
   }
-  m_linkButton->setText(str);
   setStatus(str);
 }
 QSize LanesLexicon::sizeHint() const {
@@ -3465,6 +3492,14 @@ void LanesLexicon::convertToEntry() {
     }
   }
 }
+/**
+ * Search for all controls that use use keymaps (ImLineEdit,ImEdit) and
+ * enable/disable as appropriate
+ *
+ * Update checkboxes on the keymaps button on the statusbar
+ *
+ * @param v
+ */
 void LanesLexicon::enableKeymaps(bool v) {
   bool ok;
   m_keymapsEnabled = v;
@@ -3510,19 +3545,21 @@ void LanesLexicon::enableKeymaps(bool v) {
   }
   QList<QAction *> actions = m_keymapsButton->menu()->actions();
   for(int i=0;i < actions.size();i++) {
-    actions[i]->blockSignals(true);
-    if (!v) {
-      actions[i]->setChecked(false);
-    }
-    else {
-      if (actions[i]->data().toString() == m_currentMap) {
-        actions[i]->setChecked(true);
-      }
-      else {
+    if (actions[i]->data().toString() != "_ENABLE_") {
+      actions[i]->blockSignals(true);
+      if (!v) {
         actions[i]->setChecked(false);
       }
+      else {
+        if (actions[i]->data().toString() == m_currentMap) {
+          actions[i]->setChecked(true);
+        }
+        else {
+          actions[i]->setChecked(false);
+        }
+      }
+      actions[i]->blockSignals(false);
     }
-    actions[i]->blockSignals(false);
   }
 
   //  m_searchOptions.setKeymaps(v);
