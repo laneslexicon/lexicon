@@ -369,7 +369,7 @@ void LanesLexicon::onSetInterface(bool triggered) {
     return;
   }
   if (m_shortcutMap != NULL) {
-    QShortcut * sc = qobject_cast<QShortcut *>(m_shortcutMap->mapping(QString("Toggle interface")));
+    QShortcut * sc = qobject_cast<QShortcut *>(m_shortcutMap->mapping(QString(SID_SHORTCUT_TOGGLE_INTERFACE)));
     if (sc) {
       QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
       QMessageBox msgBox;
@@ -670,6 +670,10 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_ARABIC_FONT) {
     this->onChangeArabicFont();
   }
+  else if (key == SID_SHORTCUT_MENU_SHOW) {
+    m_mainmenu->show();
+    m_showMenuAction->setChecked(true);
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -885,6 +889,8 @@ void LanesLexicon::createActions() {
 
   m_showToolbarAction = new QAction(tr("Show &toolbar"),this);
   m_showToolbarAction->setCheckable(true);
+  m_showMenuAction = new QAction(tr("Show &menu"),this);
+  m_showMenuAction->setCheckable(true);
 
 
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
@@ -909,6 +915,7 @@ void LanesLexicon::createActions() {
 
   connect(m_showContentsAction,SIGNAL(triggered()),this,SLOT(onShowContents()));
   connect(m_showToolbarAction,SIGNAL(triggered()),this,SLOT(onShowToolbar()));
+  connect(m_showMenuAction,SIGNAL(triggered()),this,SLOT(onShowMenubar()));
 
 }
 void LanesLexicon::createToolBar() {
@@ -1278,6 +1285,7 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_defaultScaleAction);
   m_viewMenu->addAction(m_showContentsAction);
   m_viewMenu->addAction(m_showToolbarAction);
+  m_viewMenu->addAction(m_showMenuAction);
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -1661,9 +1669,9 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
  * @return
  */
 bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
-  //  if ((event->type() == QEvent::Close) && (target == m_treeDock)) {
-  //    m_showContentsAction->setText(tr("&Show contents"));
-  //  }
+  if ((event->type() == QEvent::Close) && ((target == m_treeDock) || (target == m_tree))) {
+    m_showContentsAction->setChecked(false);
+  }
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     switch(keyEvent->key()) {
@@ -1852,6 +1860,7 @@ void LanesLexicon::readSettings() {
   m_toolbarText = settings.value(SID_SYSTEM_TOOLBAR_TEXT,false).toBool();
 
   m_interfaceWarning = settings.value(SID_SYSTEM_INTERFACE_WARNING,true).toBool();
+  m_menuWarning = settings.value(SID_SYSTEM_MENU_WARNING,true).toBool();
   m_saveSettings = settings.value(SID_SYSTEM_SAVE_SETTINGS,true).toBool();
   if (cmdOptions.contains("nosave")) {
     m_saveSettings = false;
@@ -2047,6 +2056,7 @@ void LanesLexicon::writeSettings() {
     settings.beginGroup("System");
     settings.setValue(SID_SYSTEM_MINIMAL,m_minimalAction->isChecked());
     settings.setValue(SID_SYSTEM_INTERFACE_WARNING,m_interfaceWarning);
+    settings.setValue(SID_SYSTEM_MENU_WARNING,m_menuWarning);
     settings.setValue(SID_SYSTEM_CONTENTS_LINKED,m_linkContents);
     settings.setValue(SID_SYSTEM_STATE,this->saveState());
     settings.setValue(SID_SYSTEM_SIZE, size());
@@ -4278,6 +4288,30 @@ void LanesLexicon::onShowToolbar() {
     //    m_showContentsAction->setText(tr("&Hide contents"));//Enabled(false);
   }
 }
+void LanesLexicon::onShowMenubar() {
+  if ( m_showMenuAction->isChecked()) {
+    m_mainmenu->show();
+    return;
+  }
+  if (m_menuWarning) {
+    QShortcut * sc = qobject_cast<QShortcut *>(m_shortcutMap->mapping(QString(SID_SHORTCUT_MENU_SHOW)));
+    if (sc) {
+      QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
+      QMessageBox msgBox;
+      msgBox.setCheckBox(noshow);
+      msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
+      QString errorMessage(tr("Warning"));
+      QString info(tr("The menubar will not be visible"));
+      QString next = QString(tr("To make it visible again, press %1")).arg(sc->key().toString());
+      msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
+                     + info + "</p><p>" + next + "</p></body></html>");
+      msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+      msgBox.exec();
+      m_menuWarning = ! noshow->isChecked();
+    }
+  }
+  m_mainmenu->hide();
+}
 void LanesLexicon::onReady() {
   QWidget * w;
   if (m_docked) {
@@ -4290,5 +4324,6 @@ void LanesLexicon::onReady() {
     m_showContentsAction->setChecked(w->isVisible());
   }
   m_showToolbarAction->setChecked(m_mainbar->isVisible());
+  m_showMenuAction->setChecked(m_mainmenu->isVisible());
   syncFromEntry();
 }

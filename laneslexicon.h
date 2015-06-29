@@ -122,6 +122,7 @@ class LanesLexicon : public QMainWindow
 
       void onShowContents();
       void onShowToolbar();
+      void onShowMenubar();
       void onNavigationMenuChanged(QAction *);       // change navigation by menu
       void onNavNext();
       void onNavPrev();
@@ -302,6 +303,7 @@ class LanesLexicon : public QMainWindow
       bool m_restoreBookmarks;
       bool m_revertEnabled;
       bool m_debug;
+      bool m_menuWarning;
 
       QToolBar * m_mainbar;
       QToolBar * m_navigation;

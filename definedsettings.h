@@ -155,7 +155,7 @@ They should not be translated.
 #define SID_SHORTCUT_TOGGLE_INTERFACE          "Toggle interface"
 #define SID_SHORTCUT_SHOW_LOGS                 "Show logs"
 #define SID_SHORTCUT_ARABIC_FONT               "Change Arabic font"
-
+#define SID_SHORTCUT_MENU_SHOW                 "Menu show"
 #define SID_SEARCH_IGNORE_DIACRITICS           "Ignore diacritics"
 #define SID_SEARCH_TYPE_REGEX                  "Regex"
 #define SID_SEARCH_WHOLE_WORD                  "Whole word"
@@ -257,6 +257,7 @@ They should not be translated.
 #define SID_SYSTEM_STYLESHEET                  "Stylesheet"
 #define SID_SYSTEM_TOOLBAR_TEXT                "Toolbar text"
 #define SID_SYSTEM_INTERFACE_WARNING           "Show interface warning"
+#define SID_SYSTEM_MENU_WARNING                "Show menu warning"
 #define SID_SYSTEM_SAVE_SETTINGS               "Save settings"
 #define SID_SYSTEM_SAVE_TABS                   "Save tabs"
 #define SID_SYSTEM_RESTORE_TABS                "Restore tabs"
