@@ -5,5 +5,8 @@
 <file>qrc/symbol-warning.png</file>
 <file>qrc/symbol-information.png</file>
 <file>qrc/symbol-debug.png</file>
+<file>qrc/arrow-left.svg</file>
+<file>qrc/arrow-right.svg</file>
+<file>qrc/window-close.svg</file>
 </qresource>
 </RCC>

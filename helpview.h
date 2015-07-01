@@ -17,7 +17,7 @@
 #include <QDialogButtonBox>
 #include <QProgressDialog>
 #include <QPushButton>
-
+#include <QPixmap>
 #include <QTimer>
 class HelpView : public QWidget {
   Q_OBJECT
@@ -44,6 +44,7 @@ class HelpView : public QWidget {
  private:
     QPushButton * m_forwardButton;
     QPushButton * m_backButton;
+    QPushButton * m_closeButton;
     void readSettings();
     void writeSettings();
     QString m_localPrefix;

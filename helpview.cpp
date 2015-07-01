@@ -7,31 +7,37 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   setObjectName("helpview");
   setWindowTitle(tr("Documentation"));
   QVBoxLayout * layout = new QVBoxLayout;
-  /// TODO need icons
-  m_forwardButton = new QPushButton(">");
-  m_backButton = new QPushButton("<");
+
+  m_forwardButton = new QPushButton(QIcon(QPixmap(":/qrc/arrow-right.svg")),tr("Forward"));
+  m_backButton = new QPushButton(QIcon(QPixmap(":/qrc/arrow-left.svg")),tr("Back"));
+  m_closeButton = new QPushButton(QIcon(QPixmap(":/qrc/window-close.svg")),tr("Close"));
 
   connect(m_forwardButton,SIGNAL(clicked()),this,SLOT(onPageForward()));
   connect(m_backButton,SIGNAL(clicked()),this,SLOT(onPageBack()));
+  connect(m_closeButton,SIGNAL(clicked()),this,SLOT(onClose()));
   QHBoxLayout * btnlayout = new QHBoxLayout;
   btnlayout->addWidget(m_backButton);
   btnlayout->addWidget(m_forwardButton);
+  btnlayout->addWidget(m_closeButton);
+
   btnlayout->addStretch();
   layout->addLayout(btnlayout);
 
 
   m_view = new QWebView(this);
 
-  QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Close);
   layout->addWidget(m_view);
+  /*
+  QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Close);
   layout->addWidget(btns);
+  */
   setLayout(layout);
   m_initialPage = true;
   m_timer = 0;
   m_progress = 0;
 
   connect(m_view,SIGNAL(linkClicked(const QUrl &)),this,SLOT(linkclick(const QUrl &)));
-  connect(btns, SIGNAL(rejected()), this, SLOT(onClose()));
+  //  connect(btns, SIGNAL(rejected()), this, SLOT(onClose()));
   connect(m_view,SIGNAL(loadProgress(int)),this,SLOT(loadProgress(int)));
   connect(m_view,SIGNAL(loadStarted()),this,SLOT(loadStarted()));
   connect(m_view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
