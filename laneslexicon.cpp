@@ -2990,7 +2990,7 @@ void LanesLexicon::onHelpLoaded(bool ok) {
       m_helpview = NULL;
       QMessageBox::warning(this, tr("Documentation Error"),
                            QString(tr("There was a problem loading the %1 documentation.\n"
-                                      "Check the settings and try again.")).arg(docSource),
+                                      "Please check the settings and try again.")).arg(docSource),
                            QMessageBox::Ok);
       return;
     }
@@ -4370,6 +4370,82 @@ void LanesLexicon::onReady() {
   syncFromEntry();
 }
 void LanesLexicon::onImportLinks() {
+  QString fileName = QFileDialog::getOpenFileName(this, tr("Import Fixed Links"),
+                           ".",
+                           tr("CSV (*.csv *.txt)"));
+  if (fileName.isEmpty()) {
+    return;
+  }
+  QFile f(fileName);
+  if ( ! f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    QLOG_WARN() << QString(tr("Error opening export file: %1 - %2")).arg(fileName).arg(f.errorString());
+    return;
+  }
+  QTextStream in(&f);
+  in.setCodec("UTF-8");
+
+  QString dbVersion;
+  QSqlQuery query(SQL_GET_INFO);
+  if (query.exec() && query.first()) {
+    dbVersion = query.value("dbid").toString();
+  }
+  if (!query.prepare(SQL_UPDATE_LINK_TO_NODE)) {
+    QLOG_WARN() << QString(tr("SQL error in import links: %1")).arg(query.lastError().text());
+    return;
+  }
+  int count=0;
+  int skipCount = 0;
+  int updateCount = 0;
+  bool ignoreDb = false;
+  QString str;
+  query.exec();
+  while(! in.atEnd()) {
+    count++;
+    str = in.readLine();
+    QStringList p = str.split(",",QString::KeepEmptyParts);
+    if (p.size() == 4) {
+      if (!ignoreDb && (p[0] != dbVersion)) {
+        QString warn = QString(tr("The link update is for a different database version.\nThe links may not match.\n\nDo you wish to continue?"));
+        int ret = QMessageBox::warning(this, tr("Link import"),warn,
+                               QMessageBox::Yes | QMessageBox::Cancel);
+        if (ret == QMessageBox::Yes) {
+          ignoreDb = true;
+        }
+        else {
+          statusMessage(tr("Import cancelled, database version mismatch"));
+          return;
+        }
+      }
+      query.bindValue(0,p[3]);
+      query.bindValue(1,p[1]);
+      if (! query.exec()) {
+        QLOG_WARN() << QString(tr("Link id: %1, From : %2 , To : 3")).arg(p[1]).arg(p[2]).arg(p[3]);
+        QLOG_WARN() << QString(tr("SQL error in update links: %1")).arg(query.lastError().text());
+      }
+      else {
+        updateCount++;
+      }
+    }
+    else {
+      QLOG_WARN() << QString(tr("Skipping record %1, incorrect format:[%2]")).arg(count).arg(str);
+      skipCount++;
+    }
+  }
+  f.close();
+  str.clear();
+  str = QString(tr("Imported %1 %2 from %3."))
+                .arg(updateCount).
+                arg(updateCount > 1 ? "links" : "link").
+                arg(QDir::current().relativeFilePath(fileName));
+  if (skipCount > 0) {
+    str += QString(tr(" (Skipped %1 %2)"))
+                   .arg(skipCount)
+      .arg((skipCount > 1 ? tr("records") : tr("record")));
+  }
+  statusMessage(str);
+
+
+  return;
 }
 /**
  * These are the link matchtype, take from links.pl
