@@ -892,7 +892,8 @@ void LanesLexicon::createActions() {
   m_showMenuAction = new QAction(tr("Show &menu"),this);
   m_showMenuAction->setCheckable(true);
 
-
+  m_exportLinksAction = new QAction(tr("&Export links"),this);
+  m_importLinksAction = new QAction(tr("&Import links"),this);
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
@@ -917,6 +918,8 @@ void LanesLexicon::createActions() {
   connect(m_showToolbarAction,SIGNAL(triggered()),this,SLOT(onShowToolbar()));
   connect(m_showMenuAction,SIGNAL(triggered()),this,SLOT(onShowMenubar()));
 
+  connect(m_importLinksAction,SIGNAL(triggered()),this,SLOT(onImportLinks()));
+  connect(m_exportLinksAction,SIGNAL(triggered()),this,SLOT(onExportLinks()));
 }
 void LanesLexicon::createToolBar() {
   QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
@@ -1342,6 +1345,8 @@ void LanesLexicon::createMenus() {
   m_toolMenu->addAction(m_changeArabicFontAction);
   m_toolMenu->addAction(m_logViewerAction);
   m_toolMenu->addAction(m_editViewAction);
+  m_toolMenu->addAction(m_importLinksAction);
+  m_toolMenu->addAction(m_exportLinksAction);
 
   m_themeMenu = m_mainmenu->addMenu(tr("The&mes"));
   m_themeMenu->setFocusPolicy(Qt::StrongFocus);
@@ -4363,4 +4368,52 @@ void LanesLexicon::onReady() {
   m_showToolbarAction->setChecked(m_mainbar->isVisible());
   m_showMenuAction->setChecked(m_mainmenu->isVisible());
   syncFromEntry();
+}
+void LanesLexicon::onImportLinks() {
+}
+/**
+ * These are the link matchtype, take from links.pl
+  1  : word
+  2  : headword
+  3  : bareword
+  4  : verb form
+ *
+ */
+
+void LanesLexicon::onExportLinks() {
+  QString fileName = QFileDialog::getSaveFileName(this, tr("Export Fixed Links"),
+                           ".",
+                           tr("CSV (*.csv *.txt)"));
+  if (fileName.isEmpty()) {
+    return;
+  }
+  QFile f(fileName);
+  if ( ! f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    QLOG_WARN() << QString(tr("Error opening export file: %1 - %2")).arg(fileName).arg(f.errorString());
+    return;
+  }
+  QTextStream out(&f);
+  out.setCodec("UTF-8");
+
+  QString dbVersion;
+  QSqlQuery query(SQL_GET_INFO);
+  if (query.exec() && query.first()) {
+    dbVersion = query.value("dbid").toString();
+  }
+  if (!query.prepare(SQL_FIXED_LINKS)) {
+    QLOG_WARN() << QString(tr("SQL error in export links: %1")).arg(query.lastError().text());
+    return;
+  }
+  int count=0;
+  query.exec();
+  while(query.next()) {
+    count++;
+    out << dbVersion << "," << query.value("linkId").toString() << "," << query.value("fromnode").toString() << "," << query.value("tonode").toString() << endl;
+  }
+  f.close();
+  statusMessage(QString(tr("Exported %1 %2 to %3"))
+                .arg(count).
+                arg(count > 1 ? "links" : "link").
+                arg(QDir::current().relativeFilePath(fileName)));
+  return;
 }

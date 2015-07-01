@@ -68,4 +68,6 @@
 #define SQL_UPDATE_NOTE_TEXT "update notes set note = ? where id = ?"
 #define SQL_INSERT_NOTE_DETAILS "insert into notes (nodeid,word,note,tag) values (?,?,?,?)"
 #define SQL_UPDATE_NOTE_TAG "update notes set tag = ? where id = ?"
+
+#define SQL_FIXED_LINKS "select linkid,fromnode,tonode from links where (datasource = 1) and (matchtype = 100)"
 #endif

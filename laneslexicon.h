@@ -201,6 +201,8 @@ class LanesLexicon : public QMainWindow
 
       void onDeleteTheme();
       void onChangeArabicFont();
+      void onExportLinks();
+      void onImportLinks();
  protected:
       void closeEvent(QCloseEvent *);
  private:
@@ -433,6 +435,8 @@ class LanesLexicon : public QMainWindow
       QAction * m_showContentsAction;
       QAction * m_showMenuAction;
       QAction * m_showToolbarAction;
+      QAction * m_exportLinksAction;
+      QAction * m_importLinksAction;
       HistoryMaster * m_history;
       NoteMaster * m_notes;
 
