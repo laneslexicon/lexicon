@@ -4433,10 +4433,15 @@ void LanesLexicon::onImportLinks() {
   }
   f.close();
   str.clear();
-  str = QString(tr("Imported %1 %2 from %3."))
-                .arg(updateCount).
-                arg(updateCount > 1 ? "links" : "link").
-                arg(QDir::current().relativeFilePath(fileName));
+  if (updateCount == 0) {
+    str = QString(tr("No links were updated."));
+  }
+  else {
+    str = QString(tr("Imported %1 %2 from %3."))
+                .arg(updateCount)
+                .arg(updateCount > 1 ? "links" : "link")
+                .arg(QDir::current().relativeFilePath(fileName));
+  }
   if (skipCount > 0) {
     str += QString(tr(" (Skipped %1 %2)"))
                    .arg(skipCount)
@@ -4486,10 +4491,16 @@ void LanesLexicon::onExportLinks() {
     count++;
     out << dbVersion << "," << query.value("linkId").toString() << "," << query.value("fromnode").toString() << "," << query.value("tonode").toString() << endl;
   }
-  f.close();
-  statusMessage(QString(tr("Exported %1 %2 to %3"))
-                .arg(count).
-                arg(count > 1 ? "links" : "link").
-                arg(QDir::current().relativeFilePath(fileName)));
+  if (count > 0) {
+    f.close();
+    statusMessage(QString(tr("Exported %1 %2 to %3"))
+                  .arg(count).
+                  arg(count > 1 ? "links" : "link").
+                  arg(QDir::current().relativeFilePath(fileName)));
+  }
+  else {
+    f.remove();
+    statusMessage(tr("No fixed links were found to export"));
+  }
   return;
 }
