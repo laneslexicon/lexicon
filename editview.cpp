@@ -76,7 +76,7 @@ void EditPage::onTextChanged() {
 }
 void EditPage::readFile(const QString & name) {
   QFile f(name);
-  if (! f.open(QIODevice::ReadOnly)) {
+  if (! f.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QLOG_WARN()  << QString(tr("Cannot open file %1:  %2")).arg(name).arg(f.errorString());
     return;
   }
@@ -88,7 +88,7 @@ void EditPage::readFile(const QString & name) {
 }
 bool EditPage::writeFile() {
   QFile f(m_fileName);
-  if (! f.open(QIODevice::WriteOnly)) {
+  if (! f.open(QIODevice::WriteOnly | QIODevice::Text)) {
     QString msg = QString(tr("Cannot open file %1 for writing: %2\n")).arg(m_fileName).arg(qPrintable(f.errorString()));
     QString title;
     if (m_type == EDIT_CSS) {

@@ -49,7 +49,7 @@ void FocusTable::exportResults() {
   }
   QString exportFileName = dlg.exportFileName();
   QFile file(exportFileName);
-  if (! file.open(QIODevice::WriteOnly)) {
+  if (! file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     QString err = QString(tr("Error opening export file to %1 : %2")).arg(exportFileName).arg(file.errorString());
     QLOG_WARN() << err;
     QMessageBox::warning(this, tr("Export Search Results"),err);

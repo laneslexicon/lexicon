@@ -686,7 +686,7 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
   QStringList css;
 
   QFile file(fileName);
-  if ( ! file.open(QIODevice::ReadOnly)) {
+  if ( ! file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     return changedEntries;
   }
   QTextStream in(&file);
@@ -719,7 +719,7 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
   if (family.isEmpty()) {
     return changedEntries;
   }
-  if (! file.open(QIODevice::WriteOnly)) {
+  if (! file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     return QStringList();
   }
   QTextStream out(&file);
@@ -910,7 +910,7 @@ QString Lexicon::getCssSpecification(const QString & selector) {
   QString css;
   QString fileName = getStylesheetFilePath(Lexicon::Application);
   QFile file(fileName);
-  if (! file.open(QIODevice::ReadOnly)) {
+  if (! file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     return css;
   }
   QTextStream in(&file);

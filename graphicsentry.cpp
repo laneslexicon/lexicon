@@ -638,7 +638,7 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
   }
 
   QFile f(filename);
-  if (! f.open(QIODevice::ReadOnly)) {
+  if (! f.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QLOG_WARN()  << QString(tr("I/O Error opening CSS file for reading: %1 - %2"))
       .arg(filename)
       .arg(f.errorString());
@@ -658,7 +658,7 @@ void GraphicsEntry::dumpInfo(EntryItem * item , const QString & node) {
   if (m_dumpXml) {
     QFileInfo fi(QDir::tempPath(),QString("%1%2.xml").arg(prefix).arg(node));
     QFile f(fi.filePath());
-    if (f.open(QIODevice::WriteOnly)) {
+    if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
       QTextStream out(&f);
       out.setCodec("UTF-8");
       out << item->getXml();
@@ -667,7 +667,7 @@ void GraphicsEntry::dumpInfo(EntryItem * item , const QString & node) {
   if (m_dumpOutputHtml) {
     QFileInfo fi(QDir::tempPath(),QString("%1%2-out.html").arg(prefix).arg(node));
         QFile f(fi.filePath());
-        if (f.open(QIODevice::WriteOnly)) {
+        if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
           QTextStream out(&f);
           out.setCodec("UTF-8");
           out << item->getOutputHtml();
@@ -983,7 +983,7 @@ Place GraphicsEntry::getPage(const Place & p) {
     if (m_dumpXml) {
       QFileInfo fi(QDir::tempPath(),QString("%1.xml").arg(pageQuery.value(7).toString()));
       QFile f(fi.filePath());
-      if (f.open(QIODevice::WriteOnly)) {
+      if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&f);
         out.setCodec("UTF-8");
         out << t;
@@ -994,7 +994,7 @@ Place GraphicsEntry::getPage(const Place & p) {
       if (m_dumpOutputHtml) {
         QFileInfo fi(QDir::tempPath(),QString("%1-out.html").arg(pageQuery.value(7).toString()));
         QFile f(fi.filePath());
-        if (f.open(QIODevice::WriteOnly)) {
+        if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
           QTextStream out(&f);
           out.setCodec("UTF-8");
           out << item->getOutputHtml();
@@ -1148,7 +1148,7 @@ void GraphicsEntry::appendEntries(int startPos) {
     if (m_dumpHtml) {
       QFileInfo fi(QDir::tempPath(),QString("%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
-      if (f.open(QIODevice::WriteOnly)) {
+      if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&f);
         out.setCodec("UTF-8");
         out << m_items[i]->toHtml();
@@ -1197,7 +1197,7 @@ void GraphicsEntry::prependEntries(int startPos) {
     if (m_dumpHtml) {
       QFileInfo fi(QDir::tempPath(),QString("%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
-      if (f.open(QIODevice::WriteOnly)) {
+      if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&f);
         out.setCodec("UTF-8");
         out << m_items[i]->toHtml();
@@ -2071,7 +2071,7 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
     }
     QFileInfo fi(QDir::tempPath(),QString("print-%1.html").arg(n));
     QFile f(fi.filePath());
-    if (f.open(QIODevice::WriteOnly)) {
+    if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
       QTextStream out(&f);
       out.setCodec("UTF-8");
       out << html;
@@ -2294,6 +2294,11 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
     QLOG_WARN() << findLink.lastError().text();
     return;
   }
+  /**
+   * This SQL sets the matchtype to 100
+   *
+   */
+
   QSqlQuery updateLink;
   if (! updateLink.prepare(SQL_UPDATE_LINK_TO_NODE)) {
     QLOG_WARN() << updateLink.lastError().text();

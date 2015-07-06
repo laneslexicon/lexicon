@@ -24,7 +24,7 @@ void ShowMapWidget::focusOutEvent(QFocusEvent * /* event */) {
 }
 void ShowMapWidget::loadHtml(const QString & fileName) {
   QFile file(fileName);
-  if (! file.open(QIODevice::ReadOnly)) {
+  if (! file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     return;
   }
   QTextStream in(&file);

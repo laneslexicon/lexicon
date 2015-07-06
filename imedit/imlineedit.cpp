@@ -43,7 +43,7 @@ return m_activeMap;
 //}
 bool ImLineEdit::loadMap(const QString & filename,const QString & mapname) {
   QFile f(filename);
-  if (!f.open(QIODevice::ReadOnly)) {
+  if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
     // TODO emit(logMessage(QString("Error loading file %1: %2 ").arg(fileName).arg(f.errorString())));
     return false;
   }

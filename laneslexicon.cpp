@@ -757,7 +757,7 @@ void LanesLexicon::loadStyleSheet() {
     return;
   }
   QFile f(filename);
-  if ( ! f.open(QIODevice::ReadOnly)) {
+  if ( ! f.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QLOG_WARN() << QString(tr("Error opening stylesheet: %1")).arg(filename);
     return;
   }

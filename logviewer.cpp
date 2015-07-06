@@ -25,7 +25,7 @@ LogViewer::LogViewer(QWidget * parent) : QWidget(parent) {
   setLayout(layout);
   //  setModal(false);
   QStringList lines;
-  if (m_log.open(QIODevice::ReadOnly)) {
+  if (m_log.open(QIODevice::ReadOnly | QIODevice::Text)) {
     m_stream.setDevice(&m_log);
     m_stream.setCodec("UTF-8");
     while(! m_stream.atEnd()) {

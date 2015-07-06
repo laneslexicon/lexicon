@@ -405,7 +405,7 @@ void ImEditor::onImport() {
    return;
  }
  QFile file(fileName);
- if (! file.open(QIODevice::ReadOnly)) {
+ if (! file.open(QIODevice::ReadOnly | QIODevice::Text)) {
    return;
  }
  QTextStream in(&file);
@@ -434,7 +434,7 @@ void ImEditor::onOpen() {
    return;
  }
  QFile file(fileName);
- if (! file.open(QIODevice::ReadOnly)) {
+ if (! file.open(QIODevice::ReadOnly | QIODevice::Text)) {
    return;
  }
  QTextStream in(&file);

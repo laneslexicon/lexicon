@@ -57,7 +57,7 @@ QString ImEdit::convertString(const QString & str) {
 bool ImEdit::loadMap(const QString & fileName,const QString & mapname) {
   QLOG_DEBUG() << Q_FUNC_INFO;
   QFile f(fileName);
-  if (!f.open(QIODevice::ReadOnly)) {
+  if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
     emit(logMessage(QString("Error loading file %1: %2 ").arg(fileName).arg(f.errorString())));
     return false;
   }
