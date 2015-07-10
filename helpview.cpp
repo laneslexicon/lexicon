@@ -48,6 +48,12 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
 
   readSettings();
 }
+/**
+ * First time through, try to make a sensible decision about what the
+ * initial page should be.
+ *
+ * @return
+ */
 bool HelpView::loadHelpSystem() {
   /**
    * check the current page points to an actual file. e.g. when the saved page url is out
@@ -109,6 +115,16 @@ HelpView::~HelpView() {
 void HelpView::linkclick(const QUrl & url) {
   QLOG_DEBUG() << Q_FUNC_INFO << url;
 
+  /**
+   *  external links when view local views
+   *
+   */
+
+  if (m_localSource && ! url.isLocalFile()) {
+    m_view->load(url);
+    return;
+
+  }
   QString str = url.toString();
   if (str.endsWith(QDir::separator())) {
     str.chop(1);
@@ -136,6 +152,10 @@ void HelpView::readSettings() {
   resize(settings.value(SID_HELP_SIZE,QSize(800,600)).toSize());
   move(settings.value(SID_HELP_POS,QSize(450,20)).toPoint());
 }
+/**
+ * If viewing local docs, do not write external URL as the curren
+ *
+ */
 void HelpView::writeSettings() {
   SETTINGS
 
@@ -143,7 +163,9 @@ void HelpView::writeSettings() {
   settings.setValue(SID_HELP_SIZE, size());
   settings.setValue(SID_HELP_POS, pos());
   if (m_localSource) {
-    settings.setValue(SID_HELP_LOCAL_URL, m_view->url());
+    if (m_view->url().isLocalFile()) {
+      settings.setValue(SID_HELP_LOCAL_URL, m_view->url());
+    }
   }
   else {
     settings.setValue(SID_HELP_ONLINE_URL, m_view->url());
@@ -173,6 +195,7 @@ void HelpView::loadStarted() {
   }
 }
 void HelpView::loadFinished(bool ok) {
+  QLOG_DEBUG() << Q_FUNC_INFO << ok;
   if (m_initialPage) {
     m_view->show();
     m_initialPage = false;
