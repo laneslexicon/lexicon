@@ -436,12 +436,14 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
             if (m_fragments.size() > 0) {
               if (m_singleRow) {
                 QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[0]);
+                html = "<span class=\"context\">" + html + "</span>";
                 addRow(root,headword,node,html,m_fragments.size(),page);
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
                     QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
+                    html = "<span class=\"context\">" + html + "</span>";
                     addRow(root,headword,node,html,i,page);
                   }
                 }
@@ -737,11 +739,12 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     else
       sx = 0;
 
-    if ((position + sz) > src.size())
+    if ((position + sz) > src.size()) {
       ex = src.size();
-    else
+    }
+    else {
       ex = position + sz;
-    //    f << src.mid(sx,ex - sx);
+    }
     m_positions << position;
     m_fragments << src.mid(sx,ex - sx);
     //    QLOG_DEBUG() << "fragment size" << (ex - sx);  //QString("[%1][%2][%3][%4]").arg(position).arg(sx).arg(ex).arg(src);
@@ -965,12 +968,14 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
               entryCount++;
               if (m_singleRow) {
                 QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[0]);
+                html = "<span class=\"context\">" + html + "</span>";
                 addRow(root,headword,node,html,m_fragments.size(),page);
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
                     QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
+                    html = "<span class=\"context\">" + html + "</span>";
                     addRow(root,headword,node,html,i,page);
                   }
                 }
