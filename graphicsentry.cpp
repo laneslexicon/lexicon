@@ -460,9 +460,14 @@ void GraphicsEntry::linkActivated(const QString & link) {
     QString msg = url.query();
     if (msg.startsWith("text=")) {
       msg.remove("text=");
-      QMessageBox::information(this, tr("A note from the editor"),
-                               msg,
-                               QMessageBox::Ok);
+      msg = getLexicon()->scanAndStyle(msg,"messagebox");
+      QMessageBox mbox;
+      mbox.setWindowTitle(tr("Text Note"));
+      mbox.setTextFormat(Qt::RichText);
+      mbox.setText("<html><head/><body><p>" + msg + "</p></body></html>");
+
+      mbox.setIcon(QMessageBox::Information);
+      mbox.exec();
       return;
     }
     if (msg.startsWith("golink")) {
