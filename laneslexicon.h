@@ -203,6 +203,7 @@ class LanesLexicon : public QMainWindow
       void onChangeArabicFont();
       void onExportLinks();
       void onImportLinks();
+      void showSearchNode(const QString &);
  protected:
       void closeEvent(QCloseEvent *);
  private:

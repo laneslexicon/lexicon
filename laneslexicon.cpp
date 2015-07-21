@@ -3457,14 +3457,15 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
  * Can be invoked by: NodeView,FullSearchWidget
  *
  * @param node
-
+ */
 void LanesLexicon::showSearchNode(const QString & node) {
   QLOG_DEBUG() << Q_FUNC_INFO << node;
   Place p;
   p.setNode(node);
-  this->showPlace(p,Lane::Create_Tab);
+  //this->showPlace(p,Lane::Create_Tab);
+  p = showPlace(p,true,false);
 }
-*/
+
 int LanesLexicon::getSearchCount() {
   int c = 0;
   for(int i=0;i < m_tabs->count();i++) {
