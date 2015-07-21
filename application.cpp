@@ -592,6 +592,89 @@ QString Lexicon::spanArabic(const QString & ar,const QString & spanstyle) {
   return QString("<span style=\"%1\">%2</span>").arg(style).arg(ar);
   */
 }
+/**
+ * This is for mixed language text and will wrap any Arabic in a <span>
+ * with the style included in the "style" attribute.
+ *
+ * Used for mixed text in widgets that don't support QTextDocument stylesheets eg QMessageBox
+ *
+ * @param str
+ * @param style
+ *
+ * @return
+ */
+QString Lexicon::scanAndStyle(const QString & str,const QString & spanstyle) {
+
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings s(f.absoluteFilePath(),QSettings::IniFormat);
+  s.setIniCodec("UTF-8");
+  QString fontFamily;
+  int fontSize = 10;
+  QString style;
+
+  if ( ! spanstyle.isEmpty() ) {
+    s.beginGroup("SpannedText");
+    s.beginGroup("Arabic");
+    style = s.value(spanstyle,QString()).toString();
+    s.endGroup();
+    s.endGroup();
+  }
+  QString ar = str;
+  //  ar = teststr;
+  bool inArabic = false;
+  QString html;
+  for(int i=0;i < ar.size();i++) {
+    QChar c = ar.at(i);
+    if ((c.unicode() >= 0x600) && (c.unicode() <= 0x6ff)) {
+      if (! inArabic) {
+        html.append(QString("<span style=\"%1\">").arg(style));
+      }
+      html.append(c);
+      inArabic = true;
+    }
+    else if (c.isPunct() || c.isNumber()) {
+      html.append(c);
+    }
+    else if (c.isSpace()) {
+      if (inArabic) {
+        bool arabicBlock = true;
+        for(int j=i+1;arabicBlock && (j < ar.size());j++) {
+          QChar sp = ar.at(j);
+          if ( sp.isLetter() ) {
+            if ((sp.unicode() >= 0x600) && (sp.unicode() <= 0x6ff)) {
+              j = ar.size();
+            }
+            else {
+              arabicBlock = false;
+            }
+          }
+        }
+        if (! arabicBlock ) {
+          html.append("</span>");
+          html.append(c);
+          inArabic = false;
+        }
+        else {
+          html.append(c);
+        }
+      }
+      else {
+        html.append(c);
+      }
+    }
+    else {
+           if (inArabic) {
+                   html.append("</span>");
+                   inArabic = false;
+                 }
+      html.append(c);
+    }
+  }
+  if (inArabic) {
+    html.append("</span>");
+  }
+  return html;
+}
 QStringList Lexicon::getThemes() const {
   QDir d(m_themeDirectory);
   return d.entryList(QStringList(),QDir::NoDotAndDotDot| QDir::Dirs);
@@ -730,6 +813,19 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
   file.close();
   return changedEntries;
 }
+/**
+ * We're looking for two type of settings, font specifications like
+ *    xxxxx="Amiri,14,1,-1, etc
+ *
+ *  and Css settings containing font-family
+ *
+ *  We select only keys that contain Arabic (case insensitivie) and
+ * then check two regexs for the above conditions.
+ *
+ * @param family
+ *
+ * @return
+ */
 QStringList Lexicon::changeFontInSettings(const QString & family) {
   QStringList changedKeys;
   QFileInfo f(m_settingsDir,m_configFile);

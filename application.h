@@ -44,6 +44,7 @@ public:
   QString getResourceFilePath(int type,const QString & = QString());
   QString spanArabic(const QString &,const QString & which = QString());
   QString scanAndSpan(const QString &,const QString & css = QString("ar"));
+  QString scanAndStyle(const QString &,const QString & css = QString());
   QDir themeDirectory() { return m_settingsDir; }
   void setCursorPosition(QWidget *,int start=0);
   QString imageDirectory();
