@@ -43,7 +43,7 @@ public:
   //  QString getResourcePath(int type);
   QString getResourceFilePath(int type,const QString & = QString());
   QString spanArabic(const QString &,const QString & which = QString());
-  QString scanAndSpan(const QString &,const QString & css = QString("ar"));
+  QString scanAndSpan(const QString &,const QString & css = QString("arabic"));
   QString scanAndStyle(const QString &,const QString & css = QString());
   QDir themeDirectory() { return m_settingsDir; }
   void setCursorPosition(QWidget *,int start=0);
@@ -54,8 +54,8 @@ public:
   QString takeLastError();
   QStringList getUsedFont();
   QStringList setArabicFont(const QString & family = QString());
-  QStringList changeFontInSettings(const QString & family);
-  QStringList changeFontInStylesheet(const QString & fileName,const QString & family);
+  QStringList changeFontInSettings(const QString & family,int size = -1);
+  QStringList changeFontInStylesheet(const QString & fileName,const QString & family,int size = -1);
   void adjustHeight(QWidget *);
   QString getCssSpecification(const QString & selector) ;
   QFont fontFromCss(const QString & css);
@@ -63,7 +63,7 @@ public:
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:
-    QString setCssFont(const QString & css,const QString & family) const;
+    QString setCssFont(const QString & css,const QString & family,int fontSize) const;
     QStringList m_errors;
     QString m_errorFilePath;
     QString m_errorFile;

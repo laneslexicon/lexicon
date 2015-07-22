@@ -762,7 +762,7 @@ QString Lexicon::getDefaultKeyboard()  {
  *
  * @param family
  */
-QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QString & family) {
+QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QString & family,int fontSize) {
   QStringList changedEntries;
   QRegularExpression reCss("(.+){(.+)}");
   QRegularExpressionMatch m;
@@ -784,10 +784,9 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
       clause = m.captured(2);
     }
     if (selector.contains("arabic",Qt::CaseInsensitive)) {
-      QString t = setCssFont(clause,family);
-      line = QString("%1 { %2 }").arg(selector,t);
+      line = setCssFont(line,family,fontSize);
       if (family.isEmpty()) {
-        changedEntries << t;
+        changedEntries << line;
       }
       else {
         changedEntries << line;
@@ -819,14 +818,15 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
  *
  *  and Css settings containing font-family
  *
- *  We select only keys that contain Arabic (case insensitivie) and
+ *  We select only keys that contain 'Arabic' (case insensitivie) and
  * then check two regexs for the above conditions.
  *
  * @param family
  *
  * @return
  */
-QStringList Lexicon::changeFontInSettings(const QString & family) {
+QStringList Lexicon::changeFontInSettings(const QString & family,int fontSize) {
+  QLOG_DEBUG() << Q_FUNC_INFO << family;
   QStringList changedKeys;
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
@@ -836,10 +836,10 @@ QStringList Lexicon::changeFontInSettings(const QString & family) {
   QFont font;
   QRegularExpression re("Arabic", QRegularExpression::CaseInsensitiveOption);
   QRegularExpression reFontString("\\d+,\\d+,\\d++");
-  QRegularExpression reCssFont("font-family", QRegularExpression::CaseInsensitiveOption);
-
+  QRegularExpression reCssFont("{([^}]+)}");
   QRegularExpressionMatch match;
   for(int i=0;i < keys.size();i++) {
+    bool ok = false;
     if (re.match(keys[i]).hasMatch()) {
       v = settings.value(keys[i]).toString();
       if (reFontString.match(v).hasMatch()) {
@@ -855,7 +855,7 @@ QStringList Lexicon::changeFontInSettings(const QString & family) {
         }
       }
       else if (reCssFont.match(v).hasMatch()) {
-        v  = setCssFont(v,family);
+        v  = setCssFont(v,family,fontSize);
         if (family.isEmpty()) {
           changedKeys << v;
         }
@@ -868,14 +868,60 @@ QStringList Lexicon::changeFontInSettings(const QString & family) {
   }
   return changedKeys;
 }
+QString Lexicon::setCssFont(const QString & src,const QString & family,int sz) const {
+  QString css = src;
+  QString r;
+  bool familyFound = false;
+  bool sizeFound = false;
+  QRegularExpression rx("{([^}]+)}");
+  QRegularExpressionMatch m = rx.match(src);
+  if (! m.hasMatch()) {
+    return src;
+  }
+  QStringList parts = m.captured(1).split(";",QString::SkipEmptyParts);
+  for(int i=0;i < parts.size();i++) {
+    parts[i] = parts[i].trimmed();
+
+    if (! parts[i].isEmpty()) {
+      QStringList kv = parts[i].split(":");
+      if (kv.size() == 2) {
+        QString k = kv[0];
+        QString v = kv[1];
+        if (k.toLower().trimmed().endsWith("font-family")) {
+          familyFound = true;
+          if (family.isEmpty()) {
+            return v.trimmed();
+          }
+          v = family;
+        }
+        if ((sz != -1) && (k.toLower().trimmed().endsWith("font-size"))) {
+          sizeFound = true;
+          v = QString("%1px").arg(sz);
+        }
+        r += k + ":" + v + ";";
+      }
+      else {
+        r += parts[i] + ";";
+      }
+    }
+  }
+  if (! familyFound)  {
+    r += QString(" font-family : %1 ;").arg(family);
+  }
+  if (! sizeFound && (sz != -1)) {
+    r += QString(" font-size : %1px ;").arg(sz);
+  }
+  return css.replace(m.capturedStart(1)+1,m.capturedLength(1)-1,r);
+}
+
 /**
- * If family is empty, return the name of font-family
+ * If family is empty, return the name of font-family otherwise replace
  *
  * @param src
  * @param family
  *
  * @return
- */
+
 QString Lexicon::setCssFont(const QString & src,const QString & family) const {
   QRegularExpressionMatch m;
   QString r;
@@ -903,6 +949,7 @@ QString Lexicon::setCssFont(const QString & src,const QString & family) const {
   }
   return r;
 }
+ */
 QStringList Lexicon::getUsedFont() {
   QStringList changes = changeFontInSettings(QString());
   QDir cssDirectory(getResourceFilePath(Lexicon::Stylesheet));
