@@ -23,13 +23,24 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   m_changeApplicationCss->setChecked(true);
   m_changeEntryCss->setChecked(true);
   m_currentFont = new QLabel("");
+  m_fontSize = new QLineEdit;
+  m_fontSize->setText("-1");
+  QValidator * sizeValidator = new QIntValidator(-1,100,this);
+  m_fontSize->setValidator(sizeValidator);
   m_changes = new QListWidget;
   m_changes->setEnabled(false);
   m_applyButton = new QPushButton(tr("Change font"));
   QFontDatabase fdb;
   m_arabicFont->addItems(fdb.families(QFontDatabase::Arabic));
   m_fontLabel = new QLabel(tr("Available Arabic fonts"));
+  formlayout->addRow(tr("Current fonts used"),m_currentFont);
   formlayout->addRow(m_fontLabel,m_arabicFont);
+  QHBoxLayout * sizelayout = new QHBoxLayout;
+  sizelayout->addWidget(m_fontSize);
+  sizelayout->addSpacing(10);
+  sizelayout->addWidget(new QLabel(tr("(-1 to leave unchanged)")));
+  sizelayout->addStretch();
+  formlayout->addRow(tr("Font size"),sizelayout);
   formlayout->addRow(tr("Show all fonts"),m_allFonts);
   formlayout->addRow(new QLabel(tr("Apply changes to:")));
   formlayout->addRow(tr("\tINI settings"),m_changeIni);
@@ -46,7 +57,7 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
 
   connect(buttonBox,SIGNAL(rejected()),this,SLOT(reject()));
-  layout->addWidget(m_currentFont);
+
   layout->addLayout(formlayout);
   layout->addWidget(m_changes);
   layout->addWidget(buttonBox);
@@ -61,18 +72,36 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   connect(m_applyButton,SIGNAL(clicked()),this,SLOT(onApply()));
 }
 void FontChangeDialog::setCurrentFontText() {
-  QString t = "The current Arabic ";
-  QStringList fonts = getLexicon()->getUsedFont();
-  if (fonts.size() > 0) {
-    t += tr("font is");
-    QLOG_DEBUG() << Q_FUNC_INFO << "Setting font to" << fonts;
-    m_arabicFont->setCurrentText(fonts[0]);
+  QString t = "In the current Arabic ";
+  QMap<QString,int>  fonts = getLexicon()->getUsedFont();
+  if (fonts.size() <= 0) {
+    m_currentFont->setText(tr("Unable determine current Arabic font"));
+    return;
   }
-  else {
-    t += tr("fonts are");
+  QMultiMap<int,QString> mm;
+  QMapIterator<QString,int> iter(fonts);
+  /**
+   * insert into the multimap which will be ascending usage count order
+   * so build the font usage string by taking the last
+   *
+   */
+
+  while(iter.hasNext()) {
+    iter.next();
+    mm.insert(iter.value(),iter.key());
   }
-  t += " " + fonts.join(",") + ".";
-  m_currentFont->setText(t);
+  QStringList str;
+  QList<int> keys = mm.keys();
+  QString mainFont = mm.value(keys.last());
+  while(keys.size() > 0) {
+    int ix = keys.takeLast();
+    QString f = mm.value(ix);
+    str <<  QString("%1 (%2)").arg(f).arg(ix);
+    mm.remove(ix,f);
+  }
+  /// set the combo to the most used font
+  m_arabicFont->setCurrentText(mainFont);
+  m_currentFont->setText(str.join(","));
 }
 
 QSize FontChangeDialog::sizeHint() const {
@@ -99,7 +128,12 @@ void FontChangeDialog::onShowAllChanged(int state) {
   }
 }
 void FontChangeDialog::onApply() {
+  bool ok = false;
   QString arabicFont = m_arabicFont->currentText();
+  int fontSize = m_fontSize->text().toInt(&ok);
+  if (! ok ) {
+    fontSize = -1;
+  }
   QStringList changes;
 
   m_changes->setEnabled(true);
@@ -125,7 +159,7 @@ void FontChangeDialog::onApply() {
     item->setFont(f);
     m_changes->addItem(item);
     m_changes->addItem("");
-    changes = getLexicon()->changeFontInSettings(arabicFont);
+    changes = getLexicon()->changeFontInSettings(arabicFont,fontSize);
     m_changes->addItems(changes);
     m_changes->addItem("");
     m_modified = true;
@@ -135,7 +169,7 @@ void FontChangeDialog::onApply() {
   filters << "*.css";
   QFileInfoList files =  cssDirectory.entryInfoList(filters);
   QString fileName;
-  bool ok = true;
+  ok = true;
   for(int i=0;i < files.size();i++) {
     fileName = files[i].absoluteFilePath();
     if (fileName == getLexicon()->getStylesheetFilePath(Lexicon::Application)) {
@@ -154,7 +188,7 @@ void FontChangeDialog::onApply() {
       m_changes->addItem(item);
       m_changes->addItem("");
 
-      changes = getLexicon()->changeFontInStylesheet(fileName,arabicFont);
+      changes = getLexicon()->changeFontInStylesheet(fileName,arabicFont,fontSize);
       m_changes->addItems(changes);
       m_changes->addItem("");
       m_modified = true;

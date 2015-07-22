@@ -52,7 +52,7 @@ public:
   QString errorFile() const { return m_errorFile; }
   void startLogging();
   QString takeLastError();
-  QStringList getUsedFont();
+  QMap<QString,int> getUsedFont();
   QStringList setArabicFont(const QString & family = QString());
   QStringList changeFontInSettings(const QString & family,int size = -1);
   QStringList changeFontInStylesheet(const QString & fileName,const QString & family,int size = -1);
