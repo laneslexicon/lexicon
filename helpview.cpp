@@ -116,14 +116,19 @@ void HelpView::linkclick(const QUrl & url) {
   QLOG_DEBUG() << Q_FUNC_INFO << url;
 
   /**
-   *  external links when view local views
+   *  external links opened via QDesktopServices
    *
    */
 
   if (m_localSource && ! url.isLocalFile()) {
-    m_view->load(url);
+    QDesktopServices::openUrl(url);
     return;
-
+  }
+  if (! m_localSource) {
+    if (url.host() !=  QUrl(m_onlinePrefix).host()) {
+      QDesktopServices::openUrl(url);
+      return;
+    }
   }
   QString str = url.toString();
   if (str.endsWith(QDir::separator())) {
@@ -194,8 +199,13 @@ void HelpView::loadStarted() {
     m_progress->show();
   }
 }
+/**
+ *
+ *
+ * @param ok
+ */
 void HelpView::loadFinished(bool ok) {
-  QLOG_DEBUG() << Q_FUNC_INFO << ok;
+  QLOG_DEBUG() << Q_FUNC_INFO << m_view->url() << ok;
   if (m_initialPage) {
     m_view->show();
     m_initialPage = false;
@@ -215,7 +225,6 @@ void HelpView::loadFinished(bool ok) {
     m_forwardButton->setEnabled(m_view->page()->history()->canGoForward());
     m_backButton->setEnabled(m_view->page()->history()->canGoBack());
   }
-  qDebug() << Q_FUNC_INFO << m_view->url() << ok;
   if (! m_initialPage ) {
     emit(finished(ok));
   }

@@ -19,6 +19,7 @@
 #include <QPushButton>
 #include <QPixmap>
 #include <QTimer>
+#include <QDesktopServices>
 class HelpView : public QWidget {
   Q_OBJECT
  public:
