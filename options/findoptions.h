@@ -30,7 +30,7 @@ class FindOptions : public OptionsWidget {
     QLineEdit * m_fullHeadColor;
     QLineEdit * m_fullHeadText;
     QLineEdit * m_contextStyle;
-
+    QLineEdit * m_contextStyleArabic;
     bool m_fullWholeWord;
     bool m_fullDiacritics;
     bool m_fullRegex;

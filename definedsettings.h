@@ -198,7 +198,7 @@ They should not be translated.
 #define SID_FULLSEARCH_NEW_TAB                 "New tab"
 #define SID_FULLSEARCH_GO_TAB                  "Activate tab"
 #define SID_FULLSEARCH_FORCE                   "Force LTR"
-#define SID_FULLSEARCH_CONTEXT_STYLE           "Context style"
+
 
 #define SID_FULLSEARCH_MAIN_CONTEXT            "Main context"
 #define SID_FULLSEARCH_ARABIC_CONTEXT          "Arabic context"
