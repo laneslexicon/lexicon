@@ -56,10 +56,13 @@ public:
   QStringList setArabicFont(const QString & family = QString());
   QStringList changeFontInSettings(const QString & family,int size = -1);
   QStringList changeFontInStylesheet(const QString & fileName,const QString & family,int size = -1);
+  QStringList getFontInSettings(const QString & selector) const;
+  QStringList getFontInStylesheet(const QString & fileName,const QString & selector) const;
   void adjustHeight(QWidget *);
   QString getCssSpecification(const QString & selector) ;
   QFont fontFromCss(const QString & css);
   void setEditFont(QWidget *,const QString & selector,const QString & sample = QString(),int margin = 4);
+
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:

@@ -785,26 +785,15 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
       clause = m.captured(2);
     }
     if (selector.contains("arabic",Qt::CaseInsensitive)) {
-      if (family.isEmpty()) {
-        QRegularExpressionMatch m = rxFamily.match(line);
-        if (m.hasMatch()) {
-          changedEntries << m.captured(1);
-        }
-      }
-      else {
         line = setCssFont(line,family,fontSize);
         changedEntries << line;
         css << line;
-      }
     }
     else {
       css << line;
     }
   }
   file.close();
-  if (family.isEmpty()) {
-    return changedEntries;
-  }
   if (! file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     return QStringList();
   }
@@ -850,34 +839,19 @@ QStringList Lexicon::changeFontInSettings(const QString & family,int fontSize) {
       if (reFontString.match(v).hasMatch()) {
         QStringList p = v.split(",");
         if (p.size() > 1) {
-          if (family.isEmpty()) {
-            qDebug() << Q_FUNC_INFO << __LINE__ << v << p[0];
-            changedKeys << p[0];
+          p[0] = family;
+          if (fontSize != -1) {
+            p[1] = QString("%1").arg(fontSize);
           }
-          else {
-            p[0] = family;
-            if (fontSize != -1) {
-              p[1] = QString("%1").arg(fontSize);
-            }
-            v = p.join(",");
-            settings.setValue(keys[i],v);
-            changedKeys << keys[i];
-          }
+          v = p.join(",");
+          settings.setValue(keys[i],v);
+          changedKeys << keys[i];
         }
       }
       else if (reCssFont.match(v).hasMatch()) {
-        if (family.isEmpty()) {
-          QRegularExpressionMatch m = rxFamily.match(v);
-          if (m.hasMatch()) {
-            qDebug() << Q_FUNC_INFO << __LINE__ << m.captured(1);
-            changedKeys << m.captured(1);
-          }
-        }
-        else {
-          v  = setCssFont(v,family,fontSize);
-          changedKeys << keys[i];
-          settings.setValue(keys[i],v);
-        }
+        v  = setCssFont(v,family,fontSize);
+        changedKeys << keys[i];
+        settings.setValue(keys[i],v);
       }
     }
   }
@@ -896,7 +870,6 @@ QString Lexicon::setCssFont(const QString & src,const QString & family,int sz) c
   QStringList parts = m.captured(1).split(";",QString::SkipEmptyParts);
   for(int i=0;i < parts.size();i++) {
     parts[i] = parts[i].trimmed();
-
     if (! parts[i].isEmpty()) {
       QStringList kv = parts[i].split(":");
       if (kv.size() == 2) {
@@ -926,13 +899,13 @@ QString Lexicon::setCssFont(const QString & src,const QString & family,int sz) c
   return css.replace(m.capturedStart(1)+1,m.capturedLength(1)-1,r);
 }
 QMap<QString,int> Lexicon::getUsedFont() {
-  QStringList changes = changeFontInSettings(QString());
+  QStringList changes = getFontInSettings(QString("Arabic"));
   QDir cssDirectory(getResourceFilePath(Lexicon::Stylesheet));
   QStringList filters;
   filters << "*.css";
   QFileInfoList files =  cssDirectory.entryInfoList(filters);
   for(int i=0;i < files.size();i++) {
-    changes << changeFontInStylesheet(files[i].absoluteFilePath(),QString());
+    changes << getFontInStylesheet(files[i].absoluteFilePath(),QString("Arabic"));
   }
   for(int i=0;i < changes.size();i++) {
     changes[i] = changes[i].remove(QChar('"'));
@@ -1155,4 +1128,73 @@ QString Lexicon::copyToTemp(const QString & fileName) {
     return tempFileName;
   }
   return QString();
+}
+QStringList Lexicon::getFontInStylesheet(const QString & fileName,const QString & matching) const {
+  QStringList fonts;
+  QRegularExpression reCss("(.+){(.+)}");
+  QRegularExpressionMatch m;
+  QStringList css;
+  QRegularExpression rxFamily("font-family\\s*:\\s*([^;}]+)");
+
+  QFile file(fileName);
+  if ( ! file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    return fonts;
+  }
+  QTextStream in(&file);
+  in.setCodec("UTF-8");
+  QString selector;
+  QString clause;
+  QRegularExpression re(matching, QRegularExpression::CaseInsensitiveOption);
+  while(! in.atEnd()) {
+    QString line = in.readLine();
+    m = reCss.match(line);
+    if (m.lastCapturedIndex() == 2) {
+      selector = m.captured(1);
+      clause = m.captured(2);
+    }
+    if (re.match(selector).hasMatch()) {
+      QRegularExpressionMatch m = rxFamily.match(line);
+      if (m.hasMatch()) {
+        fonts << m.captured(1);
+      }
+    }
+  }
+  file.close();
+  return fonts;
+}
+QStringList Lexicon::getFontInSettings(const QString & selector) const {
+  QLOG_DEBUG() << Q_FUNC_INFO << selector;
+  QStringList fonts;
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+  QStringList keys = settings.allKeys();
+  QString v;
+
+  QRegularExpression rxFamily("font-family\\s*:\\s*([^;}]+)");
+  QRegularExpression re(selector, QRegularExpression::CaseInsensitiveOption);
+  QRegularExpression reFontString("\\d+,\\d+,\\d++");
+  QRegularExpression reCssFont("{([^}]+)}");
+  QRegularExpressionMatch match;
+  for(int i=0;i < keys.size();i++) {
+    bool ok = false;
+    if (re.match(keys[i]).hasMatch()) {
+      v = settings.value(keys[i]).toString();
+      if (reFontString.match(v).hasMatch()) {
+        QStringList p = v.split(",");
+        if (p.size() > 1) {
+            qDebug() << Q_FUNC_INFO << __LINE__ << v << p[0];
+            fonts << p[0];
+        }
+      }
+      else if (reCssFont.match(v).hasMatch()) {
+          QRegularExpressionMatch m = rxFamily.match(v);
+          if (m.hasMatch()) {
+            qDebug() << Q_FUNC_INFO << __LINE__ << m.captured(1);
+            fonts << m.captured(1);
+          }
+        }
+      }
+  }
+  return fonts;
 }
