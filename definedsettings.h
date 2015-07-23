@@ -52,6 +52,7 @@ They should not be translated.
 #define SID_XSLT_NODE   "Node"
 #define SID_XSLT_PRINT   "Print"
 
+#define SID_NOTES_DEBUG "Debug"
 #define SID_NOTES_ENABLED "Enabled"
 #define SID_NOTES_DATABASE "Database"
 #define SID_NOTES_SHOW_KEYMAPS  "Show keymaps"

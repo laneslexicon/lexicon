@@ -11,6 +11,7 @@
 #include "notes.h"
 #include "xsltsupport.h"
 #include "noteview.h"
+#include "nodeview.h"
 #include "notedialog.h"
 #include "place.h"
 #include "definedsql.h"
@@ -24,7 +25,8 @@ extern QSettings * getSettings();
 #define SUBJECT_COLUMN 3
 #define NOTE_COLUMN 4
 #define NOTE_SUBSTR_LENGTH 30
-
+#define NODE_COLUMN 5
+#define PLACE_COLUMN 6
 NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   setObjectName("notebrowser");
   readSettings();
@@ -36,6 +38,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   d->setStyleSheet(m_style);
   m_list->setItemDelegateForColumn(COL_WITH_ID,d);
   m_list->setItemDelegateForColumn(SUBJECT_COLUMN,d);
+  m_list->setItemDelegateForColumn(NOTE_COLUMN,d);
 
   m_list->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   QStyle * style = m_list->style();
@@ -46,12 +49,15 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   m_printButton = new QPushButton(tr("&Print"));
   m_deleteButton = new QPushButton(tr("&Delete"));
   m_viewButton = new QPushButton(tr("&View entry"));
+  m_viewNoteButton = new QPushButton(tr("&View note"));
   m_refreshButton = new QPushButton(tr("&Refresh"));
 
   btnlayout->addWidget(m_printButton);
   btnlayout->addWidget(m_deleteButton);
-  btnlayout->addWidget(m_viewButton);
+  btnlayout->addWidget(m_viewNoteButton);
   btnlayout->addWidget(m_refreshButton);
+  btnlayout->addSpacing(20);
+  btnlayout->addWidget(m_viewButton);
   btnlayout->addStretch();
 
   layout->addWidget(m_list);
@@ -65,21 +71,32 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   m_deleteButton->setEnabled(false);
   m_printButton->setEnabled(false);
   m_viewButton->setEnabled(false);
+  m_viewNoteButton->setEnabled(false);
 
+  connect(m_list,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(onCellDoubleClicked(int,int)));
   connect(m_list,SIGNAL(cellClicked(int,int)),this,SLOT(onCellClicked(int,int)));
   connect(m_deleteButton,SIGNAL(clicked()),this,SLOT(onDeleteClicked()));
-  connect(m_viewButton,SIGNAL(clicked()),this,SLOT(onViewClicked()));
+  connect(m_viewButton,SIGNAL(clicked()),this,SLOT(onViewEntryClicked()));
+  connect(m_viewNoteButton,SIGNAL(clicked()),this,SLOT(onViewNoteClicked()));
   connect(m_refreshButton,SIGNAL(clicked()),this,SLOT(loadNotes()));
+
+  if (m_debug) {
+    m_list->showColumn(NODE_COLUMN);
+  }
+  else {
+    m_list->hideColumn(NODE_COLUMN);
+  }
+  m_list->hideColumn(PLACE_COLUMN);
   initXslt();
 }
 void NoteBrowser::loadNotes() {
   NoteMaster * notes = ::getNotes();
   m_list->setRowCount(0);
-  m_list->setColumnCount(5);
+  m_list->setColumnCount(7);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
   QStringList headers;
-  headers << tr("Id") << tr("Word") << tr("Date") << tr("Subject") << tr("Note");
+  headers << tr("Id") << tr("Word") << tr("Date") << tr("Subject") << tr("Note") << tr("Node") << tr("Place");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   //  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -97,6 +114,7 @@ void NoteBrowser::loadNotes() {
     m_list->setItem(row,0,item);
 
     item = new QTableWidgetItem(word);
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     item->setData(Qt::UserRole,q->value("id").toInt());
     //    item->setFont(m_arabicFont);
     m_list->setItem(row,COL_WITH_ID,item);
@@ -108,20 +126,27 @@ void NoteBrowser::loadNotes() {
 
     QDateTime d = QDateTime::fromString(when);
     item = new QTableWidgetItem(d.toString( Qt::SystemLocaleShortDate));
-    //      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,2,item);
     QString subject = q->value("subject").toString();
     subject = qobject_cast<Lexicon *>(qApp)->scanAndSpan(subject);
 
     item = new QTableWidgetItem(subject);
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    //      item->setFont(m_resultsFont);
     m_list->setItem(row,SUBJECT_COLUMN,item);
 
     item = new QTableWidgetItem(q->value(5).toString());
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    //      item->setFont(m_resultsFont);
     m_list->setItem(row,NOTE_COLUMN,item);
+
+    Place p = Place::fromString(q->value("place").toString());
+    item = new QTableWidgetItem(p.getNode());
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_list->setItem(row,NODE_COLUMN,item);
+
+    item = new QTableWidgetItem(q->value("place").toString());
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_list->setItem(row,PLACE_COLUMN,item);
   }
   if (m_list->rowCount() > 0) {
     m_list->itemDoubleClicked(m_list->item(0,0));
@@ -153,6 +178,7 @@ void NoteBrowser::loadNotes() {
     m_list->resizeColumnToContents(ID_COLUMN);
     m_list->resizeColumnToContents(DATE_COLUMN);
     m_list->resizeColumnToContents(NOTE_COLUMN);
+    m_list->resizeColumnToContents(NODE_COLUMN);
     m_list->setColumnWidth(WORD_COLUMN,settings.value("Word column",200).toInt());
     m_list->setColumnWidth(SUBJECT_COLUMN,settings.value("Subject column",300).toInt());
   }
@@ -160,7 +186,7 @@ void NoteBrowser::loadNotes() {
   q->finish();
   delete q;
 }
-void NoteBrowser::onCellClicked(int row,int /* column */) {
+void NoteBrowser::onCellDoubleClicked(int row,int /* column */) {
   QLOG_DEBUG() << Q_FUNC_INFO << row;
   /// saving the id with word because we may not include id in release
   QTableWidgetItem * item = m_list->item(row,COL_WITH_ID);
@@ -170,12 +196,20 @@ void NoteBrowser::onCellClicked(int row,int /* column */) {
     Note * note = notes->findOne(id);
     if (note) {
       NoteDialog * dlg = new  NoteDialog(note,this);
-      dlg->exec();
+      dlg->show();
     }
   }
   m_deleteButton->setEnabled(true);
   m_printButton->setEnabled(true);
   m_viewButton->setEnabled(true);
+  m_viewNoteButton->setEnabled(true);
+}
+void NoteBrowser::onCellClicked(int row,int /* column */) {
+  QLOG_DEBUG() << Q_FUNC_INFO << row;
+  m_deleteButton->setEnabled(true);
+  m_printButton->setEnabled(true);
+  m_viewButton->setEnabled(true);
+  m_viewNoteButton->setEnabled(true);
 }
 /**
  * returns of map of selected id/row combinations
@@ -224,7 +258,7 @@ bool NoteBrowser::eventFilter(QObject * target,QEvent * event) {
     case Qt::Key_Enter :
     case Qt::Key_Space :
     case Qt::Key_Return : {
-      this->onCellClicked(m_list->currentRow(),0);
+      this->onCellDoubleClicked(m_list->currentRow(),0);
       return true;
     }
     default:
@@ -233,20 +267,41 @@ bool NoteBrowser::eventFilter(QObject * target,QEvent * event) {
   }
   return false;
 }
-void NoteBrowser::onViewClicked() {
+void NoteBrowser::onViewNoteClicked() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  QMap<int,int> rowmap = getRowIdMap();
-
-  if (rowmap.size() == 0)
+  /// saving the id with word because we may not include id in release
+  Place p;
+  QList<QTableWidgetItem *> items = m_list->selectedItems();
+  if (items.size() == 0) {
     return;
+  }
+  int row = items[0]->row();
 
-  NoteMaster * notes = ::getNotes();
-  QList<int> ids = rowmap.keys();
 
-  for(int i=0;i < ids.size();i++) {
-    Note * n = notes->findOne(ids[i]);
-    if (n) {
-      showEntry(n->getPlace());
+  QTableWidgetItem * item = m_list->item(row,COL_WITH_ID);
+  if (item) {
+    int id = item->data(Qt::UserRole).toInt();
+    NoteMaster * notes = ::getNotes();
+    Note * note = notes->findOne(id);
+    if (note) {
+      NoteDialog * dlg = new  NoteDialog(note,this);
+      dlg->show();
+    }
+  }
+}
+void NoteBrowser::onViewEntryClicked() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
+  Place p;
+  QList<QTableWidgetItem *> items = m_list->selectedItems();
+  if (items.size() > 0) {
+    int row = items[0]->row();
+    p = Place::fromString(m_list->item(row,PLACE_COLUMN)->text());
+    if (p.isValid()) {
+      showEntry(p);
+    }
+    else {
+      QLOG_WARN() << QString(tr("Invalid place string:")).arg(items[PLACE_COLUMN]->text());
     }
   }
 }
@@ -272,21 +327,23 @@ void NoteBrowser::showEntry(const Place & p) {
     query.first();
     QString html = transform(query.value(2).toString());
     if (! html.isEmpty()) {
-            NoteView * v = new NoteView(this);
-            v->setWindowTitle(p.getShortText());
-            v->setHeader(query.value(0).toString(),
-                         query.value(1).toString(),
-                         p.getNode());
+      NodeView * v = new NodeView(this);
+      connect(v,SIGNAL(openNode(const QString &)),this,SIGNAL(showNode(const QString &)));
+      connect(v,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
+      v->setWindowTitle(p.getShortText());
+      v->setHeader(query.value(0).toString(),
+                   query.value(1).toString(),
+                   p.getNode());
 
-            v->setCSS(m_css);
-            v->setHtml(html);
-            v->show();
-            v->raise();
-            v->activateWindow();
+      v->setCSS(m_css);
+      v->setHtml(html);
+      v->show();
+      v->raise();
+      v->activateWindow();
     }
   }
   else {
-    QLOG_WARN() << "Error preparing node query" << query.lastError().text();
+    QLOG_WARN() << QString(tr("Error preparing node query:%1")).arg(query.lastError().text());
     return;
   }
 }
@@ -313,11 +370,12 @@ QString NoteBrowser::transform(const QString & xml) {
   clearParseErrors();
   return QString();
 }
-/// TODO change group
+
 void NoteBrowser::readSettings() {
   SETTINGS
 
   settings.beginGroup("Notes");
+  m_debug = settings.value(SID_NOTES_DEBUG,false).toBool();
   m_style = settings.value(SID_NOTES_CONTEXT_STYLE,QString()).toString();
   settings.endGroup();
 
@@ -327,7 +385,8 @@ void NoteBrowser::readSettings() {
   settings.endGroup();
 
   settings.beginGroup("XSLT");
-  m_xsltSource = settings.value("Node",QString("node.xslt")).toString();
+  m_xsltSource = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
+  m_xsltSource = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_xsltSource);
   settings.endGroup();
 
 }

@@ -32,8 +32,10 @@ class NoteBrowser : public QWidget {
   public slots:
     //   void onNoteSelected(int );
     void onCellClicked(int,int);
+    void onCellDoubleClicked(int,int);
     void onDeleteClicked();
-    void onViewClicked();
+    void onViewEntryClicked();
+    void onViewNoteClicked();
     void loadNotes();
  protected:
     bool eventFilter(QObject *, QEvent *);
@@ -59,6 +61,10 @@ class NoteBrowser : public QWidget {
     QPushButton * m_deleteButton;
     QPushButton * m_printButton;
     QPushButton * m_viewButton;
+    QPushButton * m_viewNoteButton;
+ signals:
+    void showNode(const QString &);
+    void printNode(const QString &);
 };
 
 #endif
