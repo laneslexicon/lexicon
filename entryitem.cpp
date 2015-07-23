@@ -76,7 +76,8 @@ void EntryItem::setProxy(QGraphicsWidget * widget ) {
 void EntryItem::setNotes() {
   m_notes.clear();
   NoteMaster * m = ::getNotes();
-  m_notes = m->find(m_place.getWord());
+  //  m_notes = m->find(m_place.getWord());
+  m_notes = m->findByNode(m_place.getNode());
 }
 void EntryItem::setXml(const QString & xml) {
   m_xml = xml;
