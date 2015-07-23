@@ -54,6 +54,7 @@ class NoteMaster {
   bool autosave() { return m_autosave;}
   bool enabled() { return m_enabled; }
   QList<Note *> find(const QString & word);
+  QList<Note *> findByNode(const QString &);
   Note * findOne(int);
   QSqlQuery * getNoteList(const QString & sql);
  private:

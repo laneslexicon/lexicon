@@ -251,6 +251,40 @@ QList<Note *> NoteMaster::find(const QString & word) {
   //  }
   return notes;
 }
+QList<Note *> NoteMaster::findByNode(const QString & node) {
+  bool ok;
+  QList<Note *> notes;
+
+  if (!m_enabled) {
+    return notes;
+  }
+  QSqlQuery query(m_db);
+  ok = query.prepare(SQL_GET_NOTES_FOR_NODE);
+  if (!ok) {
+    QLOG_WARN() << QString(QObject::tr("SQL prepare error for notes by node:%1")).arg(query.lastError().text());
+
+    return notes;
+  }
+  query.bindValue(0,node);
+  ok = query.exec();
+  if (!ok) {
+    QLOG_WARN() << QString(QObject::tr("SQL find error for notes by node:%1")).arg(query.lastError().text());
+    return notes;
+  }
+  while(query.next()) {
+    Note * n = new Note();
+    n->setId(query.value(0).toInt());
+    n->setWord(query.value(1).toString());
+    Place p = Place::fromString(query.value(2).toString());
+    n->setPlace(p);
+    n->setSubject(query.value(3).toString());
+    n->setNote(query.value(4).toString());
+    n->setWhen(query.value(5).toString());
+    n->setType(query.value(6).toInt());
+    notes << n;
+  }
+  return notes;
+}
 Note * NoteMaster::findOne(int id) {
   Note * note = NULL;
   bool ok;
