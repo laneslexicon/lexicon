@@ -51,13 +51,14 @@
 #define SQL_GET_INFO "select sourceid,description,createversion,createdate,xmlversion,dbid from lexicon where sourceid = 1"
 
 /* notebrowser.cpp */
-#define SQL_LIST_NOTES "select id,word,subject,created,amended,substr(note,1,%1) from notes"
+#define SQL_LIST_NOTES "select id,word,subject,created,amended,substr(note,1,%1),place from notes"
 #define SQL_GET_NODE_FOR_NOTE "select root,word,xml from entry where datasource = 1 and nodeid = ?"
 #define SQL_GET_WORD_FOR_NOTE "select root,word,xml from entry where datasource = 1 and word = ?"
 
 /* notes.cpp */
 
 #define SQL_GET_NOTES_FOR_WORD "select id,word,place,subject,note,created,amended,type from notes where word = ?"
+#define SQL_GET_NOTES_FOR_NODE "select id,word,place,subject,note,created,amended,type,node from notes where node = ?"
 #define SQL_GET_NOTE_BY_ID "select word,place,subject,note,created,amended,type from notes where id = ?"
 
 #define SQL_INSERT_NOTE "insert into notes (datasource,word,place,subject,note,created,type) values (:datasource,:word,:place,:subject,:note,:created,:type)"
