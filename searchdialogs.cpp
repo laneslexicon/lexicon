@@ -313,6 +313,7 @@ NodeSearchDialog::NodeSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setLayout(mainLayout);
 
   readSettings();
+  m_edit->setFocus();
 }
 void NodeSearchDialog::readSettings() {
   SETTINGS
