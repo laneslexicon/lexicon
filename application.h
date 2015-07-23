@@ -41,7 +41,7 @@ public:
   QString getStylesheetFilePath(int type);
   QString copyToTemp(const QString &);
   //  QString getResourcePath(int type);
-  QString getResourceFilePath(int type,const QString & = QString());
+  QString getResourceFilePath(int type,const QString & = QString()) ;
   QString spanArabic(const QString &,const QString & which = QString());
   QString scanAndSpan(const QString &,const QString & css = QString("arabic"));
   QString scanAndStyle(const QString &,const QString & css = QString());
@@ -52,12 +52,12 @@ public:
   QString errorFile() const { return m_errorFile; }
   void startLogging();
   QString takeLastError();
-  QMap<QString,int> getUsedFont();
+  QMap<QString,int> getUsedFont(const QString & selector = QString() , bool invertMatch = false)  ;
   QStringList setArabicFont(const QString & family = QString());
   QStringList changeFontInSettings(const QString & family,int size = -1);
   QStringList changeFontInStylesheet(const QString & fileName,const QString & family,int size = -1);
-  QStringList getFontInSettings(const QString & selector) const;
-  QStringList getFontInStylesheet(const QString & fileName,const QString & selector) const;
+  QStringList getFontInSettings(const QString & selector,bool invertMatch = false) const;
+  QStringList getFontInStylesheet(const QString & fileName,const QString & selector,bool invertMatch = false) const;
   void adjustHeight(QWidget *);
   QString getCssSpecification(const QString & selector) ;
   QFont fontFromCss(const QString & css);

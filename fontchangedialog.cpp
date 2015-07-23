@@ -73,7 +73,7 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
 }
 void FontChangeDialog::setCurrentFontText() {
   QString t = "In the current Arabic ";
-  QMap<QString,int>  fonts = getLexicon()->getUsedFont();
+  QMap<QString,int>  fonts = getLexicon()->getUsedFont("arabic");
   if (fonts.size() <= 0) {
     m_currentFont->setText(tr("Unable determine current Arabic font"));
     return;
@@ -82,10 +82,9 @@ void FontChangeDialog::setCurrentFontText() {
   QMapIterator<QString,int> iter(fonts);
   /**
    * insert into the multimap which will be ascending usage count order
-   * so build the font usage string by taking the last
+   * so we can build the font usage string by taking the last
    *
    */
-
   while(iter.hasNext()) {
     iter.next();
     mm.insert(iter.value(),iter.key());
@@ -101,6 +100,7 @@ void FontChangeDialog::setCurrentFontText() {
   }
   /// set the combo to the most used font
   m_arabicFont->setCurrentText(mainFont);
+  /// set the font usage text
   m_currentFont->setText(str.join(","));
 }
 

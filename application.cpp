@@ -898,14 +898,14 @@ QString Lexicon::setCssFont(const QString & src,const QString & family,int sz) c
   }
   return css.replace(m.capturedStart(1)+1,m.capturedLength(1)-1,r);
 }
-QMap<QString,int> Lexicon::getUsedFont() {
-  QStringList changes = getFontInSettings(QString("Arabic"));
+QMap<QString,int> Lexicon::getUsedFont(const QString & selector, bool invertMatch) {
+  QStringList changes = getFontInSettings(selector,invertMatch);
   QDir cssDirectory(getResourceFilePath(Lexicon::Stylesheet));
   QStringList filters;
   filters << "*.css";
   QFileInfoList files =  cssDirectory.entryInfoList(filters);
   for(int i=0;i < files.size();i++) {
-    changes << getFontInStylesheet(files[i].absoluteFilePath(),QString("Arabic"));
+    changes << getFontInStylesheet(files[i].absoluteFilePath(),selector,invertMatch);
   }
   for(int i=0;i < changes.size();i++) {
     changes[i] = changes[i].remove(QChar('"'));
@@ -1129,7 +1129,7 @@ QString Lexicon::copyToTemp(const QString & fileName) {
   }
   return QString();
 }
-QStringList Lexicon::getFontInStylesheet(const QString & fileName,const QString & matching) const {
+QStringList Lexicon::getFontInStylesheet(const QString & fileName,const QString & matching,bool invertMatch) const {
   QStringList fonts;
   QRegularExpression reCss("(.+){(.+)}");
   QRegularExpressionMatch m;
@@ -1152,7 +1152,9 @@ QStringList Lexicon::getFontInStylesheet(const QString & fileName,const QString 
       selector = m.captured(1);
       clause = m.captured(2);
     }
-    if (re.match(selector).hasMatch()) {
+    if ((re.match(selector).hasMatch() && !invertMatch) ||
+        (!re.match(selector).hasMatch() && invertMatch))
+      {
       QRegularExpressionMatch m = rxFamily.match(line);
       if (m.hasMatch()) {
         fonts << m.captured(1);
@@ -1162,7 +1164,7 @@ QStringList Lexicon::getFontInStylesheet(const QString & fileName,const QString 
   file.close();
   return fonts;
 }
-QStringList Lexicon::getFontInSettings(const QString & selector) const {
+QStringList Lexicon::getFontInSettings(const QString & selector,bool invertMatch) const {
   QLOG_DEBUG() << Q_FUNC_INFO << selector;
   QStringList fonts;
   QFileInfo f(m_settingsDir,m_configFile);
@@ -1178,7 +1180,9 @@ QStringList Lexicon::getFontInSettings(const QString & selector) const {
   QRegularExpressionMatch match;
   for(int i=0;i < keys.size();i++) {
     bool ok = false;
-    if (re.match(keys[i]).hasMatch()) {
+    if ((re.match(keys[i]).hasMatch() && ! invertMatch) ||
+        (! re.match(keys[i]).hasMatch() && invertMatch))
+    {
       v = settings.value(keys[i]).toString();
       if (reFontString.match(v).hasMatch()) {
         QStringList p = v.split(",");
