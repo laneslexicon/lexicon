@@ -57,6 +57,7 @@ class FullSearchWidget : public QWidget
     void showKeyboard();
     void onExport();
     void selectFocus();
+    void openNode(const QString &);
  protected:
     void focusInEvent(QFocusEvent *);
     void focusOutEvent(QFocusEvent *);

@@ -202,7 +202,7 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   v->show();
   v->raise();
   v->activateWindow();
-  connect(v,SIGNAL(openNode(const QString &)),this,SIGNAL(showNode(const QString &)));
+  connect(v,SIGNAL(openNode(const QString &)),this,SLOT(openNode(const QString &)));
   connect(v,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
 }
 bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
@@ -1029,4 +1029,8 @@ void FullSearchWidget::setForceLTR(bool v) {
  }
 void FullSearchWidget::onExport() {
   m_rxlist->exportResults();
+}
+void FullSearchWidget::openNode(const QString & node) {
+  emit(showNode(node));
+  this->setFocus();
 }
