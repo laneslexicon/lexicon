@@ -151,7 +151,7 @@ bool NoteMaster::save(Note * n) {
     QSqlQuery  query(m_db);
     ok = query.prepare(SQL_INSERT_NOTE);
     if (!ok) {
-      QLOG_WARN() << "Save prepare note error" << query.lastError().text();
+      QLOG_WARN() << QString(QObject::tr("SQL prepare error on save note:%1")).arg(query.lastError().text());
       return false;
     }
     Place p = n->getPlace();
@@ -162,6 +162,7 @@ bool NoteMaster::save(Note * n) {
     query.bindValue(":note",n->getNote());
     query.bindValue(":type",n->getType());
     query.bindValue(":created",QDateTime::currentDateTime().toString());
+    query.bindValue(":node",p.getNode());
     ok =  m_db.transaction();
     if (!ok) {
       QLOG_WARN() << "begin transaction failed" << m_db.lastError().text();

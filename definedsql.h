@@ -61,7 +61,7 @@
 #define SQL_GET_NOTES_FOR_NODE "select id,word,place,subject,note,created,amended,type,node from notes where node = ?"
 #define SQL_GET_NOTE_BY_ID "select word,place,subject,note,created,amended,type from notes where id = ?"
 
-#define SQL_INSERT_NOTE "insert into notes (datasource,word,place,subject,note,created,type) values (:datasource,:word,:place,:subject,:note,:created,:type)"
+#define SQL_INSERT_NOTE "insert into notes (datasource,word,place,subject,note,created,type,node) values (:datasource,:word,:place,:subject,:note,:created,:type,:node)"
 #define SQL_UPDATE_NOTE "update notes set subject = ?, note = ?, amended = ? where id = ?"
 
 /* noteswidget.cpp */
