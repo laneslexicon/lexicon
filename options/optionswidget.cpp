@@ -102,6 +102,11 @@ void OptionsWidget::valueChanged(double /* v */) {
   setButtons(v);
   emit(modified(v));
 }
+void OptionsWidget::valueChanged(bool /* v */) {
+  bool v =  isModified();
+  setButtons(v);
+  emit(modified(v));
+}
 void OptionsWidget::keySequenceChanged(const QKeySequence & /* v */) {
   bool v =  isModified();
   setButtons(v);

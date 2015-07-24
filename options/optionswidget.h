@@ -57,6 +57,7 @@ class OptionsWidget : public QWidget {
     virtual void onHelp();
   //  virtual void reset();
   virtual void editingFinished();
+  virtual void valueChanged(bool);
   virtual void valueChanged(int);
   virtual void valueChanged(double);
   virtual void keySequenceChanged(const QKeySequence &);

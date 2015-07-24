@@ -288,7 +288,7 @@ They should not be translated.
 #define SID_SYSTEM_EXIT                        "Exit"
 #define SID_SYSTEM_MESSAGE_TIMEOUT             "Message time"
 #define SID_SYSTEM_HELP                         "Help"
-
+#define SID_SYSTEM_APPEND_NEW_TABS              "Append new tab"
 #define SID_MAPS_CURRENT_MAP                    "Current map"
 #define SID_MAPS_ENABLED                        "Enabled"
 #define SID_MAPS_DEBUG                          "Debug"

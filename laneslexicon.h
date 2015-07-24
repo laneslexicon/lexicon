@@ -85,6 +85,7 @@ class LanesLexicon : public QMainWindow
   HistoryMaster * history();
   NoteMaster * notes();
   bool sanityCheck(int type = 0);
+  enum NewTabBehaviour { InsertTab, AppendTab };
   public slots:
     int hasPlace(const Place & p,int searchtype,bool setFocus);
     Place showPlace(const Place &,bool newTab,bool activate);
@@ -207,6 +208,7 @@ class LanesLexicon : public QMainWindow
  protected:
       void closeEvent(QCloseEvent *);
  private:
+      int addTab(bool create,QWidget * ,const QString & );
       bool deleteWidget(QWidget * );
       void showStartupEntry();
       void printCurrentPage(const QString & node = QString());
@@ -353,7 +355,7 @@ class LanesLexicon : public QMainWindow
       QSqlDatabase m_db;
       QSqlDatabase m_notesDb;
 
-
+      NewTabBehaviour m_tabStyle;
 
       QToolButton * m_bookmarkButton;
       QToolButton * m_exitButton;

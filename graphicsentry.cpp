@@ -804,18 +804,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     if (item != NULL) {
       setItemPlace(item,rootQuery);
       dumpInfo(item,rootQuery.value(7).toString());
-      /*
-      Place p;
-      p.setSupplement(supplement);
-      p.setNode(rootQuery.value(7).toString());
-      p.setRoot(root);
-      p.setWord(rootQuery.value(2).toString());
-      p.setPage(rootQuery.value(5).toInt());
-      p.setHead(rootQuery.value(9).toString());
-      item->setPlace(p);
-      */
-      QList<Note *> notes;
-      item->setNotes();//getApp()->notes()->find(rootQuery.value(2).toString()));
+      item->setNotes();
       items << item;
       /// if we asked for a specific word/node, focus on it
       if (! node.isEmpty() && (item->getNode() == node)) {
@@ -829,9 +818,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
   } while(rootQuery.next());
 
-  /// TODO we've only got a root item
-  if (items.size() == 1) {
-  }
   /**
    * Now that we have all the entries, add them to the list and
    * and calculate their positions

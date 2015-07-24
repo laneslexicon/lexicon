@@ -4,6 +4,7 @@
 #include <QFontDialog>
 #include <QPushButton>
 #include <QFileDialog>
+#include <QRadioButton>
 class SystemOptions : public OptionsWidget {
   Q_OBJECT
 
@@ -58,5 +59,8 @@ class SystemOptions : public OptionsWidget {
     QLineEdit * m_offlineLocation;
     QLineEdit * m_offlineCurrentPage;
     QCheckBox * m_localDocs;
+
+    QRadioButton * m_insertNewTab;
+    QRadioButton * m_appendNewTab;
 };
 #endif

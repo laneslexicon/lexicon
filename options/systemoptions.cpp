@@ -80,6 +80,16 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   m_splashScreen = new QCheckBox;
 
+
+  /// there are no other radiobuttons, so just make this the parent
+  QHBoxLayout * tablayout = new QHBoxLayout;
+  m_insertNewTab = new QRadioButton(tr("Insert"),this);
+  m_appendNewTab = new QRadioButton(tr("Append"),this);
+  tablayout->addWidget(m_insertNewTab);
+  tablayout->addSpacing(40);
+  tablayout->addWidget(m_appendNewTab);
+  tablayout->addStretch();
+
   QGroupBox * dbgroup = new QGroupBox(tr("Databases"));
   QFormLayout * dblayout = new QFormLayout;
   dblayout->addRow(tr("Lexicon"),lexiconlayout);
@@ -96,6 +106,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   optionlayout->addRow(tr("Debug"),m_debugOption);
   optionlayout->addRow(tr("Docked"),m_docked);
+  optionlayout->addRow(tr("New tab behaviour"),tablayout);
   optionlayout->addRow(tr("Current tab"),m_focusTab);
   optionlayout->addRow(tr("Contents linked"),m_contentsLinked);
   optionlayout->addRow(tr("Minimal interface"),m_minimalInterface);
@@ -149,6 +160,8 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   addButtons();
   readSettings();
   setupConnections();
+  connect(m_insertNewTab,SIGNAL(toggled(bool)),this,SLOT(valueChanged(bool)));
+  connect(m_appendNewTab,SIGNAL(toggled(bool)),this,SLOT(valueChanged(bool)));
   this->setLineEditSize(VLARGE_EDIT);
   this->setComboSize(VLARGE_EDIT);
   m_debug = true;
@@ -171,6 +184,8 @@ void SystemOptions::readSettings() {
   m_saveTabs->setChecked(settings.value(SID_SYSTEM_SAVE_TABS,true).toBool());
   m_rootNavigation->setChecked(settings.value(SID_SYSTEM_BY_ROOT,true).toBool());
 
+  m_appendNewTab->setChecked(settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool());
+  m_insertNewTab->setChecked(! m_appendNewTab->isChecked());
 
 #ifndef STANDALONE
   m_keyboard->addItems(getLexicon()->getKeyboards());
@@ -248,7 +263,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
 
   settings.setValue(SID_SYSTEM_TITLE,m_title->text());
   settings.setValue(SID_SYSTEM_TOOLBAR_TEXT,m_toolbarText->isChecked());
-
+  settings.setValue(SID_SYSTEM_APPEND_NEW_TABS,m_appendNewTab->isChecked());
   settings.endGroup();
   settings.beginGroup("Notes");
   settings.setValue(SID_NOTES_ENABLED,m_useNotes->isChecked());
@@ -304,6 +319,15 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SYSTEM_DOCKED,m_docked)) {
     m_dirty = true;
   }
+  qDebug() << "button" << m_appendNewTab->isChecked();
+  qDebug() << "settings" << settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool();
+  if (m_appendNewTab->isChecked() != (settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool())) {
+    m_dirty = true;
+  }
+  //  else {
+  //    setButtons(false);
+  //  }
+
   if (compare(&settings,SID_SYSTEM_CURRENT_TAB,m_focusTab)) {
     m_dirty = true;
   }

@@ -51,7 +51,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_shortcutMap = NULL;
   m_bookmarkMap = NULL;
   m_helpview = NULL;
-
+  m_tabStyle = LanesLexicon::InsertTab;
   m_rootSearchDialog = NULL;
   m_wordSearchDialog = NULL;
   m_headSearchDialog = NULL;
@@ -1637,7 +1637,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
     entry->getView()->installEventFilter(this);
     np = entry->getXmlForRoot(p);
     if (np.isValid()) {
-      int ix = m_tabs->insertTab(m_tabs->currentIndex()+1,entry,np.getShortText());
+      int ix = this->addTab(true,entry,np.getShortText());
       if (activateTab) {
         m_tabs->setCurrentIndex(ix);
       }
@@ -1645,25 +1645,24 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
     else {
       delete entry;
     }
-
     return np;
   }
   if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
-      np = entry->getXmlForRoot(p);
-      /// TODO check this and onTabsChanged
-      /// this sets the tab text to the headword
-      /// tabs->tabContentsChanged() emits signa tabsChanged()
-      /// which ends calling this->onTabsChanged()
-      // and that inserts a number in tab title
-      if (np.isValid()) {
-        m_tabs->setTabText(currentTab,np.getShortText());
-        entry->setFocus();
-        m_tabs->tabContentsChanged();
-      }
+    np = entry->getXmlForRoot(p);
+    /// TODO check this and onTabsChanged
+    /// this sets the tab text to the headword
+    /// tabs->tabContentsChanged() emits signa tabsChanged()
+    /// which ends calling this->onTabsChanged()
+    // and that inserts a number in tab title
+    if (np.isValid()) {
+      m_tabs->setTabText(currentTab,np.getShortText());
+      entry->setFocus();
+      m_tabs->tabContentsChanged();
     }
-    else {
-      return p;
-    }
+  }
+  else {
+    return p;
+  }
  return np;
 }
 /*
@@ -1939,6 +1938,12 @@ void LanesLexicon::readSettings() {
 
   connect(m_helpRequested,SIGNAL(activated()),this,SLOT(onDocs()));
 
+  if (settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool()) {
+    m_tabStyle = LanesLexicon::AppendTab;
+  }
+  else {
+    m_tabStyle = LanesLexicon::InsertTab;
+  }
 
   settings.endGroup();
 
@@ -3124,6 +3129,22 @@ void LanesLexicon::searchForRoot() {
   /// at the end
   m_rootSearchDialog->hideKeyboard();
 }
+int LanesLexicon::addTab(bool create,QWidget * w,const QString & title) {
+  int ix = m_tabs->currentIndex();
+  if (create) {
+    if (m_tabStyle == LanesLexicon::AppendTab) {
+      ix = m_tabs->addTab(w,title);
+    }
+    else {
+      ix = m_tabs->insertTab(ix+1,w,title);
+    }
+  }
+  else {
+    this->onCloseTab(ix);
+    ix = m_tabs->insertTab(ix,w,title);
+  }
+  return ix;
+}
 /**
  * TODO
  *
@@ -3143,26 +3164,14 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
     connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
     connect(s,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
     int c = this->getSearchCount();
-    if (options.newTab()) {
-      ix++;
-    }
-    else {
-      this->onCloseTab(ix);
-    }
-    m_tabs->insertTab(ix,s,QString(tr("Search %1")).arg(c+1));
-    /// deleting old tab changes current index
-    if (!options.newTab()) {
-      m_tabs->setCurrentIndex(ix);
-    }
-    if (options.activateTab()) {
-      m_tabs->setCurrentIndex(ix);
-    }
+      ix = this->addTab(options.newTab(),s,QString(tr("Search %1")).arg(c+1));
+      if (options.activateTab()) {
+        m_tabs->setCurrentIndex(ix);
+      }
 
     /// this shifts focus from ContentsWidget (how it got focus is a mystery)
     ///
     if (options.newTab() && ! options.activateTab()) {
-    }
-    else {
       s->setFocus(Qt::OtherFocusReason);
     }
     return;
@@ -3181,24 +3190,15 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
         delete s;
         return;
       }
-      if (options.newTab()) {
-        ix++;
-      }
-      else {
-        this->onCloseTab(ix);
-      }
-      m_tabs->insertTab(ix,s,QString(tr("Head word search for %1")).arg(target));
+      ix = this->addTab(options.newTab(),s,QString(tr("Head word search for %1")).arg(target));
       if (options.activateTab()) {
         m_tabs->setCurrentIndex(ix);
       }
       setSignals(s->getEntry());
       s->showFirst();
       if (options.newTab() && ! options.activateTab()) {
-      }
-      else {
         s->setFocus(Qt::OtherFocusReason);
       }
-
   }
 }
 void LanesLexicon::searchForWord() {
@@ -3489,7 +3489,7 @@ void LanesLexicon::convertToEntry() {
       entry->getView()->installEventFilter(this);
 
       entry->getXmlForRoot(p);
-      m_tabs->insertTab(ix,entry,p.getShortText());
+      ix = this->addTab(true,entry,p.getShortText());
       m_tabs->setCurrentIndex(ix);
       entry->home();
     }
