@@ -307,6 +307,7 @@ Note * NoteMaster::findOne(int id) {
   }
   query.first();
   note = new Note();
+  note->setId(id);
   note->setWord(query.value(0).toString());
   Place p = Place::fromString(query.value(1).toString());
   note->setPlace(p);
