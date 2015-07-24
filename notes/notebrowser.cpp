@@ -82,11 +82,14 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 
   if (m_debug) {
     m_list->showColumn(NODE_COLUMN);
+    m_list->showColumn(ID_COLUMN);
   }
   else {
     m_list->hideColumn(NODE_COLUMN);
+    m_list->hideColumn(ID_COLUMN);
   }
   m_list->hideColumn(PLACE_COLUMN);
+
   initXslt();
 }
 void NoteBrowser::loadNotes() {
@@ -189,9 +192,14 @@ void NoteBrowser::loadNotes() {
 void NoteBrowser::onCellDoubleClicked(int row,int /* column */) {
   QLOG_DEBUG() << Q_FUNC_INFO << row;
   /// saving the id with word because we may not include id in release
-  QTableWidgetItem * item = m_list->item(row,COL_WITH_ID);
+  QTableWidgetItem * item = m_list->item(row,ID_COLUMN);
   if (item) {
-    int id = item->data(Qt::UserRole).toInt();
+    bool ok;
+    int id = item->text().toInt(&ok);
+    if (!ok) {
+      QLOG_WARN() << QString(tr("Notebrowser warning: row %1 has invalid id:%2")).arg(row).arg(id);
+      return;
+    }
     NoteMaster * notes = ::getNotes();
     Note * note = notes->findOne(id);
     if (note) {
@@ -232,7 +240,7 @@ QMap<int,int> NoteBrowser::getRowIdMap() {
 }
 void NoteBrowser::onDeleteClicked() {
   QMap<int,int> rowmap = getRowIdMap();
-
+  QStringList nodes;
   if (rowmap.size() > 0) {
     NoteMaster * notes = ::getNotes();
     /**
@@ -246,8 +254,10 @@ void NoteBrowser::onDeleteClicked() {
     }
     qSort(rows);
     for(int i=rows.size() - 1;i >= 0;i--) {
+      nodes << m_list->item(rows[i],NODE_COLUMN)->text();
       m_list->removeRow(rows[i]);
     }
+    emit(noteDeleted(nodes));
   }
 
 }
@@ -301,7 +311,7 @@ void NoteBrowser::onViewEntryClicked() {
       showEntry(p);
     }
     else {
-      QLOG_WARN() << QString(tr("Invalid place string:")).arg(items[PLACE_COLUMN]->text());
+      QLOG_WARN() << QString(tr("Invalid place string:")).arg(m_list->item(row,PLACE_COLUMN)->text());
     }
   }
 }

@@ -65,6 +65,7 @@ class NoteBrowser : public QWidget {
  signals:
     void showNode(const QString &);
     void printNode(const QString &);
+    void noteDeleted(const QStringList &);
 };
 
 #endif
