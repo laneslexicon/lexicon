@@ -1,6 +1,7 @@
 #include "notedialog.h"
 #include "notes.h"
 #include "imeditor.h"
+#include "QsLog.h"
 #include "imlineedit.h"
 #ifndef TEST_FRAMEWORK
 #include "application.h"
@@ -248,6 +249,7 @@ void NoteDialog::cancel() {
   this->reject();
 }
 void NoteDialog::save() {
+  QLOG_DEBUG() << Q_FUNC_INFO << m_id;
   Note * n = new Note();
   n->setPlace(m_place);
   n->setId(m_id);
