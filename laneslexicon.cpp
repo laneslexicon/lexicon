@@ -13,7 +13,6 @@
 #include "notes.h"
 #include "notebrowser.h"
 #include "tabwidget.h"
-#include "namespace.h"
 #include "laneslexicon.h"
 #include "searchoptionswidget.h"
 #include "searchdialogs.h"
@@ -115,7 +114,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createStatusBar();
 
 
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     onNavigationMenuChanged(m_navModeRootAction);
     //    ->setChecked(true);
   }
@@ -123,7 +122,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     onNavigationMenuChanged(m_navModePageAction);//->setChecked(false);
   }
 
-  if (m_navMode == Lane::By_Page) {
+  if (m_navMode == LanesLexicon::ByPage) {
     m_navModePageAction->setChecked(true);
   }
   else {
@@ -824,15 +823,15 @@ void LanesLexicon::createActions() {
   m_moveGroup = new QActionGroup(this);
   m_navModeRootAction = new QAction(tr("By &root"),this);
 
-  m_navModeRootAction->setData(Lane::By_Root);
+  m_navModeRootAction->setData(LanesLexicon::ByRoot);
   m_navModeRootAction->setCheckable(true);
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     m_navModeRootAction->setChecked(true);
   }
   m_navModePageAction = new QAction(tr("By &page"),this);
-  m_navModePageAction->setData(Lane::By_Page);
+  m_navModePageAction->setData(LanesLexicon::ByPage);
   m_navModePageAction->setCheckable(true);
-  if (m_navMode == Lane::By_Page) {
+  if (m_navMode == LanesLexicon::ByPage) {
     m_navModePageAction->setChecked(true);
   }
   m_moveGroup->addAction(m_navModeRootAction);
@@ -1006,7 +1005,7 @@ void LanesLexicon::createToolBar() {
   m_navigationButton->setText(tr("Move by"));
   m_navigationButton->setFocusPolicy(Qt::StrongFocus);
   /*
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     m_navigationButton->setDefaultAction(m_navModeRootAction);
   }
   else {
@@ -1914,11 +1913,11 @@ void LanesLexicon::readSettings() {
 
   m_minimalAction->setChecked(settings.value(SID_SYSTEM_MINIMAL,false).toBool());
 
-  if ( ! settings.value( SID_SYSTEM_BY_ROOT,true).toBool()) {
-    m_navMode = Lane::By_Page;
+  if ( settings.value( SID_SYSTEM_BY_ROOT,true).toBool()) {
+    m_navMode = LanesLexicon::ByRoot;
   }
   else {
-    m_navMode = Lane::By_Root;
+    m_navMode = LanesLexicon::ByPage;
   }
   v = settings.value(SID_SYSTEM_TITLE,tr("Lane's Arabic-English Lexicon")).toString();
   this->setWindowTitle(v);
@@ -2100,7 +2099,7 @@ void LanesLexicon::writeSettings() {
     settings.setValue(SID_SYSTEM_POS, pos());
     settings.setValue(SID_SYSTEM_CURRENT_TAB,m_tabs->currentIndex());
     settings.setValue(SID_SYSTEM_RUN_DATE,QDateTime::currentDateTime().toString(Qt::ISODate));
-    if (m_navMode == Lane::By_Root) {
+    if (m_navMode == LanesLexicon::ByRoot) {
       settings.setValue(SID_SYSTEM_BY_ROOT,true);
     }
     else {
@@ -2788,7 +2787,7 @@ void LanesLexicon::bookmarkAdd(const QString & id,const Place & p) {
  * @param p
  */
 void LanesLexicon::moveNext(const Place & p) {
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     findNextRoot(p.getRoot());
   }
   else {
@@ -2796,7 +2795,7 @@ void LanesLexicon::moveNext(const Place & p) {
   }
 }
 void LanesLexicon::movePrevious(const Place & p) {
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     findPrevRoot(p.getRoot());
   }
   else {
@@ -2810,7 +2809,7 @@ void LanesLexicon::movePrevious(const Place & p) {
  * @param p
  */
 void LanesLexicon::movePreviousHead(const Place & p) {
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     findPrevRoot(p.getRoot());
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
     if (entry) {
@@ -2871,7 +2870,7 @@ void LanesLexicon::updateMenu() {
   }
 }
 void LanesLexicon::onNavNext() {
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     onNextRoot();
   }
   else {
@@ -2879,7 +2878,7 @@ void LanesLexicon::onNavNext() {
   }
 }
 void LanesLexicon::onNavPrev()  {
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     onPrevRoot();
   }
   else {
@@ -2887,7 +2886,7 @@ void LanesLexicon::onNavPrev()  {
   }
 }
 void LanesLexicon::onNavFirst()   {
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     onFirstRoot();
   }
   else {
@@ -2895,7 +2894,7 @@ void LanesLexicon::onNavFirst()   {
   }
 }
 void LanesLexicon::onNavLast()   {
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     onLastRoot();
   }
   else {
@@ -3061,7 +3060,7 @@ void LanesLexicon::searchForPage() {
     return;
   }
   Place p;
-  if (m_navMode == Lane::By_Root) {
+  if (m_navMode == LanesLexicon::ByRoot) {
     p.setRoot(root);
     p.setNode(node);
     /// if we have the node on another page,go there

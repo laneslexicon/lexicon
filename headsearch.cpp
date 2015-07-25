@@ -2,7 +2,6 @@
 #include "application.h"
 #include "headsearch.h"
 #include "focustable.h"
-#include "namespace.h"
 #include "laneslexicon.h"
 #include "searchoptionswidget.h"
 #include "definedsettings.h"

@@ -1,6 +1,5 @@
 #include "searchoptionswidget.h"
 #include "fullsearch.h"
-#include "namespace.h"
 #include "scripts.h"
 #include "QsLog.h"
 #include "definedsettings.h"

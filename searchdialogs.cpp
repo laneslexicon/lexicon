@@ -1,6 +1,5 @@
 #include "searchdialogs.h"
 #include "QsLog.h"
-#include "namespace.h"
 #include "searchoptionswidget.h"
 #include "laneslexicon.h"
 #include "externs.h"

@@ -2,7 +2,6 @@
 #include "searchoptionswidget.h"
 #include "graphicsentry.h"
 #include "application.h"
-#include "namespace.h"
 #include "laneslexicon.h"
 #include "imlineedit.h"
 #include "nodeview.h"

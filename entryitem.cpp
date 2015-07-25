@@ -5,7 +5,6 @@
 #include "notedialog.h"
 #include "notes.h"
 #include "laneslexicon.h"
-#include "namespace.h"
 #include "entryitem.h"
 #include "contentswidget.h"
 extern LanesLexicon * getApp();

@@ -1,6 +1,5 @@
 #include "searchoptions.h"
 #include "fullsearch.h"
-#include "namespace.h"
 #include "scripts.h"
 #define USE_KEYMAPS 0
 SearchOptions::SearchOptions() {

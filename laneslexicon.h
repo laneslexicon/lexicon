@@ -86,6 +86,7 @@ class LanesLexicon : public QMainWindow
   NoteMaster * notes();
   bool sanityCheck(int type = 0);
   enum NewTabBehaviour { InsertTab, AppendTab };
+  enum NavigationMode { ByRoot , ByPage };
   public slots:
     int hasPlace(const Place & p,int searchtype,bool setFocus);
     Place showPlace(const Place &,bool newTab,bool activate);
@@ -276,7 +277,7 @@ class LanesLexicon : public QMainWindow
 
       QPrinter m_printer;
 
-      int m_navMode;
+      NavigationMode m_navMode;
       int m_firstPage;
       int m_lastPage;
       int m_messageInterval;

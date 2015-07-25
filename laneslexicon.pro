@@ -110,7 +110,6 @@ HEADERS  += laneslexicon.h \
             helpviewer.h \
             menubar.h \
             tabwidget.h \
-            namespace.h \
             application.h \
             searchoptions.h \
             searchoptionswidget.h \

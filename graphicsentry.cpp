@@ -8,7 +8,6 @@
 #include "notes.h"
 #include "definedsettings.h"
 #include "laneslexicon.h"
-#include "namespace.h"
 #include "searchdialogs.h"
 #include "searchoptionswidget.h"
 #include "externs.h"
