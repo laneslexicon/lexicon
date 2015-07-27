@@ -12,21 +12,22 @@
 #include <QSettings>
 #include <QLabel>
 #include <QPushButton>
+#include <QLocale>
 #include "QsLog.h"
 #include <QComboBox>
-class FontChangeDialog : public QDialog {
+#include <QGroupBox>
+class FontChangeWidget : public QWidget {
   Q_OBJECT
-
  public:
-  FontChangeDialog(QWidget * parent = 0);
-  QSize sizeHint() const;
-   bool isModified() const;
+  FontChangeWidget(QLocale::Script script,QWidget * parent = 0);
+  bool isModified() const;
+  //  QSize sizeHint() const ;
  public slots:
    void onFontChanged(const QString &);
    void onShowAllChanged(int);
    void onApply();
-   void onHelp();
  private:
+   QLocale::Script m_script;
    void setCurrentFontText();
    //  QStringList m_arFonts;
   void readSettings();
@@ -42,6 +43,19 @@ class FontChangeDialog : public QDialog {
   QPushButton * m_applyButton;
   QLabel * m_fontLabel;
   bool m_modified;
+};
+class FontChangeDialog : public QDialog {
+  Q_OBJECT
+
+ public:
+  FontChangeDialog(QWidget * parent = 0);
+  bool isModified() const;
+ public slots:
+   void onHelp();
+ private:
+   bool m_modified;
+   FontChangeWidget * m_arabicFont;
+   FontChangeWidget * m_latinFont;
  signals:
   void showHelp(const QString &);
 };

@@ -5,8 +5,9 @@
 #define FONT_SIZE_WIDTH 40
 #define LEAD_SPACING 50
 #define SPACING 20
-FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
+FontChangeWidget::FontChangeWidget(QLocale::Script script,QWidget * parent) : QWidget(parent) {
   readSettings();
+  m_script = script;
   m_modified = false;
   setWindowTitle(tr("Change Arabic font"));
   setObjectName("fontchangedialog");
@@ -31,10 +32,19 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   m_changes->setEnabled(false);
   m_applyButton = new QPushButton(tr("Change font"));
   QFontDatabase fdb;
-  m_arabicFont->addItems(fdb.families(QFontDatabase::Arabic));
-  m_fontLabel = new QLabel(tr("Available Arabic fonts"));
-  formlayout->addRow(tr("Current fonts used"),m_currentFont);
-  formlayout->addRow(m_fontLabel,m_arabicFont);
+  if (m_script == QLocale::ArabicScript) {
+    m_arabicFont->addItems(fdb.families(QFontDatabase::Arabic));
+    m_fontLabel = new QLabel(tr("Available Arabic fonts"));
+  }
+  else {
+    m_arabicFont->addItems(fdb.families(QFontDatabase::Latin));
+    m_fontLabel = new QLabel(tr("Available Latin fonts"));
+  }
+  formlayout->addRow(tr("Most used font"),m_currentFont);
+  QHBoxLayout * fontlayout = new QHBoxLayout;
+  fontlayout->addWidget(m_arabicFont);
+  fontlayout->addStretch();
+  formlayout->addRow(m_fontLabel,fontlayout);
   QHBoxLayout * sizelayout = new QHBoxLayout;
   sizelayout->addWidget(m_fontSize);
   sizelayout->addSpacing(10);
@@ -51,31 +61,32 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   hlayout->addStretch();
   formlayout->addRow(tr(""),hlayout);
 
-  QDialogButtonBox *   buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
-
-  QPushButton * helpbutton = buttonBox->addButton(QDialogButtonBox::Help);
-  connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
-
-  connect(buttonBox,SIGNAL(rejected()),this,SLOT(reject()));
 
   layout->addLayout(formlayout);
   layout->addWidget(m_changes);
-  layout->addWidget(buttonBox);
   layout->addStretch();
   setLayout(layout);
 
   m_changes->addItem(tr("Changes will be detailed here"));
   setCurrentFontText();
   connect(m_arabicFont,SIGNAL(currentTextChanged(const QString &)),this,SLOT(onFontChanged(const QString &)));
-  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_allFonts,SIGNAL(stateChanged(int)),this,SLOT(onShowAllChanged(int)));
   connect(m_applyButton,SIGNAL(clicked()),this,SLOT(onApply()));
 }
-void FontChangeDialog::setCurrentFontText() {
-  QString t = "In the current Arabic ";
-  QMap<QString,int>  fonts = getLexicon()->getUsedFont("arabic");
+void FontChangeWidget::setCurrentFontText() {
+  QMap<QString,int>  fonts;
+  QString script;
+
+  if (m_script == QLocale::ArabicScript) {
+    fonts = getLexicon()->getUsedFont("arabic",false);
+    script = "Arabic";
+  }
+  else {
+    fonts = getLexicon()->getUsedFont("arabic",true);
+    script = "Latin";
+  }
   if (fonts.size() <= 0) {
-    m_currentFont->setText(tr("Unable determine current Arabic font"));
+    m_currentFont->setText(QString(tr("Unable determine current %1 font")).arg(script));
     return;
   }
   QMultiMap<int,QString> mm;
@@ -101,20 +112,21 @@ void FontChangeDialog::setCurrentFontText() {
   /// set the combo to the most used font
   m_arabicFont->setCurrentText(mainFont);
   /// set the font usage text
-  m_currentFont->setText(str.join(","));
+  m_currentFont->setText(mainFont); //str.join(","));
 }
-
-QSize FontChangeDialog::sizeHint() const {
+/*
+QSize FontChangeWidget::sizeHint() const {
   return QSize(600,400);
 }
+*/
 
-void FontChangeDialog::readSettings() {
+void FontChangeWidget::readSettings() {
 }
-void FontChangeDialog::writeSettings() {
+void FontChangeWidget::writeSettings() {
 }
-void FontChangeDialog::onFontChanged(const QString & family) {
+void FontChangeWidget::onFontChanged(const QString & family) {
 }
-void FontChangeDialog::onShowAllChanged(int state) {
+void FontChangeWidget::onShowAllChanged(int state) {
   QFontDatabase fdb;
   if (state == Qt::Checked) {
     m_arabicFont->clear();
@@ -127,7 +139,7 @@ void FontChangeDialog::onShowAllChanged(int state) {
     m_fontLabel->setText(tr("Available Arabic fonts"));
   }
 }
-void FontChangeDialog::onApply() {
+void FontChangeWidget::onApply() {
   bool ok = false;
   QString arabicFont = m_arabicFont->currentText();
   int fontSize = m_fontSize->text().toInt(&ok);
@@ -196,9 +208,41 @@ void FontChangeDialog::onApply() {
   }
   setCurrentFontText();
 }
-bool FontChangeDialog::isModified() const {
+bool FontChangeWidget::isModified() const {
   return m_modified;
+}
+FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
+  QVBoxLayout * layout = new QVBoxLayout;
+  QHBoxLayout * fontlayout = new QHBoxLayout;
+
+  QGroupBox * arabicBox = new QGroupBox(tr("Arabic Font"));
+  QVBoxLayout * arabiclayout = new QVBoxLayout;
+  m_arabicFont = new FontChangeWidget(QLocale::ArabicScript,this);
+  arabiclayout->addWidget(m_arabicFont);
+  arabicBox->setLayout(arabiclayout);
+
+  QGroupBox * latinBox = new QGroupBox(tr("Latin Font"));
+  QVBoxLayout * latinlayout = new QVBoxLayout;
+  m_latinFont = new FontChangeWidget(QLocale::LatinScript,this);
+  latinlayout->addWidget(m_latinFont);
+  latinBox->setLayout(latinlayout);
+
+  fontlayout->addWidget(arabicBox);
+  fontlayout->addWidget(latinBox);
+
+  QDialogButtonBox *   buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
+
+  QPushButton * helpbutton = buttonBox->addButton(QDialogButtonBox::Help);
+  connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
+
+  connect(buttonBox,SIGNAL(rejected()),this,SLOT(reject()));
+  layout->addLayout(fontlayout);
+  layout->addWidget(buttonBox);
+  setLayout(layout);
 }
 void FontChangeDialog::onHelp() {
   emit(showHelp(this->objectName()));
+}
+bool FontChangeDialog::isModified() const {
+  return m_modified;
 }
