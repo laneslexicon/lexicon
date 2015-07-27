@@ -36,6 +36,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   setObjectName("fullsearchwidget");
   m_attached = false;
   m_findTarget = new ImLineEdit;
+  m_findTarget->setObjectName("arabicedit");
   getLexicon()->adjustHeight(m_findTarget);
   QString mapname = getApp()->getActiveKeymap();
   QString mapfile = getApp()->getKeymapFileName(mapname);

@@ -33,7 +33,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   m_count = 0;
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
-
+  m_edit->setObjectName("arabicedit");
   //  m_edit->readSettings(getLexicon()->settingsFileName());
   getLexicon()->adjustHeight(m_edit);
   QString mapname = getApp()->getActiveKeymap();
