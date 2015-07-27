@@ -777,20 +777,36 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
   in.setCodec("UTF-8");
   QString selector;
   QString clause;
+  bool inComment = false;
+  bool isComment = false;
   while(! in.atEnd()) {
-    QString line = in.readLine();
-    m = reCss.match(line);
-    if (m.lastCapturedIndex() == 2) {
-      selector = m.captured(1);
-      clause = m.captured(2);
+    if (! inComment ) {
+      isComment = false;
     }
-    if (selector.contains("arabic",Qt::CaseInsensitive)) {
+    QString line = in.readLine().trimmed();
+    if (line.startsWith("/*")) {
+      isComment = true;
+      if (!line.endsWith("*/")) {
+        inComment = true;
+      }
+    }
+    if ( ! isComment ) {
+      m = reCss.match(line);
+      if (m.lastCapturedIndex() == 2) {
+        selector = m.captured(1);
+        clause = m.captured(2);
+      }
+      if (selector.contains("arabic",Qt::CaseInsensitive)) {
         line = setCssFont(line,family,fontSize);
         changedEntries << line;
         css << line;
+      }
+      else {
+        css << line;
+      }
     }
-    else {
-      css << line;
+    if (line.endsWith("*/") && inComment) {
+      inComment = false;
     }
   }
   file.close();
@@ -1145,23 +1161,38 @@ QStringList Lexicon::getFontInStylesheet(const QString & fileName,const QString 
   QString selector;
   QString clause;
   QRegularExpression re(matching, QRegularExpression::CaseInsensitiveOption);
+  bool isComment = false;
+  bool inMultiLineComment = false;
   while(! in.atEnd()) {
-    QString line = in.readLine();
-    m = reCss.match(line);
-    if (m.lastCapturedIndex() == 2) {
-      selector = m.captured(1);
-      clause = m.captured(2);
+    if ( ! inMultiLineComment ) {
+      isComment = false;
     }
-    if ((re.match(selector).hasMatch() && !invertMatch) ||
-        (!re.match(selector).hasMatch() && invertMatch))
-      {
-      QRegularExpressionMatch m = rxFamily.match(line);
-      if (m.hasMatch()) {
-        fonts << m.captured(1);
+    QString line = in.readLine().trimmed();
+    if (line.startsWith("/*")) {
+      isComment = true;
+      inMultiLineComment = ! line.endsWith("*/");
+    }
+    if ( ! isComment ) {
+      m = reCss.match(line);
+      if (m.lastCapturedIndex() == 2) {
+        selector = m.captured(1);
+        clause = m.captured(2);
       }
+      if ((re.match(selector).hasMatch() && !invertMatch) ||
+          (!re.match(selector).hasMatch() && invertMatch))
+        {
+          QRegularExpressionMatch m = rxFamily.match(line);
+          if (m.hasMatch()) {
+            fonts << m.captured(1);
+          }
+        }
+    }
+    if (line.endsWith("*/") && inMultiLineComment) {
+      inMultiLineComment = false;
     }
   }
   file.close();
+  QLOG_DEBUG() << fileName << fonts;
   return fonts;
 }
 QStringList Lexicon::getFontInSettings(const QString & selector,bool invertMatch) const {
