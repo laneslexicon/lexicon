@@ -1374,6 +1374,7 @@ void LanesLexicon::createStatusBar() {
     QAction * action  = menu->addAction(maps[i]);
     action->setCheckable(true);
     action->setData(maps[i]);
+    action->setEnabled(m_keymapsEnabled);
     if (m_currentMap == maps[i]) {
       action->setChecked(true);
     }
