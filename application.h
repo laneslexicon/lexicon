@@ -66,6 +66,7 @@ public:
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:
+    QStringList getFilteredCss(const QString & fileName) const;
     QString setCssFont(const QString & css,const QString & family,int fontSize) const;
     QStringList m_errors;
     QString m_errorFilePath;
