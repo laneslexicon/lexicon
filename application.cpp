@@ -393,20 +393,6 @@ QString Lexicon::settingsFileName(const QString & theme) {
   }
   return d.absoluteFilePath(m_configFile);
 }
-QVariant Lexicon::getValue(const QString & group,const QString & key) {
-  QFileInfo f(m_settingsDir,m_configFile);
-  QSettings s(f.absoluteFilePath(),QSettings::IniFormat);
-  s.setIniCodec("UTF-8");
-  s.beginGroup(group);
-  return s.value(key);
-}
-bool Lexicon::getBool(const QString & group,const QString & key) {
-  QFileInfo f(m_settingsDir,m_configFile);
-  QSettings s(f.absoluteFilePath(),QSettings::IniFormat);
-  s.setIniCodec("UTF-8");
-  s.beginGroup(group);
-  return s.value(key).toBool();
-}
 void Lexicon::onFocusChange(QWidget * old, QWidget * now) {
   if (old && now) {
     QLOG_DEBUG() << old->metaObject()->className() << "--->" << now->metaObject()->className();
