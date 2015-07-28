@@ -1011,40 +1011,36 @@ QFont Lexicon::fontFromCss(const QString & src) {
 
   return f;
 }
-QString Lexicon::getCssSpecification(const QString & selector) {
-  QString css;
-  QString fileName = getStylesheetFilePath(Lexicon::Application);
-  QFile file(fileName);
-  if (! file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    return css;
-  }
-  QTextStream in(&file);
+/**
+ * Return the CSS for the given selector from the application stylesheet
+ *
+ * @param selector
+ *
+ * @return
+ */
+QString Lexicon::getSelectorCss(const QString & selector) const {
+  QStringList css = getFilteredCss(getStylesheetFilePath(Lexicon::Application));
   QString clause;
-  bool ok = false;
+
   QRegularExpression rx("(^[^\\s]+)\\s");
   QRegularExpressionMatch m;
-  while(! in.atEnd() && ! ok ) {
+  for(int i=0;i < css.size();i++) {
     QString s;
-    QString line = in.readLine();
+    QString line = css[i];
     m = rx.match(line);
     if (m.hasMatch()) {
       s = m.captured(1);
     }
     if (s.contains(selector)) {
-      while(! line.contains("{") && ! line.contains("}") && ! in.atEnd()) {
-        line += in.readLine();
-      }
+      //      while(! line.contains("{") && ! line.contains("}") ) {
+      //        line += in.readLine();
+      //      }
       if (line.contains("{") &&  line.contains("}")) {
-        ok = true;
-        css = line.remove(s).trimmed();
+        return line.remove(s).trimmed();
       }
     }
   }
-  file.close();
-  if (! ok ) {
-    return css;
-  }
-  return css;
+  return QString();
 }
 /**
  * This is because on OSX QLineEdit does not automatically adjust its height
@@ -1080,7 +1076,7 @@ void Lexicon::adjustHeight(QWidget * w) {
   }
 }
 void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t,int margin) {
-  QString css = getCssSpecification("ImLineEdit");
+  QString css = getSelectorCss("ImLineEdit");
   if (css.isEmpty()) {
     return;
   }

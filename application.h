@@ -57,7 +57,7 @@ public:
   QStringList getFontInSettings(const QString & selector,bool invertMatch = false) const;
   QStringList getFontInStylesheet(const QString & fileName,const QString & selector,bool invertMatch = false) const;
   void adjustHeight(QWidget *);
-  QString getCssSpecification(const QString & selector) ;
+  QString getSelectorCss(const QString & selector) const ;
   QFont fontFromCss(const QString & css);
   void setEditFont(QWidget *,const QString & selector,const QString & sample = QString(),int margin = 4);
 
