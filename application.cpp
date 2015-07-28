@@ -912,7 +912,9 @@ QString Lexicon::setCssFont(const QString & src,const QString & family,int sz) c
   if (! sizeFound && (sz != -1)) {
     r += QString(" font-size : %1px ;").arg(sz);
   }
-  return css.replace(m.capturedStart(1)+1,m.capturedLength(1)-1,r);
+  r = " " + r + " ";
+  return css.replace(m.capturedStart(1),m.capturedLength(1),r);
+
 }
 QMap<QString,int> Lexicon::getUsedFont(const QString & selector, bool invertMatch) {
   QStringList changes = getFontInSettings(selector,invertMatch);
