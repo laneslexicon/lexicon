@@ -149,10 +149,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   connect(m_tabs,SIGNAL(tabCloseRequested(int)),this,SLOT(onCloseTab(int)));
   connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(currentTabChanged(int)));
 
-
-  if ( m_useNotes ) {
-
-  }
   if (m_restoreTabs) {
     restoreTabs();
   }
@@ -179,7 +175,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   sitemap.beginGroup("Site Map");
   QStringList keys = sitemap.childKeys();
   for(int i=0;i < keys.size();i++) {
-    m_siteMap.insert(keys[i],sitemap.value(keys[i]).toString());
+    if (! keys[i].isEmpty()) {
+      m_siteMap.insert(keys[i],sitemap.value(keys[i]).toString());
+    }
   }
 
   onSetInterface();
@@ -229,9 +227,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
 
  QTimer::singleShot(200, this, SLOT(onReady()));
-
-
-
 
   QLOG_INFO() << "-----------------------";
   QLOG_INFO() << "Initialisation complete";

@@ -54,8 +54,8 @@ public:
   QString takeLastError();
   QMap<QString,int> getUsedFont(const QString & selector = QString() , bool invertMatch = false)  ;
   QStringList setArabicFont(const QString & family = QString());
-  QStringList changeFontInSettings(const QString & family,int size = -1);
-  QStringList changeFontInStylesheet(const QString & fileName,const QString & family,int size = -1);
+  QStringList changeFontInSettings(const QString & selector,bool match,const QString & family,int size = -1);
+  QStringList changeFontInStylesheet(const QString & fileName,const QString & selector,bool matching,const QString & family,int size = -1);
   QStringList getFontInSettings(const QString & selector,bool invertMatch = false) const;
   QStringList getFontInStylesheet(const QString & fileName,const QString & selector,bool invertMatch = false) const;
   void adjustHeight(QWidget *);

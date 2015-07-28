@@ -762,7 +762,7 @@ QString Lexicon::getDefaultKeyboard()  {
  *
  * @param family
  */
-QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QString & family,int fontSize) {
+QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QString & selector,bool matching,const QString & family,int fontSize) {
   QStringList changedEntries;
   QRegularExpression reCss("(.+){(.+)}");
   QRegularExpressionMatch m;
@@ -775,7 +775,7 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
   }
   QTextStream in(&file);
   in.setCodec("UTF-8");
-  QString selector;
+  QString fselect;
   QString clause;
   bool inComment = false;
   bool isComment = false;
@@ -793,12 +793,15 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
     if ( ! isComment ) {
       m = reCss.match(line);
       if (m.lastCapturedIndex() == 2) {
-        selector = m.captured(1);
+        fselect = m.captured(1);
         clause = m.captured(2);
       }
-      if (selector.contains("arabic",Qt::CaseInsensitive)) {
-        line = setCssFont(line,family,fontSize);
-        changedEntries << line;
+      ///
+      if (line.contains("font-family")) {
+        if (fselect.contains(selector,Qt::CaseInsensitive) == matching){
+          line = setCssFont(line,family,fontSize);
+          changedEntries << line;
+        }
       }
     }
     css << line;
@@ -831,7 +834,7 @@ QStringList Lexicon::changeFontInStylesheet(const QString & fileName,const QStri
  *
  * @return
  */
-QStringList Lexicon::changeFontInSettings(const QString & family,int fontSize) {
+QStringList Lexicon::changeFontInSettings(const QString & selector,bool matching,const QString & family,int fontSize) {
   QLOG_DEBUG() << Q_FUNC_INFO << family;
   QStringList changedKeys;
   QFileInfo f(m_settingsDir,m_configFile);
@@ -841,13 +844,13 @@ QStringList Lexicon::changeFontInSettings(const QString & family,int fontSize) {
   QString v;
   QFont font;
   QRegularExpression rxFamily("font-family\\s*:\\s*([^;}]+)");
-  QRegularExpression re("Arabic", QRegularExpression::CaseInsensitiveOption);
+  QRegularExpression re(selector, QRegularExpression::CaseInsensitiveOption);
   QRegularExpression reFontString("\\d+,\\d+,\\d++");
   QRegularExpression reCssFont("{([^}]+)}");
   QRegularExpressionMatch match;
   for(int i=0;i < keys.size();i++) {
     bool ok = false;
-    if (re.match(keys[i]).hasMatch()) {
+    if (re.match(keys[i]).hasMatch() == matching) {
       v = settings.value(keys[i]).toString();
       if (reFontString.match(v).hasMatch()) {
         QStringList p = v.split(",");

@@ -119,7 +119,10 @@ QSize FontChangeWidget::sizeHint() const {
   return QSize(600,400);
 }
 */
-
+void FontChangeWidget::setSelector(const QString & selector,bool match) {
+  m_selector = selector;
+  m_matching = match;
+}
 void FontChangeWidget::readSettings() {
 }
 void FontChangeWidget::writeSettings() {
@@ -166,12 +169,12 @@ void FontChangeWidget::onApply() {
 
 
     t = getLexicon()->settingsFileName();
-    t = QString("The following settings in %1 have been changed:").arg(t);
+    t = QString(tr("Setting changes in %1 :")).arg(QDir::current().relativeFilePath(t));
     item = new QListWidgetItem(t);
     item->setFont(f);
     m_changes->addItem(item);
     m_changes->addItem("");
-    changes = getLexicon()->changeFontInSettings(arabicFont,fontSize);
+    changes = getLexicon()->changeFontInSettings(m_selector,m_matching,arabicFont,fontSize);
     m_changes->addItems(changes);
     m_changes->addItem("");
     m_modified = true;
@@ -194,13 +197,14 @@ void FontChangeWidget::onApply() {
       ok = m_changeEntryCss->isChecked();
     }
     if (ok) {
-      t = QString("CSS changes in %1").arg(fileName);
+      t = QString(tr("CSS changes in %1")).arg(QDir::current().relativeFilePath(fileName));
       item = new QListWidgetItem(t);
       item->setFont(f);
       m_changes->addItem(item);
       m_changes->addItem("");
-
-      changes = getLexicon()->changeFontInStylesheet(fileName,arabicFont,fontSize);
+      if (! m_selector.isEmpty()) {
+        changes = getLexicon()->changeFontInStylesheet(fileName,m_selector,m_matching,arabicFont,fontSize);
+      }
       m_changes->addItems(changes);
       m_changes->addItem("");
       m_modified = true;
@@ -218,12 +222,14 @@ FontChangeDialog::FontChangeDialog(QWidget * parent) : QDialog(parent) {
   QGroupBox * arabicBox = new QGroupBox(tr("Arabic Font"));
   QVBoxLayout * arabiclayout = new QVBoxLayout;
   m_arabicFont = new FontChangeWidget(QLocale::ArabicScript,this);
+  m_arabicFont->setSelector("arabic",1);
   arabiclayout->addWidget(m_arabicFont);
   arabicBox->setLayout(arabiclayout);
 
   QGroupBox * latinBox = new QGroupBox(tr("Latin Font"));
   QVBoxLayout * latinlayout = new QVBoxLayout;
   m_latinFont = new FontChangeWidget(QLocale::LatinScript,this);
+  m_latinFont->setSelector("arabic",0);
   latinlayout->addWidget(m_latinFont);
   latinBox->setLayout(latinlayout);
 

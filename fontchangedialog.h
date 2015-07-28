@@ -21,6 +21,7 @@ class FontChangeWidget : public QWidget {
  public:
   FontChangeWidget(QLocale::Script script,QWidget * parent = 0);
   bool isModified() const;
+  void setSelector(const QString & selector,bool match);
   //  QSize sizeHint() const ;
  public slots:
    void onFontChanged(const QString &);
@@ -43,6 +44,8 @@ class FontChangeWidget : public QWidget {
   QPushButton * m_applyButton;
   QLabel * m_fontLabel;
   bool m_modified;
+  QString m_selector;
+  bool m_matching;
 };
 class FontChangeDialog : public QDialog {
   Q_OBJECT
