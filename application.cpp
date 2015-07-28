@@ -2,8 +2,30 @@
 #include "QsLog.h"
 #include "definedsettings.h"
 #include "version.h"
+QString ApplicationErrors::takeLast() {
+  if (m_error.size() > 0) {
+    return m_error.takeLast();
+  }
+  return QString();
+}
+QString ApplicationErrors::getPath() const {
+  return m_filePath;
+}
+QString ApplicationErrors::getFile() const {
+  return m_file;
+}
+void ApplicationErrors::add(const QString & err) {
+  m_error << err;
+}
+void ApplicationErrors::setPath(const QString & p) {
+  m_filePath = p;
+}
+void ApplicationErrors::setFile(const QString & p) {
+  m_file = p;
+}
 Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QString resourceDir;
+  m_errors = new ApplicationErrors();
   m_status = Lexicon::Ok;
   m_configFile = "settings.ini";
 #ifdef __APPLE__
@@ -138,7 +160,7 @@ QString Lexicon::getResourcePath(int type) {
   return QString();
 }
 */
-QString Lexicon::getResourceFilePath(int type, const QString & name) {
+QString Lexicon::getResourceFilePath(int type, const QString & name) const {
   QFile file;
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
@@ -213,21 +235,24 @@ QString Lexicon::getResourceFilePath(int type, const QString & name) {
       return r.absoluteFilePath();
     }
     else {
-      m_errorFilePath = rd.absolutePath();
-      m_errorFile = name;
-      m_errors << QString(tr("Resource not found: %1")).arg(name);
+      m_errors->setPath(rd.absolutePath());
+      m_errors->setFile(name);
+      m_errors->add(QString(tr("Resource not found: %1")).arg(name));
     }
   }
   else {
-    m_errors << QString(tr("Settings directory not found: %1")).arg(m_settingsDir.absolutePath());
+    m_errors->add(QString(tr("Settings directory not found: %1")).arg(m_settingsDir.absolutePath()));
   }
   return QString();
 }
-QString Lexicon::takeLastError() {
-  if (m_errors.size() > 0) {
-    return m_errors.takeLast();
-  }
-  return QString();
+QString Lexicon::takeLastError() const {
+  return m_errors->takeLast();
+}
+QString Lexicon::errorPath() const {
+  return m_errors->getPath();
+}
+QString Lexicon::errorFile() const {
+  return m_errors->getFile();
 }
 /**
  * This is not required
@@ -927,7 +952,7 @@ QMap<QString,int> Lexicon::getUsedFont(const QString & selector, bool invertMatc
   }
   return fonts;
 }
-QString Lexicon::getStylesheetFilePath(int type) {
+QString Lexicon::getStylesheetFilePath(int type) const {
   QString fileName;
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
@@ -1228,4 +1253,9 @@ QStringList Lexicon::getFilteredCss(const QString & fileName) const {
   }
   file.close();
   return css;
+}
+Lexicon::~Lexicon() {
+  qDebug() << Q_FUNC_INFO;
+
+  delete m_errors;
 }
