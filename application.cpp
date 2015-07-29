@@ -2,6 +2,7 @@
 #include "QsLog.h"
 #include "definedsettings.h"
 #include "version.h"
+/*
 QString ApplicationErrors::takeLast() {
   if (m_error.size() > 0) {
     return m_error.takeLast();
@@ -23,9 +24,11 @@ void ApplicationErrors::setPath(const QString & p) {
 void ApplicationErrors::setFile(const QString & p) {
   m_file = p;
 }
+*/
+
 Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QString resourceDir;
-  m_errors = new ApplicationErrors();
+  //  m_errors = new ApplicationErrors();
   m_status = Lexicon::Ok;
   m_configFile = "settings.ini";
 #ifdef __APPLE__
@@ -235,16 +238,25 @@ QString Lexicon::getResourceFilePath(int type, const QString & name) const {
       return r.absoluteFilePath();
     }
     else {
-      m_errors->setPath(rd.absolutePath());
-      m_errors->setFile(name);
-      m_errors->add(QString(tr("Resource not found: %1")).arg(name));
+      qDebug() << "Name" << name;
+      qDebug() << "settings dir" << QDir::current().relativeFilePath(m_settingsDir.absolutePath());
+      qDebug() << "rd" << QDir::current().relativeFilePath(rd.absolutePath());
+      qDebug() << "test" << m_settingsDir.relativeFilePath(rd.absolutePath());
+      return QString("Error:%1:%2:%3")
+        .arg(QDir::current().relativeFilePath(rd.absolutePath()))
+        .arg(name)
+        .arg("Resource not found");
+      //      m_errors->setFile(name);
+      //      m_errors->add(QString(tr("Resource not found: %1")).arg(name));
     }
   }
   else {
-    m_errors->add(QString(tr("Settings directory not found: %1")).arg(m_settingsDir.absolutePath()));
+      return QString("Error:%1:%2:%3").arg(m_settingsDir.absolutePath()).arg("").arg("Directory not found");
+      //    m_errors->add(QString(tr("Settings directory not found: %1")).arg(m_settingsDir.absolutePath()));
   }
   return QString();
 }
+/*
 QString Lexicon::takeLastError() const {
   return m_errors->takeLast();
 }
@@ -254,6 +266,7 @@ QString Lexicon::errorPath() const {
 QString Lexicon::errorFile() const {
   return m_errors->getFile();
 }
+*/
 /**
  * This is not required
  *
@@ -1257,5 +1270,5 @@ QStringList Lexicon::getFilteredCss(const QString & fileName) const {
 Lexicon::~Lexicon() {
   qDebug() << Q_FUNC_INFO;
 
-  delete m_errors;
+  //  delete m_errors;
 }

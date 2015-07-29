@@ -745,9 +745,20 @@ void LanesLexicon::loadStyleSheet() {
     return;
   }
   QString filename = getLexicon()->getResourceFilePath(Lexicon::Stylesheet,m_applicationCssFile);
-  if (filename.isEmpty()) {
-    QString err = getLexicon()->takeLastError();
-    QLOG_WARN() << QString(tr("Unable to open stylesheet: %1")).arg(err);
+  if (filename.startsWith("Error:")) {
+    QStringList errors = filename.split(":");
+    QString msg;
+    if (errors.size() >= 2) {
+
+      msg = QString(tr("<p>Cannot find file: %1</p> \
+                        <p>Directory is:%2</p> \
+                        <p>Please review Preferences -> Layout</p>")).arg(errors[2]).arg(errors[1]);
+    }
+    else {
+      msg = QString(tr("Cannot find file: %1")).arg(m_applicationCssFile);
+    }
+    QMessageBox::warning(this,tr("Missing Application Stylesheet"),msg,QMessageBox::Ok);
+    QLOG_WARN() << QString(tr("Missing application CSS file: %1")).arg(m_applicationCssFile);
     return;
   }
   QFile f(filename);
@@ -1824,9 +1835,6 @@ void LanesLexicon::onTest() {
   addShortcut("Search node","Ctrl+S,X",true);
   }
   if (0) {
-    getLexicon()->getCssSpecification("ImLineEdit#arabicedit");
-  }
-  if (1) {
     ExportSearchDialog * d = new ExportSearchDialog(QStringList() << "One" << "Two" << "Three" << "Four" << "Five" << "Six");
     if (d->exec() == QDialog::Accepted) {
       if (d->saveSettings()) {
@@ -1835,6 +1843,7 @@ void LanesLexicon::onTest() {
     }
     delete d;
   }
+  qDebug() << ">>>>>" << getLexicon()->getSelectorCss("ImLineEdit");
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");

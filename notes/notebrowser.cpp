@@ -406,12 +406,22 @@ bool NoteBrowser::readCssFromFile(const QString & name) {
     return false;
   }
   QString filename = getLexicon()->getResourceFilePath(Lexicon::Stylesheet,name);
-  if (filename.isEmpty()) {
-    QString err = getLexicon()->takeLastError();
-    QLOG_WARN() << QString(tr("Unable to open entry stylesheet: %1")).arg(err);
+   if (filename.startsWith("Error:")) {
+    QStringList errors = filename.split(":");
+    QString msg;
+    if (errors.size() >= 2) {
+
+      msg = QString(tr("<p>Cannot find file: %1</p> \
+                        <p>Directory is:%2</p> \
+                        <p>Please review Preferences -> Layout</p>")).arg(errors[2]).arg(errors[1]);
+    }
+    else {
+      msg = QString(tr("Cannot find file: %1")).arg(name);
+    }
+    QMessageBox::warning(this,tr("Missing Entry Stylesheet"),msg,QMessageBox::Ok);
+    QLOG_WARN() << QString(tr("Missing Entry CSS  file: %1")).arg(name);
     return false;
   }
-
   QFile f(filename);
   if (! f.open(QIODevice::ReadOnly)) {
     QLOG_WARN()  << QString(tr("I/O Error opening CSS file for reading: %1 - %2"))
