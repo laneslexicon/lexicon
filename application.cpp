@@ -2,33 +2,9 @@
 #include "QsLog.h"
 #include "definedsettings.h"
 #include "version.h"
-/*
-QString ApplicationErrors::takeLast() {
-  if (m_error.size() > 0) {
-    return m_error.takeLast();
-  }
-  return QString();
-}
-QString ApplicationErrors::getPath() const {
-  return m_filePath;
-}
-QString ApplicationErrors::getFile() const {
-  return m_file;
-}
-void ApplicationErrors::add(const QString & err) {
-  m_error << err;
-}
-void ApplicationErrors::setPath(const QString & p) {
-  m_filePath = p;
-}
-void ApplicationErrors::setFile(const QString & p) {
-  m_file = p;
-}
-*/
 
 Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QString resourceDir;
-  //  m_errors = new ApplicationErrors();
   m_status = Lexicon::Ok;
   m_configFile = "settings.ini";
 #ifdef __APPLE__
@@ -1270,5 +1246,4 @@ QStringList Lexicon::getFilteredCss(const QString & fileName) const {
 Lexicon::~Lexicon() {
   qDebug() << Q_FUNC_INFO;
 
-  //  delete m_errors;
 }
