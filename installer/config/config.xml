@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+  <Name>Lane's Lexicon</Name>
+  <Version>0.1</Version>
+  <Title>Lane's Lexicon Installer</Title>
+  <Publisher>Graeme Andrews</Publisher>
+  <StartMenuDir>Lane</StartMenuDir>
+  <TargetDir>@HomeDir@/LanesLexicon</TargetDir>
+</Installer>
