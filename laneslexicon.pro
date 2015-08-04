@@ -5,7 +5,7 @@
 QT       += core gui printsupport
 QT       += webkitwidgets
 QT       += sql
-QT       += help
+#QT       += help
 QT       += svg
 CONFIG   += debug
 CONFIG   += libxslt
@@ -70,7 +70,7 @@ SOURCES += main.cpp\
         place.cpp \
         fullsearch.cpp \
         focustable.cpp \
-        helpviewer.cpp \
+ #       helpviewer.cpp \
         menubar.cpp \
         tabwidget.cpp \
         application.cpp \
@@ -107,7 +107,7 @@ HEADERS  += laneslexicon.h \
             place.h \
             fullsearch.h \
             focustable.h \
-            helpviewer.h \
+#            helpviewer.h \
             menubar.h \
             tabwidget.h \
             application.h \
