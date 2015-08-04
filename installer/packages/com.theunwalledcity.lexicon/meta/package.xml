@@ -5,7 +5,7 @@
   <Version>0.1</Version>
   <ReleaseDate>2015-08-03</ReleaseDate>
   <Licenses>
-    <License name="Test license" file="license.txt" />
+    <License name="GPL3 License" file="gpl.txt" />
   </Licenses>
   <Default>script</Default>
   <Script>installscript.qs</Script>

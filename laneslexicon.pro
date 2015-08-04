@@ -7,7 +7,7 @@ QT       += webkitwidgets
 QT       += sql
 QT       += help
 QT       += svg
-CONFIG   += debug
+CONFIG   += release
 CONFIG   += libxslt
 QMAKE_CXXFLAGS += -g
 
@@ -28,10 +28,10 @@ libxslt {
   LIBS += -L $$[QT_INSTALL_LIBS] -lxml2 -lxslt
 }
 win32 {
-INCLUDEPATH += "\Users\andrewsg\My Documents\libxml2-2.7.8.win32\include"
-INCLUDEPATH += "\Users\andrewsg\My Documents\libxslt-1.1.26.win32\include"
-LIBS += -L"\Users\andrewsg\My Documents\libxml2-2.7.8.win32\lib" -llibxml2
-LIBS += -L"\Users\andrewsg\My Documents\libxslt-1.1.26.win32\lib" -llibxslt
+INCLUDEPATH += "C:\Users\andrewsg\My Documents\libxml2-2.7.8.win32\include"
+INCLUDEPATH += "C:\Users\andrewsg\My Documents\libxslt-1.1.26.win32\include"
+LIBS += -L"C:\Users\andrewsg\My Documents\libxml2-2.7.8.win32\lib" -llibxml2
+LIBS += -L"C:\Users\andrewsg\My Documents\libxslt-1.1.26.win32\lib" -llibxslt
   INCLUDEPATH += c:/Users/andrewsg/xslt/include
   LIBS += -Lc:/Users/andrewsg/xslt/lib -llibxml2 -llibxslt
 }
@@ -51,6 +51,7 @@ TRANSLATIONS = laneslexicon_de.ts laneslexicon_fr.ts
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 macx:ICON=$${PWD}/laneslexicon.icns
+win32: RC_FILE = $${PWD}/laneslexicon.rc
 QMAKE_CXXFLAGS += -Wunused-parameter
 include(qslog/QsLog.pri)
 include(imedit/imedit.pri)
