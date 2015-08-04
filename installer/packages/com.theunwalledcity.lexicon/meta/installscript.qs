@@ -53,8 +53,8 @@ Component.prototype.createOperations = function()
         component.createOperations();
 	if (systemInfo.productType === "windows") {
            component.addOperation("CreateShortcut", "@TargetDir@/laneslexicon.exe", "@StartMenuDir@/LanesLexicon.lnk",
-            "workingDirectory=@TargetDir@", "iconPath=%SystemRoot%/system32/SHELL32.dll",
-            "iconId=2");
+            "workingDirectory=@TargetDir@");// "iconPath=%SystemRoot%/system32/SHELL32.dll",
+//            "iconId=2");
 	}
     } catch (e) {
         console.log(e);
