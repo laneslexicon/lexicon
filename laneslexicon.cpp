@@ -9,7 +9,7 @@
 #include "scripts.h"
 #include "xsltsupport.h"
 #include "menubar.h"
-#include "helpviewer.h"
+//#include "helpviewer.h"
 #include "notes.h"
 #include "notebrowser.h"
 #include "tabwidget.h"
@@ -4105,7 +4105,7 @@ bool LanesLexicon::sanityCheck(int type) {
     msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
     QString errorMessage(tr("Critical file not found"));
     QDir d;
-    QString info = QString("Missing file %1").arg(xslt);
+    QString info = QString("Missing file %1").arg(QDir::current().relativeFilePath(xslt));
     QString next;
     if (type == 0) {
       next = tr("This application will terminate");
