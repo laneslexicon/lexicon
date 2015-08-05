@@ -1298,7 +1298,7 @@ QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xm
     return QString();
   }
   if (type == ENTRY_XSLT && ! QFileInfo::exists(xsl)) {
-    QLOG_WARN() << QString(tr("Cannot find XSLT file: %1")).arg(xsl);
+    QLOG_WARN() << QString(tr("Cannot find XSLT file: %1")).arg(QDir::current().relativeFilePath(xsl));
     return QString();
   }
 

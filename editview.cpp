@@ -77,7 +77,7 @@ void EditPage::onTextChanged() {
 void EditPage::readFile(const QString & name) {
   QFile f(name);
   if (! f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    QLOG_WARN()  << QString(tr("Cannot open file %1:  %2")).arg(name).arg(f.errorString());
+    QLOG_WARN()  << QString(tr("Cannot open file %1:  %2")).arg(QDir::current().relativeFilePath(name)).arg(f.errorString());
     return;
   }
   QTextStream in(&f);
@@ -89,7 +89,7 @@ void EditPage::readFile(const QString & name) {
 bool EditPage::writeFile() {
   QFile f(m_fileName);
   if (! f.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    QString msg = QString(tr("Cannot open file %1 for writing: %2\n")).arg(m_fileName).arg(qPrintable(f.errorString()));
+    QString msg = QString(tr("<p>Cannot open file %1 for writing: %2</p>")).arg(QDir::current().relativeFilePath(m_fileName)).arg(qPrintable(f.errorString()));
     QString title;
     if (m_type == EDIT_CSS) {
       title = tr("Edit CSS");
@@ -99,7 +99,7 @@ bool EditPage::writeFile() {
     }
     QMessageBox::warning(this,
                          title,
-                         msg + "\n" + tr("Unable to save changes.\nYou may wish to copy the text and save outside the application."),
+                         msg +  tr("<p>Unable to save changes.<br/>You may wish to copy the text and save outside the application.</p>"),
                          QMessageBox::Ok);
     return false;
   }
