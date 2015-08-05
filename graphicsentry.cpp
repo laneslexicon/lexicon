@@ -2096,7 +2096,7 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   doc.setHtml(html); // + "</body></html>");
   doc.setDefaultTextOption(m_textOption);
   settings.beginGroup("Entry");
-  /// TODO prompt if any = SID_PROMPT
+
   int printNotes = settings.value(SID_ENTRY_PRINT_NOTES,-1).toInt();
   int printNodes = settings.value(SID_ENTRY_PRINT_NODES,-1).toInt();
   int printInfo = settings.value(SID_ENTRY_PRINT_INFO,-1).toInt();
@@ -2116,7 +2116,7 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   if ((printInfo == SID_PROMPT) ||
       (printNotes == SID_PROMPT) ||
       (printNodes == SID_PROMPT)) {
-    QDialog * d = new QDialog;
+    QScopedPointer<QDialog> d(new QDialog);
     d->setWindowTitle(tr("Print options"));
     QCheckBox * n = new QCheckBox(tr("Print notes"));
     QCheckBox * t = new QCheckBox(tr("Print node summary"));
@@ -2135,15 +2135,21 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
     layout->addWidget(i);
     layout->addWidget(t);
 
-    QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(btns,SIGNAL(accepted()),d,SLOT(accept()));
+    QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
+    QPushButton * btn = btns->button(QDialogButtonBox::Ok);
+    btn->setText(tr("Print"));
+    connect(btns,SIGNAL(accepted()),d.data(),SLOT(accept()));
+    connect(btns,SIGNAL(rejected()),d.data(),SLOT(reject()));
     layout->addWidget(btns);
     d->setLayout(layout);
-    d->exec();
-    pInfo = i->isChecked();
-    pNotes = n->isChecked();
-    pNodes = t->isChecked();
-    delete d;
+    if (d->exec() == QDialog::Accepted) {
+      pInfo = i->isChecked();
+      pNotes = n->isChecked();
+      pNodes = t->isChecked();
+    }
+    else {
+      return;
+    }
   }
   if  (pNotes) {
       QString note;
