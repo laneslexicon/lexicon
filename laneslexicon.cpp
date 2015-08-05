@@ -344,7 +344,6 @@ void LanesLexicon::cleanup() {
   }
 
   QFontDatabase::removeAllApplicationFonts();
-  /// TODO close notes db
   freeXslt();
   im_free(m_mapper);
   QLOG_DEBUG() << Q_FUNC_INFO << "exit";
@@ -672,7 +671,6 @@ void LanesLexicon::shortcut(const QString & key) {
   }
   updateStatusBar();
   updateMenu();
-  //QLOG_DEBUG() << qobject_cast<QShortcut *>(m_shortcutMap->mapping(k));
 }
 /**
  * setup the shortcuts from the conf
@@ -819,8 +817,6 @@ void LanesLexicon::createActions() {
   m_docAction = new QAction(tr("&Documentation"),this);
   m_aboutAction = new QAction(tr("&About"),this);
   m_bookmarkAction = new QAction(tr("Bookmarks"),this);
-
-  //  m_navigationAction = new QAction(tr("Move"),this);
 
   m_searchAction = new QAction(tr("Search"),this);
 
@@ -1009,14 +1005,6 @@ void LanesLexicon::createToolBar() {
   m_navigationButton->setMenu(m_navigationModeMenu);
   m_navigationButton->setText(tr("Move by"));
   m_navigationButton->setFocusPolicy(Qt::StrongFocus);
-  /*
-  if (m_navMode == LanesLexicon::ByRoot) {
-    m_navigationButton->setDefaultAction(m_navModeRootAction);
-  }
-  else {
-    m_navigationButton->setDefaultAction(m_navModePageAction);
-  }
-  */
 
   m_navigationButton->setPopupMode(QToolButton::InstantPopup);
   m_navigation->addWidget(m_navigationButton);
@@ -1160,10 +1148,6 @@ void LanesLexicon::createToolBar() {
     m_clearButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
   }
 
-  //  setTabOrder(m_mainbar,m_navigation);
-  //  setTabOrder(m_navigation,m_entrybar);
-
-
 }
 /**
  * when user has done something that adds to history
@@ -1302,7 +1286,6 @@ void LanesLexicon::createMenus() {
   m_bookmarkMenu->addAction(m_bookmarkClearAction);
   m_bookmarkMenu->addAction(m_bookmarkRevertAction);
   m_bookmarkMenu->addAction(m_bookmarkAddAction);
-  //  m_bookmarkMenu->addAction(m_bookmarkJumpAction);
 
   connect(m_mainmenu,SIGNAL(rebuildBookmarks()),this,SLOT(bookmarkRebuildMenu()));
 
@@ -1670,16 +1653,6 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
   }
  return np;
 }
-/*
-Place LanesLexicon::showPlace(const Place & p,int options) {
-  QLOG_DEBUG() << Q_FUNC_INFO << p;
-  bool createTab = false;
-  bool activateTab = true;
-  createTab = options && Lane::Create_Tab;
-  activateTab = options && Lane::Switch_Tab;
-  return showPlace(p,createTab,activateTab);
-}
-*/
 /**
  * when user clicks on item reason Qt::MouseFocusReason
  * when setFocus called it is Qt::OtherFocusReason
@@ -1884,12 +1857,6 @@ void LanesLexicon::readSettings() {
   if (m_applicationCssFile.isEmpty()) {
     m_applicationCssFile = "app.css";
   }
-  /*
-  QString ar = settings.value(SID_SYSTEM_ARABIC_FONT).toString();
-  if (! ar.isEmpty()) {
-    arFont.fromString(ar);
-  }
-  */
 
   m_toolbarText = settings.value(SID_SYSTEM_TOOLBAR_TEXT,false).toBool();
 
@@ -1959,29 +1926,6 @@ void LanesLexicon::readSettings() {
   settings.endGroup();
 
   ///
-  /// Search
-  ///
-
-  // settings.beginGroup("Search");
-  // m_searchOptions.setNewTab(settings.value("New tab",true).toBool());
-  // m_searchOptions.setActivateTab(settings.value("Switch tab",true).toBool());
-
-  // v  = settings.value("Type",QString("normal")).toString();
-  // if (v == "normal")
-  //   m_searchOptions.setSearchType(SearchOptions::Normal);
-  // else
-  //   m_searchOptions.setSearchType(SearchOptions::Regex);
-
-  // m_searchOptions.setIgnoreDiacritics(settings.value("Ignore diacritics",true).toBool());
-  // m_searchOptions.setWholeWordMatch(settings.value("Whole word",false).toBool());
-  // m_searchOptions.setKeymaps(m_keymapsEnabled);
-  // settings.endGroup();
-
-  // settings.beginGroup("FullSearch");
-  // m_searchOptions.setIncludeHeads(settings.value("Include heads",false).toBool());
-  // settings.endGroup();
-
-  ///
   /// Debug
   ///
   settings.beginGroup("Debug");
@@ -2049,8 +1993,6 @@ void LanesLexicon::readSettings() {
 }
 void LanesLexicon::writeSettings() {
   QString v;
-  //  Lexicon * app = qobject_cast<Lexicon *>(qApp);
-  //  QScopedPointer<QSettings> settings(app->getSettings());
 
   if (! m_saveSettings )
     return;
@@ -2142,8 +2084,6 @@ void LanesLexicon::restoreTabs() {
   Lexicon * app = qobject_cast<Lexicon *>(qApp);
   QMap<QString,QString> cmdOptions = app->getOptions();
 
-
-  //  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
   SETTINGS
   settings.beginGroup("System");
   int focusTab =  settings.value(SID_SYSTEM_CURRENT_TAB,0).toInt();
@@ -2961,7 +2901,6 @@ void LanesLexicon::onDocs() {
   if (m_helpview == NULL) {
     m_helpview = new HelpView();
     connect(m_helpview,SIGNAL(finished(bool)),this,SLOT(onHelpLoaded(bool)));
-    //    connect(m_helpview,SIGNAL(helpSystemLoaded(bool)),this,SLOT(onHelpSystemLoaded(bool)));
     m_helpview->loadHelpSystem();
   }
   else {
@@ -2974,7 +2913,6 @@ void LanesLexicon::onDocs() {
       }
     }
   }
-  //   m_tabs->setCurrentIndex(m_tabs->addTab(w,"Docs"));
    return;
 }
 /**
@@ -3093,8 +3031,6 @@ void LanesLexicon::searchForRoot() {
   else {
     m_rootSearchDialog->setText("");
   }
-  //  ArabicSearchDialog d(SearchOptions::Root,this);
-  //  d.setOptions(m_searchOptions);
   if (m_rootSearchDialog->exec()) {
     QString t = m_rootSearchDialog->getText();
     if (! t.isEmpty()) {
@@ -3234,7 +3170,7 @@ void LanesLexicon::searchForEntry() {
   else {
     m_headSearchDialog->setText("");
   }
-  //  d->setOptions(m_searchOptions);
+
   if (m_headSearchDialog->exec()) {
     QString t = m_headSearchDialog->getText();
     if (! t.isEmpty()) {
@@ -3331,37 +3267,6 @@ void LanesLexicon::printCurrentPage(const QString & node) {
       entry->print(m_printer,node);
     }
   }
-    /*
-      QMessageBox msgBox;
-      msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
-      QString errorMessage(tr("Do you want to use these settings next time?"));
-
-      QString pdf(tr("If you have selected PDF print, all subsequent prints will be sent to the same directory and named automatically."));
-      QString info(tr("If you select 'Yes', the print options dialog will not appear again and all prints will be sent to the destination you selected with the same options."));
-      QString clear(tr("To clear the saved printer information and cause the print dialog to re-appear, click on the 'Clear printer' button."));
-        msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2>"
-                     + "<p>" + info + "</p>"
-                     + "<p>" + clear + "</p>"
-                     + "<p>" + pdf + "</p>"
-                     + "</body></html>");
-      msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-      msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-      int ret = msgBox.exec();
-      if (ret == QMessageBox::Yes) {
-        m_printerReUse = true;
-        if (m_printer.outputFormat() == QPrinter::PdfFormat) {
-          QFileInfo fi(m_printer.outputFileName());
-          m_printPdfLocation  = fi.absoluteDir().absolutePath();
-          m_printToPdf = true;
-        }
-      }
-    }
-    else {
-      QLOG_DEBUG() << "printer is not valid";
-    }
-  */
-
-
 }
 void LanesLexicon::pageSearch() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
@@ -3570,8 +3475,6 @@ void LanesLexicon::enableKeymaps(bool v) {
       actions[i]->blockSignals(false);
     }
   }
-
-  //  m_searchOptions.setKeymaps(v);
   setStatus(tip);
   SETTINGS
   settings.beginGroup("Maps");
@@ -4149,27 +4052,8 @@ void LanesLexicon::onDeleteTheme() {
   QPair<QString,QString> m = d.getThemes();
   QString srcFilePath = getLexicon()->getResourceFilePath(Lexicon::ThemeRoot,m.first);
   activateTheme(m.second);
-  /*
-  int ix = m_themes->findText(theme);
-  if (ix != -1) {
-    m_themes->removeItem(ix);
-  }
-  bool ok = removeDir(srcFilePath);
-
-  if (!ok) {
-    QMessageBox::warning(this, tr("Theme deletion"),
-                               tr("There was an error deleting one or more files.\n"
-                                  "You may wish to manually delete them. The directory to remove is:\n") +
-                                  srcFilePath,
-                         QMessageBox::Ok);
-  }
-
-  QString warn = QString(tr("This will delete all files in\n%1\nDo you wish to continue?")).arg(srcFilePath);
-  int ret = QMessageBox::warning(this, warn
-                               QMessageBox::Yes | QMessageBox::Cancel);
-
-  */
 }
+
 void LanesLexicon::activateTheme(const QString & theme) {
   QLOG_DEBUG() << Q_FUNC_INFO << theme;
   int ret = getLexicon()->setTheme(theme);
@@ -4313,11 +4197,9 @@ void LanesLexicon::onShowContents() {
   }
   if (! m_showContentsAction->isChecked()) {
     w->hide();
-    //    m_showContentsAction->setText(tr("&Show contents"));//Enabled(false);
   }
   else {
     w->show();
-    //    m_showContentsAction->setText(tr("&Hide contents"));//Enabled(false);
   }
 }
 void LanesLexicon::onShowToolbar() {
@@ -4325,13 +4207,11 @@ void LanesLexicon::onShowToolbar() {
     m_mainbar->hide();
     m_navigation->hide();
     m_entrybar->hide();
-    //    m_showContentsAction->setText(tr("&Show contents"));//Enabled(false);
   }
   else {
     m_mainbar->show();
     m_navigation->show();
     m_entrybar->show();
-    //    m_showContentsAction->setText(tr("&Hide contents"));//Enabled(false);
   }
 }
 void LanesLexicon::onShowMenubar() {

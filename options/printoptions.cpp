@@ -5,14 +5,6 @@
 #include "externs.h"
 #endif
 PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
-  /*
-#ifdef STANDALONE
-  m_settings = new QSettings("default.ini",QSettings::IniFormat);
-  m_settings->setIniCodec("UTF-8");
-#else
-  m_settings = (qobject_cast<Lexicon *>(qApp))->getSettings();
-#endif
-  */
   setObjectName("printoptions");
   m_section = "Printer";
 
@@ -253,6 +245,7 @@ void PrintOptions::onDirectory() {
   QString directoryName = QFileDialog::getExistingDirectory();
   m_pdfDirectory->setText(directoryName);
 }
+
 void PrintOptions::setupPaperSize() {
   m_paper.insert(0,"A4");
   m_paper.insert(1,"B5");

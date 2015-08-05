@@ -57,88 +57,6 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
 bool Lexicon::isOk() const {
   return (m_status == Lexicon::Ok);
 }
-/**
- * Returns the absolute path to the requested file
- *
- * @param type
- * @param name If empty return the path to the directory of the required item type
- *
- * @return
-
-QString Lexicon::getResourcePath(int type) {
-  QFile file;
-  QFileInfo f(m_settingsDir,m_configFile);
-  QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Resources");
-  QString d(".");
-  switch(type) {
-  case Lexicon::ThemeRoot : {
-    QDir d = QDir::current();
-    QString t;
-    QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
-    settings->beginGroup("System");
-    t = settings->value("Theme directory","themes").toString();
-    if (t.isEmpty()) {
-      t = "themes";
-    }
-    return d.absolutePath() + QDir::separator() + t;
-    break;
-  }
-  case Lexicon::Stylesheet : {
-    d = settings.value("Stylesheet","css").toString();
-    if (d.isEmpty()) {
-      d = "css";
-    }
-    break;
-  }
-  case Lexicon::Image : {
-    d = settings.value("Image","images").toString();
-    if (d.isEmpty()) {
-      d = "images";
-    }
-    break;
-  }
-  case Lexicon::XSLT : {
-    d = settings.value("XSLT","xslt").toString();
-    if (d.isEmpty()) {
-      d = "xslt";
-    }
-    break;
-  }
-  case Lexicon::Keyboard : {
-    d = settings.value("Keyboard","keyboards").toString();
-    if (d.isEmpty()) {
-      d = "keyboards";
-    }
-    break;
-  }
-  case Lexicon::Map : {
-    d = settings.value("Map","maps").toString();
-    if (d.isEmpty()) {
-      d = "maps";
-    }
-    break;
-  }
-  case Lexicon::Splash : {
-    d = settings.value("Splash","images/splash").toString();
-    if (d.isEmpty()) {
-      d = "images/splash";
-    }
-  }
-  default : { break; }
-  }
-  if (m_settingsDir.exists(d)) {
-    QDir rd = m_settingsDir;
-    rd.cd(d);
-    return rd.absolutePath();
-  }
-  else {
-    m_errors << QString(tr("Settings directory not found: %1")).arg(m_settingsDir.absolutePath());
-  }
-  return QString();
-}
-*/
 QString Lexicon::getResourceFilePath(int type, const QString & name) const {
   QFile file;
   QFileInfo f(m_settingsDir,m_configFile);
@@ -214,35 +132,17 @@ QString Lexicon::getResourceFilePath(int type, const QString & name) const {
       return r.absoluteFilePath();
     }
     else {
-      qDebug() << "Name" << name;
-      qDebug() << "settings dir" << QDir::current().relativeFilePath(m_settingsDir.absolutePath());
-      qDebug() << "rd" << QDir::current().relativeFilePath(rd.absolutePath());
-      qDebug() << "test" << m_settingsDir.relativeFilePath(rd.absolutePath());
       return QString("Error:%1:%2:%3")
         .arg(QDir::current().relativeFilePath(rd.absolutePath()))
         .arg(name)
         .arg("Resource not found");
-      //      m_errors->setFile(name);
-      //      m_errors->add(QString(tr("Resource not found: %1")).arg(name));
     }
   }
   else {
       return QString("Error:%1:%2:%3").arg(m_settingsDir.absolutePath()).arg("").arg("Directory not found");
-      //    m_errors->add(QString(tr("Settings directory not found: %1")).arg(m_settingsDir.absolutePath()));
   }
   return QString();
 }
-/*
-QString Lexicon::takeLastError() const {
-  return m_errors->takeLast();
-}
-QString Lexicon::errorPath() const {
-  return m_errors->getPath();
-}
-QString Lexicon::errorFile() const {
-  return m_errors->getFile();
-}
-*/
 /**
  * This is not required
  *
@@ -313,14 +213,6 @@ void Lexicon::startLogging() {
 QString Lexicon::getConfig() const {
   return m_configFile;
 }
-/*
-void Lexicon::setConfig(const QString & fileName) {
-  QFileInfo fi(fileName);
-  if (fi.exists()) {
-    m_configFile = fileName;
-  }
-}
-*/
 int Lexicon::setTheme(const QString & theme) {
   QDir d = QDir::current();
   if (! d.cd(m_themeDirectory)) {
@@ -576,21 +468,6 @@ QString Lexicon::spanArabic(const QString & ar,const QString & spanstyle) {
     .arg(fontSize)
     .arg(ar);
   return style;
-  /*
-  s.beginGroup("Arabic");
-  QString fontname = s.value(SID_ARABIC_FONT_NAME,QString()).toString();
-  QString fontsize = s.value(SID_ARABIC_FONT_SIZE,QString()).toString();
-  if ( ! fontname.isEmpty()) {
-    style = QString("font-family : %1").arg(fontname);
-  }
-  if (! fontsize.isEmpty()) {
-    if (! style.isEmpty()) {
-      style += ";";
-    }
-    style += QString("font-size : %1").arg(fontsize);
-  }
-  return QString("<span style=\"%1\">%2</span>").arg(style).arg(ar);
-  */
 }
 /**
  * This is for mixed language text and will wrap any Arabic in a <span>
@@ -620,7 +497,7 @@ QString Lexicon::scanAndStyle(const QString & str,const QString & spanstyle) {
     s.endGroup();
   }
   QString ar = str;
-  //  ar = teststr;
+
   bool inArabic = false;
   QString html;
   for(int i=0;i < ar.size();i++) {
@@ -1124,12 +1001,6 @@ void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t
       edit->setMinimumHeight(sz.height() + margin);
     }
   }
-  /*
-  QList<QLineEdit *> edits = w->findChildren<QLineEdit *>();
-  foreach(QLineEdit *  widget,edits) {
-    widget->setFont(f);
-  }
-  */
 }
 QString Lexicon::copyToTemp(const QString & fileName) {
   QString tempFileName;
