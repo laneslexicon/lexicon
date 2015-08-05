@@ -2049,7 +2049,7 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   bool printerReUse = settings.value(SID_PRINTER_USE).toBool();
 
   if (printerReUse && pdfoutput) {
-    QString pdfdir = settings.value(SID_PRINTER_PDF_DIRECTORY).toString();
+    QString pdfdir = settings.value(SID_PRINTER_PDF_DIRECTORY,QDir::tempPath()).toString();
     QString filename;
     filename = getOutputFilename(pdfdir,settings.value(SID_PRINTER_AUTONAME_PDF).toBool(),
                                  settings.value(SID_PRINTER_AUTONAME_METHOD).toString(),node);
