@@ -9,7 +9,6 @@
 #include "scripts.h"
 #include "xsltsupport.h"
 #include "menubar.h"
-//#include "helpviewer.h"
 #include "notes.h"
 #include "notebrowser.h"
 #include "tabwidget.h"
