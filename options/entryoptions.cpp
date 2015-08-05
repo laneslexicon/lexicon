@@ -17,6 +17,9 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   m_back = new QLineEdit ;
   m_css = new QLineEdit ;
+  m_printCss = new QLineEdit ;
+  m_entryXslt = new QLineEdit ;
+  m_nodeXslt = new QLineEdit ;
   m_clean = new QLineEdit ;
   m_debug = new QCheckBox ;
   m_find = new QLineEdit ;
@@ -145,6 +148,14 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   printlayout->addRow(tr("Print node summary"),m_printNodes);
   printbox->setLayout(printlayout);
 
+  QGroupBox * cssbox = new QGroupBox(tr("XSLT/CSS"));
+  QFormLayout * csslayout = new QFormLayout;
+  csslayout->addRow(tr("Stylesheet"),m_css);
+  csslayout->addRow(tr("Print stylesheet"),m_printCss);
+  csslayout->addRow(tr("XSLT"),m_entryXslt);
+  csslayout->addRow(tr("Node XSLT"),m_nodeXslt);
+  cssbox->setLayout(csslayout);
+
   QGroupBox * otherbox = new QGroupBox(tr("Other"));
   QFormLayout * otherlayout = new QFormLayout;
 
@@ -189,6 +200,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   vlayout->addWidget(keybox);
   vlayout->addWidget(printbox);
+  vlayout->addWidget(cssbox);
   vlayout->addWidget(otherbox);
   vlayout->addStretch();
   setLayout(vlayout);
@@ -200,11 +212,29 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 }
 
 void EntryOptions::readSettings() {
+  QString v;
     QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
+
+
+
+  settings.beginGroup("XSLT");
+  v = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+  //  v = getLexicon()->getResourceFilePath(Lexicon::XSLT,v);
+  //  v = QDir::current().relativeFilePath(v);
+  m_entryXslt->setText(v);
+
+  v = settings.value(SID_XSLT_NODE).toString();
+  //  v = getLexicon()->getResourceFilePath(Lexicon::XSLT,v);
+  //  v = QDir::current().relativeFilePath(v);
+  m_nodeXslt->setText(v);
+  settings.endGroup();
   settings.beginGroup(m_section);
-  m_back->setText(settings.value(SID_ENTRY_BACK).toString());
   m_css->setText(settings.value(SID_ENTRY_CSS).toString());
+  m_printCss->setText(settings.value(SID_ENTRY_PRINT_CSS).toString());
+
+
+  m_back->setText(settings.value(SID_ENTRY_BACK).toString());
   m_clean->setText(settings.value(SID_ENTRY_CLEAN).toString());
   m_debug->setChecked(settings.value(SID_ENTRY_DEBUG).toBool());
   m_find->setText(settings.value(SID_ENTRY_FIND).toString());
@@ -256,6 +286,7 @@ void EntryOptions::writeSettings(const QString & fileName) {
 
   settings.setValue(SID_ENTRY_BACK,m_back->text());
   settings.setValue(SID_ENTRY_CSS,m_css->text());
+  settings.setValue(SID_ENTRY_PRINT_CSS,m_printCss->text());
   settings.setValue(SID_ENTRY_CLEAN,m_clean->text());
   settings.setValue(SID_ENTRY_DEBUG,m_debug->isChecked());
   settings.setValue(SID_ENTRY_FIND,m_find->text());
@@ -283,12 +314,18 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ENTRY_PRINT_NOTES,m_printNotes->currentData());
   settings.setValue(SID_ENTRY_PRINT_NODES,m_printNodes->currentData());
   settings.setValue(SID_ENTRY_PRINT_INFO,m_printInfo->currentData());
+
+  settings.endGroup();
+  settings.beginGroup("XSLT");
+  settings.setValue(SID_XSLT_ENTRY,m_entryXslt->text());
+  settings.setValue(SID_XSLT_NODE,m_nodeXslt->text());
+
   settings.sync();
   m_dirty = false;
   emit(modified(false));
 }
 /**
- * TODO not complete
+ *
  *
  *
  * @return
@@ -303,6 +340,9 @@ bool EntryOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_ENTRY_CSS,m_css)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ENTRY_PRINT_CSS,m_printCss)) {
     m_dirty = true;
   }
 
@@ -408,6 +448,15 @@ bool EntryOptions::isModified()  {
   if (compare(&settings,SID_ENTRY_PRINT_INFO,m_printInfo)) {
     m_dirty = true;
   }
+  settings.endGroup();
+  settings.beginGroup("XSLT");
+  if (compare(&settings,SID_XSLT_ENTRY,m_entryXslt)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_XSLT_NODE,m_nodeXslt)) {
+    m_dirty = true;
+  }
+
   return m_dirty;
 }
 void EntryOptions::onSetFont() {

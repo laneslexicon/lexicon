@@ -18,6 +18,9 @@ class EntryOptions : public OptionsWidget {
  private:
     QLineEdit * m_back;
     QLineEdit * m_css;
+    QLineEdit * m_printCss;
+    QLineEdit * m_entryXslt;
+    QLineEdit * m_nodeXslt;
     QLineEdit * m_clean;
     QCheckBox * m_debug;
     QLineEdit * m_find;
