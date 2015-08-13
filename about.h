@@ -11,6 +11,9 @@
 #include <QTableWidgetItem>
 #include <QHeaderView>
 #include <QLineEdit>
+#include <QTextEdit>
+#include <QPlainTextEdit>
+#include <QTextBrowser>
 #include <QLabel>
 #include <QCheckBox>
 #include "QsLog.h"
@@ -23,5 +26,8 @@ class AboutDialog : public QDialog {
  private:
   QWidget * buildTechTab();
   QWidget * buildSystemTab();
+  QWidget * buildAuthorTab();
+  QWidget * buildLicenseTab();
+  QWidget * buildAckTab();
 };
 #endif
