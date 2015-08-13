@@ -10,5 +10,6 @@
   <Default>script</Default>
   <Script>installscript.qs</Script>
   <UserInterfaces>
+    <UserInterface>readmecheckboxform.ui</UserInterface>
   </UserInterfaces>
 </Package>
