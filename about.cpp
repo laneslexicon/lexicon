@@ -4,6 +4,7 @@
 #include "application.h"
 #include "laneslexicon.h"
 #include "externs.h"
+#include "acknowledgements.h"
 #define EDIT_WIDTH 300
 
 AboutDialog::AboutDialog(QWidget * parent) : QDialog(parent) {
@@ -72,6 +73,7 @@ QWidget * AboutDialog::buildLicenseTab() {
 QWidget * AboutDialog::buildAckTab() {
   QTextBrowser * w = new QTextBrowser(this);
   w->setOpenExternalLinks(true);
+  /*
   QString html =  \
 "<ul>                           \
 <li><p>The default Arabic font is <a href=\"www.amirifonts.org\">Amiri.</a></p></li> \
@@ -79,6 +81,8 @@ QWidget * AboutDialog::buildAckTab() {
 <li><p>The logging system, 'QsLog' is by Ravzan Petru.</p></li> \
 <li><p>Sotheby's, for permission to use the <a href=\"http://www.sothebys.com/en/auctions/ecatalogue/2014/arts-islamic-world-l14223/lot.59.html\">image</a> of the printers' manuscript copy of Lane's Lexicon</p></li> \
 </ul>";
+  */
+  QString html = getAck();
   w->setHtml("<body><br/>" + html + "<br/><em>(Links will be opened in default browser.)</em></body>");
   w->setReadOnly(true);
   return w;
