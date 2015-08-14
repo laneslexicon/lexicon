@@ -134,4 +134,5 @@ HEADERS  += laneslexicon.h \
             themedialog.h \
             definedsql.h \
             exportsearchdialog.h \
-            helpview.h
+            helpview.h \
+            acknowledgements.h
