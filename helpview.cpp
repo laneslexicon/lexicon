@@ -95,7 +95,7 @@ bool HelpView::loadHelpSystem() {
         location.chop(1);
       }
       QFileInfo fi(m_localRoot + QDir::separator() + "index.html");
-      startPage = QUrl(m_localPrefix + fi.absoluteFilePath());
+      startPage = QUrl::fromLocalFile(fi.absoluteFilePath());
     }
     else {
       startPage = QUrl(prefix + "/" + "index.html");
@@ -158,7 +158,7 @@ void HelpView::readSettings() {
   move(settings.value(SID_HELP_POS,QSize(450,20)).toPoint());
 }
 /**
- * If viewing local docs, do not write external URL as the curren
+ * If viewing local docs, do not write external URL as the current
  *
  */
 void HelpView::writeSettings() {
