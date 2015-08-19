@@ -4,6 +4,9 @@
   <Version>0.1</Version>
   <Title>Lane's Lexicon Installer</Title>
   <Publisher>Graeme Andrews</Publisher>
+  <ProductUrl>http://www.theunwalledcity.com</ProductUrl>
   <StartMenuDir>Lane</StartMenuDir>
+  <RunProgram>@TargetDir@/laneslexicon.exe</RunProgram>
+  <RunProgramDescription>Run the program after installation.</RunProgramDescription>
   <TargetDir>@HomeDir@/LanesLexicon</TargetDir>
 </Installer>
