@@ -882,7 +882,7 @@ void LanesLexicon::createActions() {
   m_deleteThemeAction = new QAction(tr("&Delete"),this);
   m_createThemeAction = new QAction(tr("&New/Copy"),this);
 
-  m_changeArabicFontAction = new QAction(tr("Change &Arabic font"),this);
+  m_changeArabicFontAction = new QAction(tr("Change &font"),this);
 
   m_showContentsAction = new QAction(tr("Show &contents"),this);
   m_showContentsAction->setCheckable(true);
