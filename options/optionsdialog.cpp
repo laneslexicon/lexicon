@@ -45,18 +45,19 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
 
   m_tempFileName = getLexicon()->copyToTemp(settings.fileName());
   m_theme = useTheme;
-  m_modified = false;
   m_hasChanges = false;
   QString testFileName(".vanilla.ini");
   settings.setIniCodec("UTF-8");
   settings.beginGroup("System");
   m_debug = settings.value(SID_SYSTEM_DEBUG,false).toBool();
+  settings.endGroup();
   settings.beginGroup("Options");
 
   //  resize(QSize(600, 400));
   resize(settings.value("Size", QSize(600, 400)).toSize());
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
   bool writeTest = settings.value("Create",false).toBool();
+  m_showWarning = settings.value(SID_OPTIONS_CLOSE,true).toBool();
   if (settings.value("System",true).toBool()) {
     SystemOptions * systems = new SystemOptions(useTheme,this);
     m_tabs->addTab(systems,tr("System"));
@@ -148,7 +149,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
 
   connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(currentChanged(int)));
   connect(m_buttons, SIGNAL(accepted()), this, SLOT(saveChanges()));
-  connect(m_buttons, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(m_buttons, SIGNAL(rejected()), this, SLOT(onClose()));
 
   for(int i=0;i < m_tabs->count();i++) {
     OptionsWidget * w = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
@@ -185,6 +186,32 @@ OptionsDialog::~OptionsDialog() {
     QFile::remove(m_tempFileName);
   }
 }
+void OptionsDialog::onClose() {
+  qDebug() << Q_FUNC_INFO << m_hasChanges << m_showWarning;
+  if (m_hasChanges && m_showWarning) {
+    QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
+    QMessageBox msgBox;
+    msgBox.setCheckBox(noshow);
+    msgBox.setWindowTitle("Preferences");
+    msgBox.setText("Some settings have been modified.");
+    msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+    int ret = msgBox.exec();
+    m_showWarning = ! noshow->isChecked();
+    if (ret == QMessageBox::Save) {
+      // Save was clicked
+      this->saveChanges();
+    }
+
+    if (ret == QMessageBox::Cancel) {
+      return;
+    }
+  }
+  m_hasChanges = false;
+  this->reject();
+}
 void OptionsDialog::writeSettings() {
 #ifdef STANDALONE
   QSettings settings(QString("%1.ini").arg(m_theme),QSettings::IniFormat);
@@ -195,6 +222,7 @@ void OptionsDialog::writeSettings() {
   settings.beginGroup("Options");
   settings.setValue("Size", size());
   settings.setValue("Pos", pos());
+  settings.setValue(SID_OPTIONS_CLOSE,m_showWarning);
   settings.endGroup();
 }
 void OptionsDialog::enableButtons() {
@@ -220,6 +248,7 @@ void OptionsDialog::enableButtons() {
       btn->setEnabled(m_hasChanges);
     }
   }
+  m_hasChanges = v;
 }
 void OptionsDialog::valueChanged(bool /* v */) {
   this->enableButtons();
@@ -230,10 +259,10 @@ void OptionsDialog::saveChanges() {
     if (tab && tab->isModified()) {
       tab->blockSignals(true);
       tab->writeSettings();
-      m_modified = false;
       tab->blockSignals(false);
     }
   }
+  m_hasChanges = false;
   this->accept();
 }
 void OptionsDialog::resetChanges() {
@@ -279,10 +308,11 @@ void OptionsDialog::resetChanges() {
     if (tab) {
       tab->blockSignals(true);
       tab->readSettings();
-      m_modified = false;
+
       tab->blockSignals(false);
     }
   }
+  m_hasChanges = false;
   enableButtons();
 }
 void OptionsDialog::currentChanged(int /* ix */) {
@@ -297,5 +327,5 @@ void OptionsDialog::setApplyReset(bool v) {
 }
 */
 bool OptionsDialog::isModified() const {
-  return m_modified;
+  return m_hasChanges;
 }

@@ -373,3 +373,4 @@ They should not be translated.
 
 
 //#define SID_NOTES
+#define SID_OPTIONS_CLOSE "Close warning"

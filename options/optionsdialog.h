@@ -20,6 +20,7 @@ class OptionsDialog : public QDialog {
     void valueChanged(bool);
     void saveChanges();
     void resetChanges();
+    void onClose();
     void currentChanged(int);
  private:
     void setup();
@@ -29,8 +30,8 @@ class OptionsDialog : public QDialog {
     QDialogButtonBox * m_buttons;
     QTabWidget * m_tabs;
     QString m_theme;
-    bool m_modified;
     bool m_hasChanges;
+    bool m_showWarning;
     bool m_debug;
     QString m_tempFileName;
   signals:
