@@ -11,6 +11,7 @@ TabWidget::TabWidget(QWidget * parent) : QTabWidget(parent) {
   tabBar()->setObjectName("arabicpagetab");
   readSettings();
   connect(this,SIGNAL(tabBarClicked(int)),this,SLOT(onTabBarClicked(int)));
+  connect(this,SIGNAL(tabBarDoubleClicked(int)),this,SLOT(onTabBarDoubleClicked(int)));
   if (m_numberTabs) {
     connect(tabBar(),SIGNAL(tabMoved(int,int)),this,SIGNAL(tabsChanged()));
   }
@@ -51,6 +52,23 @@ void TabWidget::onTabBarClicked(int /* ix */) {
     entry->focusPlace();
   }
   */
+}
+void TabWidget::onTabBarDoubleClicked(int ix) {
+   bool ok;
+   QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                         tr("Tab title:"), QLineEdit::Normal,
+                                         "", &ok);
+   if (! ok || text.isEmpty()) {
+     return;
+   }
+
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(this->widget(ix));
+  if ( entry) {
+    QLOG_DEBUG() << "showing place for tab" << ix;
+    entry->setUserTitle(text);
+  }
+     QLOG_DEBUG() << Q_FUNC_INFO << ix << text;
+      this->setTabText(ix,text);
 }
 void TabWidget::tabRemoved(int index) {
   QTabWidget::tabRemoved(index);

@@ -4,7 +4,7 @@
 #include <QKeyEvent>
 #include <QFocusEvent>
 #include <QDebug>
-
+#include <QInputDialog>
 class TabWidget : public QTabWidget {
   Q_OBJECT
  public:
@@ -12,6 +12,7 @@ class TabWidget : public QTabWidget {
   bool numberTab() const;
   public slots:
     void onTabBarClicked(int);
+    void onTabBarDoubleClicked(int);
     void tabContentsChanged();
  protected:
     void tabRemoved(int index);

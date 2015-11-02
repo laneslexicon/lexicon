@@ -1845,6 +1845,7 @@ void LanesLexicon::readSettings() {
   /// System group
   ///
   settings.beginGroup("System");
+
   m_dbName = settings.value(SID_SYSTEM_DATABASE,"lexicon.sqlite").toString();
   if (m_dbName.isEmpty()) {
     m_dbName = "lexicon.sqlite";
@@ -1852,6 +1853,10 @@ void LanesLexicon::readSettings() {
   if (cmdOptions.contains("db")) {
     m_dbName = cmdOptions.value("db");
   }
+  QDir dd = QDir::current();
+  qDebug() << dd << m_dbName;
+  QFileInfo fi(dd,m_dbName);
+  qDebug("Database dir:%s",fi.canonicalFilePath().toLatin1().constData());
 
   m_applicationCssFile = settings.value(SID_SYSTEM_STYLESHEET,"app.css").toString();
   if (m_applicationCssFile.isEmpty()) {
@@ -2013,6 +2018,7 @@ void LanesLexicon::writeSettings() {
         settings.setValue(SID_TABS_PLACE,p.toString());
         settings.setValue(SID_TABS_ZOOM,entry->getScale());
         settings.setValue(SID_TABS_TEXTWIDTH,entry->getTextWidth());
+        settings.setValue(SID_TABS_TITLE,entry->userTitle());
         v = entry->getHome();
         if (! v.isEmpty()) {
           settings.setValue(SID_TABS_HOME,v);
@@ -2147,9 +2153,15 @@ void LanesLexicon::restoreTabs() {
         entry->getXmlForRoot(p);
         entry->setScale(scale);
         entry->setHome(home);
-
+        QString title = settings.value(SID_TABS_TITLE,QString()).toString();
+        if (! title.isEmpty()) {
+          entry->setUserTitle(title);
+        }
+        else {
+          title = p.getShortText();
+        }
         //      QLOG_DEBUG() << Q_FUNC_INFO << "adding tab" << p.getShortText();
-        m_tabs->addTab(entry,p.getShortText());
+        m_tabs->addTab(entry,title);
         m_tree->ensurePlaceVisible(p,true);
         j++;
       }
@@ -2297,14 +2309,15 @@ void LanesLexicon::placeChanged(const Place & p) {
   if (entry) {
     int ix = m_tabs->indexOf(entry);
     if (ix != -1) {
+      QString title = entry->userTitle();
+      QLOG_DEBUG() << Q_FUNC_INFO << "Setting tab text" << "User title" << title;
+      if (title.isEmpty()) {
+        title = p.getShortText();
+      }
       if (m_tabs->numberTab()) {
-        QString title;
-        title = QString("%1 %2").arg(ix+1).arg(p.getShortText());
-        m_tabs->setTabText(ix,title);
+          title = QString("%1 %2").arg(ix+1).arg(title);
       }
-      else {
-        m_tabs->setTabText(ix,p.getShortText());
-      }
+      m_tabs->setTabText(ix,title);
     }
   }
   if (m_linkContents) {
@@ -3544,7 +3557,7 @@ void LanesLexicon::localSearchShow() {
   }
 }
 void LanesLexicon::tabsChanged() {
-  //  QLOG_DEBUG() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QRegExp rx("^\\d+");
   for(int i=0;i < m_tabs->count();i++) {
     QString t = m_tabs->tabText(i);

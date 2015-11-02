@@ -318,6 +318,7 @@ They should not be translated.
 #define SID_TABS_ZOOM                           "zoom"
 #define SID_TABS_TEXTWIDTH                      "textwidth"
 #define SID_TABS_HOME                           "home"
+#define SID_TABS_TITLE                          "title"
 
 #define SID_KEYBOARDS_CONFIG                    "Config"
 

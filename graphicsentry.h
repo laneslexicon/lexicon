@@ -88,7 +88,9 @@ class GraphicsEntry : public QWidget {
     void shiftFocus();
     void setCurrentItem(QGraphicsItem *);
     static QString getXsltFileName();
+    QString userTitle() const;
   public slots:
+    void setUserTitle(const QString &);
     void anchorClicked(const QUrl &);
     void linkActivated(const QString &);
     void linkHovered(const QString &);
@@ -191,6 +193,7 @@ class GraphicsEntry : public QWidget {
     QString m_currentHtml;
     QString m_pattern;
     QString m_highlightColorName;
+    QString m_userTitle;
     QRegExp m_currentSearchRx;
 
     QList<EntryItem *> m_items;

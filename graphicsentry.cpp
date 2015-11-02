@@ -2423,3 +2423,9 @@ bool GraphicsEntry::saveLink(const QString & linkWord,const QString & target) {
   }
   return true;
 }
+void GraphicsEntry::setUserTitle(const QString & text) {
+  m_userTitle = text;
+}
+QString GraphicsEntry::userTitle() const {
+  return m_userTitle;
+}
