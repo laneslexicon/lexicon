@@ -13,6 +13,7 @@
 #include "externs.h"
 #include "nodeinfo.h"
 #include "definedsql.h"
+#include "linkcheckdialog.h"
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
   setObjectName("toolbuttondata");
@@ -82,6 +83,12 @@ void GraphicsEntry::readSettings() {
   QMap<QString,QString> cmdOptions = app->getOptions();
 
   SETTINGS
+
+
+  settings.beginGroup("System");
+  m_linkCheckMode = settings.value(SID_SYSTEM_LINK_CHECK_MODE,false).toBool();
+  settings.endGroup();
+
   settings.beginGroup("Entry");
   m_debug = settings.value(SID_ENTRY_DEBUG,false).toBool();
   QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
@@ -442,7 +449,7 @@ void GraphicsEntry::onClearScene() {
  */
 
 void GraphicsEntry::anchorClicked(const QUrl & link) {
-  QLOG_DEBUG() << Q_FUNC_INFO << link.toDisplayString();
+  QLOG_DEBUG() << Q_FUNC_INFO << link.toDisplayString();;
   QLOG_DEBUG() << QApplication::keyboardModifiers();
 }
 /**
@@ -457,6 +464,7 @@ void GraphicsEntry::linkActivated(const QString & link) {
   QLOG_DEBUG() << Q_FUNC_INFO << link;
   bool createTab =  m_linksUseCurrentTab;
   bool activateTab = m_activateLink;
+
   ///
   ///  shift or ctrl, toggles create tab behaviour
   ///
@@ -483,6 +491,10 @@ void GraphicsEntry::linkActivated(const QString & link) {
     }
     if (msg.startsWith("golink")) {
       msg.remove("golink=");
+      if (m_linkCheckMode) {
+        this->checkLink(msg);
+        return;
+      }
       QSqlQuery query;
       query.prepare(SQL_LINKTO_NODE);
       query.bindValue(0,msg);
@@ -498,7 +510,11 @@ void GraphicsEntry::linkActivated(const QString & link) {
       return;
     }
     if (msg.startsWith("nolink=")) {
-      msg.remove("nogo=");
+      msg.remove("nolink=");
+      if (m_linkCheckMode) {
+        this->checkLink(msg);
+        return;
+      }
       QMessageBox::information(this, tr("Missing link"),
                                msg,
                                QMessageBox::Ok);
@@ -2428,4 +2444,51 @@ void GraphicsEntry::setUserTitle(const QString & text) {
 }
 QString GraphicsEntry::userTitle() const {
   return m_userTitle;
+}
+void GraphicsEntry::checkLink(const QString link) {
+  int linkid;
+  bool ok;
+
+  linkid = link.toInt(&ok);
+  if (! ok) {
+    QLOG_WARN() << QString(tr("Invalid link id:%1")).arg(link);
+    return;
+  }
+  QSqlQuery query;
+  if (! query.prepare(SQL_LINK_TYPE)) {
+    QLOG_WARN() << QString(tr("Prepare failed for SQL_LINK_TYPE query:%1")).arg(query.lastError().text());
+    return;
+  }
+  query.bindValue(0,linkid);
+  if (! query.exec()) {
+    QLOG_WARN() << QString(tr("Exec failed for SQL_LINK_TYPE query:%1")).arg(query.lastError().text());
+    return;
+  }
+  query.first();
+  int linktype = query.value("orthtype").toInt();
+  int linkstatus = query.value("status").toInt();
+
+  qDebug() << link << linktype << linkstatus;
+  LinkCheckDialog * dlg = new LinkCheckDialog(query.record());
+  if (dlg->exec() == QDialog::Accepted) {
+    int status = dlg->getStatus();
+    QString tonode = dlg->getTargetNode();
+    if ((status != linkstatus) || (tonode != query.value("tonode").toString())) {
+      QSqlQuery u;
+      if (u.prepare(SQL_LINK_UPDATE_STATUS)) {
+        u.bindValue(0,status);
+        u.bindValue(1,tonode);
+        u.bindValue(2,linkid);
+        if (u.exec()) {
+          QLOG_DEBUG() << QString("Link id %1, status set to: %2").arg(linkid).arg(status);
+        }
+        else {
+          QLOG_WARN() << QString(tr("Exec failed for SQL_LINK_UPDATE_STATSU query:%1")).arg(u.lastError().text());
+        }
+      }
+      else {
+          QLOG_WARN() << QString(tr("Prepare failed for SQL_LINK_UPDATE_STATSU query:%1")).arg(u.lastError().text());
+      }
+    }
+  }
 }

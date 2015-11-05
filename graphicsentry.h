@@ -143,7 +143,7 @@ class GraphicsEntry : public QWidget {
     void moveBackward();
     EntryItem * createEntry(const QString & xml);
     QString transform(int type,const QString & xsl,const QString & xml);
-
+    void checkLink(const QString);
     SearchOptions m_currentSearchOptions;
 
     QList<int> m_searchItemIndexes;
@@ -161,6 +161,7 @@ class GraphicsEntry : public QWidget {
     bool m_dumpHtml;
     bool m_dumpOutputHtml;
     bool m_offPageMovement;
+    bool m_linkCheckMode;
 
     int m_pagingDir;
     int m_entryMargin;
