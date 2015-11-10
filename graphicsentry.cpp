@@ -86,7 +86,10 @@ void GraphicsEntry::readSettings() {
 
 
   settings.beginGroup("System");
-  m_linkCheckMode = settings.value(SID_SYSTEM_LINK_CHECK_MODE,false).toBool();
+  // 0 - no link check
+  // 1 - show link dialog and do not follow link
+  // 2 - show link dialog and then follow link
+  m_linkCheckMode = settings.value(SID_SYSTEM_LINK_CHECK_MODE,0).toInt();
   settings.endGroup();
 
   settings.beginGroup("Entry");
@@ -491,9 +494,10 @@ void GraphicsEntry::linkActivated(const QString & link) {
     }
     if (msg.startsWith("golink")) {
       msg.remove("golink=");
-      if (m_linkCheckMode) {
+      if (m_linkCheckMode > 0) {
         this->checkLink(msg);
-        return;
+        if (m_linkCheckMode == 1)
+          return;
       }
       QSqlQuery query;
       query.prepare(SQL_LINKTO_NODE);
@@ -511,9 +515,10 @@ void GraphicsEntry::linkActivated(const QString & link) {
     }
     if (msg.startsWith("nolink=")) {
       msg.remove("nolink=");
-      if (m_linkCheckMode) {
+      if (m_linkCheckMode > 0) {
         this->checkLink(msg);
-        return;
+        if (m_linkCheckMode == 1)
+          return;
       }
       QMessageBox::information(this, tr("Missing link"),
                                msg,
@@ -2473,22 +2478,25 @@ void GraphicsEntry::checkLink(const QString link) {
   if (dlg->exec() == QDialog::Accepted) {
     int status = dlg->getStatus();
     QString tonode = dlg->getTargetNode();
-    if ((status != linkstatus) || (tonode != query.value("tonode").toString())) {
-      QSqlQuery u;
-      if (u.prepare(SQL_LINK_UPDATE_STATUS)) {
-        u.bindValue(0,status);
-        u.bindValue(1,tonode);
-        u.bindValue(2,linkid);
-        if (u.exec()) {
-          QLOG_DEBUG() << QString("Link id %1, status set to: %2").arg(linkid).arg(status);
-        }
-        else {
-          QLOG_WARN() << QString(tr("Exec failed for SQL_LINK_UPDATE_STATSU query:%1")).arg(u.lastError().text());
-        }
+    QString note = dlg->getText();
+    qDebug() << QString("Status:%1,note:%2").arg(status).arg(note);
+    QSqlQuery u;
+    if (u.prepare(SQL_LINK_UPDATE_STATUS)) {
+      u.bindValue(0,status);
+      u.bindValue(1,tonode);
+      u.bindValue(2,note);
+      u.bindValue(3,linkid);
+      if (u.exec()) {
+        QLOG_INFO() << QString("Link id %1, status set to: %2").arg(linkid).arg(status);
       }
       else {
-          QLOG_WARN() << QString(tr("Prepare failed for SQL_LINK_UPDATE_STATSU query:%1")).arg(u.lastError().text());
+        QLOG_WARN() << QString(tr("Exec failed for SQL_LINK_UPDATE_STATSU query:%1")).arg(u.lastError().text());
       }
     }
+    else {
+      QLOG_WARN() << QString(tr("Prepare failed for SQL_LINK_UPDATE_STATSU query:%1")).arg(u.lastError().text());
+    }
+
   }
+  delete dlg;
 }

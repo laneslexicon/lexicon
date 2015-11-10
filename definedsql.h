@@ -73,5 +73,5 @@
 #define SQL_FIXED_LINKS "select linkid,fromnode,tonode from links where (datasource = 1) and (matchtype = 100)"
 
 #define SQL_LINK_TYPE "select * from links where linkid = ?"
-#define SQL_LINK_UPDATE_STATUS "update links set status = ?,tonode = ? where linkid = ?"
+#define SQL_LINK_UPDATE_STATUS "update links set status = ?,tonode = ?,note = ? where linkid = ?"
 #endif

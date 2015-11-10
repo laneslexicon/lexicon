@@ -9,7 +9,9 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPlainTextEdit>
 #include <QDialogButtonBox>
+
 class LinkCheckDialog : public QDialog {
   Q_OBJECT
 
@@ -17,8 +19,10 @@ class LinkCheckDialog : public QDialog {
   LinkCheckDialog(const QSqlRecord &,QWidget * parent = 0);
   int getStatus() const;
   QString getTargetNode() const;
+  QString getText() const;
  private:
   QLineEdit * m_node;
+  QPlainTextEdit * m_note;
   QComboBox * m_status;
 };
 

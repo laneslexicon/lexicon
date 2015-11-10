@@ -47,18 +47,28 @@ LinkCheckDialog::LinkCheckDialog(const QSqlRecord & record, QWidget * parent) : 
 
   m_status = new QComboBox;
   m_status->addItem("Not checked",-1);
-  m_status->addItem("Checked Ok",0);
+  m_status->addItem("Checked,Ok",0);
+  m_status->addItem("Word order wrong",1);
+  m_status->addItem("Other text problem",2);
+  m_status->addItem("Fixed Ok",3);
+  int ix;
+  switch(status) {
+  case -1 : ix = 0;break;
+  case  0 : ix = 1;break;
+  case  1 : ix = 2;break;
+  case  2 : ix = 3;break;
+  case  3 : ix = 3;break;
+  default : ix = 0;
+  }
+  m_status->setCurrentIndex(ix);
 
-  if (status == 0) {
-    m_status->setCurrentIndex(1);
-  }
-  else {
-    m_status->setCurrentIndex(0);
-  }
-  formlayout->addRow(tr("Status"),m_status);
+  formlayout->addRow(tr("Status:"),m_status);
+  m_note = new QPlainTextEdit;
+  formlayout->addRow(tr("Note:"),m_note);
+  m_note->setPlainText(record.value("note").toString());
 
   layout->addLayout(formlayout);
-  QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+  QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Save
                                      | QDialogButtonBox::Cancel);
 
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
@@ -74,3 +84,6 @@ QString LinkCheckDialog::getTargetNode() const {
   return m_node->text();
 
 }
+ QString LinkCheckDialog::getText() const {
+   return m_note->toPlainText();
+ }

@@ -2310,7 +2310,6 @@ void LanesLexicon::placeChanged(const Place & p) {
     int ix = m_tabs->indexOf(entry);
     if (ix != -1) {
       QString title = entry->userTitle();
-      QLOG_DEBUG() << Q_FUNC_INFO << "Setting tab text" << "User title" << title;
       if (title.isEmpty()) {
         title = p.getShortText();
       }
