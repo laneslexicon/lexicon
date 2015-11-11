@@ -2488,6 +2488,7 @@ void GraphicsEntry::checkLink(const QString link) {
       u.bindValue(3,linkid);
       if (u.exec()) {
         QLOG_INFO() << QString("Link id %1, status set to: %2").arg(linkid).arg(status);
+        QSqlDatabase::database().commit();
       }
       else {
         QLOG_WARN() << QString(tr("Exec failed for SQL_LINK_UPDATE_STATSU query:%1")).arg(u.lastError().text());
