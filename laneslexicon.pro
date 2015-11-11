@@ -4,6 +4,7 @@
 #-------------------------------------------------
 QT       += core gui printsupport
 QT       += webkitwidgets
+QT       += xml
 QT       += sql
 #QT       += help
 QT       += svg

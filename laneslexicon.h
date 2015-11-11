@@ -46,6 +46,7 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QPainter>
+#include <QDomDocument>
 #include "place.h"
 #include "searchoptionswidget.h"
 
@@ -93,6 +94,7 @@ class LanesLexicon : public QMainWindow
     void setStatus(const QString &);
       void enableKeymaps(bool);
     //    void saveNote(Note *);
+      void importXml(const QString & filename);
     private slots:
       void onReady();
       void onLogViewer();
@@ -180,6 +182,7 @@ class LanesLexicon : public QMainWindow
 
       void onDocs();
       void onAbout();
+      void onImportXml();
       void bookmarkRebuildMenu();
       void addShortcut(const QString & name,const QString & key,bool update = false);
       void currentTabChanged(int ix = -1);
@@ -441,6 +444,8 @@ class LanesLexicon : public QMainWindow
       QAction * m_showToolbarAction;
       QAction * m_exportLinksAction;
       QAction * m_importLinksAction;
+      QAction * m_importXmlAction;
+
       HistoryMaster * m_history;
       NoteMaster * m_notes;
 

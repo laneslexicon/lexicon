@@ -74,4 +74,5 @@
 
 #define SQL_LINK_TYPE "select * from links where linkid = ?"
 #define SQL_LINK_UPDATE_STATUS "update links set status = ?,tonode = ?,note = ? where linkid = ?"
+#define SQL_UPDATE_ENTRY_XML "update entry set xml = ? where nodeid = ?"
 #endif

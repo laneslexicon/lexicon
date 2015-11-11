@@ -894,6 +894,9 @@ void LanesLexicon::createActions() {
 
   m_exportLinksAction = new QAction(tr("&Export links"),this);
   m_importLinksAction = new QAction(tr("&Import links"),this);
+
+  m_importXmlAction = new QAction(tr("Import &Xml"),this);
+
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
@@ -920,6 +923,8 @@ void LanesLexicon::createActions() {
 
   connect(m_importLinksAction,SIGNAL(triggered()),this,SLOT(onImportLinks()));
   connect(m_exportLinksAction,SIGNAL(triggered()),this,SLOT(onExportLinks()));
+
+  connect(m_importXmlAction,SIGNAL(triggered()),this,SLOT(onImportXml()));
 }
 void LanesLexicon::createToolBar() {
   QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
@@ -1334,6 +1339,7 @@ void LanesLexicon::createMenus() {
   m_toolMenu->addAction(m_editViewAction);
   m_toolMenu->addAction(m_importLinksAction);
   m_toolMenu->addAction(m_exportLinksAction);
+  m_toolMenu->addAction(m_importXmlAction);
 
   m_themeMenu = m_mainmenu->addMenu(tr("The&mes"));
   m_themeMenu->setFocusPolicy(Qt::StrongFocus);
@@ -4399,4 +4405,63 @@ void LanesLexicon::onExportLinks() {
     statusMessage(tr("No fixed links were found to export"));
   }
   return;
+}
+void LanesLexicon::onImportXml() {
+  QString fileName = QFileDialog::getOpenFileName(this, tr("Import XML"),
+                           ".",
+                           tr("XML (*.xml)"));
+  if (fileName.isEmpty()) {
+    return;
+  }
+  importXml(fileName);
+}
+void LanesLexicon::importXml(const QString & filename) {
+  QDomDocument doc;
+  int errorLine;
+  int errorColumn;
+  QString errorStr;
+  QFile file(filename);
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    QLOG_WARN() << QString("Cannot open XML file:%1").arg(filename);
+    return;
+  }
+  if (!doc.setContent(&file,false,&errorStr,&errorLine,&errorColumn)) {
+    QLOG_WARN() << QString(tr("XML parse error: at line %1: %2")).arg(errorLine).arg(errorStr);
+    return;
+  }
+  QSqlQuery q;
+  if (!q.prepare(SQL_UPDATE_ENTRY_XML)) {
+    QLOG_WARN() << QString(tr("SQL prepare failed for update entry xml:%1")).arg(q.lastError().text());
+    return;
+  }
+  int writeCount = 0;
+  QDomElement root = doc.documentElement();
+  QDomNodeList nodes = doc.elementsByTagName("entryFree");
+  for(int i=0;i < nodes.size();i++) {
+    QDomElement e = nodes.at(i).toElement();
+    if (e.hasAttribute("id")) {
+      QString node = e.attribute("id");
+      if (node.startsWith("n")) {
+        QString xml;
+        QTextStream str(&xml);
+        e.save(str,-1);
+        q.bindValue(0,xml);
+        q.bindValue(1,node);
+        if (! q.exec()) {
+          QLOG_WARN() << QString(tr("Exec failed for SQL_LINK_UPDATE_STATSU query:%1")).arg(q.lastError().text());
+        }
+        else {
+          writeCount++;
+        }
+      }
+    }
+  }
+  if (writeCount > 0) {
+    QSqlDatabase::database().commit();
+  }
+  QString str = tr("entries");
+  if (writeCount == 1) {
+    str = tr("entry");
+  }
+  statusMessage(QString(tr("Imported %1 %2")).arg(writeCount).arg(str));
 }
