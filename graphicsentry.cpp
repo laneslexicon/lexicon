@@ -826,7 +826,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   if (m_clearScene) {
     onClearScene();
   }
-
+  m_userTitle.clear();
   items << rootItem;
 
   /// by default we will center on the root item
