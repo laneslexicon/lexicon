@@ -323,7 +323,9 @@ void NodeSearchDialog::readSettings() {
 }
 QString NodeSearchDialog::getText() const {
   QString t = m_edit->text();
-  if (! t.startsWith("n")) {
+  QRegularExpression rx("^\\d+$");
+  QRegularExpressionMatch match = rx.match(t);
+  if (match.hasMatch()) {
     t = "n" + t;
   }
   return t;
