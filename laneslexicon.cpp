@@ -2116,10 +2116,23 @@ void LanesLexicon::restoreTabs() {
   Place wp;
   settings.beginGroup("Tabs");
   QStringList tabs = settings.childGroups();
-  /// restore tab may fail, so we need to keep count of the actual tabs
-  int j = 0;
+  // tab keys are in format 'Tab-nn', so they need to be sorted
+  // to restore them in the correct sequence
+  QMap<int,QString> tabmap;
+  QRegularExpression rx("Tab-(\\d+)");
   for(int i=0;i < tabs.size();i++) {
-    settings.beginGroup(tabs[i]);
+    QRegularExpressionMatch m = rx.match(tabs[i]);
+    if (m.hasMatch()) {
+      bool ok;
+      QString v = m.captured(1);
+      tabmap.insert(v.toInt(&ok),tabs[i]);
+    }
+  }
+  QList<int> tabkeys = tabmap.keys();
+  qSort(tabkeys.begin(),tabkeys.end());
+  int j = 0;
+  for(int i=0;i < tabkeys.size();i++) {
+    settings.beginGroup(tabmap.value(tabkeys[i]));
     if (settings.value(SID_TABS_TYPE,"entry").toString() == "notes") {
       NoteBrowser * notes = new NoteBrowser(this);
       m_tabs->addTab(notes,tr("Notes"));
