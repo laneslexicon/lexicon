@@ -520,7 +520,9 @@ void GraphicsEntry::linkActivated(const QString & link) {
         if (m_linkCheckMode == 1)
           return;
       }
-      QMessageBox::information(this, tr("Missing link"),
+      QString id = msg;
+      msg = QString(tr("The target for this cross reference has not been set.\nDetails of to set it can be found in the documentation."));
+      QMessageBox::information(this, QString(tr("No target for link %1")).arg(id),
                                msg,
                                QMessageBox::Ok);
       return;
