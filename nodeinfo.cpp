@@ -15,22 +15,15 @@ NodeInfo::NodeInfo(QWidget * parent)
 
   SETTINGS
   settings.beginGroup("Node");
-  QString fontString = settings.value(SID_NODE_ARABIC_FONT).toString();
   QString sz = settings.value(SID_NODE_VIEWER_SIZE,QString()).toString();
   if (! sz.isEmpty())
     this->setPreferredSize(sz);
-
-  QFont f;
-  if (! fontString.isEmpty())
-    f.fromString(fontString);
 
   setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
   setSizeGripEnabled(true);
   QVBoxLayout * layout = new QVBoxLayout;
   m_rlabel = new QLabel("",this);
-  m_rlabel->setFont(f);
   m_hlabel = new QLabel("",this);
-  m_hlabel->setFont(f);
   m_vlabel = new QLabel("",this);
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(new QLabel(tr("Root"),this));
@@ -40,6 +33,7 @@ NodeInfo::NodeInfo(QWidget * parent)
   hlayout->addSpacing(10);
   hlayout->addWidget(m_vlabel);
   hlayout->addStretch();
+
 
   m_browser = new QTextBrowser;
   //  m_browser->setHtml(html);
@@ -100,11 +94,12 @@ void NodeInfo::reject() {
 }
 void NodeInfo::setPlace(const Place & p) {
   m_place = p;
-  m_rlabel->setText(p.getRoot());
-  m_hlabel->setText(p.getWord());
-  m_vlabel->setText(QString("(Vol %1,Page %2)").arg(p.getVol()).arg(p.getPage()));
-
-  m_node = p.getNode();
+  this->setHeader(p.getRoot(),p.getWord(),p.getNode(),p.getPage());
+  //  m_rlabel->setText(p.getRoot());
+  //  m_hlabel->setText(p.getWord());
+  //  m_vlabel->setText(QString("(Vol %1,Page %2)").arg(p.getVol()).arg(p.getPage()));
+  //
+  //  m_node = p.getNode();
 }
 void NodeInfo::setCss(const QString & css) {
   m_css = css;
@@ -115,4 +110,12 @@ void NodeInfo::setHtml(const QString & html) {
   QTextCursor cursor = m_browser->textCursor();
   cursor.setPosition(0);
   m_browser->setTextCursor(cursor);
+}
+void NodeInfo::setHeader(const QString & root,const QString & head,const QString & node,int page) {
+  m_rlabel->setText(getLexicon()->spanArabic(root,"nodeview"));
+  m_hlabel->setText(getLexicon()->spanArabic(head,"nodeview"));
+  m_node = node;
+  if (page > 0) {
+    m_vlabel->setText(QString("(v%1/%2)").arg(Place::volume(page)).arg(page));
+  }
 }

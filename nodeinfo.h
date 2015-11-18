@@ -30,6 +30,7 @@ class NodeInfo : public QDialog {
     Place m_place;
     QTextCursor m_cursor;
     QSize m_size;
+    void setHeader(const QString & root,const QString & head,const QString & node,int page);
     void setPreferredSize(const QString &);
     QTextBrowser * m_browser;
     QLabel * m_rlabel;
