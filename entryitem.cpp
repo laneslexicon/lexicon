@@ -120,12 +120,12 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   menu.setObjectName("entrycontextmenu");
   menu.addSection(tr("Current entry"));
   if ( href.startsWith("golink")) {
-    QString t = QString("Where's this: %1").arg(anchor);
+    QString t = QString("Where's this: %1").arg(anchor.remove("↓"));
     jumpAction = menu.addAction(t);
     jumpAction->setData(href);
   }
   if ( href.startsWith("nolink")) {
-    QString t = QString("Broken link: %1").arg(anchor);
+    QString t = QString("Unknown cross reference: %1").arg(anchor);
     jumpAction = menu.addAction(t);
     jumpAction->setData(href);
   }
