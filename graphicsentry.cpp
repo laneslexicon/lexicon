@@ -14,6 +14,7 @@
 #include "nodeinfo.h"
 #include "definedsql.h"
 #include "linkcheckdialog.h"
+#include "showxmldialog.h"
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
   setObjectName("toolbuttondata");
@@ -594,7 +595,8 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
   QSqlQuery nodeQuery;
   bool ok = nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE);
   if (! ok ) {
-    QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
+    QLOG_WARN() << QString(tr("Node SQL prepare failed for target:%1, error %2")).arg(link).arg(nodeQuery.lastError().text());
+    return;
   }
 
   nodeQuery.bindValue(0,node);
@@ -1498,9 +1500,9 @@ void GraphicsEntry::showPerseus(const Place & p) {
   else {
     xml = "No XML for " + node;
   }
-  QMessageBox msgBox;
-  msgBox.setText(xml);
-  msgBox.exec();
+  ShowXmlDialog d;
+  d.setXml(xml);
+  d.exec();
 }
 void GraphicsEntry::showHtml() {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -1512,10 +1514,9 @@ void GraphicsEntry::showHtml() {
   QString xml = item->getXml();
   QString html = transform(ENTRY_XSLT,m_entryXslt,xml);
 
-  QMessageBox msgBox;
-  msgBox.setTextFormat(Qt::PlainText);
-  msgBox.setText(html);
-  msgBox.exec();
+  ShowXmlDialog d;
+  d.setXml(html);
+  d.exec();
 }
 void GraphicsEntry::updateCurrentPlace(const Place &  p ) {
   m_place = p;
@@ -2472,10 +2473,6 @@ void GraphicsEntry::checkLink(const QString link) {
     return;
   }
   query.first();
-  int linktype = query.value("orthtype").toInt();
-  int linkstatus = query.value("status").toInt();
-
-  qDebug() << link << linktype << linkstatus;
   LinkCheckDialog * dlg = new LinkCheckDialog(query.record());
   if (dlg->exec() == QDialog::Accepted) {
     int status = dlg->getStatus();

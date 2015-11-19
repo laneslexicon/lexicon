@@ -47,6 +47,8 @@ They should not be translated.
 #define SID_ENTRY_DUMP_XML  "Save Xml"
 #define SID_ENTRY_DUMP_OUTPUT_HTML "Save output Html"
 #define SID_ENTRY_SHOW_LINK_WARNING  "Show link warning"
+#define SID_ENTRY_XML_VIEWER_SIZE "Xml viewer size"
+#define SID_ENTRY_XML_VIEWER_POS "Xml viewer pos"
 
 #define SID_XSLT_ENTRY   "Entry"
 #define SID_XSLT_NODE   "Node"

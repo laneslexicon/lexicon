@@ -96,7 +96,8 @@ SOURCES += main.cpp\
         themedialog.cpp \
         exportsearchdialog.cpp \
         helpview.cpp \
-        linkcheckdialog.cpp
+        linkcheckdialog.cpp \
+        showxmldialog.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -138,4 +139,5 @@ HEADERS  += laneslexicon.h \
             exportsearchdialog.h \
             helpview.h \
             acknowledgements.h  \
-            linkcheckdialog.h
+            linkcheckdialog.h \
+            showxmldialog.h
