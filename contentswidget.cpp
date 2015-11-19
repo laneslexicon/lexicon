@@ -491,10 +491,12 @@ void ContentsWidget::mouseMoveEvent(QMouseEvent * event) {
           .arg(item->text(WORD_COLUMN));
         mimeData->setText(t);
         QDrag * drag = new QDrag(this);
-        drag->setPixmap(QPixmap(m_dragIconFileName));
+        QPixmap pm(m_dragIconFileName);
+        pm = pm.scaledToHeight(50);
+        drag->setPixmap(pm);
         drag->setMimeData(mimeData);
         if (drag->exec(Qt::LinkAction) == Qt::LinkAction) {
-          QLOG_DEBUG() << "Linked ok";
+
         }
       }
     }
