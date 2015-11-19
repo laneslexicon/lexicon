@@ -276,7 +276,7 @@ void LanesLexicon::restoreSavedState() {
 
 
   resize(settings.value(SID_SYSTEM_SIZE,QSize(800,950)).toSize());
-  move(settings.value(SID_SYSTEM_POS,QSize(450,20)).toPoint());
+  move(settings.value(SID_SYSTEM_POS,QPoint(450,20)).toPoint());
 
 
 }
