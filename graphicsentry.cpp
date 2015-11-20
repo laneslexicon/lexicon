@@ -787,7 +787,7 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
     }
   }
   QSqlQuery rootQuery;
-  rootQuery.prepare(SQL_FIND_ROOT);
+  rootQuery.prepare(SQL_FIND_ENTRY_FOR_ROOT);
 
   int quasi = 0;
   QSqlQuery quasiQuery;
@@ -838,19 +838,19 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
 
   /// now add all the entries for the root
   do  {
-    supplement = rootQuery.value(8).toInt();
+    //    supplement = rootQuery.value(8).toInt();
     QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
-      .arg(rootQuery.value(3).toString())
-      .arg(rootQuery.value(2).toString())
-      .arg(rootQuery.value(5).toInt())
-      .arg(rootQuery.value(6).toString())
-      .arg(rootQuery.value(8).toInt());
-    t += rootQuery.value(4).toString();
+      .arg(rootQuery.value("bword").toString())
+      .arg(rootQuery.value("word").toString())
+      .arg(rootQuery.value("page").toInt())
+      .arg(rootQuery.value("itype").toString())
+      .arg(rootQuery.value("supplement").toInt());
+    t += rootQuery.value("xml").toString();
     t += "</word>";
     EntryItem * item  = createEntry(t);
     if (item != NULL) {
       setItemPlace(item,rootQuery);
-      dumpInfo(item,rootQuery.value(7).toString());
+      dumpInfo(item,rootQuery.value("nodeid").toString());
       item->setNotes();
       items << item;
       /// if we asked for a specific word/node, focus on it
@@ -2255,6 +2255,8 @@ void GraphicsEntry::onReload() {
   readSettings();
   QString html;
   for (int i=0;i < m_items.size();i++) {
+    qDebug() << m_items[i]->getNode();
+    qDebug() << m_items[i]->getXml();
     html = transform(ENTRY_XSLT_RECOMPILE,m_entryXslt,m_items[i]->getXml());
     m_items[i]->document()->clear();
     m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
@@ -2299,8 +2301,8 @@ void GraphicsEntry::onReload(const QString & css,const QString & xslt) {
 }
 /**
  * Params:
- * link info i.e either nolink=nn or golink=nn
- * link text - this should match the text in the link record
+ * link info i.e either nolink=<orthid> or golink=<orthid>
+ * link text - this is just the down arrow (or whatever the xslt puts in there)
  * target info in the form <node>:<word>
  * the node that needs fixing
  * reload page after fixup
@@ -2318,28 +2320,29 @@ void GraphicsEntry::onReload(const QString & css,const QString & xslt) {
 void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
   QLOG_DEBUG() << Q_FUNC_INFO << params << reload;
   EntryItem * item = qobject_cast<EntryItem *>(QObject::sender());
-  QRegExp rx("(nolink|golink)=(\\d+)");
+
+  if (! item ) {
+    QLOG_DEBUG() << Q_FUNC_INFO << "EntryItem not defined";
+    return;
+  }
+  QRegExp rx("(nolink|golink)=(.+)");
   if (rx.indexIn(params[0]) == -1) {
     QLOG_WARN() << QString(tr("Link fixup invalid parameter: %1")).arg(params[0]);
     return;
   }
-  QString linkId = rx.cap(2);
+  QString orthid = rx.cap(2);
   QString linkType = rx.cap(1);
   QString targetNode;
   QString targetWord;
-  rx.setPattern("(n\\d+):(\\w+)");
-  if (rx.indexIn(params[2]) != -1) {
-    targetNode = rx.cap(1);
-    targetWord = rx.cap(2);
-  }
-  QLOG_DEBUG() << linkId << linkType << "to" << targetNode;
-  QLOG_DEBUG() << "Point link word" << params[1];
-  QLOG_DEBUG() << "To word" << targetWord;
-  QSqlQuery findLink;
-  if (! findLink.prepare(SQL_FIND_NODE_FOR_LINK)) {
-    QLOG_WARN() << findLink.lastError().text();
+  QStringList words = params[2].split(":");
+  if (words.size() != 2) {
+    QLOG_WARN() << QString(tr("Invalid parameter in link %1 update: %2")).arg(orthid).arg(params[2]);
     return;
   }
+  targetNode = words[0];
+  targetWord = words[1];
+
+
   /**
    * This SQL sets the matchtype to 100
    *
@@ -2351,7 +2354,7 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
     return;
   }
   QSqlQuery nodefind;
-  if (! nodefind.prepare(SQL_GET_XML_FOR_NODE)) {
+  if (! nodefind.prepare(SQL_ENTRY_FOR_NODE)) {
     QLOG_WARN() << nodefind.lastError().text();
     return;
   }
@@ -2361,64 +2364,84 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
     return;
   }
 
-  findLink.bindValue(0,linkId);
+ QSqlQuery findLink;
+  if (! findLink.prepare(SQL_FIND_NODE_FOR_LINK)) {
+    QLOG_WARN() << findLink.lastError().text();
+    return;
+  }
+  findLink.bindValue(0,orthid);
   findLink.exec();
+
+  if (! findLink.first()) {
+    QLOG_INFO() << QString(tr("Cannot find link details for update: %1")).arg(orthid);
+    return;
+  }
   int c = 0;
-  while(findLink.next()) {
-    QLOG_DEBUG() << "fixup" << findLink.value(1) << findLink.value(2) << findLink.value(3);
-    QString node = findLink.value(2).toString();
-    QString linkWord = findLink.value(4).toString();
-    if (! linkWord.isEmpty()) {
-      /// first time through optionally present the save link
-      /// dialog
-      if ((c == 0) && m_showLinkWarning) {
-        if (! saveLink(linkWord,targetWord)) {
+  QLOG_DEBUG() << "fixup" << findLink.value(1) << findLink.value(2) << findLink.value(3);
+  QString node = item->getNode(); //findLink.value(2).toString();
+
+  QString linkWord = findLink.value(3).toString();
+
+  /// first time through optionally present the save link
+  /// dialog
+  if (m_showLinkWarning) {
+    QString txt = QString(tr("Link id: %1\nFrom   :%2\nTo     :%3")).arg(orthid).arg(item->getNode()).arg(targetNode);
+    if (! showLinkDialog(linkWord,targetWord,txt)) {
+      return;
+    }
+  }
+  qDebug() << "Updating link details" << node;
+  updateLink.bindValue(0,targetNode);
+  updateLink.bindValue(1,orthid);
+  if (! updateLink.exec()) {
+    QLOG_WARN() << QString(tr("Update links error: %1")).arg(updateLink.lastError().text());
+    return;
+  }
+  qDebug() << "successfully updated link record";
+  qDebug() << "Updating entry xml" ;
+  c++;
+  /// Get the XML and update the <cref ...    select="target node>">
+  ///
+  nodefind.bindValue(0,node);
+  if (nodefind.exec() && nodefind.first()) {
+    QString xml = nodefind.value("xml").toString();
+    QDomDocument doc;
+    doc.setContent(xml);
+    qDebug() << xml;
+    QDomNodeList refs = doc.elementsByTagName("ref");
+    for(int i=0;i < refs.size();i++) {
+      QDomElement e = refs.at(i).toElement();
+      QString cref = e.attribute("cref");
+      if (cref == orthid) {
+        e.setAttribute("select",targetNode);
+        QString nxml = doc.toString(-1);
+        nodeupdate.bindValue(0,nxml);
+        nodeupdate.bindValue(1,node);
+        if (!nodeupdate.exec()) {
+          QLOG_WARN() << QString(tr("Failed to update link details for node %1: %2")).arg(node).arg(nodeupdate.lastError().text());
           return;
         }
-      }
-      updateLink.bindValue(0,targetNode);
-      updateLink.bindValue(1,linkWord);
-      if (! updateLink.exec()) {
-        QLOG_WARN() << QString(tr("Update links error: %1")).arg(updateLink.lastError().text());
-      }
-      else {
-        c++;
-        if (linkType == "nolink") {
-          nodefind.bindValue(0,node);
-          if (nodefind.exec() && nodefind.first()) {
-            QString xml = nodefind.value(0).toString();
-            xml.replace(QString("nogo=\"%1\"").arg(linkId),QString("golink=\"%1\"").arg(linkId));
-            nodeupdate.bindValue(0,xml);
-            nodeupdate.bindValue(1,node);
-            if (!nodeupdate.exec()) {
-              QLOG_WARN() << QString(tr("Failed to update link details for node %1: %2")).arg(node).arg(nodeupdate.lastError().text());
-            }
-            else {
-              QLOG_DEBUG() << "Updated entry record for node" << node;
-              /// the page reload doesn't reread the xml so we need to update the in memory xml
-              ///
-              if (item && (item->getNode() == node)) {
-                xml = item->getXml();
-                xml.replace(QString("nogo=\"%1\"").arg(linkId),QString("golink=\"%1\"").arg(linkId));
-                item->setXml(xml);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  if (c > 0) {
-    QSqlDatabase::database().commit();
-    QLOG_DEBUG() << "update count" << c;
-    statusMessage(QString(tr("Updated link details")));
-    if (reload) {
-      this->onReload();
-    }
-  }
+        QLOG_DEBUG() << "Updated entry record for node" << node;
+        /// the page reload doesn't reread the xml so we need to update the in memory xml
+        ///
+        qDebug() << nxml;
 
+        item->setXml(this->wrapEntry(nodefind.record(),nxml));
+        qDebug() << item->getXml();
+        QSqlDatabase::database().commit();
+        statusMessage(QString(tr("Updated link details")));
+        if (reload) {
+          this->onReload();
+        }
+        return;
+      }
+    }
+  }
+  else {
+    QLOG_WARN() << QString(tr("Failed to update xml for node %1: %2")).arg(node).arg(nodefind.lastError().text());
+  }
 }
-bool GraphicsEntry::saveLink(const QString & linkWord,const QString & target) {
+bool GraphicsEntry::showLinkDialog(const QString & linkWord,const QString & target,const QString & text) {
   if (! m_showLinkWarning ) {
     return true;
   }
@@ -2433,7 +2456,9 @@ bool GraphicsEntry::saveLink(const QString & linkWord,const QString & target) {
   QString html2 = qobject_cast<Lexicon *>(qApp)->spanArabic(target);
   msgBox.setText(QString(tr("This will point %1 to %2.")).arg(html1).arg(html2));
   msgBox.setInformativeText(tr("Do you wish to update the link?"));
-  msgBox.setDetailedText(tr("You can change the link as many times as you want."));
+  QString txt(tr("You can change the link as many times as you want."));
+  txt += QString(tr("\nThe current update is:\n%1")).arg(text);
+  msgBox.setDetailedText(txt);
   msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
   int ret = msgBox.exec();
   if (ret == QMessageBox::Cancel) {
@@ -2454,25 +2479,23 @@ QString GraphicsEntry::userTitle() const {
   return m_userTitle;
 }
 void GraphicsEntry::checkLink(const QString link) {
-  int linkid;
   bool ok;
 
-  linkid = link.toInt(&ok);
-  if (! ok) {
-    QLOG_WARN() << QString(tr("Invalid link id:%1")).arg(link);
-    return;
-  }
+  qDebug() << Q_FUNC_INFO << link;
   QSqlQuery query;
   if (! query.prepare(SQL_LINK_TYPE)) {
     QLOG_WARN() << QString(tr("Prepare failed for SQL_LINK_TYPE query:%1")).arg(query.lastError().text());
     return;
   }
-  query.bindValue(0,linkid);
+  query.bindValue(0,link);
   if (! query.exec()) {
     QLOG_WARN() << QString(tr("Exec failed for SQL_LINK_TYPE query:%1")).arg(query.lastError().text());
     return;
   }
-  query.first();
+  if (! query.first()) {
+    QLOG_WARN() << QString(tr("Find failed for SQL_LINK_TYPE query:%1")).arg(query.lastError().text());
+    return;
+  }
   LinkCheckDialog * dlg = new LinkCheckDialog(query.record());
   if (dlg->exec() == QDialog::Accepted) {
     int status = dlg->getStatus();
@@ -2484,9 +2507,9 @@ void GraphicsEntry::checkLink(const QString link) {
       u.bindValue(0,status);
       u.bindValue(1,tonode);
       u.bindValue(2,note);
-      u.bindValue(3,linkid);
+      u.bindValue(3,link);
       if (u.exec()) {
-        QLOG_INFO() << QString("Link id %1, status set to: %2").arg(linkid).arg(status);
+        QLOG_INFO() << QString("Link id %1, status set to: %2").arg(link).arg(status);
         QSqlDatabase::database().commit();
       }
       else {
@@ -2499,4 +2522,16 @@ void GraphicsEntry::checkLink(const QString link) {
 
   }
   delete dlg;
+}
+QString GraphicsEntry::wrapEntry(const QSqlRecord & record,const QString & xml) {
+  QString t  = QString("<word buck=\"%1\" ar=\"%2\" page=\"%3\" itype=\"%4\" supp=\"%5\">")
+    .arg(record.value("bword").toString())
+    .arg(record.value("word").toString())
+    .arg(record.value("page").toInt())
+    .arg(record.value("itype").toString())
+    .arg(record.value("supplement").toInt());
+  t += xml;
+  t += "</word>";
+
+  return t;
 }

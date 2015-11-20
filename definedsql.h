@@ -6,14 +6,15 @@
 #define SQL_LINKTO_NODE "select tonode from links where orthid = ?"
 #define SQL_LINK_ROOT_FIND "select word from root where bword = ?"
 #define SQL_FIND_ENTRY_BY_NODE "select * from entry where datasource = 1 and nodeid = ?"
-#define SQL_FIND_ROOT "select root,broot,word,bword,xml,page,itype,nodeid,supplement,headword from entry where datasource = 1  and root = ? order by nodenum"
+#define SQL_FIND_ENTRY_FOR_ROOT "select root,broot,word,bword,xml,page,itype,nodeid,supplement,headword from entry where datasource = 1  and root = ? order by nodenum"
 #define SQL_QUASI_FIND_BY_WORD "select quasi from root where word = ? and datasource = 1"
 #define SQL_ROOT_FOR_PAGE "select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1 and page = ? order by nodenum asc"
 #define SQL_FIND_VERSION "select createversion,createdate,xmlversion,dbid from lexicon"
 
-#define SQL_FIND_NODE_FOR_LINK "select id,linkid,fromnode,tonode,link from links where datasource = 1 and linkid = ?"
-#define SQL_UPDATE_LINK_TO_NODE "update links set tonode = ?, matchtype = 100 where datasource = 1 and link = ?"
+#define SQL_FIND_NODE_FOR_LINK "select id,fromnode,tonode,link from links where datasource = 1 and orthid = ?"
+#define SQL_UPDATE_LINK_TO_NODE "update links set tonode = ?, matchtype = 100 where orthid = ?"
 #define SQL_GET_XML_FOR_NODE "select xml from entry where nodeid = ?"
+#define SQL_ENTRY_FOR_NODE "select * from entry where nodeid = ?"
 #define SQL_UPDATE_XML_FOR_NODE "update entry set xml = ? where nodeid = ?"
 /*
   contentswidget.cpp
@@ -70,9 +71,9 @@
 #define SQL_INSERT_NOTE_DETAILS "insert into notes (nodeid,word,note,tag) values (?,?,?,?)"
 #define SQL_UPDATE_NOTE_TAG "update notes set tag = ? where id = ?"
 
-#define SQL_FIXED_LINKS "select linkid,fromnode,tonode from links where (datasource = 1) and (matchtype = 100)"
+#define SQL_FIXED_LINKS "select orthid,fromnode,tonode from links where (datasource = 1) and (matchtype = 100)"
 
-#define SQL_LINK_TYPE "select * from links where linkid = ?"
-#define SQL_LINK_UPDATE_STATUS "update links set status = ?,tonode = ?,note = ? where linkid = ?"
+#define SQL_LINK_TYPE "select * from links where orthid = ?"
+#define SQL_LINK_UPDATE_STATUS "update links set status = ?,tonode = ?,note = ? where orthid = ?"
 #define SQL_UPDATE_ENTRY_XML "update entry set xml = ? where nodeid = ?"
 #endif

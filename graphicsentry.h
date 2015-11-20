@@ -122,6 +122,7 @@ class GraphicsEntry : public QWidget {
     int m_findCount;
     int m_highlightCount;
     int m_currentFind;
+    QString wrapEntry(const QSqlRecord &,const QString &);
     void centerOnSearchResult(int,int);
     QString lastRoot();
     QString firstRoot();
@@ -130,7 +131,7 @@ class GraphicsEntry : public QWidget {
     void writeDefaultSettings();
     QString fixHtml(const QString &);
     QString readCssFromFile(const QString &name);
-    bool saveLink(const QString &,const QString &);
+    bool showLinkDialog(const QString &,const QString &,const QString &);
     void dumpInfo(EntryItem *,const QString & node);
     void setItemPlace(EntryItem * item,const QSqlQuery & query);
 

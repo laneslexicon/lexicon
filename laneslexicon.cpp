@@ -4286,14 +4286,16 @@ void LanesLexicon::onReady() {
 }
 void LanesLexicon::onImportLinks() {
   QString fileName = QFileDialog::getOpenFileName(this, tr("Import Fixed Links"),
-                           ".",
-                           tr("CSV (*.csv *.txt)"));
+                                                  ".",
+                                                  tr("CSV (*.csv *.txt)"));
   if (fileName.isEmpty()) {
     return;
   }
   QFile f(fileName);
   if ( ! f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    QLOG_WARN() << QString(tr("Error opening export file: %1 - %2")).arg(fileName).arg(f.errorString());
+    QString str =  QString(tr("Import links error: cannot  open import file: %1 - %2")).arg(fileName).arg(f.errorString());
+    QLOG_WARN() << str;
+    statusMessage(str);
     return;
   }
   QTextStream in(&f);
@@ -4305,24 +4307,49 @@ void LanesLexicon::onImportLinks() {
     dbVersion = query.value("dbid").toString();
   }
   if (!query.prepare(SQL_UPDATE_LINK_TO_NODE)) {
-    QLOG_WARN() << QString(tr("SQL error in import links: %1")).arg(query.lastError().text());
+    QString str = QString(tr("SQL error in import links: %1")).arg(query.lastError().text());
+    QLOG_WARN() << str;
+    statusMessage(str);
     return;
   }
+  QSqlQuery nodefind;
+  if (! nodefind.prepare(SQL_ENTRY_FOR_NODE)) {
+    QString str = nodefind.lastError().text();
+    QLOG_WARN() << str;
+    statusMessage(str);
+    return;
+  }
+  QSqlQuery nodeupdate;
+  if (! nodeupdate.prepare(SQL_UPDATE_XML_FOR_NODE)) {
+    QString str = nodeupdate.lastError().text();
+    QLOG_WARN() << str;
+    statusMessage(str);
+    return;
+  }
+
   int count=0;
   int skipCount = 0;
   int updateCount = 0;
   bool ignoreDb = false;
   QString str;
-  query.exec();
+
   while(! in.atEnd()) {
     count++;
     str = in.readLine();
     QStringList p = str.split(",",QString::KeepEmptyParts);
-    if (p.size() == 4) {
+    if (p.size() != 4) {
+      QLOG_WARN() << QString(tr("Skipping record %1, incorrect format:[%2]")).arg(count).arg(str);
+      skipCount++;
+    }
+    else {
+      QString orthid = p[1];
+      QString fromnode = p[2];
+      QString targetnode = p[3];
+      /// check db version are the same
       if (!ignoreDb && (p[0] != dbVersion)) {
         QString warn = QString(tr("The link update is for a different database version.\nThe links may not match.\n\nDo you wish to continue?"));
         int ret = QMessageBox::warning(this, tr("Link import"),warn,
-                               QMessageBox::Yes | QMessageBox::Cancel);
+                                       QMessageBox::Yes | QMessageBox::Cancel);
         if (ret == QMessageBox::Yes) {
           ignoreDb = true;
         }
@@ -4331,21 +4358,55 @@ void LanesLexicon::onImportLinks() {
           return;
         }
       }
-      query.bindValue(0,p[3]);
-      query.bindValue(1,p[1]);
+      nodefind.bindValue(0,fromnode);
+      if (! nodefind.exec()) {
+        QString str = QString(tr("Import links error: SQL error : %1")).arg(nodefind.lastError().text());
+        QLOG_WARN() << str;
+        statusMessage(str);
+        return;
+      }
+      if (! nodefind.first()) {
+        QString str = QString(tr("Import links error: cannot find entry: %1")).arg(fromnode);
+        QLOG_WARN() << str;
+        statusMessage(str);
+        return;
+      }
+      ///
+      /// update the entry xml, sett <cref select="tonode">
+      //
+      QString xml = nodefind.value("xml").toString();
+      QDomDocument doc;
+      doc.setContent(xml);
+      QDomNodeList refs = doc.elementsByTagName("ref");
+      for(int i=0;i < refs.size();i++) {
+        QDomElement e = refs.at(i).toElement();
+        QString cref = e.attribute("cref");
+        if (cref == orthid) {
+          e.setAttribute("select",targetnode);
+          QString nxml = doc.toString(-1);
+          nodeupdate.bindValue(0,nxml);
+          nodeupdate.bindValue(1,fromnode);
+          if (!nodeupdate.exec()) {
+            QString str = QString(tr("Import links error: failed to update link details for node %1: %2")).arg(fromnode).arg(nodeupdate.lastError().text());
+            QLOG_WARN() << str;
+            statusMessage(str);
+            return;
+          }
+          QLOG_DEBUG() << "Updated entry record for node" << fromnode;
+        }
+      }
+      query.bindValue(0,targetnode);
+      query.bindValue(1,orthid);
       if (! query.exec()) {
-        QLOG_WARN() << QString(tr("Link id: %1, From : %2 , To : 3")).arg(p[1]).arg(p[2]).arg(p[3]);
+        QLOG_WARN() << QString(tr("Link id: %1, From : %2 , To : 3")).arg(orthid).arg(fromnode).arg(targetnode);
         QLOG_WARN() << QString(tr("SQL error in update links: %1")).arg(query.lastError().text());
       }
       else {
         updateCount++;
       }
     }
-    else {
-      QLOG_WARN() << QString(tr("Skipping record %1, incorrect format:[%2]")).arg(count).arg(str);
-      skipCount++;
-    }
   }
+
   f.close();
   str.clear();
   if (updateCount == 0) {
@@ -4353,26 +4414,22 @@ void LanesLexicon::onImportLinks() {
   }
   else {
     str = QString(tr("Imported %1 %2 from %3."))
-                .arg(updateCount)
-                .arg(updateCount > 1 ? "links" : "link")
-                .arg(QDir::current().relativeFilePath(fileName));
+      .arg(updateCount)
+      .arg(updateCount > 1 ? "links" : "link")
+      .arg(QDir::current().relativeFilePath(fileName));
   }
   if (skipCount > 0) {
     str += QString(tr(" (Skipped %1 %2)"))
-                   .arg(skipCount)
+      .arg(skipCount)
       .arg((skipCount > 1 ? tr("records") : tr("record")));
   }
   statusMessage(str);
-
-
   return;
 }
 /**
- * These are the link matchtype, take from links.pl
-  1  : word
-  2  : headword
-  3  : bareword
-  4  : verb form
+ * Export links where matchtype = 100 i.e. manually fixed links
+ *
+ * Fields are: dbversion,orthid,fromnode,tonode
  *
  */
 
@@ -4404,7 +4461,7 @@ void LanesLexicon::onExportLinks() {
   query.exec();
   while(query.next()) {
     count++;
-    out << dbVersion << "," << query.value("linkId").toString() << "," << query.value("fromnode").toString() << "," << query.value("tonode").toString() << endl;
+    out << dbVersion << "," << query.value("orthid").toString() << "," << query.value("fromnode").toString() << "," << query.value("tonode").toString() << endl;
   }
   if (count > 0) {
     f.close();
