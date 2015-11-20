@@ -3,7 +3,7 @@
 #define SQL_FIRST_ROOT "select root,page from entry where datasource = 1 and type = 0 order by nodenum limit 5;"
 #define SQL_LAST_ROOT "select root,page from entry where datasource = 1 and type = 0 order by nodenum desc limit 5;"
 #define SQL_PAGE_FIND "select root,nodeid from entry where page = %1 order by nodenum asc"
-#define SQL_LINKTO_NODE "select tonode from links where linkid = ?"
+#define SQL_LINKTO_NODE "select tonode from links where orthid = ?"
 #define SQL_LINK_ROOT_FIND "select word from root where bword = ?"
 #define SQL_FIND_ENTRY_BY_NODE "select * from entry where datasource = 1 and nodeid = ?"
 #define SQL_FIND_ROOT "select root,broot,word,bword,xml,page,itype,nodeid,supplement,headword from entry where datasource = 1  and root = ? order by nodenum"

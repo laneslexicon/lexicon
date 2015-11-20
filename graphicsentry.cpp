@@ -510,7 +510,7 @@ void GraphicsEntry::linkActivated(const QString & link) {
         emit(gotoNode(p,createTab,activateTab));
       }
       else {
-        QLOG_WARN() << QString("Missing link record for linkid %1").arg(msg);
+        QLOG_WARN() << QString(tr("Missing link record for linkid %1")).arg(msg);
       }
       return;
     }
@@ -522,7 +522,7 @@ void GraphicsEntry::linkActivated(const QString & link) {
           return;
       }
       QString id = msg;
-      msg = QString(tr("The target for this cross reference has not been set.\nDetails of to set it can be found in the documentation."));
+      msg = QString(tr("The target for this cross-reference has not been set.\nDetails of how to set it can be found in the documentation."));
       QMessageBox::information(this, QString(tr("No target for link %1")).arg(id),
                                msg,
                                QMessageBox::Ok);
