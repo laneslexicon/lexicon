@@ -3230,6 +3230,7 @@ void LanesLexicon::searchForNode() {
       if (i != -1) {
         p.setAction(Place::SwitchTab);
         m_tabs->setCurrentIndex(i);
+        showPlace(p,false,true);
         return;
       }
       p = showPlace(p,options.newTab(),options.activateTab());
