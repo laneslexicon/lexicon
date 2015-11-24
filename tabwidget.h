@@ -18,6 +18,7 @@ class TabWidget : public QTabWidget {
     void tabRemoved(int index);
     void tabInserted(int index);
     void focusOutEvent(QFocusEvent *);
+    void contextMenuEvent(QContextMenuEvent *);
  private:
     void readSettings();
     void keyPressEvent(QKeyEvent *);
@@ -25,5 +26,9 @@ class TabWidget : public QTabWidget {
     //    bool eventFilter(QObject *,QEvent *);
  signals:
   void tabsChanged();
+  void closeOtherTab(int);
+  void closeThisTab(int);
+  void duplicateTab(int);
+  void saveTabs();
 };
 #endif

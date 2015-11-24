@@ -71,7 +71,12 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_tabs->setTabsClosable(true);
   m_tabs->installEventFilter(this);
   m_tabs->tabBar()->installEventFilter(this);
+
   connect(m_tabs,SIGNAL(tabsChanged()),this,SLOT(tabsChanged()));
+  connect(m_tabs,SIGNAL(closeOtherTab(int)),this,SLOT(onCloseOtherTabs(int)));
+  connect(m_tabs,SIGNAL(closeThisTab(int)),this,SLOT(onCloseTab(int)));
+  connect(m_tabs,SIGNAL(duplicateTab(int)),this,SLOT(onDuplicateTab(int)));
+  connect(m_tabs,SIGNAL(onSaveTabs()),this,SLOT(onSaveTabs()));
   /// at the end of the history, but we should be able to restore from settings
   /// TODO would we want restore our current position in history?
   m_history = new HistoryMaster(m_historyDbName);
@@ -409,7 +414,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
   connect(entry,SIGNAL(searchStarted()),this,SLOT(pageSearchStart()));
   connect(entry,SIGNAL(searchFoundNext()),this,SLOT(pageSearchStart()));
 }
-void LanesLexicon::onCloseOtherTabs() {
+void LanesLexicon::onCloseOtherTabs(int /* index */) {
   QLOG_DEBUG() << Q_FUNC_INFO;
   m_tabs->setUpdatesEnabled(false);
   QString label = m_tabs->tabText(m_tabs->currentIndex());
@@ -621,7 +626,7 @@ void LanesLexicon::shortcut(const QString & key) {
     this->onCloseTab(m_tabs->currentIndex());
   }
   else if (key == SID_SHORTCUT_DELETE_OTHER_TABS) {
-    this->onCloseOtherTabs();
+    this->onCloseOtherTabs(-1);
   }
   else if (key == SID_SHORTCUT_CONVERT_TO_ENTRY) {
     this->convertToEntry();
@@ -4535,4 +4540,12 @@ void LanesLexicon::importXml(const QString & filename) {
     str = tr("entry");
   }
   statusMessage(QString(tr("Imported %1 %2")).arg(writeCount).arg(str));
+}
+void LanesLexicon::onDuplicateTab(int index) {
+  qDebug() << Q_FUNC_INFO << index;
+
+}
+void LanesLexicon::onSaveTabs() {
+  qDebug() << Q_FUNC_INFO;
+
 }

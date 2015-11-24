@@ -99,3 +99,29 @@ void TabWidget::focusOutEvent(QFocusEvent * /* event */) {
 bool TabWidget::numberTab() const {
   return m_numberTabs;
 }
+void TabWidget::contextMenuEvent(QContextMenuEvent * event) {
+  QMenu menu(this->tabText(this->currentIndex()));;
+  QAction * closeOther = menu.addAction(tr("Close &other tabs"));
+  QAction * closeThis = menu.addAction(tr("Close &this tab"));
+  QAction * savePageSet = menu.addAction(tr("Save &pages"));
+  savePageSet->setVisible(false);
+  QAction * duplicate = menu.addAction(tr("&Duplicate tab"));
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(this->currentWidget());
+  if (! entry) {
+    duplicate->setVisible(false);
+  }
+  QRect r = this->tabBar()->tabRect(this->currentIndex());
+  QAction * action = menu.exec(this->mapToGlobal(r.bottomLeft()) + QPoint(10,0));
+  if (action == closeOther) {
+    emit(closeOtherTab(this->currentIndex()));
+  }
+  else if (action == closeThis) {
+    emit(closeThisTab(this->currentIndex()));
+  }
+  else if (action == duplicate) {
+    emit(duplicateTab(this->currentIndex()));
+  }
+  else if (action == savePageSet) {
+    emit(saveTabs());
+  }
+}
