@@ -5,6 +5,7 @@
 #include <QList>
 #include "QsLog.h"
 #include <QDateTime>
+#include <QSqlRecord>
 /*
   Using the QVariant;
     Place p;
@@ -58,6 +59,7 @@ class Place    {
   static Place fromRoot(const QString &);
   static Place fromNode(const QString &);
   static Place fromPage(int);
+  static Place fromEntryRecord(const QSqlRecord &);
   static int   volume(int);
   QString getText(bool pageOnlyMode = false) const;
   QString getShortText() const;
@@ -157,7 +159,7 @@ class Place    {
     m_when = QDateTime::fromString(t);
   }
   QDateTime getWhen() const { return m_when;}
- private:
+ public:
   int m_datasource;
   QString m_root;
   QString m_node;

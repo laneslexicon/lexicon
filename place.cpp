@@ -10,6 +10,7 @@
 
    QLOG_DEBUG() << v.userType() << x.getNode() << x.getId();
 */
+/// TODO can we move this somewhere
 int Place::m_vols[8] = {367,837,1280,1757,2219,2475,2749,3064};
 
 bool Place::isRoot() const {
@@ -83,7 +84,7 @@ QString Place::getText(bool pageOnly) const {
     if (! txt.isEmpty()) {
       txt += ",";
     }
-    txt += QString(QObject::tr("Entry:%1")).arg(m_word);
+    txt += QString(QObject::tr("Head word:%1")).arg(m_word);
   }
   if ((! pageOnly) && ( m_page != -1)) {
     if (! txt.isEmpty()) {
@@ -170,6 +171,17 @@ Place Place::fromPage(int page) {
   Place p;
   p.setType(Place::Page);
   p.setPage(page);
+  return p;
+}
+Place Place::fromEntryRecord(const QSqlRecord & rec) {
+  Place p;
+  p.m_root = rec.value("root").toString();
+  p.m_node = rec.value("nodeid").toString();
+  p.m_supplement = rec.value("supplement").toInt();
+  p.m_word = rec.value("word").toString();
+  p.m_page = rec.value("page").toInt();
+  p.m_vol = volume(p.m_page);
+  p.m_action = Place::User;
   return p;
 }
 void Place::setHead(const QString & x) {
