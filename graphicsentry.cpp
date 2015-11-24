@@ -571,33 +571,39 @@ void GraphicsEntry::linkHovered(const QString & link) {
     gi->setToolTip(gi->getPlace().getText());
     return;
   }
-  QString t;
-  QStringList p = link.split('?');
-  if (p.size() <= 1) {
-    t = link;
+  // "127.0.0.0?golink=n1234-4"
+  // "127.0.0.0?nolink=n1234-4"
+  QRegularExpression rx("(.+)\?(no|go)link=(.+)");
+  QRegularExpressionMatch m = rx.match(link);
+  if (! m.hasMatch()) {
+    QLOG_INFO() << QString(tr("Invalid cross-reference:%1")).arg(link);
+    return;
   }
-  else {
-    t = p[1];
-  }
+  QString action = m.captured(2);
+  QString orthid = m.captured(3);
 
-  if (t.startsWith("nolink")) {
-    gi->setToolTip(tr("The target for this cross-reference has not been set."));
+  if (action == "no") {
+    gi->setToolTip(QString(tr("The target for this cross-reference (id:%1) has not been set.")).arg(orthid));
     gi->setCursor(QCursor(Qt::ArrowCursor));
     return;
   }
-  if (! t.startsWith("golink")) {
-    QLOG_DEBUG() << Q_FUNC_INFO << "Invalid link text" << link;
-    return;
-  }
-  t.remove("golink=");
-  QSqlRecord rec = this->findLinkRecord(t);
-  if (! rec.isEmpty()) {
 
-    qDebug() << rec;
+  QSqlRecord rec = this->findLinkRecord(orthid);
+  if (! rec.isEmpty()) {
+    Place n = Place::fromEntryRecord(rec);
+    gi->setCursor(QCursor(Qt::PointingHandCursor));
+    QString t = QString("Cross ref to: root %1, headword : %2\nVolume %3, page %4\nXref id : %5")
+      .arg(n.getRoot())
+      .arg(n.getWord())
+      .arg(n.getVol())
+      .arg(n.getPage())
+      .arg(orthid);
+
+    gi->setToolTip(t);
   }
-  Place n = Place::fromEntryRecord(rec);
-  gi->setCursor(QCursor(Qt::PointingHandCursor));
-  gi->setToolTip(QString(tr("To:")) + n.getText());
+  else {
+    QLOG_INFO() << QString(tr("Cannot find cross-reference information for %1")).arg(orthid);
+  }
 
 }
 /**

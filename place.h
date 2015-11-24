@@ -159,6 +159,8 @@ class Place    {
     m_when = QDateTime::fromString(t);
   }
   QDateTime getWhen() const { return m_when;}
+
+  QString location() const;
  public:
   int m_datasource;
   QString m_root;

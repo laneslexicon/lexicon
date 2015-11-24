@@ -69,6 +69,9 @@ QString Place::getShortText() const {
   }
   return QString();
 }
+QString Place::location() const {
+  return QString(QObject::tr("Vol %1,Page %2")).arg(m_vol).arg(m_page);
+}
 QString Place::getText(bool pageOnly) const {
   QString txt;
 
