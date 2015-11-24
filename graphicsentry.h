@@ -31,6 +31,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QToolButton>
 #include <QGraphicsWidget>
+#include <QSqlRecord>
 #include <QKeyEvent>
 #include <QFocusEvent>
 #include <QSettings>
@@ -123,6 +124,7 @@ class GraphicsEntry : public QWidget {
     int m_highlightCount;
     int m_currentFind;
     QString wrapEntry(const QSqlRecord &,const QString &);
+    QSqlRecord findLinkRecord(const QString & inkid) const;
     void centerOnSearchResult(int,int);
     QString lastRoot();
     QString firstRoot();

@@ -559,15 +559,51 @@ void GraphicsEntry::linkActivated(const QString & link) {
   }
 }
 void GraphicsEntry::linkHovered(const QString & link) {
-  QGraphicsTextItem * gi = static_cast<QGraphicsTextItem *>(QObject::sender());
+  //  QGraphicsTextItem * gi = static_cast<QGraphicsTextItem *>(QObject::sender());
+  EntryItem * gi = static_cast<EntryItem *>(QObject::sender());
 
+  if (!gi) {
+    return;
+  }
+  qDebug() << Q_FUNC_INFO << link;
   if (link.isEmpty()) {
     gi->setCursor(QCursor(Qt::ArrowCursor));
+    gi->setToolTip(gi->getPlace().getText());
+    return;
+  }
+  QString t;
+  QStringList p = link.split('?');
+  if (p.size() <= 1) {
+    t = link;
   }
   else {
-    gi->setCursor(QCursor(Qt::PointingHandCursor));
+    t = p[1];
   }
+
+  if (t.startsWith("nolink")) {
+    gi->setToolTip(tr("The target for this cross-reference has not been set."));
+    return;
+  }
+  if (! t.startsWith("golink")) {
+    QLOG_DEBUG() << Q_FUNC_INFO << "Invalid link text" << link;
+    return;
+  }
+  t.remove("golink=");
+  QSqlRecord rec = this->findLinkRecord(t);
+  if (! rec.isEmpty()) {
+    qDebug() << rec.value("tonode").toString();
+    qDebug() << rec;
+  }
+  Place n = Place::fromEntryRecord(rec);
+  gi->setCursor(QCursor(Qt::PointingHandCursor));
+  gi->setToolTip(QString(tr("To:")) + n.getText());
+
 }
+/**
+ * Called from context menu entry "What's This" created by EntryItem
+ *
+ * @param link
+ */
 void GraphicsEntry::showLinkDetails(const QString  & link) {
   QLOG_DEBUG() << Q_FUNC_INFO << link;
   Place p;
@@ -2534,4 +2570,38 @@ QString GraphicsEntry::wrapEntry(const QSqlRecord & record,const QString & xml) 
   t += "</word>";
 
   return t;
+}
+
+QSqlRecord GraphicsEntry::findLinkRecord(const QString & linkid) const {
+  QSqlRecord rec;
+  QLOG_DEBUG() << Q_FUNC_INFO << linkid;
+
+  QString node;
+  QSqlQuery q;
+  if (! q.prepare(SQL_LINKTO_NODE)) {
+    QLOG_WARN() << QString(tr("Prepare failed for SQL_LINKTO_NODE :%1")).arg(q.lastError().text());
+    return rec;
+  }
+  q.bindValue(0,linkid);
+  q.exec();
+  if (q.first()) {
+    node = q.value(0).toString();
+  }
+  else {
+    QLOG_WARN() << QString("Missing link record for link: %1").arg(linkid);
+    return rec;
+  }
+  if (! q.prepare(SQL_FIND_ENTRY_BY_NODE)) {
+      QLOG_WARN() << QString(tr("Prepare failed for SQL_FIND_ENTRY_BY_NODE for %1, error %2"))
+      .arg(linkid)
+      .arg(q.lastError().text());
+    return rec;
+  }
+
+  q.bindValue(0,node);
+  q.exec();
+  if (q.first()) {
+    return q.record();
+  }
+  return rec;
 }
