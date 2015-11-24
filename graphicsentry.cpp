@@ -582,6 +582,7 @@ void GraphicsEntry::linkHovered(const QString & link) {
 
   if (t.startsWith("nolink")) {
     gi->setToolTip(tr("The target for this cross-reference has not been set."));
+    gi->setCursor(QCursor(Qt::ArrowCursor));
     return;
   }
   if (! t.startsWith("golink")) {
@@ -591,7 +592,7 @@ void GraphicsEntry::linkHovered(const QString & link) {
   t.remove("golink=");
   QSqlRecord rec = this->findLinkRecord(t);
   if (! rec.isEmpty()) {
-    qDebug() << rec.value("tonode").toString();
+
     qDebug() << rec;
   }
   Place n = Place::fromEntryRecord(rec);
