@@ -159,6 +159,8 @@ They should not be translated.
 #define SID_SHORTCUT_SHOW_LOGS                 "Show logs"
 #define SID_SHORTCUT_ARABIC_FONT               "Change Arabic font"
 #define SID_SHORTCUT_MENU_SHOW                 "Menu show"
+#define SID_SHORTCUT_XREF_MODE                  "Xref mode"
+
 #define SID_SEARCH_IGNORE_DIACRITICS           "Ignore diacritics"
 #define SID_SEARCH_TYPE_REGEX                  "Regex"
 #define SID_SEARCH_WHOLE_WORD                  "Whole word"

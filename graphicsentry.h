@@ -90,6 +90,7 @@ class GraphicsEntry : public QWidget {
     void setCurrentItem(QGraphicsItem *);
     static QString getXsltFileName();
     QString userTitle() const;
+    void setXrefMode(int);
   public slots:
     void setUserTitle(const QString &);
     void anchorClicked(const QUrl &);
@@ -164,7 +165,7 @@ class GraphicsEntry : public QWidget {
     bool m_dumpHtml;
     bool m_dumpOutputHtml;
     bool m_offPageMovement;
-    bool m_linkCheckMode;
+    int  m_linkCheckMode;
 
     int m_pagingDir;
     int m_entryMargin;

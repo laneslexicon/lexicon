@@ -99,6 +99,7 @@ class LanesLexicon : public QMainWindow
       void onReady();
       void onLogViewer();
       void onLinkChanged();
+      void onXrefMode();
       void testSlot();
       void sync();
       void showNoteBrowser();

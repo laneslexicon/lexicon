@@ -2612,3 +2612,6 @@ QSqlRecord GraphicsEntry::findLinkRecord(const QString & linkid) const {
   }
   return rec;
 }
+void GraphicsEntry::setXrefMode(int m) {
+  m_linkCheckMode = m;
+}

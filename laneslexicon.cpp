@@ -671,6 +671,9 @@ void LanesLexicon::shortcut(const QString & key) {
     m_mainmenu->show();
     m_showMenuAction->setChecked(true);
   }
+  else if (key == SID_SHORTCUT_XREF_MODE) {
+    this->onXrefMode();
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -4548,4 +4551,71 @@ void LanesLexicon::onDuplicateTab(int index) {
 void LanesLexicon::onSaveTabs() {
   qDebug() << Q_FUNC_INFO;
 
+}
+/**
+ * show dialog, accept settings
+ * write to .ini
+ * update an GraphicsEntry tabs
+ */
+void LanesLexicon::onXrefMode() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
+  SETTINGS
+
+  settings.beginGroup("System");
+
+  int m = settings.value(SID_SYSTEM_LINK_CHECK_MODE,0).toInt();
+  QDialog * d = new QDialog();
+  d->setWindowTitle(tr("Set cross-reference mode"));
+  QVBoxLayout * layout = new QVBoxLayout;
+  QVBoxLayout * btnlayout = new QVBoxLayout;
+  QGroupBox * group = new QGroupBox(tr("Set cross-reference mode"));
+  QRadioButton * btn1 = new QRadioButton(tr("Follow cross-reference"));
+  QRadioButton * btn2 = new QRadioButton(tr("Show dialog and do not follow cross-reference"));
+  QRadioButton * btn3 = new QRadioButton(tr("Show dialog and follow cross-reference"));
+
+  switch(m) {
+  case 0 : { btn1->setChecked(true);break; }
+  case 1 : { btn2->setChecked(true);break; }
+  case 2 : { btn3->setChecked(true);break; }
+  default : btn1->setChecked(true);
+  }
+
+  btnlayout->addWidget(btn1);
+  btnlayout->addWidget(btn2);
+  btnlayout->addWidget(btn3);
+  btnlayout->addStretch();
+  group->setLayout(btnlayout);
+
+  QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Ok| QDialogButtonBox::Cancel);
+  layout->addWidget(group);
+  layout->addWidget(btns);
+  layout->addStretch();
+  d->setLayout(layout);
+  connect(btns,SIGNAL(accepted()),d,SLOT(accept()));
+  connect(btns,SIGNAL(rejected()),d,SLOT(reject()));
+  if (d->exec() != QDialog::Accepted) {
+    delete d;
+    return;
+  }
+  int v;
+  if (btn1->isChecked()) {
+    v = 0;
+  }
+  if (btn2->isChecked()) {
+    v = 1;
+  }
+  if (btn3->isChecked()) {
+    v = 2;
+  }
+  if (v != m) {
+    settings.setValue(SID_SYSTEM_LINK_CHECK_MODE,v);
+    for(int i=0;i < m_tabs->count();i++) {
+      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+      if (entry) {
+        entry->setXrefMode(v);
+      }
+    }
+  }
+  delete d;
 }
