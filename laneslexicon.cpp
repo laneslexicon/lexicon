@@ -1675,9 +1675,11 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
  * @param oldFocus
  * @param reason
  **/
-void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /* oldFocus */, Qt::FocusReason /* reason */) {
-  EntryItem * item = dynamic_cast<EntryItem *>(newFocus);
-  if (item) {
+void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /* oldFocus */, Qt::FocusReason  /* reason */) {
+  EntryItem * item1 = dynamic_cast<EntryItem *>(newFocus);
+  //  EntryItem * item2 = dynamic_cast<EntryItem *>(oldFocus);
+
+  if (item1) {
     updateStatusBar();
   }
 
@@ -1697,9 +1699,9 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
   }
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
+    QLOG_DEBUG() << Q_FUNC_INFO << keyEvent->modifiers() << keyEvent->key() << keyEvent->text();
     switch(keyEvent->key()) {
     case Qt::Key_Tab: {
-      QLOG_DEBUG() << Q_FUNC_INFO << "got tab" << target->objectName() << target->metaObject()->className();
         if (target == m_tabs) {
 
         }
