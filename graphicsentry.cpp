@@ -65,7 +65,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   setLayout(layout);
 
   connect(m_scene,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
-          this,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
+          this,SLOT(onFocusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)));
 
   initXslt();
   m_transform = m_view->transform();
@@ -1629,6 +1629,14 @@ void GraphicsEntry::moveBackward() {
  */
 void GraphicsEntry::onWiden() {
   /// TODO set width step in INI file
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  QGraphicsItem * item = m_scene->focusItem();
+
+  for(int i=0;i < m_items.size();i++) {
+    if (m_items[i]->hasFocus()) {
+      qDebug() << Q_FUNC_INFO << "item" << i << "has focus";
+    }
+  }
   m_textWidth += 50;
   //  QLOG_DEBUG() << "Scene rect before widen" << m_view->sceneRect() << m_textWidth;
   for(int i=0;i < m_items.size();i++) {
@@ -1638,16 +1646,18 @@ void GraphicsEntry::onWiden() {
   m_view->setSceneRect(m_scene->sceneRect());
   //  m_view->update();
   //  QLOG_DEBUG() << "Scene rect after" << m_view->sceneRect();
-  QGraphicsItem * item = m_scene->focusItem();
+
   if ( ! item ) {
-    item = m_items[0];
+    //  item = m_items[0];
   }
   if (item) {
     m_view->centerOn(item);//x,pos.y());
+    item->setFocus();
   }
 }
 void GraphicsEntry::onNarrow() {
   m_textWidth -= 50;
+  QGraphicsItem * item = m_scene->focusItem();
   //  QLOG_DEBUG() << "Scene rect before narrow" << m_view->sceneRect() << m_textWidth;
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->setTextWidth(m_textWidth);
@@ -1655,7 +1665,7 @@ void GraphicsEntry::onNarrow() {
   reposition();
   m_view->setSceneRect(m_scene->sceneRect());
   //  QLOG_DEBUG() << "Scene rect after" << m_view->sceneRect();
-  QGraphicsItem * item = m_scene->focusItem();
+
   //  m_view->setAlignment(Qt::AlignCenter);
   if ( ! item ) {
     item = m_items[0];
@@ -2638,4 +2648,23 @@ QSqlRecord GraphicsEntry::findLinkRecord(const QString & linkid) const {
 }
 void GraphicsEntry::setXrefMode(int m) {
   m_linkCheckMode = m;
+}
+void GraphicsEntry::onFocusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * oldFocus , Qt::FocusReason  reason ) {
+  EntryItem * item1 = dynamic_cast<EntryItem *>(newFocus);
+  EntryItem * item2 = dynamic_cast<EntryItem *>(oldFocus);
+
+  if (item1) {
+    m_focusPlace = item1->getPlace();
+  }
+  ///
+  /// this happens when the the graphicsentry loses focus because the user has clicked on
+  /// e.g the toolbar or pressed one of the active keys
+  ///
+  /// We try to restore focus to the last know focus place
+  ///
+  if (!item1  && item2) { // && (reason != Qt::MouseFocusReason)) {
+    this->hasPlace(m_focusPlace,GraphicsEntry::NodeSearch,true);
+  }
+  /// this updates the status bar
+  emit(focusItemChanged(newFocus,oldFocus,reason));
 }

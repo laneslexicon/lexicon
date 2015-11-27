@@ -120,7 +120,9 @@ class GraphicsEntry : public QWidget {
     void print(QPrinter &,const QString & node = QString());
     void showLinkDetails(const QString & );
     void fixLink(const QStringList &,bool);
+    void onFocusItemChanged(QGraphicsItem *,QGraphicsItem *,Qt::FocusReason);
  private:
+
     int m_findCount;
     int m_highlightCount;
     int m_currentFind;
@@ -218,7 +220,7 @@ class GraphicsEntry : public QWidget {
 
 
     Place m_place;
-
+    Place m_focusPlace;
 
     //    XalanTransformer * m_xalan;
 
