@@ -188,6 +188,7 @@ class GraphicsEntry : public QWidget {
     QString m_markKey;
     QString m_homeKey;
     QString m_reloadKey;
+    QString m_helpKey;
     QString m_currentSearchTarget;
     QString m_focusNode;
     QString m_currentCss;
