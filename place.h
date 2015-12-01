@@ -6,6 +6,8 @@
 #include "QsLog.h"
 #include <QDateTime>
 #include <QSqlRecord>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 /*
   Using the QVariant;
     Place p;
@@ -161,6 +163,8 @@ class Place    {
   QDateTime getWhen() const { return m_when;}
 
   QString location() const;
+  QString format(const QString & format) const;
+  QString formatc(const QString & format) const;
  public:
   int m_datasource;
   QString m_root;

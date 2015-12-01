@@ -190,3 +190,42 @@ Place Place::fromEntryRecord(const QSqlRecord & rec) {
 void Place::setHead(const QString & x) {
   m_head = x;
 }
+QString Place::format(const QString & fmt) const {
+  QString str = fmt;
+  str.replace("%R",m_root);
+  str.replace("%H",m_word);
+  str.replace("%V",QString("%1").arg(m_vol));
+  str.replace("%P",QString("%1").arg(m_page));
+  str.replace("%N",m_node);
+  return str;
+}
+QString Place::formatc(const QString & fmt) const {
+  QMap<QString,QString> v;
+  v.insert("R",m_root);
+  v.insert("H",m_word);
+  v.insert("N",m_node);
+  v.insert("V",QString("%1").arg(m_vol));
+  v.insert("P",QString("%1").arg(m_page));
+  QString pattern = fmt;
+  QStringList codes = v.keys();
+
+
+  for(int i=0;i < codes.size();i++) {
+    QRegularExpression hx(QString("%%1\\?(.+)%%1").arg(codes[i]));
+    QRegularExpressionMatch m =  hx.match(pattern);
+    if (m.hasMatch()) {
+      QString m1 = m.captured(1);
+      if (v.value(codes[i]).isEmpty())  {
+        pattern.replace(hx,"");
+      }
+      else {
+        pattern.replace(hx,m1 + v.value(codes[i]));
+      }
+    }
+    else {
+      pattern.replace(QString("%%1").arg(codes[i]),v.value(codes[i]));
+    }
+  }
+  return pattern;
+
+}
