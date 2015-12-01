@@ -427,7 +427,7 @@ Place GraphicsEntry::getPlace(int index) const {
   //  if (! m_focusNode.isEmpty()) {
   //    return Place::fromNode(m_focusNode);
   //  }
-  return m_place;
+  return m_focusPlace;
 }
 /**
  * returns the highest page number

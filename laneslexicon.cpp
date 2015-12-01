@@ -33,6 +33,7 @@
 #include "showmapwidget.h"
 #include "exportsearchdialog.h"
 #include "helpview.h"
+#include "pagesetdialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -76,7 +77,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   connect(m_tabs,SIGNAL(closeOtherTab(int)),this,SLOT(onCloseOtherTabs(int)));
   connect(m_tabs,SIGNAL(closeThisTab(int)),this,SLOT(onCloseTab(int)));
   connect(m_tabs,SIGNAL(duplicateTab(int)),this,SLOT(onDuplicateTab(int)));
-  connect(m_tabs,SIGNAL(onSaveTabs()),this,SLOT(onSaveTabs()));
+  connect(m_tabs,SIGNAL(savePageSet()),this,SLOT(onSavePageSet()));
   /// at the end of the history, but we should be able to restore from settings
   /// TODO would we want restore our current position in history?
   m_history = new HistoryMaster(m_historyDbName);
@@ -4550,10 +4551,6 @@ void LanesLexicon::onDuplicateTab(int index) {
   qDebug() << Q_FUNC_INFO << index;
 
 }
-void LanesLexicon::onSaveTabs() {
-  qDebug() << Q_FUNC_INFO;
-
-}
 /**
  * show dialog, accept settings
  * write to .ini
@@ -4620,4 +4617,76 @@ void LanesLexicon::onXrefMode() {
     }
   }
   delete d;
+}
+//#define SQL_PAGESET_ADD_HEADER "insert into pageset (title,accessed) values (?,?)"
+//#define SQL_PAGESET_ADD_PAGE "insert into page (pageset,place,userdata,pagenum) values (?,?,?,?)"
+
+void LanesLexicon::onSavePageSet() {
+  qDebug() << Q_FUNC_INFO;
+
+  PageSetDialog *  d = new PageSetDialog(m_tabs);
+  if (d->exec() != QDialog::Accepted) {
+    delete d;
+    return;
+  }
+  QString title = d->pageSetTitle();
+  QList<int> tabs = d->requestedTabs();
+  qDebug() << "Saving" << tabs;
+  delete d;
+  qDebug() << Q_FUNC_INFO << title;
+  QSqlQuery q(QSqlDatabase::database("notesdb"));
+  if (! q.prepare(SQL_PAGESET_ADD_HEADER)) {
+    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_ADD_HEADER query:%1")).arg(q.lastError().text());
+    return;
+  }
+  QSqlQuery p(QSqlDatabase::database("notesdb"));
+  if (! p.prepare(SQL_PAGESET_ADD_PAGE)) {
+    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_ADD_PAGE query:%1")).arg(p.lastError().text());
+    return;
+  }
+
+
+
+  q.bindValue(0,title);
+  q.bindValue(1,QDateTime::currentDateTime().toString());
+  if (! q.exec()) {
+    QLOG_WARN() << QString(tr("Exec failed for SQL_PAGESET_ADD_HEADER query:%1")).arg(q.lastError().text());
+    return;
+  }
+  QVariant v = q.lastInsertId().toInt();
+  if (! v.isValid()) {
+    QLOG_WARN() << QString(tr("No valid id return from pageset insert:%1")).arg(q.lastError().text());
+    return;
+  }
+  int id = v.toInt();
+  int ix = 0;
+  for(int i=0;i < tabs.size();i++) {
+      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(tabs[i]));
+      QString data;
+      QString place;
+      if (entry) {
+        ix++;
+        place = entry->getPlace().toString();
+        data += QString("?type=%1").arg("entry");
+        data += QString("?zoom=%1").arg(entry->getScale());
+        data += QString("?textwidth=%1").arg(entry->getTextWidth());
+        data += QString("?usertitle=%1").arg(entry->userTitle());
+        QString h = entry->getHome();
+        if (! h.isEmpty()) {
+          data += QString("?home=%1").arg(h);
+        }
+      }
+      p.bindValue(0,id);
+      p.bindValue(1,place);
+      p.bindValue(2,data);
+      p.bindValue(3,ix);
+      if (!p.exec()) {
+        QLOG_WARN() << QString(tr("Exec failed for SQL_PAGESET_ADD_PAGE query:%1")).arg(p.lastError().text());
+      }
+      qDebug() << place;
+  }
+  QSqlDatabase::database("notesdb").commit();
+  QString plural;
+  plural = (ix > 1? "s" : "");
+  QLOG_INFO() << QString("Save page set \"%1\", %2 page%3").arg(title).arg(ix).arg(plural);
 }

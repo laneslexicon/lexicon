@@ -29,6 +29,6 @@ class TabWidget : public QTabWidget {
   void closeOtherTab(int);
   void closeThisTab(int);
   void duplicateTab(int);
-  void saveTabs();
+  void savePageSet();
 };
 #endif

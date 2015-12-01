@@ -76,4 +76,10 @@
 #define SQL_LINK_TYPE "select * from links where orthid = ?"
 #define SQL_LINK_UPDATE_STATUS "update links set status = ?,tonode = ?,note = ? where orthid = ?"
 #define SQL_UPDATE_ENTRY_XML "update entry set xml = ? where nodeid = ?"
+//
+#define SQL_PAGESET_HEADERS "select * from pageset order by title asc"
+#define SQL_PAGESET_DETAIL "select * from page where pageset = ? order by pagenum asc"
+#define SQL_PAGESET_PAGE_COUNT "select count(id) from page where pageset = ?"
+#define SQL_PAGESET_ADD_HEADER "insert into pageset (title,accessed) values (?,?)"
+#define SQL_PAGESET_ADD_PAGE "insert into page (pageset,place,userdata,pagenum) values (?,?,?,?)"
 #endif

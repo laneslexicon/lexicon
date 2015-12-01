@@ -104,7 +104,7 @@ void TabWidget::contextMenuEvent(QContextMenuEvent * event) {
   QAction * closeOther = menu.addAction(tr("Close &other tabs"));
   QAction * closeThis = menu.addAction(tr("Close &this tab"));
   QAction * savePageSet = menu.addAction(tr("Save &pages"));
-  savePageSet->setVisible(false);
+  savePageSet->setVisible(true);
   QAction * duplicate = menu.addAction(tr("&Duplicate tab"));
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(this->currentWidget());
   if (! entry) {
@@ -122,6 +122,6 @@ void TabWidget::contextMenuEvent(QContextMenuEvent * event) {
     emit(duplicateTab(this->currentIndex()));
   }
   else if (action == savePageSet) {
-    emit(saveTabs());
+    emit(this->savePageSet());
   }
 }

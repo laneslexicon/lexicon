@@ -95,6 +95,7 @@ class LanesLexicon : public QMainWindow
       void enableKeymaps(bool);
     //    void saveNote(Note *);
       void importXml(const QString & filename);
+      void onSavePageSet();
     private slots:
       void onReady();
       void onLogViewer();
@@ -123,7 +124,7 @@ class LanesLexicon : public QMainWindow
       void onCloseTab(int) ;
       void onCloseOtherTabs(int) ;
       void onDuplicateTab(int);
-      void onSaveTabs();
+
 
       void onGoToPage(const Place &);
       void onExit();

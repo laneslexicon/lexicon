@@ -380,3 +380,8 @@ They should not be translated.
 
 //#define SID_NOTES
 #define SID_OPTIONS_CLOSE "Close warning"
+// pagesetdialog
+#define SID_PAGESET_MAIN_CONTEXT            "Main context"
+#define SID_PAGESET_ARABIC_CONTEXT          "Arabic context"
+#define SID_PAGESET_OVERWRITE_EXISTING      "Overwrite"
+#define SID_PAGESET_SELECT_ALL              "Select all"
