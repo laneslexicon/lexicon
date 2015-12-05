@@ -1606,17 +1606,18 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
     newTab = true;
   }
-  m_place = showPlace(p,newTab,true);
+  GraphicsEntry * entry = showPlace(p,newTab,true);
+  m_place = entry->getPlace();
   return;
 }
 
-Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
+GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
   Place np;
 
   QLOG_DEBUG() << Q_FUNC_INFO << p << createTab << activateTab;
   GraphicsEntry * entry;
   if (! p.isValid()) {
-    return p;
+    return NULL;
   }
   /// if we don't have a tab or the current tab is not a graphicsentry
   /// force new tab creation
@@ -1645,11 +1646,12 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
       if (activateTab) {
         m_tabs->setCurrentIndex(ix);
       }
+      return entry;
     }
     else {
       delete entry;
+      return NULL;
     }
-    return np;
   }
   if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
     /// TODO check this and onTabsChanged
@@ -1657,6 +1659,8 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
     /// tabs->tabContentsChanged() emits signa tabsChanged()
     /// which ends calling this->onTabsChanged()
     // and that inserts a number in tab title
+    QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "SHOULD WE BE HERE?";
+
     np = entry->getXmlForRoot(p); // ?????
     if (np.isValid()) {
       m_tabs->setTabText(currentTab,np.getShortText());
@@ -1664,10 +1668,7 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
       m_tabs->tabContentsChanged();
     }
   }
-  else {
-    return p;
-  }
- return np;
+ return entry;
 }
 /**
  * when user clicks on item reason Qt::MouseFocusReason
@@ -3055,7 +3056,7 @@ void LanesLexicon::searchForPage() {
       m_tabs->setCurrentIndex(ix);
       return;
     }
-    p = showPlace(p,options.newTab(),options.activateTab());
+    showPlace(p,options.newTab(),options.activateTab());
   }
   else {
     p.setPage(page);
@@ -3091,8 +3092,8 @@ void LanesLexicon::searchForRoot() {
         m_tabs->setCurrentIndex(ix);
         return;
       }
-      p = showPlace(Place(t),opts.newTab(),opts.activateTab());
-      if (! p.isValid()) {
+      GraphicsEntry *  entry = showPlace(Place(t),opts.newTab(),opts.activateTab());
+      if (! entry ) {
         QMessageBox msgBox;
         msgBox.setObjectName("rootnotfound");
         msgBox.setTextFormat(Qt::RichText);
@@ -3245,8 +3246,8 @@ void LanesLexicon::searchForNode() {
         showPlace(p,false,true);
         return;
       }
-      p = showPlace(p,options.newTab(),options.activateTab());
-      if (! p.isValid()) {
+      GraphicsEntry * entry = showPlace(p,options.newTab(),options.activateTab());
+      if (! entry ) {
         QMessageBox msgBox;
         msgBox.setText(QString(tr("Node not found: %1")).arg(t));
         msgBox.exec();
@@ -3415,7 +3416,7 @@ void LanesLexicon::showSearchNode(const QString & node) {
   Place p;
   p.setNode(node);
   //this->showPlace(p,Lane::Create_Tab);
-  p = showPlace(p,true,false);
+  showPlace(p,true,false);
 }
 
 int LanesLexicon::getSearchCount() {

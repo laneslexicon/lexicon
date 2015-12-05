@@ -566,12 +566,13 @@ void GraphicsEntry::linkActivated(const QString & link) {
         return;
       }
       else {
-        QLOG_WARN() << "Jump to missing root requested" << msg << query.lastError().text();
+        QLOG_WARN() << QString(tr("Error in Jump to root requested :%1, error %2")).arg(msg).arg(query.lastError().text());
       }
     }
   }
   else {
     /// TODO check this is no longer used
+    QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "SHOULD NOT BE HERE";
     QString node(link);
     /// remove the leading #
     node.remove(0,1);
@@ -712,6 +713,7 @@ void GraphicsEntry::anchorTest() {
 /// TODO how is it supposed to be used ?????????
 Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,bool createTab,bool activateTab) {
   /// check if the node is on this page
+    QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "SHOULD NOT BE HERE";
   QString node = p.getNode();
   for(int i=0;i < m_items.size();i++) {
     EntryItem * item = m_items[i];
@@ -809,6 +811,10 @@ void GraphicsEntry::setItemPlace(EntryItem * item,const QSqlQuery & query) {
  *      the Place that matches the node, but the root
  * @param root
  * @param node the id of the entry we want to focus on
+ * returns the Place of the item that is centered on; if a particular node
+ * was requested then that place is returned, otherwise the root place
+ *
+ * set the focusNode used by "home" function
  */
 Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   QList<EntryItem *> items;
@@ -966,13 +972,12 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// all items have been added and positions calculated
   ///
   m_view->setFocus();
-  //m_transform = m_view->transform();
+
   this->setScale(m_scale);
 
-  //QLOG_DEBUG() << "Scene rect" << m_scene->sceneRect();
-  /// without thus centerOn() does not work properly for
+  /// without this call to setSceneRect centerOn() does not work properly for
   /// items added to the scene
-  /// TODO check this
+  ///
   m_view->setSceneRect(m_scene->sceneRect());
   if (centerItem) {
     this->setCurrentItem(centerItem);

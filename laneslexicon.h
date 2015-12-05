@@ -90,7 +90,7 @@ class LanesLexicon : public QMainWindow
   enum NavigationMode { ByRoot , ByPage };
   public slots:
     int hasPlace(const Place & p,int searchtype,bool setFocus);
-    Place showPlace(const Place &,bool newTab,bool activate);
+    GraphicsEntry * showPlace(const Place &,bool newTab,bool activate);
     void setStatus(const QString &);
       void enableKeymaps(bool);
     //    void saveNote(Note *);
