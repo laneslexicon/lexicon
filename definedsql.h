@@ -79,6 +79,7 @@
 //
 #define SQL_PAGESET_HEADERS "select * from pageset order by title asc"
 #define SQL_PAGESET_DETAIL "select * from page where pageset = ? order by pagenum asc"
+#define SQL_PAGESET_DETAIL_BY_ID "select * from page where id = ?"
 #define SQL_PAGESET_PAGE_COUNT "select count(id) from page where pageset = ?"
 #define SQL_PAGESET_ADD_HEADER "insert into pageset (title,accessed) values (?,?)"
 #define SQL_PAGESET_ADD_PAGE "insert into page (pageset,place,userdata,pagenum) values (?,?,?,?)"

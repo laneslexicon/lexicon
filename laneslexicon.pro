@@ -98,7 +98,9 @@ SOURCES += main.cpp\
         helpview.cpp \
         linkcheckdialog.cpp \
         showxmldialog.cpp  \
-        pagesetdialog.cpp
+        centeredcheckbox.cpp \
+        pagesetdialog.cpp \
+        loadpagesetdialog.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -142,4 +144,6 @@ HEADERS  += laneslexicon.h \
             acknowledgements.h  \
             linkcheckdialog.h \
             showxmldialog.h \
-            pagesetdialog.h
+            centeredcheckbox.h \
+            pagesetdialog.h \
+            loadpagesetdialog.h

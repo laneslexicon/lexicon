@@ -5,24 +5,11 @@
 #include "externs.h"
 #include "graphicsentry.h"
 #include "definedsettings.h"
+#include "centeredcheckbox.h"
 #define SET_ID_COLUMN 0
-#define SET_PID_COLUMN 1
-#define SET_TITLE_COLUMN 2
-#define SET_COUNT_COLUMN 3
-#define SET_ACCESSED_COLUMN 4
-CenteredCheckBox::CenteredCheckBox(QWidget * parent) : QWidget(parent) {
-  QHBoxLayout * layout = new QHBoxLayout;
-  m_box = new QCheckBox;
-  layout->setAlignment(Qt::AlignCenter);
-  layout->addWidget(m_box);
-  setLayout(layout);
-}
-bool CenteredCheckBox::isChecked() const {
-  return m_box->isChecked();
-}
-void CenteredCheckBox::setChecked(bool v)  {
-  return m_box->setChecked(v);
-}
+#define SET_TITLE_COLUMN 1
+#define SET_COUNT_COLUMN 2
+#define SET_ACCESSED_COLUMN 3
 PageSetDialog::PageSetDialog(QTabWidget * tabs,QWidget * parent) : QDialog(parent) {
 
   //  m_action = action;
@@ -75,7 +62,7 @@ PageSetDialog::PageSetDialog(QTabWidget * tabs,QWidget * parent) : QDialog(paren
   this->loadTitles();
 
   m_setlist->hideColumn(SET_ID_COLUMN);
-  m_setlist->hideColumn(SET_PID_COLUMN);
+
 
   this->selectionToggled(m_selectAll->isChecked());
 }
@@ -173,9 +160,9 @@ void PageSetDialog::loadTitles() {
   QSqlRecord rec;
   m_setlist->clear();
   m_setlist->verticalHeader()->setVisible(false);
-  m_setlist->setColumnCount(5);
+  m_setlist->setColumnCount(4);
   QStringList headers;
-  headers << tr("Id") << tr("Page set id") << tr("Title") << tr("Pages") << tr("Created");
+  headers << tr("Id") << tr("Title") << tr("Pages") << tr("Created");
   m_setlist->setHorizontalHeaderLabels(headers);
   m_setlist->horizontalHeader()->setStretchLastSection(true);
   m_setlist->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -201,7 +188,6 @@ void PageSetDialog::loadTitles() {
     rec = q.record();
 
     m_setlist->setItem(row,SET_TITLE_COLUMN,new QTableWidgetItem(rec.value("title").toString()));
-    m_setlist->setItem(row,SET_PID_COLUMN,new QTableWidgetItem(QString("%1").arg(rec.value("pageset").toInt())));
     m_setlist->setItem(row,SET_ID_COLUMN,new QTableWidgetItem(QString("%1").arg(rec.value("id").toInt())));
 
     QString d = rec.value("accessed").toString();
@@ -224,8 +210,8 @@ void PageSetDialog::readSettings() {
   SETTINGS
 
   settings.beginGroup("PageSets");
-  resize(settings.value("Size", QSize(600, 400)).toSize());
-  move(settings.value("Pos", QPoint(200, 200)).toPoint());
+  resize(settings.value(SID_PAGESET_SAVE_DIALOG_SIZE, QSize(600, 400)).toSize());
+  move(settings.value(SID_PAGESET_SAVE_DIALOG_POS, QPoint(200, 200)).toPoint());
   m_spanStyle = settings.value(SID_PAGESET_MAIN_CONTEXT,QString()).toString();
   m_spanStyle += " " + settings.value(SID_PAGESET_ARABIC_CONTEXT,QString()).toString();
   m_overwrite->setChecked(settings.value(SID_PAGESET_OVERWRITE_EXISTING,false).toBool());
@@ -236,8 +222,8 @@ void PageSetDialog::writeSettings() {
   SETTINGS
 
  settings.beginGroup("PageSets");
-  settings.setValue("Size", size());
-  settings.setValue("Pos", pos());
+  settings.setValue(SID_PAGESET_SAVE_DIALOG_SIZE, size());
+  settings.setValue(SID_PAGESET_SAVE_DIALOG_POS, pos());
   settings.setValue(SID_PAGESET_OVERWRITE_EXISTING,m_overwrite->isChecked());
   settings.setValue(SID_PAGESET_SELECT_ALL,m_selectAll->isChecked());
 }

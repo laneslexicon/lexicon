@@ -34,6 +34,7 @@
 #include "exportsearchdialog.h"
 #include "helpview.h"
 #include "pagesetdialog.h"
+#include "loadpagesetdialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -905,6 +906,7 @@ void LanesLexicon::createActions() {
   m_importLinksAction = new QAction(tr("&Import links"),this);
 
   m_importXmlAction = new QAction(tr("Import &Xml"),this);
+  m_loadPageSetAction = new QAction(tr("Load page &set"),this);
 
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
@@ -934,6 +936,7 @@ void LanesLexicon::createActions() {
   connect(m_exportLinksAction,SIGNAL(triggered()),this,SLOT(onExportLinks()));
 
   connect(m_importXmlAction,SIGNAL(triggered()),this,SLOT(onImportXml()));
+  connect(m_loadPageSetAction,SIGNAL(triggered()),this,SLOT(onLoadPageSet()));
 }
 void LanesLexicon::createToolBar() {
   QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
@@ -1276,7 +1279,7 @@ void LanesLexicon::createMenus() {
   m_fileMenu = menuBar()->addMenu(tr("&File"));
   m_fileMenu->setObjectName("filemenu");
   m_fileMenu->setFocusPolicy(Qt::StrongFocus);
-
+  m_fileMenu->addAction(m_loadPageSetAction);
   m_fileMenu->addAction(m_exitAction);
 
   m_viewMenu = menuBar()->addMenu(tr("&View"));
@@ -1632,8 +1635,6 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
     }
   }
   if (createTab) {
-    /// turn history on as the user has clicked on something
-    /// and the root is not already shown
     entry = new GraphicsEntry(this);
     setSignals(entry);
     entry->installEventFilter(this);
@@ -1651,12 +1652,12 @@ Place LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
     return np;
   }
   if (entry->hasPlace(p,GraphicsEntry::RootSearch,true) == -1) {
-    np = entry->getXmlForRoot(p);
     /// TODO check this and onTabsChanged
     /// this sets the tab text to the headword
     /// tabs->tabContentsChanged() emits signa tabsChanged()
     /// which ends calling this->onTabsChanged()
     // and that inserts a number in tab title
+    np = entry->getXmlForRoot(p); // ?????
     if (np.isValid()) {
       m_tabs->setTabText(currentTab,np.getShortText());
       entry->setFocus();
@@ -4631,9 +4632,9 @@ void LanesLexicon::onSavePageSet() {
   }
   QString title = d->pageSetTitle();
   QList<int> tabs = d->requestedTabs();
-  qDebug() << "Saving" << tabs;
+
   delete d;
-  qDebug() << Q_FUNC_INFO << title;
+
   QSqlQuery q(QSqlDatabase::database("notesdb"));
   if (! q.prepare(SQL_PAGESET_ADD_HEADER)) {
     QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_ADD_HEADER query:%1")).arg(q.lastError().text());
@@ -4688,5 +4689,70 @@ void LanesLexicon::onSavePageSet() {
   QSqlDatabase::database("notesdb").commit();
   QString plural;
   plural = (ix > 1? "s" : "");
-  QLOG_INFO() << QString("Save page set \"%1\", %2 page%3").arg(title).arg(ix).arg(plural);
+  QLOG_INFO() << QString("Saved page set \"%1\", %2 page%3").arg(title).arg(ix).arg(plural);
+}
+void LanesLexicon::onLoadPageSet() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
+  LoadPageSetDialog * d = new LoadPageSetDialog;
+  QList<int> pages;
+  bool clearTabs;
+  if (d->exec() == QDialog::Accepted) {
+    pages = d->pages();
+    clearTabs = d->closeExisting();
+  }
+  delete d;
+  if (pages.size() == 0) {
+    return;
+  }
+  QSqlQuery q(QSqlDatabase::database("notesdb"));
+  if (! q.prepare(SQL_PAGESET_DETAIL_BY_ID)) {
+    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_DETAIL query:%1")).arg(q.lastError().text());
+    return;
+  }
+  if (clearTabs) {
+    while(m_tabs->count() > 0) {
+      this->onCloseTab(0);
+    }
+  }
+  qDebug() << pages;
+  int ix=0;
+  QRegularExpression rx("(\\w+)=(.+)");
+  for(int i=0;i < pages.size();i++) {
+    q.bindValue(0,pages[i]);
+    q.exec();
+    if (q.first()) {
+      QString str = q.record().value("place").toString();
+      Place p = Place::fromString(str);
+      if (p.isValid()) {
+	this->showPlace(p,true,false);
+	QString d = q.record().value("userdata").toString();
+	QStringList v = d.split("?");
+	for(int j=0;j < v.size();j++) {
+	  QRegularExpressionMatch m = rx.match(v[i]);
+          if (m.hasMatch()) {
+            QString k = m.captured(1);
+            QString v = m.captured(2);
+            if (k == "usertitle") {
+            }
+            else if (k == "zoom") {
+            }
+            else if (k == "textwidth") {
+            }
+            else if (k == "type") {
+            }
+            else if (k == "home") {
+            }
+          }
+	}
+	ix++;
+      }
+      else {
+	QLOG_WARN() << QString(tr("Invalid place not loaded:%1")).arg(str);
+      }
+    }
+    else {
+    }
+  }
+  statusMessage(QString(tr("Restored %1 page%2")).arg(ix).arg(ix == 1 ? "" : tr("s")));
 }

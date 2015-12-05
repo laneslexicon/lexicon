@@ -32,15 +32,6 @@
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif
-class CenteredCheckBox : public QWidget {
-  Q_OBJECT
- public:
-  CenteredCheckBox(QWidget * parent = 0);
-  void setChecked(bool v);
-  bool isChecked() const;
- private:
-  QCheckBox * m_box;
-};
 class PageSetDialog : public QDialog {
   Q_OBJECT
 
