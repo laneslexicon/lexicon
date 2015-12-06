@@ -33,7 +33,8 @@
 #include "showmapwidget.h"
 #include "exportsearchdialog.h"
 #include "helpview.h"
-#include "pagesetdialog.h"
+#include "savepagesetdialog.h"
+#include "editpagesetdialog.h"
 #include "loadpagesetdialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
@@ -906,7 +907,10 @@ void LanesLexicon::createActions() {
   m_importLinksAction = new QAction(tr("&Import links"),this);
 
   m_importXmlAction = new QAction(tr("Import &Xml"),this);
-  m_loadPageSetAction = new QAction(tr("Load page &set"),this);
+
+  m_loadPageSetAction = new QAction(tr("Load tab &set"),this);
+  m_savePageSetAction = new QAction(tr("Save tab &set"),this);
+  m_editPageSetAction = new QAction(tr("Edit tab &sets"),this);
 
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
@@ -937,6 +941,8 @@ void LanesLexicon::createActions() {
 
   connect(m_importXmlAction,SIGNAL(triggered()),this,SLOT(onImportXml()));
   connect(m_loadPageSetAction,SIGNAL(triggered()),this,SLOT(onLoadPageSet()));
+  connect(m_savePageSetAction,SIGNAL(triggered()),this,SLOT(onSavePageSet()));
+  connect(m_editPageSetAction,SIGNAL(triggered()),this,SLOT(onEditPageSet()));
 }
 void LanesLexicon::createToolBar() {
   QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
@@ -1279,7 +1285,6 @@ void LanesLexicon::createMenus() {
   m_fileMenu = menuBar()->addMenu(tr("&File"));
   m_fileMenu->setObjectName("filemenu");
   m_fileMenu->setFocusPolicy(Qt::StrongFocus);
-  m_fileMenu->addAction(m_loadPageSetAction);
   m_fileMenu->addAction(m_exitAction);
 
   m_viewMenu = menuBar()->addMenu(tr("&View"));
@@ -1305,6 +1310,13 @@ void LanesLexicon::createMenus() {
   m_bookmarkMenu->addAction(m_bookmarkAddAction);
 
   connect(m_mainmenu,SIGNAL(rebuildBookmarks()),this,SLOT(bookmarkRebuildMenu()));
+
+  m_pageSetMenu = m_mainmenu->addMenu(tr("Ta&bs"));
+  m_pageSetMenu->setObjectName("tabmenu");
+  m_pageSetMenu->setFocusPolicy(Qt::StrongFocus);
+  m_pageSetMenu->addAction(m_loadPageSetAction);
+  m_pageSetMenu->addAction(m_savePageSetAction);
+  m_pageSetMenu->addAction(m_editPageSetAction);
 
   m_historyMenu = m_mainmenu->addMenu(tr("&History"));
   m_historyMenu->setObjectName("historymenu");
@@ -4620,13 +4632,11 @@ void LanesLexicon::onXrefMode() {
   }
   delete d;
 }
-//#define SQL_PAGESET_ADD_HEADER "insert into pageset (title,accessed) values (?,?)"
-//#define SQL_PAGESET_ADD_PAGE "insert into page (pageset,place,userdata,pagenum) values (?,?,?,?)"
 
 void LanesLexicon::onSavePageSet() {
   qDebug() << Q_FUNC_INFO;
 
-  PageSetDialog *  d = new PageSetDialog(m_tabs);
+  SavePageSetDialog *  d = new SavePageSetDialog(m_tabs);
   if (d->exec() != QDialog::Accepted) {
     delete d;
     return;
@@ -4716,9 +4726,9 @@ void LanesLexicon::onLoadPageSet() {
       this->onCloseTab(0);
     }
   }
-  qDebug() << pages;
   int ix=0;
   QRegularExpression rx("(\\w+)=(.+)");
+  bool ok;
   for(int i=0;i < pages.size();i++) {
     q.bindValue(0,pages[i]);
     q.exec();
@@ -4726,23 +4736,34 @@ void LanesLexicon::onLoadPageSet() {
       QString str = q.record().value("place").toString();
       Place p = Place::fromString(str);
       if (p.isValid()) {
-	this->showPlace(p,true,false);
+	GraphicsEntry * entry = this->showPlace(p,true,false);
 	QString d = q.record().value("userdata").toString();
 	QStringList v = d.split("?");
 	for(int j=0;j < v.size();j++) {
-	  QRegularExpressionMatch m = rx.match(v[i]);
+	  QRegularExpressionMatch m = rx.match(v[j]);
           if (m.hasMatch()) {
             QString k = m.captured(1);
             QString v = m.captured(2);
             if (k == "usertitle") {
+              entry->setUserTitle(v);
             }
             else if (k == "zoom") {
+              double d = v.toDouble(&ok);
+              if (ok) {
+                entry->setScale(d);
+              }
             }
             else if (k == "textwidth") {
+              int w = v.toInt(&ok);
+              if (ok) {
+                entry->setTextWidth(w);
+              }
             }
             else if (k == "type") {
+              /// TODO ??
             }
             else if (k == "home") {
+              entry->setHome(v);
             }
           }
 	}
@@ -4756,4 +4777,10 @@ void LanesLexicon::onLoadPageSet() {
     }
   }
   statusMessage(QString(tr("Restored %1 page%2")).arg(ix).arg(ix == 1 ? "" : tr("s")));
+}
+void LanesLexicon::onEditPageSet() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
+  EditPageSetDialog  d;
+  d.exec();
 }

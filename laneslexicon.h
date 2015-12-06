@@ -98,6 +98,7 @@ class LanesLexicon : public QMainWindow
 
       void onSavePageSet();
       void onLoadPageSet();
+      void onEditPageSet();
     private slots:
       void onReady();
       void onLogViewer();
@@ -350,6 +351,7 @@ class LanesLexicon : public QMainWindow
       QMenu * m_toolMenu;
       QMenu * m_helpMenu;
       QMenu * m_themeMenu;
+      QMenu * m_pageSetMenu;
       AppMenu * m_mainmenu;
 
       QSize m_toolbarIconSize;
@@ -454,6 +456,8 @@ class LanesLexicon : public QMainWindow
       QAction * m_importLinksAction;
       QAction * m_importXmlAction;
       QAction * m_loadPageSetAction;
+      QAction * m_savePageSetAction;
+      QAction * m_editPageSetAction;
 
       HistoryMaster * m_history;
       NoteMaster * m_notes;

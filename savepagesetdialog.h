@@ -1,5 +1,5 @@
-#ifndef _PAGESETDIALOG_H_
-#define _PAGESETDIALOG_H_
+#ifndef _SAVEPAGESETDIALOG_H_
+#define _SAVEPAGESETDIALOG_H_
 #include <QtCore>
 #include <QDialog>
 #include <QDebug>
@@ -32,12 +32,12 @@
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif
-class PageSetDialog : public QDialog {
+class SavePageSetDialog : public QDialog {
   Q_OBJECT
 
  public:
-  PageSetDialog(QTabWidget *,QWidget * parent = 0);
-  ~PageSetDialog();
+  SavePageSetDialog(QTabWidget *,QWidget * parent = 0);
+  ~SavePageSetDialog();
   QString pageSetTitle() const;
   QList<int> requestedTabs() const;
   bool overwrite() const ;

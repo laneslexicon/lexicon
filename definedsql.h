@@ -83,4 +83,8 @@
 #define SQL_PAGESET_PAGE_COUNT "select count(id) from page where pageset = ?"
 #define SQL_PAGESET_ADD_HEADER "insert into pageset (title,accessed) values (?,?)"
 #define SQL_PAGESET_ADD_PAGE "insert into page (pageset,place,userdata,pagenum) values (?,?,?,?)"
+#define SQL_PAGESET_DELETE  "delete from pageset where id = ?"
+#define SQL_PAGESET_DELETE_ALL_PAGES "delete from page where pageset = ?"
+#define SQL_PAGESET_DELETE_PAGE "delete from page where id = ?"
+#define SQL_PAGESET_FIND_ORPHANED "select pageset.id,count(page.id)  from pageset,page where page.pageset = pageset.id group by pageset.id"
 #endif

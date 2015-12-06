@@ -391,3 +391,5 @@ They should not be translated.
 #define SID_PAGESET_LOAD_DIALOG_SIZE        "Load dialog size"
 #define SID_PAGESET_PAGE_DIALOG_POS         "Page dialog pos"
 #define SID_PAGESET_PAGE_DIALOG_SIZE        "Page dialog size"
+#define SID_PAGESET_EDIT_DIALOG_POS         "Edit dialog pos"
+#define SID_PAGESET_EDIT_DIALOG_SIZE        "Edit dialog size"

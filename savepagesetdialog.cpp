@@ -1,4 +1,4 @@
-#include "pagesetdialog.h"
+#include "savepagesetdialog.h"
 #include "definedsql.h"
 #include "QsLog.h"
 #include "application.h"
@@ -10,14 +10,14 @@
 #define SET_TITLE_COLUMN 1
 #define SET_COUNT_COLUMN 2
 #define SET_ACCESSED_COLUMN 3
-PageSetDialog::PageSetDialog(QTabWidget * tabs,QWidget * parent) : QDialog(parent) {
+SavePageSetDialog::SavePageSetDialog(QTabWidget * tabs,QWidget * parent) : QDialog(parent) {
 
   //  m_action = action;
   m_name = new QLineEdit;
   m_setlist = new QTableWidget;
   m_tablist = new QTableWidget;
 
-  m_overwrite = new QCheckBox;
+  m_overwrite = new QCheckBox(tr("Do not warn when overwriting existing page set"));
   m_selectAll = new QRadioButton(tr("Select all"));
   m_selectNone = new QRadioButton(tr("Clear selections"));
   readSettings();
@@ -32,21 +32,23 @@ PageSetDialog::PageSetDialog(QTabWidget * tabs,QWidget * parent) : QDialog(paren
   layout->addWidget(intro);
   QFormLayout * flayout = new QFormLayout;
 
-
-  flayout->addRow(tr("Current tabs"),m_tablist);
+  QGroupBox * current = new QGroupBox(tr("Current tabs"));
+  QVBoxLayout * grouplayout = new QVBoxLayout;
+  grouplayout->addWidget(m_tablist);
 
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(m_selectAll);
   hlayout->addWidget(m_selectNone);
-  hlayout->addStretch();
-  QGroupBox * radiobox = new QGroupBox;
-  radiobox->setLayout(hlayout);
-  flayout->addRow("",radiobox);
+
+  grouplayout->addLayout(hlayout);
+
+  current->setLayout(grouplayout);
+
   flayout->addRow(tr("Page set title"),m_name);
 
-
+  flayout->addRow("",current);
   flayout->addRow(tr("Existing page sets"),m_setlist);
-  flayout->addRow(tr("Do not warn when overwriting\nexisting page set"),m_overwrite);
+  flayout->addRow("",m_overwrite);
   layout->addLayout(flayout);
 
     QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Save
@@ -66,17 +68,17 @@ PageSetDialog::PageSetDialog(QTabWidget * tabs,QWidget * parent) : QDialog(paren
 
   this->selectionToggled(m_selectAll->isChecked());
 }
-PageSetDialog::~PageSetDialog() {
+SavePageSetDialog::~SavePageSetDialog() {
   qDebug() << Q_FUNC_INFO;
   writeSettings();
 }
-QString PageSetDialog::pageSetTitle() const {
+QString SavePageSetDialog::pageSetTitle() const {
   return m_name->text();
 }
-bool PageSetDialog::overwrite() const {
+bool SavePageSetDialog::overwrite() const {
   return m_overwrite->isChecked();
 }
-void PageSetDialog::onSave() {
+void SavePageSetDialog::onSave() {
   QString name = m_name->text();
   if (name.isEmpty()) {
     QString msg(tr("A page set title is required in order to save the selected pages."));
@@ -92,14 +94,21 @@ void PageSetDialog::onSave() {
       }
     }
   }
+  QList<int> t = this->requestedTabs();
+  if (t.size() == 0) {
+    QString msg(tr("No tabs have been selected for saving."));
+    QMessageBox::warning(this,tr("No tabs selected"),msg,QMessageBox::Ok);
+    return;
+  }
   this->accept();
 }
 #define TAB_SAVE_COLUMN 0
 #define TAB_INDEX_COLUMN 1
 #define TAB_TITLE_COLUMN 2
-#define TAB_PLACE_COLUMN 3
-
-void PageSetDialog::loadTabs(QTabWidget * tabs) {
+#define TAB_ROOT_COLUMN  3
+#define TAB_WORD_COLUMN  4
+#define TAB_VOLUME_COLUMN  5
+void SavePageSetDialog::loadTabs(QTabWidget * tabs) {
 
   QLOG_DEBUG() << Q_FUNC_INFO;
   /*
@@ -110,13 +119,21 @@ void PageSetDialog::loadTabs(QTabWidget * tabs) {
   m_tablist->setItemDelegateForColumn(TAB_TITLE_COLUMN,d);
   */
 
+  QMap<int,QString> hm;
+  hm.insert(TAB_SAVE_COLUMN,tr("Save"));
+  hm.insert(TAB_INDEX_COLUMN,tr("Tab"));
+  hm.insert(TAB_TITLE_COLUMN,tr("Title"));
+  hm.insert(TAB_ROOT_COLUMN,tr("Root"));
+  hm.insert(TAB_WORD_COLUMN,tr("Headword"));
+  hm.insert(TAB_VOLUME_COLUMN,tr("Volume/Page"));
+
   m_tablist->clear();
-  m_tablist->setColumnCount(4);
+  m_tablist->setColumnCount(hm.size());
   m_tablist->verticalHeader()->setVisible(false);
 
 
   QStringList headers;
-  headers << tr("Save")  << tr("Tab") << tr("Title") << tr("Current item");
+  headers << hm.values();
   m_tablist->setHorizontalHeaderLabels(headers);
   m_tablist->horizontalHeader()->setStretchLastSection(true);
   m_tablist->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -137,25 +154,31 @@ void PageSetDialog::loadTabs(QTabWidget * tabs) {
       html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(str,"pageset");
       label = new QLabel;
       label->setText(html);
+      label->setAlignment(Qt::AlignCenter);
       m_tablist->setCellWidget(row,TAB_TITLE_COLUMN,label);
 
-      //      QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(str);
-      //      html = "<span class=\"context\">" + html + "</span>";
       Place p = entry->getPlace();
-      str = p.formatc("Root: %R, %H?headword : %H  (Vol %V/%P)");
-      //      str = p.format("Root: %R, headword : %H  (Vol %V/%P)");
-      html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(str,"pageset");
-      label = new QLabel;
-      label->setText(html);
-      m_tablist->setCellWidget(row,TAB_PLACE_COLUMN,label);
 
       m_tablist->setItem(row,TAB_INDEX_COLUMN,new QTableWidgetItem(QString("%1").arg(i+1)));
+
+      html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(p.m_root,"pageset");
+      label = new QLabel(html);;
+      label->setAlignment(Qt::AlignCenter);
+      m_tablist->setCellWidget(row,TAB_ROOT_COLUMN,label);
+
+      html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(p.m_word,"pageset");
+      label = new QLabel(html);;
+      label->setAlignment(Qt::AlignCenter);
+      m_tablist->setCellWidget(row,TAB_WORD_COLUMN,label);
+
+      m_tablist->setItem(row,TAB_VOLUME_COLUMN,new QTableWidgetItem(p.format("%V/%P")));
+
       row++;
     }
   }
   m_tablist->resizeColumnsToContents();
 }
-void PageSetDialog::loadTitles() {
+void SavePageSetDialog::loadTitles() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlRecord rec;
   m_setlist->clear();
@@ -196,7 +219,6 @@ void PageSetDialog::loadTitles() {
     p.exec();
     int pages = 0;
     if (p.first()) {
-      qDebug() << p.record();
       pages = p.record().value("count(id)").toInt();
     }
     m_setlist->setItem(row,SET_COUNT_COLUMN,new QTableWidgetItem(QString("%1").arg(pages)));
@@ -206,7 +228,7 @@ void PageSetDialog::loadTitles() {
   m_setlist->resizeColumnsToContents();
   return;
 }
-void PageSetDialog::readSettings() {
+void SavePageSetDialog::readSettings() {
   SETTINGS
 
   settings.beginGroup("PageSets");
@@ -218,7 +240,7 @@ void PageSetDialog::readSettings() {
   m_selectAll->setChecked(settings.value(SID_PAGESET_SELECT_ALL,false).toBool());
 
 }
-void PageSetDialog::writeSettings() {
+void SavePageSetDialog::writeSettings() {
   SETTINGS
 
  settings.beginGroup("PageSets");
@@ -227,7 +249,7 @@ void PageSetDialog::writeSettings() {
   settings.setValue(SID_PAGESET_OVERWRITE_EXISTING,m_overwrite->isChecked());
   settings.setValue(SID_PAGESET_SELECT_ALL,m_selectAll->isChecked());
 }
-void PageSetDialog::setTitleFromTable() {
+void SavePageSetDialog::setTitleFromTable() {
   QList<QTableWidgetItem *> items = m_setlist->selectedItems();
   QString name;
   qDebug() << items.size();
@@ -241,7 +263,7 @@ void PageSetDialog::setTitleFromTable() {
   }
   m_name->setText(name);
 }
-QList<int> PageSetDialog::requestedTabs() const {
+QList<int> SavePageSetDialog::requestedTabs() const {
   bool ok;
   QList<int> tabs;
   for(int i=0;i < m_tablist->rowCount();i++) {
@@ -256,7 +278,7 @@ QList<int> PageSetDialog::requestedTabs() const {
   }
   return tabs;
 }
-void PageSetDialog::selectionToggled(bool v) {
+void SavePageSetDialog::selectionToggled(bool v) {
 
   for(int i=0;i < m_tablist->rowCount();i++) {
     CenteredCheckBox * b = qobject_cast<CenteredCheckBox *>(m_tablist->cellWidget(i,TAB_SAVE_COLUMN));
