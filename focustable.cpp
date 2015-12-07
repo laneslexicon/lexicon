@@ -90,11 +90,14 @@ void FocusTable::exportResults() {
     if (ok) {
       for(int j=0;j < cols.size();j++) {
         QTableWidgetItem * item = this->item(i,cols[j]);
-        if (item) {
-          out << removeSpan(item->text()) << sep;
+        if (! item ) {
+          QLabel * l = qobject_cast<QLabel *>(this->cellWidget(i,cols[j]));
+          if (l) {
+            out << removeSpan(l->text()) << sep;
+          }
         }
         else {
-          //          qDebug() << "No item at" << i << j;
+          out << removeSpan(item->text()) << sep;
         }
       }
       out << endl;

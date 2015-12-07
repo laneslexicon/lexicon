@@ -9,7 +9,7 @@
 #include "keyboard.h"
 #include "keyboardwidget.h"
 #include "xsltsupport.h"
-#include "htmldelegate.h"
+//#include "htmldelegate.h"
 #include "definedsettings.h"
 #include "definedsql.h"
 #include "externs.h"
@@ -84,12 +84,12 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_rxlist->horizontalHeader()->setStretchLastSection(true);
   m_rxlist->setSelectionMode(QAbstractItemView::SingleSelection);
   m_rxlist->installEventFilter(this);
-  HtmlDelegate * d = new HtmlDelegate(m_rxlist);
-  if ( ! m_spanStyle.isEmpty()) {
-    d->setStyleSheet(m_spanStyle);
-  }
+  //  HtmlDelegate * d = new HtmlDelegate(m_rxlist);
+  //  if ( ! m_spanStyle.isEmpty()) {
+  //    d->setStyleSheet(m_spanStyle);
+  //  }
   //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
-  m_rxlist->setItemDelegateForColumn(CONTEXT_COLUMN,d);
+  //  m_rxlist->setItemDelegateForColumn(CONTEXT_COLUMN,d);
 
   //QStyle * style = m_list->style();
   //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
@@ -435,15 +435,15 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
             getTextFragments(doc,target,options);
             if (m_fragments.size() > 0) {
               if (m_singleRow) {
-                QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[0]);
-                html = "<span class=\"context\">" + html + "</span>";
+                QString html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(m_fragments[0],"fullsearch");
+                // html = "<span class=\"context\">" + html + "</span>";
                 addRow(root,headword,node,html,m_fragments.size(),page);
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
-                    QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
-                    html = "<span class=\"context\">" + html + "</span>";
+                    QString html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(m_fragments[i],"fullsearch");
+                    //  html = "<span class=\"context\">" + html + "</span>";
                     addRow(root,headword,node,html,i,page);
                   }
                 }
@@ -509,9 +509,9 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
   QString t;
   QString p1;
   QString p2;
-  int findCount = bodyCount + headCount;
+  m_findCount = bodyCount + headCount;
 
-  switch(findCount) {
+  switch(m_findCount) {
   case 0 :
     p1 = "no items found";
     break;
@@ -536,13 +536,13 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
     targetText = m_target;
   }
 
-  if (findCount == 0) {
+  if (m_findCount == 0) {
     t = QString(tr("Search for \"%1\", %2")).arg(targetText).arg(p1);
   }
   else {
     t = QString(tr("Search for \"%1\", found %2 match%3 in %4 entr%5"))
       .arg(targetText)
-      .arg(findCount)
+      .arg(m_findCount)
       .arg(p1)
       .arg(entryCount)
       .arg(p2);
@@ -570,21 +570,26 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
 int FullSearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos,int page) {
 
   QTableWidgetItem * item;
-
+  QLabel * l;
   int row = m_rxlist->rowCount();
   m_rxlist->insertRow(row);
 
   m_rxlist->setCellWidget(row,SELECT_COLUMN,new CheckBoxTableItem);
 
-  item = new QTableWidgetItem(root);
-  item->setFont(m_resultsFont);
-  item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-  m_rxlist->setItem(row,ROOT_COLUMN,item);
+  l = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(root,"fullsearch"));
+  l->setAlignment(Qt::AlignCenter);
+  //  item = new QTableWidgetItem(root);
+  //  item->setFont(m_resultsFont);
+  //  item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+  m_rxlist->setCellWidget(row,ROOT_COLUMN,l);
 
-  item = new QTableWidgetItem(headword);
-  item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-  item->setFont(m_resultsFont);
-  m_rxlist->setItem(row,HEAD_COLUMN,item);
+  //  item = new QTableWidgetItem(headword);
+  //  item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+  //  item->setFont(m_resultsFont);
+  //  m_rxlist->setItem(row,HEAD_COLUMN,item);
+  l = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(headword,"fullsearch"));
+  l->setAlignment(Qt::AlignCenter);
+  m_rxlist->setCellWidget(row,HEAD_COLUMN,l);
 
   item = new QTableWidgetItem(node);
   item->setFlags(item->flags() ^ Qt::ItemIsEditable);
@@ -610,9 +615,15 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
     m_rxlist->setItem(row,POSITION_COLUMN,item);
   }
   if (text.size() > 0) {
-    item = new QTableWidgetItem(text);
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_rxlist->setItem(row,CONTEXT_COLUMN,item);
+    QRegularExpression rx("^\\s+");
+    QString str = text;
+    str = str.remove(rx);
+    l = new QLabel(str);
+    l->setAlignment(Qt::AlignLeft);
+    //    item = new QTableWidgetItem(text);
+    //    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    //    m_rxlist->setItem(row,CONTEXT_COLUMN,item);
+    m_rxlist->setCellWidget(row,CONTEXT_COLUMN,l);
   }
   else {
     m_rxlist->setItem(row,CONTEXT_COLUMN,new QTableWidgetItem(text));
@@ -969,15 +980,15 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
             if (m_fragments.size() > 0) {
               entryCount++;
               if (m_singleRow) {
-                QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[0]);
-                html = "<span class=\"context\">" + html + "</span>";
+                QString html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(m_fragments[0],"fullsearch");
+                //                html = "<span class=\"context\">" + html + "</span>";
                 addRow(root,headword,node,html,m_fragments.size(),page);
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
-                    QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(m_fragments[i]);
-                    html = "<span class=\"context\">" + html + "</span>";
+                    QString html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(m_fragments[i],"fullsearch");
+                    //                    html = "<span class=\"context\">" + html + "</span>";
                     addRow(root,headword,node,html,i,page);
                   }
                 }
@@ -1033,4 +1044,10 @@ void FullSearchWidget::onExport() {
 void FullSearchWidget::openNode(const QString & node) {
   emit(showNode(node));
   this->setFocus();
+}
+int FullSearchWidget::findCount() const {
+  return m_findCount;
+}
+QString FullSearchWidget::results() const {
+  return m_resultsText->text();
 }

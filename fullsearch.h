@@ -48,6 +48,8 @@ class FullSearchWidget : public QWidget
   void textSearch(const QString &,const SearchOptions &);
   void setSearch(const QString & searchFor,const SearchOptions &);
   void focusTable();
+  int findCount() const;
+  QString results() const;
   public slots:
     void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
     void itemDoubleClicked(QTableWidgetItem *);
@@ -91,6 +93,7 @@ class FullSearchWidget : public QWidget
 
     SearchOptionsWidget * m_search;
     int m_fragmentSize;
+    int m_findCount;
     SearchOptions m_searchOptions;
     QSqlQuery m_query;
     QSqlQuery m_nodeQuery;

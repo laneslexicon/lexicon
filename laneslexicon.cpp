@@ -3141,7 +3141,7 @@ int LanesLexicon::addTab(bool create,QWidget * w,const QString & title) {
   return ix;
 }
 /**
- * TODO
+ *
  *
  */
 void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & t) {
@@ -3158,12 +3158,15 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
     s->findTarget(true);
     connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
     connect(s,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
+    /// this is a count of search tabs (not search results)
     int c = this->getSearchCount();
-      ix = this->addTab(options.newTab(),s,QString(tr("Search %1")).arg(c+1));
-      if (options.activateTab()) {
-        m_tabs->setCurrentIndex(ix);
-      }
-
+    ix = this->addTab(options.newTab(),s,QString(tr("Search %1")).arg(c+1));
+    if (options.activateTab()) {
+      m_tabs->setCurrentIndex(ix);
+    }
+    int n = s->findCount();
+    statusMessage(QString(tr("Search returned %1 %2")).arg(n).arg(n == 1 ? "result" : "results"));
+    ///
     /// this shifts focus from ContentsWidget (how it got focus is a mystery)
     ///
     if (options.newTab() && ! options.activateTab()) {
@@ -3263,6 +3266,9 @@ void LanesLexicon::searchForNode() {
         QMessageBox msgBox;
         msgBox.setText(QString(tr("Node not found: %1")).arg(t));
         msgBox.exec();
+      }
+      else {
+        entry->home();
       }
     }
   }

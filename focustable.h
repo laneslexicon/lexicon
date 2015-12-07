@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include <QLabel>
 class CheckBoxTableItem : public QWidget {
   Q_OBJECT
  public:
