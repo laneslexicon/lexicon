@@ -23,7 +23,7 @@ LoadPageSetDialog::LoadPageSetDialog(QWidget * parent) : QDialog(parent) {
   m_overwrite = new QCheckBox(tr("Close current tabs"));
   readSettings();
 
-  setWindowTitle(tr("Load Page Set"));
+  setWindowTitle(tr("Load Tab Set"));
 
   QVBoxLayout * layout = new QVBoxLayout;
 
@@ -70,11 +70,11 @@ int LoadPageSetDialog::loadTitles() {
   QMap<int,QString> hmap;
   hmap.insert(SET_ID_COLUMN,tr("Id"));
   hmap.insert(SET_TITLE_COLUMN,tr("Title"));
-  hmap.insert(SET_COUNT_COLUMN,tr("Page count"));
+  hmap.insert(SET_COUNT_COLUMN,tr("Tab count"));
   hmap.insert(SET_ACCESSED_COLUMN,tr("Created"));
-  hmap.insert(SET_LOAD_COLUMN,tr("Load all"));
-  hmap.insert(SET_SELECT_COLUMN,tr("Select pages"));
-  hmap.insert(SET_LOAD_COUNT_COLUMN,tr("Pages to load"));
+  hmap.insert(SET_LOAD_COLUMN,tr("Open all"));
+  hmap.insert(SET_SELECT_COLUMN,tr("Select tabs"));
+  hmap.insert(SET_LOAD_COUNT_COLUMN,tr("Tabs to open"));
   m_setlist->setColumnCount(hmap.size());
 
   m_setlist->setHorizontalHeaderLabels(hmap.values());
@@ -138,7 +138,7 @@ int LoadPageSetDialog::loadTitles() {
     m_setlist->setColumnCount(1);
     m_setlist->setHorizontalHeaderLabels(QStringList() << "");
     m_setlist->horizontalHeader()->setStretchLastSection(true);
-    QLabel * m = new QLabel(tr("<em>No page sets found</em>"));
+    QLabel * m = new QLabel(tr("<em>No tab sets found</em>"));
     m->setAlignment(Qt::AlignCenter);
     m_setlist->setCellWidget(0,0,m);
   }

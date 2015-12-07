@@ -17,17 +17,17 @@ SavePageSetDialog::SavePageSetDialog(QTabWidget * tabs,QWidget * parent) : QDial
   m_setlist = new QTableWidget;
   m_tablist = new QTableWidget;
 
-  m_overwrite = new QCheckBox(tr("Do not warn when overwriting existing page set"));
+  m_overwrite = new QCheckBox(tr("Overwrite tab set with the same title."));
   m_selectAll = new QRadioButton(tr("Select all"));
   m_selectNone = new QRadioButton(tr("Clear selections"));
   readSettings();
 
   connect(m_selectAll,SIGNAL(toggled(bool)),this,SLOT(selectionToggled(bool)));
-  setWindowTitle(tr("Save page set"));
+  setWindowTitle(tr("Save tab set"));
 
   QVBoxLayout * layout = new QVBoxLayout;
 
-  QLabel * intro = new QLabel("<em>Select which tabs to include in the page set and give the page set a title</em><br/>");
+  QLabel * intro = new QLabel("<em>Select which tabs to include in the tab set and give the set a title</em><br/>");
 
   layout->addWidget(intro);
   QFormLayout * flayout = new QFormLayout;
@@ -44,10 +44,10 @@ SavePageSetDialog::SavePageSetDialog(QTabWidget * tabs,QWidget * parent) : QDial
 
   current->setLayout(grouplayout);
 
-  flayout->addRow(tr("Page set title"),m_name);
+  flayout->addRow(tr("Tab set title"),m_name);
 
   flayout->addRow("",current);
-  flayout->addRow(tr("Existing page sets"),m_setlist);
+  flayout->addRow(tr("Existing tab sets"),m_setlist);
   flayout->addRow("",m_overwrite);
   layout->addLayout(flayout);
 
@@ -80,25 +80,28 @@ bool SavePageSetDialog::overwrite() const {
 }
 void SavePageSetDialog::onSave() {
   QString name = m_name->text();
-  if (name.isEmpty()) {
-    QString msg(tr("A page set title is required in order to save the selected pages."));
-    QMessageBox::warning(this,tr("Empty page set title"),msg,QMessageBox::Ok);
-    return;
-  }
-  if (! m_overwrite->isChecked()) {
-    for(int i=0;i < m_setlist->rowCount();i++) {
-      if (name == m_setlist->item(i,SET_TITLE_COLUMN)->text()) {
-        QString msg(tr("A page set with the same title already exists.\nEither use a different title or check the overwrite box"));
-        QMessageBox::warning(this,tr("Duplicate page set title"),msg,QMessageBox::Ok);
-        return;
-      }
-    }
-  }
   QList<int> t = this->requestedTabs();
   if (t.size() == 0) {
     QString msg(tr("No tabs have been selected for saving."));
     QMessageBox::warning(this,tr("No tabs selected"),msg,QMessageBox::Ok);
     return;
+  }
+  if (name.isEmpty()) {
+    QString msg(tr("A tab set title is required in order to save the selected tabs."));
+    QMessageBox::warning(this,tr("Empty tab set title"),msg,QMessageBox::Ok);
+    return;
+  }
+  m_overwriteId = -1;
+  for(int i=0;i < m_setlist->rowCount();i++) {
+    if (name == m_setlist->item(i,SET_TITLE_COLUMN)->text()) {
+      if ( m_overwrite->isChecked()) {
+        //        QString msg(tr("A tab set with the same title already exists.\nEither use a different title or check the overwrite box"));
+        //        QMessageBox::warning(this,tr("Duplicate tab set title"),msg,QMessageBox::Ok);
+        //        return;
+        /// delete existing i.e this forces unique tab set titles
+        m_overwriteId = m_setlist->item(i,SET_ID_COLUMN)->text().toInt();
+      }
+    }
   }
   this->accept();
 }
@@ -110,14 +113,6 @@ void SavePageSetDialog::onSave() {
 #define TAB_VOLUME_COLUMN  5
 void SavePageSetDialog::loadTabs(QTabWidget * tabs) {
 
-  QLOG_DEBUG() << Q_FUNC_INFO;
-  /*
-  HtmlDelegate * d = new HtmlDelegate(m_tablist);
-  if ( ! m_spanStyle.isEmpty()) {
-    d->setStyleSheet(m_spanStyle);
-  }
-  m_tablist->setItemDelegateForColumn(TAB_TITLE_COLUMN,d);
-  */
 
   QMap<int,QString> hm;
   hm.insert(TAB_SAVE_COLUMN,tr("Save"));
@@ -185,7 +180,7 @@ void SavePageSetDialog::loadTitles() {
   m_setlist->verticalHeader()->setVisible(false);
   m_setlist->setColumnCount(4);
   QStringList headers;
-  headers << tr("Id") << tr("Title") << tr("Pages") << tr("Created");
+  headers << tr("Id") << tr("Title") << tr("Tabs") << tr("Created");
   m_setlist->setHorizontalHeaderLabels(headers);
   m_setlist->horizontalHeader()->setStretchLastSection(true);
   m_setlist->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -284,4 +279,7 @@ void SavePageSetDialog::selectionToggled(bool v) {
     CenteredCheckBox * b = qobject_cast<CenteredCheckBox *>(m_tablist->cellWidget(i,TAB_SAVE_COLUMN));
     b->setChecked(v);
   }
+}
+int SavePageSetDialog::overwriteId() const {
+  return m_overwriteId;
 }

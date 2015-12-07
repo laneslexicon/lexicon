@@ -102,8 +102,8 @@ bool TabWidget::numberTab() const {
 void TabWidget::contextMenuEvent(QContextMenuEvent * event) {
   QMenu menu(this->tabText(this->currentIndex()));;
   QAction * closeOther = menu.addAction(tr("Close &other tabs"));
-  QAction * closeThis = menu.addAction(tr("Close &this tab"));
-  QAction * savePageSet = menu.addAction(tr("Save &pages"));
+  QAction * closeThis = menu.addAction(tr("&Close this tab"));
+  QAction * savePageSet = menu.addAction(tr("&Save tabs"));
   savePageSet->setVisible(true);
   QAction * duplicate = menu.addAction(tr("&Duplicate tab"));
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(this->currentWidget());

@@ -40,6 +40,7 @@ class SavePageSetDialog : public QDialog {
   ~SavePageSetDialog();
   QString pageSetTitle() const;
   QList<int> requestedTabs() const;
+  int overwriteId() const;
   bool overwrite() const ;
   private slots:
     void onSave();
@@ -51,7 +52,7 @@ class SavePageSetDialog : public QDialog {
 
   void loadTitles();
   void loadTabs(QTabWidget *);
-  int m_action;
+  int m_overwriteId;
   QCheckBox * m_overwrite;
   QRadioButton * m_selectAll;
   QRadioButton * m_selectNone;

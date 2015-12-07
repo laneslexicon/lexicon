@@ -86,5 +86,5 @@
 #define SQL_PAGESET_DELETE  "delete from pageset where id = ?"
 #define SQL_PAGESET_DELETE_ALL_PAGES "delete from page where pageset = ?"
 #define SQL_PAGESET_DELETE_PAGE "delete from page where id = ?"
-#define SQL_PAGESET_FIND_ORPHANED "select pageset.id,count(page.id)  from pageset,page where page.pageset = pageset.id group by pageset.id"
+#define SQL_PAGESET_FIND_ORPHANED "select pageset.id from pageset left join page on page.pageset = pageset.id where page.id is NULL"
 #endif

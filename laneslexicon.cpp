@@ -908,9 +908,9 @@ void LanesLexicon::createActions() {
 
   m_importXmlAction = new QAction(tr("Import &Xml"),this);
 
-  m_loadPageSetAction = new QAction(tr("Load tab &set"),this);
-  m_savePageSetAction = new QAction(tr("Save tab &set"),this);
-  m_editPageSetAction = new QAction(tr("Edit tab &sets"),this);
+  m_loadPageSetAction = new QAction(tr("&Load"),this);
+  m_savePageSetAction = new QAction(tr("&Save"),this);
+  m_editPageSetAction = new QAction(tr("&Edit"),this);
 
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
@@ -1311,7 +1311,7 @@ void LanesLexicon::createMenus() {
 
   connect(m_mainmenu,SIGNAL(rebuildBookmarks()),this,SLOT(bookmarkRebuildMenu()));
 
-  m_pageSetMenu = m_mainmenu->addMenu(tr("Ta&bs"));
+  m_pageSetMenu = m_mainmenu->addMenu(tr("T&ab set"));
   m_pageSetMenu->setObjectName("tabmenu");
   m_pageSetMenu->setFocusPolicy(Qt::StrongFocus);
   m_pageSetMenu->addAction(m_loadPageSetAction);
@@ -4643,9 +4643,13 @@ void LanesLexicon::onSavePageSet() {
   }
   QString title = d->pageSetTitle();
   QList<int> tabs = d->requestedTabs();
+  int oid = d->overwriteId();
 
   delete d;
 
+  if (oid != -1) {
+    EditPageSetDialog::deletePageSet(oid);
+  }
   QSqlQuery q(QSqlDatabase::database("notesdb"));
   if (! q.prepare(SQL_PAGESET_ADD_HEADER)) {
     QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_ADD_HEADER query:%1")).arg(q.lastError().text());
@@ -4700,7 +4704,7 @@ void LanesLexicon::onSavePageSet() {
   QSqlDatabase::database("notesdb").commit();
   QString plural;
   plural = (ix > 1? "s" : "");
-  QLOG_INFO() << QString("Saved page set \"%1\", %2 page%3").arg(title).arg(ix).arg(plural);
+  QLOG_INFO() << QString("Saved tab set \"%1\", %2 tab%3").arg(title).arg(ix).arg(plural);
 }
 void LanesLexicon::onLoadPageSet() {
   QLOG_DEBUG() << Q_FUNC_INFO;
