@@ -71,6 +71,7 @@ class FullSearchWidget : public QWidget
     bool readCssFromFile(const QString &);
     int getMaxRecords(const QString & tablename);
     bool eventFilter(QObject * target,QEvent * event);
+    bool startsWithArabic(const QString & ) const;
     int addRow(const QString &,const QString &,const QString &,const QString &,int,int);
     void getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & rx = QRegExp());
     QTextDocument * fetchDocument(const QString & node);

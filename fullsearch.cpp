@@ -147,7 +147,7 @@ QStringList FullSearchWidget::columnHeadings() {
   return h;
 }
 void FullSearchWidget::itemChanged(QTableWidgetItem * /* item */,QTableWidgetItem * /* prev */) {
-  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "NOSHOW we should not be here";
+  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "NOSHOW WE SHOULD NOT BE HERE";
 
 }
 
@@ -435,16 +435,12 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
             getTextFragments(doc,target,options);
             if (m_fragments.size() > 0) {
               if (m_singleRow) {
-                QString html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(m_fragments[0],"fullsearch");
-                // html = "<span class=\"context\">" + html + "</span>";
-                addRow(root,headword,node,html,m_fragments.size(),page);
+                addRow(root,headword,node,m_fragments[0],m_fragments.size(),page);
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
-                    QString html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(m_fragments[i],"fullsearch");
-                    //  html = "<span class=\"context\">" + html + "</span>";
-                    addRow(root,headword,node,html,i,page);
+                    addRow(root,headword,node,m_fragments[i],i,page);
                   }
                 }
               }
@@ -615,11 +611,14 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
     m_rxlist->setItem(row,POSITION_COLUMN,item);
   }
   if (text.size() > 0) {
-    QRegularExpression rx("^\\s+");
-    QString str = text;
-    str = str.remove(rx);
-    l = new QLabel(str);
-    l->setAlignment(Qt::AlignLeft);
+    l = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(text,"fullsearch"));
+    qDebug() << "Start with" << text << this->startsWithArabic(text);
+    if (this->startsWithArabic(text)) {
+      l->setAlignment(Qt::AlignRight);
+    }
+    else {
+      l->setAlignment(Qt::AlignLeft);
+    }
     //    item = new QTableWidgetItem(text);
     //    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     //    m_rxlist->setItem(row,CONTEXT_COLUMN,item);
@@ -725,6 +724,8 @@ void FullSearchWidget::readSettings() {
 }
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
   QRegExp rx;
+  QRegularExpression leadingSpaces("^\\s+");
+  QRegularExpression lineBreaks("\\r");
   //  QString pattern;
   //  QRegExp rxclass(m_diacritics);
 
@@ -759,8 +760,16 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
       ex = position + sz;
     }
     m_positions << position;
-    m_fragments << src.mid(sx,ex - sx);
-    //    QLOG_DEBUG() << "fragment size" << (ex - sx);  //QString("[%1][%2][%3][%4]").arg(position).arg(sx).arg(ex).arg(src);
+
+
+    QString str = src.mid(sx,ex - sx);
+    str = str.remove(leadingSpaces);
+    str = str.remove(lineBreaks);
+    ///
+    /// prepend left-to-embedding, otherwise any text starting with Arabic will display wrong
+    //
+    str = "‪" + str;
+    m_fragments << str;
     c = doc->find(rx,position);
   }
   //  if (m_positions.size() > 0) {
@@ -979,17 +988,14 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
             getTextFragments(doc,target,options);
             if (m_fragments.size() > 0) {
               entryCount++;
+
               if (m_singleRow) {
-                QString html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(m_fragments[0],"fullsearch");
-                //                html = "<span class=\"context\">" + html + "</span>";
-                addRow(root,headword,node,html,m_fragments.size(),page);
+                addRow(root,headword,node,m_fragments[0],m_fragments.size(),page);
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
-                    QString html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(m_fragments[i],"fullsearch");
-                    //                    html = "<span class=\"context\">" + html + "</span>";
-                    addRow(root,headword,node,html,i,page);
+                    addRow(root,headword,node,m_fragments[i],i,page);
                   }
                 }
               }
@@ -1050,4 +1056,16 @@ int FullSearchWidget::findCount() const {
 }
 QString FullSearchWidget::results() const {
   return m_resultsText->text();
+}
+bool FullSearchWidget::startsWithArabic(const QString & t) const {
+  for(int i=0;i < t.size();i++) {
+    if (t.at(i).direction() == QChar::DirAL) {
+      return true;
+    }
+    if (t.at(i).direction() == QChar::DirL) {
+      return false;
+    }
+
+  }
+  return false;
 }
