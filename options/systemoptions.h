@@ -21,10 +21,7 @@ class SystemOptions : public OptionsWidget {
     void onSetNotesDatabase();
     void onSetHistoryDatabase();
     void onOfflineLocation();
-    void onHelp();
  private:
-    //    QLineEdit * m_arabicFont;
-    //    QLineEdit * m_color;
     QCheckBox * m_contentsLinked;
     QLineEdit * m_lexicon;
     QCheckBox * m_debugOption;
