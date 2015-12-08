@@ -283,7 +283,7 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   return false;
 }
 void OptionsWidget::onHelp() {
-  //  emit(showHelp(m_section));
+  emit(showHelp(this->metaObject()->className()));
 }
 void OptionsWidget::setLineEditSize(int size) {
   QList<QLineEdit *> edits = this->findChildren<QLineEdit *>();
