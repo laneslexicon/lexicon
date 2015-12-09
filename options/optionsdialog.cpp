@@ -179,6 +179,8 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   QSize sz = settings.value("Size", QSize(600, 950)).toSize();
   resize(sz);
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
+
+  m_changed = false;
 }
 OptionsDialog::~OptionsDialog() {
   writeSettings();
@@ -187,7 +189,7 @@ OptionsDialog::~OptionsDialog() {
   }
 }
 void OptionsDialog::onClose() {
-  qDebug() << Q_FUNC_INFO << m_hasChanges << m_showWarning;
+  QLOG_DEBUG() << Q_FUNC_INFO << m_hasChanges << m_showWarning << m_changed;
   if (m_hasChanges && m_showWarning) {
     QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
     QMessageBox msgBox;
@@ -209,7 +211,10 @@ void OptionsDialog::onClose() {
       return;
     }
   }
+
+  emit(hasChanges(m_changed));
   m_hasChanges = false;
+  m_changed = false;
   this->reject();
 }
 void OptionsDialog::writeSettings() {
@@ -258,10 +263,13 @@ void OptionsDialog::saveChanges() {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab && tab->isModified()) {
       tab->blockSignals(true);
+      QLOG_DEBUG() << "Tab has changes" << i << tab->metaObject()->className();
+      m_changed = true;
       tab->writeSettings();
       tab->blockSignals(false);
     }
   }
+
   m_hasChanges = false;
   this->accept();
 }
@@ -287,16 +295,16 @@ void OptionsDialog::resetChanges() {
   if (QFile::remove(fileName)) {
     if  (QFile::copy(m_tempFileName,fileName)) {
       ok = true;
-      qDebug() << QString(tr("Restored settings file from [%1] to [%2]"))
+      QLOG_DEBUG() << QString(tr("Restored settings file from [%1] to [%2]"))
         .arg(m_tempFileName)
         .arg(fileName);
     }
     else {
-      qDebug() << Q_FUNC_INFO << "Restore failed";
+      QLOG_DEBUG() << Q_FUNC_INFO << "Restore failed";
     }
   }
   else {
-    qDebug() << Q_FUNC_INFO << "Remove failed";
+    QLOG_DEBUG() << Q_FUNC_INFO << "Remove failed";
   }
 
   QFile::remove(tempFile);

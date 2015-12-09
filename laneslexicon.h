@@ -100,6 +100,7 @@ class LanesLexicon : public QMainWindow
       void onLoadPageSet();
       void onEditPageSet();
     private slots:
+      void onOptionsChanged(bool);
       void onReady();
       void onLogViewer();
       void onLinkChanged();

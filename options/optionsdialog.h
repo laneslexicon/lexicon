@@ -31,10 +31,12 @@ class OptionsDialog : public QDialog {
     QTabWidget * m_tabs;
     QString m_theme;
     bool m_hasChanges;
+    bool m_changed;
     bool m_showWarning;
     bool m_debug;
     QString m_tempFileName;
   signals:
     void showHelp(const QString &);
+    void hasChanges(bool);
 };
 #endif

@@ -349,6 +349,10 @@ void LanesLexicon::cleanup() {
     if (w) {
       w->close();
     }
+    OptionsDialog * d = qobject_cast<OptionsDialog *>(widgets[i]);
+    if (d) {
+      d->close();
+    }
   }
 
   QFontDatabase::removeAllApplicationFonts();
@@ -3917,14 +3921,34 @@ void LanesLexicon::revertEntry() {
     }
   }
 }
+/**
+ * Create an OptionsDialog if one is not already running
+ *
+ */
 void LanesLexicon::onOptions() {
-  OptionsDialog * d  = new OptionsDialog(m_currentTheme,this);
+  QWidgetList widgets = QApplication::topLevelWidgets();
+  foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+    OptionsDialog * d = qobject_cast<OptionsDialog *>(widget); // ->metaObject()->className();
+    if (d) {
+      if (! d->isVisible()) {
+        d->show();
+      }
+      d->raise();
+      d->activateWindow();
+      d->setFocus();
+      return;
+    }
+  }
+  OptionsDialog * d  = new OptionsDialog(m_currentTheme);//,this);
   connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
-  d->exec();
-  if (d->isModified()) {
+  connect(d,SIGNAL(hasChanges(bool)),this,SLOT(onOptionsChanged(bool)));
+  d->show();
+}
+void LanesLexicon::onOptionsChanged(bool v) {
+  QLOG_DEBUG() << Q_FUNC_INFO << v;
+  if (v) {
     activateTheme(m_currentTheme);
   }
-  delete d;
 }
 void LanesLexicon::pageSearchComplete() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(QObject::sender());
@@ -4088,9 +4112,9 @@ bool LanesLexicon::sanityCheck(int type) {
   return true;
 }
 /**
- * This is called from the OptionsDialog help button
+ * For the optionsdialogs, section is metaObect()->className()
  *
- * @param section
+ * @param section - used as a key for the sitemap from which we get the URL
  */
 void LanesLexicon::showHelp(const QString & section) {
   QLOG_DEBUG() << Q_FUNC_INFO << section;
@@ -4100,12 +4124,11 @@ void LanesLexicon::showHelp(const QString & section) {
     //    connect(m_helpview,SIGNAL(helpSystemLoaded(bool)),this,SLOT(onHelpSystemLoaded(bool)));
     m_helpview->loadHelpSystem();
   }
-  //  if (m_helpview->isHidden()) {
-  //    m_helpview->show();
-  //  }
+
   if (m_siteMap.contains(section)) {
     m_helpview->showSection(m_siteMap.value(section));
   }
+  m_helpview->setFocus();
 }
 void LanesLexicon::onDeleteTheme() {
   DeleteThemeDialog d;
