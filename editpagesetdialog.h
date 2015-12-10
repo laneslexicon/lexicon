@@ -29,6 +29,7 @@
 #include <QLineEdit>
 #include <QTabWidget>
 #include <QMessageBox>
+#include <QInputDialog>
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif
@@ -47,8 +48,9 @@ class EditPageSetDialog : public QDialog {
     void onSelectPages();
     void onSelectAll(int);
     void onApply();
+    void onItemDoubleClicked(QTableWidgetItem * item);
  private:
-
+    bool m_isDirty;
     void readSettings();
     void writeSettings();
     QMap<int,int> m_pagesets;

@@ -43,23 +43,39 @@ EditPageSetDialog::EditPageSetDialog(QWidget * parent) : QDialog(parent) {
 
   QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
   m_loadButton  = new QPushButton(tr("Apply"));
-  connect(m_loadButton,SIGNAL(clicked()),this,SLOT(onApply()));
+
 
   buttonBox->addButton(m_loadButton,QDialogButtonBox::ActionRole);
   m_loadButton->setVisible(rows > 0);
   m_loadButton->setEnabled(false);
 
+
+  connect(m_loadButton,SIGNAL(clicked()),this,SLOT(onApply()));
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   layout->addWidget(buttonBox);
 
   setLayout(layout);
 
-
+  connect(m_setlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),this,SLOT(onItemDoubleClicked(QTableWidgetItem *)));
+  m_isDirty = false;
 }
 EditPageSetDialog::~EditPageSetDialog() {
   qDebug() << Q_FUNC_INFO;
   writeSettings();
+}
+void EditPageSetDialog::onItemDoubleClicked(QTableWidgetItem * item) {
+  bool ok = false;
+  if (item->column() == SET_TITLE_COLUMN) {
+     QString text = QInputDialog::getText(this, tr("Set Title"),
+                                         tr("Title:"), QLineEdit::Normal,
+                                         "", &ok);
+     if (ok && !text.isEmpty()){
+       item->setText(text);
+       m_isDirty = true;
+       m_loadButton->setEnabled(true);
+     }
+  }
 }
 QString EditPageSetDialog::pageSetTitle() const {
   return QString();
@@ -100,6 +116,7 @@ int EditPageSetDialog::loadTitles() {
   }
   q.exec();
   int row;
+
   while(q.next()) {
     rec = q.record();
     p.bindValue(0,rec.value("id").toInt());
@@ -150,6 +167,9 @@ int EditPageSetDialog::loadTitles() {
     m_setlist->setCellWidget(0,0,m);
   }
   else {
+    // set the cells to be read only
+    // for the title cell, save copy of the text so we can check whether it has been changed
+    // and needs saving
     QTableWidgetItem * item;
     QList<int> cols;
     cols << SET_ID_COLUMN << SET_COUNT_COLUMN << SET_TITLE_COLUMN << SET_LOAD_COUNT_COLUMN << SET_ACCESSED_COLUMN;
@@ -160,7 +180,11 @@ int EditPageSetDialog::loadTitles() {
           QLOG_DEBUG() << "Missing item row/colum" <<  i << j;
         }
         else {
+          if (cols[j] == SET_TITLE_COLUMN) {
+            item->setData(Qt::UserRole,item->text());
+          }
           item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+
         }
       }
     }
@@ -292,20 +316,33 @@ QList<int> EditPageSetDialog::pages() const {
 void EditPageSetDialog::onApply() {
   bool ok;
   QString str;
-   for(int i=0;i < m_setlist->rowCount();i++) {
+  for(int i=0;i < m_setlist->rowCount();i++) {
+    // delete selected pagesets
+    // otherwise check if the title has changed
+    str = m_setlist->item(i,SET_ID_COLUMN)->text();
+    int id = str.toInt(&ok);
+    if (ok) {
       CenteredCheckBox * b = qobject_cast<CenteredCheckBox *>(m_setlist->cellWidget(i,SET_LOAD_COLUMN));
-      /// if the load box is checked, read the db to get the page id
-      /// otherwise get the from the pageentrydialog
       if (b) {
         if (b->isChecked()) {
-          str = m_setlist->item(i,SET_ID_COLUMN)->text();
-          int id = str.toInt(&ok);
-          if (ok) {
-            this->deletePageSet(id);
-          }
+          this->deletePageSet(id);
         }
       }
-   }
+      QTableWidgetItem * item = m_setlist->item(i,SET_TITLE_COLUMN);
+      if (item->text() != item->data(Qt::UserRole).toString()) {
+        QSqlQuery q(QSqlDatabase::database("notesdb"));
+        if (q.prepare(SQL_PAGESET_SET_TITLE)) {
+          q.bindValue(0,item->text());
+          q.bindValue(1,id);
+          q.exec();
+        }
+        else {
+          QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_SET_TITLE:%1")).arg(q.lastError().text());
+        }
+
+      }
+    }
+  }
   QSqlQuery p(QSqlDatabase::database("notesdb"));
   if (! p.prepare(SQL_PAGESET_DELETE_PAGE)) {
     QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_DELETE_PAGE query:%1")).arg(p.lastError().text());

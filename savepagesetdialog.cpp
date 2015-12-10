@@ -166,7 +166,9 @@ void SavePageSetDialog::loadTabs(QTabWidget * tabs) {
       label->setAlignment(Qt::AlignCenter);
       m_tablist->setCellWidget(row,TAB_WORD_COLUMN,label);
 
-      m_tablist->setItem(row,TAB_VOLUME_COLUMN,new QTableWidgetItem(p.format("%V/%P")));
+      label = new QLabel(p.format("%V/%P"));
+      label->setAlignment(Qt::AlignCenter);
+      m_tablist->setCellWidget(row,TAB_VOLUME_COLUMN,label);
 
       row++;
     }
@@ -200,25 +202,33 @@ void SavePageSetDialog::loadTitles() {
   }
   q.exec();
   int row;
+  QTableWidgetItem * item;
   while(q.next()) {
     row = m_setlist->rowCount();
     m_setlist->insertRow(row);
     rec = q.record();
+    item = new QTableWidgetItem(rec.value("title").toString());
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_setlist->setItem(row,SET_TITLE_COLUMN,item);
 
-    m_setlist->setItem(row,SET_TITLE_COLUMN,new QTableWidgetItem(rec.value("title").toString()));
-    m_setlist->setItem(row,SET_ID_COLUMN,new QTableWidgetItem(QString("%1").arg(rec.value("id").toInt())));
+    item = new QTableWidgetItem(QString("%1").arg(rec.value("id").toInt()));
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_setlist->setItem(row,SET_ID_COLUMN,item);
 
     QString d = rec.value("accessed").toString();
-    m_setlist->setItem(row,SET_ACCESSED_COLUMN,new QTableWidgetItem(QString("%1").arg(d)));
+    item = new QTableWidgetItem(d);
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_setlist->setItem(row,SET_ACCESSED_COLUMN,item);
+
     p.bindValue(0,rec.value("id").toInt());
     p.exec();
     int pages = 0;
     if (p.first()) {
       pages = p.record().value("count(id)").toInt();
     }
-    m_setlist->setItem(row,SET_COUNT_COLUMN,new QTableWidgetItem(QString("%1").arg(pages)));
-
-
+    item = new QTableWidgetItem(QString("%1").arg(pages));
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_setlist->setItem(row,SET_COUNT_COLUMN,item);
   }
   m_setlist->resizeColumnsToContents();
   return;

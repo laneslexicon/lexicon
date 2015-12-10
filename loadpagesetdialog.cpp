@@ -98,6 +98,7 @@ int LoadPageSetDialog::loadTitles() {
   }
   q.exec();
   int row;
+  QTableWidgetItem * item;
   while(q.next()) {
     rec = q.record();
     p.bindValue(0,rec.value("id").toInt());
@@ -105,10 +106,22 @@ int LoadPageSetDialog::loadTitles() {
     if (p.first() && (p.record().value("count(id)").toInt() > 0)) {
       row = m_setlist->rowCount();
       m_setlist->insertRow(row);
-      m_setlist->setItem(row,SET_COUNT_COLUMN,new QTableWidgetItem(p.record().value("count(id)").toString()));
-      m_setlist->item(row,SET_COUNT_COLUMN)->setTextAlignment(Qt::AlignCenter);
-      m_setlist->setItem(row,SET_TITLE_COLUMN,new QTableWidgetItem(rec.value("title").toString()));
-      m_setlist->setItem(row,SET_ID_COLUMN,new QTableWidgetItem(QString("%1").arg(rec.value("id").toInt())));
+      item = new QTableWidgetItem(p.record().value("count(id)").toString());
+      item->setTextAlignment(Qt::AlignCenter);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      m_setlist->setItem(row,SET_COUNT_COLUMN,item);
+
+
+      item = new QTableWidgetItem(rec.value("title").toString());
+      item->setTextAlignment(Qt::AlignCenter);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      m_setlist->setItem(row,SET_TITLE_COLUMN,item);
+
+      item = new QTableWidgetItem(QString("%1").arg(rec.value("id").toInt()));
+      item->setTextAlignment(Qt::AlignCenter);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      m_setlist->setItem(row,SET_ID_COLUMN,item);
+
       CenteredCheckBox * box = new CenteredCheckBox;
       box->setRow(row);
       connect(box,SIGNAL(stateChanged(int)),this,SLOT(onSelectAll(int)));
@@ -116,8 +129,11 @@ int LoadPageSetDialog::loadTitles() {
 
 
       QString d = rec.value("accessed").toString();
-      m_setlist->setItem(row,SET_ACCESSED_COLUMN,new QTableWidgetItem(QString("%1").arg(d)));
-      m_setlist->item(row,SET_ACCESSED_COLUMN)->setTextAlignment(Qt::AlignCenter);
+      item = new QTableWidgetItem(QString("%1").arg(d));
+      item->setTextAlignment(Qt::AlignCenter);
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      m_setlist->setItem(row,SET_ACCESSED_COLUMN,item);
+
 
       QPushButton * btn = new QPushButton(tr(".."));
       btn->setStyleSheet("margin : 5");
@@ -141,17 +157,6 @@ int LoadPageSetDialog::loadTitles() {
     QLabel * m = new QLabel(tr("<em>No tab sets found</em>"));
     m->setAlignment(Qt::AlignCenter);
     m_setlist->setCellWidget(0,0,m);
-  }
-  else {
-    QTableWidgetItem * item;
-    QList<int> cols;
-    cols << SET_ID_COLUMN << SET_COUNT_COLUMN << SET_TITLE_COLUMN << SET_LOAD_COUNT_COLUMN << SET_ACCESSED_COLUMN;
-    for(int i=0;i < m_setlist->rowCount();i++) {
-      for(int j=0;j < cols.size();j++) {
-        item = m_setlist->item(i,cols[j]);
-        item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-      }
-    }
   }
 
   m_setlist->resizeColumnsToContents();
@@ -232,7 +237,6 @@ void LoadPageSetDialog::loadTitlesToTree() {
     return;
   }
   q.exec();
-  int row;
   while(q.next()) {
     rec = q.record();
     QStringList cols;
