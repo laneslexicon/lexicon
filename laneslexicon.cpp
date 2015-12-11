@@ -1916,6 +1916,7 @@ void LanesLexicon::readSettings() {
   if (cmdOptions.contains("debug")) {
     m_debug = true;
   }
+  m_allowDuplicates = settings.value(SID_SYSTEM_ALLOW_DUPLICATES,false).toBool();
 
   m_saveBookmarks = settings.value(SID_SYSTEM_SAVE_BOOKMARKS,true).toBool();
   m_restoreBookmarks = settings.value(SID_SYSTEM_RESTORE_BOOKMARKS,true).toBool();
@@ -2287,12 +2288,17 @@ void LanesLexicon::onNextRoot() {
     Place np = m_tree->findNextPlace(p);
     if (! np.isEmpty()) {
       /// if it is, it move focus to it (if true is 2nd param)
-      if (entry->hasPlace(np,GraphicsEntry::RootSearch,true) == -1) {
+      int ix = this->hasPlace(np,GraphicsEntry::RootSearch,true);
+      if ( ix == -1) {
         entry->setPagingForward();
         entry->getXmlForRoot(np);
-        if (m_linkContents) {
-          m_tree->ensurePlaceVisible(np,true);
-        }
+      }
+      else {
+        np.setAction(Place::SwitchTab);
+        m_tabs->setCurrentIndex(ix);
+      }
+      if (m_linkContents) {
+        m_tree->ensurePlaceVisible(np,true);
       }
     }
     else {
@@ -2307,12 +2313,17 @@ void LanesLexicon::onPrevRoot() {
     Place np = m_tree->findPrevPlace(p);
     if (! np.isEmpty()) {
       /// if it is, it move focus to it (if true is 2nd param)
-      if (entry->hasPlace(np,GraphicsEntry::RootSearch,true) == -1) {
+      int ix = this->hasPlace(np,GraphicsEntry::RootSearch,true);
+      if (ix == -1) {
         entry->setPagingBackward();
         entry->getXmlForRoot(np);
-        if (m_linkContents) {
-          m_tree->ensurePlaceVisible(np,true);
-        }
+      }
+      else {
+        np.setAction(Place::SwitchTab);
+        m_tabs->setCurrentIndex(ix);
+      }
+      if (m_linkContents) {
+        m_tree->ensurePlaceVisible(np,true);
       }
     }
     else {
@@ -3083,6 +3094,7 @@ void LanesLexicon::searchForPage() {
   }
 }
 void LanesLexicon::searchForRoot() {
+  QLOG_DEBUG() << Q_FUNC_INFO << m_allowDuplicates;
   int ix;
   if (m_rootSearchDialog == NULL) {
     m_rootSearchDialog = new ArabicSearchDialog(SearchOptions::Root);
@@ -3094,7 +3106,6 @@ void LanesLexicon::searchForRoot() {
   if (m_rootSearchDialog->exec()) {
     QString t = m_rootSearchDialog->getText();
     if (! t.isEmpty()) {
-      /// TODO maybe change this to if == Latin
       if (! UcdScripts::isScript(t,"Arabic")) {
         t = convertString(t);
       }
@@ -3414,6 +3425,9 @@ void LanesLexicon::showNoteBrowser() {
   m_tabs->addTab(new NoteBrowser(this),"Notes");
 }
 int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
+  if (m_allowDuplicates) {
+    return -1;
+  }
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
     if (entry) {

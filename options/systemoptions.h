@@ -39,6 +39,7 @@ class SystemOptions : public OptionsWidget {
     // Save bookmarks ?
     QCheckBox * m_saveSettings;
     QCheckBox * m_saveTabs;
+    QCheckBox * m_allowDuplicates;
     QCheckBox * m_showInterfaceWarning;
     QLineEdit * m_css;
     QLineEdit * m_historyDb;

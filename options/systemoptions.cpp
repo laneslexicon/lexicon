@@ -80,7 +80,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   m_splashScreen = new QCheckBox;
 
-
+  m_allowDuplicates = new QCheckBox;
   /// there are no other radiobuttons, so just make this the parent
   QHBoxLayout * tablayout = new QHBoxLayout;
   m_insertNewTab = new QRadioButton(tr("Insert"),this);
@@ -120,6 +120,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   optionlayout->addRow(tr("Title"),m_title);
   optionlayout->addRow(tr("Toolbar text"),m_toolbarText);
   optionlayout->addRow(tr("Nav by root"),m_rootNavigation);
+  optionlayout->addRow(tr("Allow duplicates"),m_allowDuplicates);
   optionlayout->addRow(tr("Use notes"),m_useNotes);
 
   optionlayout->addRow(tr("Keyboard"),m_keyboard);
@@ -197,6 +198,7 @@ void SystemOptions::readSettings() {
 #endif
   QString d = settings.value(SID_SYSTEM_RUN_DATE,QString()).toString();
   m_runDate->setDateTime(QDateTime::fromString(d,Qt::ISODate));
+  m_allowDuplicates->setChecked(settings.value(SID_SYSTEM_ALLOW_DUPLICATES,false).toBool());
 
   m_showInterfaceWarning->setChecked(settings.value(SID_SYSTEM_INTERFACE_WARNING,true).toBool());
   m_css->setText(settings.value(SID_SYSTEM_STYLESHEET,"app.css").toString());
@@ -264,6 +266,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_SYSTEM_TITLE,m_title->text());
   settings.setValue(SID_SYSTEM_TOOLBAR_TEXT,m_toolbarText->isChecked());
   settings.setValue(SID_SYSTEM_APPEND_NEW_TABS,m_appendNewTab->isChecked());
+  settings.setValue(SID_SYSTEM_ALLOW_DUPLICATES,m_allowDuplicates->isChecked());
   settings.endGroup();
   settings.beginGroup("Notes");
   settings.setValue(SID_NOTES_ENABLED,m_useNotes->isChecked());
@@ -353,6 +356,9 @@ bool SystemOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_SYSTEM_INTERFACE_WARNING,m_showInterfaceWarning)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_ALLOW_DUPLICATES,m_allowDuplicates)) {
     m_dirty = true;
   }
   if (compare(&settings,SID_SYSTEM_STYLESHEET,m_css)) {
