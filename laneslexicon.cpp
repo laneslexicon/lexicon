@@ -183,7 +183,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   QStringList keys = sitemap.childKeys();
   for(int i=0;i < keys.size();i++) {
     if (! keys[i].isEmpty()) {
-      m_siteMap.insert(keys[i],sitemap.value(keys[i]).toString());
+      m_siteMap.insert(keys[i].toLower(),sitemap.value(keys[i]).toString());
     }
   }
 
@@ -4125,8 +4125,8 @@ void LanesLexicon::showHelp(const QString & section) {
     m_helpview->loadHelpSystem();
   }
 
-  if (m_siteMap.contains(section)) {
-    m_helpview->showSection(m_siteMap.value(section));
+  if (m_siteMap.contains(section.toLower())) {
+    m_helpview->showSection(m_siteMap.value(section.toLower()));
   }
   m_helpview->setFocus();
 }
