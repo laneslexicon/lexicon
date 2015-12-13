@@ -58,7 +58,7 @@ EditPageSetDialog::EditPageSetDialog(QWidget * parent) : QDialog(parent) {
   setLayout(layout);
 
   connect(m_setlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),this,SLOT(onItemDoubleClicked(QTableWidgetItem *)));
-  m_isDirty = false;
+  m_dirty = false;
 }
 EditPageSetDialog::~EditPageSetDialog() {
   qDebug() << Q_FUNC_INFO;
@@ -72,7 +72,7 @@ void EditPageSetDialog::onItemDoubleClicked(QTableWidgetItem * item) {
                                          "", &ok);
      if (ok && !text.isEmpty()){
        item->setText(text);
-       m_isDirty = true;
+       m_dirty = true;
        m_loadButton->setEnabled(true);
      }
   }
@@ -334,7 +334,10 @@ void EditPageSetDialog::onApply() {
         if (q.prepare(SQL_PAGESET_SET_TITLE)) {
           q.bindValue(0,item->text());
           q.bindValue(1,id);
-          q.exec();
+          if (q.exec()) {
+            item->setData(Qt::UserRole,item->text());
+            QSqlDatabase::database("notesdb").commit();
+          }
         }
         else {
           QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_SET_TITLE:%1")).arg(q.lastError().text());
@@ -379,6 +382,7 @@ void EditPageSetDialog::onApply() {
   QSqlDatabase::database("notesdb").commit();
   this->loadTitles();
   m_loadButton->setEnabled(false);
+  m_dirty = false;
 }
 bool EditPageSetDialog::deletePageSet(int id) {
   bool ok = false;

@@ -50,7 +50,7 @@ class EditPageSetDialog : public QDialog {
     void onApply();
     void onItemDoubleClicked(QTableWidgetItem * item);
  private:
-    bool m_isDirty;
+    bool m_dirty;
     void readSettings();
     void writeSettings();
     QMap<int,int> m_pagesets;

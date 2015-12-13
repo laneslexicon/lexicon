@@ -189,7 +189,7 @@ void LoadPageSetDialog::onSelectPages() {
   PageEntryDialog * d;
   if (! m_pageDialogs.contains(pageset)) {
     d = new PageEntryDialog(pageset,this);
-    d->setWindowTitle(btn->property("pagetitle").toString());
+    d->setWindowTitle(QString(tr("Select tabs to load from %1")).arg(btn->property("pagetitle").toString()));
     m_pageDialogs.insert(pageset,d);
   }
   else {
@@ -215,7 +215,7 @@ void LoadPageSetDialog::loadTitlesToTree() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlRecord rec;
   m_tree->clear();
-  m_tree->setColumnCount(3);
+  m_tree->setColumnCount(4);
   QStringList headers;
   headers << tr("Title") << tr("Pages") << tr("Created") << tr("Load pages");
   m_tree->setHeaderLabels(headers);
