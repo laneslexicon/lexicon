@@ -612,7 +612,6 @@ int FullSearchWidget::addRow(const QString & root,const QString & headword, cons
   }
   if (text.size() > 0) {
     l = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(text,"fullsearch"));
-    qDebug() << "Start with" << text << this->startsWithArabic(text);
     if (this->startsWithArabic(text)) {
       l->setAlignment(Qt::AlignRight);
     }
