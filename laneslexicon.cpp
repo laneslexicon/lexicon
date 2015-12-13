@@ -4155,7 +4155,11 @@ void LanesLexicon::showHelp(const QString & section) {
   }
 
   if (m_siteMap.contains(section.toLower())) {
-    m_helpview->showSection(m_siteMap.value(section.toLower()));
+    QString url = m_siteMap.value(section.toLower());
+    if (! para.isEmpty()) {
+      url = QString("%1#%2").arg(url).arg(para);
+    }
+    m_helpview->showSection(url);
   }
   m_helpview->setFocus();
 }

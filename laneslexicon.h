@@ -173,7 +173,7 @@ class LanesLexicon : public QMainWindow
       void onEditView();
 
       void onOptions();
-      void showHelp(const QString &);
+      void showHelp(const QString &,const QString & = QString());
       void onHelpLoaded(bool);
       void onSetInterface(bool triggered=false);
       void treeItemDoubleClicked(QTreeWidgetItem * , int);
