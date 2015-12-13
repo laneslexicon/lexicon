@@ -1626,12 +1626,11 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   m_place = entry->getPlace();
   return;
 }
-
 GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool activateTab) {
   Place np;
 
   QLOG_DEBUG() << Q_FUNC_INFO << p << createTab << activateTab;
-  GraphicsEntry * entry;
+  GraphicsEntry * entry = NULL;
   if (! p.isValid()) {
     return NULL;
   }
@@ -1675,17 +1674,19 @@ GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool acti
     /// tabs->tabContentsChanged() emits signa tabsChanged()
     /// which ends calling this->onTabsChanged()
     // and that inserts a number in tab title
-    QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "SHOULD WE BE HERE?";
-
-    np = entry->getXmlForRoot(p); // ?????
+    np = entry->getXmlForRoot(p);
     if (np.isValid()) {
       m_tabs->setTabText(currentTab,np.getShortText());
       entry->setFocus();
       m_tabs->tabContentsChanged();
     }
+    else {
+      return NULL;
+    }
   }
  return entry;
 }
+
 /**
  * when user clicks on item reason Qt::MouseFocusReason
  * when setFocus called it is Qt::OtherFocusReason
@@ -1716,6 +1717,14 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
   if ((event->type() == QEvent::Close) && ((target == m_treeDock) || (target == m_tree))) {
     m_showContentsAction->setChecked(false);
   }
+  /*
+  if (target == m_tabs) {
+    qDebug() << "tab has focus";
+  }
+  if (target == m_tabs->tabBar()) {
+    qDebug() << "tab bar has focus";
+  }
+  */
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     QLOG_DEBUG() << Q_FUNC_INFO << keyEvent->modifiers() << keyEvent->key() << keyEvent->text();
@@ -1734,8 +1743,14 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
         }
         break;
     }
-      case Qt::Key_Left:
+    case Qt::Key_Left: {
+      //      qDebug() << "Left";
         break;
+    }
+    case Qt::Key_Right: {
+      //      qDebug() << "Right";
+        break;
+    }
         /*
       case Qt::Key_T: {
         if (keyEvent->modifiers() && Qt::ControlModifier) {
@@ -3403,13 +3418,13 @@ void LanesLexicon::currentTabChanged(int ix) {
  */
 int LanesLexicon::searchTabs(const QString & node) {
   QLOG_DEBUG() << Q_FUNC_INFO << node;
+  if (m_allowDuplicates) {
+    return -1;
+  }
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
-    if (entry) {
-      if (entry->hasNode(node)) {
-        QLOG_DEBUG() << "Node found in tab" << i;
+    if (entry && entry->hasNode(node)) {
         return i;
-      }
     }
   }
   return -1;
@@ -4145,8 +4160,8 @@ bool LanesLexicon::sanityCheck(int type) {
  *
  * @param section - used as a key for the sitemap from which we get the URL
  */
-void LanesLexicon::showHelp(const QString & section) {
-  QLOG_DEBUG() << Q_FUNC_INFO << section;
+void LanesLexicon::showHelp(const QString & section,const QString & para ) {
+  QLOG_DEBUG() << Q_FUNC_INFO << section << para;
   if (m_helpview == NULL) {
     m_helpview = new HelpView();
     connect(m_helpview,SIGNAL(finished(bool)),this,SLOT(onHelpLoaded(bool)));
