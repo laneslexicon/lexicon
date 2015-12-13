@@ -89,7 +89,7 @@ class LanesLexicon : public QMainWindow
   enum NewTabBehaviour { InsertTab, AppendTab };
   enum NavigationMode { ByRoot , ByPage };
   public slots:
-    int hasPlace(const Place & p,int searchtype,bool setFocus);
+    int hasPlace(const Place & p,int searchtype,bool setFocus = false);
     GraphicsEntry * showPlace(const Place &,bool newTab,bool activate);
     void setStatus(const QString &);
       void enableKeymaps(bool);

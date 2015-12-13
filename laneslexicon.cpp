@@ -3428,6 +3428,21 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
   if (m_allowDuplicates) {
     return -1;
   }
+  if (searchtype == GraphicsEntry::RootSearch) {
+    if (p.root().isEmpty()) {
+      return -1;
+    }
+  }
+  if (searchtype == GraphicsEntry::NodeSearch) {
+    if (p.node().isEmpty()) {
+      return -1;
+    }
+  }
+  if (searchtype == GraphicsEntry::WordSearch) {
+    if (p.word().isEmpty()) {
+      return -1;
+    }
+  }
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
     if (entry) {
