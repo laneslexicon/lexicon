@@ -2337,8 +2337,6 @@ void GraphicsEntry::onReload() {
   readSettings();
   QString html;
   for (int i=0;i < m_items.size();i++) {
-    qDebug() << m_items[i]->getNode();
-    qDebug() << m_items[i]->getXml();
     html = transform(ENTRY_XSLT_RECOMPILE,m_entryXslt,m_items[i]->getXml());
     m_items[i]->document()->clear();
     m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
