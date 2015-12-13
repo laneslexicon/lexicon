@@ -138,6 +138,7 @@ class Place    {
   void setNode(const QString & node) { m_node = node;}
 
   QString getRoot() const { return m_root;}
+  QString root() const { return m_root;}
 
   int getSupplement() const { return m_supplement;}
   void setSupplement(int i) { m_supplement = i;}
@@ -151,7 +152,9 @@ class Place    {
   int getVol() const { return m_vol;}
   int volume() const { return m_vol;}
   QString getNode() const { return m_node;}
+  QString node() const { return m_node;}
   QString getWord() const { return m_word;}
+  QString word() const { return m_word;}
 
   void setHead(const QString &);
   QString getHead() const { return m_head;}
