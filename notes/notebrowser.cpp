@@ -27,6 +27,7 @@ extern QSettings * getSettings();
 #define NOTE_SUBSTR_LENGTH 30
 #define NODE_COLUMN 5
 #define PLACE_COLUMN 6
+#define VOLUME_COLUMN 7
 NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   setObjectName("notebrowser");
   readSettings();
@@ -95,11 +96,11 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 void NoteBrowser::loadNotes() {
   NoteMaster * notes = ::getNotes();
   m_list->setRowCount(0);
-  m_list->setColumnCount(7);
+  m_list->setColumnCount(8);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
   QStringList headers;
-  headers << tr("Id") << tr("Word") << tr("Date") << tr("Subject") << tr("Note") << tr("Node") << tr("Place");
+  headers << tr("Id") << tr("Word") << tr("Date") << tr("Subject") << tr("Note") << tr("Node") << tr("Place") << tr("Volume/Page");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   //  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -109,17 +110,19 @@ void NoteBrowser::loadNotes() {
   QString sql = QString(SQL_LIST_NOTES).arg(NOTE_SUBSTR_LENGTH);
   QSqlQuery  * q = notes->getNoteList(sql);
   while(q->next()) {
-    QString word = q->value("word").toString();
-    word = qobject_cast<Lexicon *>(qApp)->scanAndSpan(word);
     int row = m_list->rowCount();
     m_list->insertRow(row);
+
+    QString word = q->value("word").toString();
+    word = qobject_cast<Lexicon *>(qApp)->scanAndSpan(word);
+
     item = new QTableWidgetItem(q->value("id").toString());
     m_list->setItem(row,0,item);
 
     item = new QTableWidgetItem(word);
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     item->setData(Qt::UserRole,q->value("id").toInt());
-    //    item->setFont(m_arabicFont);
+
     m_list->setItem(row,COL_WITH_ID,item);
 
     QString when;
@@ -146,6 +149,11 @@ void NoteBrowser::loadNotes() {
     item = new QTableWidgetItem(p.getNode());
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,NODE_COLUMN,item);
+
+    item = new QTableWidgetItem(p.format("%V/%P"));//q->value("place").toString());
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    m_list->setItem(row,VOLUME_COLUMN,item);
+
 
     item = new QTableWidgetItem(q->value("place").toString());
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
