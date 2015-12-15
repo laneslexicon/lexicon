@@ -37,6 +37,7 @@ class NoteBrowser : public QWidget {
     void onViewEntryClicked();
     void onViewNoteClicked();
     void loadNotes();
+    void stateChanged(int);
  protected:
     bool eventFilter(QObject *, QEvent *);
  private:
@@ -51,7 +52,6 @@ class NoteBrowser : public QWidget {
     QString transform(const QString & xml);
     QString m_style;
     QLabel * createLabel(const QString &,bool removeLineBreak = true) const;
-    QMap<int,int> getRowIdMap();
     QTableWidget * m_list;
     QTextEdit * m_note;
     QLineEdit * m_subject;

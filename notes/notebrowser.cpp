@@ -14,17 +14,18 @@
 #include "notedialog.h"
 #include "place.h"
 #include "definedsql.h"
+#include "centeredcheckbox.h"
 extern NoteMaster * getNotes();
 extern QSettings * getSettings();
 #define ID_COLUMN 0
-#define WORD_COLUMN 1
-#define AMENDED_COLUMN 2
-#define DATE_COLUMN 2
-#define SUBJECT_COLUMN 3
-#define NOTE_COLUMN 4
-#define NODE_COLUMN 5
-#define PLACE_COLUMN 6
-#define VOLUME_COLUMN 7
+#define DELETE_COLUMN 1
+#define WORD_COLUMN 2
+#define DATE_COLUMN 3
+#define SUBJECT_COLUMN 4
+#define NOTE_COLUMN 5
+#define NODE_COLUMN 6
+#define PLACE_COLUMN 7
+#define VOLUME_COLUMN 8
 NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   setObjectName("notebrowser");
   readSettings();
@@ -74,6 +75,8 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   connect(m_refreshButton,SIGNAL(clicked()),this,SLOT(loadNotes()));
 
   if (m_debug) {
+    m_list->setColumnWidth(NODE_COLUMN,50);
+    m_list->setColumnWidth(ID_COLUMN,50);
     m_list->showColumn(NODE_COLUMN);
     m_list->showColumn(ID_COLUMN);
   }
@@ -95,11 +98,11 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 void NoteBrowser::loadNotes() {
   NoteMaster * notes = ::getNotes();
   m_list->setRowCount(0);
-  m_list->setColumnCount(8);
+  m_list->setColumnCount(9);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
   QStringList headers;
-  headers << tr("Id") << tr("Word") << tr("Date") << tr("Subject") << tr("Note") << tr("Node") << tr("Place") << tr("Volume/Page");
+  headers << tr("Id") << tr("Delete") << tr("Word") << tr("Date") << tr("Subject") << tr("Note") << tr("Node") << tr("Place") << tr("Volume/Page");
   m_list->setHorizontalHeaderLabels(headers);
   m_list->horizontalHeader()->setStretchLastSection(true);
   //  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -119,6 +122,10 @@ void NoteBrowser::loadNotes() {
 
     item = new QTableWidgetItem(q->value("id").toString());
     m_list->setItem(row,ID_COLUMN,item);
+
+    CenteredCheckBox * box = new CenteredCheckBox;
+    connect(box,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
+    m_list->setCellWidget(row,DELETE_COLUMN,box);
 
     l = this->createLabel(word);
     l->setAlignment(l->alignment() ^ Qt::AlignHCenter);
@@ -156,12 +163,6 @@ void NoteBrowser::loadNotes() {
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,PLACE_COLUMN,item);
   }
-  if (m_list->rowCount() > 0) {
-    m_list->selectRow(0);
-    m_list->itemDoubleClicked(m_list->item(0,0));
-    m_list->setFocusPolicy(Qt::StrongFocus);
-    m_list->setFocus();
-  }
   SETTINGS
 
   settings.beginGroup("Notes");
@@ -179,7 +180,6 @@ void NoteBrowser::loadNotes() {
     }
   }
   else {
-
     m_list->resizeColumnToContents(ID_COLUMN);
     m_list->resizeColumnToContents(DATE_COLUMN);
     m_list->resizeColumnToContents(NOTE_COLUMN);
@@ -187,6 +187,7 @@ void NoteBrowser::loadNotes() {
     m_list->setColumnWidth(WORD_COLUMN,settings.value(SID_NOTES_WORD_COLUMN,200).toInt());
     m_list->setColumnWidth(SUBJECT_COLUMN,settings.value(SID_NOTES_SUBJECT_COLUMN,300).toInt());
   }
+  m_list->resizeColumnToContents(DELETE_COLUMN);
   q->finish();
   delete q;
 }
@@ -215,52 +216,35 @@ void NoteBrowser::onCellDoubleClicked(int row,int /* column */) {
 }
 void NoteBrowser::onCellClicked(int row,int /* column */) {
   QLOG_DEBUG() << Q_FUNC_INFO << row;
-  m_deleteButton->setEnabled(true);
   m_printButton->setEnabled(true);
   m_viewButton->setEnabled(true);
   m_viewNoteButton->setEnabled(true);
 }
-/**
- * returns of map of selected id/row combinations
- *
- *
- * @return
- */
-QMap<int,int> NoteBrowser::getRowIdMap() {
-  QMap<int,int> rowmap;
-  QList<QTableWidgetItem *> items = m_list->selectedItems();
-  for(int i=0;i < items.size();i++) {
-    int row = items[i]->row();
-    QTableWidgetItem * item = m_list->item(row,ID_COLUMN);
-    if (item) {
-      int id = item->text().toInt();
-      rowmap.insert(id,row);
+void NoteBrowser::onDeleteClicked() {
+  QList<int> d;      // list of ids to delete
+  QStringList nodes; // list of nodes to with deleted notes
+  QList<int> rows;   // rows to delete
+  for(int row=0;row < m_list->rowCount();row++) {
+    CenteredCheckBox * b = qobject_cast<CenteredCheckBox *>(m_list->cellWidget(row,DELETE_COLUMN));
+    if (b && b->isChecked()) {
+      d << m_list->item(row,ID_COLUMN)->text().toInt();
+      nodes << m_list->item(row,NODE_COLUMN)->text();
+      rows << row;
     }
   }
-  return rowmap;
-}
-void NoteBrowser::onDeleteClicked() {
-  QMap<int,int> rowmap = getRowIdMap();
-  QStringList nodes;
-  if (rowmap.size() > 0) {
+  //  qDebug() << "Ids" << d;
+  //  qDebug() << "Rows" << rows;
+  //  qDebug() << "Nodes" << nodes;
+  if (d.size() > 0) {
     NoteMaster * notes = ::getNotes();
-    /**
-     * get list of deleted ids, get the corresponding rows
-     * from row map, sort them, and call removeRow from the highest to lowest
-     */
-    QList<int> d = notes->deleteNotes(rowmap.keys());
-    QList<int> rows;
-    for(int i=0;i < d.size();i++) {
-      rows << rowmap.value(d[i]);
-    }
-    qSort(rows);
+    QList<int> deleted = notes->deleteNotes(d);
     for(int i=rows.size() - 1;i >= 0;i--) {
-      nodes << m_list->item(rows[i],NODE_COLUMN)->text();
       m_list->removeRow(rows[i]);
     }
+    statusMessage(QString(tr("Deleted %1 %2")).arg(deleted.size()).arg(deleted.size() == 1 ? "note" : "notes"));
     emit(noteDeleted(nodes));
   }
-
+  m_deleteButton->setEnabled(false);
 }
 bool NoteBrowser::eventFilter(QObject * target,QEvent * event) {
   if ((target == m_list) && (event->type() == QEvent::KeyPress)) {
@@ -474,4 +458,14 @@ QLabel * NoteBrowser::createLabel(const QString & text,bool removeLineBreaks) co
     l->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
   }
   return l;
+}
+void NoteBrowser::stateChanged(int /* state */) {
+  for(int row=0;row < m_list->rowCount();row++) {
+    CenteredCheckBox * b = qobject_cast<CenteredCheckBox *>(m_list->cellWidget(row,DELETE_COLUMN));
+    if (b && b->isChecked()) {
+      m_deleteButton->setEnabled(true);
+      return;
+    }
+  }
+  m_deleteButton->setEnabled(false);
 }
