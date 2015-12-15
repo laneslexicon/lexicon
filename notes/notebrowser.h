@@ -43,11 +43,14 @@ class NoteBrowser : public QWidget {
     void readSettings();
     void showEntry(const Place &);
     bool readCssFromFile(const QString &);
+    bool startsWithArabic(const QString &) const;
     bool m_debug;
+    int m_substrLength;
     QString m_css;
     QString m_xsltSource;
     QString transform(const QString & xml);
     QString m_style;
+    QLabel * createLabel(const QString &,bool removeLineBreak = true) const;
     QMap<int,int> getRowIdMap();
     QTableWidget * m_list;
     QTextEdit * m_note;

@@ -61,6 +61,10 @@ They should not be translated.
 #define SID_NOTES_SHOW_PRINT  "Show print"
 #define SID_NOTES_COLUMNS "Columns"
 #define SID_NOTES_CONTEXT_STYLE "Context style"
+#define SID_NOTES_SUBSTR_LENGTH "Note substr length"
+#define SID_NOTES_WORD_COLUMN "Word column"
+#define SID_NOTES_SUBJECT_COLUMN "Subject column"
+
 //#define SID_SHORTCUT_COLLAPSE_ALL "Collapse all"
 
 #define SID_HISTORY_ENABLED          "Enabled"

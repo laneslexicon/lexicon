@@ -7,7 +7,6 @@
 #include "definedsettings.h"
 #endif
 #include "QsLog.h"
-#include "htmldelegate.h"
 #include "notes.h"
 #include "xsltsupport.h"
 #include "noteview.h"
@@ -18,13 +17,11 @@
 extern NoteMaster * getNotes();
 extern QSettings * getSettings();
 #define ID_COLUMN 0
-#define COL_WITH_ID 1
 #define WORD_COLUMN 1
 #define AMENDED_COLUMN 2
 #define DATE_COLUMN 2
 #define SUBJECT_COLUMN 3
 #define NOTE_COLUMN 4
-#define NOTE_SUBSTR_LENGTH 30
 #define NODE_COLUMN 5
 #define PLACE_COLUMN 6
 #define VOLUME_COLUMN 7
@@ -35,11 +32,6 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   m_list = new QTableWidget;
   m_list->setObjectName("notetable");
   m_list->installEventFilter(this);
-  HtmlDelegate * d = new HtmlDelegate;
-  d->setStyleSheet(m_style);
-  m_list->setItemDelegateForColumn(COL_WITH_ID,d);
-  m_list->setItemDelegateForColumn(SUBJECT_COLUMN,d);
-  m_list->setItemDelegateForColumn(NOTE_COLUMN,d);
 
   m_list->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   QStyle * style = m_list->style();
@@ -63,7 +55,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 
   layout->addWidget(m_list);
   layout->addLayout(btnlayout);
-  m_list->adjustSize();//resizeColumnsToContents();
+  m_list->adjustSize();
 
   setLayout(layout);
 
@@ -91,7 +83,14 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   }
   m_list->hideColumn(PLACE_COLUMN);
 
+
   initXslt();
+  if (m_list->rowCount() > 0) {
+    m_list->selectRow(0);
+    m_list->itemDoubleClicked(m_list->item(0,0));
+    m_list->setFocusPolicy(Qt::StrongFocus);
+    m_list->setFocus();
+  }
 }
 void NoteBrowser::loadNotes() {
   NoteMaster * notes = ::getNotes();
@@ -107,8 +106,10 @@ void NoteBrowser::loadNotes() {
 
   QTableWidgetItem * item;
 
-  QString sql = QString(SQL_LIST_NOTES).arg(NOTE_SUBSTR_LENGTH);
+  QString sql = QString(SQL_LIST_NOTES).arg(m_substrLength);
   QSqlQuery  * q = notes->getNoteList(sql);
+  QLabel * l;
+  QString str;
   while(q->next()) {
     int row = m_list->rowCount();
     m_list->insertRow(row);
@@ -117,13 +118,11 @@ void NoteBrowser::loadNotes() {
     word = qobject_cast<Lexicon *>(qApp)->scanAndSpan(word);
 
     item = new QTableWidgetItem(q->value("id").toString());
-    m_list->setItem(row,0,item);
+    m_list->setItem(row,ID_COLUMN,item);
 
-    item = new QTableWidgetItem(word);
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    item->setData(Qt::UserRole,q->value("id").toInt());
-
-    m_list->setItem(row,COL_WITH_ID,item);
+    l = this->createLabel(word);
+    l->setAlignment(l->alignment() ^ Qt::AlignHCenter);
+    m_list->setCellWidget(row,WORD_COLUMN,l);
 
     QString when;
     when = q->value("amended").toString();
@@ -131,26 +130,24 @@ void NoteBrowser::loadNotes() {
         when = q->value("created").toString();
 
     QDateTime d = QDateTime::fromString(when);
-    item = new QTableWidgetItem(d.toString( Qt::SystemLocaleShortDate));
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_list->setItem(row,2,item);
-    QString subject = q->value("subject").toString();
-    subject = qobject_cast<Lexicon *>(qApp)->scanAndSpan(subject);
+    l = this->createLabel(d.toString( Qt::SystemLocaleShortDate));
+    m_list->setCellWidget(row,DATE_COLUMN,l);
+    l->setAlignment(l->alignment() ^ Qt::AlignHCenter);
 
-    item = new QTableWidgetItem(subject);
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_list->setItem(row,SUBJECT_COLUMN,item);
+    l = this->createLabel(q->value("subject").toString());
+    l->setAlignment(l->alignment() ^ Qt::AlignHCenter);
+    m_list->setCellWidget(row,SUBJECT_COLUMN,l);
 
-    item = new QTableWidgetItem(q->value(5).toString());
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_list->setItem(row,NOTE_COLUMN,item);
+    /// this is the substr of the note
+    l = this->createLabel(q->value(5).toString());
+    m_list->setCellWidget(row,NOTE_COLUMN,l);
 
     Place p = Place::fromString(q->value("place").toString());
     item = new QTableWidgetItem(p.getNode());
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,NODE_COLUMN,item);
 
-    item = new QTableWidgetItem(p.format("%V/%P"));//q->value("place").toString());
+    item = new QTableWidgetItem(p.format("%V/%P"));
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,VOLUME_COLUMN,item);
 
@@ -160,19 +157,15 @@ void NoteBrowser::loadNotes() {
     m_list->setItem(row,PLACE_COLUMN,item);
   }
   if (m_list->rowCount() > 0) {
+    m_list->selectRow(0);
     m_list->itemDoubleClicked(m_list->item(0,0));
-
+    m_list->setFocusPolicy(Qt::StrongFocus);
+    m_list->setFocus();
   }
-  /**
-   * having to do this because the html elements do not appear to
-   * report their size correctly (too large)
-   */
-
-
-
   SETTINGS
 
   settings.beginGroup("Notes");
+
   if (settings.contains("Columns")) {
     bool ok;
     QList<QVariant> cols = settings.value("Columns").toList();
@@ -186,14 +179,14 @@ void NoteBrowser::loadNotes() {
     }
   }
   else {
+
     m_list->resizeColumnToContents(ID_COLUMN);
     m_list->resizeColumnToContents(DATE_COLUMN);
     m_list->resizeColumnToContents(NOTE_COLUMN);
     m_list->resizeColumnToContents(NODE_COLUMN);
-    m_list->setColumnWidth(WORD_COLUMN,settings.value("Word column",200).toInt());
-    m_list->setColumnWidth(SUBJECT_COLUMN,settings.value("Subject column",300).toInt());
+    m_list->setColumnWidth(WORD_COLUMN,settings.value(SID_NOTES_WORD_COLUMN,200).toInt());
+    m_list->setColumnWidth(SUBJECT_COLUMN,settings.value(SID_NOTES_SUBJECT_COLUMN,300).toInt());
   }
-
   q->finish();
   delete q;
 }
@@ -238,9 +231,9 @@ QMap<int,int> NoteBrowser::getRowIdMap() {
   QList<QTableWidgetItem *> items = m_list->selectedItems();
   for(int i=0;i < items.size();i++) {
     int row = items[i]->row();
-    QTableWidgetItem * item = m_list->item(row,COL_WITH_ID);
+    QTableWidgetItem * item = m_list->item(row,ID_COLUMN);
     if (item) {
-      int id = item->data(Qt::UserRole).toInt();
+      int id = item->text().toInt();
       rowmap.insert(id,row);
     }
   }
@@ -296,9 +289,9 @@ void NoteBrowser::onViewNoteClicked() {
   int row = items[0]->row();
 
 
-  QTableWidgetItem * item = m_list->item(row,COL_WITH_ID);
+  QTableWidgetItem * item = m_list->item(row,ID_COLUMN);
   if (item) {
-    int id = item->data(Qt::UserRole).toInt();
+    int id = item->text().toInt();
     NoteMaster * notes = ::getNotes();
     Note * note = notes->findOne(id);
     if (note) {
@@ -395,6 +388,8 @@ void NoteBrowser::readSettings() {
   settings.beginGroup("Notes");
   m_debug = settings.value(SID_NOTES_DEBUG,false).toBool();
   m_style = settings.value(SID_NOTES_CONTEXT_STYLE,QString()).toString();
+  m_substrLength = settings.value(SID_NOTES_SUBSTR_LENGTH,50).toInt();
+
   settings.endGroup();
 
   settings.beginGroup("Entry");
@@ -452,4 +447,31 @@ NoteBrowser::~NoteBrowser() {
 
   settings.beginGroup("Notes");
   settings.setValue(SID_NOTES_COLUMNS,colwidths);
+}
+bool NoteBrowser::startsWithArabic(const QString & t) const {
+  for(int i=0;i < t.size();i++) {
+    if (t.at(i).direction() == QChar::DirAL) {
+      return true;
+    }
+    if (t.at(i).direction() == QChar::DirL) {
+      return false;
+    }
+
+  }
+  return false;
+}
+QLabel * NoteBrowser::createLabel(const QString & text,bool removeLineBreaks) const {
+  QString str = text;
+  if (removeLineBreaks) {
+   str = str.replace(QRegularExpression("\\r|\\n")," ");
+  }
+
+  QLabel * l = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(str,"notebrowser"));
+  if (this->startsWithArabic(str)) {
+    l->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+  }
+  else {
+    l->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+  }
+  return l;
 }
