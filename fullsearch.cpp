@@ -724,7 +724,7 @@ void FullSearchWidget::readSettings() {
 void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
   QRegExp rx;
   QRegularExpression leadingSpaces("^\\s+");
-  QRegularExpression lineBreaks("\\r");
+  QRegularExpression lineBreaks("\\r|\\n");
   //  QString pattern;
   //  QRegExp rxclass(m_diacritics);
 
