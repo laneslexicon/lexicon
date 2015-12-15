@@ -460,7 +460,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_loadPageSetAction;
       QAction * m_savePageSetAction;
       QAction * m_editPageSetAction;
-
+      QAction * m_showNoteBrowserAction;
       HistoryMaster * m_history;
       NoteMaster * m_notes;
 

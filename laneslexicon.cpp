@@ -916,6 +916,8 @@ void LanesLexicon::createActions() {
   m_savePageSetAction = new QAction(tr("&Save"),this);
   m_editPageSetAction = new QAction(tr("&Edit"),this);
 
+  m_showNoteBrowserAction = new QAction(tr("View &notes"),this);
+
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
@@ -947,6 +949,8 @@ void LanesLexicon::createActions() {
   connect(m_loadPageSetAction,SIGNAL(triggered()),this,SLOT(onLoadPageSet()));
   connect(m_savePageSetAction,SIGNAL(triggered()),this,SLOT(onSavePageSet()));
   connect(m_editPageSetAction,SIGNAL(triggered()),this,SLOT(onEditPageSet()));
+
+  connect(m_showNoteBrowserAction,SIGNAL(triggered()),this,SLOT(showNoteBrowser()));
 }
 void LanesLexicon::createToolBar() {
   QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
@@ -1368,6 +1372,7 @@ void LanesLexicon::createMenus() {
   m_toolMenu->addAction(m_importLinksAction);
   m_toolMenu->addAction(m_exportLinksAction);
   m_toolMenu->addAction(m_importXmlAction);
+  m_toolMenu->addAction(m_showNoteBrowserAction);
 
   m_themeMenu = m_mainmenu->addMenu(tr("The&mes"));
   m_themeMenu->setFocusPolicy(Qt::StrongFocus);
@@ -3437,7 +3442,8 @@ void LanesLexicon::showNoteBrowser() {
       return;
     }
   }
-  m_tabs->addTab(new NoteBrowser(this),"Notes");
+  int ix = m_tabs->addTab(new NoteBrowser(this),tr("Notes"));
+  m_tabs->setCurrentIndex(ix);
 }
 int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
   if (m_allowDuplicates) {
