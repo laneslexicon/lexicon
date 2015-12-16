@@ -38,14 +38,19 @@ class NoteBrowser : public QWidget {
     void onViewNoteClicked();
     void loadNotes();
     void stateChanged(int);
+    private slots:
+      void sectionDoubleClicked(int);
  protected:
     bool eventFilter(QObject *, QEvent *);
  private:
+    QMap<int,QString> m_cols;
     void readSettings();
     void showEntry(const Place &);
+    void afterLoad();
     bool readCssFromFile(const QString &);
     bool startsWithArabic(const QString &) const;
     bool m_debug;
+    bool m_noNotes;
     int m_substrLength;
     QString m_css;
     QString m_xsltSource;

@@ -15,17 +15,19 @@
 #include "place.h"
 #include "definedsql.h"
 #include "centeredcheckbox.h"
+#include "columnselectdialog.h"
 extern NoteMaster * getNotes();
 extern QSettings * getSettings();
 #define ID_COLUMN 0
 #define DELETE_COLUMN 1
-#define WORD_COLUMN 2
-#define DATE_COLUMN 3
-#define SUBJECT_COLUMN 4
-#define NOTE_COLUMN 5
-#define NODE_COLUMN 6
-#define PLACE_COLUMN 7
-#define VOLUME_COLUMN 8
+#define ROOT_COLUMN 2
+#define WORD_COLUMN 3
+#define DATE_COLUMN 4
+#define SUBJECT_COLUMN 5
+#define NOTE_COLUMN 6
+#define VOLUME_COLUMN 7
+#define NODE_COLUMN 8
+#define PLACE_COLUMN 9
 NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   setObjectName("notebrowser");
   readSettings();
@@ -41,17 +43,29 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 
   QHBoxLayout * btnlayout = new QHBoxLayout;
   m_printButton = new QPushButton(tr("&Print"));
-  m_deleteButton = new QPushButton(tr("&Delete"));
+  m_deleteButton = new QPushButton(tr("&Delete selected"));
   m_viewButton = new QPushButton(tr("&View entry"));
   m_viewNoteButton = new QPushButton(tr("&View note"));
   m_refreshButton = new QPushButton(tr("&Refresh"));
 
-  btnlayout->addWidget(m_printButton);
-  btnlayout->addWidget(m_deleteButton);
+  m_cols.insert(ID_COLUMN,tr("Id"));
+  m_cols.insert(DELETE_COLUMN,tr("Delete"));
+  m_cols.insert(ROOT_COLUMN,tr("Root"));
+  m_cols.insert(WORD_COLUMN,tr("Word"));
+  m_cols.insert(DATE_COLUMN,tr("Created"));
+  m_cols.insert(SUBJECT_COLUMN,tr("Subject"));
+  m_cols.insert(NOTE_COLUMN,tr("Note"));
+  m_cols.insert(NODE_COLUMN,tr("Node"));
+  m_cols.insert(PLACE_COLUMN,tr("Place"));
+  m_cols.insert(VOLUME_COLUMN,tr("Volume/Page"));
+
   btnlayout->addWidget(m_viewNoteButton);
-  btnlayout->addWidget(m_refreshButton);
-  btnlayout->addSpacing(20);
   btnlayout->addWidget(m_viewButton);
+  btnlayout->addWidget(m_printButton);
+  btnlayout->addSpacing(20);
+  btnlayout->addWidget(m_deleteButton);
+  btnlayout->addSpacing(20);
+  btnlayout->addWidget(m_refreshButton);
   btnlayout->addStretch();
 
   layout->addWidget(m_list);
@@ -74,6 +88,8 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
   connect(m_viewNoteButton,SIGNAL(clicked()),this,SLOT(onViewNoteClicked()));
   connect(m_refreshButton,SIGNAL(clicked()),this,SLOT(loadNotes()));
 
+  connect(m_list->horizontalHeader(),SIGNAL(sectionDoubleClicked(int)),this,SLOT(sectionDoubleClicked(int)));
+
   if (m_debug) {
     m_list->setColumnWidth(NODE_COLUMN,50);
     m_list->setColumnWidth(ID_COLUMN,50);
@@ -88,24 +104,50 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 
 
   initXslt();
-  if (m_list->rowCount() > 0) {
-    m_list->selectRow(0);
-    m_list->itemDoubleClicked(m_list->item(0,0));
-    m_list->setFocusPolicy(Qt::StrongFocus);
-    m_list->setFocus();
+  this->afterLoad();
+
+  /// restore the column widths
+  SETTINGS
+  settings.beginGroup("Notes");
+  QByteArray b = settings.value(SID_NOTES_COLUMN_STATE,QByteArray()).toByteArray();
+  if (b.size() > 0) {
+    m_list->horizontalHeader()->restoreState(b);
+  }
+  else {
+    m_list->resizeColumnsToContents();
+  }
+}
+
+void NoteBrowser::sectionDoubleClicked(int index) {
+  QLOG_DEBUG() << Q_FUNC_INFO << index;
+
+  QList<bool> v;
+  for(int i=0; i < m_list->columnCount();i++) {
+    v << !m_list->horizontalHeader()->isSectionHidden(i);
+  }
+  ColumnSelectDialog d(m_cols);
+  d.setState(v);
+  if (d.exec() == QDialog::Accepted) {
+    v = d.state();
+    for(int i=0;i < v.size();i++) {
+      if (v[i]) {
+        m_list->showColumn(i);
+      }
+      else {
+        m_list->hideColumn(i);
+      }
+    }
   }
 }
 void NoteBrowser::loadNotes() {
   NoteMaster * notes = ::getNotes();
   m_list->setRowCount(0);
-  m_list->setColumnCount(9);
+  m_list->setColumnCount(m_cols.size());
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
-  QStringList headers;
-  headers << tr("Id") << tr("Delete") << tr("Word") << tr("Date") << tr("Subject") << tr("Note") << tr("Node") << tr("Place") << tr("Volume/Page");
-  m_list->setHorizontalHeaderLabels(headers);
+  //  m_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+  m_list->setHorizontalHeaderLabels(m_cols.values());
   m_list->horizontalHeader()->setStretchLastSection(true);
-  //  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
 
   QTableWidgetItem * item;
 
@@ -116,6 +158,7 @@ void NoteBrowser::loadNotes() {
   while(q->next()) {
     int row = m_list->rowCount();
     m_list->insertRow(row);
+    Place p = Place::fromString(q->value("place").toString());
 
     QString word = q->value("word").toString();
     word = qobject_cast<Lexicon *>(qApp)->scanAndSpan(word);
@@ -126,6 +169,11 @@ void NoteBrowser::loadNotes() {
     CenteredCheckBox * box = new CenteredCheckBox;
     connect(box,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
     m_list->setCellWidget(row,DELETE_COLUMN,box);
+
+    l = this->createLabel(p.root());
+    l->setAlignment(l->alignment() ^ Qt::AlignHCenter);
+    m_list->setCellWidget(row,ROOT_COLUMN,l);
+
 
     l = this->createLabel(word);
     l->setAlignment(l->alignment() ^ Qt::AlignHCenter);
@@ -149,7 +197,7 @@ void NoteBrowser::loadNotes() {
     l = this->createLabel(q->value(5).toString());
     m_list->setCellWidget(row,NOTE_COLUMN,l);
 
-    Place p = Place::fromString(q->value("place").toString());
+
     item = new QTableWidgetItem(p.getNode());
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,NODE_COLUMN,item);
@@ -163,37 +211,41 @@ void NoteBrowser::loadNotes() {
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,PLACE_COLUMN,item);
   }
-  SETTINGS
-
-  settings.beginGroup("Notes");
-
-  if (settings.contains("Columns")) {
-    bool ok;
-    QList<QVariant> cols = settings.value("Columns").toList();
-    if (cols.size() > 0) {
-      for(int i=0;i < cols.size();i++) {
-        int sz = cols[i].toInt(&ok);
-        if (ok) {
-          m_list->setColumnWidth(i,sz);
-        }
-      }
-    }
-  }
-  else {
-    m_list->resizeColumnToContents(ID_COLUMN);
-    m_list->resizeColumnToContents(DATE_COLUMN);
-    m_list->resizeColumnToContents(NOTE_COLUMN);
-    m_list->resizeColumnToContents(NODE_COLUMN);
-    m_list->setColumnWidth(WORD_COLUMN,settings.value(SID_NOTES_WORD_COLUMN,200).toInt());
-    m_list->setColumnWidth(SUBJECT_COLUMN,settings.value(SID_NOTES_SUBJECT_COLUMN,300).toInt());
-  }
   m_list->resizeColumnToContents(DELETE_COLUMN);
   q->finish();
   delete q;
+  this->afterLoad();
+}
+void NoteBrowser::afterLoad() {
+  if (m_list->rowCount() > 0) {
+    m_list->selectRow(0);
+    m_list->itemDoubleClicked(m_list->item(0,0));
+    m_deleteButton->setEnabled(true);
+    m_printButton->setEnabled(true);
+    m_viewButton->setEnabled(true);
+    m_viewNoteButton->setEnabled(true);
+    m_noNotes = false;
+  }
+  else {
+    m_noNotes = true;
+    m_list->setRowCount(1);
+    QLabel * l = new QLabel("<em>" + tr("There are no notes.") + "</em>");
+    for(int i=0;i < m_list->columnCount();i++) {
+      m_list->hideColumn(i);
+    }
+    l->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    m_list->showColumn(NOTE_COLUMN);
+    m_list->setCellWidget(0,NOTE_COLUMN,l);
+    m_deleteButton->setEnabled(false);
+    m_printButton->setEnabled(false);
+    m_viewButton->setEnabled(false);
+    m_viewNoteButton->setEnabled(false);
+    m_list->selectRow(0);
+  }
 }
 void NoteBrowser::onCellDoubleClicked(int row,int /* column */) {
   QLOG_DEBUG() << Q_FUNC_INFO << row;
-  /// saving the id with word because we may not include id in release
+
   QTableWidgetItem * item = m_list->item(row,ID_COLUMN);
   if (item) {
     bool ok;
@@ -209,7 +261,6 @@ void NoteBrowser::onCellDoubleClicked(int row,int /* column */) {
       dlg->show();
     }
   }
-  m_deleteButton->setEnabled(true);
   m_printButton->setEnabled(true);
   m_viewButton->setEnabled(true);
   m_viewNoteButton->setEnabled(true);
@@ -245,6 +296,7 @@ void NoteBrowser::onDeleteClicked() {
     emit(noteDeleted(nodes));
   }
   m_deleteButton->setEnabled(false);
+  this->afterLoad();
 }
 bool NoteBrowser::eventFilter(QObject * target,QEvent * event) {
   if ((target == m_list) && (event->type() == QEvent::KeyPress)) {
@@ -370,9 +422,11 @@ void NoteBrowser::readSettings() {
   SETTINGS
 
   settings.beginGroup("Notes");
+
   m_debug = settings.value(SID_NOTES_DEBUG,false).toBool();
   m_style = settings.value(SID_NOTES_CONTEXT_STYLE,QString()).toString();
   m_substrLength = settings.value(SID_NOTES_SUBSTR_LENGTH,50).toInt();
+
 
   settings.endGroup();
 
@@ -422,15 +476,16 @@ bool NoteBrowser::readCssFromFile(const QString & name) {
   m_css = css;
   return true;
 }
+/**
+ * save the column widths only whene have any rows
+ * (when rows =0 we just have the note column so everything else = 0)
+ */
 NoteBrowser::~NoteBrowser() {
-  QList<QVariant> colwidths;
-  for(int i=0;i < m_list->columnCount();i++) {
-    colwidths << QVariant(m_list->columnWidth(i));
+  if (! m_noNotes) {
+    SETTINGS
+    settings.beginGroup("Notes");
+    settings.setValue(SID_NOTES_COLUMN_STATE,m_list->horizontalHeader()->saveState());
   }
-  SETTINGS
-
-  settings.beginGroup("Notes");
-  settings.setValue(SID_NOTES_COLUMNS,colwidths);
 }
 bool NoteBrowser::startsWithArabic(const QString & t) const {
   for(int i=0;i < t.size();i++) {
@@ -460,8 +515,12 @@ QLabel * NoteBrowser::createLabel(const QString & text,bool removeLineBreaks) co
   return l;
 }
 void NoteBrowser::stateChanged(int /* state */) {
+  CenteredCheckBox * box = qobject_cast<CenteredCheckBox *>(sender());
   for(int row=0;row < m_list->rowCount();row++) {
     CenteredCheckBox * b = qobject_cast<CenteredCheckBox *>(m_list->cellWidget(row,DELETE_COLUMN));
+    if (b == box) {
+      m_list->selectRow(row);
+    }
     if (b && b->isChecked()) {
       m_deleteButton->setEnabled(true);
       return;
