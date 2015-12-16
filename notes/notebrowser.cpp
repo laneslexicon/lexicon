@@ -74,7 +74,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 
   setLayout(layout);
 
-  loadNotes();
+
 
   m_deleteButton->setEnabled(false);
   m_printButton->setEnabled(false);
@@ -104,17 +104,19 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 
 
   initXslt();
-  this->afterLoad();
+  loadNotes();
 
-  /// restore the column widths
-  SETTINGS
-  settings.beginGroup("Notes");
-  QByteArray b = settings.value(SID_NOTES_COLUMN_STATE,QByteArray()).toByteArray();
-  if (b.size() > 0) {
-    m_list->horizontalHeader()->restoreState(b);
-  }
-  else {
-    m_list->resizeColumnsToContents();
+  /// restore the column widths if we have any
+  if (! m_noNotes) {
+     SETTINGS
+     settings.beginGroup("Notes");
+     QByteArray b = settings.value(SID_NOTES_COLUMN_STATE,QByteArray()).toByteArray();
+      if (b.size() > 0) {
+        m_list->horizontalHeader()->restoreState(b);
+      }
+      else {
+        m_list->resizeColumnsToContents();
+      }
   }
 }
 
@@ -202,9 +204,9 @@ void NoteBrowser::loadNotes() {
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     m_list->setItem(row,NODE_COLUMN,item);
 
-    item = new QTableWidgetItem(p.format("%V/%P"));
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_list->setItem(row,VOLUME_COLUMN,item);
+    l = this->createLabel(p.format("%V/%P"));
+    l->setAlignment(l->alignment() ^ Qt::AlignHCenter);
+    m_list->setCellWidget(row,VOLUME_COLUMN,l);
 
 
     item = new QTableWidgetItem(q->value("place").toString());
@@ -217,6 +219,7 @@ void NoteBrowser::loadNotes() {
   this->afterLoad();
 }
 void NoteBrowser::afterLoad() {
+  QLOG_DEBUG() << Q_FUNC_INFO << m_list->rowCount();
   if (m_list->rowCount() > 0) {
     m_list->selectRow(0);
     m_list->itemDoubleClicked(m_list->item(0,0));
@@ -236,6 +239,7 @@ void NoteBrowser::afterLoad() {
     l->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     m_list->showColumn(NOTE_COLUMN);
     m_list->setCellWidget(0,NOTE_COLUMN,l);
+    //    m_list->horizontalHeader()->setMinimumSectionSize(-1);
     m_deleteButton->setEnabled(false);
     m_printButton->setEnabled(false);
     m_viewButton->setEnabled(false);
