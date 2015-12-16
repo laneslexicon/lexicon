@@ -1772,7 +1772,7 @@ void GraphicsEntry::closeEvent(QCloseEvent * event) {
 void GraphicsEntry::notesButtonPressed() {
   ToolButtonData * btn = qobject_cast<ToolButtonData *>(QObject::sender());
   if (btn) {
-    //QLOG_DEBUG() << "index" << btn->getIndex();
+    QLOG_DEBUG() << "index" << btn->getIndex();
     EntryItem * item = m_items[btn->getIndex()];
     item->showNote();
 
@@ -1797,11 +1797,17 @@ void GraphicsEntry::addButtonDecoration(bool ok) {
       ToolButtonData  * notesBtn = new ToolButtonData(i);
       notesBtn->setIcon(QIcon(QPixmap(":/qrc/notes.png")));
       notesBtn->setStyleSheet("padding :0px;border : 0px;margin : 0px");
-      QGraphicsWidget *pushButton = m_scene->addWidget(notesBtn);
+      QGraphicsProxyWidget *pushButton = m_scene->addWidget(notesBtn);
+      /// at the moment if a page has > 1 toolbuttons, clicking on one
+      /// then on another, the second is not activated, Instead focus is
+      /// set on the owning item of the first button. To activate the 2nd
+      /// button you need to click on its owner first.
+      pushButton->setFocusPolicy(Qt::StrongFocus);
+      pushButton->widget()->setFocusPolicy(Qt::StrongFocus);
+      notesBtn->setFocusPolicy(Qt::StrongFocus);
       pushButton->setPos(btnx,btny);
       connect(notesBtn,SIGNAL(clicked()),this,SLOT(notesButtonPressed()));
       m_items[i]->setProxy(pushButton);
-      Place p = item->getPlace();
       item->setNotes();
     }
   }
