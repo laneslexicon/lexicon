@@ -2185,6 +2185,7 @@ void LanesLexicon::restoreTabs() {
     settings.beginGroup(tabmap.value(tabkeys[i]));
     if (settings.value(SID_TABS_TYPE,"entry").toString() == "notes") {
       NoteBrowser * notes = new NoteBrowser(this);
+      connect(notes,SIGNAL(noteDeleted(const QStringList &)),this,SLOT(onNotesDeleted(const QStringList &)));
       m_tabs->addTab(notes,tr("Notes"));
       j++;
     }
@@ -3442,7 +3443,10 @@ void LanesLexicon::showNoteBrowser() {
       return;
     }
   }
-  int ix = m_tabs->addTab(new NoteBrowser(this),tr("Notes"));
+  NoteBrowser * notes = new NoteBrowser(this);
+  connect(notes,SIGNAL(noteDeleted(const QStringList &)),this,SLOT(onNotesDeleted(const QStringList &)));
+
+  int ix = m_tabs->addTab(notes,tr("Notes"));
   m_tabs->setCurrentIndex(ix);
 }
 int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
@@ -4870,4 +4874,29 @@ void LanesLexicon::onEditPageSet() {
 
   EditPageSetDialog  d;
   d.exec();
+}
+/**
+ * when notes are deleted we have to check if any are showing and reload the tab
+ *
+ * so get a list of tabs which need reloading
+ *
+ * @param nodes
+ */
+void LanesLexicon::onNotesDeleted(const QStringList & nodes) {
+  QLOG_DEBUG() << Q_FUNC_INFO << nodes;
+  QList<int> t;
+  for(int i=0;i < nodes.size();i++) {
+    for(int j=0;j < m_tabs->count();j++) {
+      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(j));
+      if (entry && entry->hasNode(nodes[i])) {
+        if (! t.contains(j)) {
+          t << j;
+        }
+      }
+    }
+  }
+  for(int i=0;i < t.size();i++) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(t[i]));
+    entry->onReload();
+  }
 }
