@@ -2320,27 +2320,33 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
  */
 void GraphicsEntry::onReload() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  /*
-  SETTINGS
-  settings.beginGroup("Entry");
-  m_debug = settings.value(SID_ENTRY_DEBUG,false).toBool();
-  QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
-  css = readCssFromFile(css);
-  if (! css.isEmpty()) {
-    m_currentCss = css;
-    emit(cssChanged());
-  }
-  css = settings.value(SID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
-  css = readCssFromFile(css);
-  if (! css.isEmpty()) {
-    m_printCss = css;
-  }
-  settings.endGroup();
-  settings.beginGroup("XSLT");
-  m_entryXslt = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
-  m_entryXslt = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_entryXslt);
-  */
+
+  double scale = m_scale;
+  QString title = m_userTitle;
+  int textwidth = m_textWidth;
   readSettings();
+  m_textWidth = textwidth;
+  this->getXmlForRoot(m_place);
+  this->setScale(scale,true);
+  if (! title.isEmpty()) {
+    QWidget * w = this->parentWidget();
+    while(w) {
+      QTabWidget * tab = qobject_cast<QTabWidget *>(w);
+      if (tab)  {
+        for(int i=0;i < tab->count();i++) {
+          if (tab->widget(i) == this) {
+            tab->setTabText(i,title);
+          }
+        }
+        w = NULL;
+      }
+      else {
+        w = w->parentWidget();
+      }
+    }
+    this->setUserTitle(title);
+  }
+  /*
   QString html;
   for (int i=0;i < m_items.size();i++) {
     html = transform(ENTRY_XSLT_RECOMPILE,m_entryXslt,m_items[i]->getXml());
@@ -2351,6 +2357,7 @@ void GraphicsEntry::onReload() {
     m_items[i]->setHtml(html);
     m_items[i]->setOutputHtml(html);
   }
+  */
   statusMessage(tr("Reloaded page"));
 }
 /**
