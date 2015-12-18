@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QModelIndex>
 #include <QKeyEvent>
+class ColumnarTableWidget;
 class Place;
 class NoteBrowser : public QWidget {
   Q_OBJECT
@@ -38,12 +39,12 @@ class NoteBrowser : public QWidget {
     void onViewNoteClicked();
     void loadNotes();
     void stateChanged(int);
-    private slots:
-      void sectionDoubleClicked(int);
  protected:
     bool eventFilter(QObject *, QEvent *);
  private:
     QMap<int,QString> m_cols;
+    QList<int> m_defaultColumnWidth;
+    QList<int> m_defaultColumnOrder;
     void readSettings();
     void showEntry(const Place &);
     void afterLoad();
@@ -57,7 +58,7 @@ class NoteBrowser : public QWidget {
     QString transform(const QString & xml);
     QString m_style;
     QLabel * createLabel(const QString &,bool removeLineBreak = true) const;
-    QTableWidget * m_list;
+    ColumnarTableWidget * m_list;
     QTextEdit * m_note;
     QLineEdit * m_subject;
     QLineEdit * m_tag;
