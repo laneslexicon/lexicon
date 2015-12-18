@@ -6,7 +6,7 @@ ColumnarTableWidget::ColumnarTableWidget(const QStringList & headers,QWidget * p
   m_colHeadings = headers;
   m_defaultWidthKey = "Default width";
   m_columnWidthsKey = "Column widths";
-  m_stateKey = "State";
+  m_stateKey = "Column state";
 
   setRowCount(0);
   setColumnCount(m_colHeadings.size());
