@@ -64,7 +64,6 @@ void TabWidget::onTabBarDoubleClicked(int ix) {
 
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(this->widget(ix));
   if ( entry) {
-    QLOG_DEBUG() << "showing place for tab" << ix;
     entry->setUserTitle(text);
   }
      QLOG_DEBUG() << Q_FUNC_INFO << ix << text;
