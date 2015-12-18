@@ -103,7 +103,8 @@ SOURCES += main.cpp\
         loadpagesetdialog.cpp \
         editpagesetdialog.cpp \
         pageentrydialog.cpp \
-        columnselectdialog.cpp
+        columnselectdialog.cpp \
+        columnartablewidget.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -152,4 +153,5 @@ HEADERS  += laneslexicon.h \
             loadpagesetdialog.h \
             editpagesetdialog.h \
             pageentrydialog.h \
-            columnselectdialog.h
+            columnselectdialog.h \
+            columnartablewidget.h
