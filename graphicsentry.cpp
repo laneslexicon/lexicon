@@ -420,9 +420,22 @@ Place GraphicsEntry::getPlace(int index) const {
   if ((index >= 0) && (index < m_items.size())) {
       return m_items[index]->getPlace();
   }
+  if (! m_focusNode.isEmpty()) {
+    return Place::fromNode(m_focusNode);
+  }
+  Place p;
   EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
   if (item) {
-      return item->getPlace();
+      p = item->getPlace();
+      if (p.isValid()) {
+        return p;
+      }
+  }
+  if (m_focusPlace.isValid()) {
+    return m_focusPlace;
+  }
+  if (m_items.size() > 1) {
+    return m_items[1]->getPlace();
   }
   //  if (! m_focusNode.isEmpty()) {
   //    return Place::fromNode(m_focusNode);
