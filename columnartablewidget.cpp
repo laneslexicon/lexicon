@@ -1,5 +1,6 @@
 #include "columnartablewidget.h"
 #include "columnselectdialog.h"
+#include "QsLog.h"
 ColumnarTableWidget::ColumnarTableWidget(const QStringList & headers,QWidget * parent) : QTableWidget(parent) {
   m_settings = 0;
   m_saveConfig = true;
@@ -24,15 +25,18 @@ ColumnarTableWidget::~ColumnarTableWidget() {
     delete m_settings;
   }
 }
+/*
 void ColumnarTableWidget::resetTable() {
-  setRowCount(0);
+  clearContents();//setRowCount(0);
   setColumnCount(m_colHeadings.size());
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setHorizontalHeaderLabels(m_colHeadings);
   horizontalHeader()->setStretchLastSection(true);
   horizontalHeader()->setSectionsMovable(true);
   horizontalHeader()->setSectionsClickable(true);
+  horizontalHeader()->setDefaultSectionSize(m_defaultWidth);
 }
+*/
 void ColumnarTableWidget::setKey(int key,const QString & value) {
   switch(key) {
   case DEFAULT_WIDTH : { m_defaultWidthKey = value;break; }
@@ -55,6 +59,11 @@ void ColumnarTableWidget::onColumnDialog(int /* section */) {
   c = d.state();
   for(int i=0;i < c.size();i++) {
     this->horizontalHeader()->setSectionHidden(i,!c[i]);
+    if (c[i]) {     // if its visible
+      if (this->columnWidth(i) == 0) {  // zero width, it was invisible
+        this->setColumnWidth(i,m_defaultWidth);
+      }
+    }
   }
 }
 /**
@@ -96,10 +105,20 @@ void ColumnarTableWidget::readConfiguration(QSettings & settings) {
   }
 }
 void ColumnarTableWidget::writeConfiguration() {
+  QLOG_DEBUG() << Q_FUNC_INFO <<m_saveConfig;
   if (m_saveConfig) {
     m_settings->setValue(m_stateKey,this->horizontalHeader()->saveState());
+    m_settings->sync();
   }
 }
 void ColumnarTableWidget::setSaveConfiguration(bool v) {
   m_saveConfig = v;
 }
+/*
+void ColumnarTableWidget::saveState() {
+  m_state = horizontalHeader()->saveState();
+}
+void ColumnarTableWidget::restoreState() {
+  horizontalHeader()->restoreState(m_state);
+}
+*/
