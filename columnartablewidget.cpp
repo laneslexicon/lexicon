@@ -25,18 +25,6 @@ ColumnarTableWidget::~ColumnarTableWidget() {
     delete m_settings;
   }
 }
-/*
-void ColumnarTableWidget::resetTable() {
-  clearContents();//setRowCount(0);
-  setColumnCount(m_colHeadings.size());
-  setSelectionBehavior(QAbstractItemView::SelectRows);
-  setHorizontalHeaderLabels(m_colHeadings);
-  horizontalHeader()->setStretchLastSection(true);
-  horizontalHeader()->setSectionsMovable(true);
-  horizontalHeader()->setSectionsClickable(true);
-  horizontalHeader()->setDefaultSectionSize(m_defaultWidth);
-}
-*/
 void ColumnarTableWidget::setKey(int key,const QString & value) {
   switch(key) {
   case DEFAULT_WIDTH : { m_defaultWidthKey = value;break; }
@@ -114,11 +102,3 @@ void ColumnarTableWidget::writeConfiguration() {
 void ColumnarTableWidget::setSaveConfiguration(bool v) {
   m_saveConfig = v;
 }
-/*
-void ColumnarTableWidget::saveState() {
-  m_state = horizontalHeader()->saveState();
-}
-void ColumnarTableWidget::restoreState() {
-  horizontalHeader()->restoreState(m_state);
-}
-*/
