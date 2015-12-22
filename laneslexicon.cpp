@@ -1907,9 +1907,7 @@ void LanesLexicon::readSettings() {
     m_dbName = cmdOptions.value("db");
   }
   QDir dd = QDir::current();
-  qDebug() << dd << m_dbName;
   QFileInfo fi(dd,m_dbName);
-  qDebug("Database dir:%s",fi.canonicalFilePath().toLatin1().constData());
 
   m_applicationCssFile = settings.value(SID_SYSTEM_STYLESHEET,"app.css").toString();
   if (m_applicationCssFile.isEmpty()) {
@@ -2052,7 +2050,7 @@ void LanesLexicon::readSettings() {
 }
 void LanesLexicon::writeSettings() {
   QString v;
-
+  QLOG_DEBUG() << Q_FUNC_INFO;
   if (! m_saveSettings )
     return;
 
@@ -4728,6 +4726,7 @@ void LanesLexicon::onSavePageSet() {
   }
   QString title = d->pageSetTitle();
   QList<int> tabs = d->requestedTabs();
+  QLOG_DEBUG() << Q_FUNC_INFO << tabs;
   int oid = d->overwriteId();
 
   delete d;
@@ -4761,22 +4760,23 @@ void LanesLexicon::onSavePageSet() {
   }
   int id = v.toInt();
   int ix = 0;
+
   for(int i=0;i < tabs.size();i++) {
-      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(tabs[i]));
-      QString data;
-      QString place;
-      if (entry) {
-        ix++;
-        place = entry->getPlace().toString();
-        data += QString("?type=%1").arg("entry");
-        data += QString("?zoom=%1").arg(entry->getScale());
-        data += QString("?textwidth=%1").arg(entry->getTextWidth());
-        data += QString("?usertitle=%1").arg(entry->userTitle());
-        QString h = entry->getHome();
-        if (! h.isEmpty()) {
-          data += QString("?home=%1").arg(h);
-        }
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(tabs[i]));
+    QString data;
+    QString place;
+    if (entry) {
+      ix++;
+      place = entry->getPlace().toString();
+      data += QString("?type=%1").arg("entry");
+      data += QString("?zoom=%1").arg(entry->getScale());
+      data += QString("?textwidth=%1").arg(entry->getTextWidth());
+      data += QString("?usertitle=%1").arg(entry->userTitle());
+      QString h = entry->getHome();
+      if (! h.isEmpty()) {
+        data += QString("?home=%1").arg(h);
       }
+
       p.bindValue(0,id);
       p.bindValue(1,place);
       p.bindValue(2,data);
@@ -4784,12 +4784,17 @@ void LanesLexicon::onSavePageSet() {
       if (!p.exec()) {
         QLOG_WARN() << QString(tr("Exec failed for SQL_PAGESET_ADD_PAGE query:%1")).arg(p.lastError().text());
       }
-      qDebug() << place;
+    }
   }
   QSqlDatabase::database("notesdb").commit();
   QString plural;
-  plural = (ix > 1? "s" : "");
-  QLOG_INFO() << QString("Saved tab set \"%1\", %2 tab%3").arg(title).arg(ix).arg(plural);
+  switch(ix) {
+  case 0 : { plural = tr("tabs");break;}
+  case 1 : { plural = tr("tab");break;}
+  default : { plural = tr("tabs");break;}
+  }
+  plural = (ix > 1 ? "tabs" : "tab");
+  statusMessage(QString("Saved tab set \"%1\", %2 %3").arg(title).arg(ix).arg(plural));
 }
 void LanesLexicon::onLoadPageSet() {
   QLOG_DEBUG() << Q_FUNC_INFO;
