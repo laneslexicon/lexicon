@@ -290,25 +290,23 @@ void LanesLexicon::restoreSavedState() {
 }
 void LanesLexicon::closeEvent(QCloseEvent * event) {
   cleanup();
+
   QMainWindow::closeEvent(event);
 }
 void LanesLexicon::cleanup() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
   if (m_ok) {
     writeSettings();
   }
+
   if (m_history) {
     delete m_history;
   }
+
   while(m_tabs->count() > 0) {
     this->onCloseTab(0);
   }
-
-  if (m_db.isOpen()) {
-    m_db.close();
-  }
-  if (m_notesDb.isOpen())
-    m_notesDb.close();
-
   if (m_editView != NULL){
     delete m_editView;
     m_editView = 0;
@@ -354,11 +352,14 @@ void LanesLexicon::cleanup() {
       d->close();
     }
   }
-
+  if (m_db.isOpen()) {
+    m_db.close();
+  }
+  if (m_notesDb.isOpen())
+    m_notesDb.close();
   QFontDatabase::removeAllApplicationFonts();
   freeXslt();
   im_free(m_mapper);
-  QLOG_DEBUG() << Q_FUNC_INFO << "exit";
 }
 void LanesLexicon::onSetInterface(bool triggered) {
   bool v = m_minimalAction->isChecked();
@@ -1524,9 +1525,6 @@ void LanesLexicon::onHistorySelection() {
 }
 void LanesLexicon::onExit()
 {
-  if (m_db.isOpen()) {
-    m_db.close();
-  }
   close();
 }
 bool LanesLexicon::openDatabase(const QString & dbname) {
