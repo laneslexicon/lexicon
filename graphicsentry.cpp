@@ -417,10 +417,18 @@ void GraphicsEntry::focusLast() {
  * @return
  */
 Place GraphicsEntry::getPlace(int index) const {
+  QLOG_DEBUG() << Q_FUNC_INFO << index;
   if ((index >= 0) && (index < m_items.size())) {
       return m_items[index]->getPlace();
   }
   if (! m_focusNode.isEmpty()) {
+    QSqlQuery sql;
+    if (sql.prepare(SQL_ENTRY_FOR_NODE)) {
+      sql.bindValue(0,m_focusNode);
+      if (sql.exec()  && sql.first()) {
+        return Place::fromEntryRecord(sql.record());
+      }
+    }
     return Place::fromNode(m_focusNode);
   }
   Place p;
@@ -437,9 +445,6 @@ Place GraphicsEntry::getPlace(int index) const {
   if (m_items.size() > 1) {
     return m_items[1]->getPlace();
   }
-  //  if (! m_focusNode.isEmpty()) {
-  //    return Place::fromNode(m_focusNode);
-  //  }
   return m_focusPlace;
 }
 /**
