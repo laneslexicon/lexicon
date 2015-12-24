@@ -7,6 +7,7 @@
 #include "graphicsentry.h"
 #include "definedsettings.h"
 #include "centeredcheckbox.h"
+#include "columnartablewidget.h"
 #define SET_ID_COLUMN 0
 #define SET_TITLE_COLUMN 1
 #define SET_COUNT_COLUMN 2
@@ -18,7 +19,12 @@
 LoadPageSetDialog::LoadPageSetDialog(QWidget * parent) : QDialog(parent) {
   qDebug() << Q_FUNC_INFO;
   //  m_action = action;
-  m_setlist = new QTableWidget;
+  QStringList cols;
+  cols << tr("Id") << tr("Title") << tr("Tab count") << tr("Created") << tr("Load all") << tr("Select tabs") << tr("Tabs to load");
+
+  m_setlist = new ColumnarTableWidget(cols);
+  m_setlist->setKey(ColumnarTableWidget::STATE,SID_PAGESET_LOADSETLIST_STATE);
+
 
   m_overwrite = new QCheckBox(tr("Close current tabs"));
   readSettings();
@@ -64,9 +70,10 @@ bool LoadPageSetDialog::closeExisting() const {
 int LoadPageSetDialog::loadTitles() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlRecord rec;
-  m_setlist->clear();
+  m_setlist->clearContents();
   m_setlist->verticalHeader()->setVisible(false);
 
+  /*
   QMap<int,QString> hmap;
   hmap.insert(SET_ID_COLUMN,tr("Id"));
   hmap.insert(SET_TITLE_COLUMN,tr("Title"));
@@ -76,13 +83,10 @@ int LoadPageSetDialog::loadTitles() {
   hmap.insert(SET_SELECT_COLUMN,tr("Select tabs"));
   hmap.insert(SET_LOAD_COUNT_COLUMN,tr("Tabs to open"));
   m_setlist->setColumnCount(hmap.size());
-
   m_setlist->setHorizontalHeaderLabels(hmap.values());
-  //  m_setlist->horizontalHeader()->setStretchLastSection(true);
-  //  m_setlist->setSelectionMode(QAbstractItemView::SingleSelection);
   m_setlist->setSelectionBehavior(QAbstractItemView::SelectRows);
-
   m_setlist->horizontalHeader()->setSectionResizeMode(SET_ACCESSED_COLUMN,QHeaderView::Stretch);
+  */
   //  connect(m_setlist,SIGNAL(itemSelectionChanged()),this,SLOT(setTitleFromTable()));
   QSqlQuery q(QSqlDatabase::database("notesdb"));
   if (! q.prepare(SQL_PAGESET_HEADERS)) {
@@ -149,14 +153,14 @@ int LoadPageSetDialog::loadTitles() {
   }
   int rows = m_setlist->rowCount();
   if (rows == 0) {
-    m_setlist->clear();
+    m_setlist->clearContents();
     m_setlist->insertRow(0);
-    m_setlist->setColumnCount(1);
+    m_setlist->setColumnCount(2);
     m_setlist->setHorizontalHeaderLabels(QStringList() << "");
     m_setlist->horizontalHeader()->setStretchLastSection(true);
     QLabel * m = new QLabel(tr("<em>No tab sets found</em>"));
     m->setAlignment(Qt::AlignCenter);
-    m_setlist->setCellWidget(0,0,m);
+    m_setlist->setCellWidget(0,1,m);
   }
 
   m_setlist->resizeColumnsToContents();

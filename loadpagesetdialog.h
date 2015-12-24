@@ -35,6 +35,7 @@
 #include <QStyleFactory>
 #endif
 class PageEntryDialog;
+class ColumnarTableWidget;
 
 class LoadPageSetDialog : public QDialog {
   Q_OBJECT
@@ -58,7 +59,7 @@ class LoadPageSetDialog : public QDialog {
   void loadTitlesToTree();
   int m_action;
   QCheckBox * m_overwrite;
-  QTableWidget * m_setlist;
+  ColumnarTableWidget * m_setlist;
   QString m_spanStyle;
   QTreeWidget * m_tree;
   QMap<int,PageEntryDialog *> m_pageDialogs;

@@ -399,3 +399,8 @@ They should not be translated.
 #define SID_PAGESET_PAGE_DIALOG_SIZE        "Page dialog size"
 #define SID_PAGESET_EDIT_DIALOG_POS         "Edit dialog pos"
 #define SID_PAGESET_EDIT_DIALOG_SIZE        "Edit dialog size"
+#define SID_PAGESET_TABLIST_STATE           "Tab list state"
+#define SID_PAGESET_SETLIST_STATE           "Set list state"
+#define SID_PAGESET_EDIT_TAB_LIST_STATE     "Edit tablist state"
+#define SID_PAGESET_LOADSETLIST_STATE       "Load setlist state"
+#define SID_PAGESET_PAGEENTRY_STATE         "Page entry state"

@@ -7,6 +7,7 @@
 #include "graphicsentry.h"
 #include "definedsettings.h"
 #include "centeredcheckbox.h"
+#include "columnartablewidget.h"
 #define SET_ID_COLUMN 0
 #define SET_TITLE_COLUMN 1
 #define SET_COUNT_COLUMN 2
@@ -24,9 +25,12 @@
 #define PAGE_ID_COLUMN 5
 
 EditPageSetDialog::EditPageSetDialog(QWidget * parent) : QDialog(parent) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  QStringList cols;
+  cols << tr("Id") << tr("Title") << tr("Tab count") << tr("Created") << tr("Delete") << tr("Select tabs") << tr("Tabs to delete");
 
-  m_setlist = new QTableWidget;
+  m_setlist = new ColumnarTableWidget(cols);
+  m_setlist->setKey(ColumnarTableWidget::STATE,SID_PAGESET_EDIT_TAB_LIST_STATE);
 
   readSettings();
 
@@ -59,6 +63,10 @@ EditPageSetDialog::EditPageSetDialog(QWidget * parent) : QDialog(parent) {
 
   connect(m_setlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),this,SLOT(onItemDoubleClicked(QTableWidgetItem *)));
   m_dirty = false;
+
+  SETTINGS
+  settings.beginGroup("PageSets");
+  m_setlist->readConfiguration(settings);
 }
 EditPageSetDialog::~EditPageSetDialog() {
   qDebug() << Q_FUNC_INFO;
@@ -83,10 +91,10 @@ QString EditPageSetDialog::pageSetTitle() const {
 int EditPageSetDialog::loadTitles() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlRecord rec;
-  //  m_setlist->clear();
+  m_setlist->clearContents();
   m_setlist->setRowCount(0);
   m_setlist->verticalHeader()->setVisible(false);
-
+  /*
   QMap<int,QString> hmap;
   hmap.insert(SET_ID_COLUMN,tr("Id"));
   hmap.insert(SET_TITLE_COLUMN,tr("Title"));
@@ -98,8 +106,7 @@ int EditPageSetDialog::loadTitles() {
   m_setlist->setColumnCount(hmap.size());
 
   m_setlist->setHorizontalHeaderLabels(hmap.values());
-  //  m_setlist->horizontalHeader()->setStretchLastSection(true);
-  //  m_setlist->setSelectionMode(QAbstractItemView::SingleSelection);
+  */
   m_setlist->setSelectionBehavior(QAbstractItemView::SelectRows);
 
   m_setlist->horizontalHeader()->setSectionResizeMode(SET_ACCESSED_COLUMN,QHeaderView::Stretch);

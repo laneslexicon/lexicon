@@ -33,6 +33,7 @@
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif
+class ColumnarTableWidget;
 class PageEntryDialog;
 class EditPageSetDialog : public QDialog {
   Q_OBJECT
@@ -57,7 +58,7 @@ class EditPageSetDialog : public QDialog {
     QPushButton * m_loadButton;
   int loadTitles();
   int m_action;
-  QTableWidget * m_setlist;
+  ColumnarTableWidget * m_setlist;
   QString m_spanStyle;
   QMap<int,PageEntryDialog *> m_pageDialogs;
   //  void createPageDialog(int);

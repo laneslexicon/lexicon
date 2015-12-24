@@ -6,7 +6,7 @@
 #include "graphicsentry.h"
 #include "definedsettings.h"
 #include "centeredcheckbox.h"
-
+#include "columnartablewidget.h"
 #define PAGE_LOAD_COLUMN 0
 #define PAGE_NODE_COLUMN 1
 #define PAGE_ROOT_COLUMN 2
@@ -25,19 +25,12 @@ PageEntryDialog::PageEntryDialog(int pageset,QWidget * parent) : QDialog(parent)
   p.exec();
   int page = 0;
   QVBoxLayout * layout = new QVBoxLayout;
-  m_pages = new QTableWidget;
+
   QMap<int,QString> hm;
-  hm.insert(PAGE_LOAD_COLUMN,tr("Select"));
-  hm.insert(PAGE_NODE_COLUMN,tr("Node"));
-  hm.insert(PAGE_ROOT_COLUMN,tr("Root"));
-  hm.insert(PAGE_WORD_COLUMN,tr("Headword"));
-  hm.insert(PAGE_VOLUME_COLUMN,tr("Volume/Page"));
-  hm.insert(PAGE_ID_COLUMN,tr("Id"));
-
-  m_pages->setColumnCount(hm.size());
-
-  m_pages->setHorizontalHeaderLabels(hm.values());
-  m_pages->horizontalHeader()->setStretchLastSection(true);
+  QStringList cols;
+  cols << tr("Select") << tr("Node") << tr("Root") << tr("Headword") << tr("Volume/Page") << tr("Id");
+  m_pages = new ColumnarTableWidget(cols);
+  m_pages->setKey(ColumnarTableWidget::STATE,SID_PAGESET_PAGEENTRY_STATE);
   m_pages->setSelectionMode(QAbstractItemView::SingleSelection);
   m_pages->verticalHeader()->setVisible(false);
 
@@ -110,6 +103,11 @@ PageEntryDialog::PageEntryDialog(int pageset,QWidget * parent) : QDialog(parent)
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   layout->addWidget(buttonBox);
   setLayout(layout);
+  ///
+  SETTINGS
+  settings.beginGroup("PageSets");
+  m_pages->readConfiguration(settings);
+
 }
 int PageEntryDialog::pageCount() const {
   int p = 0;

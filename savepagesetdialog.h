@@ -32,6 +32,7 @@
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif
+class ColumnarTableWidget;
 class SavePageSetDialog : public QDialog {
   Q_OBJECT
 
@@ -56,8 +57,8 @@ class SavePageSetDialog : public QDialog {
   QCheckBox * m_overwrite;
   QRadioButton * m_selectAll;
   QRadioButton * m_selectNone;
-  QTableWidget * m_setlist;
-  QTableWidget * m_tablist;
+  ColumnarTableWidget * m_setlist;
+  ColumnarTableWidget * m_tablist;
   QLineEdit * m_name;
   QString m_spanStyle;
 };

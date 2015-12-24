@@ -8,6 +8,7 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QSettings>
+#include <QLabel>
 /*************************************************************************/
 /* QStringList cols;                                                     */
 /* cols << "One" << "Two" << "Three";                                    */
@@ -30,9 +31,11 @@ class ColumnarTableWidget : public QTableWidget {
   enum { DEFAULT_WIDTH, COLUMN_WIDTHS,STATE };
   virtual void readConfiguration(QSettings &);
   virtual void writeConfiguration();
+  virtual QLabel * createLabel(const QString &,const QString & style = QString()) const;
  private slots:
     void onColumnDialog(int);
  private:
+    bool startsWithArabic(const QString &) const;
     QStringList m_colHeadings;
     QString m_defaultWidthKey;
     QString m_columnWidthsKey;

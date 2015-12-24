@@ -27,6 +27,7 @@
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif
+class ColumnarTableWidget;
 class PageEntryDialog : public QDialog {
   Q_OBJECT
 
@@ -35,7 +36,7 @@ class PageEntryDialog : public QDialog {
   ~PageEntryDialog();
   int pageCount() const;
   QList<int> pages() const;
-  QTableWidget * m_pages;
+  ColumnarTableWidget * m_pages;
  protected:
   void showEvent(QShowEvent *);
   void done(int);

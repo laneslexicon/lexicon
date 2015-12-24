@@ -1,3 +1,4 @@
+#include "application.h"
 #include "columnartablewidget.h"
 #include "columnselectdialog.h"
 #include "QsLog.h"
@@ -16,7 +17,7 @@ ColumnarTableWidget::ColumnarTableWidget(const QStringList & headers,QWidget * p
   horizontalHeader()->setStretchLastSection(true);
   horizontalHeader()->setSectionsMovable(true);
   horizontalHeader()->setSectionsClickable(true);
-
+  verticalHeader()->setVisible(false);
   connect(this->horizontalHeader(),SIGNAL(sectionDoubleClicked(int)),this,SLOT(onColumnDialog(int)));
 }
 ColumnarTableWidget::~ColumnarTableWidget() {
@@ -101,4 +102,40 @@ void ColumnarTableWidget::writeConfiguration() {
 }
 void ColumnarTableWidget::setSaveConfiguration(bool v) {
   m_saveConfig = v;
+}
+QLabel * ColumnarTableWidget::createLabel(const QString & text,const QString & style) const {
+  //
+  /// remove line breaks and leading/trailing spaces
+  QString str = text.trimmed();
+  str = str.replace(QRegularExpression("\\r|\\n")," ");
+
+  QLabel * l;
+  if (! style.isEmpty()) {
+    l = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(str,style));
+  }
+  else {
+    l = new QLabel(str);
+  }
+
+  /*
+  if (this->startsWithArabic(str)) {
+    l->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+  }
+  else {
+    l->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+  }
+  */
+  return l;
+}
+bool ColumnarTableWidget::startsWithArabic(const QString & t) const {
+  for(int i=0;i < t.size();i++) {
+    if (t.at(i).direction() == QChar::DirAL) {
+      return true;
+    }
+    if (t.at(i).direction() == QChar::DirL) {
+      return false;
+    }
+
+  }
+  return false;
 }
