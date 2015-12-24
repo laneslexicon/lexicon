@@ -428,12 +428,17 @@ void LanesLexicon::onCloseOtherTabs(int /* index */) {
   QString label = m_tabs->tabText(m_tabs->currentIndex());
   QWidget * w = m_tabs->currentWidget();
   m_tabs->removeTab(m_tabs->currentIndex());
-  while(m_tabs->count() > 0) {
-    this->onCloseTab(0);
-  }
+  this->closeAllTabs();
   m_tabs->addTab(w,label);
   m_tabs->setUpdatesEnabled(true);
 }
+/**
+ *
+ *
+ * @param w
+ *
+ * @return
+ */
 bool LanesLexicon::deleteWidget(QWidget * w) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(w);
   if (entry) {
@@ -464,6 +469,17 @@ void LanesLexicon::onCloseTab(int ix) {
   m_tabs->removeTab(ix);
   if (! deleteWidget(w)) {
     delete w;
+  }
+}
+void LanesLexicon::closeAllTabs() {
+  int m = m_tabs->count();
+
+  for(int i = m -1;i > -1;i--) {
+    QWidget * w = m_tabs->widget(i);
+    m_tabs->removeTab(i);
+    if (! deleteWidget(w)) {
+      delete w;
+    }
   }
 }
 void LanesLexicon::shortcut(const QString & key) {
@@ -4816,9 +4832,7 @@ void LanesLexicon::onLoadPageSet() {
     return;
   }
   if (clearTabs) {
-    while(m_tabs->count() > 0) {
-      this->onCloseTab(0);
-    }
+    this->closeAllTabs();
   }
   int ix=0;
   QRegularExpression rx("(\\w+)=(.+)");
@@ -4870,7 +4884,14 @@ void LanesLexicon::onLoadPageSet() {
     else {
     }
   }
-  statusMessage(QString(tr("Restored %1 page%2")).arg(ix).arg(ix == 1 ? "" : tr("s")));
+  QString plural;
+  switch(ix) {
+  case 0 : { plural = tr("tabs");break;}
+  case 1 : { plural = tr("tab");break;}
+  default : { plural = tr("tabs");break;}
+  }
+  plural = (ix > 1 ? "tabs" : "tab");
+  statusMessage(QString("Restored %1 %2").arg(ix).arg(plural));
 }
 void LanesLexicon::onEditPageSet() {
   QLOG_DEBUG() << Q_FUNC_INFO;

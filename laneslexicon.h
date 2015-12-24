@@ -231,7 +231,7 @@ class LanesLexicon : public QMainWindow
       void cleanup();
       void search(int searchType,ArabicSearchDialog *,const QString &);
       //      Place showPlace(const Place &,int);
-
+      void closeAllTabs();
       void updateStatusBar();
       void updateMenu();
       int searchTabs(const QString & node);
