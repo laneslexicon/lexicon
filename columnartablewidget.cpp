@@ -9,7 +9,7 @@ ColumnarTableWidget::ColumnarTableWidget(const QStringList & headers,QWidget * p
   m_defaultWidthKey = "Default width";
   m_columnWidthsKey = "Column widths";
   m_stateKey = "Column state";
-
+  m_defaultWidth = -1;
   setRowCount(0);
   setColumnCount(m_colHeadings.size());
   setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -66,10 +66,14 @@ void ColumnarTableWidget::onColumnDialog(int /* section */) {
  * @param settings a QSettings pointing at the correct group
  */
 void ColumnarTableWidget::readConfiguration(QSettings & settings) {
+
   m_settings = new QSettings(settings.fileName(),settings.format());
   m_settings->setIniCodec(settings.iniCodec());
   m_settings->beginGroup(settings.group());
-  m_defaultWidth = settings.value(m_defaultWidthKey,200).toInt();
+  if (m_defaultWidth == -1) {
+    m_defaultWidth = 200;
+  }
+  m_defaultWidth = settings.value(m_defaultWidthKey,m_defaultWidth).toInt();
   this->horizontalHeader()->setDefaultSectionSize(m_defaultWidth);
   QByteArray b = settings.value(m_stateKey,QByteArray()).toByteArray();
   if (b.size() > 0) {
@@ -92,6 +96,9 @@ void ColumnarTableWidget::readConfiguration(QSettings & settings) {
       }
     }
   }
+}
+void ColumnarTableWidget::setDefaultWidth(int v) {
+  m_defaultWidth = v;
 }
 void ColumnarTableWidget::writeConfiguration() {
   QLOG_DEBUG() << Q_FUNC_INFO <<m_saveConfig;

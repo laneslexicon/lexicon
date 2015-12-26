@@ -28,6 +28,7 @@ class ColumnarTableWidget : public QTableWidget {
   ~ColumnarTableWidget();
   void setKey(int,const QString &);
   void setSaveConfiguration(bool v);
+  void setDefaultWidth(int);
   enum { DEFAULT_WIDTH, COLUMN_WIDTHS,STATE };
   virtual void readConfiguration(QSettings &);
   virtual void writeConfiguration();
