@@ -17,7 +17,7 @@
 #define SET_LOAD_COUNT_COLUMN 6
 
 LoadPageSetDialog::LoadPageSetDialog(QWidget * parent) : QDialog(parent) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   //  m_action = action;
   QStringList cols;
   cols << tr("Id") << tr("Title") << tr("Tab count") << tr("Created") << tr("Load all") << tr("Select tabs") << tr("Tabs to load");
@@ -54,7 +54,12 @@ LoadPageSetDialog::LoadPageSetDialog(QWidget * parent) : QDialog(parent) {
   layout->addWidget(buttonBox);
 
   setLayout(layout);
-
+ ///
+  SETTINGS
+  settings.beginGroup("PageSets");
+  m_setlist->readConfiguration(settings);
+  m_setlist->resizeColumnToContents(SET_SELECT_COLUMN);
+  m_setlist->resizeColumnToContents(SET_LOAD_COLUMN);
 
 }
 LoadPageSetDialog::~LoadPageSetDialog() {
@@ -73,20 +78,6 @@ int LoadPageSetDialog::loadTitles() {
   m_setlist->clearContents();
   m_setlist->verticalHeader()->setVisible(false);
 
-  /*
-  QMap<int,QString> hmap;
-  hmap.insert(SET_ID_COLUMN,tr("Id"));
-  hmap.insert(SET_TITLE_COLUMN,tr("Title"));
-  hmap.insert(SET_COUNT_COLUMN,tr("Tab count"));
-  hmap.insert(SET_ACCESSED_COLUMN,tr("Created"));
-  hmap.insert(SET_LOAD_COLUMN,tr("Open all"));
-  hmap.insert(SET_SELECT_COLUMN,tr("Select tabs"));
-  hmap.insert(SET_LOAD_COUNT_COLUMN,tr("Tabs to open"));
-  m_setlist->setColumnCount(hmap.size());
-  m_setlist->setHorizontalHeaderLabels(hmap.values());
-  m_setlist->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_setlist->horizontalHeader()->setSectionResizeMode(SET_ACCESSED_COLUMN,QHeaderView::Stretch);
-  */
   //  connect(m_setlist,SIGNAL(itemSelectionChanged()),this,SLOT(setTitleFromTable()));
   QSqlQuery q(QSqlDatabase::database("notesdb"));
   if (! q.prepare(SQL_PAGESET_HEADERS)) {
@@ -163,7 +154,11 @@ int LoadPageSetDialog::loadTitles() {
     m_setlist->setCellWidget(0,1,m);
   }
 
-  m_setlist->resizeColumnsToContents();
+  //  m_setlist->resizeColumnsToContents();
+  ///
+  SETTINGS
+  settings.beginGroup("PageSets");
+  m_setlist->readConfiguration(settings);
   return rows;
 }
 void LoadPageSetDialog::readSettings() {
@@ -214,53 +209,6 @@ void LoadPageSetDialog::onSelectPages() {
     }
   }
   m_loadButton->setEnabled(this->loadCount() > 0);
-}
-void LoadPageSetDialog::loadTitlesToTree() {
-  QLOG_DEBUG() << Q_FUNC_INFO;
-  QSqlRecord rec;
-  m_tree->clear();
-  m_tree->setColumnCount(4);
-  QStringList headers;
-  headers << tr("Title") << tr("Pages") << tr("Created") << tr("Load pages");
-  m_tree->setHeaderLabels(headers);
-  //  m_tree->horizontalHeader()->setStretchLastSection(true);
-  //  m_tree->setSelectionMode(QAbstractItemView::SingleSelection);
-  //  m_tree->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-  //  connect(m_tree,SIGNAL(itemSelectionChanged()),this,SLOT(setTitleFromTable()));
-  QSqlQuery q(QSqlDatabase::database("notesdb"));
-  if (! q.prepare(SQL_PAGESET_HEADERS)) {
-    /// Report error
-    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_HEADER query:%1")).arg(q.lastError().text());
-    return;
-  }
-  QSqlQuery p(QSqlDatabase::database("notesdb"));
-  if (! p.prepare(SQL_PAGESET_DETAIL)) {
-    /// Report error
-    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_DETAIL query:%1")).arg(p.lastError().text());
-    return;
-  }
-  q.exec();
-  while(q.next()) {
-    rec = q.record();
-    QStringList cols;
-    cols << rec.value("title").toString() << rec.value("accessed").toString();
-    QTreeWidgetItem * item = new QTreeWidgetItem(cols);
-    item->setFlags(item->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
-    m_tree->addTopLevelItem(item);
-
-    p.bindValue(0,rec.value("id").toInt());
-    p.exec();
-    while(p.next()) {
-      cols.clear();
-      Place n = Place::fromString(p.record().value("place").toString());
-      cols << n.m_root << n.m_word << n.m_node;
-      QTreeWidgetItem * child = new QTreeWidgetItem(item,cols);
-      child->setFlags(item->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
-    }
-  }
-  //  m_tree->resizeColumnsToContents();
-  return;
 }
 void LoadPageSetDialog::onSelectAll(int state) {
   CenteredCheckBox * b = qobject_cast<CenteredCheckBox *>(QObject::sender());

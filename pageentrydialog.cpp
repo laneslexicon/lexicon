@@ -107,7 +107,6 @@ PageEntryDialog::PageEntryDialog(int pageset,QWidget * parent) : QDialog(parent)
   SETTINGS
   settings.beginGroup("PageSets");
   m_pages->readConfiguration(settings);
-
 }
 int PageEntryDialog::pageCount() const {
   int p = 0;
