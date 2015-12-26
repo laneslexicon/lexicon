@@ -63,6 +63,8 @@ void ColumnarTableWidget::onColumnDialog(int /* section */) {
  * otherwise if we have 'columns' set the sizes from that, provided there are as many entries as
  * there are columns
  *
+ * The passed QSettings is cloned, so the calling routine can do what it wants
+ *
  * @param settings a QSettings pointing at the correct group
  */
 void ColumnarTableWidget::readConfiguration(QSettings & settings) {
@@ -145,4 +147,15 @@ bool ColumnarTableWidget::startsWithArabic(const QString & t) const {
 
   }
   return false;
+}
+void ColumnarTableWidget::showEmpty(const QString & text) {
+  this->insertRow(0);
+  for(int i=1;i < this->columnCount();i++) {
+    this->hideColumn(i);
+  }
+  m_emptyText = text;
+  QLabel * label = this->createLabel(text);
+  label->setAlignment(Qt::AlignCenter);
+  this->setCellWidget(0,0,label);
+  m_saveConfig = false;
 }
