@@ -6,13 +6,14 @@
 #include "history.h"
 #include "externs.h"
 #include "definedsettings.h"
+#include "columnartablewidget.h"
 HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   : QDialog(parent) {
   readSettings();
   setWindowTitle(tr("Current History"));
   setObjectName("historywidget");
   QList<HistoryEvent *> events = history->getHistory();
-  m_list = new QTableWidget(events.size(),5);
+  m_list = new ColumnarTableWidget(QStringList() << tr("Id") << tr("Root") << tr("Head") << tr("Vol/Page") << tr("Visited"));
   m_list->setObjectName("historylist");
   //  HtmlDelegate * d = new HtmlDelegate(m_list);
   //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
@@ -20,37 +21,50 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
 
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_list->setKey(ColumnarTableWidget::STATE,SID_HISTORY_LIST_STATE);
+  m_list->setDefaultWidth(100);
 
-  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Head") << tr("Vol/Page") << tr("Visited"));
-  m_list->horizontalHeader()->setStretchLastSection(true);
-  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
+  //  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Head") << tr("Vol/Page") << tr("Visited"));
+  //  m_list->horizontalHeader()->setStretchLastSection(true);
+  //  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QTableWidgetItem * item;
   HistoryEvent * h;
+  int row;
   for(int i=0;i < events.size();i++) {
     h = events[i];
-    item = new QTableWidgetItem(QString("%1").arg(h->getId()));
-    m_list->setItem(i,0,item);
     Place p = h->getPlace();
-      //      QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(p.getText());
+    if (p.isValid()) {
+    row = m_list->rowCount();
+    m_list->insertRow(row);
+
+    item = new QTableWidgetItem(QString("%1").arg(h->getId()));
+    m_list->setItem(row,0,item);
+
     item = new QTableWidgetItem(p.getRoot());
     item->setFont(m_arFont);
-    m_list->setItem(i,1,item);
+    m_list->setItem(row,1,item);
     item = new QTableWidgetItem(p.getWord());
     item->setFont(m_arFont);
-    m_list->setItem(i,2,item);
+    m_list->setItem(row,2,item);
     item = new QTableWidgetItem(QString(tr("V%1/%2")).arg(p.getVol()).arg(p.getPage()));
-    m_list->setItem(i,3,item);
+    m_list->setItem(row,3,item);
     item = new QTableWidgetItem(h->getWhen().toString());
-    m_list->setItem(i,4,item);
+    m_list->setItem(row,4,item);
+    }
   }
-  if (events.size() > 0) {
+  if (m_list->rowCount() > 0) {
     m_list->selectRow(0);
   }
-  /// TODO set these from defaults
+  else {
+    m_list->showEmpty(tr("No history items"));
+  }
   m_newTab = new QCheckBox(tr("Open in new tab"));
   m_switchTab = new QCheckBox(tr("Switch to new tab"));
   SETTINGS
   settings.beginGroup("History");
+
+  m_list->readConfiguration(settings);
+
   m_newTab->setChecked(settings.value(SID_HISTORY_NEW_TAB,false).toBool());
   m_switchTab->setChecked(settings.value(SID_HISTORY_GO_TAB,true).toBool());
   m_switchTab->setEnabled(m_newTab->isChecked());
