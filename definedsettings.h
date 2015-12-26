@@ -257,7 +257,6 @@ They should not be translated.
 
 #define SID_BOOKMARK_NEW_TAB                   "New tab"
 #define SID_BOOKMARK_GO_TAB                    "Activate tab"
-#define SID_BOOKMARK_ARABIC_FONT               "Arabic font"
 #define SID_BOOKMARK_DEBUG                     "Debug"
 #define SID_BOOKMARK_ADD                       "Add"
 #define SID_BOOKMARK_LIST                      "List"
@@ -265,7 +264,7 @@ They should not be translated.
 #define SID_BOOKMARK_REVERT                    "Revert"
 #define SID_BOOKMARK_CLEAR                     "Clear"
 #define SID_BOOKMARK_ID                        "Id"
-#define SID_BOOKMARK_LIST_STATE                "List state"
+#define SID_BOOKMARK_LIST_STATE                "Book marklist state"
 
 #define SID_SYSTEM_DATABASE                    "Database"
 #define SID_SYSTEM_STYLESHEET                  "Stylesheet"
