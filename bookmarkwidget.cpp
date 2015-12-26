@@ -13,7 +13,6 @@
 #define NODE_COLUMN 4
 BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * parent)
   : QDialog(parent) {
-  readSettings();
   setWindowTitle(tr("Current Bookmarks"));
   setObjectName("bookmarkwidget");
   QStringList keys = marks.keys();
@@ -47,21 +46,29 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
       label->setAlignment(Qt::AlignCenter);
       m_list->setCellWidget(row,WORD_COLUMN,label);
 
-      item = new QTableWidgetItem(p.format("%V/%P"));
+      label = m_list->createLabel(p.format("%V/%P"));
       label->setAlignment(Qt::AlignCenter);
-      m_list->setItem(row,VOL_COLUMN,item);
+      m_list->setCellWidget(row,VOL_COLUMN,label);
 
       item = new QTableWidgetItem(p.getNode());
       m_list->setItem(row,NODE_COLUMN,item);
     }
   }
+  //
+  SETTINGS
+  settings.beginGroup("Bookmark");
+  m_list->readConfiguration(settings);
+  settings.endGroup();
+
   if (keys.size() > 0) {
     m_list->selectRow(0);
   }
-
+  else {
+    m_list->showEmpty(tr("No bookmarks"));
+  }
   m_newTab = new QCheckBox(tr("Open in new tab"));
   m_switchTab = new QCheckBox(tr("Switch to new tab"));
-  SETTINGS
+
   settings.beginGroup("Bookmark");
   m_newTab->setChecked(settings.value(SID_BOOKMARK_NEW_TAB,false).toBool());
   m_switchTab->setChecked(settings.value(SID_BOOKMARK_GO_TAB,true).toBool());
@@ -93,10 +100,6 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   setLayout(layout);
   m_list->installEventFilter(this);
 
-  //
-  settings.endGroup();
-  settings.beginGroup("Bookmarks");
-  m_list->readConfiguration(settings);
 
 }
 void BookmarkWidget::setPlace() {
