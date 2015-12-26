@@ -24,17 +24,11 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   m_list->setKey(ColumnarTableWidget::STATE,SID_BOOKMARK_LIST_STATE);
   m_list->setDefaultWidth(100);
   m_list->setObjectName("arabicbookmarklist");
-  //  HtmlDelegate * d = new HtmlDelegate(m_list);
-  //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
-  //  m_list->setItemDelegate(d);
-
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
-  //  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
-
-  //  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Entry") << tr("Vol/Page") << tr("Node"));
-  //  m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
+
   QTableWidgetItem * item;
+  QLabel * label;
   int row;
   for(int i=0;i < keys.size();i++) {
     Place p = marks.value(keys[i]);
@@ -43,15 +37,20 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
       m_list->insertRow(row);
       item = new QTableWidgetItem(QString("%1").arg(keys[i]));
       m_list->setItem(row,KEY_COLUMN,item);
-      //      QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(p.getText());
-      item = new QTableWidgetItem(p.getRoot());
-      item->setFont(m_arFont);
-      m_list->setItem(row,ROOT_COLUMN,item);
-      item = new QTableWidgetItem(p.getWord());
-      item->setFont(m_arFont);
-      m_list->setItem(row,WORD_COLUMN,item);
-      item = new QTableWidgetItem(QString(tr("V%1/%2")).arg(p.getVol()).arg(p.getPage()));
+
+      label = m_list->createLabel(p.m_root,"bookmarklist");
+      label->setAlignment(Qt::AlignCenter);
+      m_list->setCellWidget(row,ROOT_COLUMN,label);
+
+
+      label = m_list->createLabel(p.m_word,"bookmarklist");
+      label->setAlignment(Qt::AlignCenter);
+      m_list->setCellWidget(row,WORD_COLUMN,label);
+
+      item = new QTableWidgetItem(p.format("%V/%P"));
+      label->setAlignment(Qt::AlignCenter);
       m_list->setItem(row,VOL_COLUMN,item);
+
       item = new QTableWidgetItem(p.getNode());
       m_list->setItem(row,NODE_COLUMN,item);
     }
@@ -134,14 +133,6 @@ QSize BookmarkWidget::sizeHint() const {
   return QSize(600,300);
 }
 void BookmarkWidget::readSettings() {
-  SETTINGS
-  settings.beginGroup("Bookmark");
-  QString fontString = settings.value(SID_BOOKMARK_ARABIC_FONT).toString();
-  if ( ! fontString.isEmpty()) {
-    m_arFont.fromString(fontString);
-  }
-  m_debug = settings.value(SID_BOOKMARK_DEBUG,false).toBool();
-  settings.endGroup();
 }
 bool BookmarkWidget::getNewTab() {
   return m_newTab->isChecked();
