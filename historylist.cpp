@@ -7,29 +7,32 @@
 #include "externs.h"
 #include "definedsettings.h"
 #include "columnartablewidget.h"
+
+#define KEY_COLUMN 0
+#define ROOT_COLUMN 1
+#define WORD_COLUMN 2
+#define VOL_COLUMN 3
+#define WHEN_COLUMN 4
+#define NODE_COLUMN 5
+
 HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   : QDialog(parent) {
   readSettings();
   setWindowTitle(tr("Current History"));
   setObjectName("historywidget");
   QList<HistoryEvent *> events = history->getHistory();
-  m_list = new ColumnarTableWidget(QStringList() << tr("Id") << tr("Root") << tr("Head") << tr("Vol/Page") << tr("Visited"));
+  m_list = new ColumnarTableWidget(QStringList() << tr("Id") << tr("Root") << tr("Head") << tr("Vol/Page") << tr("Visited") << tr("Node"));
   m_list->setObjectName("historylist");
-  //  HtmlDelegate * d = new HtmlDelegate(m_list);
-  //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
-  //  m_list->setItemDelegate(d);
 
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_list->setKey(ColumnarTableWidget::STATE,SID_HISTORY_LIST_STATE);
   m_list->setDefaultWidth(100);
 
-  //  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Head") << tr("Vol/Page") << tr("Visited"));
-  //  m_list->horizontalHeader()->setStretchLastSection(true);
-  //  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QTableWidgetItem * item;
   HistoryEvent * h;
   int row;
+  QLabel * label;
   for(int i=0;i < events.size();i++) {
     h = events[i];
     Place p = h->getPlace();
@@ -38,18 +41,26 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
     m_list->insertRow(row);
 
     item = new QTableWidgetItem(QString("%1").arg(h->getId()));
-    m_list->setItem(row,0,item);
+    m_list->setItem(row,KEY_COLUMN,item);
 
-    item = new QTableWidgetItem(p.getRoot());
-    item->setFont(m_arFont);
-    m_list->setItem(row,1,item);
-    item = new QTableWidgetItem(p.getWord());
-    item->setFont(m_arFont);
-    m_list->setItem(row,2,item);
-    item = new QTableWidgetItem(QString(tr("V%1/%2")).arg(p.getVol()).arg(p.getPage()));
-    m_list->setItem(row,3,item);
+    label = m_list->createLabel(p.m_root,"bookmarklist");
+    label->setAlignment(Qt::AlignCenter);
+    m_list->setCellWidget(row,ROOT_COLUMN,label);
+
+
+    label = m_list->createLabel(p.m_word,"bookmarklist");
+    label->setAlignment(Qt::AlignCenter);
+    m_list->setCellWidget(row,WORD_COLUMN,label);
+
+    label = m_list->createLabel(p.format("%V/%P"));
+    label->setAlignment(Qt::AlignCenter);
+    m_list->setCellWidget(row,VOL_COLUMN,label);
+
     item = new QTableWidgetItem(h->getWhen().toString());
-    m_list->setItem(row,4,item);
+    m_list->setItem(row,WHEN_COLUMN,item);
+
+    item = new QTableWidgetItem(p.getNode());
+    m_list->setItem(row,NODE_COLUMN,item);
     }
   }
   if (m_list->rowCount() > 0) {
