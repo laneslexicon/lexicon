@@ -2576,11 +2576,12 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
       QString m = dlg->getSelected();
       bool newTab = dlg->getNewTab();
       bool switchTab = dlg->getSwitchTab();
-      delete dlg;
+
       if ( ! m.isEmpty()) {
         bookmarkJump(m,newTab,switchTab);
       }
     }
+    delete dlg;
     return;
   }
   if (key == "clear") {
