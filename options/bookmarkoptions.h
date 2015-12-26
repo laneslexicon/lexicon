@@ -16,7 +16,6 @@ class BookmarkOptions : public OptionsWidget {
     void onSetColor();
  private:
     QLineEdit * m_id;
-    QLineEdit * m_font;
     QCheckBox * m_newTab;
     QCheckBox * m_goTab;
     QKeySequenceEdit * m_add;
