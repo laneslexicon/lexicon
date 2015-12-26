@@ -264,7 +264,7 @@ They should not be translated.
 #define SID_BOOKMARK_REVERT                    "Revert"
 #define SID_BOOKMARK_CLEAR                     "Clear"
 #define SID_BOOKMARK_ID                        "Id"
-
+#define SID_BOOKMARK_LIST_STATE                "List state"
 
 #define SID_SYSTEM_DATABASE                    "Database"
 #define SID_SYSTEM_STYLESHEET                  "Stylesheet"

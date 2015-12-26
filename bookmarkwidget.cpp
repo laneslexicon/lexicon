@@ -5,6 +5,7 @@
 #include "application.h"
 #include "definedsettings.h"
 #include "externs.h"
+#include "columnartablewidget.h"
 #define KEY_COLUMN 0
 #define ROOT_COLUMN 1
 #define WORD_COLUMN 2
@@ -17,41 +18,48 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   setObjectName("bookmarkwidget");
   QStringList keys = marks.keys();
   keys.removeOne("-here-");
-  m_list = new QTableWidget(keys.size(),5);
+
+
+  m_list = new ColumnarTableWidget(QStringList() << tr("Id") << tr("Root") << tr("Entry") << tr("Vol/Page") << tr("Node"));
+  m_list->setKey(ColumnarTableWidget::STATE,SID_BOOKMARK_LIST_STATE);
+  m_list->setDefaultWidth(100);
   m_list->setObjectName("arabicbookmarklist");
   //  HtmlDelegate * d = new HtmlDelegate(m_list);
   //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
   //  m_list->setItemDelegate(d);
 
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
+  //  m_list->setSelectionMode(QAbstractItemView::SingleSelection);
 
-  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Entry") << tr("Vol/Page") << tr("Node"));
-  m_list->horizontalHeader()->setStretchLastSection(true);
+  //  m_list->setHorizontalHeaderLabels(QStringList() << tr("Id") << tr("Root") << tr("Entry") << tr("Vol/Page") << tr("Node"));
+  //  m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   QTableWidgetItem * item;
+  int row;
   for(int i=0;i < keys.size();i++) {
-    item = new QTableWidgetItem(QString("%1").arg(keys[i]));
-      m_list->setItem(i,KEY_COLUMN,item);
-      Place p = marks.value(keys[i]);
+    Place p = marks.value(keys[i]);
+    if (p.isValid()) {
+      row = m_list->rowCount();
+      m_list->insertRow(row);
+      item = new QTableWidgetItem(QString("%1").arg(keys[i]));
+      m_list->setItem(row,KEY_COLUMN,item);
       //      QString html = qobject_cast<Lexicon *>(qApp)->scanAndSpan(p.getText());
       item = new QTableWidgetItem(p.getRoot());
       item->setFont(m_arFont);
-      m_list->setItem(i,ROOT_COLUMN,item);
+      m_list->setItem(row,ROOT_COLUMN,item);
       item = new QTableWidgetItem(p.getWord());
       item->setFont(m_arFont);
-      m_list->setItem(i,WORD_COLUMN,item);
+      m_list->setItem(row,WORD_COLUMN,item);
       item = new QTableWidgetItem(QString(tr("V%1/%2")).arg(p.getVol()).arg(p.getPage()));
-      m_list->setItem(i,VOL_COLUMN,item);
+      m_list->setItem(row,VOL_COLUMN,item);
       item = new QTableWidgetItem(p.getNode());
-      m_list->setItem(i,NODE_COLUMN,item);
+      m_list->setItem(row,NODE_COLUMN,item);
+    }
   }
   if (keys.size() > 0) {
     m_list->selectRow(0);
   }
-  if (! m_debug) {
-    m_list->hideColumn(NODE_COLUMN);
-  }
+
   m_newTab = new QCheckBox(tr("Open in new tab"));
   m_switchTab = new QCheckBox(tr("Switch to new tab"));
   SETTINGS
@@ -85,6 +93,12 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   layout->addLayout(hlayout);
   setLayout(layout);
   m_list->installEventFilter(this);
+
+  //
+  settings.endGroup();
+  settings.beginGroup("Bookmarks");
+  m_list->readConfiguration(settings);
+
 }
 void BookmarkWidget::setPlace() {
   int row = m_list->currentRow();

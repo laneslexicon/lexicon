@@ -14,6 +14,7 @@
 #include <QRegExp>
 #include <QCheckBox>
 class Place;
+class ColumnarTableWidget;
 class BookmarkWidget : public QDialog {
   Q_OBJECT
  public:
@@ -31,7 +32,7 @@ class BookmarkWidget : public QDialog {
     QCheckBox * m_switchTab;
     void readSettings();
     bool m_debug;
-    QTableWidget * m_list;
+    ColumnarTableWidget * m_list;
     QString  m_mark;
     bool eventFilter(QObject *,QEvent *);
     QFont m_arFont;
