@@ -232,7 +232,7 @@ class LanesLexicon : public QMainWindow
       void search(int searchType,ArabicSearchDialog *,const QString &);
       //      Place showPlace(const Place &,int);
       void closeAllTabs();
-      void updateStatusBar();
+      void updateStatusBar(const Place & p = Place());
       void updateMenu();
       int searchTabs(const QString & node);
       void restoreBookmarks();

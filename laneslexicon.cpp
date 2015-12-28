@@ -1725,7 +1725,7 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
   //  EntryItem * item2 = dynamic_cast<EntryItem *>(oldFocus);
 
   if (item1) {
-    updateStatusBar();
+    updateStatusBar(item1->getPlace());
   }
 
 }
@@ -2883,31 +2883,35 @@ void LanesLexicon::setStatus(const QString & txt) {
  * Use the spanArabic function to set the font
  *
  */
-void LanesLexicon::updateStatusBar() {
+void LanesLexicon::updateStatusBar(const Place & p) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   QString headseparator;
-  if (entry) {
-    Place p = entry->getPlace();
-    QString root = tr("Root:") + qobject_cast<Lexicon *>(qApp)->spanArabic(p.getRoot());
-    QString head = p.getWord();
-    if (! head.isEmpty()) {
-      head = tr("Entry:") + qobject_cast<Lexicon *>(qApp)->spanArabic(head);
-      headseparator = ",";
-    }
-    qobject_cast<Lexicon *>(qApp)->spanArabic(p.getWord());
-    QString page = QString(QObject::tr("Vol %1,Page %2")).arg(p.getVol()).arg(p.getPage());
-    QString node = p.getNode();
-    if ( ! node.isEmpty()) {
-      node = "(" + node + ")";
-    }
-    QString html = QString("<body class=\"place\">%1,%2%3 %4 %5</body>").arg(root).arg(head).arg(headseparator).arg(page).arg(node);
-    m_placeIndicator->setText(html);
+  Place current;
+  if (p.isValid()) {
+    current = p;
   }
-  else {
+  else if (entry) {
+    current = entry->getPlace();
+  }
+  if (! current.isValid()) {
+    QLOG_DEBUG() << Q_FUNC_INFO << "Invalid place" << p.toString();
     m_placeIndicator->setText("");
-
+    return;
   }
-  //  m_keymapsButton->setEnabled(m_keymapsEnabled);
+  QString root = tr("Root:") + qobject_cast<Lexicon *>(qApp)->spanArabic(current.getRoot());
+  QString head = current.getWord();
+  if (! head.isEmpty()) {
+    head = tr("Entry:") + qobject_cast<Lexicon *>(qApp)->spanArabic(head);
+    headseparator = ",";
+  }
+  qobject_cast<Lexicon *>(qApp)->spanArabic(current.getWord());
+  QString page = QString(QObject::tr("Vol %1,Page %2")).arg(current.getVol()).arg(current.getPage());
+  QString node = current.getNode();
+  if ( ! node.isEmpty()) {
+    node = "(" + node + ")";
+  }
+  QString html = QString("<body class=\"place\">%1,%2%3 %4 %5</body>").arg(root).arg(head).arg(headseparator).arg(page).arg(node);
+  m_placeIndicator->setText(html);
 }
 /**
  * navigation mode can be changed:
