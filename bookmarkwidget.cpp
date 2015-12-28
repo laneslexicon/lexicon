@@ -34,8 +34,11 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
     if (p.isValid()) {
       row = m_list->rowCount();
       m_list->insertRow(row);
-      item = new QTableWidgetItem(QString("%1").arg(keys[i]));
-      m_list->setItem(row,KEY_COLUMN,item);
+      label = m_list->createLabel(keys[i]);
+      label->setAlignment(Qt::AlignCenter);
+      m_list->setCellWidget(row,KEY_COLUMN,label);
+
+
 
       label = m_list->createLabel(p.m_root,"bookmarklist");
       label->setAlignment(Qt::AlignCenter);
@@ -75,7 +78,7 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   m_switchTab->setEnabled(m_newTab->isChecked());
   connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(onStateChanged(int)));
 
-  QPushButton * jumpButton = new QPushButton(tr("&Jump to"));
+  QPushButton * jumpButton = new QPushButton(tr("&Show in tab"));
   QPushButton * cancelButton = new QPushButton(tr("&Cancel"));
   if (keys.size() == 0) {
     jumpButton->setEnabled(false);
@@ -105,11 +108,15 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
 void BookmarkWidget::setPlace() {
   int row = m_list->currentRow();
   QLOG_DEBUG() << Q_FUNC_INFO << row;
-  QTableWidgetItem * item = m_list->item(row,KEY_COLUMN);
-  if (item) {
-    QString t = item->text();
-    m_mark = item->text();
+  QLabel * label = qobject_cast<QLabel *>(m_list->cellWidget(row,KEY_COLUMN));
+  if (label) {
+    m_mark = label->text();
   }
+  SETTINGS
+
+  settings.beginGroup("Bookmark");
+  settings.setValue(SID_BOOKMARK_NEW_TAB,m_newTab->isChecked());
+  settings.setValue(SID_BOOKMARK_GO_TAB,m_switchTab->isChecked());
   this->accept();
 }
 void BookmarkWidget::jump(QTableWidgetItem * /* item */) {
@@ -145,4 +152,7 @@ bool BookmarkWidget::getSwitchTab() {
 }
 void BookmarkWidget::onStateChanged(int /* state */) {
   m_switchTab->setEnabled(m_newTab->isChecked());
+}
+BookmarkWidget::~BookmarkWidget() {
+
 }

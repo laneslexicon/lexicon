@@ -19,6 +19,7 @@ class BookmarkWidget : public QDialog {
   Q_OBJECT
  public:
   BookmarkWidget(const QMap<QString,Place> & marks,QWidget * parent = 0);
+  ~BookmarkWidget();
   QString getSelected() { return m_mark;}
   QSize sizeHint() const;
   bool getNewTab();
