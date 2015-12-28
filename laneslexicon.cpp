@@ -3456,7 +3456,8 @@ int LanesLexicon::searchTabs(const QString & node) {
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
     if (entry && entry->hasNode(node)) {
-        return i;
+      statusMessage(QString(tr("Requested entry already available in tab %1")).arg(i + 1));
+      return i;
     }
   }
   return -1;
