@@ -1653,6 +1653,12 @@ GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool acti
   if (! p.isValid()) {
     return NULL;
   }
+  int ix = this->searchTabs(p.node());
+  if (ix != -1) {
+    m_tabs->setCurrentIndex(ix);
+    entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
+    return entry;
+  }
   /// if we don't have a tab or the current tab is not a graphicsentry
   /// force new tab creation
   int currentTab = m_tabs->currentIndex();
@@ -3440,6 +3446,9 @@ int LanesLexicon::searchTabs(const QString & node) {
   if (m_allowDuplicates) {
     return -1;
   }
+  if (node.isEmpty()) {
+    return -1;
+  }
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
     if (entry && entry->hasNode(node)) {
@@ -3504,7 +3513,6 @@ void LanesLexicon::showSearchNode(const QString & node) {
   QLOG_DEBUG() << Q_FUNC_INFO << node;
   Place p;
   p.setNode(node);
-  //this->showPlace(p,Lane::Create_Tab);
   showPlace(p,true,false);
 }
 
@@ -3850,7 +3858,7 @@ void LanesLexicon::syncFromContents() {
   }
   Place p = m_tree->getCurrentPlace();
   if (p.isValid()) {
-      this->showPlace(p,false,true);
+       this->showPlace(p,false,true);
   }
 }
 /**
