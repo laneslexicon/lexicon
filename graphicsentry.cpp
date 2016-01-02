@@ -419,32 +419,40 @@ void GraphicsEntry::focusLast() {
 Place GraphicsEntry::getPlace(int index) const {
   QLOG_DEBUG() << Q_FUNC_INFO << index;
   if ((index >= 0) && (index < m_items.size())) {
+    QLOG_DEBUG() << "get_place_1";
       return m_items[index]->getPlace();
-  }
-  if (! m_focusNode.isEmpty()) {
-    QSqlQuery sql;
-    if (sql.prepare(SQL_ENTRY_FOR_NODE)) {
-      sql.bindValue(0,m_focusNode);
-      if (sql.exec()  && sql.first()) {
-        return Place::fromEntryRecord(sql.record());
-      }
-    }
-    return Place::fromNode(m_focusNode);
   }
   Place p;
   EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
   if (item) {
       p = item->getPlace();
       if (p.isValid()) {
+        //        QLOG_DEBUG() << "get_place_4";
         return p;
       }
   }
+  /// TODO this is not always updated - it may be outdated
+  if (! m_focusNode.isEmpty()) {
+    QSqlQuery sql;
+    if (sql.prepare(SQL_ENTRY_FOR_NODE)) {
+      sql.bindValue(0,m_focusNode);
+      if (sql.exec()  && sql.first()) {
+        //        QLOG_DEBUG() << "get_place_2";
+        return Place::fromEntryRecord(sql.record());
+      }
+    }
+    //    QLOG_DEBUG() << "get_place_3";
+    return Place::fromNode(m_focusNode);
+  }
   if (m_focusPlace.isValid()) {
+    //    QLOG_DEBUG() << "get_place_5";
     return m_focusPlace;
   }
   if (m_items.size() > 1) {
+    //    QLOG_DEBUG() << "get_place_6";
     return m_items[1]->getPlace();
   }
+  //  QLOG_DEBUG() << "get_place_7";
   return m_focusPlace;
 }
 /**
@@ -2689,6 +2697,7 @@ void GraphicsEntry::onFocusItemChanged(QGraphicsItem * newFocus, QGraphicsItem *
 
   if (item1) {
     m_focusPlace = item1->getPlace();
+    m_focusNode = m_focusPlace.node();
   }
   ///
   /// this happens when the the graphicsentry loses focus because the user has clicked on
