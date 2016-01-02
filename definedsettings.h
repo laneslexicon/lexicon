@@ -265,7 +265,7 @@ They should not be translated.
 #define SID_BOOKMARK_CLEAR                     "Clear"
 #define SID_BOOKMARK_ID                        "Id"
 #define SID_BOOKMARK_LIST_STATE                "Book marklist state"
-
+#define SID_BOOKMARK_MENU_FORMAT               "Menu format"
 #define SID_SYSTEM_DATABASE                    "Database"
 #define SID_SYSTEM_STYLESHEET                  "Stylesheet"
 #define SID_SYSTEM_TOOLBAR_TEXT                "Toolbar text"

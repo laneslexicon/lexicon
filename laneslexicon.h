@@ -289,6 +289,7 @@ class LanesLexicon : public QMainWindow
       QString m_firstRoot;
       QString m_lastRoot;
 
+      QString m_bookmarkMenuFormat;
       QPrinter m_printer;
 
       NavigationMode m_navMode;

@@ -2069,8 +2069,13 @@ void LanesLexicon::readSettings() {
   if ((! m_currentMap.isEmpty()) && ! m_maps.contains(m_currentMap) ) {
     QLOG_WARN() << QString(tr("Default map <%1> not found in settings")).arg(m_currentMap);
   }
+
+  settings.beginGroup("Bookmark");
+  m_bookmarkMenuFormat = settings.value(SID_BOOKMARK_MENU_FORMAT,"Root:%R,Entry:%H, Vol %V/%P (%N)").toString();
+  settings.endGroup();
 }
 void LanesLexicon::writeSettings() {
+
   QString v;
   QLOG_DEBUG() << Q_FUNC_INFO;
   if (! m_saveSettings )
@@ -2566,15 +2571,20 @@ Place LanesLexicon::getCurrentPlace() {
  */
 void LanesLexicon::bookmarkShortcut(const QString & key) {
   QLOG_DEBUG() << Q_FUNC_INFO << key;
-  if (m_revertEnabled && (key == "revert")) {
-    if (! m_bookmarks.contains("-here-")) {
+  if (key == "revert") {
+    if (m_revertEnabled) {
+      if (! m_bookmarks.contains("-here-")) {
+        return;
+      }
+      Place p = m_bookmarks.value("-here-");
+      /// TODO document this
+      showPlace(p,false,true);
+      m_revertEnabled = false;
       return;
     }
-    Place p = m_bookmarks.value("-here-");
-    /// TODO document this
-    showPlace(p,false,true);
-    m_revertEnabled = false;
-    return;
+    else {
+      return;
+    }
   }
   if (key == "list") {
     BookmarkWidget * dlg = new BookmarkWidget(m_bookmarks,this);
@@ -2593,7 +2603,6 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
   if (key == "clear") {
     /// TODO warning dialog ?
     bookmarkClear();
-    /// TODO clear menu
     return;
   }
   QRegExp rx("([^-]+)-(.+)");
@@ -2652,7 +2661,9 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
       m_bookmarkMenu->removeAction(actions[ix]);
     }
     Place p = m_bookmarks.value(id);
-    QAction * action = m_bookmarkMenu->addAction(p.getText());
+    QAction * action = m_bookmarkMenu->addAction(QString("%1 - %2")
+                                                 .arg(id)
+                                                 .arg(p.format(m_bookmarkMenuFormat)));
     action->setShortcut(sc->key());
     action->setShortcutContext(Qt::WidgetShortcut);
     connect(action,SIGNAL(triggered()),sc,SIGNAL(activated()));
