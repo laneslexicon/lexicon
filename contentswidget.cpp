@@ -466,8 +466,8 @@ QString ContentsWidget::itypeText(const QString & itype) {
     return itype;
   }
   int n = itype.toInt(&ok);
-  if (ok  && (n >= 0) && (n < m_itypesText.size())) {
-    return m_itypesText[n];
+  if (ok  && (n > 0) && (n <= m_itypesText.size())) {
+    return m_itypesText[n-1];
   }
   else {
     return itype;
