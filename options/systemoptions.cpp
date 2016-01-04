@@ -234,7 +234,6 @@ void SystemOptions::writeSettings(const QString & fileName) {
   if (!fileName.isEmpty()) {
     f = fileName;
   }
-  qDebug() << Q_FUNC_INFO << f;
 #ifdef LANE
   getLexicon()->setTheme(m_theme->currentText());
   getLexicon()->setDefaultKeyboard(m_keyboard->currentText());
@@ -322,8 +321,6 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SYSTEM_DOCKED,m_docked)) {
     m_dirty = true;
   }
-  qDebug() << "button" << m_appendNewTab->isChecked();
-  qDebug() << "settings" << settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool();
   if (m_appendNewTab->isChecked() != (settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool())) {
     m_dirty = true;
   }
