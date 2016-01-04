@@ -32,6 +32,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_focusDown = new QLineEdit ;
   m_narrow = new QLineEdit ;
   m_reload = new QLineEdit ;
+  m_offPage = new QCheckBox;
   m_saveHtml = new QCheckBox ;
   m_saveXml = new QCheckBox ;
   m_saveOutputHtml = new QCheckBox ;
@@ -165,7 +166,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   this->setControlSize(m_show,SMALL_EDIT);
   this->setControlSize(m_showLinkWarning,SMALL_EDIT);
   this->setControlSize(m_highlightColor,LARGE_EDIT);
-
+  otherlayout->addRow(tr("Off page movement"),m_offPage);
   otherlayout->addRow(tr("Default zoom"),m_zoom);
   otherlayout->addRow(tr("Show link warning"),m_showLinkWarning);
   otherlayout->addRow(tr("Step size"),m_step);
@@ -236,6 +237,7 @@ void EntryOptions::readSettings() {
 
   m_back->setText(settings.value(SID_ENTRY_BACK).toString());
   m_clean->setText(settings.value(SID_ENTRY_CLEAN).toString());
+  m_offPage->setChecked(settings.value(SID_ENTRY_OFF_PAGE).toBool());
   m_debug->setChecked(settings.value(SID_ENTRY_DEBUG).toBool());
   m_find->setText(settings.value(SID_ENTRY_FIND).toString());
   m_findNext->setText(settings.value(SID_ENTRY_FIND_NEXT).toString());
@@ -314,6 +316,7 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ENTRY_PRINT_NOTES,m_printNotes->currentData());
   settings.setValue(SID_ENTRY_PRINT_NODES,m_printNodes->currentData());
   settings.setValue(SID_ENTRY_PRINT_INFO,m_printInfo->currentData());
+  settings.setValue(SID_ENTRY_OFF_PAGE,m_offPage->isChecked());
 
   settings.endGroup();
   settings.beginGroup("XSLT");
@@ -446,6 +449,9 @@ bool EntryOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_ENTRY_PRINT_INFO,m_printInfo)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ENTRY_OFF_PAGE,m_offPage)) {
     m_dirty = true;
   }
   settings.endGroup();

@@ -36,6 +36,7 @@ class EntryOptions : public OptionsWidget {
     QCheckBox * m_saveHtml;
     QCheckBox * m_saveXml;
     QCheckBox * m_saveOutputHtml;
+    QCheckBox * m_offPage;
     QLineEdit * m_show;
     QComboBox * m_printNotes;
     QComboBox * m_printInfo;
