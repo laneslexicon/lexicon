@@ -1242,6 +1242,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
   connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
   connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
   connect(gi,SIGNAL(showHtml()),this,SLOT(showHtml()));
+  connect(gi,SIGNAL(searchPage()),this,SIGNAL(searchPage()));
   connect(gi,SIGNAL(fixLink(const QStringList &,bool)),this,SLOT(fixLink(const QStringList &,bool)));
   /// placeChanged is emitted whenever an EntryItem gets a focusInEvent
   connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));

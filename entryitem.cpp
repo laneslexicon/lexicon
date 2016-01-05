@@ -164,6 +164,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   menu.addSection(tr("All entries"));
   QAction *selectAllAction = menu.addAction(tr("S&elect"));
   QAction *printAllAction = menu.addAction(tr("Pri&nt"));
+  QAction *localSearchAction = menu.addAction(tr("&Local search"));
   connect(printAllAction,SIGNAL(triggered()),this,SIGNAL(printPage()));
   if (this->textCursor().hasSelection()) {
     QAction *clearAllAction = menu.addAction(tr("C&lear selections"));
@@ -173,6 +174,9 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   QAction *selectedAction = menu.exec(event->screenPos());
   if (selectedAction == perseusAction) {
     emit(showPerseus(p));
+  }
+  if (selectedAction == localSearchAction) {
+    emit(searchPage());
   }
   else if (selectedAction == markAction) {
     bool ok;

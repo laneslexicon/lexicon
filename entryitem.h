@@ -111,6 +111,7 @@ class EntryItem : public QGraphicsTextItem {
     void printNode(const QString & node);
     void printPage();
     void fixLink(const QStringList &,bool);
+    void searchPage();
  protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
   void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
