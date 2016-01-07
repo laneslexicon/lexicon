@@ -5,6 +5,32 @@
 #include "application.h"
 #include "externs.h"
 #endif
+DebugOptionsDialog::DebugOptionsDialog(bool xml,bool html,bool ohtml,QWidget * parent) : QDialog(parent) {
+  QVBoxLayout * layout = new QVBoxLayout;
+
+  QFormLayout * formlayout = new QFormLayout;
+  setWindowTitle(tr("Advanced Options"));
+  m_xml = new QCheckBox;
+  m_html = new QCheckBox;
+  m_outputHtml = new QCheckBox;
+
+  m_xml->setChecked(xml);
+  m_html->setChecked(html);
+  m_outputHtml->setChecked(ohtml);
+  formlayout->addRow(tr("Save XML"),m_xml);
+  formlayout->addRow(tr("Save HTML"),m_html);
+  formlayout->addRow(tr("Generated HTML"),m_outputHtml);
+
+  layout->addLayout(formlayout);
+  QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
+
+  layout->addWidget(btns);
+
+  connect(btns,SIGNAL(accepted()),this,SLOT(accept()));
+  connect(btns,SIGNAL(rejected()),this,SLOT(reject()));
+
+  setLayout(layout);
+}
 /**
  * Not done:
  *
@@ -21,7 +47,6 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_entryXslt = new QLineEdit ;
   m_nodeXslt = new QLineEdit ;
   m_clean = new QLineEdit ;
-  m_debug = new QCheckBox ;
   m_find = new QLineEdit ;
   m_findNext = new QLineEdit ;
   m_forward = new QLineEdit ;
@@ -33,9 +58,16 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_narrow = new QLineEdit ;
   m_reload = new QLineEdit ;
   m_offPage = new QCheckBox;
-  m_saveHtml = new QCheckBox ;
-  m_saveXml = new QCheckBox ;
-  m_saveOutputHtml = new QCheckBox ;
+  // the next three are not shown
+  // these need to have a parent otherwise findChildren routines in OptionsWidget wont pick them up
+  m_saveHtml = new QCheckBox(this) ;
+  m_saveXml = new QCheckBox(this) ;
+  m_saveOutputHtml = new QCheckBox(this) ;
+
+  m_saveOutputHtml->setVisible(false);
+  m_saveHtml->setVisible(false);
+  m_saveXml->setVisible(false);
+
   m_show = new QLineEdit ;
   m_showLinkWarning = new QCheckBox ;
   m_step = new QLineEdit ;
@@ -181,22 +213,15 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   colorlayout->addStretch();
   otherlayout->addRow(tr("Highlight color"),colorlayout);
 
+  QPushButton * advancedbutton = new QPushButton(tr("Options"));
+  connect(advancedbutton,SIGNAL(clicked()),this,SLOT(onAdvanced()));
 
-  /// Debug
-  QHBoxLayout * debugcontainer = new QHBoxLayout;
-  QGridLayout * debuglayout = new QGridLayout;
-  debuglayout->addWidget(new QLabel(tr("Debug")),0,0);
-  debuglayout->addWidget(m_debug,0,1);
-  debuglayout->addWidget(new QLabel(tr("Save HTML")),0,2);
-  debuglayout->addWidget(m_saveHtml,0,3);
-  debuglayout->addWidget(new QLabel(tr("Save inner HTML")),1,0);
-  debuglayout->addWidget(m_saveOutputHtml,1,1);
-  debuglayout->addWidget(new QLabel(tr("Save XML")),1,2);
-  debuglayout->addWidget(m_saveXml,1,3);
-  debugcontainer->addLayout(debuglayout);
-  debugcontainer->addStretch();
+  QHBoxLayout * adlayout = new QHBoxLayout;
+  adlayout->addWidget(advancedbutton);
+  adlayout->addStretch();
+  otherlayout->addRow(tr("Advanced"),adlayout);
 
-  otherlayout->addRow(tr("Tech"),debugcontainer);
+
   otherbox->setLayout(otherlayout);
 
   vlayout->addWidget(keybox);
@@ -238,7 +263,6 @@ void EntryOptions::readSettings() {
   m_back->setText(settings.value(SID_ENTRY_BACK).toString());
   m_clean->setText(settings.value(SID_ENTRY_CLEAN).toString());
   m_offPage->setChecked(settings.value(SID_ENTRY_OFF_PAGE).toBool());
-  m_debug->setChecked(settings.value(SID_ENTRY_DEBUG).toBool());
   m_find->setText(settings.value(SID_ENTRY_FIND).toString());
   m_findNext->setText(settings.value(SID_ENTRY_FIND_NEXT).toString());
   m_forward->setText(settings.value(SID_ENTRY_FORWARD).toString());
@@ -290,7 +314,6 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ENTRY_CSS,m_css->text());
   settings.setValue(SID_ENTRY_PRINT_CSS,m_printCss->text());
   settings.setValue(SID_ENTRY_CLEAN,m_clean->text());
-  settings.setValue(SID_ENTRY_DEBUG,m_debug->isChecked());
   settings.setValue(SID_ENTRY_FIND,m_find->text());
   settings.setValue(SID_ENTRY_FIND_NEXT,m_findNext->text());
   settings.setValue(SID_ENTRY_FORWARD,m_forward->text());
@@ -350,9 +373,6 @@ bool EntryOptions::isModified()  {
   }
 
   if (compare(&settings,SID_ENTRY_CLEAN,m_clean)) {
-    m_dirty = true;
-  }
-  if (compare(&settings,SID_ENTRY_DEBUG,m_debug)) {
     m_dirty = true;
   }
 
@@ -528,4 +548,17 @@ void EntryOptions::onSetColor() {
     }
   }
   m_highlightColor->setText(d.currentColor().name());
+}
+void EntryOptions::onAdvanced() {
+  DebugOptionsDialog d(
+                       m_saveXml->isChecked(),
+                       m_saveHtml->isChecked(),
+                       m_saveOutputHtml->isChecked()
+);
+
+  if (d.exec() == QDialog::Accepted) {
+    this->m_saveHtml->setChecked(d.m_html->isChecked());
+    this->m_saveXml->setChecked(d.m_xml->isChecked());
+    this->m_saveOutputHtml->setChecked(d.m_outputHtml->isChecked());
+  }
 }

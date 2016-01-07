@@ -3,6 +3,14 @@
 #include "optionswidget.h"
 #include <QFontDialog>
 #include <QPushButton>
+class DebugOptionsDialog : public QDialog {
+  Q_OBJECT
+ public:
+  DebugOptionsDialog(bool,bool,bool,QWidget * parent = 0);
+  QCheckBox * m_xml;
+  QCheckBox * m_html;
+  QCheckBox * m_outputHtml;
+};
 
 class EntryOptions : public OptionsWidget {
   Q_OBJECT
@@ -15,6 +23,7 @@ class EntryOptions : public OptionsWidget {
     bool isModified();
     void onSetFont();
     void onSetColor();
+    void onAdvanced();
  private:
     QLineEdit * m_back;
     QLineEdit * m_css;
