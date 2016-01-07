@@ -1577,27 +1577,34 @@ QString GraphicsEntry::firstRoot() {
   return root;
 }
 void GraphicsEntry::showPerseus(const Place & p) {
-  QString node = p.getNode();
-  if ( node.isEmpty()) {
-    QMessageBox msgBox;
-    msgBox.setText(tr("No XML found"));
-    msgBox.exec();
-    return;
-  }
-  QSqlQuery nodeQuery;
-  bool ok = nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE);
-  if (! ok ) {
-    QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
-  }
-
-  nodeQuery.bindValue(0,node);
-  nodeQuery.exec();
   QString xml;
-  if (nodeQuery.first()) {
-    xml = nodeQuery.value("xml").toString();
+  EntryItem * item = qobject_cast<EntryItem *>(sender());
+  if (item) {
+    xml = item->getXml();
   }
-  else {
-    xml = "No XML for " + node;
+  if (xml.isEmpty()) {
+    QString node = p.getNode();
+    if ( node.isEmpty()) {
+      QMessageBox msgBox;
+      msgBox.setText(tr("No XML found"));
+      msgBox.exec();
+      return;
+    }
+    QSqlQuery nodeQuery;
+    bool ok = nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE);
+    if (! ok ) {
+      QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
+    }
+
+    nodeQuery.bindValue(0,node);
+    nodeQuery.exec();
+
+    if (nodeQuery.first()) {
+      xml = nodeQuery.value("xml").toString();
+    }
+    else {
+      xml = "No XML for " + node;
+    }
   }
   ShowXmlDialog d;
   d.setXml(xml);
