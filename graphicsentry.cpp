@@ -94,7 +94,6 @@ void GraphicsEntry::readSettings() {
   settings.endGroup();
 
   settings.beginGroup("Entry");
-  m_debug = settings.value(SID_ENTRY_DEBUG,false).toBool();
   QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
   css = readCssFromFile(css);
   /// if there are errors, readCssFromFile will show them
