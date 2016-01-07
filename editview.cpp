@@ -2,14 +2,14 @@
 #include "application.h"
 #include "definedsettings.h"
 #include "externs.h"
-#define EDIT_CSS 0
-#define EDIT_XSLT 1
 EditPage::EditPage(int type,QWidget * parent) : QWidget(parent) {
   m_type = type;
+  m_infoName = new QLineEdit;
+  m_infoName->setReadOnly(true);
   readSettings();
   QVBoxLayout * layout = new QVBoxLayout;
   m_text = new QPlainTextEdit;
-  if (type == EDIT_CSS) {
+  if (type == EditPage::Css) {
     m_useOther = new QCheckBox(tr("Use edited XSLT"));
     setObjectName("editcss");
   }
@@ -21,13 +21,23 @@ EditPage::EditPage(int type,QWidget * parent) : QWidget(parent) {
   m_buttons =   new QDialogButtonBox(QDialogButtonBox::Apply|QDialogButtonBox::RestoreDefaults,this);
   connect(m_buttons,SIGNAL(clicked(QAbstractButton *)),this,SLOT(onClicked(QAbstractButton *)));
   connect(m_text,SIGNAL(textChanged()),this,SLOT(onTextChanged()));
-
+  QPushButton * btn = m_buttons->button(QDialogButtonBox::Apply);
+  if (btn) {
+    btn->setText(tr("Apply changes to current tabs"));
+  }
+  btn = m_buttons->button(QDialogButtonBox::RestoreDefaults);
+  if (btn) {
+    btn->setText(tr("Reload original contents"));
+  }
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  hlayout->addWidget(new QLabel(tr("File")));
+  hlayout->addWidget(m_infoName);
+  layout->addLayout(hlayout);
   layout->addWidget(m_text);
   layout->addWidget(m_useOther);
   layout->addWidget(m_buttons);
   setLayout(layout);
   this->restore();
-  //  m_buttons->button(QDialogButtonBox::Reset)->setEnabled(false);
 }
 QString EditPage::getText() const {
   return m_text->toPlainText();
@@ -42,13 +52,11 @@ void EditPage::apply() {
 }
 void EditPage::reset() {
   m_text->setPlainText(m_lines.join("\n"));
-  //  m_buttons->button(QDialogButtonBox::Reset)->setEnabled(false);
 }
 void EditPage::restore() {
   m_lines.clear();
   this->readFile(m_fileName);
   m_text->setPlainText(m_lines.join("\n"));
-  //  m_buttons->button(QDialogButtonBox::Reset)->setEnabled(false);
   emit(modified(m_type,false));
 }
 
@@ -71,14 +79,22 @@ void EditPage::onClicked(QAbstractButton * btn) {
   }
 }
 void EditPage::onTextChanged() {
-  //  m_buttons->button(QDialogButtonBox::Reset)->setEnabled(true);
   emit(modified(m_type,true));
 }
 void EditPage::readFile(const QString & name) {
+  QLOG_DEBUG() << Q_FUNC_INFO << m_type << name;
   QFile f(name);
   if (! f.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QLOG_WARN()  << QString(tr("Cannot open file %1:  %2")).arg(QDir::current().relativeFilePath(name)).arg(f.errorString());
     return;
+  }
+  m_infoName->setText(QString(tr("F(ile:%1")).arg(name));
+  // TODO remove this when screenshot done
+  if (m_type == EditPage::Css) {
+    m_infoName->setText("/usr/home/andrewsg/Lexicon/Resources/themes/default/css/entry.css");
+  }
+  else {
+    m_infoName->setText("/usr/home/andrewsg/Lexicon/Resources/themes/default/xslt/entry.xslt");
   }
   QTextStream in(&f);
   while(! in.atEnd()) {
@@ -91,7 +107,7 @@ bool EditPage::writeFile() {
   if (! f.open(QIODevice::WriteOnly | QIODevice::Text)) {
     QString msg = QString(tr("<p>Cannot open file %1 for writing: %2</p>")).arg(QDir::current().relativeFilePath(m_fileName)).arg(qPrintable(f.errorString()));
     QString title;
-    if (m_type == EDIT_CSS) {
+    if (m_type == EditPage::Css) {
       title = tr("Edit CSS");
     }
     else {
@@ -111,6 +127,14 @@ bool EditPage::writeFile() {
 
 void EditPage::readSettings() {
   SETTINGS
+
+  settings.beginGroup("EditView");
+  QString style;
+  style = settings.value(SID_EDITVIEW_FILE_STYLESHEET,QString()).toString();
+  if (! style.isEmpty()) {
+    m_infoName->setStyleSheet(style);
+  }
+  settings.endGroup();
   if (m_type == EditPage::Css) {
     settings.beginGroup("Entry");
     m_fileName = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
@@ -122,7 +146,7 @@ void EditPage::readSettings() {
     m_fileName = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_fileName);
 
   }
-  readFile(m_fileName);
+  //  readFile(m_fileName);
 }
 /**
  * EditView
@@ -136,12 +160,10 @@ EditView::EditView(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   m_tabs = new QTabWidget;
   m_tabs->setObjectName("edittabs");
-  m_cssEditor = new EditPage(EDIT_CSS);
-  //  m_cssEditor->setText(m_css.join("\n"));
+  m_cssEditor = new EditPage(EditPage::Css);
   m_tabs->addTab(m_cssEditor,tr("CSS"));
 
-  m_xsltEditor = new EditPage(EDIT_XSLT);
-  //  m_xsltEditor->setText(m_xslt.join("\n"));
+  m_xsltEditor = new EditPage(EditPage::Xslt);
   m_tabs->addTab(m_xsltEditor,tr("XSLT"));
   m_buttons = new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
 
@@ -178,10 +200,10 @@ void EditView::reject() {
   this->hide();
 }
 void EditView::modified(int type,bool isDirty) {
-  if (type == EDIT_CSS) {
+  if (type == EditPage::Css) {
     m_cssModified = isDirty;
   }
-  if (type == EDIT_XSLT) {
+  if (type == EditPage::Xslt) {
     m_xsltModified = isDirty;
   }
   m_buttons->button(QDialogButtonBox::Save)->setEnabled(m_cssModified || m_xsltModified);
@@ -210,7 +232,7 @@ void EditView::readSettings() {
 void EditView::apply(int type,bool useEdited) {
   QString css;
   QString xslt;
-  if (type == EDIT_CSS) {
+  if (type == EditPage::Css) {
     css = m_cssEditor->getText();
     if (useEdited) {
       xslt = m_xsltEditor->getText();
@@ -219,7 +241,7 @@ void EditView::apply(int type,bool useEdited) {
       xslt = m_xsltEditor->getOriginalText();
     }
   }
-  if (type == EDIT_XSLT) {
+  if (type == EditPage::Xslt) {
     xslt = m_xsltEditor->getText();
     if (useEdited) {
       css = m_cssEditor->getText();
@@ -233,5 +255,5 @@ void EditView::apply(int type,bool useEdited) {
   }
 }
 void EditView::onHelp() {
-  emit(showHelp(m_tabs->currentWidget()->objectName()));
+  emit(showHelp(m_tabs->currentWidget()->metaObject()->className()));
 }

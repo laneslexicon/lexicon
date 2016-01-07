@@ -3,7 +3,9 @@
 #include <QDialog>
 #include <QTabWidget>
 #include <QPlainTextEdit>
+#include <QLineEdit>
 #include <QPushButton>
+#include <QLabel>
 #include <QString>
 #include <QScopedPointer>
 #include <QSettings>
@@ -23,6 +25,7 @@ class EditPage : public QWidget {
 
  public:
   EditPage(int type,QWidget * parent = 0);
+  enum EditType { Css, Xslt };
   QString getText() const;
   QString getOriginalText() const;
   bool writeFile();
@@ -43,6 +46,7 @@ class EditPage : public QWidget {
     QPlainTextEdit * m_text;
     QCheckBox * m_useOther;
     QDialogButtonBox * m_buttons;
+    QLineEdit * m_infoName;
  signals:
     void apply(int,bool);
     void modified(int,bool);
