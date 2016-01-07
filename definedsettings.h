@@ -323,7 +323,7 @@ They should not be translated.
 
 #define SID_EDITVIEW_SIZE                       "Size"
 #define SID_EDITVIEW_POS                       "Pos"
-
+#define SID_EDITVIEW_FILE_STYLESHEET           "Filename style"
 
 #define SID_TABS_TYPE                           "type"
 #define SID_TABS_PLACE                          "place"
