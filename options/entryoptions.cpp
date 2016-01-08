@@ -5,7 +5,7 @@
 #include "application.h"
 #include "externs.h"
 #endif
-DebugOptionsDialog::DebugOptionsDialog(bool xml,bool html,bool ohtml,QWidget * parent) : QDialog(parent) {
+DebugOptionsDialog::DebugOptionsDialog(bool xml,bool html,bool ohtml,const QString & path,QWidget * parent) : QDialog(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
 
   QFormLayout * formlayout = new QFormLayout;
@@ -13,15 +13,29 @@ DebugOptionsDialog::DebugOptionsDialog(bool xml,bool html,bool ohtml,QWidget * p
   m_xml = new QCheckBox;
   m_html = new QCheckBox;
   m_outputHtml = new QCheckBox;
+  m_path = new QLineEdit;
 
   m_xml->setChecked(xml);
   m_html->setChecked(html);
   m_outputHtml->setChecked(ohtml);
-  formlayout->addRow(tr("Save XML"),m_xml);
-  formlayout->addRow(tr("Save HTML"),m_html);
-  formlayout->addRow(tr("Generated HTML"),m_outputHtml);
+  m_path->setText(path);
+  formlayout->addRow(new QLabel(tr("Save generated XML/HTML")));
+  formlayout->addRow(tr("XML"),m_xml);
+  formlayout->addRow(tr("XSLT output HTML"),m_outputHtml);
+  formlayout->addRow(tr("Qt HTML"),m_html);
+
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  QPushButton * pathButton = new QPushButton(tr("Set path"));
+  connect(pathButton,SIGNAL(clicked()),this,SLOT(onPathSelect()));
+  hlayout->addWidget(m_path);
+  hlayout->addWidget(pathButton);
+  hlayout->addStretch();
+
+  formlayout->addRow(tr("Output directory"),hlayout);
+
 
   layout->addLayout(formlayout);
+
   QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
 
   layout->addWidget(btns);
@@ -30,6 +44,12 @@ DebugOptionsDialog::DebugOptionsDialog(bool xml,bool html,bool ohtml,QWidget * p
   connect(btns,SIGNAL(rejected()),this,SLOT(reject()));
 
   setLayout(layout);
+}
+void DebugOptionsDialog::onPathSelect() {
+  QString d  = QFileDialog::getExistingDirectory(this, QString(tr("Select directory")), m_path->text());
+  if (! d.isEmpty()) {
+    m_path->setText(d);
+  }
 }
 /**
  * Not done:
@@ -58,15 +78,17 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_narrow = new QLineEdit ;
   m_reload = new QLineEdit ;
   m_offPage = new QCheckBox;
-  // the next three are not shown
+  // the next four are not shown
   // these need to have a parent otherwise findChildren routines in OptionsWidget wont pick them up
   m_saveHtml = new QCheckBox(this) ;
   m_saveXml = new QCheckBox(this) ;
   m_saveOutputHtml = new QCheckBox(this) ;
+  m_outputPath = new QLineEdit(this);
 
   m_saveOutputHtml->setVisible(false);
   m_saveHtml->setVisible(false);
   m_saveXml->setVisible(false);
+  m_outputPath->setVisible(false);
 
   m_show = new QLineEdit ;
   m_showLinkWarning = new QCheckBox ;
@@ -276,6 +298,7 @@ void EntryOptions::readSettings() {
   m_saveHtml->setChecked(settings.value(SID_ENTRY_DUMP_HTML).toBool());
   m_saveXml->setChecked(settings.value(SID_ENTRY_DUMP_XML).toBool());
   m_saveOutputHtml->setChecked(settings.value(SID_ENTRY_DUMP_OUTPUT_HTML).toBool());
+  m_outputPath->setText(settings.value(SID_ENTRY_OUTPUT_PATH,QDir::tempPath()).toString());
   m_show->setText(settings.value(SID_ENTRY_SHOW).toString());
   m_showLinkWarning->setChecked(settings.value(SID_ENTRY_SHOW_LINK_WARNING).toBool());
   m_step->setText(settings.value(SID_ENTRY_STEP).toString());
@@ -327,6 +350,7 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ENTRY_DUMP_HTML,m_saveHtml->isChecked());
   settings.setValue(SID_ENTRY_DUMP_XML,m_saveXml->isChecked());
   settings.setValue(SID_ENTRY_DUMP_OUTPUT_HTML,m_saveOutputHtml->isChecked());
+  settings.setValue(SID_ENTRY_OUTPUT_PATH,m_outputPath->text());
   settings.setValue(SID_ENTRY_SHOW,m_show->text());
   settings.setValue(SID_ENTRY_SHOW_LINK_WARNING,m_showLinkWarning->isChecked());
   settings.setValue(SID_ENTRY_STEP,m_step->text());
@@ -426,7 +450,9 @@ bool EntryOptions::isModified()  {
   if (compare(&settings,SID_ENTRY_DUMP_OUTPUT_HTML,m_saveOutputHtml)) {
     m_dirty = true;
   }
-
+  if (compare(&settings,SID_ENTRY_OUTPUT_PATH,m_outputPath)) {
+    m_dirty = true;
+  }
   if (compare(&settings,SID_ENTRY_SHOW,m_show)) {
     m_dirty = true;
   }
@@ -553,12 +579,14 @@ void EntryOptions::onAdvanced() {
   DebugOptionsDialog d(
                        m_saveXml->isChecked(),
                        m_saveHtml->isChecked(),
-                       m_saveOutputHtml->isChecked()
+                       m_saveOutputHtml->isChecked(),
+                       m_outputPath->text()
 );
 
   if (d.exec() == QDialog::Accepted) {
     this->m_saveHtml->setChecked(d.m_html->isChecked());
     this->m_saveXml->setChecked(d.m_xml->isChecked());
     this->m_saveOutputHtml->setChecked(d.m_outputHtml->isChecked());
+    this->m_outputPath->setText(d.m_path->text());
   }
 }
