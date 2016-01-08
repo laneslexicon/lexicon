@@ -305,6 +305,7 @@ class LanesLexicon : public QMainWindow
       NodeSearchDialog   * m_nodeSearchDialog;
       PageSearchDialog   * m_pageSearchDialog;
 
+      bool m_allowNavMode;
       bool m_toolbarText;
       bool m_linkContents;
       bool m_printToPdf;

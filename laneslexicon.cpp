@@ -58,7 +58,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_headSearchDialog = NULL;
   m_nodeSearchDialog = NULL;
   m_pageSearchDialog = NULL;
-
+  m_allowNavMode = false;
   createActions();
   readSettings();
 
@@ -120,22 +120,22 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createToolBar();
   createStatusBar();
 
+  if (m_allowNavMode) {
+    if (m_navMode == LanesLexicon::ByRoot) {
+      onNavigationMenuChanged(m_navModeRootAction);
+      //    ->setChecked(true);
+    }
+    else {
+      onNavigationMenuChanged(m_navModePageAction);//->setChecked(false);
+    }
 
-  if (m_navMode == LanesLexicon::ByRoot) {
-    onNavigationMenuChanged(m_navModeRootAction);
-    //    ->setChecked(true);
+    if (m_navMode == LanesLexicon::ByPage) {
+      m_navModePageAction->setChecked(true);
+    }
+    else {
+      m_navModeRootAction->setChecked(true);
+    }
   }
-  else {
-    onNavigationMenuChanged(m_navModePageAction);//->setChecked(false);
-  }
-
-  if (m_navMode == LanesLexicon::ByPage) {
-    m_navModePageAction->setChecked(true);
-  }
-  else {
-    m_navModeRootAction->setChecked(true);
-  }
-
   if (m_db.isOpen()) {
     setStatus(tr("Ready"));
     if (! m_valgrind ) {
@@ -852,7 +852,6 @@ void LanesLexicon::createActions() {
 
   m_searchAction = new QAction(tr("Search"),this);
 
-
   m_moveGroup = new QActionGroup(this);
   m_navModeRootAction = new QAction(tr("By &root"),this);
 
@@ -1039,24 +1038,29 @@ void LanesLexicon::createToolBar() {
   m_mainbar->setFloatable(true);
   //  addToolBarBreak();
 
+
+
   m_navigation = addToolBar(tr("Navigation"));
   m_navigation->setIconSize(m_toolbarIconSize);
   m_navigation->setObjectName("navigationtoolbar");
 
   m_navigation->setFloatable(true);
+  if (m_allowNavMode) {
+    m_navigationModeMenu = new QMenu(m_navigation);
+    m_navigationModeMenu->addAction(m_navModeRootAction);
+    m_navigationModeMenu->addAction(m_navModePageAction);
+    m_navigationButton = new QToolButton(m_navigation);
+    m_navigationButton->setObjectName("navigationby");
+    m_navigationButton->setMenu(m_navigationModeMenu);
+    m_navigationButton->setText(tr("Move by"));
+    m_navigationButton->setFocusPolicy(Qt::StrongFocus);
 
-  m_navigationModeMenu = new QMenu(m_navigation);
-  m_navigationModeMenu->addAction(m_navModeRootAction);
-  m_navigationModeMenu->addAction(m_navModePageAction);
-  m_navigationButton = new QToolButton(m_navigation);
-  m_navigationButton->setObjectName("navigationby");
-  m_navigationButton->setMenu(m_navigationModeMenu);
-  m_navigationButton->setText(tr("Move by"));
-  m_navigationButton->setFocusPolicy(Qt::StrongFocus);
+    m_navigationButton->setPopupMode(QToolButton::InstantPopup);
+    m_navigation->addWidget(m_navigationButton);
 
-  m_navigationButton->setPopupMode(QToolButton::InstantPopup);
-  m_navigation->addWidget(m_navigationButton);
-
+    m_navigationModeMenu->setVisible(false);
+    m_navigationButton->setVisible(false);
+  }
   m_navFirstButton = new QToolButton(m_navigation);
   m_navFirstButton->setDefaultAction(m_navFirstAction);
   m_navFirstButton->setText(tr("First"));
@@ -1159,8 +1163,13 @@ void LanesLexicon::createToolBar() {
   setTabOrder(m_docButton,m_aboutButton);
   setTabOrder(m_aboutButton,m_optionsButton);
   setTabOrder(m_optionsButton,m_logButton);
-  setTabOrder(m_logButton,m_navigationButton);
-  setTabOrder(m_navigationButton,m_navFirstButton);
+  if (m_allowNavMode) {
+    setTabOrder(m_logButton,m_navigationButton);
+    setTabOrder(m_navigationButton,m_navFirstButton);
+  }
+  else {
+    setTabOrder(m_logButton,m_navFirstButton);
+  }
   setTabOrder(m_navFirstButton,m_navNextButton);
   setTabOrder(m_navNextButton,m_navPrevButton);
   setTabOrder(m_navPrevButton,m_navLastButton);
@@ -1349,15 +1358,17 @@ void LanesLexicon::createMenus() {
   m_historyMenu->addAction(m_clearHistoryAction);
   m_historyMenu->addAction(m_showHistoryAction);
 
-  m_moveMenu = m_mainmenu->addMenu(tr("&Navigation"));
+  m_moveMenu = m_mainmenu->addMenu(tr("&Roots"));
   m_moveMenu->setObjectName("navigationmenu");
   m_moveMenu->setFocusPolicy(Qt::StrongFocus);
   m_moveMenu->addAction(m_navFirstAction);
   m_moveMenu->addAction(m_navNextAction);
   m_moveMenu->addAction(m_navPrevAction);
   m_moveMenu->addAction(m_navLastAction);
-  m_moveMenu->addAction(m_navModeRootAction);
-  m_moveMenu->addAction(m_navModePageAction);
+  if (m_allowNavMode) {
+    m_moveMenu->addAction(m_navModeRootAction);
+    m_moveMenu->addAction(m_navModePageAction);
+  }
 
   m_searchMenu = m_mainmenu->addMenu(tr("&Search"));
   m_searchMenu->setFocusPolicy(Qt::StrongFocus);
@@ -1969,6 +1980,9 @@ void LanesLexicon::readSettings() {
   else {
     m_navMode = LanesLexicon::ByPage;
   }
+  /// force by root
+  m_navMode = LanesLexicon::ByRoot;
+
   v = settings.value(SID_SYSTEM_TITLE,tr("Lane's Arabic-English Lexicon")).toString();
   this->setWindowTitle(v);
 
@@ -2972,8 +2986,10 @@ void LanesLexicon::onNavLast()   {
   }
 }
 void LanesLexicon::onNavigationMenuChanged(QAction * action) {
-  m_navigationButton->setDefaultAction(action);
-  m_navigationButton->menu()->hide();
+  if (m_allowNavMode) {
+    m_navigationButton->setDefaultAction(action);
+    m_navigationButton->menu()->hide();
+  }
 }
 void LanesLexicon::onClearHistory() {
   QLOG_DEBUG() << Q_FUNC_INFO;
