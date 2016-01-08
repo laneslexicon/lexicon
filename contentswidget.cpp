@@ -87,11 +87,10 @@ void ContentsWidget::readSettings() {
   m_moveUp = settings.value(SID_CONTENTS_MOVE_UP,"w").toString();
   m_expand = settings.value(SID_CONTENTS_EXPAND," ").toString();
   m_romanItypes = settings.value(SID_CONTENTS_ROMAN_ITYPES,false).toBool();
-  m_itypesText = settings.value(SID_CONTENTS_ITYPES).toStringList();
+
   QStringList m;
   m << "I" << "II" << "III" << "IV" << "V" << "VI" << "VII" << "VIII" << "IX" << "X" << "XI" << "XII" << "XIII" << "XIV";
   m_itypesText = settings.value(SID_CONTENTS_ITYPES,m).toStringList();
-  qDebug() << ">>>>>>>>>>>>>>>>>>>" << m_itypesText;
   settings.endGroup();
 
   settings.beginGroup("Icons");
