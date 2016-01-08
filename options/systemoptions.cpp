@@ -14,6 +14,7 @@
  */
 SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
   m_section = "System";
+  m_allowNavMode = false;
   QVBoxLayout * vlayout = new QVBoxLayout;
   setObjectName("systemoptions");
 
@@ -119,7 +120,12 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   optionlayout->addRow(tr("Theme"),m_theme);
   optionlayout->addRow(tr("Title"),m_title);
   optionlayout->addRow(tr("Toolbar text"),m_toolbarText);
-  optionlayout->addRow(tr("Nav by root"),m_rootNavigation);
+  if (m_allowNavMode) {
+    optionlayout->addRow(tr("Nav by root"),m_rootNavigation);
+  }
+  else {
+    m_rootNavigation->setVisible(false);
+  }
   optionlayout->addRow(tr("Allow duplicates"),m_allowDuplicates);
   optionlayout->addRow(tr("Use notes"),m_useNotes);
 
@@ -346,8 +352,10 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SYSTEM_SAVE_TABS,m_saveTabs)) {
     m_dirty = true;
   }
-  if (compare(&settings,SID_SYSTEM_BY_ROOT,m_rootNavigation)) {
-    m_dirty = true;
+  if (m_allowNavMode) {
+    if (compare(&settings,SID_SYSTEM_BY_ROOT,m_rootNavigation)) {
+      m_dirty = true;
+    }
   }
   if (compare(&settings,SID_SYSTEM_RUN_DATE,m_runDate)) {
     m_dirty = true;
@@ -447,32 +455,6 @@ void SystemOptions::onSetFont() {
   */
 }
 void SystemOptions::onSetColor() {
-  /*
-  QColor color;
-  color.setNamedColor(m_highlightColor->text());
-  QColorDialog d(color);
-  if (d.exec() != QDialog::Accepted) {
-    return;
-  }
-  int r,g,b;
-  color = d.currentColor();
-  color.getRgb(&r,&g,&b);
-  QString str = QString("%1,%2,%3").arg(r).arg(g).arg(b);
-  QSettings settings(m_settingsFileName,QSettings::IniFormat);
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Colors");
-  QStringList keys = settings.allKeys();
-  QStringList v;
-  for(int i=0;i < keys.size();i++) {
-    v = settings.value(keys[i]).toStringList();
-    if (v.join(",") == str) {
-
-      m_highlightColor->setText(keys[i]);
-      return;
-    }
-  }
-  m_highlightColor->setText(d.currentColor().name());
-  */
 }
 void SystemOptions::onSetDatabase() {
   QString fileName = QFileDialog::getOpenFileName(this,

@@ -60,5 +60,7 @@ class SystemOptions : public OptionsWidget {
 
     QRadioButton * m_insertNewTab;
     QRadioButton * m_appendNewTab;
+
+    bool m_allowNavMode;
 };
 #endif
