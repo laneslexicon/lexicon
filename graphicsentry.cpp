@@ -797,12 +797,21 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
 }
 
 void GraphicsEntry::dumpInfo(EntryItem * item , const QString & node) {
+  SETTINGS
+
+  settings.beginGroup("Entry");
+  QString p = settings.value(SID_ENTRY_OUTPUT_PATH,QDir::tempPath()).toString();
+
+  QFileInfo d(p);
+  if (! d.isDir()) {
+    p = QDir::tempPath();
+  }
   QString prefix;
   if (item->isRoot()) {
     prefix = "root-";
   }
   if (m_dumpXml) {
-    QFileInfo fi(QDir::tempPath(),QString("%1%2.xml").arg(prefix).arg(node));
+    QFileInfo fi(p,QString("%1%2.xml").arg(prefix).arg(node));
     QFile f(fi.filePath());
     if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
       QTextStream out(&f);
@@ -811,12 +820,21 @@ void GraphicsEntry::dumpInfo(EntryItem * item , const QString & node) {
     }
   }
   if (m_dumpOutputHtml) {
-    QFileInfo fi(QDir::tempPath(),QString("%1%2-out.html").arg(prefix).arg(node));
+    QFileInfo fi(p,QString("%1%2-in.html").arg(prefix).arg(node));
         QFile f(fi.filePath());
         if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
           QTextStream out(&f);
           out.setCodec("UTF-8");
           out << item->getOutputHtml();
+        }
+  }
+  if (m_dumpHtml) {
+    QFileInfo fi(p,QString("%1%2-qt.html").arg(prefix).arg(node));
+        QFile f(fi.filePath());
+        if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+          QTextStream out(&f);
+          out.setCodec("UTF-8");
+          out << item->toHtml();
         }
   }
 }
@@ -1061,6 +1079,7 @@ Place GraphicsEntry::getPage(const Place & p) {
   }
   QString node = pageQuery.value("nodeid").toString();
 
+
   if (m_clearScene) {
     onClearScene();
   }
@@ -1281,6 +1300,7 @@ void GraphicsEntry::appendEntries(int startPos) {
     m_items[i]->setPos(xpos,ypos);
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
+    /*
     if (m_dumpHtml) {
       QFileInfo fi(QDir::tempPath(),QString("%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
@@ -1290,6 +1310,7 @@ void GraphicsEntry::appendEntries(int startPos) {
         out << m_items[i]->toHtml();
       }
     }
+    */
     sz = m_items[i]->document()->size();
 
     if (m_items[i]->hasNotes()) {
