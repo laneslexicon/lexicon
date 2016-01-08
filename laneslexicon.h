@@ -324,7 +324,6 @@ class LanesLexicon : public QMainWindow
       bool m_saveBookmarks;
       bool m_restoreBookmarks;
       bool m_revertEnabled;
-      bool m_debug;
       bool m_menuWarning;
       bool m_allowDuplicates;
 

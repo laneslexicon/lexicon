@@ -28,7 +28,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   lexiconlayout->addWidget(lexiconbutton);
   lexiconlayout->addStretch();
   //  this->setControlSize(m_lexicon,VLARGE_EDIT);
-  m_debugOption = new QCheckBox;
+
   m_docked = new QCheckBox;
   m_focusTab = new QLineEdit;
   //  this->setControlSize(m_focusTab,LARGE_EDIT);
@@ -105,7 +105,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
 
 
-  optionlayout->addRow(tr("Debug"),m_debugOption);
+
   optionlayout->addRow(tr("Docked"),m_docked);
   optionlayout->addRow(tr("New tab behaviour"),tablayout);
   optionlayout->addRow(tr("Current tab"),m_focusTab);
@@ -181,7 +181,7 @@ void SystemOptions::readSettings() {
 
   m_contentsLinked->setChecked(settings.value(SID_SYSTEM_CONTENTS_LINKED,true).toBool());
   m_lexicon->setText(settings.value(SID_SYSTEM_DATABASE,"lexicon.sqlite").toString());
-  m_debugOption->setChecked(settings.value(SID_SYSTEM_DEBUG,true).toBool());
+
   m_docked->setChecked(settings.value(SID_SYSTEM_DOCKED,true).toBool());
   m_focusTab->setText(settings.value(SID_SYSTEM_CURRENT_TAB,"0").toString());
   m_minimalInterface->setChecked(settings.value(SID_SYSTEM_MINIMAL,true).toBool());
@@ -253,7 +253,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
 
   settings.setValue(SID_SYSTEM_CONTENTS_LINKED,  m_contentsLinked->isChecked());
   settings.setValue(SID_SYSTEM_DATABASE,m_lexicon->text());
-  settings.setValue(SID_SYSTEM_DEBUG,m_debugOption->isChecked());
+
   settings.setValue(SID_SYSTEM_DOCKED,m_docked->isChecked());
   settings.setValue(SID_SYSTEM_CURRENT_TAB,m_focusTab->text());
   settings.setValue(SID_SYSTEM_MINIMAL,m_minimalInterface->isChecked());
@@ -319,9 +319,6 @@ bool SystemOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_SYSTEM_DATABASE,m_lexicon)) {
-    m_dirty = true;
-  }
-  if (compare(&settings,SID_SYSTEM_DEBUG,m_debugOption)) {
     m_dirty = true;
   }
   if (compare(&settings,SID_SYSTEM_DOCKED,m_docked)) {

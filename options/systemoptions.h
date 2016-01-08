@@ -24,7 +24,6 @@ class SystemOptions : public OptionsWidget {
  private:
     QCheckBox * m_contentsLinked;
     QLineEdit * m_lexicon;
-    QCheckBox * m_debugOption;
     QCheckBox * m_docked;
     QLineEdit * m_focusTab;
     QCheckBox * m_rootNavigation;

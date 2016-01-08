@@ -1961,10 +1961,6 @@ void LanesLexicon::readSettings() {
   if (cmdOptions.contains("notabs")) {
     m_restoreTabs = false;
   }
-  m_debug = settings.value(SID_SYSTEM_DEBUG,false).toBool();
-  if (cmdOptions.contains("debug")) {
-    m_debug = true;
-  }
   m_allowDuplicates = settings.value(SID_SYSTEM_ALLOW_DUPLICATES,false).toBool();
 
   m_saveBookmarks = settings.value(SID_SYSTEM_SAVE_BOOKMARKS,true).toBool();
@@ -3747,9 +3743,6 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(iconfile);
     return;
   }
-  if (m_debug) {
-    QLOG_DEBUG() << QString(" %1").arg(iconfile);
-  }
   QIcon icon(fi.absoluteFilePath());
   if (! icon.isNull()) {
     action->setIcon(icon);
@@ -3774,9 +3767,6 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   if (!imgd.exists()) {
     QLOG_WARN() << QString(tr("Theme image directory not found : %1")).arg(imgd.absolutePath());
     return;
-  }
-  if (m_debug) {
-    QLOG_DEBUG() << tr("Loading icons:");
   }
 
   QString imgdir = imgd.absolutePath();
