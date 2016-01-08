@@ -346,10 +346,12 @@ void LanesLexicon::cleanup() {
     ShowMapWidget * w = qobject_cast<ShowMapWidget *>(widgets[i]);
     if (w) {
       w->close();
+      delete w;
     }
     OptionsDialog * d = qobject_cast<OptionsDialog *>(widgets[i]);
     if (d) {
       d->close();
+      delete d;
     }
   }
   if (m_db.isOpen()) {
