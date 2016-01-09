@@ -1,6 +1,6 @@
 #ifndef __SEARCHOPTIONS_H__
 #define __SEARCHOPTIONS_H__
-
+#include <QString>
 class SearchOptions {
  public:
   enum SearchType_t { Normal, Regex };
@@ -39,6 +39,9 @@ class SearchOptions {
   bool ignoreCase() const;
   void setIgnoreCase(bool);
 
+  QString pattern() const;
+  void setPattern(const QString &);
+
   bool isValid() const;
 
  private:
@@ -53,5 +56,6 @@ class SearchOptions {
   bool m_newTab;
   bool m_activateTab;
   bool m_ignoreCase;
+  QString m_pattern;
 };
 #endif

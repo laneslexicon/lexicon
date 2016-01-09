@@ -240,9 +240,11 @@ void ArabicSearchDialog::setOptions(SearchOptions & opts) {
 */
 void ArabicSearchDialog::getOptions(SearchOptions & opts) const {
   m_options->getOptions(opts);
+  opts.setPattern(m_edit->text());
 }
 void ArabicSearchDialog::setOptions(SearchOptions & opts)  {
   m_options->setOptions(opts);
+  m_edit->setText(opts.pattern());
 }
 void ArabicSearchDialog::loadKeymap(const QString & mapname) {
   m_edit->setCurrentMap(mapname);

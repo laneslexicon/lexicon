@@ -88,3 +88,9 @@ void SearchOptions::setIgnoreCase(bool v) {
 bool SearchOptions::isValid() const {
   return (m_target != SearchOptions::Unknown);
 }
+QString SearchOptions::pattern() const {
+  return m_pattern;
+}
+void SearchOptions::setPattern(const QString & str) {
+  m_pattern = str;
+}
