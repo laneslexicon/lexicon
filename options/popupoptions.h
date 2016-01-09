@@ -11,7 +11,7 @@ class DialogOptions : public QDialog {
 
  public:
   DialogOptions(QWidget * parent =0);
-  enum Which { Tab , Go , Whole, Diacritics, Regex, Force };
+  enum Which { Tab , Go , Whole, Diacritics, Regex, Force, IgnoreCase };
   void setChecked(int,bool);
   bool isChecked(int);
   void enableOption(int,bool v);
@@ -22,6 +22,6 @@ class DialogOptions : public QDialog {
   QCheckBox * m_diacritics;
   QCheckBox * m_regex;
   QCheckBox * m_force;
-
+  QCheckBox * m_ignoreCase;
 };
 #endif

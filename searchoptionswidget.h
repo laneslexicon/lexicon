@@ -51,6 +51,7 @@ class SearchOptionsWidget : public QWidget {
   QCheckBox * m_ignoreDiacritics;
   QCheckBox * m_wholeWordMatch;
   QCheckBox * m_includeHeads;
+  QCheckBox * m_ignoreCase;
   QCheckBox * m_showAllSearch;
   QCheckBox * m_newTab;
   QCheckBox * m_makeActive;

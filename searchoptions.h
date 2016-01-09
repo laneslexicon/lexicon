@@ -36,6 +36,9 @@ class SearchOptions {
   bool keymaps() const;
   void setKeymaps(bool);
 
+  bool ignoreCase() const;
+  void setIgnoreCase(bool);
+
  private:
   bool m_ignoreDiacritics;
   bool m_wholeWordMatch;
@@ -47,5 +50,6 @@ class SearchOptions {
   bool m_showAll;
   bool m_newTab;
   bool m_activateTab;
+  bool m_ignoreCase;
 };
 #endif

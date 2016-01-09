@@ -1952,6 +1952,12 @@ int GraphicsEntry::search() {
   m_searchItemIndexes.clear();
   QRegExp rx = SearchOptionsWidget::buildRx(t,m_pattern,options);
   QLOG_DEBUG() << "Search pattern" << rx.pattern();
+  if (options.ignoreCase()) {
+    rx.setCaseSensitivity(Qt::CaseInsensitive);
+  }
+  else {
+    rx.setCaseSensitivity(Qt::CaseSensitive);
+  }
   m_currentSearchRx = rx;
   m_currentSearchTarget = t;
   QGraphicsItem * focusItem = m_scene->focusItem();

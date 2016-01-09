@@ -13,6 +13,7 @@ SearchOptions::SearchOptions() {
   m_showAll = false;
   m_newTab = false;
   m_activateTab = false;
+  m_ignoreCase = false;
 }
 bool SearchOptions::ignoreDiacritics() const {
   return m_ignoreDiacritics;
@@ -48,6 +49,10 @@ void SearchOptions::setShowAll(bool v) {
 bool SearchOptions::includeHeads() const {
   return m_includeHeads;
 }
+bool SearchOptions::ignoreCase() const {
+  return m_ignoreCase;
+}
+
 void SearchOptions::setIncludeHeads(bool v) {
   m_includeHeads = v;
 }
@@ -75,4 +80,7 @@ bool SearchOptions::keymaps() const {
 }
 void SearchOptions::setKeymaps(bool v) {
   m_keymaps = v;
+}
+void SearchOptions::setIgnoreCase(bool v) {
+  m_ignoreCase = v;
 }

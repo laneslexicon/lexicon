@@ -215,6 +215,7 @@ void FindOptions::readSettings() {
   m_localDiacritics = settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool();
   m_localRegex      = settings.value(SID_LOCALSEARCH_TYPE_REGEX,true).toBool();
   m_localForce      = settings.value(SID_LOCALSEARCH_FORCE,true).toBool();
+  m_ignoreCase      = settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool();
 
 
   m_localShowAll->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
@@ -281,6 +282,7 @@ void FindOptions::writeSettings(const QString & fileName) {
    settings.setValue(SID_LOCALSEARCH_DIACRITICS,m_localDiacritics);
    settings.setValue(SID_LOCALSEARCH_TYPE_REGEX,m_localRegex);
    settings.setValue(SID_LOCALSEARCH_FORCE,m_localForce);
+   settings.setValue(SID_LOCALSEARCH_IGNORE_CASE,m_ignoreCase);
 
 
   settings.value(SID_LOCALSEARCH_SHOW_ALL,m_localShowAll->isChecked());
@@ -439,6 +441,9 @@ bool FindOptions::isModified()  {
   if (m_localForce      != settings.value(SID_LOCALSEARCH_FORCE,true).toBool()) {
     m_dirty = true;
   }
+  if (m_ignoreCase      != settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool()) {
+    m_dirty = true;
+  }
   settings.endGroup();
   settings.beginGroup("Search");
 
@@ -578,11 +583,13 @@ void FindOptions::onLocalDialog() {
   d.setChecked(DialogOptions::Diacritics,m_localDiacritics);
   d.setChecked(DialogOptions::Regex,m_localRegex);
   d.setChecked(DialogOptions::Force,m_localForce);
+  d.setChecked(DialogOptions::IgnoreCase,m_ignoreCase);
   if (d.exec() == QDialog::Accepted) {
     m_localWholeWord = d.isChecked(DialogOptions::Whole);
     m_localDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_localRegex = d.isChecked(DialogOptions::Regex);
     m_localForce = d.isChecked(DialogOptions::Force);
+    m_ignoreCase = d.isChecked(DialogOptions::IgnoreCase);
     emit(modified(true));
     bool v = isModified();
     setButtons(v);

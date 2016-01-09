@@ -56,6 +56,7 @@ class FindOptions : public OptionsWidget {
     bool m_localWholeWord;
     bool m_localRegex;
     bool m_localDiacritics;
+    bool m_ignoreCase;
 
     QCheckBox * m_localShowAll;
 

@@ -48,7 +48,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   m_fullText = new QRadioButton(tr("Full text"));
   m_normalSearch = new QRadioButton(tr("Normal"),m_typeGroup);
   m_regexSearch = new QRadioButton(tr("Regular expression"),m_typeGroup);
-
+  m_ignoreCase = new QCheckBox(tr("Ignore case"));
   QHBoxLayout * typelayout = new QHBoxLayout;
   typelayout->addWidget(m_normalSearch);
   typelayout->addWidget(m_regexSearch);
@@ -78,6 +78,8 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   gridlayout->addWidget(m_includeHeads,row,0);
   row++;
   gridlayout->addWidget(m_showAllSearch,row,0);
+  row++;
+  gridlayout->addWidget(m_ignoreCase,row,0);
   row++;
   gridlayout->addWidget(m_newTab,row,0);
   gridlayout->addWidget(m_makeActive,row,1);
@@ -110,6 +112,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
   m_arabicTarget->hide();
   m_buckwalterTarget->hide();
   m_showAllSearch->hide();
+  m_ignoreCase->hide();
     switch(type) {
   case SearchOptions::Root : {
     m_ignoreDiacritics->hide();
@@ -177,6 +180,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
     m_makeActive->hide();
     m_showAllSearch->show();
     m_typeGroup->show();
+    m_ignoreCase->show();
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
         m_keymapGroup->setVisible(false);
@@ -337,6 +341,7 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   opts.setNewTab(m_newTab->isChecked());
   opts.setActivateTab(m_makeActive->isChecked());
   opts.setShowAll(m_showAllSearch->isChecked());
+  opts.setIgnoreCase(m_ignoreCase->isChecked());
 }
 void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -363,7 +368,7 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
 
   m_showAllSearch->setChecked(options.showAll());
 
-
+  m_ignoreCase->setChecked(options.ignoreCase());
 }
 void SearchOptionsWidget::setOptions(int type) {
   QLOG_DEBUG() << Q_FUNC_INFO << type;
@@ -410,6 +415,7 @@ void SearchOptionsWidget::setOptions(int type) {
     m_regexSearch->setChecked(settings.value(SID_LOCALSEARCH_TYPE_REGEX,false).toBool());
     m_normalSearch->setChecked(! m_regexSearch->isChecked());
     m_showAllSearch->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
+    m_ignoreCase->setChecked(settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool());
     settings.endGroup();
     break;
   }

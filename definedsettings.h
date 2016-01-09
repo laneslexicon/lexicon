@@ -192,6 +192,7 @@ They should not be translated.
 #define SID_LOCALSEARCH_FORCE_LTR              "Force LTR"
 #define SID_LOCALSEARCH_TYPE_REGEX             "Regex"
 #define SID_LOCALSEARCH_FORCE                  "Force LTR"
+#define SID_LOCALSEARCH_IGNORE_CASE            "Ignore case"
 
 #define SID_FULLSEARCH_ONE_ROW                 "One row"
 #define SID_FULLSEARCH_RESULTS_FONT            "Results Arabic font"
