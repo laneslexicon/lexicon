@@ -4,16 +4,16 @@
 class SearchOptions {
  public:
   enum SearchType_t { Normal, Regex };
-  enum  { Root , Entry, Word, Local, Node, Page };
+  enum SearchScope_t { Unknown, Root , Entry, Word, Local, Node, Page };
   SearchOptions();
   bool ignoreDiacritics() const;
   void setIgnoreDiacritics(bool);
 
   void setSearchType(SearchType_t);
-  int  getSearchType() const;
+  SearchType_t  getSearchType() const;
 
-  void setSearchScope(int);
-  int  getSearchScope() const ;
+  void setSearchScope(SearchScope_t);
+  SearchScope_t  getSearchScope() const ;
 
   bool wholeWordMatch() const;
   void setWholeWordMatch(bool v);
@@ -39,13 +39,15 @@ class SearchOptions {
   bool ignoreCase() const;
   void setIgnoreCase(bool);
 
+  bool isValid() const;
+
  private:
   bool m_ignoreDiacritics;
   bool m_wholeWordMatch;
   bool m_keymaps;
   SearchType_t  m_type;
   bool m_includeHeads;
-  int  m_target;
+  SearchScope_t  m_target;
   bool m_forceLTR;
   bool m_showAll;
   bool m_newTab;

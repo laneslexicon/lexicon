@@ -8,7 +8,7 @@ SearchOptions::SearchOptions() {
   m_keymaps = false;
   m_type = SearchOptions::Normal;
   m_includeHeads = false;
-  m_target = 0;
+  m_target = SearchOptions::Unknown;
   m_forceLTR = false;
   m_showAll = false;
   m_newTab = false;
@@ -30,13 +30,14 @@ void SearchOptions::setWholeWordMatch(bool v) {
 void SearchOptions::setSearchType(SearchType_t x) {
   m_type = x;
 }
-int SearchOptions::getSearchType() const {
+SearchOptions::SearchType_t SearchOptions::getSearchType() const {
   return m_type;
 }
-void SearchOptions::setSearchScope(int x) {
+void SearchOptions::setSearchScope(SearchScope_t x) {
+
   m_target = x;
 }
-int SearchOptions::getSearchScope() const {
+SearchOptions::SearchScope_t SearchOptions::getSearchScope() const {
   return m_target;
 }
 bool SearchOptions::showAll() const {
@@ -83,4 +84,7 @@ void SearchOptions::setKeymaps(bool v) {
 }
 void SearchOptions::setIgnoreCase(bool v) {
   m_ignoreCase = v;
+}
+bool SearchOptions::isValid() const {
+  return (m_target != SearchOptions::Unknown);
 }

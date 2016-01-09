@@ -6,7 +6,7 @@
 #include "definedsettings.h"
 extern Lexicon * getLexicon();
 
-ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::WindowFlags f) :
+ArabicSearchDialog::ArabicSearchDialog(SearchOptions::SearchScope_t searchType,QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   setObjectName("arabicsearchdialog");
   m_searchType = searchType;
@@ -89,7 +89,7 @@ ArabicSearchDialog::ArabicSearchDialog(int searchType,QWidget * parent,Qt::Windo
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
 
-  m_options = new SearchOptionsWidget(searchType);
+  m_options = new SearchOptionsWidget(searchType,this);
 
   connect(m_options,SIGNAL(force(bool)),m_edit,SLOT(setForceLTR(bool)));
 
@@ -240,6 +240,9 @@ void ArabicSearchDialog::setOptions(SearchOptions & opts) {
 */
 void ArabicSearchDialog::getOptions(SearchOptions & opts) const {
   m_options->getOptions(opts);
+}
+void ArabicSearchDialog::setOptions(SearchOptions & opts)  {
+  m_options->setOptions(opts);
 }
 void ArabicSearchDialog::loadKeymap(const QString & mapname) {
   m_edit->setCurrentMap(mapname);

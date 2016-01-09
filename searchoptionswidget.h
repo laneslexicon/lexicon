@@ -17,7 +17,7 @@ class SearchOptionsWidget : public QWidget {
   Q_OBJECT
 
  public:
-  SearchOptionsWidget(int searchType,QWidget * parent = 0);
+  SearchOptionsWidget(SearchOptions::SearchScope_t,QWidget * parent = 0);
   SearchOptionsWidget(SearchOptions & opts,QWidget * parent = 0);
   ~SearchOptionsWidget();
 

@@ -18,12 +18,13 @@ class ArabicSearchDialog : public QDialog {
   Q_OBJECT
 
  public:
-  ArabicSearchDialog(int type,QWidget * parent = 0, Qt::WindowFlags f = 0);
+  ArabicSearchDialog(SearchOptions::SearchScope_t type,QWidget * parent = 0, Qt::WindowFlags f = 0);
   ~ArabicSearchDialog();
   QString getText() const;
   void setPrompt(const QString &);
   //  void setOptions(SearchOptions &);
   void getOptions(SearchOptions &) const;
+  void setOptions(SearchOptions &);
   bool getForceLTR() const ;
   void setText(const QString &);
   void hideKeyboard();
@@ -35,7 +36,7 @@ class ArabicSearchDialog : public QDialog {
     void onKeyboardShortcut(const QString &);
     void onHelp();
  protected:
-    int m_searchType;
+    SearchOptions::SearchScope_t m_searchType;
     int m_count;
     KeyboardWidget * m_keyboard;
     bool m_attached;

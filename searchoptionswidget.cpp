@@ -12,7 +12,7 @@
  *
  *
  */
-SearchOptionsWidget::SearchOptionsWidget(int searchFor,QWidget * parent) : QWidget(parent) {
+SearchOptionsWidget::SearchOptionsWidget(SearchOptions::SearchScope_t searchFor,QWidget * parent) : QWidget(parent) {
   QLOG_DEBUG()  << Q_FUNC_INFO << searchFor;
   setObjectName("searchoptionswidget");
   m_options.setSearchScope(searchFor);
@@ -315,6 +315,7 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString 
 }
 void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   QLOG_DEBUG() << Q_FUNC_INFO;
+
   opts.setIgnoreDiacritics(true);
   opts.setSearchType(SearchOptions::Normal);
   opts.setIgnoreDiacritics(m_ignoreDiacritics->isChecked());
@@ -342,6 +343,8 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   opts.setActivateTab(m_makeActive->isChecked());
   opts.setShowAll(m_showAllSearch->isChecked());
   opts.setIgnoreCase(m_ignoreCase->isChecked());
+  opts.setSearchScope(m_options.getSearchScope());
+
 }
 void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   QLOG_DEBUG() << Q_FUNC_INFO;
