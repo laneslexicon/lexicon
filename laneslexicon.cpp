@@ -384,7 +384,7 @@ void LanesLexicon::onSetInterface(bool triggered) {
       msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
       QString errorMessage(tr("Warning"));
       QString info(tr("The toolbars and menubars will not be visible"));
-      QString next = QString(tr("To make them visible again, press %1")).arg(sc->key().toString());
+      QString next = QString(tr("To make them visible again, use the shortcut %1")).arg(sc->key().toString());
       msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
                      + info + "</p><p>" + next + "</p></body></html>");
       msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
