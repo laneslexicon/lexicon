@@ -218,6 +218,7 @@ class GraphicsEntry : public QWidget {
     QGraphicsScene * m_scene;
     QGraphicsTextItem * m_item;
 
+    QMap<SearchOptions::SearchScope_t,SearchOptions *> m_lastSearchOptions;
 
     Place m_place;
     Place m_focusPlace;

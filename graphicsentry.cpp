@@ -72,6 +72,14 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 }
 GraphicsEntry::~GraphicsEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+
+  QList<SearchOptions::SearchScope_t> keys = m_lastSearchOptions.keys();
+  for(int i=0;i < keys.size();i++) {
+    SearchOptions * opts = m_lastSearchOptions.take(keys[i]);
+    if (opts) {
+      delete opts;
+    }
+  }
 }
 QGraphicsView * GraphicsEntry::getView() const {
   return m_view;
@@ -1898,47 +1906,64 @@ void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
   }
 }
 /**
+ * Local Search
+ *
  * This uses different default search options from the other search routines
- *
- *
  * @return
  */
 int GraphicsEntry::search() {
-  QString target = "and";
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
+  QString target;
   int count = 0;
 
-
   SearchOptions options;
-  options.setSearchScope(SearchOptions::Local);
-  // int max = m_items.size() * step;
   QString v;
 
-  QLOG_DEBUG() << Q_FUNC_INFO;
-  SETTINGS
-  settings.beginGroup("LocalSearch");
-  if (settings.value(SID_LOCALSEARCH_TYPE_REGEX,false).toBool()) {
-    options.setSearchType(SearchOptions::Regex);
+  if (m_lastSearchOptions.contains(SearchOptions::Local)) {
+    SearchOptions * o = dynamic_cast<SearchOptions *>(m_lastSearchOptions.value(SearchOptions::Local));
+    if (o) {
+      options = SearchOptions(*o);
+    }
   }
-  else {
-    options.setSearchType(SearchOptions::Normal);
+  /// if we haven't got a cache search options get it from settings
+  if (! options.isValid()) {
+    SETTINGS
+      settings.beginGroup("LocalSearch");
+    if (settings.value(SID_LOCALSEARCH_TYPE_REGEX,false).toBool()) {
+      options.setSearchType(SearchOptions::Regex);
+    }
+    else {
+      options.setSearchType(SearchOptions::Normal);
+    }
+    options.setSearchScope(SearchOptions::Local);
+    options.setIgnoreDiacritics(settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool());
+    options.setWholeWordMatch(settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool());
+    options.setForceLTR(settings.value(SID_LOCALSEARCH_FORCE,false).toBool());
+    options.setIgnoreCase(settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool());
+    options.setShowAll(settings.value(SID_LOCALSEARCH_SHOW_ALL,false).toBool());
   }
-
-  options.setIgnoreDiacritics(settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool());
-  options.setWholeWordMatch(settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool());
-  options.setForceLTR(settings.value(SID_LOCALSEARCH_FORCE_LTR,false).toBool());
-  options.setShowAll(settings.value(SID_LOCALSEARCH_SHOW_ALL,false).toBool());
   ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Local,this);
-  //  d->setOptions(options);
+  d->setOptions(options);
   QString t;
   if (d->exec()) {
     t = d->getText();
+    d->getOptions(options);
+    delete d;
     if ( t.isEmpty()) {
       return -1;
     }
-    d->getOptions(options);
     m_currentSearchOptions = options;
+    if (m_lastSearchOptions.contains(SearchOptions::Local)) {
+      SearchOptions * o = dynamic_cast<SearchOptions *>(m_lastSearchOptions.take(SearchOptions::Local));
+      if (o) {
+        delete o;
+      }
+    }
+    m_lastSearchOptions.insert(SearchOptions::Local,new SearchOptions(options));
   }
   else {
+    delete d;
     return -1;
   }
   m_findCount = 0;
@@ -2000,7 +2025,7 @@ int GraphicsEntry::search() {
     }
   }
   else {
-    if (! m_currentSearchOptions.showAll()) {
+    if (! options.showAll()) {
       this->centerOnSearchResult(m_searchItemIndexes[m_searchItemPtr],0);
       emit(searchStarted());
     }
@@ -2017,7 +2042,7 @@ int GraphicsEntry::search() {
  * m_currentSearchPosition is the current position within the current EntryItem
  */
 void GraphicsEntry::searchNext() {
-  //  QLOG_DEBUG() << Q_FUNC_INFO << m_searchItemPtr << m_searchIndex;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   int pos;
   if (m_currentSearchTarget.isEmpty()) {
     return;
@@ -2053,10 +2078,14 @@ void GraphicsEntry::searchNext() {
   return;
 }
 void GraphicsEntry::centerOnSearchResult(int itemIndex,int ix) {
+  bool showAll = false;
   int pos = m_items[itemIndex]->showHighlight(ix);
   m_highlightCount++;
   m_currentFind++;
-  if (m_currentSearchOptions.showAll()) {
+  if (m_lastSearchOptions.contains(SearchOptions::Local)) {
+    showAll = m_lastSearchOptions.value(SearchOptions::Local)->showAll();
+  }
+  if (showAll) {
     statusMessage(QString("Find count: %1").arg(m_findCount));
   }
   else {
