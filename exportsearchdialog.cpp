@@ -6,7 +6,7 @@ ExportSearchDialog::ExportSearchDialog(const QStringList & columns,QWidget * par
   setWindowTitle(tr("Export Options"));
   m_columnLabels = columns;
   QVBoxLayout * layout = new QVBoxLayout;
-  QGroupBox * columnbox = new QGroupBox(tr("Columns"));
+  QGroupBox * columnbox = new QGroupBox(tr("Select columns to export"));
   QFormLayout * columnlayout = new QFormLayout;
   columnlayout->setHorizontalSpacing(100);
   for(int i=0;i < columns.size();i++) {
