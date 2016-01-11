@@ -115,6 +115,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
   connect(m_rxlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
+  connect(m_rxlist,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(onCellDoubleClicked(int,int)));
   initXslt();
   //  m_search->setOptions(m_defaultOptions);
   m_search->setVisible(false);
@@ -150,15 +151,37 @@ void FullSearchWidget::itemChanged(QTableWidgetItem * /* item */,QTableWidgetIte
   QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "NOSHOW WE SHOULD NOT BE HERE";
 
 }
+void FullSearchWidget::onCellDoubleClicked(int row,int /* col */) {
+  QLOG_DEBUG() << Q_FUNC_INFO << row;
 
+  this->showNode(row);
+}
 void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
-  bool isHead = false;
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  //  bool isHead = false;
   /// get the node
+
+  /*
   item = item->tableWidget()->item(item->row(),NODE_COLUMN);
   if (item->data(Qt::UserRole).toBool()) {
     isHead = true;
   }
   QString node = item->text();
+  }
+  */
+  this->showNode(item->row());
+}
+void FullSearchWidget::showNode(int row) {
+  QTableWidgetItem * item = m_rxlist->item(row,NODE_COLUMN);
+  if (! item) {
+    return;
+  }
+  QString node = item->text();
+  if (node.isEmpty()) {
+    QLOG_WARN() << QString("No node row %1").arg(row);
+    return;
+  }
+  bool isHead = item->data(Qt::UserRole).toBool();
   m_nodeQuery.bindValue(0,node);
   m_nodeQuery.exec();
   /// missing node
@@ -166,7 +189,7 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
     QLOG_WARN() << Q_FUNC_INFO << "No record for node" << node;
     return;
   }
-  item = item->tableWidget()->item(item->row(),POSITION_COLUMN);
+  item = m_rxlist->item(row,POSITION_COLUMN);
   if (!item) {
     return;
   }
@@ -178,6 +201,8 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   QString xml = m_nodeQuery.value("xml").toString();
   QString html = this->transform(xml);
   NodeView * v = new NodeView(this);
+  v->setAttribute(Qt::WA_DeleteOnClose);
+
   v->setWindowTitle(QString(tr("Showing result %1 in search for %2")
                             .arg(item->row() + 1)
                             .arg(m_target)));
@@ -526,7 +551,7 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
 
   QString targetText;
   if (UcdScripts::isScript(m_target,"Arabic")) {
-    targetText = getLexicon()->spanArabic(m_target,"searchresults");
+    targetText = getLexicon()->spanArabic(m_target,"fullsearchresults");
   }
   else {
     targetText = m_target;

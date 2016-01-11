@@ -53,6 +53,7 @@ class FullSearchWidget : public QWidget
   public slots:
     void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
     void itemDoubleClicked(QTableWidgetItem *);
+    void onCellDoubleClicked(int,int);
     void hideOptions();
     void findTarget(bool show=false);
     void cancelSearch();
@@ -65,6 +66,7 @@ class FullSearchWidget : public QWidget
     void focusOutEvent(QFocusEvent *);
     //   void eventFilter(QObject *,QEvent *);
  private:
+    void showNode(int row);
     void readSettings();
     QStringList columnHeadings();
     QString buildText(int,int,int,int);
