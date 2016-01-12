@@ -3149,7 +3149,7 @@ void LanesLexicon::searchForRoot() {
     connect(m_rootSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   }
   else {
-    m_rootSearchDialog->setText("");
+    //    m_rootSearchDialog->setText("");
   }
   if (m_rootSearchDialog->exec()) {
     QString t = m_rootSearchDialog->getText();
@@ -3288,7 +3288,7 @@ void LanesLexicon::searchForEntry() {
 
   }
   else {
-    m_headSearchDialog->setText("");
+    //    m_headSearchDialog->setText("");
   }
 
   if (m_headSearchDialog->exec()) {
