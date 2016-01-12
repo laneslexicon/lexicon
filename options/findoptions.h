@@ -39,7 +39,7 @@ class FindOptions : public OptionsWidget {
     bool m_fullForce;
 
     /// head word search
-    QCheckBox * m_headDebug;
+    QCheckBox * m_headPhrase;
     QSpinBox  * m_headStep;
     QCheckBox * m_headVertical;
     QCheckBox * m_headFocusTable;

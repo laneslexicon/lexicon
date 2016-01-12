@@ -69,14 +69,14 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   /// Head word search
   QGroupBox * headbox = new QGroupBox(tr("Head word search"));
-  m_headDebug = new QCheckBox;
+  m_headPhrase = new QCheckBox;
   m_headStep = new QSpinBox;
   this->setControlSize(m_headStep,MEDIUM_EDIT);
-  m_headVertical = new QCheckBox;
-  m_headFocusTable = new QCheckBox;
+  //  m_headVertical = new QCheckBox;
+  //  m_headFocusTable = new QCheckBox;
   this->setControlSize(m_headStep,MEDIUM_EDIT);
   m_headStep->setSingleStep(25);
-  m_headSingleClick = new QCheckBox;
+  //  m_headSingleClick = new QCheckBox;
   /*
   m_headNewTab = new QCheckBox;
   m_headGoTab = new QCheckBox;
@@ -85,18 +85,19 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_headRegex  = new QCheckBox;
   */
   QFormLayout * headlayout = new QFormLayout;
-  headlayout->addRow(tr("Vertical layout"),m_headVertical);
+  //  headlayout->addRow(tr("Vertical layout"),m_headVertical);
   headlayout->addRow(tr("Step interval"),m_headStep);
-  headlayout->addRow(tr("Initial focus on results"),m_headFocusTable);
-  headlayout->addRow(tr("Single click to activate"),m_headSingleClick);
+  //  headlayout->addRow(tr("Initial focus on results"),m_headFocusTable);
+  //  headlayout->addRow(tr("Single click to activate"),m_headSingleClick);
   QPushButton * headbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout2 = new QHBoxLayout;
   setlayout2->addWidget(headbtn);
-  //  setlayout2->addStretch();
+  setlayout2->addStretch();
+
   headlayout->addRow(tr("Search dialog options"),setlayout2);
   connect(headbtn,SIGNAL(clicked()),this,SLOT(onHeadDialog()));
 
-  headlayout->addRow(tr("Debug"),m_headDebug);
+  headlayout->addRow(tr("Use head phrase"),m_headPhrase);
   headbox->setLayout(headlayout);
 
   /// Local search
@@ -110,8 +111,9 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   QPushButton * localbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout3 = new QHBoxLayout;
   setlayout3->addWidget(localbtn);
-  //  setlayout3->addStretch();
+  setlayout3->addStretch();
   locallayout->addRow(tr("Search dialog options"),setlayout3);
+
   connect(localbtn,SIGNAL(clicked()),this,SLOT(onLocalDialog()));
 
   localbox->setLayout(locallayout);
@@ -145,14 +147,11 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
 
   layout->addWidget(fullbox);
-  QHBoxLayout * hlayoutsearches = new QHBoxLayout;
-  hlayoutsearches->addWidget(headbox);
-  hlayoutsearches->addWidget(localbox);
-
-  layout->addLayout(hlayoutsearches);//Widget(headbox);
-  //  layout->addWidget(localbox);
+  layout->addWidget(headbox);
+  layout->addWidget(localbox);
   layout->addWidget(otherbox);
   layout->addStretch();
+
   setLayout(layout);
   addButtons();
   readSettings();
@@ -185,10 +184,10 @@ void FindOptions::readSettings() {
   settings.beginGroup("HeadSearch");
   // head word search
 
-  m_headDebug->setChecked(settings.value(SID_HEADSEARCH_DEBUG,false).toBool());
-  m_headSingleClick->setChecked(settings.value(SID_HEADSEARCH_SINGLE_CLICK,true).toBool());
-  m_headVertical->setChecked(settings.value(SID_HEADSEARCH_VERTICAL_LAYOUT,true).toBool());
-  m_headFocusTable->setChecked(settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool());
+  m_headPhrase->setChecked(settings.value(SID_HEADSEARCH_USE_PHRASE,false).toBool());
+  //  m_headSingleClick->setChecked(settings.value(SID_HEADSEARCH_SINGLE_CLICK,true).toBool());
+  //  m_headVertical->setChecked(settings.value(SID_HEADSEARCH_VERTICAL_LAYOUT,true).toBool());
+  //  m_headFocusTable->setChecked(settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool());
   m_headStep->setValue(settings.value(SID_HEADSEARCH_STEP,50).toInt());
 
   m_headNewTab     = settings.value(SID_HEADSEARCH_NEW_TAB,true).toBool();
@@ -261,12 +260,14 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.endGroup();
   settings.beginGroup("HeadSearch");
 
-  settings.setValue(SID_HEADSEARCH_DEBUG,m_headDebug->isChecked());
+  settings.setValue(SID_HEADSEARCH_USE_PHRASE,m_headPhrase->isChecked());
+  /*
   settings.setValue(SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical->isChecked());
   settings.setValue(SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable->isChecked());
-  settings.setValue(SID_HEADSEARCH_STEP,m_headStep->value());
-  settings.setValue(SID_HEADSEARCH_SINGLE_CLICK,m_headSingleClick->isChecked());
 
+  settings.setValue(SID_HEADSEARCH_SINGLE_CLICK,m_headSingleClick->isChecked());
+  */
+  settings.setValue(SID_HEADSEARCH_STEP,m_headStep->value());
   settings.setValue(SID_HEADSEARCH_NEW_TAB,m_headNewTab);
   settings.setValue(SID_HEADSEARCH_GO_TAB,m_headGoTab);
   settings.setValue(SID_HEADSEARCH_WHOLE_WORD,m_headWholeWord );
@@ -375,10 +376,10 @@ bool FindOptions::isModified()  {
   settings.endGroup();
   settings.beginGroup("HeadSearch");
 
-  if (compare(&settings,SID_HEADSEARCH_DEBUG,m_headDebug)) {
+  if (compare(&settings,SID_HEADSEARCH_USE_PHRASE,m_headPhrase)) {
     m_dirty = true;
   }
-  if (compare(&settings,SID_HEADSEARCH_SINGLE_CLICK,m_headSingleClick)) {
+  /*  if (compare(&settings,SID_HEADSEARCH_SINGLE_CLICK,m_headSingleClick)) {
     m_dirty = true;
   }
 
@@ -389,7 +390,7 @@ bool FindOptions::isModified()  {
   if (compare(&settings,SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable)) {
     m_dirty = true;
   }
-
+  */
   if (compare(&settings,SID_HEADSEARCH_STEP,m_headStep)) {
     m_dirty = true;
   }
