@@ -28,7 +28,7 @@ void FocusTable::focusInEvent(QFocusEvent * event) {
 }
 void FocusTable::focusOutEvent(QFocusEvent * event) {
   /// TODO get from INI
-  this->setStyleSheet("QTableView { selection-background-color : lightgray}");
+  //  this->setStyleSheet("QTableView { selection-background-color : lightgray}");
   QTableWidget::focusOutEvent(event);
 }
 void FocusTable::exportResults() {

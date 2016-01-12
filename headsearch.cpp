@@ -8,12 +8,14 @@
 #include "definedsql.h"
 #include "externs.h"
 #include "scripts.h"
+#include "columnartablewidget.h"
 #define SELECT_COLUMN 0
 #define ROOT_COLUMN 1
-#define ENTRY_COLUMN 2
-#define NODE_COLUMN 3
-#define VOL_COLUMN 4
-#define COLUMN_COUNT 5
+#define HEAD_COLUMN 2
+#define ENTRY_COLUMN 3
+#define NODE_COLUMN 4
+#define VOL_COLUMN 5
+#define COLUMN_COUNT 6
 /// TODO
 /// some of these functions pass SearchOptions - why can't we use the class member
 extern LanesLexicon * getApp();
@@ -22,8 +24,17 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   setWindowTitle(tr("Search for Head Word"));
   setObjectName("headsearchwidget");
-  QWidget * container = new QWidget;
-  QVBoxLayout * containerlayout = new QVBoxLayout;
+  //  QWidget * container = new QWidget;
+  //  QVBoxLayout * containerlayout = new QVBoxLayout;
+  m_heads = new ColumnarTableWidget(QStringList() << tr("Mark") << tr("Root") << tr("Head") << tr("Entry") << tr("Node") << tr("Vol/Page"));
+
+  m_heads->setKey(ColumnarTableWidget::STATE,SID_HEADSEARCH_STATE);
+  m_heads->setDefaultWidth(100);
+  m_heads->setObjectName("headsearchlist");
+  m_heads->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_heads->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_heads->setMarkColumn(SELECT_COLUMN);
+
   m_list = new FocusTable;
   m_list->setColumnCount(COLUMN_COUNT);
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -33,7 +44,7 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_list->setHorizontalHeaderLabels(m_columns);
   m_list->horizontalHeader()->setStretchLastSection(true);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_list->installEventFilter(this);
+  //  m_list->installEventFilter(this);
   //QStyle * style = m_list->style();
   //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
   //  QHBoxLayout * resultslayout = new QHBoxLayout;
@@ -41,115 +52,78 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_searchTitle->hide();
   m_resultsText = new QLabel("");
   m_resultsText->hide();
+  /*
   m_convertButton = new QPushButton(tr("&Close results list"));
   m_convertButton->hide();
-
+  */
   m_exportButton = new QPushButton(tr("&Export results"));
   m_exportButton->hide();
 
-  connect(m_convertButton,SIGNAL(clicked()),this,SLOT(onRemoveResults()));
+  //  connect(m_convertButton,SIGNAL(clicked()),this,SLOT(onRemoveResults()));
   connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
 
-  containerlayout->addWidget(m_searchTitle);
-  containerlayout->addWidget(m_list);
+  layout->addWidget(m_searchTitle);
+  layout->addWidget(m_list);
+  layout->addWidget(m_heads);
+
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(m_resultsText);
   hlayout->addStretch();
-  hlayout->addWidget(m_convertButton);
+  //  hlayout->addWidget(m_convertButton);
   hlayout->addWidget(m_exportButton);
-  //  containerlayout->addWidget(m_resultsText);
-  //  resultslayout->addStretch();
-  //  containerlayout->addWidget(m_convertButton);
-  containerlayout->addLayout(hlayout);
 
-
-  //  containerlayout->addLayout(resultslayout);
-  container->setLayout(containerlayout);
-  m_entry = new GraphicsEntry;
-  m_entry->installEventFilter(this);
-  //  QLOG_DEBUG() << "result count" << count;
-  //  this->search(str,options);
-  QSplitter * splitter;
-  if (m_verticalLayout) {
-    splitter = new QSplitter(Qt::Vertical);
-  }
-  else {
-    splitter = new QSplitter(Qt::Horizontal);
-  }
-  splitter->addWidget(container);
-  splitter->addWidget(m_entry);
-  splitter->setStretchFactor(0,0);
-  splitter->setStretchFactor(1,1);
-  layout->addWidget(splitter);
-  m_list->adjustSize();
-  m_list->resizeColumnToContents(SELECT_COLUMN);
+  layout->addLayout(hlayout);
 
   setLayout(layout);
-  connect(m_list,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
-          this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
-  /// show the first item in the list
-  /// TODO decide who gets focus and select the first row
-  /// TODO if table loses focus, change the background selection color
-  if (m_list->rowCount() > 0) {
-    m_list->itemDoubleClicked(m_list->item(0,NODE_COLUMN));
-    m_exportButton->setEnabled(true);
-    m_exportButton->setVisible(true);
-  }
-  else {
-    m_exportButton->setEnabled(false);
-    m_exportButton->setVisible(false);
-  }
-  if (m_singleClick) {
-    connect(m_list,SIGNAL(currentItemChanged(QTableWidgetItem * ,QTableWidgetItem * )),
-          this,SLOT(viewedItemChanged(QTableWidgetItem * ,QTableWidgetItem * )));
-  }
-  connect(m_list,SIGNAL(itemChanged(QTableWidgetItem)),this,SLOT(itemChanged(QTableWidgetItem *)));
+  connect(m_heads,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
+          this,SLOT(onItemDoubleClicked(QTableWidgetItem * )));
+  connect(m_heads,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(onCellDoubleClicked(int,int)));
 
-  if (m_focusTable)
-    m_list->setFocus();
-  else
-    m_entry->setFocus();
+
+  SETTINGS
+
+  settings.beginGroup("HeadSearch");
+  m_heads->readConfiguration(settings);
+  settings.endGroup();
 }
+/*
 GraphicsEntry * HeadSearchWidget::getEntry() {
   return m_entry;
 }
+*/
 int HeadSearchWidget::count() {
   return m_list->rowCount();
 }
-void HeadSearchWidget::itemChanged(QTableWidgetItem * /*item */) {
-}
-void HeadSearchWidget::viewedItemChanged(QTableWidgetItem * item,QTableWidgetItem * /* prev */) {
+/*
+void HeadSearchWidget::viewedItemChanged(QTableWidgetItem * item,QTableWidgetItem * prev) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
 
   item = item->tableWidget()->item(item->row(),NODE_COLUMN);
   QString node = item->text();
   QLOG_DEBUG() << Q_FUNC_INFO << node;
   m_nodeQuery.bindValue(0,node);
   m_nodeQuery.exec();
-  /// missing node
+
   if ( ! m_nodeQuery.first()) {
     QLOG_WARN() << "No record for node" << node;
     return;
   }
-  /// TODO make this a QSettings option or dialog option
+
   Place np;
   np.setNode(node);
-  //  np.setNodeOnly(true);
-  Place p = m_entry->getXmlForRoot(np);
-  //  if (p.isValid()) {
-  //    m_entry->highlight(m_target);
-  //  }
-  //  else {
-  //    QLOG_DEBUG() << "Invalid place returned for node" << node;
-  //  }
 }
-void HeadSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
-  /// get the node
+*/
+void HeadSearchWidget::onItemDoubleClicked(QTableWidgetItem * item) {
   QLOG_DEBUG() << Q_FUNC_INFO << "row" << item->row();
-  item = item->tableWidget()->item(item->row(),NODE_COLUMN);
+  QTableWidgetItem * nodeItem = m_heads->item(item->row(),NODE_COLUMN);
+  if (nodeItem) {
+    this->showNode(nodeItem->text());
+  }
+  /*
   QString node = item->text();
   m_nodeQuery.bindValue(0,node);
   m_nodeQuery.exec();
-  /// missing node
+
   if ( ! m_nodeQuery.first()) {
     QLOG_WARN() << "No record for node" << node;
     return;
@@ -166,6 +140,17 @@ void HeadSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   else {
     QLOG_DEBUG() << "Invalid place returned for node" << node;
   }
+  */
+}
+void HeadSearchWidget::onCellDoubleClicked(int row,int /* col */) {
+  QLOG_DEBUG() << Q_FUNC_INFO << "row";
+  QTableWidgetItem * nodeItem = m_heads->item(row,NODE_COLUMN);
+  if (nodeItem) {
+    this->showNode(nodeItem->text());
+  }
+}
+void HeadSearchWidget::showNode(const QString & node) {
+  QLOG_DEBUG() << Q_FUNC_INFO << node;
 }
 bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
 
@@ -215,9 +200,11 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
       break;
     }
     case Qt::Key_Tab: {
+      qDebug() << ">>>>> TAB";
       QTableWidget *e = qobject_cast<QTableWidget *>(target);
       if ( e) {
-        m_entry->setFocus();
+        //        m_entry->setFocus();
+        return true;
       }
       break;
     }
@@ -239,6 +226,7 @@ bool HeadSearchWidget::eventFilter(QObject * target,QEvent * event) {
   return QWidget::eventFilter(target,event);
 }
 void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions & options) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QRegExp rx;
 
   QRegExp rxclass(m_diacritics);
@@ -248,43 +236,30 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   bool replaceSearch = true;
   m_target = target;
   m_searchOptions = options;
-  QString sql(SQL_FIND_ENTRY_HEADWORD);
 
   rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   m_currentRx = rx;
 
   bool ok = true;
-  if (m_query.prepare(sql)) {
-    if (! m_nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE)) {
-      QLOG_WARN() << QString(tr("SQL Error on %1: %2"))
-        .arg("SQL_FIND_ENTRY_BY_NODE")
-        .arg(m_nodeQuery.lastError().text());
-      ok = false;
-    }
-  }
-  else {
-      QLOG_WARN() << QString(tr("SQL Error on %1: %2"))
-        .arg("SQL_FIND_ENTRY_HEADWORD")
+  if (! m_query.prepare(SQL_ALL_ENTRIES)) {
+      QLOG_WARN() << QString(tr("SQL prepare error %1: %2"))
+        .arg("SQL_ALL_ENTRIES")
         .arg(m_query.lastError().text());
-      ok = false;
-   }
-  if (! ok ) {
      return;
   }
-  m_list->setRowCount(0);
 
-  if (m_debug) {
-    m_list->showColumn(NODE_COLUMN);
-  }
-  else {
-    m_list->hideColumn(NODE_COLUMN);
-  }
+  m_list->clearContents();
+  m_heads->clearContents();
 
   m_query.exec();
   QTableWidgetItem * item;
   int count = 0;
-  /// TODO get count of entry items instead of hard coding 48000
+  QEventLoop ep;
+
   QProgressDialog *  pd = new QProgressDialog(tr("Searching..."), tr("Cancel"), 0,48000, getApp());
+#ifdef __APPLE__
+  m_progress->setStyle(QStyleFactory::create("Fusion"));
+#endif
   connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
   pd->setWindowModality(Qt::WindowModal);
   pd->show();
@@ -292,12 +267,16 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   QString node;
   QString word;
   QString headword;
+  Place p;
+  QLabel * label;
   int page;
+
+
   while(m_query.next() & ! m_cancelSearch) {
     count++;
-    node = m_query.value("nodeid").toString();
-    page = m_query.value("page").toInt();
-    headword = word = m_query.value("headword").toString();
+    headword = m_query.value("headword").toString();
+    word = m_query.value("word").toString();
+
     /// strip diacritics if required
     if (options.getSearchType() == SearchOptions::Normal) {
       if (replaceSearch) {
@@ -305,10 +284,35 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
           word =  word.replace(rxclass,QString());
       }
     }
+
     if (word.indexOf(rx) != -1) {
+      p = Place::fromEntryRecord(m_query.record());
+      node = m_query.value("nodeid").toString();
+      page = m_query.value("page").toInt();
       int row = m_list->rowCount();
       m_list->insertRow(row);
+      m_heads->insertRow(row);
+
+
       m_list->setCellWidget(row,SELECT_COLUMN,new CheckBoxTableItem);
+      m_heads->setCellWidget(row,SELECT_COLUMN,new CheckBoxTableItem);
+
+      label = m_heads->createLabel(p.m_root,"headsearchlist");
+      label->setAlignment(Qt::AlignCenter);
+      m_heads->setCellWidget(row,ROOT_COLUMN,label);
+
+      label = m_heads->createLabel(headword,"headsearchlist");
+      label->setAlignment(Qt::AlignCenter);
+      m_heads->setCellWidget(row,HEAD_COLUMN,label);
+
+      label = m_heads->createLabel(p.m_word,"headsearchlist");
+      label->setAlignment(Qt::AlignCenter);
+      m_heads->setCellWidget(row,ENTRY_COLUMN,label);
+
+      label = m_heads->createLabel(p.format("%V/%P"));
+      label->setAlignment(Qt::AlignCenter);
+      m_heads->setCellWidget(row,VOL_COLUMN,label);
+
 
       item = new QTableWidgetItem(m_query.value("root").toString());
       item->setFont(m_resultsFont);
@@ -320,9 +324,13 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
       item->setFont(m_resultsFont);
       m_list->setItem(row,ENTRY_COLUMN,item);
 
-      item = new QTableWidgetItem(node);
+      item = new QTableWidgetItem(p.node());
       item->setFlags(item->flags() ^ Qt::ItemIsEditable);
       m_list->setItem(row,NODE_COLUMN,item);
+
+      item = new QTableWidgetItem(p.node());
+      item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+      m_heads->setItem(row,NODE_COLUMN,item);
 
       int vol = Place::volume(page);
       if (vol > 0) {
@@ -335,22 +343,27 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
     }
     if ((count % m_stepCount) == 0) {
       pd->setValue(count);
+      ep.processEvents();
     }
   }
-  QString ar = getLexicon()->spanArabic(m_target,"searchresult");
+  qDebug() << "searched records" << count;
+  qDebug() << "head count" << m_heads->rowCount();
+
+  QString ar = getLexicon()->spanArabic(m_target,"headsearchresults");
   /// need the <body> otherwise it's treated as plain text
-  QString html =  QString(tr("<body><p>Search for:%1</p></body>")).arg(ar);
+  QString html =  QString(tr("<html><body><p>Search for:%1</p></body></html>")).arg(ar);
+
+  m_heads->resizeColumnToContents(SELECT_COLUMN);
   m_searchTitle->setText(html);
   m_searchTitle->show();
   m_resultsText->setText(this->buildText(options));
   m_resultsText->show();
 
-  if (m_list->rowCount() > 0) {
-    m_convertButton->show();
-    m_list->selectRow(0);
-    m_list->setFocus();
-    m_list->adjustSize();
-    m_list->itemDoubleClicked(m_list->item(0,NODE_COLUMN));
+  if (m_heads->rowCount() > 0) {
+    //    m_convertButton->show();
+    m_heads->selectRow(0);
+    //    m_list->setFocus();
+    //    m_list->adjustSize();
     m_exportButton->setEnabled(true);
     m_exportButton->setVisible(true);
   }
@@ -361,22 +374,9 @@ void HeadSearchWidget::search(const QString & searchtarget,const SearchOptions &
   delete pd;
 
 }
-void HeadSearchWidget::showFirst() {
-  if (m_list->rowCount() > 0) {
-    QTableWidgetItem * item = m_list->item(0,ROOT_COLUMN);
-    this->viewedItemChanged(item,0);
-    QFocusEvent * e = new QFocusEvent(QEvent::FocusOut);
-    QApplication::postEvent(m_list,e);
-    //    m_list->selectRow(0);
-    //    m_list->setFocus();
 
-  }
-  if (m_focusTable)
-    m_list->setFocus();
-
-  return;
-}
 QString HeadSearchWidget::buildText(const SearchOptions & options) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   QString t;
   QString p1;
   QString p2;
@@ -386,7 +386,7 @@ QString HeadSearchWidget::buildText(const SearchOptions & options) {
   QString targetText;
   if (options.getSearchType() != SearchOptions::Regex) {
     if (UcdScripts::isScript(m_target,"Arabic")) {
-      targetText = getLexicon()->spanArabic(m_target,"searchresults");
+      targetText = getLexicon()->spanArabic(m_target,"headsearchresults");
   }
     else {
       targetText = m_target;
@@ -475,13 +475,17 @@ void HeadSearchWidget::readSettings() {
 
 }
 void HeadSearchWidget::onRemoveResults() {
+  /*
   Place p = m_entry->getPlace();
   QLOG_DEBUG() << Q_FUNC_INFO << p;
   emit(deleteSearch());
+  */
 }
+/*
 Place HeadSearchWidget::getPlace() {
   return m_entry->getPlace();
 }
+*/
 void HeadSearchWidget::onExport() {
   m_list->exportResults();
 }

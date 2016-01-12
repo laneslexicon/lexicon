@@ -9,6 +9,7 @@
 #define SQL_FIND_ENTRY_FOR_ROOT "select root,broot,word,bword,xml,page,itype,nodeid,supplement,headword from entry where datasource = 1  and root = ? order by nodenum"
 #define SQL_QUASI_FIND_BY_WORD "select quasi from root where word = ? and datasource = 1"
 #define SQL_ROOT_FOR_PAGE "select root,broot,word,bword,xml,page,itype,nodeid,supplement from entry where datasource = 1 and page = ? order by nodenum asc"
+#define SQL_ALL_ENTRIES "select * from entry where datasource = 1 order by nodenum asc"
 #define SQL_FIND_VERSION "select createversion,createdate,xmlversion,dbid from lexicon"
 
 #define SQL_FIND_NODE_FOR_LINK "select id,fromnode,tonode,link from links where datasource = 1 and orthid = ?"

@@ -9,6 +9,7 @@
 #include <QHeaderView>
 #include <QSettings>
 #include <QLabel>
+#include <QMessageBox>
 /*************************************************************************/
 /* QStringList cols;                                                     */
 /* cols << "One" << "Two" << "Three";                                    */
@@ -30,13 +31,16 @@ class ColumnarTableWidget : public QTableWidget {
   void setSaveConfiguration(bool v);
   void setDefaultWidth(int);
   void showEmpty(const QString &);
+  void setMarkColumn(int);
   enum { DEFAULT_WIDTH, COLUMN_WIDTHS,STATE };
   virtual void readConfiguration(QSettings &);
   virtual void writeConfiguration();
   virtual QLabel * createLabel(const QString &,const QString & style = QString()) const;
+  QString exportResults() const;
  private slots:
     void onColumnDialog(int);
  private:
+    QString removeSpan(const QString &) const;
     bool startsWithArabic(const QString &) const;
     QStringList m_colHeadings;
     QString m_defaultWidthKey;
@@ -46,5 +50,6 @@ class ColumnarTableWidget : public QTableWidget {
     QSettings * m_settings;
     int m_defaultWidth;
     bool m_saveConfig;
+    int m_markColumn;
 };
 #endif

@@ -185,6 +185,7 @@ They should not be translated.
 #define SID_HEADSEARCH_TYPE_REGEX              "Regex"
 #define SID_HEADSEARCH_FORCE                   "Force LTR"
 #define SID_HEADSEARCH_SINGLE_CLICK            "Single click to activate"
+#define SID_HEADSEARCH_STATE                   "State"
 
 #define SID_LOCALSEARCH_SHOW_ALL               "Show all results"
 #define SID_LOCALSEARCH_DIACRITICS             "Ignore diacritics"

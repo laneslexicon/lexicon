@@ -2,6 +2,8 @@
 #include "columnartablewidget.h"
 #include "columnselectdialog.h"
 #include "QsLog.h"
+#include "exportsearchdialog.h"
+#include "centeredcheckbox.h"
 ColumnarTableWidget::ColumnarTableWidget(const QStringList & headers,QWidget * parent) : QTableWidget(parent) {
   m_settings = 0;
   m_saveConfig = true;
@@ -10,6 +12,7 @@ ColumnarTableWidget::ColumnarTableWidget(const QStringList & headers,QWidget * p
   m_columnWidthsKey = "Column widths";
   m_stateKey = "Column state";
   m_defaultWidth = -1;
+  m_markColumn = -1;
   setRowCount(0);
   setColumnCount(m_colHeadings.size());
   setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -158,4 +161,89 @@ void ColumnarTableWidget::showEmpty(const QString & text) {
   label->setAlignment(Qt::AlignCenter);
   this->setCellWidget(0,0,label);
   m_saveConfig = false;
+}
+QString ColumnarTableWidget::exportResults() const {
+  QStringList columns;
+
+  for(int i=0;i < this->columnCount();i++) {
+    QString s = this->horizontalHeaderItem(i)->text();
+    if (! s.isEmpty()) {
+      columns << s;
+    }
+  }
+  ExportSearchDialog dlg(columns);
+  if (dlg.exec() != QDialog::Accepted) {
+    return QString();
+  }
+  if (dlg.saveSettings()) {
+    dlg.writeSettings();
+  }
+  QString exportFileName = dlg.exportFileName();
+  QFile file(exportFileName);
+  if (! file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    QString err = QString(tr("Error opening export file to %1 : %2")).arg(exportFileName).arg(file.errorString());
+    QLOG_WARN() << err;
+    QMessageBox::warning(0, tr("Export Search Results"),err);
+    return QString();
+  }
+  if (exportFileName.isEmpty()) {
+    return QString();
+  }
+  QString sep = dlg.separator();
+  columns = dlg.columns();
+  QTextStream out(&file);
+  out.setCodec("UTF-8");
+
+  out << columns.join(sep) << endl;
+
+  QList<int> cols;
+  for(int i=0;i < this->columnCount();i++) {
+    QString s = this->horizontalHeaderItem(i)->text();
+    if (! s.isEmpty() && columns.contains(s)) {
+        cols << i;
+    }
+  }
+  bool markedRowsOnly = dlg.markedRows();
+  int rowCount = this->rowCount();
+  bool ok;
+  int writeCount = 0;
+  for(int i=0;i < rowCount;i++) {
+    ok = false;
+    if (! markedRowsOnly || (m_markColumn == -1)) {
+      ok = true;
+    }
+    else {
+      CenteredCheckBox * m = qobject_cast<CenteredCheckBox *>(this->cellWidget(i,m_markColumn));
+      if (m && m->isChecked()) {
+        ok = true;
+      }
+    }
+    if (ok) {
+      for(int j=0;j < cols.size();j++) {
+        QTableWidgetItem * item = this->item(i,cols[j]);
+        if (! item ) {
+          QLabel * l = qobject_cast<QLabel *>(this->cellWidget(i,cols[j]));
+          if (l) {
+            out << removeSpan(l->text()) << sep;
+          }
+        }
+        else {
+          out << removeSpan(item->text()) << sep;
+        }
+      }
+      out << endl;
+      writeCount++;
+    }
+  }
+  file.close();
+  return QString(tr("Exported search results to file: %1 (%2 lines)")).arg(exportFileName).arg(writeCount);;
+}
+QString ColumnarTableWidget::removeSpan(const QString & str) const {
+  QString t = str;
+  t.remove(QRegularExpression("<span[^>]+>"));
+  t.remove(QRegularExpression("</span>"));
+  return t;
+}
+void ColumnarTableWidget::setMarkColumn(int col) {
+  m_markColumn = col;
 }

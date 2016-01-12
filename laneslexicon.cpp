@@ -1851,27 +1851,6 @@ void LanesLexicon::onTest() {
   }
   }
   if (0) {
-    HeadSearchWidget * w = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
-    if (w) {
-      Place p = w->getEntry()->getPlace();
-      if (p.isValid()) {
-        int ix = m_tabs->currentIndex();
-        this->onCloseTab(ix);
-        GraphicsEntry * entry = new GraphicsEntry(this);
-        setSignals(entry);
-        entry->installEventFilter(this);
-        entry->getView()->installEventFilter(this);
-
-        entry->getXmlForRoot(p);
-        m_tabs->insertTab(ix,entry,p.getShortText());
-        m_tabs->setCurrentIndex(ix);
-      }
-      else {
-        QLOG_DEBUG() << "could not clone graphcicsentry";
-      }
-    }
-  }
-  if (0) {
     Place p = m_tree->getCurrentPlace();
     QLOG_DEBUG() << QString("Root %1, Word %2 , Node %3, Supplement %4")
       .arg(p.getRoot())
@@ -3276,8 +3255,6 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       if (options.activateTab()) {
         m_tabs->setCurrentIndex(ix);
       }
-      setSignals(s->getEntry());
-      s->showFirst();
       if (options.newTab() && ! options.activateTab()) {
         s->setFocus(Qt::OtherFocusReason);
       }
@@ -3429,12 +3406,14 @@ void LanesLexicon::pageClear() {
     m_clearAction->setEnabled(false);
     return;
   }
+  /*
   HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
   if (results) {
     results->getEntry()->clearHighlights();
     m_clearAction->setEnabled(false);
     return;
   }
+  */
 
 
 }
@@ -3559,6 +3538,7 @@ int LanesLexicon::getSearchCount() {
 void LanesLexicon::convertToEntry() {
   HeadSearchWidget * w = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
   if (w) {
+    /*
     Place p = w->getEntry()->getPlace();
     if (p.isValid()) {
       int ix = m_tabs->currentIndex();
@@ -3576,6 +3556,7 @@ void LanesLexicon::convertToEntry() {
     else {
 
     }
+    */
   }
 }
 /**
@@ -3666,9 +3647,8 @@ QMapIterator<QString,QString> LanesLexicon::getMapIterator() {
   return iter;
 }
 void LanesLexicon::deleteSearch() {
-  //  if (! p.isValid()) {
-  //    return;
-  //  }
+  /*
+  DELETE THIS
   Place p;
   int currentTab = m_tabs->currentIndex();
   HeadSearchWidget * searchwidget = qobject_cast<HeadSearchWidget *>(m_tabs->widget(currentTab));
@@ -3689,7 +3669,7 @@ void LanesLexicon::deleteSearch() {
   m_tabs->setCurrentIndex(currentTab);
   entry->home();
   return;
-
+  */
 }
 void LanesLexicon::localSearch() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());

@@ -26,6 +26,7 @@
 class GraphicsEntry;
 class FocusTable;
 class Place;
+class ColumnarTableWidget;
 class HeadSearchWidget : public QWidget
 {
     Q_OBJECT
@@ -33,17 +34,18 @@ class HeadSearchWidget : public QWidget
  public:
     //    HeadSearchWidget(const QString & str,const SearchOptions &,QWidget * parent = 0);
     HeadSearchWidget(QWidget * parent = 0);
-    Place getPlace();
-    GraphicsEntry * getEntry();
+    //    Place getPlace();
+    //    GraphicsEntry * getEntry();
     int count();
    void search(const QString &,const SearchOptions &);
-   void showFirst();
+   //   void showFirst();
    void focusTable();
+   void showNode(const QString &);
  public slots:
    void cancelSearch();
-   void viewedItemChanged(QTableWidgetItem *,QTableWidgetItem *);
-   void itemChanged(QTableWidgetItem *);
-   void itemDoubleClicked(QTableWidgetItem *);
+   //   void viewedItemChanged(QTableWidgetItem *,QTableWidgetItem *);
+   void onItemDoubleClicked(QTableWidgetItem *);
+   void onCellDoubleClicked(int,int);
    void onRemoveResults();
    void onExport();
    void selectFocus();
@@ -67,6 +69,7 @@ class HeadSearchWidget : public QWidget
    QString m_target;
    QLabel * m_resultsText;
    FocusTable * m_list;
+   ColumnarTableWidget * m_heads;
    GraphicsEntry * m_entry;
 /// for Arabic font from QSettings
    QFont m_resultsFont;
@@ -74,7 +77,7 @@ class HeadSearchWidget : public QWidget
    bool m_cancelSearch;
    bool m_debug;
    bool m_verticalLayout;
-   QPushButton * m_convertButton;
+   //   QPushButton * m_convertButton;
    QPushButton * m_exportButton;
  signals:
    void searchResult(const QString &);
