@@ -255,11 +255,11 @@ bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
     case Qt::Key_Return:
     case Qt::Key_Space: {
       //        if (keyEvent->modifiers() && Qt::ControlModifier) {
-      int currentRow = m_rxlist->currentRow();
-      QTableWidgetItem * item = m_rxlist->item(currentRow,NODE_COLUMN);
-      if (item)
-        m_rxlist->itemDoubleClicked(item);
-
+      //      int currentRow = m_rxlist->currentRow();
+      //      QTableWidgetItem * item = m_rxlist->item(currentRow,NODE_COLUMN);
+      //      if (item)
+      //        m_rxlist->itemDoubleClicked(item);
+      this->onCellDoubleClicked(m_rxlist->currentRow(),NODE_COLUMN);
       break;
     }
     case Qt::Key_E: {
