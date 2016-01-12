@@ -162,16 +162,18 @@ void ColumnarTableWidget::showEmpty(const QString & text) {
   this->setCellWidget(0,0,label);
   m_saveConfig = false;
 }
-QString ColumnarTableWidget::exportResults() const {
+QString ColumnarTableWidget::exportResults(const QString & key) const {
   QStringList columns;
 
   for(int i=0;i < this->columnCount();i++) {
     QString s = this->horizontalHeaderItem(i)->text();
-    if (! s.isEmpty()) {
-      columns << s;
+    if (i != m_markColumn) {
+      if (! s.isEmpty()) {
+        columns << s;
+      }
     }
   }
-  ExportSearchDialog dlg(columns);
+  ExportSearchDialog dlg(columns,key);
   if (dlg.exec() != QDialog::Accepted) {
     return QString();
   }
