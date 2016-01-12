@@ -158,7 +158,7 @@ class Place    {
 
   void setHead(const QString &);
   QString getHead() const { return m_head;}
-
+  QString head() const { return m_head;}
 
   void setWhen(const QString & t) {
     m_when = QDateTime::fromString(t);
