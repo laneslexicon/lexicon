@@ -119,3 +119,9 @@ void NodeInfo::setHeader(const QString & root,const QString & head,const QString
     m_vlabel->setText(QString("(v%1/%2)").arg(Place::volume(page)).arg(page));
   }
 }
+void NodeInfo::setHeader(const Place & p) {
+  m_rlabel->setText(getLexicon()->spanArabic(p.root(),"nodeview"));
+  m_hlabel->setText(getLexicon()->spanArabic(p.head(),"nodeview"));
+  m_node = p.node();
+  m_vlabel->setText(p.format("v%V/%P"));
+}
