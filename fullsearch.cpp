@@ -825,8 +825,7 @@ int FullSearchWidget::getMaxRecords(const QString & table) {
 bool FullSearchWidget::readCssFromFile(const QString & name) {
   QFile f(name);
   if (! f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    QLOG_WARN()  << "Cannot open CSS file for reading: " << name
-                 << f.errorString();
+    QLOG_WARN()  << QString(tr("Error reading CSS file :%1, error: %2 ")).arg(name).arg(f.errorString());
     return false;
 
   }
