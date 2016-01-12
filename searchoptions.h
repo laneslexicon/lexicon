@@ -4,6 +4,7 @@
 class SearchOptions {
  public:
   enum SearchType_t { Normal, Regex };
+  /// Word == HeadSearch , Entry == FullSearch
   enum SearchScope_t { Unknown, Root , Entry, Word, Local, Node, Page };
   SearchOptions();
   bool ignoreDiacritics() const;
@@ -39,6 +40,9 @@ class SearchOptions {
   bool ignoreCase() const;
   void setIgnoreCase(bool);
 
+  bool headPhrase() const;
+  void setHeadPhrase(bool);
+
   QString pattern() const;
   void setPattern(const QString &);
 
@@ -57,5 +61,6 @@ class SearchOptions {
   bool m_activateTab;
   bool m_ignoreCase;
   QString m_pattern;
+  bool m_headPhrase;
 };
 #endif

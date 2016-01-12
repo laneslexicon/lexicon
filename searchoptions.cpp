@@ -94,3 +94,9 @@ QString SearchOptions::pattern() const {
 void SearchOptions::setPattern(const QString & str) {
   m_pattern = str;
 }
+void SearchOptions::setHeadPhrase(bool v) {
+  m_headPhrase = v;
+}
+bool SearchOptions::headPhrase() const {
+  return m_headPhrase;
+}
