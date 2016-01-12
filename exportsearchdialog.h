@@ -18,7 +18,7 @@ class ExportSearchDialog : public QDialog {
   Q_OBJECT
 
  public:
-  ExportSearchDialog(const QStringList & columns,QWidget * parent = 0);
+  ExportSearchDialog(const QStringList & columns,const QString & columnKey = QString(),QWidget * parent = 0);
   QString separator() const;
   QString exportFileName() const;
   QStringList columns() const;
@@ -28,6 +28,7 @@ class ExportSearchDialog : public QDialog {
    void onFileSelect();
   void readSettings();
   void writeSettings();
+  void setColumnKey(const QString &);
  protected:
    QSize sizeHint() const;
  private:
@@ -42,5 +43,6 @@ class ExportSearchDialog : public QDialog {
   QLineEdit * m_charSeparator;
   QCheckBox * m_saveSettings;
   QLineEdit * m_fileName;
+  QString   m_columnKey;
 };
 #endif

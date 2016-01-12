@@ -2,9 +2,16 @@
 #include "application.h"
 #include "externs.h"
 #include "definedsettings.h"
-ExportSearchDialog::ExportSearchDialog(const QStringList & columns,QWidget * parent) : QDialog(parent) {
+ExportSearchDialog::ExportSearchDialog(const QStringList & columns,const QString & columnKey,QWidget * parent) : QDialog(parent) {
   setWindowTitle(tr("Export Options"));
   m_columnLabels = columns;
+  /// settings key to get list of required columns
+  if (columnKey.isEmpty()) {
+    m_columnKey = SID_EXPORT_SEARCH_COLUMNS;
+  }
+  else {
+    m_columnKey = columnKey;
+  }
   QVBoxLayout * layout = new QVBoxLayout;
   QGroupBox * columnbox = new QGroupBox(tr("Select columns to export"));
   QFormLayout * columnlayout = new QFormLayout;
@@ -120,15 +127,15 @@ void ExportSearchDialog::readSettings() {
   SETTINGS
 
   settings.beginGroup("Export Search");
-  QStringList columns = settings.value(SID_EXPORT_SEARCH_COLUMNS,QStringList()).toStringList();
+  QStringList columns = settings.value(m_columnKey,QStringList()).toStringList();
   for (int i=0;i < columns.size();i++) {
     int ix = m_columnLabels.indexOf(columns[i]);
     if ((ix >= 0) && (ix < m_columns.size())) {
-      m_columns[i]->setChecked(true);
+      m_columns[ix]->setChecked(true);
     }
   }
   QString s = settings.value(SID_EXPORT_SEARCH_SEPARATOR,"\t").toString();
-  qDebug() << QString("One%1Two").arg(s);
+
   if (s == QString("\t")) {
     m_tabSeparator->setChecked(true);
   }
@@ -161,7 +168,7 @@ void ExportSearchDialog::writeSettings() {
       columns << m_columnLabels[i];
     }
   }
-  settings.setValue(SID_EXPORT_SEARCH_COLUMNS,columns);
+  settings.setValue(m_columnKey,columns);
   settings.setValue(SID_EXPORT_SEARCH_ROWS,m_allRows->isChecked());
   settings.setValue(SID_EXPORT_SEARCH_FILENAME,m_fileName->text());
   settings.setValue(SID_EXPORT_SEARCH_SEPARATOR,this->separator());
@@ -184,4 +191,7 @@ QStringList ExportSearchDialog::columns() const {
     }
   }
   return columns;
+}
+void ExportSearchDialog::setColumnKey(const QString & str) {
+  m_columnKey = str;
 }
