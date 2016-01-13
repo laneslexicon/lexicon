@@ -100,9 +100,7 @@ NoteBrowser::NoteBrowser(QWidget * parent) : QWidget(parent) {
 
 void NoteBrowser::loadNotes() {
   NoteMaster * notes = ::getNotes();
-  qDebug() << ">>>>>>>>>>>>>>>> count before clear" << m_list->rowCount();
   m_list->clearContents();
-  qDebug() << ">>>>>>>>>>>>>>>> count after clear" << m_list->rowCount();
   m_list->setRowCount(0);
 
   QTableWidgetItem * item;
@@ -401,7 +399,7 @@ void NoteBrowser::readSettings() {
   settings.endGroup();
 
   settings.beginGroup("XSLT");
-  m_xsltSource = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
+  m_xsltSource = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
   m_xsltSource = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_xsltSource);
   settings.endGroup();
 
