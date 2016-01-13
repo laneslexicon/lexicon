@@ -1628,8 +1628,10 @@ void GraphicsEntry::showHtml() {
   d.exec();
 }
 void GraphicsEntry::updateCurrentPlace(const Place &  p ) {
-  m_place = p;
-  emit(placeChanged(p));
+  if (p.node() != m_place.node()) {
+    m_place = p;
+    emit(placeChanged(p));
+  }
 }
 /**
  *
