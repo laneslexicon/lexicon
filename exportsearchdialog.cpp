@@ -180,8 +180,8 @@ void ExportSearchDialog::writeSettings() {
 bool ExportSearchDialog::saveSettings() const {
   return m_saveSettings->isChecked();
 }
-bool ExportSearchDialog::markedRows() const {
-  return m_markedRows->isChecked();
+bool ExportSearchDialog::allRows() const {
+  return m_allRows->isChecked();
 }
 QStringList ExportSearchDialog::columns() const {
   QStringList columns;

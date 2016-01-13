@@ -22,7 +22,7 @@ class ExportSearchDialog : public QDialog {
   QString separator() const;
   QString exportFileName() const;
   QStringList columns() const;
-  bool markedRows() const;
+  bool allRows() const;
   bool saveSettings() const;
   public slots:
    void onFileSelect();
