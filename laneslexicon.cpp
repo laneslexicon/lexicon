@@ -3188,6 +3188,7 @@ void LanesLexicon::searchForRoot() {
   m_rootSearchDialog->hideKeyboard();
 }
 int LanesLexicon::addTab(bool create,QWidget * w,const QString & title) {
+  QLOG_DEBUG() << Q_FUNC_INFO << create << title;
   int ix = m_tabs->currentIndex();
   if (create) {
     if (m_tabStyle == LanesLexicon::AppendTab) {

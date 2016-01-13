@@ -2615,7 +2615,6 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
         qDebug() << nxml;
 
         item->setXml(this->wrapEntry(nodefind.record(),nxml));
-        qDebug() << item->getXml();
         QSqlDatabase::database().commit();
         statusMessage(QString(tr("Updated link details")));
         if (reload) {

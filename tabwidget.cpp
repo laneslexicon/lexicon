@@ -66,8 +66,7 @@ void TabWidget::onTabBarDoubleClicked(int ix) {
   if ( entry) {
     entry->setUserTitle(text);
   }
-     QLOG_DEBUG() << Q_FUNC_INFO << ix << text;
-      this->setTabText(ix,text);
+  this->setTabText(ix,text);
 }
 void TabWidget::tabRemoved(int index) {
   QTabWidget::tabRemoved(index);
