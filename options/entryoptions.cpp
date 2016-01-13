@@ -65,7 +65,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_css = new QLineEdit ;
   m_printCss = new QLineEdit ;
   m_entryXslt = new QLineEdit ;
-  m_nodeXslt = new QLineEdit ;
+  //  m_nodeXslt = new QLineEdit ;
   m_clean = new QLineEdit ;
   m_find = new QLineEdit ;
   m_findNext = new QLineEdit ;
@@ -208,7 +208,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   csslayout->addRow(tr("Stylesheet"),m_css);
   csslayout->addRow(tr("Print stylesheet"),m_printCss);
   csslayout->addRow(tr("XSLT"),m_entryXslt);
-  csslayout->addRow(tr("Node XSLT"),m_nodeXslt);
+  //  csslayout->addRow(tr("Node XSLT"),m_nodeXslt);
   cssbox->setLayout(csslayout);
 
   QGroupBox * otherbox = new QGroupBox(tr("Other"));
@@ -251,6 +251,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   vlayout->addWidget(cssbox);
   vlayout->addWidget(otherbox);
   vlayout->addStretch();
+
   setLayout(vlayout);
   addButtons();
   readSettings();
@@ -272,10 +273,10 @@ void EntryOptions::readSettings() {
   //  v = QDir::current().relativeFilePath(v);
   m_entryXslt->setText(v);
 
-  v = settings.value(SID_XSLT_NODE).toString();
+  //  v = settings.value(SID_XSLT_NODE).toString();
   //  v = getLexicon()->getResourceFilePath(Lexicon::XSLT,v);
   //  v = QDir::current().relativeFilePath(v);
-  m_nodeXslt->setText(v);
+  //  m_nodeXslt->setText(v);
   settings.endGroup();
   settings.beginGroup(m_section);
   m_css->setText(settings.value(SID_ENTRY_CSS).toString());
@@ -368,7 +369,7 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.endGroup();
   settings.beginGroup("XSLT");
   settings.setValue(SID_XSLT_ENTRY,m_entryXslt->text());
-  settings.setValue(SID_XSLT_NODE,m_nodeXslt->text());
+  //  settings.setValue(SID_XSLT_NODE,m_nodeXslt->text());
 
   settings.sync();
   m_dirty = false;
@@ -505,9 +506,11 @@ bool EntryOptions::isModified()  {
   if (compare(&settings,SID_XSLT_ENTRY,m_entryXslt)) {
     m_dirty = true;
   }
+  /*
   if (compare(&settings,SID_XSLT_NODE,m_nodeXslt)) {
     m_dirty = true;
   }
+  */
 
   return m_dirty;
 }
