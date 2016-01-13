@@ -183,32 +183,6 @@ void GraphicsEntry::readSettings() {
   settings.endGroup();
 
   m_entryXslt = getXsltFileName();
-  settings.beginGroup("XSLT");
-  m_nodeXslt = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
-  if (m_nodeXslt.isEmpty()) {
-    m_nodeXslt = "node.xslt";
-  }
-  QString nodePath = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_nodeXslt);
-
-  if (nodePath.startsWith("Error:")) {
-    QStringList errors = nodePath.split(":");
-    QString msg;
-    if (errors.size() >= 2) {
-
-      msg = QString(tr("<p>Cannot find file: %1</p> \
-                        <p>Directory is:%2</p> \
-                        <p>Please review Preferences -> Layout</p>")).arg(errors[2]).arg(errors[1]);
-    }
-    else {
-      msg = QString(tr("Cannot find file: %1")).arg(m_nodeXslt);
-    }
-    QMessageBox::warning(this,tr("Missing node XSLT file"),msg,QMessageBox::Ok);
-    QLOG_WARN() << QString(tr("Missing node XSLT file: %1")).arg(m_nodeXslt);
-  }
-  else {
-    m_nodeXslt = nodePath;
-  }
-  settings.endGroup();
 
   settings.beginGroup("Notes");
   m_notesEnabled = settings.value(SID_NOTES_ENABLED,true).toBool();
@@ -703,11 +677,12 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
   nodeQuery.bindValue(0,node);
   nodeQuery.exec();
   if (nodeQuery.first()) {
-    p.setRoot(nodeQuery.value("root").toString());
-    p.setSupplement(nodeQuery.value("supplement").toInt());
-    p.setWord(nodeQuery.value("word").toString());
-    p.setPage(nodeQuery.value("page").toInt());
-    QString html =    transform(NODE_XSLT,m_nodeXslt,nodeQuery.value("xml").toString());
+    p = Place::fromEntryRecord(nodeQuery.record());
+    //    p.setRoot(nodeQuery.value("root").toString());
+    //    p.setSupplement(nodeQuery.value("supplement").toInt());
+    //    p.setWord(nodeQuery.value("word").toString());
+    //    p.setPage(nodeQuery.value("page").toInt());
+    QString html =    transform(NODE_XSLT,m_entryXslt,nodeQuery.value("xml").toString());
     NodeInfo * info = new NodeInfo(this);
     info->setWindowTitle(tr("Link target"));
     info->setPlace(p);
