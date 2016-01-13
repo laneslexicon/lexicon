@@ -37,7 +37,7 @@ void freeXslt() {
 #endif
 #ifdef USE_LIBXSLT
 static xsltStylesheetPtr cur;
-static xsltStylesheetPtr curNode;
+static xsltStylesheetPtr curNode;    // this is not used any more
 static xsltStylesheetPtr curTest = NULL;
 xmlDocPtr xsltTest = NULL;
 QStringList xmlParseErrors;
@@ -109,8 +109,9 @@ int compileStylesheet(int type,const QString & xsl) {
 QString xsltTransform(int type,const QString & xml) {
   QString result;
   xmlDocPtr doc, res;
-  const char *params[16 + 1];
+  const char * params[16 + 1];
   memset(params,0x00,sizeof(params));
+  int nbparams = 0;
   QByteArray ba = xml.toUtf8();
   doc = xmlParseMemory(ba.data(),ba.size());
   /// if errors in xml they will be xmlParseErrors
@@ -120,20 +121,28 @@ QString xsltTransform(int type,const QString & xml) {
 
   xmlChar * buf;
   int sz;
-
-  switch(type) {
+    switch(type) {
   case ENTRY_XSLT:
   case ENTRY_XSLT_RECOMPILE: {
+    params[nbparams++] = "entrytype";
+    params[nbparams++] = "\"word\"";
+    params[nbparams] = NULL;
     res = xsltApplyStylesheet(cur, doc, params);
     xsltSaveResultToString(&buf,&sz, res,cur);
     break;
   }
   case NODE_XSLT:{
-    res = xsltApplyStylesheet(curNode, doc, params);
+    params[nbparams++] = "entrytype";
+    params[nbparams++] = "\"node\"";
+    res = xsltApplyStylesheet(cur, doc, params);
+    params[nbparams] = NULL;
     xsltSaveResultToString(&buf,&sz, res,curNode);
     break;
   }
   case TEST_XSLT: {
+    params[nbparams++] = "entrytype";
+    params[nbparams++] = "\"word\"";
+    params[nbparams] = NULL;
     res = xsltApplyStylesheet(curTest, doc, params);
     xsltSaveResultToString(&buf,&sz, res,curTest);
     break;
