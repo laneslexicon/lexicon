@@ -1896,8 +1896,14 @@ void GraphicsEntry::focusPlace() {
  * @param item
  */
 void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_view->setFocus();
-  m_view->ensureVisible(item);
+  /// get the y position of the item
+  /// add half the view height so that we are centering on the point that
+  /// makes the top of the item, the top of the view
+  QPointF pos = item->scenePos();
+  pos += QPointF(0,m_view->height()/2);
+  m_view->centerOn(pos);
   m_scene->setFocusItem(item);
   EntryItem * entry = dynamic_cast<EntryItem *>(item);
   if (entry) {
