@@ -267,7 +267,6 @@ void LanesLexicon::showStartupEntry() {
     m_tree->ensurePlaceVisible(p);
   }
   else {
-    /// TODO make sure requested item has focus
     this->currentTabChanged(ix);
   }
 }
@@ -419,6 +418,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
 
   connect(entry,SIGNAL(gotoNode(const Place &,bool,bool)),this,SLOT(showPlace(const Place &,bool,bool)));
   connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
+  connect(entry,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
   connect(entry,SIGNAL(printPage()),this,SLOT(pagePrint()));
   connect(entry,SIGNAL(searchFinished()),this,SLOT(pageSearchComplete()));
   connect(entry,SIGNAL(searchStarted()),this,SLOT(pageSearchStart()));
@@ -3238,10 +3238,13 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
     }
     return;
   }
+  /// head word search
   if (searchType == SearchOptions::Entry) {
       HeadSearchWidget * s = new HeadSearchWidget(this);
       connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
       connect(s,SIGNAL(deleteSearch()),this,SLOT(deleteSearch()));
+      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+
       s->search(target,options);
       if (s->count() == 0) {
         QMessageBox msgBox;
@@ -3421,17 +3424,12 @@ void LanesLexicon::pageClear() {
 void LanesLexicon::currentTabChanged(int ix) {
   QLOG_DEBUG() << Q_FUNC_INFO << ix;
 
-  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
   if ( entry ) {
     Place p = entry->getPlace();
     if (m_linkContents) {
       m_tree->ensurePlaceVisible(p,true);
     }
-    this->enableForPage(true);
-    return;
-  }
-  HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
-  if (results) {
     this->enableForPage(true);
     return;
   }
@@ -3461,7 +3459,7 @@ int LanesLexicon::searchTabs(const QString & node) {
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
     if (entry && entry->hasNode(node)) {
-      statusMessage(QString(tr("Requested entry already available in tab %1")).arg(i + 1));
+      statusMessage(QString(tr("Requested entry already showing in tab %1")).arg(i + 1));
       return i;
     }
   }
@@ -3515,15 +3513,39 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
 
 }
 /**
- * Can be invoked by: NodeView,FullSearchWidget
+ * Can be invoked by: FullSearchWidget,HeadSearchWidget or graphicsentry when view link details
  *
  * @param node
  */
+
+/// TODO find out whether to do background loading
 void LanesLexicon::showSearchNode(const QString & node) {
   QLOG_DEBUG() << Q_FUNC_INFO << node;
+  FullSearchWidget * w = qobject_cast<FullSearchWidget *>(sender());
+  if (w) {
+    QLOG_DEBUG() << ">>>>>>>>>>>>>>>>> fullsearch";
+  }
+  else {
+    HeadSearchWidget * h = qobject_cast<HeadSearchWidget *>(sender());
+    if (h) {
+      QLOG_DEBUG() << ">>>>>>>>>>>>>>>>> headsearch";
+    }
+    else {
+      GraphicsEntry * e = qobject_cast<GraphicsEntry *>(sender());
+      if (e) {
+        QLOG_DEBUG() << ">>>>>>>>>>>>>>>>>>>> link view";
+      }
+    }
+  }
   Place p;
   p.setNode(node);
   showPlace(p,true,false);
+  int ix = this->searchTabs(node);
+  if (ix != -1) {
+    statusMessage(QString(tr("Entry loaded into tab %1")).arg(ix+1));
+    return;
+  }
+
 }
 
 int LanesLexicon::getSearchCount() {
