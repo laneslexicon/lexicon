@@ -4,6 +4,7 @@
 #include "QsLog.h"
 #include "exportsearchdialog.h"
 #include "centeredcheckbox.h"
+#include "focustable.h"
 ColumnarTableWidget::ColumnarTableWidget(const QStringList & headers,QWidget * parent) : QTableWidget(parent) {
   m_settings = 0;
   m_saveConfig = true;
@@ -128,15 +129,6 @@ QLabel * ColumnarTableWidget::createLabel(const QString & text,const QString & s
   else {
     l = new QLabel(str);
   }
-
-  /*
-  if (this->startsWithArabic(str)) {
-    l->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-  }
-  else {
-    l->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-  }
-  */
   return l;
 }
 bool ColumnarTableWidget::startsWithArabic(const QString & t) const {
@@ -205,19 +197,26 @@ QString ColumnarTableWidget::exportResults(const QString & key) const {
         cols << i;
     }
   }
-  bool markedRowsOnly = dlg.markedRows();
+  bool allRows = dlg.allRows();
   int rowCount = this->rowCount();
   bool ok;
   int writeCount = 0;
+
+  if (m_markColumn == -1) {
+    allRows = true;
+  }
   for(int i=0;i < rowCount;i++) {
-    ok = false;
-    if (! markedRowsOnly || (m_markColumn == -1)) {
-      ok = true;
-    }
-    else {
+    ok = true;
+    if (! allRows ) {
       CenteredCheckBox * m = qobject_cast<CenteredCheckBox *>(this->cellWidget(i,m_markColumn));
-      if (m && m->isChecked()) {
-        ok = true;
+      if (m) {
+        ok =  m->isChecked();
+      }
+      else {
+        CheckBoxTableItem * ti = qobject_cast<CheckBoxTableItem *>(this->cellWidget(i,m_markColumn));
+        if (ti) {
+          ok = ti->isChecked();
+        }
       }
     }
     if (ok) {
