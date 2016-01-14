@@ -1667,7 +1667,7 @@ GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool acti
     return NULL;
   }
   int ix = this->searchTabs(p.node());
-  if (ix != -1) {
+  if ((ix != -1) && activateTab) {
     m_tabs->setCurrentIndex(ix);
     entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
     return entry;
