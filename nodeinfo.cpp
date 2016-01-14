@@ -100,11 +100,6 @@ void NodeInfo::reject() {
 void NodeInfo::setPlace(const Place & p) {
   m_place = p;
   this->setHeader(p);
-  //  m_rlabel->setText(p.getRoot());
-  //  m_hlabel->setText(p.getWord());
-  //  m_vlabel->setText(QString("(Vol %1,Page %2)").arg(p.getVol()).arg(p.getPage()));
-  //
-  //  m_node = p.getNode();
 }
 void NodeInfo::setCss(const QString & css) {
   m_css = css;
@@ -128,7 +123,10 @@ void NodeInfo::setHeader(const Place & p) {
   m_rlabel->setText(getLexicon()->spanArabic(p.root(),"nodeview"));
   m_hlabel->setText(getLexicon()->spanArabic(p.word(),"nodeview"));
   m_node = p.node();
-  QString str = QString("%1, Head word: %2").arg(p.format("Vol %V/%P")).arg(p.head());
-  //  m_vlabel->setText(p.format("Vol %V/%P"));
+  QString head;
+  if (p.head() != p.word()) {
+    head = QString(tr(", Head word: %1")).arg(p.head());
+  }
+  QString str = QString("%1%2").arg(p.format("Vol %V/%P")).arg(head);
   m_vlabel->setText(getLexicon()->scanAndStyle(str,"nodeview"));
 }
