@@ -50,7 +50,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   m_regexSearch = new QRadioButton(tr("Regular expression"),m_typeGroup);
   m_ignoreCase = new QCheckBox(tr("Ignore case"));
   /// for head search
-  m_headPhrase = new QCheckBox(tr("Use entry heading"));
+  m_headPhrase = new QCheckBox(tr("Search entry heading"));
   QHBoxLayout * typelayout = new QHBoxLayout;
   typelayout->addWidget(m_normalSearch);
   typelayout->addWidget(m_regexSearch);
