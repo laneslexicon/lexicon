@@ -72,22 +72,11 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_headPhrase = new QCheckBox;
   m_headStep = new QSpinBox;
   this->setControlSize(m_headStep,MEDIUM_EDIT);
-  //  m_headVertical = new QCheckBox;
-  //  m_headFocusTable = new QCheckBox;
   this->setControlSize(m_headStep,MEDIUM_EDIT);
   m_headStep->setSingleStep(25);
   m_nodeinfoClose = new QCheckBox;
-  /*
-  m_headNewTab = new QCheckBox;
-  m_headGoTab = new QCheckBox;
-  m_headWholeWord = new QCheckBox;
-  m_headDiacritics = new QCheckBox;
-  m_headRegex  = new QCheckBox;
-  */
   QFormLayout * headlayout = new QFormLayout;
-  //  headlayout->addRow(tr("Vertical layout"),m_headVertical);
   headlayout->addRow(tr("Step interval"),m_headStep);
-  //  headlayout->addRow(tr("Initial focus on results"),m_headFocusTable);
   headlayout->addRow(tr("Close entry info after load"),m_nodeinfoClose);
   QPushButton * headbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout2 = new QHBoxLayout;
