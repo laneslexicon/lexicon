@@ -72,7 +72,7 @@ void FocusTable::exportResults() {
         cols << i;
     }
   }
-  bool markedRowsOnly = dlg.markedRows();
+  bool markedRowsOnly = ! dlg.allRows();
   int rowCount = this->rowCount();
   bool ok;
   int writeCount = 0;
