@@ -76,7 +76,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   //  m_headFocusTable = new QCheckBox;
   this->setControlSize(m_headStep,MEDIUM_EDIT);
   m_headStep->setSingleStep(25);
-  //  m_headSingleClick = new QCheckBox;
+  m_nodeinfoClose = new QCheckBox;
   /*
   m_headNewTab = new QCheckBox;
   m_headGoTab = new QCheckBox;
@@ -88,7 +88,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   //  headlayout->addRow(tr("Vertical layout"),m_headVertical);
   headlayout->addRow(tr("Step interval"),m_headStep);
   //  headlayout->addRow(tr("Initial focus on results"),m_headFocusTable);
-  //  headlayout->addRow(tr("Single click to activate"),m_headSingleClick);
+  headlayout->addRow(tr("Close entry info after load"),m_nodeinfoClose);
   QPushButton * headbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout2 = new QHBoxLayout;
   setlayout2->addWidget(headbtn);
@@ -185,7 +185,7 @@ void FindOptions::readSettings() {
   // head word search
 
   m_headPhrase->setChecked(settings.value(SID_HEADSEARCH_USE_PHRASE,false).toBool());
-  //  m_headSingleClick->setChecked(settings.value(SID_HEADSEARCH_SINGLE_CLICK,true).toBool());
+  m_nodeinfoClose->setChecked(settings.value(SID_HEADSEARCH_NODEINFO_CLOSE,true).toBool());
   //  m_headVertical->setChecked(settings.value(SID_HEADSEARCH_VERTICAL_LAYOUT,true).toBool());
   //  m_headFocusTable->setChecked(settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool());
   m_headStep->setValue(settings.value(SID_HEADSEARCH_STEP,50).toInt());
@@ -265,8 +265,8 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical->isChecked());
   settings.setValue(SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable->isChecked());
 
-  settings.setValue(SID_HEADSEARCH_SINGLE_CLICK,m_headSingleClick->isChecked());
   */
+  settings.setValue(SID_HEADSEARCH_NODEINFO_CLOSE,m_nodeinfoClose->isChecked());
   settings.setValue(SID_HEADSEARCH_STEP,m_headStep->value());
   settings.setValue(SID_HEADSEARCH_NEW_TAB,m_headNewTab);
   settings.setValue(SID_HEADSEARCH_GO_TAB,m_headGoTab);
@@ -379,10 +379,10 @@ bool FindOptions::isModified()  {
   if (compare(&settings,SID_HEADSEARCH_USE_PHRASE,m_headPhrase)) {
     m_dirty = true;
   }
-  /*  if (compare(&settings,SID_HEADSEARCH_SINGLE_CLICK,m_headSingleClick)) {
+  if (compare(&settings,SID_HEADSEARCH_NODEINFO_CLOSE,m_nodeinfoClose)) {
     m_dirty = true;
   }
-
+  /*
   if (compare(&settings,SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical)) {
     m_dirty = true;
   }

@@ -32,7 +32,7 @@ class EntryOptions : public OptionsWidget {
     QLineEdit * m_css;
     QLineEdit * m_printCss;
     QLineEdit * m_entryXslt;
-    //    QLineEdit * m_nodeXslt;
+    QCheckBox * m_nodeinfoClose;
     QLineEdit * m_clean;
     QCheckBox * m_debug;
     QLineEdit * m_find;

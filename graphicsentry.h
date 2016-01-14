@@ -167,6 +167,7 @@ class GraphicsEntry : public QWidget {
     bool m_dumpHtml;
     bool m_dumpOutputHtml;
     bool m_offPageMovement;
+    bool m_nodeinfoClose;
     int  m_linkCheckMode;
 
     int m_pagingDir;
@@ -250,6 +251,7 @@ class GraphicsEntry : public QWidget {
     void searchStarted();
     void searchFoundNext();
     void searchFinished();
+    void showNode(const QString &);
 };
 /*
 class LaneGraphicsView : public QGraphicsView {

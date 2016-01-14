@@ -180,6 +180,8 @@ void GraphicsEntry::readSettings() {
 
   m_highlightColorName = settings.value(SID_ENTRY_HIGHLIGHT_COLOR,"yellow").toString();
 
+  m_nodeinfoClose = settings.value(SID_ENTRY_NODEINFO_CLOSE,true).toBool();
+
   settings.endGroup();
 
   m_entryXslt = getXsltFileName();
@@ -688,11 +690,13 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
     info->setPlace(p);
     info->setCss(m_currentCss);
     info->setHtml(html);
+    info->setCloseOnLoad(m_nodeinfoClose);
+    connect(info,SIGNAL(openNode(const QString &)),this,SIGNAL(showNode(const QString &)));
     int ret = info->exec();
     delete info;
-    if (ret == QDialog::Accepted) {
-      emit(gotoNode(Place::fromNode(node),true,true));
-    }
+    //    if (ret == QDialog::Accepted) {
+    //      emit(gotoNode(Place::fromNode(node),true,true));
+    //    }
   }
   else {
     QLOG_WARN() << QString(tr("Requested link node not found : %1")).arg(node);

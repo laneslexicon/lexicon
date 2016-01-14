@@ -60,7 +60,7 @@ void DebugOptionsDialog::onPathSelect() {
 EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
   setObjectName("entryoptions");
   m_section = "Entry";
-
+  m_nodeinfoClose = new QCheckBox;
   m_back = new QLineEdit ;
   m_css = new QLineEdit ;
   m_printCss = new QLineEdit ;
@@ -226,6 +226,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   otherlayout->addRow(tr("Step size"),m_step);
   otherlayout->addRow(tr("Text width"),m_textWidth);
   otherlayout->addRow(tr("Text margin"),m_margin);
+  otherlayout->addRow(tr("Close entry info after load"),m_nodeinfoClose);
 
   QHBoxLayout * colorlayout = new QHBoxLayout;
   colorlayout->addWidget(m_highlightColor);
@@ -282,6 +283,7 @@ void EntryOptions::readSettings() {
   m_css->setText(settings.value(SID_ENTRY_CSS).toString());
   m_printCss->setText(settings.value(SID_ENTRY_PRINT_CSS).toString());
 
+  m_nodeinfoClose->setChecked(settings.value(SID_ENTRY_NODEINFO_CLOSE).toBool());
 
   m_back->setText(settings.value(SID_ENTRY_BACK).toString());
   m_clean->setText(settings.value(SID_ENTRY_CLEAN).toString());
@@ -334,6 +336,7 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
+  settings.setValue(SID_ENTRY_NODEINFO_CLOSE,m_nodeinfoClose->isChecked());
   settings.setValue(SID_ENTRY_BACK,m_back->text());
   settings.setValue(SID_ENTRY_CSS,m_css->text());
   settings.setValue(SID_ENTRY_PRINT_CSS,m_printCss->text());
@@ -387,6 +390,9 @@ bool EntryOptions::isModified()  {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
+  if (compare(&settings,SID_ENTRY_NODEINFO_CLOSE,m_nodeinfoClose)) {
+    m_dirty = true;
+  }
   if (compare(&settings,SID_ENTRY_BACK,m_back)) {
     m_dirty = true;
   }

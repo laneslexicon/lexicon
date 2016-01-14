@@ -50,8 +50,9 @@ They should not be translated.
 #define SID_ENTRY_XML_VIEWER_SIZE "Xml viewer size"
 #define SID_ENTRY_XML_VIEWER_POS "Xml viewer pos"
 #define SID_ENTRY_OUTPUT_PATH "Debug directory"
+#define SID_ENTRY_NODEINFO_CLOSE "Node info close"
+
 #define SID_XSLT_ENTRY   "Entry"
-#define SID_XSLT_NODE   "Node"
 #define SID_XSLT_PRINT   "Print"
 
 #define SID_NOTES_DEBUG "Debug"
@@ -174,19 +175,17 @@ They should not be translated.
 #define SID_SEARCH_DIACRITICS                  "Diacritics"
 
 #define SID_HEADSEARCH_STEP                    "Step"
-//#define SID_HEADSEARCH_DEBUG                   "Debug"
 #define SID_HEADSEARCH_FOCUS_TABLE             "Focus table"
 #define SID_HEADSEARCH_NEW_TAB                 "New tab"
 #define SID_HEADSEARCH_GO_TAB                  "Activate tab"
-//#define SID_HEADSEARCH_VERTICAL_LAYOUT         "Vertical layout"
 #define SID_HEADSEARCH_WHOLE_WORD              "Whole word"
 #define SID_HEADSEARCH_DIACRITICS              "Ignore diacritics"
 #define SID_HEADSEARCH_TYPE_REGEX              "Regex"
 #define SID_HEADSEARCH_FORCE                   "Force LTR"
-//#define SID_HEADSEARCH_SINGLE_CLICK            "Single click to activate"
 #define SID_HEADSEARCH_STATE                   "State"
 #define SID_HEADSEARCH_USE_PHRASE               "Use phrase"
 #define SID_HEADSEARCH_COLUMNS                  "HeadSearch Export columns"
+#define SID_HEADSEARCH_NODEINFO_CLOSE           "Node info close"
 
 #define SID_LOCALSEARCH_SHOW_ALL               "Show all results"
 #define SID_LOCALSEARCH_DIACRITICS             "Ignore diacritics"

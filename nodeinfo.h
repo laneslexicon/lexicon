@@ -10,6 +10,7 @@
 #include <QFont>
 #include <QPushButton>
 #include <QRegExp>
+#include <QCheckBox>
 #include "place.h"
 class NodeInfo : public QDialog {
   Q_OBJECT
@@ -24,6 +25,7 @@ class NodeInfo : public QDialog {
   QSize sizeHint() const;
   void setHeader(const QString & root,const QString & head,const QString & node,int page);
   void setHeader(const Place &);
+  void setCloseOnLoad(bool v);
   public slots:
     void accept();
     void reject();
@@ -41,6 +43,7 @@ class NodeInfo : public QDialog {
     QString m_head;
     QString m_node;
     QString m_css;
+    QCheckBox * m_closeOnTabLoad;
  signals:
     void openNode(const QString & node);
 };
