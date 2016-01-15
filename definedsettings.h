@@ -167,6 +167,7 @@ They should not be translated.
 #define SID_SHORTCUT_ARABIC_FONT               "Change Arabic font"
 #define SID_SHORTCUT_MENU_SHOW                 "Menu show"
 #define SID_SHORTCUT_XREF_MODE                  "Xref mode"
+#define SID_SHORTCUT_LIST_TABS                  "List tabs"
 
 #define SID_SEARCH_IGNORE_DIACRITICS           "Ignore diacritics"
 #define SID_SEARCH_TYPE_REGEX                  "Regex"
@@ -303,6 +304,7 @@ They should not be translated.
 #define SID_SYSTEM_APPEND_NEW_TABS              "Append new tab"
 #define SID_SYSTEM_LINK_CHECK_MODE              "Link check mode"
 #define SID_SYSTEM_ALLOW_DUPLICATES             "Allow duplicates"
+#define SID_SYSTEM_TABLIST_STATE                "Tab list columns"
 #define SID_MAPS_CURRENT_MAP                    "Current map"
 #define SID_MAPS_ENABLED                        "Enabled"
 #define SID_MAPS_DEBUG                          "Debug"

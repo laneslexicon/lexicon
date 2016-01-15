@@ -85,6 +85,7 @@ class LanesLexicon : public QMainWindow
   QMapIterator<QString,QString> getMapIterator();
   HistoryMaster * history();
   NoteMaster * notes();
+  QTabWidget * tabwidget() const;
   bool sanityCheck(int type = 0);
   enum NewTabBehaviour { InsertTab, AppendTab };
   enum NavigationMode { ByRoot , ByPage };
@@ -100,6 +101,7 @@ class LanesLexicon : public QMainWindow
       void onLoadPageSet();
       void onEditPageSet();
     private slots:
+      void onTabList();
       void onOptionsChanged(bool);
       void onReady();
       void onLogViewer();
@@ -404,7 +406,7 @@ class LanesLexicon : public QMainWindow
       QActionGroup * m_moveGroup;
 
 
-
+      QAction * m_tablistAction;
       QAction * m_minimalAction;
       QAction * m_logViewerAction;
       QAction * m_optionsAction;

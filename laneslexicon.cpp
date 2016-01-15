@@ -36,6 +36,7 @@
 #include "savepagesetdialog.h"
 #include "editpagesetdialog.h"
 #include "loadpagesetdialog.h"
+#include "tablistdialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -700,6 +701,9 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_XREF_MODE) {
     this->onXrefMode();
   }
+  else if (key == SID_SHORTCUT_LIST_TABS) {
+    this->onTabList();
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -936,6 +940,9 @@ void LanesLexicon::createActions() {
 
   m_showNoteBrowserAction = new QAction(tr("View &notes"),this);
 
+  m_tablistAction = new QAction(tr("List &tabs"),this);
+
+  connect(m_tablistAction,SIGNAL(triggered()),this,SLOT(onTabList()));
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
@@ -1335,6 +1342,7 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_showContentsAction);
   m_viewMenu->addAction(m_showToolbarAction);
   m_viewMenu->addAction(m_showMenuAction);
+  m_viewMenu->addAction(m_tablistAction);
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -4959,4 +4967,13 @@ void LanesLexicon::onNotesDeleted(const QStringList & nodes) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(t[i]));
     entry->onReload();
   }
+}
+QTabWidget * LanesLexicon::tabwidget() const {
+  return m_tabs;
+}
+void LanesLexicon::onTabList() {
+  TabListDialog * d = new TabListDialog;
+
+  d->setAttribute(Qt::WA_DeleteOnClose);
+  d->show();
 }
