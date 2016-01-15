@@ -126,6 +126,8 @@ void NodeView::setHtml(const QString & html) {
     return;
   m_positionIndex = 0;
   m_positions.clear();
+  /// build index of positions
+  ///
   QTextCursor c = m_browser->document()->find(m_pattern,0);
   while(!c.isNull()) {
     position = c.position();
@@ -138,6 +140,10 @@ void NodeView::setHtml(const QString & html) {
   }
 
 }
+/**
+ * First time through we use startPosition so that the initial display is at the right occurrence
+ * for when we are showing one occurrence per line in the results table
+ */
 void NodeView::findFirst() {
   if (m_positions.size() == 0) {
     return;
@@ -145,7 +151,9 @@ void NodeView::findFirst() {
   if ((m_startPosition >= 0) && (m_startPosition < m_positions.size())) {
     m_positionIndex = m_startPosition;
   }
+  else {
   m_positionIndex = 0;
+  }
   QTextCursor c = m_browser->document()->find(m_pattern,m_positions[m_positionIndex]);
   m_browser->setTextCursor(c);
   if (m_positionIndex == (m_positions.size() -1 )) {
@@ -154,6 +162,7 @@ void NodeView::findFirst() {
   else {
     m_findNextButton->setEnabled(true);
   }
+  m_startPosition = -1;
 }
 void NodeView::findNext() {
   m_positionIndex++;

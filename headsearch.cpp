@@ -1,7 +1,6 @@
 #include "graphicsentry.h"
 #include "application.h"
 #include "headsearch.h"
-#include "focustable.h"
 #include "laneslexicon.h"
 #include "searchoptionswidget.h"
 #include "definedsettings.h"
@@ -27,8 +26,7 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   QVBoxLayout * layout = new QVBoxLayout;
   setWindowTitle(tr("Search for Head Word"));
   setObjectName("headsearchwidget");
-  //  QWidget * container = new QWidget;
-  //  QVBoxLayout * containerlayout = new QVBoxLayout;
+
   m_heads = new ColumnarTableWidget(QStringList() << tr("Mark") << tr("Root") << tr("Head word") << tr("Entry") << tr("Node") << tr("Vol/Page"));
 
   m_heads->setKey(ColumnarTableWidget::STATE,SID_HEADSEARCH_STATE);
@@ -43,14 +41,10 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_searchTitle->hide();
   m_resultsText = new QLabel("");
   m_resultsText->hide();
-  /*
-  m_convertButton = new QPushButton(tr("&Close results list"));
-  m_convertButton->hide();
-  */
+
   m_exportButton = new QPushButton(tr("&Export results"));
   m_exportButton->hide();
 
-  //  connect(m_convertButton,SIGNAL(clicked()),this,SLOT(onRemoveResults()));
   connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
 
   layout->addWidget(m_searchTitle);
@@ -59,7 +53,6 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(m_resultsText);
   hlayout->addStretch();
-  //  hlayout->addWidget(m_convertButton);
   hlayout->addWidget(m_exportButton);
 
   layout->addLayout(hlayout);
@@ -81,33 +74,9 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
       .arg(m_nodeQuery.lastError().text());
   }
 }
-/*
-GraphicsEntry * HeadSearchWidget::getEntry() {
-  return m_entry;
-}
-*/
 int HeadSearchWidget::count() {
   return m_heads->rowCount();
 }
-/*
-void HeadSearchWidget::viewedItemChanged(QTableWidgetItem * item,QTableWidgetItem * prev) {
-  QLOG_DEBUG() << Q_FUNC_INFO;
-
-  item = item->tableWidget()->item(item->row(),NODE_COLUMN);
-  QString node = item->text();
-  QLOG_DEBUG() << Q_FUNC_INFO << node;
-  m_nodeQuery.bindValue(0,node);
-  m_nodeQuery.exec();
-
-  if ( ! m_nodeQuery.first()) {
-    QLOG_WARN() << "No record for node" << node;
-    return;
-  }
-
-  Place np;
-  np.setNode(node);
-}
-*/
 void HeadSearchWidget::onItemDoubleClicked(QTableWidgetItem * item) {
   QLOG_DEBUG() << Q_FUNC_INFO << "row" << item->row();
 
@@ -173,6 +142,7 @@ void HeadSearchWidget::search(const QString & searchpattern,const SearchOptions 
   }
 
   m_heads->clearContents();
+  m_heads->setRowCount(0);
   m_query.exec();
   QEventLoop ep;
 
@@ -383,18 +353,6 @@ void HeadSearchWidget::readSettings() {
   readCssFromFile(css);
 
 }
-void HeadSearchWidget::onRemoveResults() {
-  /*
-  Place p = m_entry->getPlace();
-  QLOG_DEBUG() << Q_FUNC_INFO << p;
-  emit(deleteSearch());
-  */
-}
-/*
-Place HeadSearchWidget::getPlace() {
-  return m_entry->getPlace();
-}
-*/
 void HeadSearchWidget::onExport() {
   statusMessage(m_heads->exportResults(SID_HEADSEARCH_COLUMNS));
 }
@@ -427,12 +385,10 @@ void HeadSearchWidget::showNode(int row)  {
   v->setHeader(Place::fromEntryRecord(m_nodeQuery.record()));
   v->setHtml(html);
   v->setCloseOnLoad(m_nodeinfoClose);
-  //  v->findFirst();
   v->show();
   v->raise();
   v->activateWindow();
   connect(v,SIGNAL(openNode(const QString &)),this,SLOT(openNode(const QString &)));
-  //  connect(v,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
 
 }
 QString HeadSearchWidget::transform(const QString & xml) const {

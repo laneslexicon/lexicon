@@ -27,9 +27,9 @@
 
 /* fullsearch.cpp */
 
-#define SQL_FIND_XREF_ENTRIES "select id,word,root,entry,node,nodenum,page from xref where datasource = 1 order by nodenum asc"
+#define SQL_FIND_XREF_ENTRIES "select * from xref where datasource = 1 order by nodenum asc"
 
-#define SQL_FIND_ENTRY_DETAILS "select root,word,xml,page from entry where datasource = 1 and nodeid = ?"
+#define SQL_FIND_ENTRY_DETAILS "select * from entry where datasource = 1 and nodeid = ?"
 #define SQL_FIND_MAXIMUM "select id from %1 order by id desc limit 1"
 
 #define SQL_REGEX_FIND_ENTRY_DETAILS "select root,word,nodeid,xml,page from entry where datasource = 1 order by nodenum asc"

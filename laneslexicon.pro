@@ -71,7 +71,7 @@ SOURCES += main.cpp\
         history.cpp \
         place.cpp \
         fullsearch.cpp \
-        focustable.cpp \
+ #       focustable.cpp \
  #       helpviewer.cpp \
         menubar.cpp \
         tabwidget.cpp \
@@ -118,7 +118,7 @@ HEADERS  += laneslexicon.h \
             history.h \
             place.h \
             fullsearch.h \
-            focustable.h \
+#            focustable.h \
 #            helpviewer.h \
             menubar.h \
             tabwidget.h \

@@ -4,20 +4,20 @@
 #include "QsLog.h"
 #include "exportsearchdialog.h"
 #include "centeredcheckbox.h"
-#include "focustable.h"
+//#include "focustable.h"
 ColumnarTableWidget::ColumnarTableWidget(const QStringList & headers,QWidget * parent) : QTableWidget(parent) {
   m_settings = 0;
   m_saveConfig = true;
-  m_colHeadings = headers;
+  m_columnHeadings = headers;
   m_defaultWidthKey = "Default width";
   m_columnWidthsKey = "Column widths";
   m_stateKey = "Column state";
   m_defaultWidth = -1;
   m_markColumn = -1;
   setRowCount(0);
-  setColumnCount(m_colHeadings.size());
+  setColumnCount(m_columnHeadings.size());
   setSelectionBehavior(QAbstractItemView::SelectRows);
-  setHorizontalHeaderLabels(m_colHeadings);
+  setHorizontalHeaderLabels(m_columnHeadings);
   horizontalHeader()->setStretchLastSection(true);
   horizontalHeader()->setSectionsMovable(true);
   horizontalHeader()->setSectionsClickable(true);
@@ -40,7 +40,7 @@ void ColumnarTableWidget::setKey(int key,const QString & value) {
 }
 void ColumnarTableWidget::onColumnDialog(int /* section */) {
   QStringList m;
-  ColumnSelectDialog d(m_colHeadings);
+  ColumnSelectDialog d(m_columnHeadings);
   QList<bool> c;
   for(int i=0;i < this->columnCount();i++) {
     c << ! this->horizontalHeader()->isSectionHidden(i);
@@ -93,19 +93,26 @@ void ColumnarTableWidget::readConfiguration(QSettings & settings) {
     for(int i=0;i < v.size();i++) {
       w = v[i].toInt(&ok);
       if (ok) {
+        if (w == -1) {
+          w = m_defaultWidth;
+        }
         sections << w;
       }
     }
-    if (sections.size() == m_colHeadings.size()) {
+    if (sections.size() == m_columnHeadings.size()) {
       for(int i=0;i < sections.size();i++) {
         this->setColumnWidth(i,sections[i]);
       }
     }
   }
+  if (m_markColumn != -1) {
+    this->resizeColumnToContents(m_markColumn);
+  }
 }
 void ColumnarTableWidget::setDefaultWidth(int v) {
   m_defaultWidth = v;
 }
+
 void ColumnarTableWidget::writeConfiguration() {
   QLOG_DEBUG() << Q_FUNC_INFO <<m_saveConfig;
   if (m_saveConfig) {
@@ -183,13 +190,15 @@ QString ColumnarTableWidget::exportResults(const QString & key) const {
   if (exportFileName.isEmpty()) {
     return QString();
   }
+
   QString sep = dlg.separator();
   columns = dlg.columns();
   QTextStream out(&file);
   out.setCodec("UTF-8");
 
   out << columns.join(sep) << endl;
-
+  /// columns will contain a list of column headings to export
+  /// turn this into a list of column numbers
   QList<int> cols;
   for(int i=0;i < this->columnCount();i++) {
     QString s = this->horizontalHeaderItem(i)->text();
@@ -201,10 +210,11 @@ QString ColumnarTableWidget::exportResults(const QString & key) const {
   int rowCount = this->rowCount();
   bool ok;
   int writeCount = 0;
-
+  QString str;
   if (m_markColumn == -1) {
     allRows = true;
   }
+
   for(int i=0;i < rowCount;i++) {
     ok = true;
     if (! allRows ) {
@@ -212,25 +222,29 @@ QString ColumnarTableWidget::exportResults(const QString & key) const {
       if (m) {
         ok =  m->isChecked();
       }
+      /*
       else {
         CheckBoxTableItem * ti = qobject_cast<CheckBoxTableItem *>(this->cellWidget(i,m_markColumn));
         if (ti) {
           ok = ti->isChecked();
         }
       }
+      */
     }
     if (ok) {
       for(int j=0;j < cols.size();j++) {
-        QTableWidgetItem * item = this->item(i,cols[j]);
-        if (! item ) {
-          QLabel * l = qobject_cast<QLabel *>(this->cellWidget(i,cols[j]));
-          if (l) {
-            out << removeSpan(l->text()) << sep;
+        str = this->textForColumn(i,cols[j]);
+        str.remove(QChar(0x202a));
+        str.remove(QChar(0x202b));
+        str.remove(QChar(0x202c));
+        str.remove(QChar(0x202d));
+        str.remove(QChar(0x202e));
+        if (m_ignoreText.contains(cols[j])) {
+          if (str == m_ignoreText.value(cols[j])) {
+            str.clear();
           }
         }
-        else {
-          out << removeSpan(item->text()) << sep;
-        }
+        out <<  str << sep;
       }
       out << endl;
       writeCount++;
@@ -238,6 +252,20 @@ QString ColumnarTableWidget::exportResults(const QString & key) const {
   }
   file.close();
   return QString(tr("Exported search results to file: %1 (%2 lines)")).arg(exportFileName).arg(writeCount);;
+}
+QString ColumnarTableWidget::textForColumn(int row,int col) const {
+  QTableWidgetItem * item = this->item(row,col);
+  QString str;
+  if (item) {
+    str = item->text();
+  }
+  else {
+    QLabel * label = qobject_cast<QLabel *>(this->cellWidget(row,col));
+    if (label) {
+      str = label->text();
+    }
+  }
+  return removeSpan(str);
 }
 QString ColumnarTableWidget::removeSpan(const QString & str) const {
   QString t = str;
@@ -247,4 +275,10 @@ QString ColumnarTableWidget::removeSpan(const QString & str) const {
 }
 void ColumnarTableWidget::setMarkColumn(int col) {
   m_markColumn = col;
+}
+void ColumnarTableWidget::setColumnWidth(int col,int width) {
+  m_columnWidths.insert(col,width);
+}
+void ColumnarTableWidget::setExportIgnore(int col,const QString & text) {
+  m_ignoreText.insert(col,text);
 }

@@ -42,7 +42,6 @@ class HeadSearchWidget : public QWidget
    void cancelSearch();
    void onItemDoubleClicked(QTableWidgetItem *);
    void onCellDoubleClicked(int,int);
-   void onRemoveResults();
    void onExport();
    void selectFocus();
    void openNode(const QString &);

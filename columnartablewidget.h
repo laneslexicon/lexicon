@@ -32,6 +32,8 @@ class ColumnarTableWidget : public QTableWidget {
   void setDefaultWidth(int);
   void showEmpty(const QString &);
   void setMarkColumn(int);
+  void setColumnWidth(int,int);
+  void setExportIgnore(int,const QString &);
   enum { DEFAULT_WIDTH, COLUMN_WIDTHS,STATE };
   virtual void readConfiguration(QSettings &);
   virtual void writeConfiguration();
@@ -40,9 +42,10 @@ class ColumnarTableWidget : public QTableWidget {
  private slots:
     void onColumnDialog(int);
  private:
+    QString textForColumn(int row,int col) const;
     QString removeSpan(const QString &) const;
     bool startsWithArabic(const QString &) const;
-    QStringList m_colHeadings;
+    QStringList m_columnHeadings;
     QString m_defaultWidthKey;
     QString m_columnWidthsKey;
     QString m_stateKey;
@@ -51,5 +54,7 @@ class ColumnarTableWidget : public QTableWidget {
     int m_defaultWidth;
     bool m_saveConfig;
     int m_markColumn;
+    QMap<int,int> m_columnWidths;
+    QMap<int,QString> m_ignoreText;
 };
 #endif
