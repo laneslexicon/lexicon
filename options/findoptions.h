@@ -24,13 +24,10 @@ class FindOptions : public OptionsWidget {
     QCheckBox * m_fullIncludeHeads;
     QCheckBox * m_fullOneRow;
     QSpinBox  * m_fullStep;
-    //    QLineEdit * m_fullViewerWidth;
-    //    QLineEdit * m_fullViewerHeight;
-    //    QLineEdit * m_fullXslt;
-    QLineEdit * m_fullHeadColor;
     QLineEdit * m_fullHeadText;
     QLineEdit * m_contextStyle;
     QLineEdit * m_contextStyleArabic;
+
     bool m_fullWholeWord;
     bool m_fullDiacritics;
     bool m_fullRegex;
