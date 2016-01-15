@@ -589,7 +589,7 @@ void GraphicsEntry::linkActivated(const QString & link) {
     p.setNode(node);
     /// TODO replace this
     /// including move to new tab stuff
-    showPlace(p,false,createTab,activateTab);
+    /// showPlace(p,createTab,activateTab);
   }
 }
 void GraphicsEntry::linkHovered(const QString & link) {
@@ -599,7 +599,6 @@ void GraphicsEntry::linkHovered(const QString & link) {
   if (!gi) {
     return;
   }
-  qDebug() << Q_FUNC_INFO << link;
   if (link.isEmpty()) {
     gi->setCursor(QCursor(Qt::ArrowCursor));
     gi->setToolTip(gi->getPlace().getText());
@@ -721,10 +720,18 @@ void GraphicsEntry::anchorTest() {
     }
   }
 }
-/// TODO fix this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-/// TODO how is it supposed to be used ?????????
+/**
+ *
+ *
+ * @param p
+ * @param thisPageOnly
+ * @param createTab
+ * @param activateTab
+ *
+ * @return
+ */
+/*
 Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,bool createTab,bool activateTab) {
-  /// check if the node is on this page
     QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "SHOULD NOT BE HERE";
   QString node = p.getNode();
   for(int i=0;i < m_items.size();i++) {
@@ -743,6 +750,7 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,bool createTab,
   }
   return p;
 }
+*/
 /**
  *
  *
