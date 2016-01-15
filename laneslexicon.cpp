@@ -4706,7 +4706,28 @@ void LanesLexicon::importXml(const QString & filename) {
 }
 void LanesLexicon::onDuplicateTab(int index) {
   qDebug() << Q_FUNC_INFO << index;
+  GraphicsEntry * entry;
+  Place p;
+  entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(index));
 
+  if (entry) {
+    p = entry->getPlace();
+  }
+  else {
+    return;
+  }
+  bool v = m_allowDuplicates;
+
+  if (! p.isValid()) {
+    QLOG_DEBUG() << Q_FUNC_INFO << "Invalid place" << p.toString();
+    return;
+  }
+  m_allowDuplicates = true;
+  entry = this->showPlace(p,true,false);
+  if (entry) {
+    statusMessage(QString(tr("Duplicated tab %1")).arg(index + 1));
+  }
+  m_allowDuplicates = v;
 }
 /**
  * show dialog, accept settings
