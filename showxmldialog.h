@@ -10,20 +10,29 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QCheckBox>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
 class ShowXmlDialog : public QDialog {
   Q_OBJECT
 
  public:
   enum XmlType { Xml, Html };
-  ShowXmlDialog(QWidget * parent = 0);
+  ShowXmlDialog(const QString & node = QString(),QWidget * parent = 0);
   void setXml(const QString & xml);
   public slots:
+    void onExport();
     void onSave();
     void onClose();
+    void onUnlock(int);
  private:
   QPlainTextEdit * m_xml;
-  QCheckBox * m_stripWrapper;
+  QString m_node;
+  QCheckBox * m_unlock;
   int m_type;
+  QString m_originalXml;
+  QDialogButtonBox * m_buttonBox;
+  bool m_locked;
 };
 
 #endif

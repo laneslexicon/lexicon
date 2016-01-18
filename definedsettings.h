@@ -49,6 +49,7 @@ They should not be translated.
 #define SID_ENTRY_SHOW_LINK_WARNING  "Show link warning"
 #define SID_ENTRY_XML_VIEWER_SIZE "Xml viewer size"
 #define SID_ENTRY_XML_VIEWER_POS "Xml viewer pos"
+#define SID_ENTRY_XML_VIEWER_LOCKED "Xml viewer locked"
 #define SID_ENTRY_OUTPUT_PATH "Debug directory"
 #define SID_ENTRY_NODEINFO_CLOSE "Node info close"
 
