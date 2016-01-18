@@ -1253,7 +1253,7 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
   //    }
   connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
   connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
-  connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
+  connect(gi,SIGNAL(showXml(const Place &)),this,SLOT(showPerseus(const Place &)));
   connect(gi,SIGNAL(showHtml()),this,SLOT(showHtml()));
   connect(gi,SIGNAL(searchPage()),this,SIGNAL(searchPage()));
   connect(gi,SIGNAL(fixLink(const QStringList &,bool)),this,SLOT(fixLink(const QStringList &,bool)));
@@ -1593,12 +1593,13 @@ QString GraphicsEntry::firstRoot() {
 }
 void GraphicsEntry::showPerseus(const Place & p) {
   QString xml;
+  QString node;
   EntryItem * item = qobject_cast<EntryItem *>(sender());
   if (item) {
-    xml = item->getXml();
+    //    xml = item->getXml();
   }
   if (xml.isEmpty()) {
-    QString node = p.getNode();
+    node = p.getNode();
     if ( node.isEmpty()) {
       QMessageBox msgBox;
       msgBox.setText(tr("No XML found"));
@@ -1621,7 +1622,7 @@ void GraphicsEntry::showPerseus(const Place & p) {
       xml = "No XML for " + node;
     }
   }
-  ShowXmlDialog d;
+  ShowXmlDialog d(node);
   d.setXml(xml);
   d.exec();
 }
