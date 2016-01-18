@@ -98,7 +98,7 @@ class EntryItem : public QGraphicsTextItem {
     void notesRejected();
     void notesAccepted();
  signals:
-    void showPerseus(const Place &);
+    void showXml(const Place &);
     void showHtml();
     void placeChanged(const Place &);
     void bookmarkAdd(const QString & id,const Place & p);

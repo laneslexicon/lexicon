@@ -173,7 +173,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   Place p = this->getPlace();
   QAction *selectedAction = menu.exec(event->screenPos());
   if (selectedAction == perseusAction) {
-    emit(showPerseus(p));
+    emit(showXml(p));
   }
   if (selectedAction == localSearchAction) {
     emit(searchPage());
