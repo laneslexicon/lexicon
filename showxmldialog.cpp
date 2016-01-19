@@ -93,13 +93,6 @@ void ShowXmlDialog::onExport() {
       statusMessage(QString(tr("Successfully exported data to %1")).arg(filename));
     }
   }
-  SETTINGS
-
-  settings.beginGroup("Entry");
-  settings.setValue(SID_ENTRY_XML_VIEWER_SIZE, size());
-  settings.setValue(SID_ENTRY_XML_VIEWER_POS, pos());
-
-  this->accept();
 }
 void ShowXmlDialog::onSave() {
   QLOG_DEBUG()  << Q_FUNC_INFO;
