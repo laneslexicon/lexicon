@@ -851,6 +851,21 @@ void Lexicon::setCursorPosition(QWidget * w,int pos) {
     widget->setCursorPosition(pos);
   }
 }
+QString Lexicon::getXsltFileName() const {
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+
+  QString fileName;
+  settings.beginGroup("XSLT");
+  fileName = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+  if (fileName.isEmpty()) {
+    fileName = "entry.xslt";
+  }
+  QString xsltDir = this->getResourceFilePath(Lexicon::XSLT);
+  QFileInfo fi(xsltDir,fileName);
+  return fi.absoluteFilePath();
+}
 QFont Lexicon::fontFromCss(const QString & src) {
   QFont f;
   QString family;

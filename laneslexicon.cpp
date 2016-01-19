@@ -4198,7 +4198,7 @@ bool LanesLexicon::sanityCheck(int type) {
     msgBox.exec();
     return false;
   }
-  QString xslt =  GraphicsEntry::getXsltFileName();
+  QString xslt =  getLexicon()->getXsltFileName();
   if (xslt.isEmpty() || ! QFileInfo::exists(xslt)) {
     QMessageBox msgBox;
     msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());

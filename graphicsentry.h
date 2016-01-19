@@ -88,7 +88,6 @@ class GraphicsEntry : public QWidget {
     void setHome(const QString &);
     void shiftFocus();
     void setCurrentItem(QGraphicsItem *);
-    static QString getXsltFileName();
     QString userTitle() const;
     void setXrefMode(int);
   public slots:

@@ -184,7 +184,7 @@ void GraphicsEntry::readSettings() {
 
   settings.endGroup();
 
-  m_entryXslt = getXsltFileName();
+  m_entryXslt = getLexicon()->getXsltFileName();
 
   settings.beginGroup("Notes");
   m_notesEnabled = settings.value(SID_NOTES_ENABLED,true).toBool();
@@ -221,18 +221,6 @@ void GraphicsEntry::readSettings() {
   }
   settings.endGroup();
 
-}
-QString GraphicsEntry::getXsltFileName()  {
-  QString fileName;
-  SETTINGS
-  settings.beginGroup("XSLT");
-  fileName = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
-  if (fileName.isEmpty()) {
-    fileName = "entry.xslt";
-  }
-  QString xsltDir = getLexicon()->getResourceFilePath(Lexicon::XSLT);
-  QFileInfo fi(xsltDir,fileName);
-  return fi.absoluteFilePath();
 }
 
 void GraphicsEntry::writeDefaultSettings() {
