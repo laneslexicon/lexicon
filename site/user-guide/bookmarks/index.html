@@ -87,7 +87,14 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../moving/">Moving around</a>
+        <a class="" href="../moving/">Contents and entry</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../tabs/">Tabs</a>
         
     </li>
 
@@ -114,11 +121,11 @@
             
                 <li class="toctree-l3"><a href="#bookmarks">Bookmarks</a></li>
                 
-                    <li><a class="toctree-l4" href="#using">Using</a></li>
-                
-                    <li><a class="toctree-l4" href="#configuration">Configuration</a></li>
+                    <li><a class="toctree-l4" href="#adding-bookmarks">Adding bookmarks</a></li>
                 
                     <li><a class="toctree-l4" href="#using-uppercase-letters-as-bookmarks">Using uppercase letters as bookmarks</a></li>
+                
+                    <li><a class="toctree-l4" href="#editing-bookmarks-manually">Editing bookmarks manually</a></li>
                 
             
             </ul>
@@ -142,21 +149,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../links/">Cross references</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../errors/">Reporting errors</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../fixing/">Fixing the text</a>
+        <a class="" href="../missinglinks/">Cross references</a>
         
     </li>
 
@@ -178,28 +171,14 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../../custom/custom/">Introduction</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../../custom/themes/">Themes</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../../custom/application/">The Application</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../../custom/contents/">Lexicon entries</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../../custom/editview/">Using Edit View</a>
         
     </li>
 
@@ -213,14 +192,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../custom/shortcuts/">Shortcuts</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../../custom/keymaps/">Keymaps</a>
+        <a class="" href="../../custom/editview/">Using Edit View</a>
         
     </li>
 
@@ -327,19 +299,47 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../other/buckwalter/">Buckwalter transliteration</a>
+        <a class="" href="../../other/editing/">Editing the text</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/orths/">Word order</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../errors/">Reporting errors</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/entrycss/">The CSS structure of an entry</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/entryxml/">The XML structure of an entry</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../download/">Obtaining</a>
         
     </li>
 
         
     </ul>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../../download/">Obtaining</a>
-        
-    </li>
 <li>
           
             <li>
@@ -357,6 +357,20 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../../dev-guide/vkeyboard/">Virtual keyboards</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../dev-guide/keymaps/">Setting up a keymap</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../dev-guide/scripts/">Scripts</a>
         
     </li>
 
@@ -422,6 +436,42 @@
     </li>
 <li>
           
+            <li>
+    <ul class="subnav">
+    <li><span>Appendix</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/buckwalter/">Buckwalter transliteration</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../appendix/buckwalterkeymap/">Buckwalter keymap</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../appendix/windows101_text/">Windows 101 text specification</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../appendix/windows101_ini/">Windows 101 INI specification</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
         </ul>
       </div>
       &nbsp;
@@ -459,23 +509,25 @@
             <div class="section">
               
                 <h2 id="bookmarks">Bookmarks</h2>
-<h4 id="using">Using</h4>
-<p>Ctrl-B followed by single letter will add a book mark at the current place.</p>
-<p>To go to that bookmark, Ctrl-J followed by the same letter.</p>
-<p>If you have jumped to a bookmark and wish to return to the previous place, enter Ctrl-B,Ctrl-R</p>
-<p>To list your current bookmarks, enter Ctrl-B,Ctrl-L</p>
-<h4 id="configuration">Configuration</h4>
-<p>The allowed bookmarks are specified in the configuration file</p>
-<p>[Bookmark]</p>
-<p>Add=Ctrl+B</p>
-<p>Clear="Ctrl+B,Ctrl+C"</p>
-<p>Id=abcdefghijklmnopqrstuvwxyzA</p>
-<p>Jump=Ctrl+J</p>
-<p>List="Ctrl+B,Ctrl+L"</p>
-<p>Revert="Ctrl+B,Ctrl+R"</p>
-<p>Each character in the Id string can be used as a bookmark. Upper and lower cases are treated as separate.</p>
+<p>There are two types of bookmarks: single-letter marks and anything longer.</p>
+<p>Single letter bookmarks can be retrieved by entering Ctrl+J and the letter or from the bookmark menu:</p>
+<p><img alt="Bookmark dropdown list" src="../../images/bookmarkdropdowna.svg" /></p>
+<p>by clicking on the entry.</p>
+<p>Longer bookmarks are listed in the bookmark dialog, activated by the default shortcut Ctrl+B,Ctrl+L or from the bookmark menu.</p>
+<p><img alt="Bookmark list" src="../../images/currentbookmarks.svg" /></p>
+<p>To jump to a bookmark from the list, select the row and click on the 'Show in tab' button.</p>
+<h4 id="adding-bookmarks">Adding bookmarks</h4>
+<p>When an entry is selected i.e. a dashed rectangle surrounds the text, a bookmark can be added by:</p>
+<ul>
+<li>Ctrl+B and a single letter will add a bookmark using that letter.</li>
+<li>Ctrl+B,Ctrl-A will show a text entry box for single letter or longer bookmarks</li>
+<li>From the context menu</li>
+</ul>
+<p>If you have jumped to a bookmark and wish to return to the previous place, enter Ctrl-B,Ctrl-R. (This only preserves a single jump from position.)</p>
 <h4 id="using-uppercase-letters-as-bookmarks">Using uppercase letters as bookmarks</h4>
 <p>Entering uppercase bookmarks by simply typing Ctrl+B,A can be difficult because of timing issues. It is simpler in this case to add the bookmark either by right-clicking on the item or adding it via the main menu. Both methods will popup a small dialog allowing to the enter the uppercase character.</p>
+<h4 id="editing-bookmarks-manually">Editing bookmarks manually</h4>
+<p>Bookmarks are written to the current configuration file and so can be edited manually if required. The location of the current configuration file can be determined from the entries in System tab of the About dialog. (By combining the current working directory and configuration file entries.)</p>
               
             </div>
           </div>

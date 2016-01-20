@@ -87,7 +87,14 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/moving/">Moving around</a>
+        <a class="" href="../../user-guide/moving/">Contents and entry</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../user-guide/tabs/">Tabs</a>
         
     </li>
 
@@ -129,21 +136,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/links/">Cross references</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/errors/">Reporting errors</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/fixing/">Fixing the text</a>
+        <a class="" href="../../user-guide/missinglinks/">Cross references</a>
         
     </li>
 
@@ -164,36 +157,19 @@
 
         
             
+    <li class="toctree-l1 ">
+        <a class="" href="../custom/">Introduction</a>
+        
+    </li>
+
+        
+            
     <li class="toctree-l1 current">
         <a class="current" href="./">Themes</a>
         
             <ul>
             
-                <li class="toctree-l3"><a href="#background-information">Background information</a></li>
-                
-            
             </ul>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../application/">The Application</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../contents/">Lexicon entries</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../editview/">Using Edit View</a>
         
     </li>
 
@@ -207,14 +183,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../shortcuts/">Shortcuts</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../keymaps/">Keymaps</a>
+        <a class="" href="../editview/">Using Edit View</a>
         
     </li>
 
@@ -321,19 +290,47 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../other/buckwalter/">Buckwalter transliteration</a>
+        <a class="" href="../../other/editing/">Editing the text</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/orths/">Word order</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../user-guide/errors/">Reporting errors</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/entrycss/">The CSS structure of an entry</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/entryxml/">The XML structure of an entry</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../download/">Obtaining</a>
         
     </li>
 
         
     </ul>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../../download/">Obtaining</a>
-        
-    </li>
 <li>
           
             <li>
@@ -351,6 +348,20 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../../dev-guide/vkeyboard/">Virtual keyboards</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../dev-guide/keymaps/">Setting up a keymap</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../dev-guide/scripts/">Scripts</a>
         
     </li>
 
@@ -416,6 +427,42 @@
     </li>
 <li>
           
+            <li>
+    <ul class="subnav">
+    <li><span>Appendix</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/buckwalter/">Buckwalter transliteration</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../appendix/buckwalterkeymap/">Buckwalter keymap</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../appendix/windows101_text/">Windows 101 text specification</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../appendix/windows101_ini/">Windows 101 INI specification</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
         </ul>
       </div>
       &nbsp;
@@ -452,8 +499,7 @@
           <div role="main">
             <div class="section">
               
-                <h5 id="background-information">Background information</h5>
-<p>The primary motivation behind using 'themes' is to isolate configuration changes so that it is possible to maintain a clean, working environment.</p>
+                <p>The primary motivation behind using 'themes' is to isolate configuration changes so that it is possible to maintain a clean, working environment: each theme has its own copy of the configuration files described in the previous section.</p>
 <p>This is achieved through the directory structure - each theme has its own directory and a its own copy of the various files e.g. icons, configuration files. While this requires a certain amount of duplication the overhead is not large (approximately 5mb).</p>
 <p>The root directory on Windows,Linux and *BSD is</p>
 <pre><code>[install directory]/Resources
@@ -499,7 +545,7 @@
     <tr>
         <td class="directorypad" colspan=3></td>
         <td>keyboards</td>
-        <td>A directory the virtual keyboard definitions</td>
+        <td>A directory containing the virtual keyboard definitions</td>
     </tr>
     <tr>
         <td colspan="3" class="directorypad"></td>
@@ -509,7 +555,7 @@
     <tr>
         <td colspan="3" class="directorypad"></td>
         <td class="themedirectory">xlst</td>
-        <td>XSLT</td>
+        <td>XSLT fileso</td>
     </tr>
     <tr>
         <td colspan="3" class="directorypad"></td>
@@ -533,7 +579,7 @@
 </table>
 </div>
 
-<p>Creating a new theme is simply a matter of copying the current theme and giving a new name. This can be done either from the Menu (using Tools-&gt;Themes-&gt;New) or by using the operating system's file manager.</p>
+<p>Creating a new theme is simply a matter of copying the current theme and giving it a new name. This can be done either from <em>Menu-&gt;Themes-&gt;New/Copy</em> or by using the operating system's file manager.</p>
               
             </div>
           </div>
@@ -541,10 +587,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../application/" class="btn btn-neutral float-right" title="The Application"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../font/" class="btn btn-neutral float-right" title="Changing fonts"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../../user-guide/diffs/" class="btn btn-neutral" title="Some differences"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../custom/" class="btn btn-neutral" title="Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -570,10 +616,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../../user-guide/diffs/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../custom/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../application/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../font/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

@@ -87,7 +87,14 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/moving/">Moving around</a>
+        <a class="" href="../../user-guide/moving/">Contents and entry</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../user-guide/tabs/">Tabs</a>
         
     </li>
 
@@ -129,21 +136,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/links/">Cross references</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/errors/">Reporting errors</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/fixing/">Fixing the text</a>
+        <a class="" href="../../user-guide/missinglinks/">Cross references</a>
         
     </li>
 
@@ -165,28 +158,14 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../custom/">Introduction</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../themes/">Themes</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../application/">The Application</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../contents/">Lexicon entries</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../editview/">Using Edit View</a>
         
     </li>
 
@@ -204,14 +183,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../shortcuts/">Shortcuts</a>
-        
-    </li>
-
-        
-            
-    <li class="toctree-l1 ">
-        <a class="" href="../keymaps/">Keymaps</a>
+        <a class="" href="../editview/">Using Edit View</a>
         
     </li>
 
@@ -318,19 +290,47 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../other/buckwalter/">Buckwalter transliteration</a>
+        <a class="" href="../../other/editing/">Editing the text</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/orths/">Word order</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../user-guide/errors/">Reporting errors</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/entrycss/">The CSS structure of an entry</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/entryxml/">The XML structure of an entry</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../download/">Obtaining</a>
         
     </li>
 
         
     </ul>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../../download/">Obtaining</a>
-        
-    </li>
 <li>
           
             <li>
@@ -348,6 +348,20 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../../dev-guide/vkeyboard/">Virtual keyboards</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../dev-guide/keymaps/">Setting up a keymap</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../dev-guide/scripts/">Scripts</a>
         
     </li>
 
@@ -413,6 +427,42 @@
     </li>
 <li>
           
+            <li>
+    <ul class="subnav">
+    <li><span>Appendix</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../other/buckwalter/">Buckwalter transliteration</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../appendix/buckwalterkeymap/">Buckwalter keymap</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../appendix/windows101_text/">Windows 101 text specification</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../appendix/windows101_ini/">Windows 101 INI specification</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
         </ul>
       </div>
       &nbsp;
@@ -449,17 +499,20 @@
           <div role="main">
             <div class="section">
               
-                <p>Font information is specified in three files:</p>
-<ul>
-<li>settings.ini</li>
-<li>entry.css</li>
-<li>application.css</li>
-</ul>
-<p>For the font change utility to work:</p>
+                <p>The font change dialog can be used to change the font used for either Arabic or English text. In doing so it reads the current theme's configuration files and attempts to the determine the currently used fonts and present that information as part of the dialog:</p>
+<p><img alt="Font Change Dialog" src="../../images/fontchange.png" /></p>
+<p>The left panel should be used to change the font used for Arabic text; the right panel to change the font for all non-Arabic text.</p>
+<p>The user can select the font family using the drop down list, which is initially populated by those fonts that support the writing system under consideration.</p>
+<p>To change the font size for <em>ALL</em> entries a numeric should be entered where specified. Use this option at your own risk.</p>
+<p>The changes can be restricted to a specific area by using the checkboxes provided. Some details of the areas covered can be found <a href="../custom/">here</a>.</p>
+<p>For instance, to change the Arabic font used by the Lexicon entries, the 'Application stylesheet' and 'Configuration settings' checkboxes should be un-checked in the left panel and 'Change font' button clicked.</p>
+<p>For this font change utility to work:</p>
 <ul>
 <li>all CSS selectors that specify Arabic font must have 'arabic' in their name</li>
 <li>all settings key/value pairs that specifiy Arabic, must have 'arabic' in their key</li>
+<li>the CSS specifiying the font name should be in the form 'font-family : xxxxxx'</li>
 </ul>
+<p>If these conditions are not met, the results will not be those desired.</p>
               
             </div>
           </div>
@@ -467,10 +520,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../shortcuts/" class="btn btn-neutral float-right" title="Shortcuts"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../editview/" class="btn btn-neutral float-right" title="Using Edit View"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../editview/" class="btn btn-neutral" title="Using Edit View"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../themes/" class="btn btn-neutral" title="Themes"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -496,10 +549,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../editview/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../themes/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../shortcuts/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../editview/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
