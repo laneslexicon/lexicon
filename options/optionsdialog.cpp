@@ -183,6 +183,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   m_changed = false;
 }
 OptionsDialog::~OptionsDialog() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   writeSettings();
   if (! m_tempFileName.isEmpty()) {
     QFile::remove(m_tempFileName);

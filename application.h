@@ -31,6 +31,7 @@ public:
   QString settingsFileName(const QString & theme = QString());
   QString editorSettingsFileName(const QString & theme = QString());
   QString currentTheme() const { return m_currentTheme;}
+  QString getXsltFileName() const;
   bool isOk() const;
   int setTheme(const QString &);
   void scanForFonts(const QDir &);

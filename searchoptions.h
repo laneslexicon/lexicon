@@ -1,19 +1,20 @@
 #ifndef __SEARCHOPTIONS_H__
 #define __SEARCHOPTIONS_H__
-
+#include <QString>
 class SearchOptions {
  public:
   enum SearchType_t { Normal, Regex };
-  enum  { Root , Entry, Word, Local, Node, Page };
+  /// Word == HeadSearch , Entry == FullSearch
+  enum SearchScope_t { Unknown, Root , Entry, Word, Local, Node, Page };
   SearchOptions();
   bool ignoreDiacritics() const;
   void setIgnoreDiacritics(bool);
 
   void setSearchType(SearchType_t);
-  int  getSearchType() const;
+  SearchType_t  getSearchType() const;
 
-  void setSearchScope(int);
-  int  getSearchScope() const ;
+  void setSearchScope(SearchScope_t);
+  SearchScope_t  getSearchScope() const ;
 
   bool wholeWordMatch() const;
   void setWholeWordMatch(bool v);
@@ -36,16 +37,30 @@ class SearchOptions {
   bool keymaps() const;
   void setKeymaps(bool);
 
+  bool ignoreCase() const;
+  void setIgnoreCase(bool);
+
+  bool headPhrase() const;
+  void setHeadPhrase(bool);
+
+  QString pattern() const;
+  void setPattern(const QString &);
+
+  bool isValid() const;
+
  private:
   bool m_ignoreDiacritics;
   bool m_wholeWordMatch;
   bool m_keymaps;
   SearchType_t  m_type;
   bool m_includeHeads;
-  int  m_target;
+  SearchScope_t  m_target;
   bool m_forceLTR;
   bool m_showAll;
   bool m_newTab;
   bool m_activateTab;
+  bool m_ignoreCase;
+  QString m_pattern;
+  bool m_headPhrase;
 };
 #endif

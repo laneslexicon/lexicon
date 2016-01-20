@@ -5,11 +5,11 @@
 #include "laneslexicon.h"
 #include "imlineedit.h"
 #include "nodeview.h"
-#include "focustable.h"
+#include "columnartablewidget.h"
 #include "keyboard.h"
 #include "keyboardwidget.h"
 #include "xsltsupport.h"
-//#include "htmldelegate.h"
+#include "centeredcheckbox.h"
 #include "definedsettings.h"
 #include "definedsql.h"
 #include "externs.h"
@@ -17,14 +17,9 @@
 #define ROOT_COLUMN 1
 #define HEAD_COLUMN 2
 #define NODE_COLUMN 3
-#define VOL_COLUMN 4
-#define POSITION_COLUMN 5
+#define POSITION_COLUMN 4
+#define VOL_COLUMN 5
 #define CONTEXT_COLUMN 6
-#define COLUMN_COUNT 7
-
-
-/// TODO
-/// some function pass SearchOptions - can we use the class member
 /**
  *
  *
@@ -67,7 +62,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   targetlayout->addWidget(m_keyboardButton);
   targetlayout->addWidget(m_hideOptionsButton);
 
-  QStringList headers = this->columnHeadings();
+
   m_defaultOptions.setSearchScope(SearchOptions::Word);
   m_search = new SearchOptionsWidget(m_defaultOptions,this);
 
@@ -75,24 +70,23 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
 
   //  QWidget * container = new QWidget;
   m_container = new QVBoxLayout;
-  m_rxlist = new FocusTable;
-  m_rxlist->setColumnCount(COLUMN_COUNT);
+  QStringList headings;
+  headings << tr("Mark") << tr("Root") << tr("Entry") << tr("Node") << tr("Occurs")  << tr("Vol/Page") << tr("Context");
+  if (! m_singleRow) {
+    headings[POSITION_COLUMN] = tr("Position");
+  }
+  m_rxlist = new ColumnarTableWidget(headings);
+
+  m_rxlist->setKey(ColumnarTableWidget::STATE,SID_FULLSEARCH_LIST_STATE);
+  m_rxlist->setKey(ColumnarTableWidget::COLUMN_WIDTHS,SID_FULLSEARCH_LIST_COLUMNS);
+  m_rxlist->setDefaultWidth(100);
+  m_rxlist->setObjectName("fullsearchresultlist");
   m_rxlist->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_rxlist->setSelectionMode(QAbstractItemView::SingleSelection);
-
-  m_rxlist->setHorizontalHeaderLabels(headers);
-  m_rxlist->horizontalHeader()->setStretchLastSection(true);
-  m_rxlist->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_rxlist->setMarkColumn(SELECT_COLUMN);
+  m_rxlist->setExportIgnore(CONTEXT_COLUMN,m_headText);
   m_rxlist->installEventFilter(this);
-  //  HtmlDelegate * d = new HtmlDelegate(m_rxlist);
-  //  if ( ! m_spanStyle.isEmpty()) {
-  //    d->setStyleSheet(m_spanStyle);
-  //  }
-  //  d->setStyleSheet(".ar { font-family : Amiri;font-size : 16px}");
-  //  m_rxlist->setItemDelegateForColumn(CONTEXT_COLUMN,d);
-
-  //QStyle * style = m_list->style();
-  //  QLOG_DEBUG() << "style hint" << style->styleHint(QStyle::SH_ItemView_ChangeHighlightOnFocus);
+  //  m_rxlist->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_progress = new QProgressBar;
   m_progress->hide();
   QHBoxLayout * resultslayout = new QHBoxLayout;
@@ -115,50 +109,45 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
   connect(m_rxlist,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
+  connect(m_rxlist,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(onCellDoubleClicked(int,int)));
   initXslt();
   //  m_search->setOptions(m_defaultOptions);
   m_search->setVisible(false);
-  m_rxlist->hide();
+
+
+  SETTINGS
+  settings.beginGroup("FullSearch");
+  m_rxlist->readConfiguration(settings);
+  //  m_rxlist->hide();
 
   this->setFocus();
 }
 FullSearchWidget::~FullSearchWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
+void FullSearchWidget::onCellDoubleClicked(int row,int /* col */) {
+  QLOG_DEBUG() << Q_FUNC_INFO << row;
 
-QStringList FullSearchWidget::columnHeadings() {
-  QStringList h;
-  for(int i=0;i < COLUMN_COUNT;i++) {
-    h << "";
-  }
-  h[SELECT_COLUMN] = "";
-  h[ROOT_COLUMN] = tr("Root");
-
-  h[HEAD_COLUMN] = tr("Entry");
-  h[NODE_COLUMN] =  tr("Node");
-  if (m_singleRow) {
-    h[POSITION_COLUMN] = tr("Occurs");
-  }
-  else {
-    h[POSITION_COLUMN] = tr("Position");
-  }
-  h[CONTEXT_COLUMN] = tr("Context");
-  h[VOL_COLUMN] = tr("Vol/Page");
-  return h;
+  this->showNode(row);
 }
-void FullSearchWidget::itemChanged(QTableWidgetItem * /* item */,QTableWidgetItem * /* prev */) {
-  QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "NOSHOW WE SHOULD NOT BE HERE";
-
-}
-
 void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
-  bool isHead = false;
-  /// get the node
-  item = item->tableWidget()->item(item->row(),NODE_COLUMN);
-  if (item->data(Qt::UserRole).toBool()) {
-    isHead = true;
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  this->showNode(item->row());
+}
+void FullSearchWidget::showNode(int row) {
+  QLabel * label = qobject_cast<QLabel *>(m_rxlist->cellWidget(row,NODE_COLUMN));
+  int pos;
+  if (! label) {
+    return;
   }
-  QString node = item->text();
+  QString node = label->text();
+
+  if (node.isEmpty()) {
+    QLOG_WARN() << QString("No node row %1").arg(row);
+    return;
+  }
+  bool isHead = label->property("HEADWORD").toBool();
+
   m_nodeQuery.bindValue(0,node);
   m_nodeQuery.exec();
   /// missing node
@@ -166,20 +155,21 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
     QLOG_WARN() << Q_FUNC_INFO << "No record for node" << node;
     return;
   }
-  item = item->tableWidget()->item(item->row(),POSITION_COLUMN);
-  if (!item) {
-    return;
-  }
-  int pos = item->data(Qt::UserRole).toInt();
+  Place p = Place::fromEntryRecord(m_nodeQuery.record());
+
   if (m_singleRow) {
     pos = 0;
   }
-  /// TODO make this a QSettings option or dialog option
+  else {
+    pos = label->property("TEXTINDEX").toInt();
+  }
   QString xml = m_nodeQuery.value("xml").toString();
   QString html = this->transform(xml);
   NodeView * v = new NodeView(this);
+  v->setAttribute(Qt::WA_DeleteOnClose);
+
   v->setWindowTitle(QString(tr("Showing result %1 in search for %2")
-                            .arg(item->row() + 1)
+                            .arg(row + 1)
                             .arg(m_target)));
   v->setPattern(m_currentRx);
   v->setCSS(m_currentCSS);
@@ -192,11 +182,13 @@ void FullSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
   if (Place::volume(page) == 0) {
     page = 0;
   }
-  v->setHeader(m_nodeQuery.value("root").toString(),m_nodeQuery.value("word").toString(),node,page);
-  /// has to be call before setHtml otherwise it will select the first occurence
-  if (! isHead ) {
-    v->setStartPosition(pos);
-  }
+  v->setHeader(p.root(),p.word(),node,page);
+  /**
+   * set the index for which occurrence to show first time through
+   *
+   */
+
+  v->setStartPosition(pos);
   v->setHtml(html);
   v->findFirst();
   v->show();
@@ -230,11 +222,11 @@ bool FullSearchWidget::eventFilter(QObject * target,QEvent * event) {
     case Qt::Key_Return:
     case Qt::Key_Space: {
       //        if (keyEvent->modifiers() && Qt::ControlModifier) {
-      int currentRow = m_rxlist->currentRow();
-      QTableWidgetItem * item = m_rxlist->item(currentRow,NODE_COLUMN);
-      if (item)
-        m_rxlist->itemDoubleClicked(item);
-
+      //      int currentRow = m_rxlist->currentRow();
+      //      QTableWidgetItem * item = m_rxlist->item(currentRow,NODE_COLUMN);
+      //      if (item)
+      //        m_rxlist->itemDoubleClicked(item);
+      this->onCellDoubleClicked(m_rxlist->currentRow(),NODE_COLUMN);
       break;
     }
     case Qt::Key_E: {
@@ -312,7 +304,6 @@ void FullSearchWidget::findTarget(bool showProgress) {
   else {
     this->textSearch(m_findTarget->text(),options);
   }
-
   m_progress->hide();
 
 }
@@ -358,7 +349,10 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
       .arg(m_query.lastError().text());
     return;
   }
+  m_rxlist->clearContents();
   m_rxlist->setRowCount(0);
+  m_resultsText->hide();
+
   int headCount = 0;
   int textCount = 0;
   int readCount = 0;
@@ -416,16 +410,21 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
         }
         if (headword.indexOf(rx) != -1) {
           if (options.includeHeads()) {
-            int row = addRow(root,m_nodeQuery.value("word").toString(),node,m_headText,-1,page);
-            QTableWidgetItem * item = m_rxlist->item(row,NODE_COLUMN);
-            item->setData(Qt::UserRole,true);
+            int row = addRow(m_nodeQuery.record(),m_headText,-1);
+            QLabel * label = qobject_cast<QLabel *>(m_rxlist->cellWidget(row,NODE_COLUMN));
+            if (label) {
+              label->setProperty("HEADWORD",true);
+            }
             headCount++;
+            /// TODO fix or remove
+            /*
             if (m_headBackgroundColor.isValid()) {
               QBrush b(m_headBackgroundColor);
               for(int i=0;i < m_rxlist->columnCount();i++) {
                 m_rxlist->item(row,i)->setBackground(b);
               }
             }
+            */
           }
         }
         headword = m_nodeQuery.value("word").toString();
@@ -435,12 +434,12 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
             getTextFragments(doc,target,options);
             if (m_fragments.size() > 0) {
               if (m_singleRow) {
-                addRow(root,headword,node,m_fragments[0],m_fragments.size(),page);
+                addRow(m_nodeQuery.record(),m_fragments[0],m_fragments.size());
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
-                    addRow(root,headword,node,m_fragments[i],i,page);
+                    addRow(m_nodeQuery.record(),m_fragments[i],i);
                   }
                 }
               }
@@ -454,7 +453,6 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     }
   }
   qint64 et = QDateTime::currentMSecsSinceEpoch();
-  //  m_rxlist->setUpdatesEnabled(true);
   if (pd) {
     delete pd;
   }
@@ -463,22 +461,12 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
   m_resultsText->show();
   if (m_rxlist->rowCount() > 0) {
-
-    m_rxlist->resizeColumnToContents(SELECT_COLUMN);
-    m_rxlist->resizeColumnToContents(ROOT_COLUMN);
-    if (m_debug) {
-      m_rxlist->showColumn(NODE_COLUMN);
-    }
-    else {
-      m_rxlist->resizeColumnToContents(NODE_COLUMN);
-      m_rxlist->hideColumn(NODE_COLUMN);
-    }
-
-    m_rxlist->resizeColumnToContents(POSITION_COLUMN);
-    m_rxlist->resizeColumnToContents(VOL_COLUMN);
+    ////
+    ///
+    /// THIS makes the horizontal scrollbar appear. WTF
+    ///
+    ///
     m_rxlist->resizeColumnToContents(CONTEXT_COLUMN);
-
-
     m_exportButton->setEnabled(true);
     m_container->removeItem(m_spacer);
     m_rxlist->show();
@@ -490,7 +478,6 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     m_findTarget->setFocus(Qt::OtherFocusReason);
     m_exportButton->setEnabled(false);
   }
-  qDebug() << Q_FUNC_INFO << "Exit";
 }
 /**
  *
@@ -507,41 +494,26 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
   QString p2;
   m_findCount = bodyCount + headCount;
 
-  switch(m_findCount) {
-  case 0 :
-    p1 = "no items found";
-    break;
-  case 1:
-    p1 = "";
-    break;
-  default:
-    p1 ="es";
-  }
-  if (entryCount == 1) {
-    p2 = "y";
-  }
-  else {
-    p2 = "ies";
-  }
-
   QString targetText;
   if (UcdScripts::isScript(m_target,"Arabic")) {
-    targetText = getLexicon()->spanArabic(m_target,"searchresults");
+    targetText = getLexicon()->spanArabic(m_target,"fullsearchresults");
   }
   else {
     targetText = m_target;
   }
 
   if (m_findCount == 0) {
-    t = QString(tr("Search for \"%1\", %2")).arg(targetText).arg(p1);
+    t = QString(tr("Search \"%1\": no items found")).arg(targetText).arg(p1);
   }
   else {
-    t = QString(tr("Search for \"%1\", found %2 match%3 in %4 entr%5"))
-      .arg(targetText)
-      .arg(m_findCount)
-      .arg(p1)
-      .arg(entryCount)
-      .arg(p2);
+    t = QString(tr("Search \"%1\": found %2")).arg(targetText).arg(m_findCount);
+
+    t += (m_findCount > 1 ? QString(tr(" matches")) : QString(tr("match")));
+    t += (m_findCount > 1 ? QString(tr(" in %1 entries")).arg(entryCount) : QString(tr(" in 1 entry")));
+
+    if (headCount > 0) {
+      t += (headCount > 1 ? QString(tr( " and %1 headwords")).arg(headCount) : QString(tr(" and 1 headword")));
+    }
   }
   if (m_searchOptions.getSearchType() == SearchOptions::Regex) {
     t += tr(", regular expression search");
@@ -563,75 +535,77 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
   }
   return t;
 }
-int FullSearchWidget::addRow(const QString & root,const QString & headword, const QString & node, const QString & text,int pos,int page) {
+/**
+ *
+ *
+ * @param record
+ * @param text
+ * @param pos index to the m_positions array of text positions or the actual position
+ *
+ * @return
+ */
+int FullSearchWidget::addRow(const QSqlRecord & record, const QString & text,int pos) {
 
   QTableWidgetItem * item;
-  QLabel * l;
+  QLabel * label;
+  Place p = Place::fromEntryRecord(record);
   int row = m_rxlist->rowCount();
   m_rxlist->insertRow(row);
 
-  m_rxlist->setCellWidget(row,SELECT_COLUMN,new CheckBoxTableItem);
+  m_rxlist->setCellWidget(row,SELECT_COLUMN,new CenteredCheckBox);
 
-  l = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(root,"fullsearch"));
-  l->setAlignment(Qt::AlignCenter);
-  //  item = new QTableWidgetItem(root);
-  //  item->setFont(m_resultsFont);
-  //  item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-  m_rxlist->setCellWidget(row,ROOT_COLUMN,l);
+  label = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(p.root(),"fullsearch"));
+  label->setAlignment(Qt::AlignCenter);
+  m_rxlist->setCellWidget(row,ROOT_COLUMN,label);
 
-  //  item = new QTableWidgetItem(headword);
-  //  item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-  //  item->setFont(m_resultsFont);
-  //  m_rxlist->setItem(row,HEAD_COLUMN,item);
-  l = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(headword,"fullsearch"));
-  l->setAlignment(Qt::AlignCenter);
-  m_rxlist->setCellWidget(row,HEAD_COLUMN,l);
+  label = m_rxlist->createLabel(p.head(),"fullsearch");
+  label->setAlignment(Qt::AlignCenter);
+  m_rxlist->setCellWidget(row,HEAD_COLUMN,label);
 
-  item = new QTableWidgetItem(node);
-  item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-  m_rxlist->setItem(row,NODE_COLUMN,item);
+  label = m_rxlist->createLabel(p.node());
+  label->setAlignment(Qt::AlignCenter);
+  m_rxlist->setCellWidget(row,NODE_COLUMN,label);
 
   int c = pos;
   ///
   /// for pos = -1
   ///
   if (pos == -1) {
-    m_rxlist->setItem(row,POSITION_COLUMN,new QTableWidgetItem(""));
+    m_rxlist->setCellWidget(row,POSITION_COLUMN,new QLabel(""));
   }
   else {
-    if (!m_singleRow) {
+    if (! m_singleRow ) {
       c = 0;
       if ((pos >= 0) && (pos < m_positions.size())) {
         c = m_positions[pos];
       }
     }
-    item = new QTableWidgetItem(QString("%1").arg(c));
-    item->setData(Qt::UserRole,pos);
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_rxlist->setItem(row,POSITION_COLUMN,item);
+    /// set the position on the node label for later use
+    label->setProperty("TEXTINDEX",pos);
+    ///
+    label = m_rxlist->createLabel((QString("%1").arg(c)));
+    label->setAlignment(Qt::AlignCenter);
+    m_rxlist->setCellWidget(row,POSITION_COLUMN,label);
   }
-  if (text.size() > 0) {
-    l = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(text,"fullsearch"));
-    if (this->startsWithArabic(text)) {
-      l->setAlignment(Qt::AlignRight);
-    }
-    else {
-      l->setAlignment(Qt::AlignLeft);
-    }
-    //    item = new QTableWidgetItem(text);
-    //    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    //    m_rxlist->setItem(row,CONTEXT_COLUMN,item);
-    m_rxlist->setCellWidget(row,CONTEXT_COLUMN,l);
+
+  label = m_rxlist->createLabel(text,"fullsearch");
+  if (text == m_headText) {
+    label->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
   }
   else {
-    m_rxlist->setItem(row,CONTEXT_COLUMN,new QTableWidgetItem(text));
+    if (this->startsWithArabic(text)) {
+      label->setAlignment(Qt::AlignRight);
+    }
+    else {
+      label->setAlignment(Qt::AlignLeft);
+    }
   }
-  int vol = Place::volume(page);
-  if (vol > 0) {
-    item = new QTableWidgetItem(QString("%1/%2").arg(vol).arg(page));
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    m_rxlist->setItem(row,VOL_COLUMN,item);
-  }
+  m_rxlist->setCellWidget(row,CONTEXT_COLUMN,label);
+
+  label = m_rxlist->createLabel(p.format("%V/%P"));
+  label->setAlignment(Qt::AlignCenter);
+  m_rxlist->setCellWidget(row,VOL_COLUMN,label);
+
   return row;
 }
 QTextDocument * FullSearchWidget::fetchDocument(const QString & xml) {
@@ -701,7 +675,7 @@ void FullSearchWidget::readSettings() {
 
 
   settings.beginGroup("XSLT");
-  m_xsltSource = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
+  m_xsltSource = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
   m_xsltSource = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_xsltSource);
   settings.endGroup();
 
@@ -800,8 +774,7 @@ int FullSearchWidget::getMaxRecords(const QString & table) {
 bool FullSearchWidget::readCssFromFile(const QString & name) {
   QFile f(name);
   if (! f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    QLOG_WARN()  << "Cannot open CSS file for reading: " << name
-                 << f.errorString();
+    QLOG_WARN()  << QString(tr("Error reading CSS file :%1, error: %2 ")).arg(name).arg(f.errorString());
     return false;
 
   }
@@ -926,8 +899,9 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
     m_rxlist->hideColumn(NODE_COLUMN);
   }
   //  m_rxlist->showColumn(4);
+  m_rxlist->clearContents();
   m_rxlist->setRowCount(0);
-  //  m_rxlist->hide();
+  m_resultsText->hide();
 
   //  m_nodquery.bindValue(0,m_target);
 
@@ -971,14 +945,17 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
     page = m_query.value("page").toInt();
     if (headword.indexOf(rx) != -1) {
       if (options.includeHeads()) {
-        int row = addRow(root,headword,node,m_headText,0,page);
+        int row = addRow(m_query.record(),m_headText,0);
         headCount++;
+        /// TODO fix or remove
+        /*
         if (m_headBackgroundColor.isValid()) {
           QBrush b(m_headBackgroundColor);
           for(int i=0;i < m_rxlist->columnCount();i++) {
             m_rxlist->item(row,i)->setBackground(b);
           }
         }
+        */
       }
     }
     QString xml = m_query.value("xml").toString();
@@ -989,12 +966,14 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
               entryCount++;
 
               if (m_singleRow) {
-                addRow(root,headword,node,m_fragments[0],m_fragments.size(),page);
+                /// pass the first text fragments and the total number of fragments
+                addRow(m_query.record(),m_fragments[0],m_fragments.size());
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
-                    addRow(root,headword,node,m_fragments[i],i,page);
+                    /// pass the i'th fragment and the index of the fragment
+                    addRow(m_query.record(),m_fragments[i],i);
                   }
                 }
               }
@@ -1005,7 +984,6 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   }
   m_rxlist->setUpdatesEnabled(true);
   qint64 et = QDateTime::currentMSecsSinceEpoch();
-  QLOG_DEBUG() << "Search time ms:" << et - st;
   if (pd) {
     delete pd;
   }
@@ -1020,31 +998,15 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   else {
     m_exportButton->setEnabled(false);
   }
-  //  m_resultsText->setText(QString("Search for %1, returned %2 results").arg(target).arg(m_rxlist->rowCount()));
   m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
   m_resultsText->show();
-  m_rxlist->resizeColumnToContents(SELECT_COLUMN);
-  m_rxlist->resizeColumnToContents(ROOT_COLUMN);
-  m_rxlist->resizeColumnToContents(NODE_COLUMN);
-  m_rxlist->resizeColumnToContents(POSITION_COLUMN);
-  m_rxlist->resizeColumnToContents(CONTEXT_COLUMN);
-  m_rxlist->resizeColumnToContents(VOL_COLUMN);
   this->show();
-  /*
-  else {
-    QMessageBox msgBox;
-    msgBox.setObjectName("wordnotfound");
-    msgBox.setTextFormat(Qt::RichText);
-    msgBox.setText(QString(tr("Word not found")));
-    msgBox.exec();
-  }
-  */
 }
 void FullSearchWidget::setForceLTR(bool v) {
    m_findTarget->setForceLTR(v);
  }
 void FullSearchWidget::onExport() {
-  m_rxlist->exportResults();
+  statusMessage(m_rxlist->exportResults());
 }
 void FullSearchWidget::openNode(const QString & node) {
   emit(showNode(node));

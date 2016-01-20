@@ -13,7 +13,8 @@ BookmarkOptions::BookmarkOptions(const QString & theme,QWidget * parent) : Optio
   m_section = "Bookmark";
   setObjectName("bookmarkoptions");
   m_id = new QLineEdit;
-  m_font = new QLineEdit;
+  m_format = new QLineEdit;
+  //  m_font = new QLineEdit;
   m_add = new QKeySequenceEdit;
   m_list = new QKeySequenceEdit;
   m_jump = new QKeySequenceEdit;
@@ -35,7 +36,8 @@ BookmarkOptions::BookmarkOptions(const QString & theme,QWidget * parent) : Optio
 
   QFormLayout * layout2 = new QFormLayout;
   layout2->addRow(tr("Ids"),m_id);
-
+  layout2->addRow(tr("Menu format"),m_format);
+  /*
   QHBoxLayout * hlayout = new QHBoxLayout;
   QPushButton * btn  = new QPushButton(tr("Click to set font"));
   connect(btn,SIGNAL(clicked()),this,SLOT(onSetFont()));
@@ -45,6 +47,7 @@ BookmarkOptions::BookmarkOptions(const QString & theme,QWidget * parent) : Optio
   hlayout->addStretch();
 
   layout2->addRow(tr("Arabic font"),hlayout);
+*/
   layout2->addRow(tr("Open in new tab"),m_newTab);
   layout2->addRow(tr("Activate new tab"),m_goTab);
 
@@ -58,7 +61,7 @@ BookmarkOptions::BookmarkOptions(const QString & theme,QWidget * parent) : Optio
   this->setKeySequenceEditSize(VLARGE_EDIT);
 
   m_id->setMinimumWidth(VLARGE_EDIT);
-  m_font->setMinimumWidth(VLARGE_EDIT);
+  //  m_font->setMinimumWidth(VLARGE_EDIT);
 }
 
 void BookmarkOptions::readSettings() {
@@ -66,7 +69,8 @@ void BookmarkOptions::readSettings() {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
   m_id->setText(settings.value(SID_BOOKMARK_ID,"abcdefghijklmnopqrstuvywxy").toString());
-  m_font->setText(settings.value(SID_BOOKMARK_ARABIC_FONT).toString());
+  m_format->setText(settings.value(SID_BOOKMARK_MENU_FORMAT,"Root:%R,Entry:%H, Vol %V/%P (%N)").toString());
+
   m_newTab->setChecked(settings.value(SID_BOOKMARK_NEW_TAB,false).toBool());
   m_goTab->setChecked(settings.value(SID_BOOKMARK_GO_TAB,false).toBool());
 
@@ -111,7 +115,8 @@ void BookmarkOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_BOOKMARK_NEW_TAB,m_newTab->isChecked());
   settings.setValue(SID_BOOKMARK_GO_TAB,m_goTab->isChecked());
   settings.setValue(SID_BOOKMARK_ID,m_id->text());
-  settings.setValue(SID_BOOKMARK_ARABIC_FONT,m_font->text());
+  settings.setValue(SID_BOOKMARK_MENU_FORMAT,m_format->text());
+  //  settings.setValue(SID_BOOKMARK_ARABIC_FONT,m_font->text());
   settings.sync();
   m_dirty = false;
   emit(modified(false));
@@ -152,12 +157,18 @@ bool BookmarkOptions::isModified()  {
   if (compare(&settings,SID_BOOKMARK_ID,m_id)) {
     m_dirty = true;
   }
+  if (compare(&settings,SID_BOOKMARK_MENU_FORMAT,m_format)) {
+    m_dirty = true;
+  }
+  /*
   if (compare(&settings,SID_BOOKMARK_ARABIC_FONT,m_font)) {
     m_dirty = true;
   }
+  */
   return m_dirty;
 }
 void BookmarkOptions::onSetFont() {
+  /*
   QFont f;
   f.fromString(m_font->text());
 
@@ -176,6 +187,7 @@ void BookmarkOptions::onSetFont() {
     m_font->setText(font.toString());
   }
   delete d;
+  */
   return;
 }
 void BookmarkOptions::onSetColor() {

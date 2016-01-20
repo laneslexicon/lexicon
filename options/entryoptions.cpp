@@ -5,6 +5,52 @@
 #include "application.h"
 #include "externs.h"
 #endif
+DebugOptionsDialog::DebugOptionsDialog(bool xml,bool html,bool ohtml,const QString & path,QWidget * parent) : QDialog(parent) {
+  QVBoxLayout * layout = new QVBoxLayout;
+
+  QFormLayout * formlayout = new QFormLayout;
+  setWindowTitle(tr("Advanced Options"));
+  m_xml = new QCheckBox;
+  m_html = new QCheckBox;
+  m_outputHtml = new QCheckBox;
+  m_path = new QLineEdit;
+
+  m_xml->setChecked(xml);
+  m_html->setChecked(html);
+  m_outputHtml->setChecked(ohtml);
+  m_path->setText(path);
+  formlayout->addRow(new QLabel(tr("Save generated XML/HTML")));
+  formlayout->addRow(tr("XML"),m_xml);
+  formlayout->addRow(tr("XSLT output HTML"),m_outputHtml);
+  formlayout->addRow(tr("Qt HTML"),m_html);
+
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  QPushButton * pathButton = new QPushButton(tr("Set path"));
+  connect(pathButton,SIGNAL(clicked()),this,SLOT(onPathSelect()));
+  hlayout->addWidget(m_path);
+  hlayout->addWidget(pathButton);
+  hlayout->addStretch();
+
+  formlayout->addRow(tr("Output directory"),hlayout);
+
+
+  layout->addLayout(formlayout);
+
+  QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
+
+  layout->addWidget(btns);
+
+  connect(btns,SIGNAL(accepted()),this,SLOT(accept()));
+  connect(btns,SIGNAL(rejected()),this,SLOT(reject()));
+
+  setLayout(layout);
+}
+void DebugOptionsDialog::onPathSelect() {
+  QString d  = QFileDialog::getExistingDirectory(this, QString(tr("Select directory")), m_path->text());
+  if (! d.isEmpty()) {
+    m_path->setText(d);
+  }
+}
 /**
  * Not done:
  *
@@ -14,14 +60,13 @@
 EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
   setObjectName("entryoptions");
   m_section = "Entry";
-
+  m_nodeinfoClose = new QCheckBox;
   m_back = new QLineEdit ;
   m_css = new QLineEdit ;
   m_printCss = new QLineEdit ;
   m_entryXslt = new QLineEdit ;
-  m_nodeXslt = new QLineEdit ;
+  //  m_nodeXslt = new QLineEdit ;
   m_clean = new QLineEdit ;
-  m_debug = new QCheckBox ;
   m_find = new QLineEdit ;
   m_findNext = new QLineEdit ;
   m_forward = new QLineEdit ;
@@ -32,9 +77,19 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_focusDown = new QLineEdit ;
   m_narrow = new QLineEdit ;
   m_reload = new QLineEdit ;
-  m_saveHtml = new QCheckBox ;
-  m_saveXml = new QCheckBox ;
-  m_saveOutputHtml = new QCheckBox ;
+  m_offPage = new QCheckBox;
+  // the next four are not shown
+  // these need to have a parent otherwise findChildren routines in OptionsWidget wont pick them up
+  m_saveHtml = new QCheckBox(this) ;
+  m_saveXml = new QCheckBox(this) ;
+  m_saveOutputHtml = new QCheckBox(this) ;
+  m_outputPath = new QLineEdit(this);
+
+  m_saveOutputHtml->setVisible(false);
+  m_saveHtml->setVisible(false);
+  m_saveXml->setVisible(false);
+  m_outputPath->setVisible(false);
+
   m_show = new QLineEdit ;
   m_showLinkWarning = new QCheckBox ;
   m_step = new QLineEdit ;
@@ -153,7 +208,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   csslayout->addRow(tr("Stylesheet"),m_css);
   csslayout->addRow(tr("Print stylesheet"),m_printCss);
   csslayout->addRow(tr("XSLT"),m_entryXslt);
-  csslayout->addRow(tr("Node XSLT"),m_nodeXslt);
+  //  csslayout->addRow(tr("Node XSLT"),m_nodeXslt);
   cssbox->setLayout(csslayout);
 
   QGroupBox * otherbox = new QGroupBox(tr("Other"));
@@ -165,12 +220,13 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   this->setControlSize(m_show,SMALL_EDIT);
   this->setControlSize(m_showLinkWarning,SMALL_EDIT);
   this->setControlSize(m_highlightColor,LARGE_EDIT);
-
+  otherlayout->addRow(tr("Off page movement"),m_offPage);
   otherlayout->addRow(tr("Default zoom"),m_zoom);
   otherlayout->addRow(tr("Show link warning"),m_showLinkWarning);
   otherlayout->addRow(tr("Step size"),m_step);
   otherlayout->addRow(tr("Text width"),m_textWidth);
   otherlayout->addRow(tr("Text margin"),m_margin);
+  otherlayout->addRow(tr("Close entry info after load"),m_nodeinfoClose);
 
   QHBoxLayout * colorlayout = new QHBoxLayout;
   colorlayout->addWidget(m_highlightColor);
@@ -180,22 +236,15 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   colorlayout->addStretch();
   otherlayout->addRow(tr("Highlight color"),colorlayout);
 
+  QPushButton * advancedbutton = new QPushButton(tr("Options"));
+  connect(advancedbutton,SIGNAL(clicked()),this,SLOT(onAdvanced()));
 
-  /// Debug
-  QHBoxLayout * debugcontainer = new QHBoxLayout;
-  QGridLayout * debuglayout = new QGridLayout;
-  debuglayout->addWidget(new QLabel(tr("Debug")),0,0);
-  debuglayout->addWidget(m_debug,0,1);
-  debuglayout->addWidget(new QLabel(tr("Save HTML")),0,2);
-  debuglayout->addWidget(m_saveHtml,0,3);
-  debuglayout->addWidget(new QLabel(tr("Save inner HTML")),1,0);
-  debuglayout->addWidget(m_saveOutputHtml,1,1);
-  debuglayout->addWidget(new QLabel(tr("Save XML")),1,2);
-  debuglayout->addWidget(m_saveXml,1,3);
-  debugcontainer->addLayout(debuglayout);
-  debugcontainer->addStretch();
+  QHBoxLayout * adlayout = new QHBoxLayout;
+  adlayout->addWidget(advancedbutton);
+  adlayout->addStretch();
+  otherlayout->addRow(tr("Advanced"),adlayout);
 
-  otherlayout->addRow(tr("Tech"),debugcontainer);
+
   otherbox->setLayout(otherlayout);
 
   vlayout->addWidget(keybox);
@@ -203,6 +252,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   vlayout->addWidget(cssbox);
   vlayout->addWidget(otherbox);
   vlayout->addStretch();
+
   setLayout(vlayout);
   addButtons();
   readSettings();
@@ -224,19 +274,20 @@ void EntryOptions::readSettings() {
   //  v = QDir::current().relativeFilePath(v);
   m_entryXslt->setText(v);
 
-  v = settings.value(SID_XSLT_NODE).toString();
+  //  v = settings.value(SID_XSLT_NODE).toString();
   //  v = getLexicon()->getResourceFilePath(Lexicon::XSLT,v);
   //  v = QDir::current().relativeFilePath(v);
-  m_nodeXslt->setText(v);
+  //  m_nodeXslt->setText(v);
   settings.endGroup();
   settings.beginGroup(m_section);
   m_css->setText(settings.value(SID_ENTRY_CSS).toString());
   m_printCss->setText(settings.value(SID_ENTRY_PRINT_CSS).toString());
 
+  m_nodeinfoClose->setChecked(settings.value(SID_ENTRY_NODEINFO_CLOSE).toBool());
 
   m_back->setText(settings.value(SID_ENTRY_BACK).toString());
   m_clean->setText(settings.value(SID_ENTRY_CLEAN).toString());
-  m_debug->setChecked(settings.value(SID_ENTRY_DEBUG).toBool());
+  m_offPage->setChecked(settings.value(SID_ENTRY_OFF_PAGE).toBool());
   m_find->setText(settings.value(SID_ENTRY_FIND).toString());
   m_findNext->setText(settings.value(SID_ENTRY_FIND_NEXT).toString());
   m_forward->setText(settings.value(SID_ENTRY_FORWARD).toString());
@@ -250,6 +301,7 @@ void EntryOptions::readSettings() {
   m_saveHtml->setChecked(settings.value(SID_ENTRY_DUMP_HTML).toBool());
   m_saveXml->setChecked(settings.value(SID_ENTRY_DUMP_XML).toBool());
   m_saveOutputHtml->setChecked(settings.value(SID_ENTRY_DUMP_OUTPUT_HTML).toBool());
+  m_outputPath->setText(settings.value(SID_ENTRY_OUTPUT_PATH,QDir::tempPath()).toString());
   m_show->setText(settings.value(SID_ENTRY_SHOW).toString());
   m_showLinkWarning->setChecked(settings.value(SID_ENTRY_SHOW_LINK_WARNING).toBool());
   m_step->setText(settings.value(SID_ENTRY_STEP).toString());
@@ -284,11 +336,11 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
+  settings.setValue(SID_ENTRY_NODEINFO_CLOSE,m_nodeinfoClose->isChecked());
   settings.setValue(SID_ENTRY_BACK,m_back->text());
   settings.setValue(SID_ENTRY_CSS,m_css->text());
   settings.setValue(SID_ENTRY_PRINT_CSS,m_printCss->text());
   settings.setValue(SID_ENTRY_CLEAN,m_clean->text());
-  settings.setValue(SID_ENTRY_DEBUG,m_debug->isChecked());
   settings.setValue(SID_ENTRY_FIND,m_find->text());
   settings.setValue(SID_ENTRY_FIND_NEXT,m_findNext->text());
   settings.setValue(SID_ENTRY_FORWARD,m_forward->text());
@@ -302,6 +354,7 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ENTRY_DUMP_HTML,m_saveHtml->isChecked());
   settings.setValue(SID_ENTRY_DUMP_XML,m_saveXml->isChecked());
   settings.setValue(SID_ENTRY_DUMP_OUTPUT_HTML,m_saveOutputHtml->isChecked());
+  settings.setValue(SID_ENTRY_OUTPUT_PATH,m_outputPath->text());
   settings.setValue(SID_ENTRY_SHOW,m_show->text());
   settings.setValue(SID_ENTRY_SHOW_LINK_WARNING,m_showLinkWarning->isChecked());
   settings.setValue(SID_ENTRY_STEP,m_step->text());
@@ -314,11 +367,12 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ENTRY_PRINT_NOTES,m_printNotes->currentData());
   settings.setValue(SID_ENTRY_PRINT_NODES,m_printNodes->currentData());
   settings.setValue(SID_ENTRY_PRINT_INFO,m_printInfo->currentData());
+  settings.setValue(SID_ENTRY_OFF_PAGE,m_offPage->isChecked());
 
   settings.endGroup();
   settings.beginGroup("XSLT");
   settings.setValue(SID_XSLT_ENTRY,m_entryXslt->text());
-  settings.setValue(SID_XSLT_NODE,m_nodeXslt->text());
+  //  settings.setValue(SID_XSLT_NODE,m_nodeXslt->text());
 
   settings.sync();
   m_dirty = false;
@@ -336,6 +390,9 @@ bool EntryOptions::isModified()  {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
+  if (compare(&settings,SID_ENTRY_NODEINFO_CLOSE,m_nodeinfoClose)) {
+    m_dirty = true;
+  }
   if (compare(&settings,SID_ENTRY_BACK,m_back)) {
     m_dirty = true;
   }
@@ -347,9 +404,6 @@ bool EntryOptions::isModified()  {
   }
 
   if (compare(&settings,SID_ENTRY_CLEAN,m_clean)) {
-    m_dirty = true;
-  }
-  if (compare(&settings,SID_ENTRY_DEBUG,m_debug)) {
     m_dirty = true;
   }
 
@@ -403,7 +457,9 @@ bool EntryOptions::isModified()  {
   if (compare(&settings,SID_ENTRY_DUMP_OUTPUT_HTML,m_saveOutputHtml)) {
     m_dirty = true;
   }
-
+  if (compare(&settings,SID_ENTRY_OUTPUT_PATH,m_outputPath)) {
+    m_dirty = true;
+  }
   if (compare(&settings,SID_ENTRY_SHOW,m_show)) {
     m_dirty = true;
   }
@@ -448,14 +504,19 @@ bool EntryOptions::isModified()  {
   if (compare(&settings,SID_ENTRY_PRINT_INFO,m_printInfo)) {
     m_dirty = true;
   }
+  if (compare(&settings,SID_ENTRY_OFF_PAGE,m_offPage)) {
+    m_dirty = true;
+  }
   settings.endGroup();
   settings.beginGroup("XSLT");
   if (compare(&settings,SID_XSLT_ENTRY,m_entryXslt)) {
     m_dirty = true;
   }
+  /*
   if (compare(&settings,SID_XSLT_NODE,m_nodeXslt)) {
     m_dirty = true;
   }
+  */
 
   return m_dirty;
 }
@@ -522,4 +583,19 @@ void EntryOptions::onSetColor() {
     }
   }
   m_highlightColor->setText(d.currentColor().name());
+}
+void EntryOptions::onAdvanced() {
+  DebugOptionsDialog d(
+                       m_saveXml->isChecked(),
+                       m_saveHtml->isChecked(),
+                       m_saveOutputHtml->isChecked(),
+                       m_outputPath->text()
+);
+
+  if (d.exec() == QDialog::Accepted) {
+    this->m_saveHtml->setChecked(d.m_html->isChecked());
+    this->m_saveXml->setChecked(d.m_xml->isChecked());
+    this->m_saveOutputHtml->setChecked(d.m_outputHtml->isChecked());
+    this->m_outputPath->setText(d.m_path->text());
+  }
 }

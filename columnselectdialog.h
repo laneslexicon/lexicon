@@ -12,9 +12,11 @@ class ColumnSelectDialog : public QDialog {
   Q_OBJECT
  public:
   ColumnSelectDialog(QMap<int,QString> cols,QWidget * parent = 0);
+  ColumnSelectDialog(const QStringList & cols,QWidget * parent = 0);
   void setState(QList<bool>);
   QList<bool> state() const;
  private:
+  void setup();
   QList<QCheckBox *> m_cols;
   QGridLayout * m_grid;
 };

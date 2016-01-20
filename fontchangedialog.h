@@ -52,6 +52,7 @@ class FontChangeDialog : public QDialog {
 
  public:
   FontChangeDialog(QWidget * parent = 0);
+  ~FontChangeDialog();
   bool isModified() const;
  public slots:
    void onHelp();

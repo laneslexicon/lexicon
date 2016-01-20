@@ -54,7 +54,7 @@ class GraphicsEntry : public QWidget {
   ~GraphicsEntry();
   enum SearchType { RootSearch, WordSearch, NodeSearch, PageSearch };
     Place getXmlForRoot(const Place &);
-    Place showPlace(const Place &,bool thisPageOnly,bool createTab,bool activateTab);
+    //    Place showPlace(const Place &,bool thisPageOnly,bool createTab,bool activateTab);
     Place getPage(const Place & );
     Place getPlace(int index=-1) const;
 
@@ -88,7 +88,6 @@ class GraphicsEntry : public QWidget {
     void setHome(const QString &);
     void shiftFocus();
     void setCurrentItem(QGraphicsItem *);
-    static QString getXsltFileName();
     QString userTitle() const;
     void setXrefMode(int);
   public slots:
@@ -167,6 +166,7 @@ class GraphicsEntry : public QWidget {
     bool m_dumpHtml;
     bool m_dumpOutputHtml;
     bool m_offPageMovement;
+    bool m_nodeinfoClose;
     int  m_linkCheckMode;
 
     int m_pagingDir;
@@ -218,6 +218,7 @@ class GraphicsEntry : public QWidget {
     QGraphicsScene * m_scene;
     QGraphicsTextItem * m_item;
 
+    QMap<SearchOptions::SearchScope_t,SearchOptions *> m_lastSearchOptions;
 
     Place m_place;
     Place m_focusPlace;
@@ -249,6 +250,7 @@ class GraphicsEntry : public QWidget {
     void searchStarted();
     void searchFoundNext();
     void searchFinished();
+    void showNode(const QString &);
 };
 /*
 class LaneGraphicsView : public QGraphicsView {

@@ -26,32 +26,34 @@
 class GraphicsEntry;
 class FocusTable;
 class Place;
+class ColumnarTableWidget;
 class HeadSearchWidget : public QWidget
 {
     Q_OBJECT
 
  public:
-    //    HeadSearchWidget(const QString & str,const SearchOptions &,QWidget * parent = 0);
     HeadSearchWidget(QWidget * parent = 0);
-    Place getPlace();
-    GraphicsEntry * getEntry();
     int count();
    void search(const QString &,const SearchOptions &);
-   void showFirst();
+
    void focusTable();
+   void showNode(int row);
  public slots:
    void cancelSearch();
-   void viewedItemChanged(QTableWidgetItem *,QTableWidgetItem *);
-   void itemChanged(QTableWidgetItem *);
-   void itemDoubleClicked(QTableWidgetItem *);
-   void onRemoveResults();
+   void onItemDoubleClicked(QTableWidgetItem *);
+   void onCellDoubleClicked(int,int);
    void onExport();
    void selectFocus();
+   void openNode(const QString &);
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);
 
  private:
+   bool readCssFromFile(const QString &);
+   QString m_xsltSource;
+   QString m_css;
+   QString transform(const QString & xml) const;
    QStringList m_columns;
    void readSettings();
    bool eventFilter(QObject * target,QEvent * event);
@@ -66,18 +68,15 @@ class HeadSearchWidget : public QWidget
    QSqlQuery m_nodeQuery;
    QString m_target;
    QLabel * m_resultsText;
-   FocusTable * m_list;
+   ColumnarTableWidget * m_heads;
    GraphicsEntry * m_entry;
-/// for Arabic font from QSettings
-   QFont m_resultsFont;
-   bool m_singleClick;
+   bool m_headPhrase;
    bool m_cancelSearch;
-   bool m_debug;
-   bool m_verticalLayout;
-   QPushButton * m_convertButton;
+   bool m_nodeinfoClose;
    QPushButton * m_exportButton;
  signals:
    void searchResult(const QString &);
    void deleteSearch();
+   void showNode(const QString &);
 };
 #endif

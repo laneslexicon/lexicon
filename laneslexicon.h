@@ -85,6 +85,7 @@ class LanesLexicon : public QMainWindow
   QMapIterator<QString,QString> getMapIterator();
   HistoryMaster * history();
   NoteMaster * notes();
+  QTabWidget * tabwidget() const;
   bool sanityCheck(int type = 0);
   enum NewTabBehaviour { InsertTab, AppendTab };
   enum NavigationMode { ByRoot , ByPage };
@@ -100,6 +101,7 @@ class LanesLexicon : public QMainWindow
       void onLoadPageSet();
       void onEditPageSet();
     private slots:
+      void onTabList();
       void onOptionsChanged(bool);
       void onReady();
       void onLogViewer();
@@ -108,6 +110,7 @@ class LanesLexicon : public QMainWindow
       void testSlot();
       void sync();
       void showNoteBrowser();
+      void onNotesDeleted(const QStringList &);
       void shortcut(const QString &);
       void deleteSearch();
       void localSearch();
@@ -230,8 +233,8 @@ class LanesLexicon : public QMainWindow
       void cleanup();
       void search(int searchType,ArabicSearchDialog *,const QString &);
       //      Place showPlace(const Place &,int);
-
-      void updateStatusBar();
+      void closeAllTabs();
+      void updateStatusBar(const Place & p = Place());
       void updateMenu();
       int searchTabs(const QString & node);
       void restoreBookmarks();
@@ -288,6 +291,7 @@ class LanesLexicon : public QMainWindow
       QString m_firstRoot;
       QString m_lastRoot;
 
+      QString m_bookmarkMenuFormat;
       QPrinter m_printer;
 
       NavigationMode m_navMode;
@@ -303,6 +307,7 @@ class LanesLexicon : public QMainWindow
       NodeSearchDialog   * m_nodeSearchDialog;
       PageSearchDialog   * m_pageSearchDialog;
 
+      bool m_allowNavMode;
       bool m_toolbarText;
       bool m_linkContents;
       bool m_printToPdf;
@@ -321,7 +326,6 @@ class LanesLexicon : public QMainWindow
       bool m_saveBookmarks;
       bool m_restoreBookmarks;
       bool m_revertEnabled;
-      bool m_debug;
       bool m_menuWarning;
       bool m_allowDuplicates;
 
@@ -402,7 +406,7 @@ class LanesLexicon : public QMainWindow
       QActionGroup * m_moveGroup;
 
 
-
+      QAction * m_tablistAction;
       QAction * m_minimalAction;
       QAction * m_logViewerAction;
       QAction * m_optionsAction;

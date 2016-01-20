@@ -71,7 +71,7 @@ SOURCES += main.cpp\
         history.cpp \
         place.cpp \
         fullsearch.cpp \
-        focustable.cpp \
+ #       focustable.cpp \
  #       helpviewer.cpp \
         menubar.cpp \
         tabwidget.cpp \
@@ -103,7 +103,9 @@ SOURCES += main.cpp\
         loadpagesetdialog.cpp \
         editpagesetdialog.cpp \
         pageentrydialog.cpp \
-        columnselectdialog.cpp
+        columnselectdialog.cpp \
+        columnartablewidget.cpp \
+        tablistdialog.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -116,7 +118,7 @@ HEADERS  += laneslexicon.h \
             history.h \
             place.h \
             fullsearch.h \
-            focustable.h \
+#            focustable.h \
 #            helpviewer.h \
             menubar.h \
             tabwidget.h \
@@ -152,4 +154,6 @@ HEADERS  += laneslexicon.h \
             loadpagesetdialog.h \
             editpagesetdialog.h \
             pageentrydialog.h \
-            columnselectdialog.h
+            columnselectdialog.h \
+            columnartablewidget.h \
+            tablistdialog.h

@@ -4,7 +4,8 @@
 #include "externs.h"
 /**
  * This is used to show details of the linked-to node in a cross reference
- * The some settings are used by NodeView
+ * and by HeadSearch to view an entry's details
+ * The same settings are used by NodeView
  *
  * @param parent
  */
@@ -36,32 +37,34 @@ NodeInfo::NodeInfo(QWidget * parent)
 
 
   m_browser = new QTextBrowser;
-  //  m_browser->setHtml(html);
 
-  QDialogButtonBox * buttonBox = new QDialogButtonBox();
+  QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
 
-  QPushButton * button = new QPushButton(tr("&Cancel"));
-  buttonBox->addButton(button,QDialogButtonBox::RejectRole);
+  QPushButton * button = new QPushButton(tr("&Show in tab"));
 
-  /*
-  button = new QPushButton(tr("&Print"));
-  connect(button,SIGNAL(clicked()),this,SLOT(print()));
+
   buttonBox->addButton(button,QDialogButtonBox::ActionRole);
-  */
-  button = new QPushButton(tr("&Show in tab"));
-  buttonBox->addButton(button,QDialogButtonBox::ActionRole);
-  connect(button,SIGNAL(clicked()),this,SLOT(accept()));
+  connect(button,SIGNAL(clicked()),this,SLOT(openEntry()));
 
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
+  QHBoxLayout * boxlayout = new QHBoxLayout;
+  m_closeOnTabLoad = new QCheckBox(tr("Close after load"));
+  boxlayout->addWidget(m_closeOnTabLoad);
+  boxlayout->addWidget(buttonBox);
+
   layout->addLayout(hlayout);
   layout->addWidget(m_browser);
-  layout->addWidget(buttonBox);
+  layout->addLayout(boxlayout);
   setLayout(layout);
+
 }
 NodeInfo::~NodeInfo() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+}
+void NodeInfo::setCloseOnLoad(bool v) {
+  m_closeOnTabLoad->setChecked(v);
 }
 void NodeInfo::setPreferredSize(const QString & szStr) {
   m_size.setWidth(400);
@@ -80,8 +83,10 @@ void NodeInfo::setPreferredSize(const QString & szStr) {
   }
 }
 void NodeInfo::openEntry() {
-  /// Not used
   emit(openNode(m_node));
+  if (m_closeOnTabLoad->isChecked()) {
+    this->accept();
+  }
 }
 QSize NodeInfo::sizeHint() const {
   return m_size;
@@ -94,12 +99,7 @@ void NodeInfo::reject() {
 }
 void NodeInfo::setPlace(const Place & p) {
   m_place = p;
-  this->setHeader(p.getRoot(),p.getWord(),p.getNode(),p.getPage());
-  //  m_rlabel->setText(p.getRoot());
-  //  m_hlabel->setText(p.getWord());
-  //  m_vlabel->setText(QString("(Vol %1,Page %2)").arg(p.getVol()).arg(p.getPage()));
-  //
-  //  m_node = p.getNode();
+  this->setHeader(p);
 }
 void NodeInfo::setCss(const QString & css) {
   m_css = css;
@@ -116,6 +116,17 @@ void NodeInfo::setHeader(const QString & root,const QString & head,const QString
   m_hlabel->setText(getLexicon()->spanArabic(head,"nodeview"));
   m_node = node;
   if (page > 0) {
-    m_vlabel->setText(QString("(v%1/%2)").arg(Place::volume(page)).arg(page));
+    m_vlabel->setText(QString("(Vol v%1/%2)").arg(Place::volume(page)).arg(page));
   }
+}
+void NodeInfo::setHeader(const Place & p) {
+  m_rlabel->setText(getLexicon()->spanArabic(p.root(),"nodeview"));
+  m_hlabel->setText(getLexicon()->spanArabic(p.word(),"nodeview"));
+  m_node = p.node();
+  QString head;
+  if (p.head() != p.word()) {
+    head = QString(tr(", Head word: %1")).arg(p.head());
+  }
+  QString str = QString("%1%2").arg(p.format("Vol %V/%P")).arg(head);
+  m_vlabel->setText(getLexicon()->scanAndStyle(str,"nodeview"));
 }

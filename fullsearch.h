@@ -9,6 +9,7 @@
 #include <QSettings>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QFile>
 #include <QLabel>
 #include <QSettings>
@@ -31,7 +32,7 @@
 class ImLineEdit;
 class GraphicsEntry;
 class SearchOptionsWidget;
-class FocusTable;
+class ColumnarTableWidget;
 class KeyboardWidget;
 class FullSearchWidget : public QWidget
 {
@@ -51,8 +52,8 @@ class FullSearchWidget : public QWidget
   int findCount() const;
   QString results() const;
   public slots:
-    void itemChanged(QTableWidgetItem *,QTableWidgetItem *);
     void itemDoubleClicked(QTableWidgetItem *);
+    void onCellDoubleClicked(int,int);
     void hideOptions();
     void findTarget(bool show=false);
     void cancelSearch();
@@ -65,14 +66,14 @@ class FullSearchWidget : public QWidget
     void focusOutEvent(QFocusEvent *);
     //   void eventFilter(QObject *,QEvent *);
  private:
+    void showNode(int row);
     void readSettings();
-    QStringList columnHeadings();
     QString buildText(int,int,int,int);
     bool readCssFromFile(const QString &);
     int getMaxRecords(const QString & tablename);
     bool eventFilter(QObject * target,QEvent * event);
     bool startsWithArabic(const QString & ) const;
-    int addRow(const QString &,const QString &,const QString &,const QString &,int,int);
+    int addRow(const QSqlRecord &,const QString &,int);
     void getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & rx = QRegExp());
     QTextDocument * fetchDocument(const QString & node);
     QString transform(const QString & xml);
@@ -110,7 +111,7 @@ class FullSearchWidget : public QWidget
     QPushButton * m_exportButton;
     QSpacerItem * m_spacer;
     QVBoxLayout * m_container;
-    FocusTable * m_rxlist;
+    ColumnarTableWidget * m_rxlist;
     GraphicsEntry * m_text;
     QPushButton * m_findButton;
     QPushButton * m_hideOptionsButton;

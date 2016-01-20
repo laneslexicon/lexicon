@@ -29,12 +29,11 @@
 #include <QLineEdit>
 #include <QTabWidget>
 #include <QMessageBox>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif
 class PageEntryDialog;
+class ColumnarTableWidget;
 
 class LoadPageSetDialog : public QDialog {
   Q_OBJECT
@@ -55,12 +54,10 @@ class LoadPageSetDialog : public QDialog {
     QMap<int,int> m_pagesets;
     QPushButton * m_loadButton;
   int loadTitles();
-  void loadTitlesToTree();
   int m_action;
   QCheckBox * m_overwrite;
-  QTableWidget * m_setlist;
+  ColumnarTableWidget * m_setlist;
   QString m_spanStyle;
-  QTreeWidget * m_tree;
   QMap<int,PageEntryDialog *> m_pageDialogs;
   //  void createPageDialog(int);
 };

@@ -14,6 +14,7 @@
  */
 SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWidget(theme,parent) {
   m_section = "System";
+  m_allowNavMode = false;
   QVBoxLayout * vlayout = new QVBoxLayout;
   setObjectName("systemoptions");
 
@@ -27,7 +28,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   lexiconlayout->addWidget(lexiconbutton);
   lexiconlayout->addStretch();
   //  this->setControlSize(m_lexicon,VLARGE_EDIT);
-  m_debugOption = new QCheckBox;
+
   m_docked = new QCheckBox;
   m_focusTab = new QLineEdit;
   //  this->setControlSize(m_focusTab,LARGE_EDIT);
@@ -104,7 +105,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
 
 
-  optionlayout->addRow(tr("Debug"),m_debugOption);
+
   optionlayout->addRow(tr("Docked"),m_docked);
   optionlayout->addRow(tr("New tab behaviour"),tablayout);
   optionlayout->addRow(tr("Current tab"),m_focusTab);
@@ -119,7 +120,12 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   optionlayout->addRow(tr("Theme"),m_theme);
   optionlayout->addRow(tr("Title"),m_title);
   optionlayout->addRow(tr("Toolbar text"),m_toolbarText);
-  optionlayout->addRow(tr("Nav by root"),m_rootNavigation);
+  if (m_allowNavMode) {
+    optionlayout->addRow(tr("Nav by root"),m_rootNavigation);
+  }
+  else {
+    m_rootNavigation->setVisible(false);
+  }
   optionlayout->addRow(tr("Allow duplicates"),m_allowDuplicates);
   optionlayout->addRow(tr("Use notes"),m_useNotes);
 
@@ -175,7 +181,7 @@ void SystemOptions::readSettings() {
 
   m_contentsLinked->setChecked(settings.value(SID_SYSTEM_CONTENTS_LINKED,true).toBool());
   m_lexicon->setText(settings.value(SID_SYSTEM_DATABASE,"lexicon.sqlite").toString());
-  m_debugOption->setChecked(settings.value(SID_SYSTEM_DEBUG,true).toBool());
+
   m_docked->setChecked(settings.value(SID_SYSTEM_DOCKED,true).toBool());
   m_focusTab->setText(settings.value(SID_SYSTEM_CURRENT_TAB,"0").toString());
   m_minimalInterface->setChecked(settings.value(SID_SYSTEM_MINIMAL,true).toBool());
@@ -234,7 +240,6 @@ void SystemOptions::writeSettings(const QString & fileName) {
   if (!fileName.isEmpty()) {
     f = fileName;
   }
-  qDebug() << Q_FUNC_INFO << f;
 #ifdef LANE
   getLexicon()->setTheme(m_theme->currentText());
   getLexicon()->setDefaultKeyboard(m_keyboard->currentText());
@@ -248,7 +253,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
 
   settings.setValue(SID_SYSTEM_CONTENTS_LINKED,  m_contentsLinked->isChecked());
   settings.setValue(SID_SYSTEM_DATABASE,m_lexicon->text());
-  settings.setValue(SID_SYSTEM_DEBUG,m_debugOption->isChecked());
+
   settings.setValue(SID_SYSTEM_DOCKED,m_docked->isChecked());
   settings.setValue(SID_SYSTEM_CURRENT_TAB,m_focusTab->text());
   settings.setValue(SID_SYSTEM_MINIMAL,m_minimalInterface->isChecked());
@@ -316,14 +321,9 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SYSTEM_DATABASE,m_lexicon)) {
     m_dirty = true;
   }
-  if (compare(&settings,SID_SYSTEM_DEBUG,m_debugOption)) {
-    m_dirty = true;
-  }
   if (compare(&settings,SID_SYSTEM_DOCKED,m_docked)) {
     m_dirty = true;
   }
-  qDebug() << "button" << m_appendNewTab->isChecked();
-  qDebug() << "settings" << settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool();
   if (m_appendNewTab->isChecked() != (settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool())) {
     m_dirty = true;
   }
@@ -349,8 +349,10 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SYSTEM_SAVE_TABS,m_saveTabs)) {
     m_dirty = true;
   }
-  if (compare(&settings,SID_SYSTEM_BY_ROOT,m_rootNavigation)) {
-    m_dirty = true;
+  if (m_allowNavMode) {
+    if (compare(&settings,SID_SYSTEM_BY_ROOT,m_rootNavigation)) {
+      m_dirty = true;
+    }
   }
   if (compare(&settings,SID_SYSTEM_RUN_DATE,m_runDate)) {
     m_dirty = true;
@@ -450,32 +452,6 @@ void SystemOptions::onSetFont() {
   */
 }
 void SystemOptions::onSetColor() {
-  /*
-  QColor color;
-  color.setNamedColor(m_highlightColor->text());
-  QColorDialog d(color);
-  if (d.exec() != QDialog::Accepted) {
-    return;
-  }
-  int r,g,b;
-  color = d.currentColor();
-  color.getRgb(&r,&g,&b);
-  QString str = QString("%1,%2,%3").arg(r).arg(g).arg(b);
-  QSettings settings(m_settingsFileName,QSettings::IniFormat);
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Colors");
-  QStringList keys = settings.allKeys();
-  QStringList v;
-  for(int i=0;i < keys.size();i++) {
-    v = settings.value(keys[i]).toStringList();
-    if (v.join(",") == str) {
-
-      m_highlightColor->setText(keys[i]);
-      return;
-    }
-  }
-  m_highlightColor->setText(d.currentColor().name());
-  */
 }
 void SystemOptions::onSetDatabase() {
   QString fileName = QFileDialog::getOpenFileName(this,

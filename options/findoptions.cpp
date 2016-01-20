@@ -31,24 +31,15 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_contextStyle = new QLineEdit;
   m_contextStyleArabic = new QLineEdit;
 
-  m_fullHeadColor = new QLineEdit;
-  this->setControlSize(m_fullHeadColor,VLARGE_EDIT);
   m_fullHeadText = new QLineEdit;
 
 
   QFormLayout * fulllayout = new QFormLayout;
-  QHBoxLayout * colorlayout = new QHBoxLayout;
-  colorlayout->addWidget(m_fullHeadColor);
-  QPushButton * colorbutton = new QPushButton(tr("Set colour"));
-  connect(colorbutton,SIGNAL(clicked()),this,SLOT(onSetColor()));
-  colorlayout->addWidget(colorbutton);
-  colorlayout->addStretch();
 
   fulllayout->addRow(tr("Include head words in\nsearch results"),m_fullIncludeHeads);
   fulllayout->addRow(tr("Fragment size"),m_fullFragmentSize);
   fulllayout->addRow(tr("Main context style"),m_contextStyle);
   fulllayout->addRow(tr("Arabic context style"),m_contextStyleArabic);
-  fulllayout->addRow(tr("Head word background colour"),colorlayout);
   fulllayout->addRow(tr("Text for head word results"),m_fullHeadText);
   fulllayout->addRow(tr("One row for each entry"),m_fullOneRow);
   fulllayout->addRow(tr("Progress interval"),m_fullStep);
@@ -69,34 +60,24 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   /// Head word search
   QGroupBox * headbox = new QGroupBox(tr("Head word search"));
-  m_headDebug = new QCheckBox;
+  m_headPhrase = new QCheckBox;
   m_headStep = new QSpinBox;
   this->setControlSize(m_headStep,MEDIUM_EDIT);
-  m_headVertical = new QCheckBox;
-  m_headFocusTable = new QCheckBox;
   this->setControlSize(m_headStep,MEDIUM_EDIT);
   m_headStep->setSingleStep(25);
-  m_headSingleClick = new QCheckBox;
-  /*
-  m_headNewTab = new QCheckBox;
-  m_headGoTab = new QCheckBox;
-  m_headWholeWord = new QCheckBox;
-  m_headDiacritics = new QCheckBox;
-  m_headRegex  = new QCheckBox;
-  */
+  m_nodeinfoClose = new QCheckBox;
   QFormLayout * headlayout = new QFormLayout;
-  headlayout->addRow(tr("Vertical layout"),m_headVertical);
   headlayout->addRow(tr("Step interval"),m_headStep);
-  headlayout->addRow(tr("Initial focus on results"),m_headFocusTable);
-  headlayout->addRow(tr("Single click to activate"),m_headSingleClick);
+  headlayout->addRow(tr("Close entry info after load"),m_nodeinfoClose);
   QPushButton * headbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout2 = new QHBoxLayout;
   setlayout2->addWidget(headbtn);
-  //  setlayout2->addStretch();
+  setlayout2->addStretch();
+
   headlayout->addRow(tr("Search dialog options"),setlayout2);
   connect(headbtn,SIGNAL(clicked()),this,SLOT(onHeadDialog()));
 
-  headlayout->addRow(tr("Debug"),m_headDebug);
+  headlayout->addRow(tr("Use head phrase"),m_headPhrase);
   headbox->setLayout(headlayout);
 
   /// Local search
@@ -110,8 +91,9 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   QPushButton * localbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout3 = new QHBoxLayout;
   setlayout3->addWidget(localbtn);
-  //  setlayout3->addStretch();
+  setlayout3->addStretch();
   locallayout->addRow(tr("Search dialog options"),setlayout3);
+
   connect(localbtn,SIGNAL(clicked()),this,SLOT(onLocalDialog()));
 
   localbox->setLayout(locallayout);
@@ -145,14 +127,11 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
 
   layout->addWidget(fullbox);
-  QHBoxLayout * hlayoutsearches = new QHBoxLayout;
-  hlayoutsearches->addWidget(headbox);
-  hlayoutsearches->addWidget(localbox);
-
-  layout->addLayout(hlayoutsearches);//Widget(headbox);
-  //  layout->addWidget(localbox);
+  layout->addWidget(headbox);
+  layout->addWidget(localbox);
   layout->addWidget(otherbox);
   layout->addStretch();
+
   setLayout(layout);
   addButtons();
   readSettings();
@@ -170,7 +149,6 @@ void FindOptions::readSettings() {
   m_fullIncludeHeads->setChecked(settings.value(SID_FULLSEARCH_INCLUDE_HEADS,true).toBool());
   m_fullOneRow->setChecked(settings.value(SID_FULLSEARCH_ONE_ROW,true).toBool());
   m_fullStep->setValue(settings.value(SID_FULLSEARCH_STEP,50).toInt());
-  m_fullHeadColor->setText(settings.value(SID_FULLSEARCH_HEAD_BACKGROUND).toString());
   m_contextStyle->setText(settings.value(SID_FULLSEARCH_MAIN_CONTEXT).toString());
   m_contextStyleArabic->setText(settings.value(SID_FULLSEARCH_ARABIC_CONTEXT).toString());
 
@@ -185,10 +163,8 @@ void FindOptions::readSettings() {
   settings.beginGroup("HeadSearch");
   // head word search
 
-  m_headDebug->setChecked(settings.value(SID_HEADSEARCH_DEBUG,false).toBool());
-  m_headSingleClick->setChecked(settings.value(SID_HEADSEARCH_SINGLE_CLICK,true).toBool());
-  m_headVertical->setChecked(settings.value(SID_HEADSEARCH_VERTICAL_LAYOUT,true).toBool());
-  m_headFocusTable->setChecked(settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool());
+  m_headPhrase->setChecked(settings.value(SID_HEADSEARCH_USE_PHRASE,false).toBool());
+  m_nodeinfoClose->setChecked(settings.value(SID_HEADSEARCH_NODEINFO_CLOSE,true).toBool());
   m_headStep->setValue(settings.value(SID_HEADSEARCH_STEP,50).toInt());
 
   m_headNewTab     = settings.value(SID_HEADSEARCH_NEW_TAB,true).toBool();
@@ -198,23 +174,13 @@ void FindOptions::readSettings() {
   m_headRegex      = settings.value(SID_HEADSEARCH_TYPE_REGEX,true).toBool();
   m_headForce      = settings.value(SID_HEADSEARCH_FORCE,true).toBool();
 
-
-  //  m_viewerSize = settings.value(SID_FULLSEARCH_VIEWER_SIZE,QSize(600,400)).toSize();
-
-  /*
-
-  m_fullWholeWord->setChecked(settings.value(SID_FULLSEARCH_WHOLE_WORD,true).toBool());
- m_fullXslt;
- m_fullHeadColor;
- m_fullHeadText;
-
-  */
   settings.endGroup();
   settings.beginGroup("LocalSearch");
   m_localWholeWord  = settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool();
   m_localDiacritics = settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool();
   m_localRegex      = settings.value(SID_LOCALSEARCH_TYPE_REGEX,true).toBool();
   m_localForce      = settings.value(SID_LOCALSEARCH_FORCE,true).toBool();
+  m_ignoreCase      = settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool();
 
 
   m_localShowAll->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
@@ -246,7 +212,6 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_FULLSEARCH_INCLUDE_HEADS,m_fullIncludeHeads->isChecked());
   settings.setValue(SID_FULLSEARCH_ONE_ROW,m_fullOneRow->isChecked());
   settings.setValue(SID_FULLSEARCH_STEP,m_fullStep->value());
-  settings.setValue(SID_FULLSEARCH_HEAD_BACKGROUND,m_fullHeadColor->text());
   settings.setValue(SID_FULLSEARCH_MAIN_CONTEXT,m_contextStyle->text());
   settings.setValue(SID_FULLSEARCH_ARABIC_CONTEXT,m_contextStyleArabic->text());
 
@@ -260,12 +225,14 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.endGroup();
   settings.beginGroup("HeadSearch");
 
-  settings.setValue(SID_HEADSEARCH_DEBUG,m_headDebug->isChecked());
+  settings.setValue(SID_HEADSEARCH_USE_PHRASE,m_headPhrase->isChecked());
+  /*
   settings.setValue(SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical->isChecked());
   settings.setValue(SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable->isChecked());
-  settings.setValue(SID_HEADSEARCH_STEP,m_headStep->value());
-  settings.setValue(SID_HEADSEARCH_SINGLE_CLICK,m_headSingleClick->isChecked());
 
+  */
+  settings.setValue(SID_HEADSEARCH_NODEINFO_CLOSE,m_nodeinfoClose->isChecked());
+  settings.setValue(SID_HEADSEARCH_STEP,m_headStep->value());
   settings.setValue(SID_HEADSEARCH_NEW_TAB,m_headNewTab);
   settings.setValue(SID_HEADSEARCH_GO_TAB,m_headGoTab);
   settings.setValue(SID_HEADSEARCH_WHOLE_WORD,m_headWholeWord );
@@ -281,6 +248,7 @@ void FindOptions::writeSettings(const QString & fileName) {
    settings.setValue(SID_LOCALSEARCH_DIACRITICS,m_localDiacritics);
    settings.setValue(SID_LOCALSEARCH_TYPE_REGEX,m_localRegex);
    settings.setValue(SID_LOCALSEARCH_FORCE,m_localForce);
+   settings.setValue(SID_LOCALSEARCH_IGNORE_CASE,m_ignoreCase);
 
 
   settings.value(SID_LOCALSEARCH_SHOW_ALL,m_localShowAll->isChecked());
@@ -340,11 +308,6 @@ bool FindOptions::isModified()  {
   if (compare(&settings,SID_FULLSEARCH_STEP,m_fullStep)) {
     m_dirty = true;
   }
-
-  if (compare(&settings,SID_FULLSEARCH_HEAD_BACKGROUND,m_fullHeadColor)) {
-    m_dirty = true;
-  }
-
   if (m_fullNewTab     != settings.value(SID_FULLSEARCH_NEW_TAB,true).toBool()) {
     m_dirty = true;
   }
@@ -373,13 +336,13 @@ bool FindOptions::isModified()  {
   settings.endGroup();
   settings.beginGroup("HeadSearch");
 
-  if (compare(&settings,SID_HEADSEARCH_DEBUG,m_headDebug)) {
+  if (compare(&settings,SID_HEADSEARCH_USE_PHRASE,m_headPhrase)) {
     m_dirty = true;
   }
-  if (compare(&settings,SID_HEADSEARCH_SINGLE_CLICK,m_headSingleClick)) {
+  if (compare(&settings,SID_HEADSEARCH_NODEINFO_CLOSE,m_nodeinfoClose)) {
     m_dirty = true;
   }
-
+  /*
   if (compare(&settings,SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical)) {
     m_dirty = true;
   }
@@ -387,7 +350,7 @@ bool FindOptions::isModified()  {
   if (compare(&settings,SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable)) {
     m_dirty = true;
   }
-
+  */
   if (compare(&settings,SID_HEADSEARCH_STEP,m_headStep)) {
     m_dirty = true;
   }
@@ -437,6 +400,9 @@ bool FindOptions::isModified()  {
   }
 
   if (m_localForce      != settings.value(SID_LOCALSEARCH_FORCE,true).toBool()) {
+    m_dirty = true;
+  }
+  if (m_ignoreCase      != settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool()) {
     m_dirty = true;
   }
   settings.endGroup();
@@ -503,29 +469,6 @@ void FindOptions::onSetFont() {
   */
 }
 void FindOptions::onSetColor() {
-  QColor color;
-  color.setNamedColor(m_fullHeadColor->text());
-  QColorDialog d(color);
-  if (d.exec() != QDialog::Accepted) {
-    return;
-  }
-  int r,g,b;
-  color = d.currentColor();
-  color.getRgb(&r,&g,&b);
-  QString str = QString("%1,%2,%3").arg(r).arg(g).arg(b);
-  QSettings settings(m_settingsFileName,QSettings::IniFormat);
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Colors");
-  QStringList keys = settings.allKeys();
-  QStringList v;
-  for(int i=0;i < keys.size();i++) {
-    v = settings.value(keys[i]).toStringList();
-    if (v.join(",") == str) {
-      m_fullHeadColor->setText(keys[i]);
-      return;
-    }
-  }
-  m_fullHeadColor->setText(d.currentColor().name());
 }
 void FindOptions::onFullDialog() {
   DialogOptions d;
@@ -578,11 +521,13 @@ void FindOptions::onLocalDialog() {
   d.setChecked(DialogOptions::Diacritics,m_localDiacritics);
   d.setChecked(DialogOptions::Regex,m_localRegex);
   d.setChecked(DialogOptions::Force,m_localForce);
+  d.setChecked(DialogOptions::IgnoreCase,m_ignoreCase);
   if (d.exec() == QDialog::Accepted) {
     m_localWholeWord = d.isChecked(DialogOptions::Whole);
     m_localDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_localRegex = d.isChecked(DialogOptions::Regex);
     m_localForce = d.isChecked(DialogOptions::Force);
+    m_ignoreCase = d.isChecked(DialogOptions::IgnoreCase);
     emit(modified(true));
     bool v = isModified();
     setButtons(v);

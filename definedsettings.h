@@ -49,9 +49,11 @@ They should not be translated.
 #define SID_ENTRY_SHOW_LINK_WARNING  "Show link warning"
 #define SID_ENTRY_XML_VIEWER_SIZE "Xml viewer size"
 #define SID_ENTRY_XML_VIEWER_POS "Xml viewer pos"
+#define SID_ENTRY_XML_VIEWER_LOCKED "Xml viewer locked"
+#define SID_ENTRY_OUTPUT_PATH "Debug directory"
+#define SID_ENTRY_NODEINFO_CLOSE "Node info close"
 
 #define SID_XSLT_ENTRY   "Entry"
-#define SID_XSLT_NODE   "Node"
 #define SID_XSLT_PRINT   "Print"
 
 #define SID_NOTES_DEBUG "Debug"
@@ -59,7 +61,8 @@ They should not be translated.
 #define SID_NOTES_DATABASE "Database"
 #define SID_NOTES_SHOW_KEYMAPS  "Show keymaps"
 #define SID_NOTES_SHOW_PRINT  "Show print"
-//#define SID_NOTES_COLUMNS "Columns"
+#define SID_NOTES_COLUMNS "Column widths"
+#define SID_NOTES_DEFAULT_COLUMN_WIDTH "Default width"
 #define SID_NOTES_CONTEXT_STYLE "Context style"
 #define SID_NOTES_SUBSTR_LENGTH "Note substr length"
 #define SID_NOTES_WORD_COLUMN "Word column"
@@ -77,6 +80,7 @@ They should not be translated.
 #define SID_HISTORY_LIST_ARABIC_FONT "List Arabic font"
 #define SID_HISTORY_VIEWER_SIZE      "Viewer size"
 #define SID_HISTORY_VIEWER_POS       "Viewer pos"
+#define SID_HISTORY_LIST_STATE       "List state"
 
 #define SID_ROOTS_DEBUG "Debug"
 #define SID_ROOTS_EXPAND "Expand"
@@ -164,6 +168,7 @@ They should not be translated.
 #define SID_SHORTCUT_ARABIC_FONT               "Change Arabic font"
 #define SID_SHORTCUT_MENU_SHOW                 "Menu show"
 #define SID_SHORTCUT_XREF_MODE                  "Xref mode"
+#define SID_SHORTCUT_LIST_TABS                  "List tabs"
 
 #define SID_SEARCH_IGNORE_DIACRITICS           "Ignore diacritics"
 #define SID_SEARCH_TYPE_REGEX                  "Regex"
@@ -171,18 +176,18 @@ They should not be translated.
 
 #define SID_SEARCH_DIACRITICS                  "Diacritics"
 
-#define SID_HEADSEARCH_RESULTS_FONT            "Results Arabic font"
 #define SID_HEADSEARCH_STEP                    "Step"
-#define SID_HEADSEARCH_DEBUG                   "Debug"
 #define SID_HEADSEARCH_FOCUS_TABLE             "Focus table"
 #define SID_HEADSEARCH_NEW_TAB                 "New tab"
 #define SID_HEADSEARCH_GO_TAB                  "Activate tab"
-#define SID_HEADSEARCH_VERTICAL_LAYOUT         "Vertical layout"
 #define SID_HEADSEARCH_WHOLE_WORD              "Whole word"
 #define SID_HEADSEARCH_DIACRITICS              "Ignore diacritics"
 #define SID_HEADSEARCH_TYPE_REGEX              "Regex"
 #define SID_HEADSEARCH_FORCE                   "Force LTR"
-#define SID_HEADSEARCH_SINGLE_CLICK            "Single click to activate"
+#define SID_HEADSEARCH_STATE                   "State"
+#define SID_HEADSEARCH_USE_PHRASE               "Use phrase"
+#define SID_HEADSEARCH_COLUMNS                  "HeadSearch Export columns"
+#define SID_HEADSEARCH_NODEINFO_CLOSE           "Node info close"
 
 #define SID_LOCALSEARCH_SHOW_ALL               "Show all results"
 #define SID_LOCALSEARCH_DIACRITICS             "Ignore diacritics"
@@ -190,6 +195,7 @@ They should not be translated.
 #define SID_LOCALSEARCH_FORCE_LTR              "Force LTR"
 #define SID_LOCALSEARCH_TYPE_REGEX             "Regex"
 #define SID_LOCALSEARCH_FORCE                  "Force LTR"
+#define SID_LOCALSEARCH_IGNORE_CASE            "Ignore case"
 
 #define SID_FULLSEARCH_ONE_ROW                 "One row"
 #define SID_FULLSEARCH_RESULTS_FONT            "Results Arabic font"
@@ -207,7 +213,8 @@ They should not be translated.
 #define SID_FULLSEARCH_NEW_TAB                 "New tab"
 #define SID_FULLSEARCH_GO_TAB                  "Activate tab"
 #define SID_FULLSEARCH_FORCE                   "Force LTR"
-
+#define SID_FULLSEARCH_LIST_STATE              "List state"
+#define SID_FULLSEARCH_LIST_COLUMNS            "Default column widths"
 
 #define SID_FULLSEARCH_MAIN_CONTEXT            "Main context"
 #define SID_FULLSEARCH_ARABIC_CONTEXT          "Arabic context"
@@ -238,6 +245,7 @@ They should not be translated.
 #define SID_CONTENTS_SHOWNODE                  "Show node"
 #define SID_CONTENTS_SHOWSUPPLEMENT            "Show supplement"
 #define SID_CONTENTS_ROMAN_ITYPES              "Verb form number Roman"
+#define SID_CONTENTS_ITYPES                    "Itype"
 
 #define SID_LOGGING_FILE                       "Logfile"
 #define SID_LOGGING_MAXSIZE                    "Maximum size"
@@ -255,7 +263,6 @@ They should not be translated.
 
 #define SID_BOOKMARK_NEW_TAB                   "New tab"
 #define SID_BOOKMARK_GO_TAB                    "Activate tab"
-#define SID_BOOKMARK_ARABIC_FONT               "Arabic font"
 #define SID_BOOKMARK_DEBUG                     "Debug"
 #define SID_BOOKMARK_ADD                       "Add"
 #define SID_BOOKMARK_LIST                      "List"
@@ -263,8 +270,8 @@ They should not be translated.
 #define SID_BOOKMARK_REVERT                    "Revert"
 #define SID_BOOKMARK_CLEAR                     "Clear"
 #define SID_BOOKMARK_ID                        "Id"
-
-
+#define SID_BOOKMARK_LIST_STATE                "Book marklist state"
+#define SID_BOOKMARK_MENU_FORMAT               "Menu format"
 #define SID_SYSTEM_DATABASE                    "Database"
 #define SID_SYSTEM_STYLESHEET                  "Stylesheet"
 #define SID_SYSTEM_TOOLBAR_TEXT                "Toolbar text"
@@ -299,6 +306,7 @@ They should not be translated.
 #define SID_SYSTEM_APPEND_NEW_TABS              "Append new tab"
 #define SID_SYSTEM_LINK_CHECK_MODE              "Link check mode"
 #define SID_SYSTEM_ALLOW_DUPLICATES             "Allow duplicates"
+#define SID_SYSTEM_TABLIST_STATE                "Tab list columns"
 #define SID_MAPS_CURRENT_MAP                    "Current map"
 #define SID_MAPS_ENABLED                        "Enabled"
 #define SID_MAPS_DEBUG                          "Debug"
@@ -321,7 +329,7 @@ They should not be translated.
 
 #define SID_EDITVIEW_SIZE                       "Size"
 #define SID_EDITVIEW_POS                       "Pos"
-
+#define SID_EDITVIEW_FILE_STYLESHEET           "Filename style"
 
 #define SID_TABS_TYPE                           "type"
 #define SID_TABS_PLACE                          "place"
@@ -398,3 +406,8 @@ They should not be translated.
 #define SID_PAGESET_PAGE_DIALOG_SIZE        "Page dialog size"
 #define SID_PAGESET_EDIT_DIALOG_POS         "Edit dialog pos"
 #define SID_PAGESET_EDIT_DIALOG_SIZE        "Edit dialog size"
+#define SID_PAGESET_TABLIST_STATE           "Tab list state"
+#define SID_PAGESET_SETLIST_STATE           "Set list state"
+#define SID_PAGESET_EDIT_TAB_LIST_STATE     "Edit tablist state"
+#define SID_PAGESET_LOADSETLIST_STATE       "Load setlist state"
+#define SID_PAGESET_PAGEENTRY_STATE         "Page entry state"

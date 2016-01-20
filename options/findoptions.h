@@ -24,13 +24,10 @@ class FindOptions : public OptionsWidget {
     QCheckBox * m_fullIncludeHeads;
     QCheckBox * m_fullOneRow;
     QSpinBox  * m_fullStep;
-    //    QLineEdit * m_fullViewerWidth;
-    //    QLineEdit * m_fullViewerHeight;
-    //    QLineEdit * m_fullXslt;
-    QLineEdit * m_fullHeadColor;
     QLineEdit * m_fullHeadText;
     QLineEdit * m_contextStyle;
     QLineEdit * m_contextStyleArabic;
+
     bool m_fullWholeWord;
     bool m_fullDiacritics;
     bool m_fullRegex;
@@ -39,11 +36,11 @@ class FindOptions : public OptionsWidget {
     bool m_fullForce;
 
     /// head word search
-    QCheckBox * m_headDebug;
+    QCheckBox * m_headPhrase;
     QSpinBox  * m_headStep;
     QCheckBox * m_headVertical;
     QCheckBox * m_headFocusTable;
-    QCheckBox * m_headSingleClick;
+    QCheckBox * m_nodeinfoClose;
     bool m_headWholeWord;
     bool m_headDiacritics;
     bool m_headRegex;
@@ -56,6 +53,7 @@ class FindOptions : public OptionsWidget {
     bool m_localWholeWord;
     bool m_localRegex;
     bool m_localDiacritics;
+    bool m_ignoreCase;
 
     QCheckBox * m_localShowAll;
 

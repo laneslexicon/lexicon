@@ -36,6 +36,7 @@
 #include "savepagesetdialog.h"
 #include "editpagesetdialog.h"
 #include "loadpagesetdialog.h"
+#include "tablistdialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -58,7 +59,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_headSearchDialog = NULL;
   m_nodeSearchDialog = NULL;
   m_pageSearchDialog = NULL;
-
+  m_allowNavMode = false;
   createActions();
   readSettings();
 
@@ -120,22 +121,22 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createToolBar();
   createStatusBar();
 
+  if (m_allowNavMode) {
+    if (m_navMode == LanesLexicon::ByRoot) {
+      onNavigationMenuChanged(m_navModeRootAction);
+      //    ->setChecked(true);
+    }
+    else {
+      onNavigationMenuChanged(m_navModePageAction);//->setChecked(false);
+    }
 
-  if (m_navMode == LanesLexicon::ByRoot) {
-    onNavigationMenuChanged(m_navModeRootAction);
-    //    ->setChecked(true);
+    if (m_navMode == LanesLexicon::ByPage) {
+      m_navModePageAction->setChecked(true);
+    }
+    else {
+      m_navModeRootAction->setChecked(true);
+    }
   }
-  else {
-    onNavigationMenuChanged(m_navModePageAction);//->setChecked(false);
-  }
-
-  if (m_navMode == LanesLexicon::ByPage) {
-    m_navModePageAction->setChecked(true);
-  }
-  else {
-    m_navModeRootAction->setChecked(true);
-  }
-
   if (m_db.isOpen()) {
     setStatus(tr("Ready"));
     if (! m_valgrind ) {
@@ -267,7 +268,6 @@ void LanesLexicon::showStartupEntry() {
     m_tree->ensurePlaceVisible(p);
   }
   else {
-    /// TODO make sure requested item has focus
     this->currentTabChanged(ix);
   }
 }
@@ -290,25 +290,23 @@ void LanesLexicon::restoreSavedState() {
 }
 void LanesLexicon::closeEvent(QCloseEvent * event) {
   cleanup();
+
   QMainWindow::closeEvent(event);
 }
 void LanesLexicon::cleanup() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
   if (m_ok) {
     writeSettings();
   }
+
   if (m_history) {
     delete m_history;
   }
+
   while(m_tabs->count() > 0) {
     this->onCloseTab(0);
   }
-
-  if (m_db.isOpen()) {
-    m_db.close();
-  }
-  if (m_notesDb.isOpen())
-    m_notesDb.close();
-
   if (m_editView != NULL){
     delete m_editView;
     m_editView = 0;
@@ -348,17 +346,22 @@ void LanesLexicon::cleanup() {
     ShowMapWidget * w = qobject_cast<ShowMapWidget *>(widgets[i]);
     if (w) {
       w->close();
+      delete w;
     }
     OptionsDialog * d = qobject_cast<OptionsDialog *>(widgets[i]);
     if (d) {
       d->close();
+      delete d;
     }
   }
-
+  if (m_db.isOpen()) {
+    m_db.close();
+  }
+  if (m_notesDb.isOpen())
+    m_notesDb.close();
   QFontDatabase::removeAllApplicationFonts();
   freeXslt();
   im_free(m_mapper);
-  QLOG_DEBUG() << Q_FUNC_INFO << "exit";
 }
 void LanesLexicon::onSetInterface(bool triggered) {
   bool v = m_minimalAction->isChecked();
@@ -381,7 +384,7 @@ void LanesLexicon::onSetInterface(bool triggered) {
       msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
       QString errorMessage(tr("Warning"));
       QString info(tr("The toolbars and menubars will not be visible"));
-      QString next = QString(tr("To make them visible again, press %1")).arg(sc->key().toString());
+      QString next = QString(tr("To make them visible again, use the shortcut %1")).arg(sc->key().toString());
       msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
                      + info + "</p><p>" + next + "</p></body></html>");
       msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -416,6 +419,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
 
   connect(entry,SIGNAL(gotoNode(const Place &,bool,bool)),this,SLOT(showPlace(const Place &,bool,bool)));
   connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
+  connect(entry,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
   connect(entry,SIGNAL(printPage()),this,SLOT(pagePrint()));
   connect(entry,SIGNAL(searchFinished()),this,SLOT(pageSearchComplete()));
   connect(entry,SIGNAL(searchStarted()),this,SLOT(pageSearchStart()));
@@ -427,12 +431,17 @@ void LanesLexicon::onCloseOtherTabs(int /* index */) {
   QString label = m_tabs->tabText(m_tabs->currentIndex());
   QWidget * w = m_tabs->currentWidget();
   m_tabs->removeTab(m_tabs->currentIndex());
-  while(m_tabs->count() > 0) {
-    this->onCloseTab(0);
-  }
+  this->closeAllTabs();
   m_tabs->addTab(w,label);
   m_tabs->setUpdatesEnabled(true);
 }
+/**
+ *
+ *
+ * @param w
+ *
+ * @return
+ */
 bool LanesLexicon::deleteWidget(QWidget * w) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(w);
   if (entry) {
@@ -463,6 +472,17 @@ void LanesLexicon::onCloseTab(int ix) {
   m_tabs->removeTab(ix);
   if (! deleteWidget(w)) {
     delete w;
+  }
+}
+void LanesLexicon::closeAllTabs() {
+  int m = m_tabs->count();
+
+  for(int i = m -1;i > -1;i--) {
+    QWidget * w = m_tabs->widget(i);
+    m_tabs->removeTab(i);
+    if (! deleteWidget(w)) {
+      delete w;
+    }
   }
 }
 void LanesLexicon::shortcut(const QString & key) {
@@ -681,6 +701,9 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_XREF_MODE) {
     this->onXrefMode();
   }
+  else if (key == SID_SHORTCUT_LIST_TABS) {
+    this->onTabList();
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -835,7 +858,6 @@ void LanesLexicon::createActions() {
 
   m_searchAction = new QAction(tr("Search"),this);
 
-
   m_moveGroup = new QActionGroup(this);
   m_navModeRootAction = new QAction(tr("By &root"),this);
 
@@ -918,6 +940,9 @@ void LanesLexicon::createActions() {
 
   m_showNoteBrowserAction = new QAction(tr("View &notes"),this);
 
+  m_tablistAction = new QAction(tr("List &tabs"),this);
+
+  connect(m_tablistAction,SIGNAL(triggered()),this,SLOT(onTabList()));
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
   connect(m_deleteThemeAction,SIGNAL(triggered()),this,SLOT(onDeleteTheme()));
   connect(m_createThemeAction,SIGNAL(triggered()),this,SLOT(onCreateTheme()));
@@ -1022,24 +1047,29 @@ void LanesLexicon::createToolBar() {
   m_mainbar->setFloatable(true);
   //  addToolBarBreak();
 
+
+
   m_navigation = addToolBar(tr("Navigation"));
   m_navigation->setIconSize(m_toolbarIconSize);
   m_navigation->setObjectName("navigationtoolbar");
 
   m_navigation->setFloatable(true);
+  if (m_allowNavMode) {
+    m_navigationModeMenu = new QMenu(m_navigation);
+    m_navigationModeMenu->addAction(m_navModeRootAction);
+    m_navigationModeMenu->addAction(m_navModePageAction);
+    m_navigationButton = new QToolButton(m_navigation);
+    m_navigationButton->setObjectName("navigationby");
+    m_navigationButton->setMenu(m_navigationModeMenu);
+    m_navigationButton->setText(tr("Move by"));
+    m_navigationButton->setFocusPolicy(Qt::StrongFocus);
 
-  m_navigationModeMenu = new QMenu(m_navigation);
-  m_navigationModeMenu->addAction(m_navModeRootAction);
-  m_navigationModeMenu->addAction(m_navModePageAction);
-  m_navigationButton = new QToolButton(m_navigation);
-  m_navigationButton->setObjectName("navigationby");
-  m_navigationButton->setMenu(m_navigationModeMenu);
-  m_navigationButton->setText(tr("Move by"));
-  m_navigationButton->setFocusPolicy(Qt::StrongFocus);
+    m_navigationButton->setPopupMode(QToolButton::InstantPopup);
+    m_navigation->addWidget(m_navigationButton);
 
-  m_navigationButton->setPopupMode(QToolButton::InstantPopup);
-  m_navigation->addWidget(m_navigationButton);
-
+    m_navigationModeMenu->setVisible(false);
+    m_navigationButton->setVisible(false);
+  }
   m_navFirstButton = new QToolButton(m_navigation);
   m_navFirstButton->setDefaultAction(m_navFirstAction);
   m_navFirstButton->setText(tr("First"));
@@ -1142,8 +1172,13 @@ void LanesLexicon::createToolBar() {
   setTabOrder(m_docButton,m_aboutButton);
   setTabOrder(m_aboutButton,m_optionsButton);
   setTabOrder(m_optionsButton,m_logButton);
-  setTabOrder(m_logButton,m_navigationButton);
-  setTabOrder(m_navigationButton,m_navFirstButton);
+  if (m_allowNavMode) {
+    setTabOrder(m_logButton,m_navigationButton);
+    setTabOrder(m_navigationButton,m_navFirstButton);
+  }
+  else {
+    setTabOrder(m_logButton,m_navFirstButton);
+  }
   setTabOrder(m_navFirstButton,m_navNextButton);
   setTabOrder(m_navNextButton,m_navPrevButton);
   setTabOrder(m_navPrevButton,m_navLastButton);
@@ -1307,6 +1342,7 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_showContentsAction);
   m_viewMenu->addAction(m_showToolbarAction);
   m_viewMenu->addAction(m_showMenuAction);
+  m_viewMenu->addAction(m_tablistAction);
 
   m_bookmarkMenu = m_mainmenu->addMenu(tr("&Bookmarks"));
   m_bookmarkMenu->setObjectName("bookmarkmenu");
@@ -1332,15 +1368,17 @@ void LanesLexicon::createMenus() {
   m_historyMenu->addAction(m_clearHistoryAction);
   m_historyMenu->addAction(m_showHistoryAction);
 
-  m_moveMenu = m_mainmenu->addMenu(tr("&Navigation"));
+  m_moveMenu = m_mainmenu->addMenu(tr("&Roots"));
   m_moveMenu->setObjectName("navigationmenu");
   m_moveMenu->setFocusPolicy(Qt::StrongFocus);
   m_moveMenu->addAction(m_navFirstAction);
   m_moveMenu->addAction(m_navNextAction);
   m_moveMenu->addAction(m_navPrevAction);
   m_moveMenu->addAction(m_navLastAction);
-  m_moveMenu->addAction(m_navModeRootAction);
-  m_moveMenu->addAction(m_navModePageAction);
+  if (m_allowNavMode) {
+    m_moveMenu->addAction(m_navModeRootAction);
+    m_moveMenu->addAction(m_navModePageAction);
+  }
 
   m_searchMenu = m_mainmenu->addMenu(tr("&Search"));
   m_searchMenu->setFocusPolicy(Qt::StrongFocus);
@@ -1524,9 +1562,6 @@ void LanesLexicon::onHistorySelection() {
 }
 void LanesLexicon::onExit()
 {
-  if (m_db.isOpen()) {
-    m_db.close();
-  }
   close();
 }
 bool LanesLexicon::openDatabase(const QString & dbname) {
@@ -1639,6 +1674,12 @@ GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool acti
   if (! p.isValid()) {
     return NULL;
   }
+  int ix = this->searchTabs(p.node());
+  if ((ix != -1) && activateTab) {
+    m_tabs->setCurrentIndex(ix);
+    entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
+    return entry;
+  }
   /// if we don't have a tab or the current tab is not a graphicsentry
   /// force new tab creation
   int currentTab = m_tabs->currentIndex();
@@ -1705,7 +1746,7 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
   //  EntryItem * item2 = dynamic_cast<EntryItem *>(oldFocus);
 
   if (item1) {
-    updateStatusBar();
+    updateStatusBar(item1->getPlace());
   }
 
 }
@@ -1818,27 +1859,6 @@ void LanesLexicon::onTest() {
   }
   }
   if (0) {
-    HeadSearchWidget * w = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
-    if (w) {
-      Place p = w->getEntry()->getPlace();
-      if (p.isValid()) {
-        int ix = m_tabs->currentIndex();
-        this->onCloseTab(ix);
-        GraphicsEntry * entry = new GraphicsEntry(this);
-        setSignals(entry);
-        entry->installEventFilter(this);
-        entry->getView()->installEventFilter(this);
-
-        entry->getXmlForRoot(p);
-        m_tabs->insertTab(ix,entry,p.getShortText());
-        m_tabs->setCurrentIndex(ix);
-      }
-      else {
-        QLOG_DEBUG() << "could not clone graphcicsentry";
-      }
-    }
-  }
-  if (0) {
     Place p = m_tree->getCurrentPlace();
     QLOG_DEBUG() << QString("Root %1, Word %2 , Node %3, Supplement %4")
       .arg(p.getRoot())
@@ -1909,9 +1929,7 @@ void LanesLexicon::readSettings() {
     m_dbName = cmdOptions.value("db");
   }
   QDir dd = QDir::current();
-  qDebug() << dd << m_dbName;
   QFileInfo fi(dd,m_dbName);
-  qDebug("Database dir:%s",fi.canonicalFilePath().toLatin1().constData());
 
   m_applicationCssFile = settings.value(SID_SYSTEM_STYLESHEET,"app.css").toString();
   if (m_applicationCssFile.isEmpty()) {
@@ -1932,10 +1950,6 @@ void LanesLexicon::readSettings() {
   if (cmdOptions.contains("notabs")) {
     m_restoreTabs = false;
   }
-  m_debug = settings.value(SID_SYSTEM_DEBUG,false).toBool();
-  if (cmdOptions.contains("debug")) {
-    m_debug = true;
-  }
   m_allowDuplicates = settings.value(SID_SYSTEM_ALLOW_DUPLICATES,false).toBool();
 
   m_saveBookmarks = settings.value(SID_SYSTEM_SAVE_BOOKMARKS,true).toBool();
@@ -1951,6 +1965,9 @@ void LanesLexicon::readSettings() {
   else {
     m_navMode = LanesLexicon::ByPage;
   }
+  /// force by root
+  m_navMode = LanesLexicon::ByRoot;
+
   v = settings.value(SID_SYSTEM_TITLE,tr("Lane's Arabic-English Lexicon")).toString();
   this->setWindowTitle(v);
 
@@ -2051,10 +2068,15 @@ void LanesLexicon::readSettings() {
   if ((! m_currentMap.isEmpty()) && ! m_maps.contains(m_currentMap) ) {
     QLOG_WARN() << QString(tr("Default map <%1> not found in settings")).arg(m_currentMap);
   }
+
+  settings.beginGroup("Bookmark");
+  m_bookmarkMenuFormat = settings.value(SID_BOOKMARK_MENU_FORMAT,"Root:%R,Entry:%H, Vol %V/%P (%N)").toString();
+  settings.endGroup();
 }
 void LanesLexicon::writeSettings() {
-  QString v;
 
+  QString v;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   if (! m_saveSettings )
     return;
 
@@ -2185,6 +2207,7 @@ void LanesLexicon::restoreTabs() {
     settings.beginGroup(tabmap.value(tabkeys[i]));
     if (settings.value(SID_TABS_TYPE,"entry").toString() == "notes") {
       NoteBrowser * notes = new NoteBrowser(this);
+      connect(notes,SIGNAL(noteDeleted(const QStringList &)),this,SLOT(onNotesDeleted(const QStringList &)));
       m_tabs->addTab(notes,tr("Notes"));
       j++;
     }
@@ -2547,15 +2570,20 @@ Place LanesLexicon::getCurrentPlace() {
  */
 void LanesLexicon::bookmarkShortcut(const QString & key) {
   QLOG_DEBUG() << Q_FUNC_INFO << key;
-  if (m_revertEnabled && (key == "revert")) {
-    if (! m_bookmarks.contains("-here-")) {
+  if (key == "revert") {
+    if (m_revertEnabled) {
+      if (! m_bookmarks.contains("-here-")) {
+        return;
+      }
+      Place p = m_bookmarks.value("-here-");
+      /// TODO document this
+      showPlace(p,false,true);
+      m_revertEnabled = false;
       return;
     }
-    Place p = m_bookmarks.value("-here-");
-    /// TODO document this
-    showPlace(p,false,true);
-    m_revertEnabled = false;
-    return;
+    else {
+      return;
+    }
   }
   if (key == "list") {
     BookmarkWidget * dlg = new BookmarkWidget(m_bookmarks,this);
@@ -2563,17 +2591,17 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
       QString m = dlg->getSelected();
       bool newTab = dlg->getNewTab();
       bool switchTab = dlg->getSwitchTab();
-      delete dlg;
+
       if ( ! m.isEmpty()) {
         bookmarkJump(m,newTab,switchTab);
       }
     }
+    delete dlg;
     return;
   }
   if (key == "clear") {
     /// TODO warning dialog ?
     bookmarkClear();
-    /// TODO clear menu
     return;
   }
   QRegExp rx("([^-]+)-(.+)");
@@ -2632,7 +2660,9 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
       m_bookmarkMenu->removeAction(actions[ix]);
     }
     Place p = m_bookmarks.value(id);
-    QAction * action = m_bookmarkMenu->addAction(p.getText());
+    QAction * action = m_bookmarkMenu->addAction(QString("%1 - %2")
+                                                 .arg(id)
+                                                 .arg(p.format(m_bookmarkMenuFormat)));
     action->setShortcut(sc->key());
     action->setShortcutContext(Qt::WidgetShortcut);
     connect(action,SIGNAL(triggered()),sc,SIGNAL(activated()));
@@ -2863,31 +2893,35 @@ void LanesLexicon::setStatus(const QString & txt) {
  * Use the spanArabic function to set the font
  *
  */
-void LanesLexicon::updateStatusBar() {
+void LanesLexicon::updateStatusBar(const Place & p) {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   QString headseparator;
-  if (entry) {
-    Place p = entry->getPlace();
-    QString root = tr("Root:") + qobject_cast<Lexicon *>(qApp)->spanArabic(p.getRoot());
-    QString head = p.getWord();
-    if (! head.isEmpty()) {
-      head = tr("Entry:") + qobject_cast<Lexicon *>(qApp)->spanArabic(head);
-      headseparator = ",";
-    }
-    qobject_cast<Lexicon *>(qApp)->spanArabic(p.getWord());
-    QString page = QString(QObject::tr("Vol %1,Page %2")).arg(p.getVol()).arg(p.getPage());
-    QString node = p.getNode();
-    if ( ! node.isEmpty()) {
-      node = "(" + node + ")";
-    }
-    QString html = QString("<body class=\"place\">%1,%2%3 %4 %5</body>").arg(root).arg(head).arg(headseparator).arg(page).arg(node);
-    m_placeIndicator->setText(html);
+  Place current;
+  if (p.isValid()) {
+    current = p;
   }
-  else {
+  else if (entry) {
+    current = entry->getPlace();
+  }
+  if (! current.isValid()) {
+    QLOG_DEBUG() << Q_FUNC_INFO << "Invalid place" << p.toString();
     m_placeIndicator->setText("");
-
+    return;
   }
-  //  m_keymapsButton->setEnabled(m_keymapsEnabled);
+  QString root = tr("Root:") + qobject_cast<Lexicon *>(qApp)->spanArabic(current.getRoot());
+  QString head = current.getWord();
+  if (! head.isEmpty()) {
+    head = tr("Entry:") + qobject_cast<Lexicon *>(qApp)->spanArabic(head);
+    headseparator = ",";
+  }
+  qobject_cast<Lexicon *>(qApp)->spanArabic(current.getWord());
+  QString page = QString(QObject::tr("Vol %1,Page %2")).arg(current.getVol()).arg(current.getPage());
+  QString node = current.getNode();
+  if ( ! node.isEmpty()) {
+    node = "(" + node + ")";
+  }
+  QString html = QString("<body class=\"place\">%1,%2%3 %4 %5</body>").arg(root).arg(head).arg(headseparator).arg(page).arg(node);
+  m_placeIndicator->setText(html);
 }
 /**
  * navigation mode can be changed:
@@ -2937,8 +2971,10 @@ void LanesLexicon::onNavLast()   {
   }
 }
 void LanesLexicon::onNavigationMenuChanged(QAction * action) {
-  m_navigationButton->setDefaultAction(action);
-  m_navigationButton->menu()->hide();
+  if (m_allowNavMode) {
+    m_navigationButton->setDefaultAction(action);
+    m_navigationButton->menu()->hide();
+  }
 }
 void LanesLexicon::onClearHistory() {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -3121,7 +3157,7 @@ void LanesLexicon::searchForRoot() {
     connect(m_rootSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   }
   else {
-    m_rootSearchDialog->setText("");
+    //    m_rootSearchDialog->setText("");
   }
   if (m_rootSearchDialog->exec()) {
     QString t = m_rootSearchDialog->getText();
@@ -3160,6 +3196,7 @@ void LanesLexicon::searchForRoot() {
   m_rootSearchDialog->hideKeyboard();
 }
 int LanesLexicon::addTab(bool create,QWidget * w,const QString & title) {
+  QLOG_DEBUG() << Q_FUNC_INFO << create << title;
   int ix = m_tabs->currentIndex();
   if (create) {
     if (m_tabStyle == LanesLexicon::AppendTab) {
@@ -3209,10 +3246,13 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
     }
     return;
   }
+  /// head word search
   if (searchType == SearchOptions::Entry) {
       HeadSearchWidget * s = new HeadSearchWidget(this);
       connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
       connect(s,SIGNAL(deleteSearch()),this,SLOT(deleteSearch()));
+      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+
       s->search(target,options);
       if (s->count() == 0) {
         QMessageBox msgBox;
@@ -3227,8 +3267,6 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       if (options.activateTab()) {
         m_tabs->setCurrentIndex(ix);
       }
-      setSignals(s->getEntry());
-      s->showFirst();
       if (options.newTab() && ! options.activateTab()) {
         s->setFocus(Qt::OtherFocusReason);
       }
@@ -3262,7 +3300,7 @@ void LanesLexicon::searchForEntry() {
 
   }
   else {
-    m_headSearchDialog->setText("");
+    //    m_headSearchDialog->setText("");
   }
 
   if (m_headSearchDialog->exec()) {
@@ -3380,29 +3418,26 @@ void LanesLexicon::pageClear() {
     m_clearAction->setEnabled(false);
     return;
   }
+  /*
   HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
   if (results) {
     results->getEntry()->clearHighlights();
     m_clearAction->setEnabled(false);
     return;
   }
+  */
 
 
 }
 void LanesLexicon::currentTabChanged(int ix) {
   QLOG_DEBUG() << Q_FUNC_INFO << ix;
 
-  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
   if ( entry ) {
     Place p = entry->getPlace();
     if (m_linkContents) {
       m_tree->ensurePlaceVisible(p,true);
     }
-    this->enableForPage(true);
-    return;
-  }
-  HeadSearchWidget * results = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
-  if (results) {
     this->enableForPage(true);
     return;
   }
@@ -3426,10 +3461,14 @@ int LanesLexicon::searchTabs(const QString & node) {
   if (m_allowDuplicates) {
     return -1;
   }
+  if (node.isEmpty()) {
+    return -1;
+  }
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
     if (entry && entry->hasNode(node)) {
-        return i;
+      statusMessage(QString(tr("Requested entry already showing in tab %1")).arg(i + 1));
+      return i;
     }
   }
   return -1;
@@ -3442,7 +3481,10 @@ void LanesLexicon::showNoteBrowser() {
       return;
     }
   }
-  int ix = m_tabs->addTab(new NoteBrowser(this),tr("Notes"));
+  NoteBrowser * notes = new NoteBrowser(this);
+  connect(notes,SIGNAL(noteDeleted(const QStringList &)),this,SLOT(onNotesDeleted(const QStringList &)));
+
+  int ix = m_tabs->addTab(notes,tr("Notes"));
   m_tabs->setCurrentIndex(ix);
 }
 int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
@@ -3479,16 +3521,39 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
 
 }
 /**
- * Can be invoked by: NodeView,FullSearchWidget
+ * Can be invoked by: FullSearchWidget,HeadSearchWidget or graphicsentry when view link details
  *
  * @param node
  */
+
+/// TODO find out whether to do background loading
 void LanesLexicon::showSearchNode(const QString & node) {
   QLOG_DEBUG() << Q_FUNC_INFO << node;
+  FullSearchWidget * w = qobject_cast<FullSearchWidget *>(sender());
+  if (w) {
+    QLOG_DEBUG() << ">>>>>>>>>>>>>>>>> fullsearch";
+  }
+  else {
+    HeadSearchWidget * h = qobject_cast<HeadSearchWidget *>(sender());
+    if (h) {
+      QLOG_DEBUG() << ">>>>>>>>>>>>>>>>> headsearch";
+    }
+    else {
+      GraphicsEntry * e = qobject_cast<GraphicsEntry *>(sender());
+      if (e) {
+        QLOG_DEBUG() << ">>>>>>>>>>>>>>>>>>>> link view";
+      }
+    }
+  }
   Place p;
   p.setNode(node);
-  //this->showPlace(p,Lane::Create_Tab);
   showPlace(p,true,false);
+  int ix = this->searchTabs(node);
+  if (ix != -1) {
+    statusMessage(QString(tr("Entry loaded into tab %1")).arg(ix+1));
+    return;
+  }
+
 }
 
 int LanesLexicon::getSearchCount() {
@@ -3504,6 +3569,7 @@ int LanesLexicon::getSearchCount() {
 void LanesLexicon::convertToEntry() {
   HeadSearchWidget * w = qobject_cast<HeadSearchWidget *>(m_tabs->currentWidget());
   if (w) {
+    /*
     Place p = w->getEntry()->getPlace();
     if (p.isValid()) {
       int ix = m_tabs->currentIndex();
@@ -3521,6 +3587,7 @@ void LanesLexicon::convertToEntry() {
     else {
 
     }
+    */
   }
 }
 /**
@@ -3611,9 +3678,8 @@ QMapIterator<QString,QString> LanesLexicon::getMapIterator() {
   return iter;
 }
 void LanesLexicon::deleteSearch() {
-  //  if (! p.isValid()) {
-  //    return;
-  //  }
+  /*
+  DELETE THIS
   Place p;
   int currentTab = m_tabs->currentIndex();
   HeadSearchWidget * searchwidget = qobject_cast<HeadSearchWidget *>(m_tabs->widget(currentTab));
@@ -3634,7 +3700,7 @@ void LanesLexicon::deleteSearch() {
   m_tabs->setCurrentIndex(currentTab);
   entry->home();
   return;
-
+  */
 }
 void LanesLexicon::localSearch() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
@@ -3690,9 +3756,6 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
     QLOG_WARN() << QString(tr("Icon not found:%1")).arg(iconfile);
     return;
   }
-  if (m_debug) {
-    QLOG_DEBUG() << QString(" %1").arg(iconfile);
-  }
   QIcon icon(fi.absoluteFilePath());
   if (! icon.isNull()) {
     action->setIcon(icon);
@@ -3717,9 +3780,6 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   if (!imgd.exists()) {
     QLOG_WARN() << QString(tr("Theme image directory not found : %1")).arg(imgd.absolutePath());
     return;
-  }
-  if (m_debug) {
-    QLOG_DEBUG() << tr("Loading icons:");
   }
 
   QString imgdir = imgd.absolutePath();
@@ -3833,7 +3893,7 @@ void LanesLexicon::syncFromContents() {
   }
   Place p = m_tree->getCurrentPlace();
   if (p.isValid()) {
-      this->showPlace(p,false,true);
+       this->showPlace(p,false,true);
   }
 }
 /**
@@ -4138,7 +4198,7 @@ bool LanesLexicon::sanityCheck(int type) {
     msgBox.exec();
     return false;
   }
-  QString xslt =  GraphicsEntry::getXsltFileName();
+  QString xslt =  getLexicon()->getXsltFileName();
   if (xslt.isEmpty() || ! QFileInfo::exists(xslt)) {
     QMessageBox msgBox;
     msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
@@ -4646,7 +4706,28 @@ void LanesLexicon::importXml(const QString & filename) {
 }
 void LanesLexicon::onDuplicateTab(int index) {
   qDebug() << Q_FUNC_INFO << index;
+  GraphicsEntry * entry;
+  Place p;
+  entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(index));
 
+  if (entry) {
+    p = entry->getPlace();
+  }
+  else {
+    return;
+  }
+  bool v = m_allowDuplicates;
+
+  if (! p.isValid()) {
+    QLOG_DEBUG() << Q_FUNC_INFO << "Invalid place" << p.toString();
+    return;
+  }
+  m_allowDuplicates = true;
+  entry = this->showPlace(p,true,false);
+  if (entry) {
+    statusMessage(QString(tr("Duplicated tab %1")).arg(index + 1));
+  }
+  m_allowDuplicates = v;
 }
 /**
  * show dialog, accept settings
@@ -4726,6 +4807,7 @@ void LanesLexicon::onSavePageSet() {
   }
   QString title = d->pageSetTitle();
   QList<int> tabs = d->requestedTabs();
+  QLOG_DEBUG() << Q_FUNC_INFO << tabs;
   int oid = d->overwriteId();
 
   delete d;
@@ -4759,22 +4841,23 @@ void LanesLexicon::onSavePageSet() {
   }
   int id = v.toInt();
   int ix = 0;
+
   for(int i=0;i < tabs.size();i++) {
-      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(tabs[i]));
-      QString data;
-      QString place;
-      if (entry) {
-        ix++;
-        place = entry->getPlace().toString();
-        data += QString("?type=%1").arg("entry");
-        data += QString("?zoom=%1").arg(entry->getScale());
-        data += QString("?textwidth=%1").arg(entry->getTextWidth());
-        data += QString("?usertitle=%1").arg(entry->userTitle());
-        QString h = entry->getHome();
-        if (! h.isEmpty()) {
-          data += QString("?home=%1").arg(h);
-        }
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(tabs[i]));
+    QString data;
+    QString place;
+    if (entry) {
+      ix++;
+      place = entry->getPlace().toString();
+      data += QString("?type=%1").arg("entry");
+      data += QString("?zoom=%1").arg(entry->getScale());
+      data += QString("?textwidth=%1").arg(entry->getTextWidth());
+      data += QString("?usertitle=%1").arg(entry->userTitle());
+      QString h = entry->getHome();
+      if (! h.isEmpty()) {
+        data += QString("?home=%1").arg(h);
       }
+
       p.bindValue(0,id);
       p.bindValue(1,place);
       p.bindValue(2,data);
@@ -4782,12 +4865,17 @@ void LanesLexicon::onSavePageSet() {
       if (!p.exec()) {
         QLOG_WARN() << QString(tr("Exec failed for SQL_PAGESET_ADD_PAGE query:%1")).arg(p.lastError().text());
       }
-      qDebug() << place;
+    }
   }
   QSqlDatabase::database("notesdb").commit();
   QString plural;
-  plural = (ix > 1? "s" : "");
-  QLOG_INFO() << QString("Saved tab set \"%1\", %2 tab%3").arg(title).arg(ix).arg(plural);
+  switch(ix) {
+  case 0 : { plural = tr("tabs");break;}
+  case 1 : { plural = tr("tab");break;}
+  default : { plural = tr("tabs");break;}
+  }
+  plural = (ix > 1 ? "tabs" : "tab");
+  statusMessage(QString("Saved tab set \"%1\", %2 %3").arg(title).arg(ix).arg(plural));
 }
 void LanesLexicon::onLoadPageSet() {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -4809,9 +4897,7 @@ void LanesLexicon::onLoadPageSet() {
     return;
   }
   if (clearTabs) {
-    while(m_tabs->count() > 0) {
-      this->onCloseTab(0);
-    }
+    this->closeAllTabs();
   }
   int ix=0;
   QRegularExpression rx("(\\w+)=(.+)");
@@ -4863,11 +4949,52 @@ void LanesLexicon::onLoadPageSet() {
     else {
     }
   }
-  statusMessage(QString(tr("Restored %1 page%2")).arg(ix).arg(ix == 1 ? "" : tr("s")));
+  QString plural;
+  switch(ix) {
+  case 0 : { plural = tr("tabs");break;}
+  case 1 : { plural = tr("tab");break;}
+  default : { plural = tr("tabs");break;}
+  }
+  plural = (ix > 1 ? "tabs" : "tab");
+  statusMessage(QString("Restored %1 %2").arg(ix).arg(plural));
 }
 void LanesLexicon::onEditPageSet() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 
   EditPageSetDialog  d;
   d.exec();
+}
+/**
+ * when notes are deleted we have to check if any are showing and reload the tab
+ *
+ * so get a list of tabs which need reloading
+ *
+ * @param nodes
+ */
+void LanesLexicon::onNotesDeleted(const QStringList & nodes) {
+  QLOG_DEBUG() << Q_FUNC_INFO << nodes;
+  QList<int> t;
+  for(int i=0;i < nodes.size();i++) {
+    for(int j=0;j < m_tabs->count();j++) {
+      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(j));
+      if (entry && entry->hasNode(nodes[i])) {
+        if (! t.contains(j)) {
+          t << j;
+        }
+      }
+    }
+  }
+  for(int i=0;i < t.size();i++) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(t[i]));
+    entry->onReload();
+  }
+}
+QTabWidget * LanesLexicon::tabwidget() const {
+  return m_tabs;
+}
+void LanesLexicon::onTabList() {
+  TabListDialog * d = new TabListDialog;
+
+  d->setAttribute(Qt::WA_DeleteOnClose);
+  d->show();
 }

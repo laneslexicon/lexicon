@@ -72,6 +72,14 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
 }
 GraphicsEntry::~GraphicsEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+
+  QList<SearchOptions::SearchScope_t> keys = m_lastSearchOptions.keys();
+  for(int i=0;i < keys.size();i++) {
+    SearchOptions * opts = m_lastSearchOptions.take(keys[i]);
+    if (opts) {
+      delete opts;
+    }
+  }
 }
 QGraphicsView * GraphicsEntry::getView() const {
   return m_view;
@@ -94,7 +102,6 @@ void GraphicsEntry::readSettings() {
   settings.endGroup();
 
   settings.beginGroup("Entry");
-  m_debug = settings.value(SID_ENTRY_DEBUG,false).toBool();
   QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
   css = readCssFromFile(css);
   /// if there are errors, readCssFromFile will show them
@@ -173,35 +180,11 @@ void GraphicsEntry::readSettings() {
 
   m_highlightColorName = settings.value(SID_ENTRY_HIGHLIGHT_COLOR,"yellow").toString();
 
+  m_nodeinfoClose = settings.value(SID_ENTRY_NODEINFO_CLOSE,true).toBool();
+
   settings.endGroup();
 
-  m_entryXslt = getXsltFileName();
-  settings.beginGroup("XSLT");
-  m_nodeXslt = settings.value(SID_XSLT_NODE,QString("node.xslt")).toString();
-  if (m_nodeXslt.isEmpty()) {
-    m_nodeXslt = "node.xslt";
-  }
-  QString nodePath = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_nodeXslt);
-
-  if (nodePath.startsWith("Error:")) {
-    QStringList errors = nodePath.split(":");
-    QString msg;
-    if (errors.size() >= 2) {
-
-      msg = QString(tr("<p>Cannot find file: %1</p> \
-                        <p>Directory is:%2</p> \
-                        <p>Please review Preferences -> Layout</p>")).arg(errors[2]).arg(errors[1]);
-    }
-    else {
-      msg = QString(tr("Cannot find file: %1")).arg(m_nodeXslt);
-    }
-    QMessageBox::warning(this,tr("Missing node XSLT file"),msg,QMessageBox::Ok);
-    QLOG_WARN() << QString(tr("Missing node XSLT file: %1")).arg(m_nodeXslt);
-  }
-  else {
-    m_nodeXslt = nodePath;
-  }
-  settings.endGroup();
+  m_entryXslt = getLexicon()->getXsltFileName();
 
   settings.beginGroup("Notes");
   m_notesEnabled = settings.value(SID_NOTES_ENABLED,true).toBool();
@@ -238,18 +221,6 @@ void GraphicsEntry::readSettings() {
   }
   settings.endGroup();
 
-}
-QString GraphicsEntry::getXsltFileName()  {
-  QString fileName;
-  SETTINGS
-  settings.beginGroup("XSLT");
-  fileName = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
-  if (fileName.isEmpty()) {
-    fileName = "entry.xslt";
-  }
-  QString xsltDir = getLexicon()->getResourceFilePath(Lexicon::XSLT);
-  QFileInfo fi(xsltDir,fileName);
-  return fi.absoluteFilePath();
 }
 
 void GraphicsEntry::writeDefaultSettings() {
@@ -417,16 +388,42 @@ void GraphicsEntry::focusLast() {
  * @return
  */
 Place GraphicsEntry::getPlace(int index) const {
+  QLOG_DEBUG() << Q_FUNC_INFO << index;
   if ((index >= 0) && (index < m_items.size())) {
+    QLOG_DEBUG() << "get_place_1";
       return m_items[index]->getPlace();
   }
+  Place p;
   EntryItem * item = dynamic_cast<EntryItem *>(m_scene->focusItem());
   if (item) {
-      return item->getPlace();
+      p = item->getPlace();
+      if (p.isValid()) {
+        //        QLOG_DEBUG() << "get_place_4";
+        return p;
+      }
   }
-  //  if (! m_focusNode.isEmpty()) {
-  //    return Place::fromNode(m_focusNode);
-  //  }
+  /// TODO this is not always updated - it may be outdated
+  if (! m_focusNode.isEmpty()) {
+    QSqlQuery sql;
+    if (sql.prepare(SQL_ENTRY_FOR_NODE)) {
+      sql.bindValue(0,m_focusNode);
+      if (sql.exec()  && sql.first()) {
+        //        QLOG_DEBUG() << "get_place_2";
+        return Place::fromEntryRecord(sql.record());
+      }
+    }
+    //    QLOG_DEBUG() << "get_place_3";
+    return Place::fromNode(m_focusNode);
+  }
+  if (m_focusPlace.isValid()) {
+    //    QLOG_DEBUG() << "get_place_5";
+    return m_focusPlace;
+  }
+  if (m_items.size() > 1) {
+    //    QLOG_DEBUG() << "get_place_6";
+    return m_items[1]->getPlace();
+  }
+  //  QLOG_DEBUG() << "get_place_7";
   return m_focusPlace;
 }
 /**
@@ -580,7 +577,7 @@ void GraphicsEntry::linkActivated(const QString & link) {
     p.setNode(node);
     /// TODO replace this
     /// including move to new tab stuff
-    showPlace(p,false,createTab,activateTab);
+    /// showPlace(p,createTab,activateTab);
   }
 }
 void GraphicsEntry::linkHovered(const QString & link) {
@@ -590,7 +587,6 @@ void GraphicsEntry::linkHovered(const QString & link) {
   if (!gi) {
     return;
   }
-  qDebug() << Q_FUNC_INFO << link;
   if (link.isEmpty()) {
     gi->setCursor(QCursor(Qt::ArrowCursor));
     gi->setToolTip(gi->getPlace().getText());
@@ -670,21 +666,24 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
   nodeQuery.bindValue(0,node);
   nodeQuery.exec();
   if (nodeQuery.first()) {
-    p.setRoot(nodeQuery.value("root").toString());
-    p.setSupplement(nodeQuery.value("supplement").toInt());
-    p.setWord(nodeQuery.value("word").toString());
-    p.setPage(nodeQuery.value("page").toInt());
-    QString html =    transform(NODE_XSLT,m_nodeXslt,nodeQuery.value("xml").toString());
+    p = Place::fromEntryRecord(nodeQuery.record());
+    //    p.setRoot(nodeQuery.value("root").toString());
+    //    p.setSupplement(nodeQuery.value("supplement").toInt());
+    //    p.setWord(nodeQuery.value("word").toString());
+    //    p.setPage(nodeQuery.value("page").toInt());
+    QString html =    transform(NODE_XSLT,m_entryXslt,nodeQuery.value("xml").toString());
     NodeInfo * info = new NodeInfo(this);
     info->setWindowTitle(tr("Link target"));
     info->setPlace(p);
     info->setCss(m_currentCss);
     info->setHtml(html);
+    info->setCloseOnLoad(m_nodeinfoClose);
+    connect(info,SIGNAL(openNode(const QString &)),this,SIGNAL(showNode(const QString &)));
     int ret = info->exec();
     delete info;
-    if (ret == QDialog::Accepted) {
-      emit(gotoNode(Place::fromNode(node),true,true));
-    }
+    //    if (ret == QDialog::Accepted) {
+    //      emit(gotoNode(Place::fromNode(node),true,true));
+    //    }
   }
   else {
     QLOG_WARN() << QString(tr("Requested link node not found : %1")).arg(node);
@@ -709,10 +708,18 @@ void GraphicsEntry::anchorTest() {
     }
   }
 }
-/// TODO fix this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-/// TODO how is it supposed to be used ?????????
+/**
+ *
+ *
+ * @param p
+ * @param thisPageOnly
+ * @param createTab
+ * @param activateTab
+ *
+ * @return
+ */
+/*
 Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,bool createTab,bool activateTab) {
-  /// check if the node is on this page
     QLOG_DEBUG() << Q_FUNC_INFO << __LINE__ << "SHOULD NOT BE HERE";
   QString node = p.getNode();
   for(int i=0;i < m_items.size();i++) {
@@ -731,6 +738,7 @@ Place GraphicsEntry::showPlace(const Place & p,bool thisPageOnly,bool createTab,
   }
   return p;
 }
+*/
 /**
  *
  *
@@ -772,12 +780,21 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
 }
 
 void GraphicsEntry::dumpInfo(EntryItem * item , const QString & node) {
+  SETTINGS
+
+  settings.beginGroup("Entry");
+  QString p = settings.value(SID_ENTRY_OUTPUT_PATH,QDir::tempPath()).toString();
+
+  QFileInfo d(p);
+  if (! d.isDir()) {
+    p = QDir::tempPath();
+  }
   QString prefix;
   if (item->isRoot()) {
     prefix = "root-";
   }
   if (m_dumpXml) {
-    QFileInfo fi(QDir::tempPath(),QString("%1%2.xml").arg(prefix).arg(node));
+    QFileInfo fi(p,QString("%1%2.xml").arg(prefix).arg(node));
     QFile f(fi.filePath());
     if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
       QTextStream out(&f);
@@ -786,12 +803,21 @@ void GraphicsEntry::dumpInfo(EntryItem * item , const QString & node) {
     }
   }
   if (m_dumpOutputHtml) {
-    QFileInfo fi(QDir::tempPath(),QString("%1%2-out.html").arg(prefix).arg(node));
+    QFileInfo fi(p,QString("%1%2-in.html").arg(prefix).arg(node));
         QFile f(fi.filePath());
         if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
           QTextStream out(&f);
           out.setCodec("UTF-8");
           out << item->getOutputHtml();
+        }
+  }
+  if (m_dumpHtml) {
+    QFileInfo fi(p,QString("%1%2-qt.html").arg(prefix).arg(node));
+        QFile f(fi.filePath());
+        if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+          QTextStream out(&f);
+          out.setCodec("UTF-8");
+          out << item->toHtml();
         }
   }
 }
@@ -1036,6 +1062,7 @@ Place GraphicsEntry::getPage(const Place & p) {
   }
   QString node = pageQuery.value("nodeid").toString();
 
+
   if (m_clearScene) {
     onClearScene();
   }
@@ -1214,8 +1241,9 @@ EntryItem * GraphicsEntry::createEntry(const QString & xml) {
   //    }
   connect(gi,SIGNAL(linkActivated(const QString &)),this,SLOT(linkActivated(const QString &)));
   connect(gi,SIGNAL(linkHovered(const QString &)),this,SLOT(linkHovered(const QString &)));
-  connect(gi,SIGNAL(showPerseus(const Place &)),this,SLOT(showPerseus(const Place &)));
+  connect(gi,SIGNAL(showXml(const Place &)),this,SLOT(showPerseus(const Place &)));
   connect(gi,SIGNAL(showHtml()),this,SLOT(showHtml()));
+  connect(gi,SIGNAL(searchPage()),this,SIGNAL(searchPage()));
   connect(gi,SIGNAL(fixLink(const QStringList &,bool)),this,SLOT(fixLink(const QStringList &,bool)));
   /// placeChanged is emitted whenever an EntryItem gets a focusInEvent
   connect(gi,SIGNAL(placeChanged(const Place &)),this,SLOT(updateCurrentPlace(const Place &)));
@@ -1255,6 +1283,7 @@ void GraphicsEntry::appendEntries(int startPos) {
     m_items[i]->setPos(xpos,ypos);
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
+    /*
     if (m_dumpHtml) {
       QFileInfo fi(QDir::tempPath(),QString("%1.html").arg(m_items[i]->getNode()));
       QFile f(fi.filePath());
@@ -1264,6 +1293,7 @@ void GraphicsEntry::appendEntries(int startPos) {
         out << m_items[i]->toHtml();
       }
     }
+    */
     sz = m_items[i]->document()->size();
 
     if (m_items[i]->hasNotes()) {
@@ -1550,29 +1580,37 @@ QString GraphicsEntry::firstRoot() {
   return root;
 }
 void GraphicsEntry::showPerseus(const Place & p) {
-  QString node = p.getNode();
-  if ( node.isEmpty()) {
-    QMessageBox msgBox;
-    msgBox.setText(tr("No XML found"));
-    msgBox.exec();
-    return;
-  }
-  QSqlQuery nodeQuery;
-  bool ok = nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE);
-  if (! ok ) {
-    QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
-  }
-
-  nodeQuery.bindValue(0,node);
-  nodeQuery.exec();
   QString xml;
-  if (nodeQuery.first()) {
-    xml = nodeQuery.value("xml").toString();
+  QString node;
+  EntryItem * item = qobject_cast<EntryItem *>(sender());
+  if (item) {
+    //    xml = item->getXml();
   }
-  else {
-    xml = "No XML for " + node;
+  if (xml.isEmpty()) {
+    node = p.getNode();
+    if ( node.isEmpty()) {
+      QMessageBox msgBox;
+      msgBox.setText(tr("No XML found"));
+      msgBox.exec();
+      return;
+    }
+    QSqlQuery nodeQuery;
+    bool ok = nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE);
+    if (! ok ) {
+      QLOG_WARN() << "node SQL prepare failed" << nodeQuery.lastError();
+    }
+
+    nodeQuery.bindValue(0,node);
+    nodeQuery.exec();
+
+    if (nodeQuery.first()) {
+      xml = nodeQuery.value("xml").toString();
+    }
+    else {
+      xml = "No XML for " + node;
+    }
   }
-  ShowXmlDialog d;
+  ShowXmlDialog d(node);
   d.setXml(xml);
   d.exec();
 }
@@ -1591,8 +1629,10 @@ void GraphicsEntry::showHtml() {
   d.exec();
 }
 void GraphicsEntry::updateCurrentPlace(const Place &  p ) {
-  m_place = p;
-  emit(placeChanged(p));
+  if (p.node() != m_place.node()) {
+    m_place = p;
+    emit(placeChanged(p));
+  }
 }
 /**
  *
@@ -1834,8 +1874,14 @@ void GraphicsEntry::focusPlace() {
  * @param item
  */
 void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_view->setFocus();
-  m_view->ensureVisible(item);
+  /// get the y position of the item
+  /// add half the view height so that we are centering on the point that
+  /// makes the top of the item, the top of the view
+  QPointF pos = item->scenePos();
+  pos += QPointF(0,m_view->height()/2);
+  m_view->centerOn(pos);
   m_scene->setFocusItem(item);
   EntryItem * entry = dynamic_cast<EntryItem *>(item);
   if (entry) {
@@ -1844,47 +1890,64 @@ void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
   }
 }
 /**
+ * Local Search
+ *
  * This uses different default search options from the other search routines
- *
- *
  * @return
  */
 int GraphicsEntry::search() {
-  QString target = "and";
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
+  QString target;
   int count = 0;
 
-
   SearchOptions options;
-  options.setSearchScope(SearchOptions::Local);
-  // int max = m_items.size() * step;
   QString v;
 
-  QLOG_DEBUG() << Q_FUNC_INFO;
-  SETTINGS
-  settings.beginGroup("LocalSearch");
-  if (settings.value(SID_LOCALSEARCH_TYPE_REGEX,false).toBool()) {
-    options.setSearchType(SearchOptions::Regex);
+  if (m_lastSearchOptions.contains(SearchOptions::Local)) {
+    SearchOptions * o = dynamic_cast<SearchOptions *>(m_lastSearchOptions.value(SearchOptions::Local));
+    if (o) {
+      options = SearchOptions(*o);
+    }
   }
-  else {
-    options.setSearchType(SearchOptions::Normal);
+  /// if we haven't got a cache search options get it from settings
+  if (! options.isValid()) {
+    SETTINGS
+      settings.beginGroup("LocalSearch");
+    if (settings.value(SID_LOCALSEARCH_TYPE_REGEX,false).toBool()) {
+      options.setSearchType(SearchOptions::Regex);
+    }
+    else {
+      options.setSearchType(SearchOptions::Normal);
+    }
+    options.setSearchScope(SearchOptions::Local);
+    options.setIgnoreDiacritics(settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool());
+    options.setWholeWordMatch(settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool());
+    options.setForceLTR(settings.value(SID_LOCALSEARCH_FORCE,false).toBool());
+    options.setIgnoreCase(settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool());
+    options.setShowAll(settings.value(SID_LOCALSEARCH_SHOW_ALL,false).toBool());
   }
-
-  options.setIgnoreDiacritics(settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool());
-  options.setWholeWordMatch(settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool());
-  options.setForceLTR(settings.value(SID_LOCALSEARCH_FORCE_LTR,false).toBool());
-  options.setShowAll(settings.value(SID_LOCALSEARCH_SHOW_ALL,false).toBool());
   ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Local,this);
-  //  d->setOptions(options);
+  d->setOptions(options);
   QString t;
   if (d->exec()) {
     t = d->getText();
+    d->getOptions(options);
+    delete d;
     if ( t.isEmpty()) {
       return -1;
     }
-    d->getOptions(options);
     m_currentSearchOptions = options;
+    if (m_lastSearchOptions.contains(SearchOptions::Local)) {
+      SearchOptions * o = dynamic_cast<SearchOptions *>(m_lastSearchOptions.take(SearchOptions::Local));
+      if (o) {
+        delete o;
+      }
+    }
+    m_lastSearchOptions.insert(SearchOptions::Local,new SearchOptions(options));
   }
   else {
+    delete d;
     return -1;
   }
   m_findCount = 0;
@@ -1898,6 +1961,12 @@ int GraphicsEntry::search() {
   m_searchItemIndexes.clear();
   QRegExp rx = SearchOptionsWidget::buildRx(t,m_pattern,options);
   QLOG_DEBUG() << "Search pattern" << rx.pattern();
+  if (options.ignoreCase()) {
+    rx.setCaseSensitivity(Qt::CaseInsensitive);
+  }
+  else {
+    rx.setCaseSensitivity(Qt::CaseSensitive);
+  }
   m_currentSearchRx = rx;
   m_currentSearchTarget = t;
   QGraphicsItem * focusItem = m_scene->focusItem();
@@ -1940,7 +2009,7 @@ int GraphicsEntry::search() {
     }
   }
   else {
-    if (! m_currentSearchOptions.showAll()) {
+    if (! options.showAll()) {
       this->centerOnSearchResult(m_searchItemIndexes[m_searchItemPtr],0);
       emit(searchStarted());
     }
@@ -1957,7 +2026,7 @@ int GraphicsEntry::search() {
  * m_currentSearchPosition is the current position within the current EntryItem
  */
 void GraphicsEntry::searchNext() {
-  //  QLOG_DEBUG() << Q_FUNC_INFO << m_searchItemPtr << m_searchIndex;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   int pos;
   if (m_currentSearchTarget.isEmpty()) {
     return;
@@ -1993,10 +2062,14 @@ void GraphicsEntry::searchNext() {
   return;
 }
 void GraphicsEntry::centerOnSearchResult(int itemIndex,int ix) {
+  bool showAll = false;
   int pos = m_items[itemIndex]->showHighlight(ix);
   m_highlightCount++;
   m_currentFind++;
-  if (m_currentSearchOptions.showAll()) {
+  if (m_lastSearchOptions.contains(SearchOptions::Local)) {
+    showAll = m_lastSearchOptions.value(SearchOptions::Local)->showAll();
+  }
+  if (showAll) {
     statusMessage(QString("Find count: %1").arg(m_findCount));
   }
   else {
@@ -2320,27 +2393,33 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
  */
 void GraphicsEntry::onReload() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  /*
-  SETTINGS
-  settings.beginGroup("Entry");
-  m_debug = settings.value(SID_ENTRY_DEBUG,false).toBool();
-  QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
-  css = readCssFromFile(css);
-  if (! css.isEmpty()) {
-    m_currentCss = css;
-    emit(cssChanged());
-  }
-  css = settings.value(SID_ENTRY_PRINT_CSS,QString("entry_print.css")).toString();
-  css = readCssFromFile(css);
-  if (! css.isEmpty()) {
-    m_printCss = css;
-  }
-  settings.endGroup();
-  settings.beginGroup("XSLT");
-  m_entryXslt = settings.value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
-  m_entryXslt = getLexicon()->getResourceFilePath(Lexicon::XSLT,m_entryXslt);
-  */
+
+  double scale = m_scale;
+  QString title = m_userTitle;
+  int textwidth = m_textWidth;
   readSettings();
+  m_textWidth = textwidth;
+  this->getXmlForRoot(m_place);
+  this->setScale(scale,true);
+  if (! title.isEmpty()) {
+    QWidget * w = this->parentWidget();
+    while(w) {
+      QTabWidget * tab = qobject_cast<QTabWidget *>(w);
+      if (tab)  {
+        for(int i=0;i < tab->count();i++) {
+          if (tab->widget(i) == this) {
+            tab->setTabText(i,title);
+          }
+        }
+        w = NULL;
+      }
+      else {
+        w = w->parentWidget();
+      }
+    }
+    this->setUserTitle(title);
+  }
+  /*
   QString html;
   for (int i=0;i < m_items.size();i++) {
     html = transform(ENTRY_XSLT_RECOMPILE,m_entryXslt,m_items[i]->getXml());
@@ -2351,6 +2430,7 @@ void GraphicsEntry::onReload() {
     m_items[i]->setHtml(html);
     m_items[i]->setOutputHtml(html);
   }
+  */
   statusMessage(tr("Reloaded page"));
 }
 /**
@@ -2513,7 +2593,6 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
         qDebug() << nxml;
 
         item->setXml(this->wrapEntry(nodefind.record(),nxml));
-        qDebug() << item->getXml();
         QSqlDatabase::database().commit();
         statusMessage(QString(tr("Updated link details")));
         if (reload) {
@@ -2664,6 +2743,7 @@ void GraphicsEntry::onFocusItemChanged(QGraphicsItem * newFocus, QGraphicsItem *
 
   if (item1) {
     m_focusPlace = item1->getPlace();
+    m_focusNode = m_focusPlace.node();
   }
   ///
   /// this happens when the the graphicsentry loses focus because the user has clicked on

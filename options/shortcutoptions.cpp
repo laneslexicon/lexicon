@@ -14,11 +14,13 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
   QVBoxLayout * vlayout = new QVBoxLayout;
 
   QStringList keys;
+
+
   keys << SID_SHORTCUT_CONTENTS_COLLAPSE_ALL << SID_SHORTCUT_CONTENTS_COLLAPSE_LETTER << SID_SHORTCUT_CONTENTS_SHOW;
   addTab("Contents",keys);
   keys.clear();
 
-  keys << SID_SHORTCUT_DELETE_TAB << SID_SHORTCUT_DELETE_OTHER_TABS << SID_SHORTCUT_GO_TAB;
+  keys << SID_SHORTCUT_DELETE_TAB << SID_SHORTCUT_DELETE_OTHER_TABS << SID_SHORTCUT_GO_TAB << SID_SHORTCUT_LIST_TABS;
   addTab("Tabs",keys);
   keys.clear();
 
@@ -26,7 +28,7 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
   addTab("History",keys);
   keys.clear();
 
-  keys << SID_SHORTCUT_NAV_FIRST << SID_SHORTCUT_NAV_NEXT << SID_SHORTCUT_NAV_PREV << SID_SHORTCUT_NAV_LAST << SID_SHORTCUT_NAV_ROOT_MODE << SID_SHORTCUT_NAV_PAGE_MODE;
+  keys << SID_SHORTCUT_NAV_FIRST << SID_SHORTCUT_NAV_NEXT << SID_SHORTCUT_NAV_PREV << SID_SHORTCUT_NAV_LAST;// << SID_SHORTCUT_NAV_ROOT_MODE << SID_SHORTCUT_NAV_PAGE_MODE;
   addTab("Navigation",keys);
   keys.clear();
 
@@ -34,7 +36,7 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
   addTab(tr("Keymaps"),keys);
   keys.clear();
 
-  keys << SID_SHORTCUT_SEARCH_ROOT << SID_SHORTCUT_SEARCH_HEAD << SID_SHORTCUT_SEARCH_WORD << SID_SHORTCUT_SEARCH_NODE << SID_SHORTCUT_SEARCH_PAGE;
+  keys << SID_SHORTCUT_SEARCH_ROOT << SID_SHORTCUT_SEARCH_HEAD << SID_SHORTCUT_SEARCH_WORD << SID_SHORTCUT_SEARCH_NODE;
   addTab(tr("Global Search"),keys);
   keys.clear();
 

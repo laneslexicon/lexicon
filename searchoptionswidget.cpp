@@ -12,7 +12,7 @@
  *
  *
  */
-SearchOptionsWidget::SearchOptionsWidget(int searchFor,QWidget * parent) : QWidget(parent) {
+SearchOptionsWidget::SearchOptionsWidget(SearchOptions::SearchScope_t searchFor,QWidget * parent) : QWidget(parent) {
   QLOG_DEBUG()  << Q_FUNC_INFO << searchFor;
   setObjectName("searchoptionswidget");
   m_options.setSearchScope(searchFor);
@@ -48,7 +48,9 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   m_fullText = new QRadioButton(tr("Full text"));
   m_normalSearch = new QRadioButton(tr("Normal"),m_typeGroup);
   m_regexSearch = new QRadioButton(tr("Regular expression"),m_typeGroup);
-
+  m_ignoreCase = new QCheckBox(tr("Ignore case"));
+  /// for head search
+  m_headPhrase = new QCheckBox(tr("Search entry heading"));
   QHBoxLayout * typelayout = new QHBoxLayout;
   typelayout->addWidget(m_normalSearch);
   typelayout->addWidget(m_regexSearch);
@@ -77,7 +79,11 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   row++;
   gridlayout->addWidget(m_includeHeads,row,0);
   row++;
+  gridlayout->addWidget(m_headPhrase,row,0);
+  row++;
   gridlayout->addWidget(m_showAllSearch,row,0);
+  row++;
+  gridlayout->addWidget(m_ignoreCase,row,0);
   row++;
   gridlayout->addWidget(m_newTab,row,0);
   gridlayout->addWidget(m_makeActive,row,1);
@@ -110,6 +116,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
   m_arabicTarget->hide();
   m_buckwalterTarget->hide();
   m_showAllSearch->hide();
+  m_ignoreCase->hide();
     switch(type) {
   case SearchOptions::Root : {
     m_ignoreDiacritics->hide();
@@ -120,6 +127,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
     m_normalSearch->hide();
     m_regexSearch->hide();
     m_typeGroup->hide();
+    m_headPhrase->hide();
     if (USE_KEYMAPS) {
       if (m_hasMaps)
         m_keymapGroup->setVisible(false);
@@ -128,6 +136,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
   }
   case SearchOptions::Entry : {
     m_includeHeads->setVisible(false);
+    m_headPhrase->show();
     m_normalSearch->show();
     m_regexSearch->show();
     m_typeGroup->show();
@@ -153,6 +162,8 @@ void SearchOptionsWidget::showMore(bool /* show */) {
   }
   case SearchOptions::Word : {
     m_typeGroup->show();
+    m_headPhrase->hide();
+
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
         m_keymapGroup->setVisible(false);
@@ -173,10 +184,12 @@ void SearchOptionsWidget::showMore(bool /* show */) {
     break;
   }
   case SearchOptions::Local : {
+    m_headPhrase->hide();
     m_newTab->hide();
     m_makeActive->hide();
     m_showAllSearch->show();
     m_typeGroup->show();
+    m_ignoreCase->show();
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
         m_keymapGroup->setVisible(false);
@@ -311,6 +324,7 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString 
 }
 void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   QLOG_DEBUG() << Q_FUNC_INFO;
+
   opts.setIgnoreDiacritics(true);
   opts.setSearchType(SearchOptions::Normal);
   opts.setIgnoreDiacritics(m_ignoreDiacritics->isChecked());
@@ -337,6 +351,9 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   opts.setNewTab(m_newTab->isChecked());
   opts.setActivateTab(m_makeActive->isChecked());
   opts.setShowAll(m_showAllSearch->isChecked());
+  opts.setIgnoreCase(m_ignoreCase->isChecked());
+  opts.setSearchScope(m_options.getSearchScope());
+  opts.setHeadPhrase(m_headPhrase->isChecked());
 }
 void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -363,7 +380,8 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
 
   m_showAllSearch->setChecked(options.showAll());
 
-
+  m_ignoreCase->setChecked(options.ignoreCase());
+  m_headPhrase->setChecked(options.headPhrase());
 }
 void SearchOptionsWidget::setOptions(int type) {
   QLOG_DEBUG() << Q_FUNC_INFO << type;
@@ -393,6 +411,7 @@ void SearchOptionsWidget::setOptions(int type) {
     m_normalSearch->setChecked(! m_regexSearch->isChecked());
     m_newTab->setChecked(settings.value(SID_HEADSEARCH_NEW_TAB,false).toBool());
     m_makeActive->setChecked(settings.value(SID_HEADSEARCH_GO_TAB,true).toBool());
+    m_headPhrase->setChecked(settings.value(SID_HEADSEARCH_USE_PHRASE,false).toBool());
     settings.endGroup();
     break;
   }
@@ -410,6 +429,7 @@ void SearchOptionsWidget::setOptions(int type) {
     m_regexSearch->setChecked(settings.value(SID_LOCALSEARCH_TYPE_REGEX,false).toBool());
     m_normalSearch->setChecked(! m_regexSearch->isChecked());
     m_showAllSearch->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
+    m_ignoreCase->setChecked(settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool());
     settings.endGroup();
     break;
   }

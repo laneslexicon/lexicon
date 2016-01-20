@@ -1,16 +1,29 @@
 #include "columnselectdialog.h"
 ColumnSelectDialog::ColumnSelectDialog(QMap<int,QString> cols,QWidget * parent) : QDialog(parent) {
-  QVBoxLayout * layout = new QVBoxLayout;
-  m_grid = new QGridLayout;
-
+  this->setup();
   QList<int> c = cols.keys();
-  m_grid->addWidget(new QLabel(tr("Column")),0,0);
-  m_grid->addWidget(new QLabel(tr("Visible")),0,1);
   for(int i=0;i < c.size();i++) {
     m_grid->addWidget(new QLabel(cols.value(c[i])),i+1,0);
     m_cols << new QCheckBox;
     m_grid->addWidget(m_cols[i],i+1,1);
   }
+}
+ColumnSelectDialog::ColumnSelectDialog(const QStringList & cols,QWidget * parent) : QDialog(parent) {
+  this->setup();
+  for(int i=0;i < cols.size();i++) {
+    m_grid->addWidget(new QLabel(cols[i]),i+1,0);
+    m_cols << new QCheckBox;
+    m_grid->addWidget(m_cols[i],i+1,1);
+  }
+}
+void ColumnSelectDialog::setup() {
+  QVBoxLayout * layout = new QVBoxLayout;
+  m_grid = new QGridLayout;
+
+
+  m_grid->addWidget(new QLabel(tr("Column")),0,0);
+  m_grid->addWidget(new QLabel(tr("Visible")),0,1);
+
   QDialogButtonBox * buttons = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
   connect(buttons,SIGNAL(accepted()),this,SLOT(accept()));
   connect(buttons,SIGNAL(rejected()),this,SLOT(reject()));

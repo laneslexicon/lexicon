@@ -3,6 +3,17 @@
 #include "optionswidget.h"
 #include <QFontDialog>
 #include <QPushButton>
+class DebugOptionsDialog : public QDialog {
+  Q_OBJECT
+ public:
+  DebugOptionsDialog(bool,bool,bool,const QString &,QWidget * parent = 0);
+  QCheckBox * m_xml;
+  QCheckBox * m_html;
+  QCheckBox * m_outputHtml;
+  QLineEdit *  m_path;
+  private slots:
+    void onPathSelect();
+};
 
 class EntryOptions : public OptionsWidget {
   Q_OBJECT
@@ -15,12 +26,13 @@ class EntryOptions : public OptionsWidget {
     bool isModified();
     void onSetFont();
     void onSetColor();
+    void onAdvanced();
  private:
     QLineEdit * m_back;
     QLineEdit * m_css;
     QLineEdit * m_printCss;
     QLineEdit * m_entryXslt;
-    QLineEdit * m_nodeXslt;
+    QCheckBox * m_nodeinfoClose;
     QLineEdit * m_clean;
     QCheckBox * m_debug;
     QLineEdit * m_find;
@@ -36,6 +48,8 @@ class EntryOptions : public OptionsWidget {
     QCheckBox * m_saveHtml;
     QCheckBox * m_saveXml;
     QCheckBox * m_saveOutputHtml;
+    QLineEdit * m_outputPath;
+    QCheckBox * m_offPage;
     QLineEdit * m_show;
     QComboBox * m_printNotes;
     QComboBox * m_printInfo;

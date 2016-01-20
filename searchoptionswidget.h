@@ -17,7 +17,7 @@ class SearchOptionsWidget : public QWidget {
   Q_OBJECT
 
  public:
-  SearchOptionsWidget(int searchType,QWidget * parent = 0);
+  SearchOptionsWidget(SearchOptions::SearchScope_t,QWidget * parent = 0);
   SearchOptionsWidget(SearchOptions & opts,QWidget * parent = 0);
   ~SearchOptionsWidget();
 
@@ -51,9 +51,11 @@ class SearchOptionsWidget : public QWidget {
   QCheckBox * m_ignoreDiacritics;
   QCheckBox * m_wholeWordMatch;
   QCheckBox * m_includeHeads;
+  QCheckBox * m_ignoreCase;
   QCheckBox * m_showAllSearch;
   QCheckBox * m_newTab;
   QCheckBox * m_makeActive;
+  QCheckBox * m_headPhrase;
   QRadioButton * m_headWord;
   QRadioButton * m_fullText;
   QCheckBox * m_forceLTR;

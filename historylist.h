@@ -15,6 +15,7 @@
 #include <QRegExp>
 #include <QCheckBox>
 class Place;
+class ColumnarTableWidget;
 class HistoryMaster;
 extern HistoryMaster * getHistory();
 class HistoryWidget : public QDialog {
@@ -35,7 +36,7 @@ class HistoryWidget : public QDialog {
     QCheckBox * m_switchTab;
     void readSettings();
     void writeSettings();
-    QTableWidget * m_list;
+    ColumnarTableWidget * m_list;
     QString  m_mark;
     bool eventFilter(QObject *,QEvent *);
     QFont m_arFont;

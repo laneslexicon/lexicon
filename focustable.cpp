@@ -28,7 +28,7 @@ void FocusTable::focusInEvent(QFocusEvent * event) {
 }
 void FocusTable::focusOutEvent(QFocusEvent * event) {
   /// TODO get from INI
-  this->setStyleSheet("QTableView { selection-background-color : lightgray}");
+  //  this->setStyleSheet("QTableView { selection-background-color : lightgray}");
   QTableWidget::focusOutEvent(event);
 }
 void FocusTable::exportResults() {
@@ -72,7 +72,7 @@ void FocusTable::exportResults() {
         cols << i;
     }
   }
-  bool markedRowsOnly = dlg.markedRows();
+  bool markedRowsOnly = ! dlg.allRows();
   int rowCount = this->rowCount();
   bool ok;
   int writeCount = 0;

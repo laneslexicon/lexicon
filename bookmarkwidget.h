@@ -14,10 +14,12 @@
 #include <QRegExp>
 #include <QCheckBox>
 class Place;
+class ColumnarTableWidget;
 class BookmarkWidget : public QDialog {
   Q_OBJECT
  public:
   BookmarkWidget(const QMap<QString,Place> & marks,QWidget * parent = 0);
+  ~BookmarkWidget();
   QString getSelected() { return m_mark;}
   QSize sizeHint() const;
   bool getNewTab();
@@ -30,10 +32,8 @@ class BookmarkWidget : public QDialog {
     QCheckBox * m_newTab;
     QCheckBox * m_switchTab;
     void readSettings();
-    bool m_debug;
-    QTableWidget * m_list;
+    ColumnarTableWidget * m_list;
     QString  m_mark;
     bool eventFilter(QObject *,QEvent *);
-    QFont m_arFont;
 };
 #endif

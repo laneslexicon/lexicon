@@ -99,6 +99,10 @@ QWidget * AboutDialog::buildSystemTab() {
   keymaps->setChecked(getApp()->keymapsEnabled());
   layout->addRow(tr("Keymaps enabled"),keymaps);
   layout->addRow(tr("Configuration file"),new QLineEdit(QDir::current().relativeFilePath(getLexicon()->settingsFileName())));
+  layout->addRow(tr("XSLT"),new QLineEdit(QDir::current().relativeFilePath(getLexicon()->getXsltFileName())));
+
+  layout->addRow(tr("Entry stylesheet"),new QLineEdit(QDir::current().relativeFilePath(getLexicon()->getStylesheetFilePath(Lexicon::Entry))));
+  layout->addRow(tr("Application stylesheet"),new QLineEdit(QDir::current().relativeFilePath(getLexicon()->getStylesheetFilePath(Lexicon::Application))));
   w->setLayout(layout);
   return w;
 }

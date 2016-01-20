@@ -17,7 +17,6 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   setObjectName("contentswidget");
   readSettings();
   setColumnCount(5);
-  //  setDragEnabled(true);
   setHeaderLabels(
                   QStringList() << tr("Letter/Root") << tr("Entry") << tr("Head") << tr("") << tr("Node"));
   setSelectionMode(QAbstractItemView::SingleSelection);
@@ -29,7 +28,6 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(nodeCollapsed(QTreeWidgetItem *)));
   this->setExpandsOnDoubleClick(false);
 
-  m_itypesText << "I" << "II" << "III" << "IV" << "V" << "VI" << "VII" << "VIII" << "IX" << "X" << "XI" << "XII" << "XIII" << "XIV";
   if (! m_debug)
     this->hideColumn(NODE_COLUMN);
 
@@ -89,6 +87,10 @@ void ContentsWidget::readSettings() {
   m_moveUp = settings.value(SID_CONTENTS_MOVE_UP,"w").toString();
   m_expand = settings.value(SID_CONTENTS_EXPAND," ").toString();
   m_romanItypes = settings.value(SID_CONTENTS_ROMAN_ITYPES,false).toBool();
+
+  QStringList m;
+  m << "I" << "II" << "III" << "IV" << "V" << "VI" << "VII" << "VIII" << "IX" << "X" << "XI" << "XII" << "XIII" << "XIV";
+  m_itypesText = settings.value(SID_CONTENTS_ITYPES,m).toStringList();
   settings.endGroup();
 
   settings.beginGroup("Icons");
@@ -466,8 +468,8 @@ QString ContentsWidget::itypeText(const QString & itype) {
     return itype;
   }
   int n = itype.toInt(&ok);
-  if (ok  && (n >= 0) && (n < m_itypesText.size())) {
-    return m_itypesText[n];
+  if (ok  && (n > 0) && (n <= m_itypesText.size())) {
+    return m_itypesText[n-1];
   }
   else {
     return itype;
@@ -544,6 +546,11 @@ Place ContentsWidget::getCurrentPlace() {
   }
   return p;
 }
+/**
+ * TODO remove this
+ *
+ * @param event
+ */
 void ContentsWidget::contextMenuEvent(QContextMenuEvent * event) {
   QTreeWidgetItem * item = this->itemAt(event->pos());
   if (!item) {

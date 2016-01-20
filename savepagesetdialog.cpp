@@ -6,6 +6,7 @@
 #include "graphicsentry.h"
 #include "definedsettings.h"
 #include "centeredcheckbox.h"
+#include "columnartablewidget.h"
 #define SET_ID_COLUMN 0
 #define SET_TITLE_COLUMN 1
 #define SET_COUNT_COLUMN 2
@@ -14,8 +15,18 @@ SavePageSetDialog::SavePageSetDialog(QTabWidget * tabs,QWidget * parent) : QDial
 
   //  m_action = action;
   m_name = new QLineEdit;
-  m_setlist = new QTableWidget;
-  m_tablist = new QTableWidget;
+
+  QStringList cols;
+  cols << tr("Id") << tr("Title") << tr("Tabs") << tr("Created");
+  m_setlist = new ColumnarTableWidget(cols);
+  m_setlist->setKey(ColumnarTableWidget::STATE,SID_PAGESET_SETLIST_STATE);
+
+  cols.clear();
+  cols << tr("Save") << tr("Tab") << tr("Title") << tr("Root") << tr("Headword") << tr("Volume/Page");
+
+
+  m_tablist = new ColumnarTableWidget(cols);
+  m_tablist->setKey(ColumnarTableWidget::STATE,SID_PAGESET_TABLIST_STATE);
 
   m_overwrite = new QCheckBox(tr("Overwrite tab set with the same title."));
   m_selectAll = new QRadioButton(tr("Select all"));
@@ -67,9 +78,14 @@ SavePageSetDialog::SavePageSetDialog(QTabWidget * tabs,QWidget * parent) : QDial
 
 
   this->selectionToggled(m_selectAll->isChecked());
+  ///
+  SETTINGS
+  settings.beginGroup("PageSets");
+  m_tablist->readConfiguration(settings);
+  m_setlist->readConfiguration(settings);
+
 }
 SavePageSetDialog::~SavePageSetDialog() {
-  qDebug() << Q_FUNC_INFO;
   writeSettings();
 }
 QString SavePageSetDialog::pageSetTitle() const {
@@ -113,26 +129,6 @@ void SavePageSetDialog::onSave() {
 #define TAB_VOLUME_COLUMN  5
 void SavePageSetDialog::loadTabs(QTabWidget * tabs) {
 
-
-  QMap<int,QString> hm;
-  hm.insert(TAB_SAVE_COLUMN,tr("Save"));
-  hm.insert(TAB_INDEX_COLUMN,tr("Tab"));
-  hm.insert(TAB_TITLE_COLUMN,tr("Title"));
-  hm.insert(TAB_ROOT_COLUMN,tr("Root"));
-  hm.insert(TAB_WORD_COLUMN,tr("Headword"));
-  hm.insert(TAB_VOLUME_COLUMN,tr("Volume/Page"));
-
-  m_tablist->clear();
-  m_tablist->setColumnCount(hm.size());
-  m_tablist->verticalHeader()->setVisible(false);
-
-
-  QStringList headers;
-  headers << hm.values();
-  m_tablist->setHorizontalHeaderLabels(headers);
-  m_tablist->horizontalHeader()->setStretchLastSection(true);
-  m_tablist->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_tablist->setSelectionBehavior(QAbstractItemView::SelectRows);
   int row = 0;
   QString html;
   QString str;
@@ -140,33 +136,36 @@ void SavePageSetDialog::loadTabs(QTabWidget * tabs) {
   for(int i=0;i < tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(tabs->widget(i));
     if (entry) {
+      Place p = entry->getPlace();
+
       m_tablist->insertRow(row);
 
       m_tablist->setCellWidget(row,TAB_SAVE_COLUMN,new CenteredCheckBox);
+
       QString str = tabs->tabText(i);
       QRegularExpression rx("^\\s*(\\d+)\\s*");
       str = str.replace(rx,"");
-      html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(str,"pageset");
-      label = new QLabel;
-      label->setText(html);
+
+      label = m_tablist->createLabel(str,"pageset");
       label->setAlignment(Qt::AlignCenter);
       m_tablist->setCellWidget(row,TAB_TITLE_COLUMN,label);
 
-      Place p = entry->getPlace();
+      /// tab titles start at 1, so increment the tab index
 
-      m_tablist->setItem(row,TAB_INDEX_COLUMN,new QTableWidgetItem(QString("%1").arg(i+1)));
+      label = m_tablist->createLabel(QString("%1").arg(i+1));
+      label->setAlignment(Qt::AlignCenter);
+      m_tablist->setCellWidget(row,TAB_INDEX_COLUMN,label);
 
-      html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(p.m_root,"pageset");
-      label = new QLabel(html);;
+      label = m_tablist->createLabel(p.m_root,"pageset");
       label->setAlignment(Qt::AlignCenter);
       m_tablist->setCellWidget(row,TAB_ROOT_COLUMN,label);
 
-      html = qobject_cast<Lexicon *>(qApp)->scanAndStyle(p.m_word,"pageset");
-      label = new QLabel(html);;
+
+      label = m_tablist->createLabel(p.m_word,"pageset");
       label->setAlignment(Qt::AlignCenter);
       m_tablist->setCellWidget(row,TAB_WORD_COLUMN,label);
 
-      label = new QLabel(p.format("%V/%P"));
+      label = m_tablist->createLabel(p.format("%V/%P"));
       label->setAlignment(Qt::AlignCenter);
       m_tablist->setCellWidget(row,TAB_VOLUME_COLUMN,label);
 
@@ -177,26 +176,17 @@ void SavePageSetDialog::loadTabs(QTabWidget * tabs) {
 }
 void SavePageSetDialog::loadTitles() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+
   QSqlRecord rec;
-  m_setlist->clear();
-  m_setlist->verticalHeader()->setVisible(false);
-  m_setlist->setColumnCount(4);
-  QStringList headers;
-  headers << tr("Id") << tr("Title") << tr("Tabs") << tr("Created");
-  m_setlist->setHorizontalHeaderLabels(headers);
-  m_setlist->horizontalHeader()->setStretchLastSection(true);
-  m_setlist->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_setlist->setSelectionBehavior(QAbstractItemView::SelectRows);
+
   connect(m_setlist,SIGNAL(itemSelectionChanged()),this,SLOT(setTitleFromTable()));
   QSqlQuery q(QSqlDatabase::database("notesdb"));
   if (! q.prepare(SQL_PAGESET_HEADERS)) {
-    /// Report error
     QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_HEADER query:%1")).arg(q.lastError().text());
     return;
   }
   QSqlQuery p(QSqlDatabase::database("notesdb"));
   if (! p.prepare(SQL_PAGESET_PAGE_COUNT)) {
-    /// Report error
     QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_PAGE_COUNT query:%1")).arg(p.lastError().text());
     return;
   }
@@ -257,7 +247,7 @@ void SavePageSetDialog::writeSettings() {
 void SavePageSetDialog::setTitleFromTable() {
   QList<QTableWidgetItem *> items = m_setlist->selectedItems();
   QString name;
-  qDebug() << items.size();
+
   if (items.size() > 0) {
     for(int i=0;i < items.size();i++) {
       if (items[i]->column() == SET_TITLE_COLUMN) {
@@ -273,15 +263,21 @@ QList<int> SavePageSetDialog::requestedTabs() const {
   QList<int> tabs;
   for(int i=0;i < m_tablist->rowCount();i++) {
     CenteredCheckBox * b = qobject_cast<CenteredCheckBox *>(m_tablist->cellWidget(i,TAB_SAVE_COLUMN));
+    qDebug() << Q_FUNC_INFO << __LINE__ << i;
     if (b->isChecked()) {
-      QString v = m_tablist->item(i,TAB_INDEX_COLUMN)->text();
+      QLabel * label = qobject_cast<QLabel *>(m_tablist->cellWidget(i,TAB_INDEX_COLUMN));
+      if (label) {
+        QString v = label->text();
       int x = v.toInt(&ok);
       if (ok) {
-      tabs << x;
+        /// decrement the index we incremented
+        x--;
+        tabs << x;
       }
     }
   }
-  return tabs;
+}
+return tabs;
 }
 void SavePageSetDialog::selectionToggled(bool v) {
 
