@@ -1,0 +1,60 @@
+
+@font-face {
+    font-family: AmiriWeb;
+    font-style: normal;
+    font-weight: 400;
+    src: url('amiri-regular.eot?') format('eot'),
+         url('amiri-regular.woff2') format('woff2'),
+         url('amiri-regular.woff') format('woff'),
+         url('amiri-regular.ttf')  format('truetype');
+}
+
+@font-face {
+    font-family: Amiri QuranWeb;
+    font-style: normal;
+    font-weight: 400;
+    src: url('amiri-quran.eot?') format('eot'),
+         url('amiri-quran.woff2') format('woff2'),
+         url('amiri-quran.woff') format('woff'),
+         url('amiri-quran.ttf')  format('truetype');
+}
+
+@font-face {
+    font-family: Amiri Quran ColoredWeb;
+    font-style: normal;
+    font-weight: 400;
+    src: url('amiri-quran-colored.eot?') format('eot'),
+         url('amiri-quran-colored.woff2') format('woff2'),
+         url('amiri-quran-colored.woff') format('woff'),
+         url('amiri-quran-colored.ttf')  format('truetype');
+}
+
+@font-face {
+    font-family: AmiriWeb;
+    font-style: normal;
+    font-weight: 700;
+    src: url('amiri-bold.eot?') format('eot'),
+         url('amiri-bold.woff2') format('woff2'),
+         url('amiri-bold.woff') format('woff'),
+         url('amiri-bold.ttf')  format('truetype');
+}
+
+@font-face {
+    font-family: AmiriWeb;
+    font-style: oblique;
+    font-weight: 400;
+    src: url('amiri-slanted.eot?') format('eot'),
+         url('amiri-slanted.woff2') format('woff2'),
+         url('amiri-slanted.woff') format('woff'),
+         url('amiri-slanted.ttf')  format('truetype');
+}
+
+@font-face {
+    font-family: AmiriWeb;
+    font-style: oblique;
+    font-weight: 700;
+    src: url('amiri-boldslanted.eot?') format('eot'),
+         url('amiri-boldslanted.woff2') format('woff2'),
+         url('amiri-boldslanted.woff') format('woff'),
+         url('amiri-boldslanted.ttf')  format('truetype');
+}
