@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
   <link rel="stylesheet" href="../../css/highlight.css">
+  <link href="../../css/amiri.css" rel="stylesheet">
   <link href="../../css/mansur.css" rel="stylesheet">
   <link href="../../fonts/amiri.css" rel="stylesheet">
 
@@ -582,7 +583,7 @@ It is the same sequence: a &lt;foreign&gt; followed by an &lt;orth&gt;,  each wi
     ma&lt;/foreign&gt; &lt;lb/&gt; ↓
   &lt;orth type="arrow" lang="ar"&gt;Ald~ahora falaA SaAma walaA A^al~aY&lt;/orth&gt;
 </code></pre>
-<p>The fix has to be applied to the XML and loaded into the database using the provided [script](../dev-guide/scripts.md#orths. So for example, the above entry (n1226) occurs in the file _A0.xml:</p>
+<p>The fix has to be applied to the XML and then processed and loaded into the database using the provided <a href="../../dev-guide/scripts/#orths">script</a>. So for example, the above entry (n1226) occurs in the file _A0.xml:</p>
 <pre><code>perl orths.pl --db lexicon.sqlite --node n1126 --perseus ../xml/_A0.xml
 </code></pre>
               

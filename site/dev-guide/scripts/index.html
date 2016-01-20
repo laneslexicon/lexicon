@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
   <link rel="stylesheet" href="../../css/highlight.css">
+  <link href="../../css/amiri.css" rel="stylesheet">
   <link href="../../css/mansur.css" rel="stylesheet">
   <link href="../../fonts/amiri.css" rel="stylesheet">
 
@@ -361,6 +362,9 @@
         
             <ul>
             
+                <li class="toctree-l3"><a href="#orthspl">orths.pl</a></li>
+                
+            
             </ul>
         
     </li>
@@ -499,7 +503,26 @@
           <div role="main">
             <div class="section">
               
-                
+                <h4 id="orthspl">orths.pl</h4>
+<p><a name="orths"></a></p>
+<p>Analyses XML file and reports on &lt;orth&gt; usage and attempts to <em>fix</em> known patterns. Outputs to log file.</p>
+<p>perl orths.pl --db lexicon.sqlite --xml ../xml/_A0.xml  --node n1126  --verbose</p>
+<p>perl orths.pl --dry-run --db lexicon.sqlite --xml ../xml/_A0.xml  --node n1126  --verbose</p>
+<pre><code>perl orths.pl -h
+   --db              Name of input database (required)
+   --dbout           Name of output database if different (optional)
+   --node            Do &lt;orths&gt; for only the given node or comma separated list of nodes
+   --log-dir         Write log file to given directory, defaults to current
+   --dry-run         Do not update the database
+   --show            Show the before/after XML
+   --export          Export the current link table records before updating
+   --verbose         Show relevant node text in log
+   --xml             XML source file for use with --node
+   --backup          Create a backup copy of each node before updating
+   --out-template    Output XML using the supplied value as a filename template, replacing
+                     the literal NODE by the node number. For example, --out-template test-NODE.xml
+   --help            Print this
+</code></pre>
               
             </div>
           </div>
