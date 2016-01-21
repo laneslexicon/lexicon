@@ -127,7 +127,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
     m_rootNavigation->setVisible(false);
   }
   optionlayout->addRow(tr("Allow duplicates"),m_allowDuplicates);
-  optionlayout->addRow(tr("Use notes"),m_useNotes);
+  //  optionlayout->addRow(tr("Use notes"),m_useNotes);
 
   optionlayout->addRow(tr("Keyboard"),m_keyboard);
   optionlayout->addRow(tr("Show splash screen"),m_splashScreen);
@@ -214,7 +214,7 @@ void SystemOptions::readSettings() {
 
   settings.endGroup();
   settings.beginGroup("Notes");
-  m_useNotes->setChecked(settings.value(SID_NOTES_ENABLED,false).toBool());
+  //  m_useNotes->setChecked(settings.value(SID_NOTES_ENABLED,false).toBool());
   m_notesDb->setText(settings.value(SID_NOTES_DATABASE,"notes.sqlite").toString());
   settings.endGroup();
   settings.beginGroup("Splash");
@@ -274,7 +274,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_SYSTEM_ALLOW_DUPLICATES,m_allowDuplicates->isChecked());
   settings.endGroup();
   settings.beginGroup("Notes");
-  settings.setValue(SID_NOTES_ENABLED,m_useNotes->isChecked());
+  //  settings.setValue(SID_NOTES_ENABLED,m_useNotes->isChecked());
   settings.setValue(SID_NOTES_DATABASE,m_notesDb->text());
   /*
 
@@ -375,6 +375,7 @@ bool SystemOptions::isModified()  {
   }
 
   settings.endGroup();
+  /*
   settings.beginGroup("Notes");
   if (compare(&settings,SID_NOTES_ENABLED,m_useNotes)) {
     m_dirty = true;
@@ -382,15 +383,15 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_NOTES_DATABASE,m_notesDb)) {
     m_dirty = true;
   }
-#ifdef LANE
+  settings.endGroup();
+  */
   if (m_keyboard->currentText() !=   getLexicon()->getDefaultKeyboard()) {
     m_dirty = true;
   }
   if (m_theme->currentText() != getLexicon()->currentTheme()) {
     m_dirty = true;
   }
-#endif
-  settings.endGroup();
+
   settings.beginGroup("Splash");
   if (compare(&settings,SID_SPLASH_ENABLED,m_splashScreen)) {
     m_dirty = true;

@@ -33,13 +33,13 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_expand->setMinimumWidth(SMALL_EDIT);
   m_expand->setMaximumWidth(SMALL_EDIT);
 
-  m_singleClick = new QCheckBox;
-  m_doubleClick = new QCheckBox;
+  //  m_singleClick = new QCheckBox;
+  //  m_doubleClick = new QCheckBox;
   m_showHeadColumn = new QCheckBox;
   m_showEntryColumn = new QCheckBox;
   m_showNodeColumn = new QCheckBox;
   m_romanItypes = new QCheckBox;
-  m_debug = new QCheckBox;
+
 
 
   formlayout->addRow(tr("Show head word"),m_showHeadColumn);
@@ -49,8 +49,8 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   formlayout->addRow(tr("Move up"),m_moveUp);
   formlayout->addRow(tr("Move down"),m_moveDown);
   formlayout->addRow(tr("Expand/collapse"),m_expand);
-  formlayout->addRow(tr("Single click activates item"),m_singleClick);
-  formlayout->addRow(tr("Double click activates item"),m_doubleClick);
+  //  formlayout->addRow(tr("Single click activates item"),m_singleClick);
+  //  formlayout->addRow(tr("Double click activates item"),m_doubleClick);
 
   QHBoxLayout * hlayout1 = new QHBoxLayout;
   m_standardFont = new QLineEdit;
@@ -72,10 +72,9 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   connect(m_arabicButton,SIGNAL(clicked()),this,SLOT(onSetFont()));
 
 
-  formlayout->addRow(tr("Enable debug"),m_debug);
 
   vlayout->addLayout(formlayout);
-
+  /*
   m_info = new QLabel;
 
   QStringList html;
@@ -95,18 +94,17 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   html << "</ul>";
   m_info->setText(html.join(""));
   vlayout->addWidget(m_info);
+  */
   setLayout(vlayout);
   addButtons();
   readSettings();
   setupConnections();
-  //  getLexicon()->setCursorPosition(this);
 }
 void RootsOptions::readSettings() {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
-  m_debug->setChecked(settings.value(SID_CONTENTS_DEBUG).toBool());
   m_moveUp->setText(settings.value(SID_CONTENTS_MOVE_UP).toString());
   m_moveDown->setText(settings.value(SID_CONTENTS_MOVE_DOWN).toString());
   m_expand->setText(settings.value(SID_CONTENTS_EXPAND).toString());
@@ -134,7 +132,6 @@ void RootsOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_CONTENTS_SHOWENTRY,m_showEntryColumn->isChecked());
   settings.setValue(SID_CONTENTS_SHOWNODE,m_showNodeColumn->isChecked());
   settings.setValue(SID_CONTENTS_ROMAN_ITYPES,m_romanItypes->isChecked());
-  settings.setValue(SID_CONTENTS_DEBUG,m_debug->isChecked());
   settings.setValue(SID_CONTENTS_MOVE_UP,m_moveUp->text());
   settings.setValue(SID_CONTENTS_MOVE_DOWN,m_moveDown->text());
   settings.setValue(SID_CONTENTS_EXPAND,m_expand->text());
@@ -167,9 +164,6 @@ bool RootsOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_CONTENTS_ROMAN_ITYPES,m_romanItypes)) {
-    m_dirty = true;
-  }
-  if (compare(&settings,SID_CONTENTS_DEBUG,m_debug)) {
     m_dirty = true;
   }
   if (compare(&settings,SID_CONTENTS_MOVE_UP,m_moveUp)) {
