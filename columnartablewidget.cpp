@@ -214,7 +214,7 @@ QString ColumnarTableWidget::exportResults(const QString & key) const {
   if (m_markColumn == -1) {
     allRows = true;
   }
-
+  QRegularExpression rx("[\u2000-\u202e]");
   for(int i=0;i < rowCount;i++) {
     ok = true;
     if (! allRows ) {
@@ -222,23 +222,11 @@ QString ColumnarTableWidget::exportResults(const QString & key) const {
       if (m) {
         ok =  m->isChecked();
       }
-      /*
-      else {
-        CheckBoxTableItem * ti = qobject_cast<CheckBoxTableItem *>(this->cellWidget(i,m_markColumn));
-        if (ti) {
-          ok = ti->isChecked();
-        }
-      }
-      */
     }
     if (ok) {
       for(int j=0;j < cols.size();j++) {
         str = this->textForColumn(i,cols[j]);
-        str.remove(QChar(0x202a));
-        str.remove(QChar(0x202b));
-        str.remove(QChar(0x202c));
-        str.remove(QChar(0x202d));
-        str.remove(QChar(0x202e));
+        str.remove(rx);
         if (m_ignoreText.contains(cols[j])) {
           if (str == m_ignoreText.value(cols[j])) {
             str.clear();
