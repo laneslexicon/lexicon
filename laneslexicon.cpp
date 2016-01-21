@@ -37,6 +37,7 @@
 #include "editpagesetdialog.h"
 #include "loadpagesetdialog.h"
 #include "tablistdialog.h"
+#include "textwidthdialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -913,6 +914,7 @@ void LanesLexicon::createActions() {
   m_syncFromContentsAction = new QAction(tr("Align &entry with contents"),this);
 
   m_defaultScaleAction = new QAction(tr("Set default &zoom"),this);
+  m_defaultWidthAction = new QAction(tr("Set default &text width"),this);
 
   m_selectThemeAction = new QAction(tr("&Switch"),this);
   m_editThemeAction = new QAction(tr("&Edit"),this);
@@ -960,6 +962,7 @@ void LanesLexicon::createActions() {
   connect(m_clearAction,SIGNAL(triggered()),this,SLOT(pageClear()));
   connect(m_convertToEntryAction,SIGNAL(triggered()),this,SLOT(convertToEntry()));
   connect(m_defaultScaleAction,SIGNAL(triggered()),this,SLOT(onDefaultScale()));
+  connect(m_defaultWidthAction,SIGNAL(triggered()),this,SLOT(onDefaultWidth()));
   connect(m_selectThemeAction,SIGNAL(triggered()),this,SLOT(onSelectTheme()));
   connect(m_editThemeAction,SIGNAL(triggered()),this,SLOT(onEditTheme()));
 
@@ -1343,6 +1346,7 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_syncFromEntryAction);
   m_viewMenu->addAction(m_linkAction);
   m_viewMenu->addAction(m_defaultScaleAction);
+  m_viewMenu->addAction(m_defaultWidthAction);
   m_viewMenu->addAction(m_showContentsAction);
   m_viewMenu->addAction(m_showToolbarAction);
   m_viewMenu->addAction(m_showMenuAction);
@@ -4111,17 +4115,40 @@ void LanesLexicon::onDefaultScale() {
   SETTINGS
 
   settings.beginGroup("Entry");
-  qreal scale  = settings.value("Zoom",1.0).toDouble();
+  qreal scale  = settings.value(SID_ENTRY_SCALE,1.0).toDouble();
   ZoomDialog * d = new ZoomDialog(scale);
 
   if (d->exec()) {
-    settings.setValue("Zoom",d->value());
+    settings.setValue(SID_ENTRY_SCALE,d->value());
     if (d->applyAll()) {
       GraphicsEntry * entry;
       for(int i=0;i < m_tabs->count();i++) {
         entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
         if (entry) {
           entry->setScale(d->value());
+        }
+      }
+    }
+  }
+  delete d;
+}
+void LanesLexicon::onDefaultWidth() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  SETTINGS
+
+  settings.beginGroup("Entry");
+  int w  = settings.value(SID_ENTRY_TEXT_WIDTH,200).toInt();
+
+  TextwidthDialog * d = new TextwidthDialog(w);
+
+  if (d->exec()) {
+    settings.setValue(SID_ENTRY_TEXT_WIDTH,d->value());
+    if (d->applyAll()) {
+      GraphicsEntry * entry;
+      for(int i=0;i < m_tabs->count();i++) {
+        entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+        if (entry) {
+          entry->setTextWidth(d->value(),true);
         }
       }
     }

@@ -156,6 +156,7 @@ class LanesLexicon : public QMainWindow
       void onLastPage();
 
       void onDefaultScale();
+      void onDefaultWidth();
 
       void onSelectTheme();
       void onEditTheme();
@@ -452,6 +453,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_syncFromEntryAction;
       QAction * m_aboutAction;
       QAction * m_defaultScaleAction;
+      QAction * m_defaultWidthAction;
       QAction * m_selectThemeAction;
       QAction * m_editThemeAction;
       QAction * m_deleteThemeAction;

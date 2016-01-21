@@ -1674,6 +1674,8 @@ void GraphicsEntry::moveBackward() {
  */
 void GraphicsEntry::onWiden() {
   /// TODO set width step in INI file
+  this->setTextWidth(m_textWidth + 50,true);
+  /*
   QLOG_DEBUG() << Q_FUNC_INFO;
   QGraphicsItem * item = m_scene->focusItem();
 
@@ -1683,36 +1685,37 @@ void GraphicsEntry::onWiden() {
     }
   }
   m_textWidth += 50;
-  //  QLOG_DEBUG() << "Scene rect before widen" << m_view->sceneRect() << m_textWidth;
   for(int i=0;i < m_items.size();i++) {
     m_items[i]->setTextWidth(m_textWidth);
   }
   reposition();
   m_view->setSceneRect(m_scene->sceneRect());
-  //  m_view->update();
-  //  QLOG_DEBUG() << "Scene rect after" << m_view->sceneRect();
 
   if ( ! item ) {
-    //  item = m_items[0];
+
   }
   if (item) {
     m_view->centerOn(item);//x,pos.y());
     item->setFocus();
   }
+  */
 }
 void GraphicsEntry::onNarrow() {
-  m_textWidth -= 50;
-  QGraphicsItem * item = m_scene->focusItem();
-  //  QLOG_DEBUG() << "Scene rect before narrow" << m_view->sceneRect() << m_textWidth;
-  for(int i=0;i < m_items.size();i++) {
-    m_items[i]->setTextWidth(m_textWidth);
+  this->setTextWidth(m_textWidth - 50,true);
+}
+void GraphicsEntry::setTextWidth(int w,bool apply) {
+  QLOG_DEBUG() << Q_FUNC_INFO << w << apply;
+  m_textWidth = w;
+  if (! apply ) {
+    return;
+  }
+ QGraphicsItem * item = m_scene->focusItem();
+   for(int i=0;i < m_items.size();i++) {
+     m_items[i]->setTextWidth(w);
   }
   reposition();
   m_view->setSceneRect(m_scene->sceneRect());
-  //  QLOG_DEBUG() << "Scene rect after" << m_view->sceneRect();
-
-  //  m_view->setAlignment(Qt::AlignCenter);
-  if ( ! item ) {
+   if ( ! item ) {
     item = m_items[0];
   }
   if (item) {

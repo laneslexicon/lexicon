@@ -71,7 +71,6 @@ class GraphicsEntry : public QWidget {
     qreal getScale() { return m_scale;}
     void setScale(qreal v, bool use = true);
     int getTextWidth() const { return m_textWidth; }
-    void setTextWidth(int w) { m_textWidth = w;}
     QGraphicsScene * getScene() { return m_scene;}
     int search();
     int getFindCount() const;
@@ -91,6 +90,7 @@ class GraphicsEntry : public QWidget {
     QString userTitle() const;
     void setXrefMode(int);
   public slots:
+    void setTextWidth(int, bool apply = false);
     void setUserTitle(const QString &);
     void anchorClicked(const QUrl &);
     void linkActivated(const QString &);
