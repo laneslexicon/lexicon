@@ -1649,6 +1649,8 @@ void GraphicsEntry::copy() {
   for(int i=0;i < m_items.size();i++) {
     txt += m_items[i]->textCursor().selectedText();
   }
+  QRegularExpression rx("[\u2000-\u202e]");
+  txt.remove(rx);
   clipboard->setText(txt);
 }
 void GraphicsEntry::selectAll() {
@@ -2277,7 +2279,8 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   }
   html.replace("<body","<div");
   html.replace("</body>","</div>");
-  html.remove(QChar(0x200e));
+  QRegularExpression rx("[\u2000-\u202e]");
+  html.remove(rx);
   if (m_dumpOutputHtml) {
     QString n;
     if (node.isEmpty()) {
