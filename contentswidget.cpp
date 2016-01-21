@@ -28,8 +28,6 @@ ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(nodeCollapsed(QTreeWidgetItem *)));
   this->setExpandsOnDoubleClick(false);
 
-  if (! m_debug)
-    this->hideColumn(NODE_COLUMN);
 
   if (! m_showEntryWord && ! m_showHeadWord ) {
     m_showEntryWord = true;
@@ -82,7 +80,6 @@ void ContentsWidget::readSettings() {
   m_showHeadWord = settings.value(SID_CONTENTS_SHOWHEAD,false).toBool();
   m_showEntryWord = settings.value(SID_CONTENTS_SHOWENTRY,false).toBool();
   m_showNode = settings.value(SID_CONTENTS_SHOWNODE,false).toBool();
-  m_debug = settings.value(SID_CONTENTS_DEBUG,false).toBool();
   m_moveDown = settings.value(SID_CONTENTS_MOVE_DOWN,"s").toString();
   m_moveUp = settings.value(SID_CONTENTS_MOVE_UP,"w").toString();
   m_expand = settings.value(SID_CONTENTS_EXPAND," ").toString();

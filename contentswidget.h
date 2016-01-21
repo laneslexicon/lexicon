@@ -47,7 +47,6 @@ class ContentsWidget : public QTreeWidget {
   QStringList m_itypesText;
   void toggleExpand();
   void readSettings();
-  bool m_debug;
   bool m_showHeadWord;
   bool m_showEntryWord;
   bool m_showNode;
