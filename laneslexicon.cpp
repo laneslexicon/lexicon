@@ -3007,6 +3007,7 @@ void LanesLexicon::onDocs() {
     QMessageBox::information(NULL,tr("Information"),tr("Not yet implemented"));
     return;
   }
+  /*
   QWidget * w;
   w = QApplication::activeWindow();
   if (w) {
@@ -3024,7 +3025,7 @@ void LanesLexicon::onDocs() {
   if (w) {
     qDebug() << Q_FUNC_INFO  << "Active popup widget" << w->objectName() << w->metaObject()->className();
   }
-
+  */
   if (m_helpview == NULL) {
     m_helpview = new HelpView();
     connect(m_helpview,SIGNAL(finished(bool)),this,SLOT(onHelpLoaded(bool)));
