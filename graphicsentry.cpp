@@ -158,9 +158,13 @@ void GraphicsEntry::readSettings() {
 
   m_widenKey = settings.value(SID_ENTRY_WIDEN,QString()).toString();
   m_narrowKey = settings.value(SID_ENTRY_NARROW,QString()).toString();
-  m_widenStep = settings.value(SID_ENTRY_STEP,50).toInt(&ok);
+  m_widenStep = settings.value(SID_ENTRY_WIDEN_STEP,50).toInt(&ok);
   if ( ! ok ) {
     m_widenStep = 50;
+  }
+  m_scaleStep = settings.value(SID_ENTRY_SCALE_STEP,.1).toDouble(&ok);
+  if (!ok) {
+    m_scaleStep = .1;
   }
   m_searchKey = settings.value(SID_ENTRY_FIND,QString()).toString();
   m_searchNextKey = settings.value(SID_ENTRY_FIND_NEXT,QString()).toString();
@@ -1464,14 +1468,14 @@ void GraphicsEntry::onZoom(double v) {
 }
 qreal GraphicsEntry::onZoomIn() {
   m_view->setTransform(m_transform);
-  m_scale += .1;
+  m_scale += m_scaleStep;
   m_view->scale(m_scale,m_scale);
   return m_scale;
 }
 qreal GraphicsEntry::onZoomOut() {
   m_view->setTransform(m_transform);
   /// TODO shouldn't this be from scaleStep
-  m_scale -= .1;
+  m_scale -= m_scaleStep;
   m_view->scale(m_scale,m_scale);
   return m_scale;
 }
@@ -1673,8 +1677,12 @@ void GraphicsEntry::moveBackward() {
  *
  */
 void GraphicsEntry::onWiden() {
-  /// TODO set width step in INI file
-  this->setTextWidth(m_textWidth + 50,true);
+  SETTINGS
+
+  settings.beginGroup("Entry");
+  int step = settings.value(SID_ENTRY_WIDEN_STEP,50).toInt();
+
+  this->setTextWidth(m_textWidth + step,true);
   /*
   QLOG_DEBUG() << Q_FUNC_INFO;
   QGraphicsItem * item = m_scene->focusItem();
@@ -1701,7 +1709,12 @@ void GraphicsEntry::onWiden() {
   */
 }
 void GraphicsEntry::onNarrow() {
-  this->setTextWidth(m_textWidth - 50,true);
+  SETTINGS
+
+  settings.beginGroup("Entry");
+  int step = settings.value(SID_ENTRY_WIDEN_STEP,50).toInt();
+
+  this->setTextWidth(m_textWidth - step,true);
 }
 void GraphicsEntry::setTextWidth(int w,bool apply) {
   QLOG_DEBUG() << Q_FUNC_INFO << w << apply;

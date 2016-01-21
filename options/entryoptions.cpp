@@ -92,7 +92,8 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   m_show = new QLineEdit ;
   m_showLinkWarning = new QCheckBox ;
-  m_step = new QLineEdit ;
+  m_widenStep = new QLineEdit ;
+  m_scaleStep = new QLineEdit ;
   m_highlightColor = new QLineEdit ;
   m_textWidth = new QLineEdit ;
   m_widen = new QLineEdit ;
@@ -160,7 +161,8 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   this->setControlSize(m_margin,MEDIUM_EDIT);
   this->setControlSize(m_narrow,SMALL_EDIT);
   this->setControlSize(m_widen,SMALL_EDIT);
-  this->setControlSize(m_step,SMALL_EDIT);
+  this->setControlSize(m_widenStep,SMALL_EDIT);
+  this->setControlSize(m_scaleStep,SMALL_EDIT);
   keylayout->addWidget(new QLabel(tr("Widen text")),6,0);
   keylayout->addWidget(m_widen,6,1);
   keylayout->addWidget(new QLabel("Narrow text"),7,0);
@@ -222,8 +224,9 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   this->setControlSize(m_highlightColor,LARGE_EDIT);
   otherlayout->addRow(tr("Off page movement"),m_offPage);
   otherlayout->addRow(tr("Default zoom"),m_zoom);
+  otherlayout->addRow(tr("Zoom step size"),m_scaleStep);
   otherlayout->addRow(tr("Show link warning"),m_showLinkWarning);
-  otherlayout->addRow(tr("Step size"),m_step);
+  otherlayout->addRow(tr("Widen/narrow step size"),m_widenStep);
   otherlayout->addRow(tr("Text width"),m_textWidth);
   otherlayout->addRow(tr("Text margin"),m_margin);
   otherlayout->addRow(tr("Close entry info after load"),m_nodeinfoClose);
@@ -304,7 +307,8 @@ void EntryOptions::readSettings() {
   m_outputPath->setText(settings.value(SID_ENTRY_OUTPUT_PATH,QDir::tempPath()).toString());
   m_show->setText(settings.value(SID_ENTRY_SHOW).toString());
   m_showLinkWarning->setChecked(settings.value(SID_ENTRY_SHOW_LINK_WARNING).toBool());
-  m_step->setText(settings.value(SID_ENTRY_STEP).toString());
+  m_widenStep->setText(settings.value(SID_ENTRY_WIDEN_STEP).toString());
+  m_scaleStep->setText(settings.value(SID_ENTRY_SCALE_STEP).toString());
   m_highlightColor->setText(settings.value(SID_ENTRY_HIGHLIGHT_COLOR).toString());
   m_textWidth->setText(settings.value(SID_ENTRY_TEXT_WIDTH).toString());
   m_widen->setText(settings.value(SID_ENTRY_WIDEN).toString());
@@ -357,8 +361,12 @@ void EntryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ENTRY_OUTPUT_PATH,m_outputPath->text());
   settings.setValue(SID_ENTRY_SHOW,m_show->text());
   settings.setValue(SID_ENTRY_SHOW_LINK_WARNING,m_showLinkWarning->isChecked());
-  settings.setValue(SID_ENTRY_STEP,m_step->text());
+
+  settings.setValue(SID_ENTRY_WIDEN_STEP,m_widenStep->text());
+  settings.setValue(SID_ENTRY_SCALE_STEP,m_scaleStep->text());
+
   settings.setValue(SID_ENTRY_HIGHLIGHT_COLOR,m_highlightColor->text());
+
   settings.setValue(SID_ENTRY_TEXT_WIDTH,m_textWidth->text());
   settings.setValue(SID_ENTRY_WIDEN,m_widen->text());
   settings.setValue(SID_ENTRY_SCALE,m_zoom->value());
@@ -468,7 +476,10 @@ bool EntryOptions::isModified()  {
     m_dirty = true;
   }
 
-  if (compare(&settings,SID_ENTRY_STEP,m_step)) {
+  if (compare(&settings,SID_ENTRY_WIDEN_STEP,m_widenStep)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ENTRY_SCALE_STEP,m_scaleStep)) {
     m_dirty = true;
   }
 

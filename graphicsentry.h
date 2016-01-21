@@ -121,7 +121,7 @@ class GraphicsEntry : public QWidget {
     void fixLink(const QStringList &,bool);
     void onFocusItemChanged(QGraphicsItem *,QGraphicsItem *,Qt::FocusReason);
  private:
-
+    double m_scaleStep;
     int m_findCount;
     int m_highlightCount;
     int m_currentFind;
