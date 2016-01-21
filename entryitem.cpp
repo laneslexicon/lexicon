@@ -144,12 +144,15 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   QAction *selectAction;// = menu.addAction(tr("&Select"));
   QAction *printAction = menu.addAction(tr("&Print"));
 
+  QAction *copyAction = menu.addAction("&Copy");
+  connect(copyAction,SIGNAL(triggered()),this,SIGNAL(copy()));
+  copyAction->setEnabled(this->textCursor().hasSelection());
+
   if (this->textCursor().hasSelection()) {
-    QAction *copyAction = menu.addAction("&Copy");
-    connect(copyAction,SIGNAL(triggered()),this,SIGNAL(copy()));
+    //    QAction *copyAction = menu.addAction("&Copy");
+    //    connect(copyAction,SIGNAL(triggered()),this,SIGNAL(copy()));
     QAction *clearCurrentAction = menu.addAction(tr("Clear &selection"));
     connect(clearCurrentAction,SIGNAL(triggered()),this,SLOT(clearSelection()));
-
   }
   else {
     selectAction = menu.addAction(tr("&Select current entry"));
