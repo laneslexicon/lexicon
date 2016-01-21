@@ -4109,25 +4109,21 @@ void LanesLexicon::enableForPage(bool v) {
 void LanesLexicon::onDefaultScale() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   SETTINGS
-    //  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
+
   settings.beginGroup("Entry");
   qreal scale  = settings.value("Zoom",1.0).toDouble();
   ZoomDialog * d = new ZoomDialog(scale);
 
-  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-  qreal entryScale = 0;
-  if (entry) {
-    connect(d,SIGNAL(valueChanged(double)),entry,SLOT(onZoom(double)));
-    entryScale = entry->getScale();
-  }
   if (d->exec()) {
-    if (d->value() != scale) {
-      settings.setValue("Zoom",d->value());
-    }
-  }
-  else {
-    if (entryScale > 0) {
-      entry->setScale(entryScale);
+    settings.setValue("Zoom",d->value());
+    if (d->applyAll()) {
+      GraphicsEntry * entry;
+      for(int i=0;i < m_tabs->count();i++) {
+        entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+        if (entry) {
+          entry->setScale(d->value());
+        }
+      }
     }
   }
   delete d;
@@ -5002,4 +4998,7 @@ void LanesLexicon::onTabList() {
 
   d->setAttribute(Qt::WA_DeleteOnClose);
   d->show();
+}
+QWidget * LanesLexicon::currentTab() {
+  return m_tabs->currentWidget();
 }

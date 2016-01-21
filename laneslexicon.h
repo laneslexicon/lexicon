@@ -86,6 +86,7 @@ class LanesLexicon : public QMainWindow
   HistoryMaster * history();
   NoteMaster * notes();
   QTabWidget * tabwidget() const;
+  QWidget * currentTab();
   bool sanityCheck(int type = 0);
   enum NewTabBehaviour { InsertTab, AppendTab };
   enum NavigationMode { ByRoot , ByPage };
@@ -222,6 +223,7 @@ class LanesLexicon : public QMainWindow
       void onExportLinks();
       void onImportLinks();
       void showSearchNode(const QString &);
+
  protected:
       void closeEvent(QCloseEvent *);
  private:
