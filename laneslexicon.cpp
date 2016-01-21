@@ -1212,6 +1212,10 @@ void LanesLexicon::createToolBar() {
     m_printButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_localSearchButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_clearButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_syncRightButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_syncLeftButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_aboutButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_localSearchNextButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
   }
 
 }
