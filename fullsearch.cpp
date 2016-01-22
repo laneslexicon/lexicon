@@ -669,8 +669,8 @@ void FullSearchWidget::readSettings() {
   m_defaultOptions.setIgnoreDiacritics(settings.value(SID_FULLSEARCH_DIACRITICS,true).toBool());
   m_defaultOptions.setWholeWordMatch(settings.value(SID_FULLSEARCH_WHOLE_WORD,false).toBool());
   //  m_spanStyle = settings.value(SID_FULLSEARCH_CONTEXT_STYLE,QString()).toString();
-  m_spanStyle = settings.value(SID_FULLSEARCH_MAIN_CONTEXT,QString()).toString();
-  m_spanStyle += " " + settings.value(SID_FULLSEARCH_ARABIC_CONTEXT,QString()).toString();
+  //  m_spanStyle = settings.value(SID_FULLSEARCH_MAIN_CONTEXT,QString()).toString();
+  //  m_spanStyle += " " + settings.value(SID_FULLSEARCH_ARABIC_CONTEXT,QString()).toString();
   settings.endGroup();
 
 

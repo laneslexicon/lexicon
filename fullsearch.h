@@ -105,7 +105,6 @@ class FullSearchWidget : public QWidget
     QString m_xsltSource;
     QString m_currentCSS;
     QString m_diacritics;
-    QString m_spanStyle;
     QString m_keyboardConfig;
     QLabel * m_resultsText;
     QPushButton * m_exportButton;
