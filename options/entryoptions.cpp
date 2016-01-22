@@ -128,7 +128,6 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_printNodes->setMinimumWidth(VLARGE_EDIT);
   */
   QVBoxLayout * vlayout = new QVBoxLayout;
-  QFormLayout * layout = new QFormLayout;
 
   QGroupBox * keybox = new QGroupBox(tr("Keyboard commands"));
   //  QFormLayout * keylayout = new QFormLayout;
@@ -179,7 +178,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
 
   /// Local search
-  QHBoxLayout * searchlayout = new QHBoxLayout;
+
   this->setControlSize(m_find,SMALL_EDIT);
   this->setControlSize(m_findNext,SMALL_EDIT);
   this->setControlSize(m_clean,SMALL_EDIT);
@@ -223,11 +222,35 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   this->setControlSize(m_showLinkWarning,SMALL_EDIT);
   this->setControlSize(m_highlightColor,LARGE_EDIT);
   otherlayout->addRow(tr("Off page movement"),m_offPage);
-  otherlayout->addRow(tr("Default zoom"),m_zoom);
-  otherlayout->addRow(tr("Zoom step size"),m_scaleStep);
+
+  QHBoxLayout * zoomlayout = new QHBoxLayout;
+  zoomlayout->addWidget(m_zoom);
+  zoomlayout->addSpacing(20);
+  zoomlayout->addWidget(new QLabel(tr("Zoom step size")));
+  zoomlayout->addSpacing(10);
+  zoomlayout->addWidget(m_scaleStep);
+  zoomlayout->addStretch();
+
+  otherlayout->addRow(tr("Default zoom"),zoomlayout);
+
+  //  otherlayout->addRow(tr("Default zoom"),m_zoom);
+  //  otherlayout->addRow(tr("Zoom step size"),m_scaleStep);
   otherlayout->addRow(tr("Show link warning"),m_showLinkWarning);
-  otherlayout->addRow(tr("Widen/narrow step size"),m_widenStep);
-  otherlayout->addRow(tr("Text width"),m_textWidth);
+
+  QHBoxLayout * widthlayout = new QHBoxLayout;
+  widthlayout->addWidget(m_textWidth);
+  widthlayout->addSpacing(20);
+  widthlayout->addWidget(new QLabel(tr("Width step size")));
+  widthlayout->addSpacing(10);
+  widthlayout->addWidget(m_widenStep);
+  widthlayout->addStretch();
+
+  otherlayout->addRow(tr("Text width"),widthlayout);
+
+  //  otherlayout->addRow(tr("Widen/narrow step size"),m_widenStep);
+  //  otherlayout->addRow(tr("Text width"),m_textWidth);
+
+
   otherlayout->addRow(tr("Text margin"),m_margin);
   otherlayout->addRow(tr("Close entry info after load"),m_nodeinfoClose);
 
