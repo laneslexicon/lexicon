@@ -28,8 +28,6 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   this->setControlSize(m_fullFragmentSize,MEDIUM_EDIT);
   m_fullStep->setSingleStep(25);
   this->setControlSize(m_fullStep,MEDIUM_EDIT);
-  m_contextStyle = new QLineEdit;
-  m_contextStyleArabic = new QLineEdit;
 
   m_fullHeadText = new QLineEdit;
 
@@ -38,8 +36,8 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   fulllayout->addRow(tr("Include head words in\nsearch results"),m_fullIncludeHeads);
   fulllayout->addRow(tr("Fragment size"),m_fullFragmentSize);
-  fulllayout->addRow(tr("Main context style"),m_contextStyle);
-  fulllayout->addRow(tr("Arabic context style"),m_contextStyleArabic);
+  //  fulllayout->addRow(tr("Main context style"),m_contextStyle);
+  //  fulllayout->addRow(tr("Arabic context style"),m_contextStyleArabic);
   fulllayout->addRow(tr("Text for head word results"),m_fullHeadText);
   fulllayout->addRow(tr("One row for each entry"),m_fullOneRow);
   fulllayout->addRow(tr("Progress interval"),m_fullStep);
@@ -149,8 +147,6 @@ void FindOptions::readSettings() {
   m_fullIncludeHeads->setChecked(settings.value(SID_FULLSEARCH_INCLUDE_HEADS,true).toBool());
   m_fullOneRow->setChecked(settings.value(SID_FULLSEARCH_ONE_ROW,true).toBool());
   m_fullStep->setValue(settings.value(SID_FULLSEARCH_STEP,50).toInt());
-  m_contextStyle->setText(settings.value(SID_FULLSEARCH_MAIN_CONTEXT).toString());
-  m_contextStyleArabic->setText(settings.value(SID_FULLSEARCH_ARABIC_CONTEXT).toString());
 
   m_fullNewTab     = settings.value(SID_FULLSEARCH_NEW_TAB,true).toBool();
   m_fullGoTab      = settings.value(SID_FULLSEARCH_GO_TAB,true).toBool();
@@ -212,9 +208,6 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_FULLSEARCH_INCLUDE_HEADS,m_fullIncludeHeads->isChecked());
   settings.setValue(SID_FULLSEARCH_ONE_ROW,m_fullOneRow->isChecked());
   settings.setValue(SID_FULLSEARCH_STEP,m_fullStep->value());
-  settings.setValue(SID_FULLSEARCH_MAIN_CONTEXT,m_contextStyle->text());
-  settings.setValue(SID_FULLSEARCH_ARABIC_CONTEXT,m_contextStyleArabic->text());
-
 
   settings.setValue(SID_FULLSEARCH_NEW_TAB,m_fullNewTab);
   settings.setValue(SID_FULLSEARCH_GO_TAB,m_fullGoTab);
@@ -288,14 +281,6 @@ bool FindOptions::isModified()  {
     m_dirty = true;
   }
 
-  if (compare(&settings,SID_FULLSEARCH_MAIN_CONTEXT,m_contextStyle)) {
-    m_dirty = true;
-  }
-  if (compare(&settings,SID_FULLSEARCH_ARABIC_CONTEXT,m_contextStyleArabic)) {
-    m_dirty = true;
-  }
-
-
   if (compare(&settings,SID_FULLSEARCH_INCLUDE_HEADS,m_fullIncludeHeads)) {
     m_dirty = true;
   }
@@ -342,15 +327,6 @@ bool FindOptions::isModified()  {
   if (compare(&settings,SID_HEADSEARCH_NODEINFO_CLOSE,m_nodeinfoClose)) {
     m_dirty = true;
   }
-  /*
-  if (compare(&settings,SID_HEADSEARCH_VERTICAL_LAYOUT,m_headVertical)) {
-    m_dirty = true;
-  }
-
-  if (compare(&settings,SID_HEADSEARCH_FOCUS_TABLE,m_headFocusTable)) {
-    m_dirty = true;
-  }
-  */
   if (compare(&settings,SID_HEADSEARCH_STEP,m_headStep)) {
     m_dirty = true;
   }

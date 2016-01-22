@@ -217,9 +217,6 @@ They should not be translated.
 #define SID_FULLSEARCH_LIST_STATE              "List state"
 #define SID_FULLSEARCH_LIST_COLUMNS            "Default column widths"
 
-#define SID_FULLSEARCH_MAIN_CONTEXT            "Main context"
-#define SID_FULLSEARCH_ARABIC_CONTEXT          "Arabic context"
-
 #define SID_ROOTSEARCH_NEW_TAB                 "Root new tab"
 #define SID_ROOTSEARCH_GO_TAB                  "Root activate tab"
 #define SID_PAGESEARCH_NEW_TAB                 "Page new tab"
