@@ -11,6 +11,7 @@
 #include "logoptions.h"
 #include "historyoptions.h"
 #include "iconoptions.h"
+#include "spanningoptions.h"
 #include "QsLog.h"
 #include "definedsettings.h"
 #ifndef STANDALONE
@@ -133,6 +134,13 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
     m_tabs->addTab(icon,tr("Icons"));
     if (writeTest) {
       icon->writeSettings(testFileName);
+    }
+  }
+  if (settings.value("Spanning",true).toBool()) {
+    SpanningOptions * spanning = new SpanningOptions(useTheme,this);
+    m_tabs->addTab(spanning,tr("Additional Arabic CSS"));
+    if (writeTest) {
+      spanning->writeSettings(testFileName);
     }
   }
   for(int i=0;i < m_tabs->count();i++) {
