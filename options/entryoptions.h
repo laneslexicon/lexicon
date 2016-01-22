@@ -51,9 +51,6 @@ class EntryOptions : public OptionsWidget {
     QLineEdit * m_outputPath;
     QCheckBox * m_offPage;
     QLineEdit * m_show;
-    QComboBox * m_printNotes;
-    QComboBox * m_printInfo;
-    QComboBox * m_printNodes;
     QCheckBox * m_showLinkWarning;
     QLineEdit * m_widenStep;
     QLineEdit * m_scaleStep;
