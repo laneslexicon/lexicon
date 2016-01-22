@@ -79,11 +79,37 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   usagebox->setLayout(formlayout);
 
+
+  m_printNotes = new QComboBox;
+  m_printInfo = new QComboBox;
+  m_printNodes = new QComboBox;
+
+
+  m_printNotes->addItem(tr("Always"),SID_ALWAYS);
+  m_printNodes->addItem(tr("Always"),SID_ALWAYS);
+  m_printInfo->addItem(tr("Always"),SID_ALWAYS);
+  m_printNotes->addItem(tr("Never"),SID_NEVER);
+  m_printNodes->addItem(tr("Never"),SID_NEVER);
+  m_printInfo->addItem(tr("Never"),SID_NEVER);
+  m_printNotes->addItem(tr("Prompt"),SID_PROMPT);
+  m_printNodes->addItem(tr("Prompt"),SID_PROMPT);
+  m_printInfo->addItem(tr("Prompt"),SID_PROMPT);
+
+  QGroupBox * printbox  = new QGroupBox(tr("Supplementary information"));
+  QFormLayout * printlayout = new QFormLayout;
+  printlayout->addRow(tr("Print notes"),m_printNotes);
+  printlayout->addRow(tr("Print system info"),m_printInfo);
+  printlayout->addRow(tr("Print node summary"),m_printNodes);
+  printbox->setLayout(printlayout);
+
+
   QFormLayout * uselayout = new QFormLayout;
   uselayout->addRow(tr("Use these settings and do not prompt for printer settings"),m_alwaysUse);
   vlayout->addWidget(printerbox);
   vlayout->addWidget(usagebox);
+  vlayout->addWidget(printbox);
   vlayout->addLayout(uselayout);
+  vlayout->addStretch();
   setLayout(vlayout);
   addButtons();
   setupPaperSize();
@@ -170,6 +196,20 @@ void PrintOptions::readSettings() {
   }
   m_pdfName->setCurrentIndex(ix);
 
+  settings.endGroup();
+  settings.beginGroup("Entry");
+  int x;
+  x = settings.value(SID_ENTRY_PRINT_NOTES,SID_ALWAYS).toInt();
+  ix = m_printNotes->findData(x);
+  m_printNotes->setCurrentIndex(ix);
+
+  x = settings.value(SID_ENTRY_PRINT_NODES,SID_ALWAYS).toInt();
+  ix = m_printNodes->findData(x);
+  m_printNodes->setCurrentIndex(ix);
+
+  x = settings.value(SID_ENTRY_PRINT_INFO,SID_ALWAYS).toInt();
+  ix = m_printInfo->findData(x);
+  m_printInfo->setCurrentIndex(ix);
 
   settings.endGroup();
 }
@@ -193,9 +233,14 @@ void PrintOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_PRINTER_AUTONAME_PDF,m_pdfAutoName->isChecked());
 
   settings.setValue(SID_PRINTER_AUTONAME_METHOD,m_pdfName->currentData().toString());
-  settings.sync();
+
 
   settings.endGroup();
+  settings.beginGroup("Entry");
+  settings.setValue(SID_ENTRY_PRINT_NOTES,m_printNotes->currentData());
+  settings.setValue(SID_ENTRY_PRINT_NODES,m_printNodes->currentData());
+  settings.setValue(SID_ENTRY_PRINT_INFO,m_printInfo->currentData());
+  settings.sync();
   emit(modified(false));
 }
 bool PrintOptions::isModified()  {
@@ -236,6 +281,17 @@ bool PrintOptions::isModified()  {
   }
 
   if (m_pdfName->currentData().toString() != settings.value(SID_PRINTER_AUTONAME_METHOD).toString()) {
+    m_dirty = true;
+  }
+  settings.endGroup();
+  settings.beginGroup("Entry");
+  if (compare(&settings,SID_ENTRY_PRINT_NOTES,m_printNotes)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ENTRY_PRINT_NODES,m_printNodes)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ENTRY_PRINT_INFO,m_printInfo)) {
     m_dirty = true;
   }
   settings.endGroup();

@@ -36,6 +36,9 @@ class PrintOptions : public OptionsWidget {
     QPushButton * m_directoryButton;
     //    QPrinter * m_printer;
     QCheckBox * m_pdfAutoName;
+    QComboBox * m_printNotes;
+    QComboBox * m_printInfo;
+    QComboBox * m_printNodes;
     QMap<int,QString> m_paper;
     int m_papersz;
     int m_orientationNum;
