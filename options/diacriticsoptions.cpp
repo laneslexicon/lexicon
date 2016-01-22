@@ -89,6 +89,7 @@ DiacriticsOptions::DiacriticsOptions(const QString & theme,QWidget * parent) : O
       col = 0;
     }
   }
+  /*
   QStringList html;
 
   html << tr("The characters presented here form a complete list of those characters in the Unicode Arabic character set (Range 0600-06ff) that occur in the lexicon.");
@@ -98,8 +99,10 @@ DiacriticsOptions::DiacriticsOptions(const QString & theme,QWidget * parent) : O
   QTextEdit * info = new QTextEdit;
   info->setHtml(html.join(""));
   info->setReadOnly(true);
+  */
   vlayout->addLayout(gridlayout);
-  vlayout->addWidget(info);
+  //  vlayout->addWidget(info);
+  vlayout->addStretch();
   setLayout(vlayout);
   addButtons();
   readSettings();
