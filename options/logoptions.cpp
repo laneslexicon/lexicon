@@ -21,6 +21,8 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
 
   m_file = new QLineEdit ;
   m_maxSize = new QLineEdit ;
+  m_fullPath = new QLineEdit;
+  m_fullPath->setVisible(false);
   m_maxSize->setValidator(new QIntValidator);
   m_level = new QComboBox ;
   QStringList levels;
@@ -50,11 +52,14 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   layout->addRow(tr("Maximum file size (bytes)"),m_maxSize);
   layout->addRow(tr("Log level"),m_level);
   layout->addRow(tr("Number of archives"),m_archive);
+  layout->addRow(tr("Rotate logs"),m_rotate);
   layout->addRow(tr("Viewer lines"),m_maxLines);
   layout->addRow(tr("Viewer refresh interval (msecs)"),m_interval);
-  layout->addRow(tr("Rotate logs"),m_rotate);
+
 
   vlayout->addLayout(layout);
+  vlayout->addWidget(m_fullPath);
+
   vlayout->addStretch();
   setLayout(vlayout);
   addButtons();
@@ -198,6 +203,7 @@ void LogOptions::onFullPath() {
   QLineEdit * edit = new QLineEdit;
   edit->setText(getLexicon()->logFilePath());
   edit->setReadOnly(true);
+  m_fullPath->setText(getLexicon()->logFilePath());
   SETTINGS
 
   settings.beginGroup("EditView");
@@ -208,11 +214,11 @@ void LogOptions::onFullPath() {
   }
   d->setWindowTitle(tr("Log file path"));
   QVBoxLayout * layout = new QVBoxLayout;
-  //  QHBoxLayout * hlayout = new QHBoxLayout;
-
   layout->addWidget(edit);
-  //  layout->addLayout(hlayout);
   QDialogButtonBox * buttons = new QDialogButtonBox(QDialogButtonBox::Close);
+  QPushButton * button = new QPushButton(tr("Copy to clipboard"));
+  connect(button,SIGNAL(clicked()),this,SLOT(onCopy()));
+  buttons->addButton(button,QDialogButtonBox::ActionRole);
   connect(buttons,SIGNAL(rejected()),d,SLOT(reject()));
   layout->addWidget(buttons);
   layout->addStretch();
@@ -221,4 +227,10 @@ void LogOptions::onFullPath() {
   d->resize(400,60);
   d->exec();
   delete d;
+}
+void LogOptions::onCopy() {
+  QString str = m_fullPath->text();
+  m_fullPath->setSelection(0,str.length());
+  m_fullPath->copy();
+
 }
