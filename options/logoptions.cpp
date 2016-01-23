@@ -1,6 +1,7 @@
 #include "logoptions.h"
 #include "definedsettings.h"
 #include "QsLog.h"
+#include "externs.h"
 #ifndef STANDALONE
 #include "application.h"
 #endif
@@ -37,7 +38,15 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   m_interval->setValidator(new QIntValidator);
   m_rotate = new QCheckBox ;
 
-  layout->addRow(tr("File name"),m_file);
+  QPushButton * button = new QPushButton(tr("Show full path"));
+  connect(button,SIGNAL(clicked()),this,SLOT(onFullPath()));
+
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  hlayout->addWidget(m_file);
+  hlayout->addSpacing(10);
+  hlayout->addWidget(button);
+  hlayout->addStretch();
+  layout->addRow(tr("File name"),hlayout);
   layout->addRow(tr("Maximum file size (bytes)"),m_maxSize);
   layout->addRow(tr("Log level"),m_level);
   layout->addRow(tr("Number of archives"),m_archive);
@@ -181,4 +190,35 @@ void LogOptions::onSetColor() {
   }
   m_highlightColor->setText(d.currentColor().name());
   */
+}
+void LogOptions::onFullPath() {
+  QDialog * d = new QDialog;
+
+  //  QLabel * label = new QLabel(tr("Full path"));
+  QLineEdit * edit = new QLineEdit;
+  edit->setText(getLexicon()->logFilePath());
+  edit->setReadOnly(true);
+  SETTINGS
+
+  settings.beginGroup("EditView");
+  QString style;
+  style = settings.value(SID_EDITVIEW_FILE_STYLESHEET,QString()).toString();
+  if (! style.isEmpty()) {
+    edit->setStyleSheet(style);
+  }
+  d->setWindowTitle(tr("Log file path"));
+  QVBoxLayout * layout = new QVBoxLayout;
+  //  QHBoxLayout * hlayout = new QHBoxLayout;
+
+  layout->addWidget(edit);
+  //  layout->addLayout(hlayout);
+  QDialogButtonBox * buttons = new QDialogButtonBox(QDialogButtonBox::Close);
+  connect(buttons,SIGNAL(rejected()),d,SLOT(reject()));
+  layout->addWidget(buttons);
+  layout->addStretch();
+  d->setLayout(layout);
+  d->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  d->resize(400,60);
+  d->exec();
+  delete d;
 }
