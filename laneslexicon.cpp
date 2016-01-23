@@ -881,15 +881,15 @@ void LanesLexicon::createActions() {
   connect(m_docAction,SIGNAL(triggered()),this,SLOT(onDocs()));
   connect(m_aboutAction,SIGNAL(triggered()),this,SLOT(onAbout()));
 
-  m_searchWordAction = new QAction(tr("For Arabic &word"),this);
+  m_searchWordAction = new QAction(tr("Arabic &word"),this);
   connect(m_searchWordAction,SIGNAL(triggered()),this,SLOT(searchForWord()));
-  m_searchPageAction = new QAction(tr("For &page"),this);
+  m_searchPageAction = new QAction(tr("&Page"),this);
   connect(m_searchPageAction,SIGNAL(triggered()),this,SLOT(searchForPage()));
-  m_searchRootAction = new QAction(tr("For &root"),this);
+  m_searchRootAction = new QAction(tr("&Root"),this);
   connect(m_searchRootAction,SIGNAL(triggered()),this,SLOT(searchForRoot()));
-  m_searchNodeAction = new QAction(tr("For &node"),this);
+  m_searchNodeAction = new QAction(tr("&Node"),this);
   connect(m_searchNodeAction,SIGNAL(triggered()),this,SLOT(searchForNode()));
-  m_searchEntryAction = new QAction(tr("For &head word"),this);
+  m_searchEntryAction = new QAction(tr("&Head word"),this);
   connect(m_searchEntryAction,SIGNAL(triggered()),this,SLOT(searchForEntry()));
 
   m_zoomInAction = new QAction(tr("Zoom &in"),this);
