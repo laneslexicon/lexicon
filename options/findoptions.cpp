@@ -24,6 +24,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_fullIncludeHeads = new QCheckBox;
   m_fullOneRow = new QCheckBox;
   m_fullStep = new QSpinBox;
+  m_contextStyle = new QLineEdit;
 
   this->setControlSize(m_fullFragmentSize,MEDIUM_EDIT);
   m_fullStep->setSingleStep(25);
@@ -36,7 +37,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   fulllayout->addRow(tr("Include head words in\nsearch results"),m_fullIncludeHeads);
   fulllayout->addRow(tr("Fragment size"),m_fullFragmentSize);
-  //  fulllayout->addRow(tr("Main context style"),m_contextStyle);
+  fulllayout->addRow(tr("Context style"),m_contextStyle);
   //  fulllayout->addRow(tr("Arabic context style"),m_contextStyleArabic);
   fulllayout->addRow(tr("Text for head word results"),m_fullHeadText);
   fulllayout->addRow(tr("One row for each entry"),m_fullOneRow);
@@ -147,6 +148,7 @@ void FindOptions::readSettings() {
   m_fullIncludeHeads->setChecked(settings.value(SID_FULLSEARCH_INCLUDE_HEADS,true).toBool());
   m_fullOneRow->setChecked(settings.value(SID_FULLSEARCH_ONE_ROW,true).toBool());
   m_fullStep->setValue(settings.value(SID_FULLSEARCH_STEP,50).toInt());
+  m_contextStyle->setText(settings.value(SID_FULLSEARCH_CONTEXT_STYLE,QString()).toString());
 
   m_fullNewTab     = settings.value(SID_FULLSEARCH_NEW_TAB,true).toBool();
   m_fullGoTab      = settings.value(SID_FULLSEARCH_GO_TAB,true).toBool();
@@ -215,6 +217,7 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_FULLSEARCH_DIACRITICS,m_fullDiacritics);
   settings.setValue(SID_FULLSEARCH_TYPE_REGEX,m_fullRegex);
   settings.setValue(SID_FULLSEARCH_FORCE,m_fullForce);
+  settings.setValue(SID_FULLSEARCH_CONTEXT_STYLE,m_contextStyle->text());
   settings.endGroup();
   settings.beginGroup("HeadSearch");
 
@@ -277,6 +280,9 @@ bool FindOptions::isModified()  {
   }
 
 
+  if (compare(&settings,SID_FULLSEARCH_CONTEXT_STYLE,m_contextStyle)) {
+    m_dirty = true;
+  }
   if (compare(&settings,SID_FULLSEARCH_FRAGMENT_SIZE,m_fullFragmentSize)) {
     m_dirty = true;
   }

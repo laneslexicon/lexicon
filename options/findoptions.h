@@ -25,6 +25,7 @@ class FindOptions : public OptionsWidget {
     QCheckBox * m_fullOneRow;
     QSpinBox  * m_fullStep;
     QLineEdit * m_fullHeadText;
+    QLineEdit * m_contextStyle;
 
     bool m_fullWholeWord;
     bool m_fullDiacritics;

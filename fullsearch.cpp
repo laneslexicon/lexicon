@@ -600,6 +600,11 @@ int FullSearchWidget::addRow(const QSqlRecord & record, const QString & text,int
       label->setAlignment(Qt::AlignLeft);
     }
   }
+  if ( ! m_contextStyle.isEmpty()) {
+    QString str = label->text();
+    str = QString("<span style=\"%1\">%2</span>").arg(m_contextStyle).arg(str);
+    label->setText(str);
+  }
   m_rxlist->setCellWidget(row,CONTEXT_COLUMN,label);
 
   label = m_rxlist->createLabel(p.format("%V/%P"));
@@ -647,6 +652,7 @@ void FullSearchWidget::readSettings() {
   //m_xsltSource = settings.value("XSLT",QString("entry.xslt")).toString();
   settings.endGroup();
   settings.beginGroup("FullSearch");
+  m_contextStyle = settings.value(SID_FULLSEARCH_CONTEXT_STYLE,QString()).toString();
   m_singleRow = settings.value(SID_FULLSEARCH_ONE_ROW,true).toBool();
   QString f = settings.value(SID_FULLSEARCH_RESULTS_FONT,QString()).toString();
   if (! f.isEmpty()) {
