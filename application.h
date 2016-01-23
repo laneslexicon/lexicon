@@ -61,7 +61,7 @@ public:
   QString getSelectorCss(const QString & selector) const ;
   QFont fontFromCss(const QString & css);
   void setEditFont(QWidget *,const QString & selector,const QString & sample = QString(),int margin = 4);
-
+  QString logFilePath() const;
   public slots:
     void onFocusChange(QWidget *,QWidget *);
  private:
@@ -71,6 +71,7 @@ public:
     QString m_showFirst;
     QString m_themeDirectory;
     QString m_currentTheme;
+    QString m_logFilePath;
     QDir m_settingsDir;
     int m_status;
     QMap<QString,QString> m_options;

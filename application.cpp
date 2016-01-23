@@ -197,8 +197,11 @@ void Lexicon::startLogging() {
     case 6  : { logger.setLoggingLevel(QsLogging::OffLevel) ; break; }
     default : { logger.setLoggingLevel(QsLogging::InfoLevel) ; break; }
     }
+    QFileInfo logInfo(QDir::current(),logfile);
+    m_logFilePath = logInfo.absoluteFilePath();
     //    const QString sLogPath(QDir(applicationDirPath()).filePath(logfile));
-    const QString sLogPath(QDir::current().filePath(logfile));
+    // const QString sLogPath(QDir::current().filePath(logfile));
+    const QString sLogPath(logInfo.absoluteFilePath());
     /// path, rotatation enabled,bytes to rotate after,nbr of old logs to keep
    QsLogging::DestinationPtr fileDestination(
       QsLogging::DestinationFactory::MakeFileDestination(sLogPath, rotate, maxsize, archiveCount) );
@@ -207,8 +210,19 @@ void Lexicon::startLogging() {
    logger.addDestination(debugDestination);
    logger.addDestination(fileDestination);
    QLOG_INFO() << QDateTime::currentDateTime().toLocalTime().toString().toLocal8Bit().constData();
+   QLOG_INFO() << "Log file" << sLogPath;
    QLOG_INFO() << "Built with Qt" << QT_VERSION_STR;
-   QLOG_INFO() << "Program started";
+   QLOG_INFO() << "BuildAbi" << QSysInfo::buildAbi();
+   QLOG_INFO() << "Kernel type" << QSysInfo::kernelType();
+   QLOG_INFO() << "Kernel info" << QSysInfo::kernelVersion();
+#ifdef Q_OS_OSX
+   QLOG_INFO() << "Mac version" << QSysInfo::macVersion();
+#endif
+#ifdef  Q_OS_WIN
+    QLOG_INFO << "Windows version" << QSysInfo::windowsVersion();
+#endif
+    QLOG_INFO() << "Product version" << QSysInfo::productVersion();
+    QLOG_INFO() << "Product name" << QSysInfo::prettyProductName();
 }
 QString Lexicon::getConfig() const {
   return m_configFile;
@@ -1128,6 +1142,9 @@ QStringList Lexicon::getFilteredCss(const QString & fileName) const {
   }
   file.close();
   return css;
+}
+QString Lexicon::logFilePath() const {
+  return m_logFilePath;
 }
 Lexicon::~Lexicon() {
   qDebug() << Q_FUNC_INFO;
