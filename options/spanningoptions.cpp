@@ -18,8 +18,8 @@ SpanningOptions::SpanningOptions(const QString & theme,QWidget * parent) : Optio
 
   m_names.insert("bookmarklist",tr("Bookmark list"));
 
-  m_names.insert("fullsearch",tr("Full search results list"));
-  m_names.insert("fullsearchresults",tr("Full search results summary"));
+  m_names.insert("fullsearch",tr("Lexicon search results list"));
+  m_names.insert("fullsearchresults",tr("Lexicon search results summary"));
 
   m_names.insert("headsearchlist",tr("Headword search results list"));
   m_names.insert("headsearchresults",tr("Headword search results summary"));
@@ -27,10 +27,11 @@ SpanningOptions::SpanningOptions(const QString & theme,QWidget * parent) : Optio
   m_names.insert("linktext",tr("Cross reference info box"));
   m_names.insert("nodeview",tr("Entry viewer heading"));
   m_names.insert("notebrowser",tr("Note browser"));
-  m_names.insert("pageset",tr("Tab set lists"));
+  m_names.insert("pageset",tr("Tab Set lists"));
   m_names.insert("rootnotfound",tr("Root not found"));
   m_names.insert("wordnotfound",tr("Word not found"));
-
+  m_names.insert("tablist",tr("Tab List entries"));
+  m_names.insert("messagebox",tr("Message box"));
   QVBoxLayout * vlayout = new QVBoxLayout;
 
   QFormLayout * formlayout = new QFormLayout;
@@ -100,7 +101,6 @@ bool SpanningOptions::isModified()  {
   settings.beginGroup("Arabic");
 
   for(int i=0;i < m_keys.size();i++) {
-    QLineEdit * edit = m_edits.value(m_keys[i]);
     if (compare(&settings,m_keys[i],m_edits.value(m_keys[i]))) {
       m_dirty = true;
     }

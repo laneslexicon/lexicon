@@ -138,7 +138,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   }
   if (settings.value("Spanning",true).toBool()) {
     SpanningOptions * spanning = new SpanningOptions(useTheme,this);
-    m_tabs->addTab(spanning,tr("Additional Arabic CSS"));
+    m_tabs->addTab(spanning,tr("Embedded Arabic CSS"));
     if (writeTest) {
       spanning->writeSettings(testFileName);
     }
