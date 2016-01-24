@@ -18,7 +18,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   QVBoxLayout * layout = new QVBoxLayout;
   QGroupBox * fullbox = new QGroupBox(tr("Full text search"));
 
-  m_fullDebug = new QCheckBox;
+  //  m_fullDebug = new QCheckBox;
   m_fullFragmentSize = new QSpinBox;
   this->setControlSize(m_fullFragmentSize,LARGE_EDIT);
   m_fullIncludeHeads = new QCheckBox;
@@ -36,10 +36,9 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   QFormLayout * fulllayout = new QFormLayout;
 
   fulllayout->addRow(tr("Include head words in\nsearch results"),m_fullIncludeHeads);
+  fulllayout->addRow(tr("Text for head word results"),m_fullHeadText);
   fulllayout->addRow(tr("Fragment size"),m_fullFragmentSize);
   fulllayout->addRow(tr("Context style"),m_contextStyle);
-  //  fulllayout->addRow(tr("Arabic context style"),m_contextStyleArabic);
-  fulllayout->addRow(tr("Text for head word results"),m_fullHeadText);
   fulllayout->addRow(tr("One row for each entry"),m_fullOneRow);
   fulllayout->addRow(tr("Progress interval"),m_fullStep);
 
@@ -49,7 +48,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   setlayout1->addWidget(fullbtn);
   //  setlayout1->addStretch();
   fulllayout->addRow(tr("Search dialog options"),setlayout1);
-  fulllayout->addRow(tr("Debug"),m_fullDebug);
+  //  fulllayout->addRow(tr("Debug"),m_fullDebug);
 
   connect(fullbtn,SIGNAL(clicked()),this,SLOT(onFullDialog()));
 
@@ -143,13 +142,13 @@ void FindOptions::readSettings() {
   settings.setIniCodec("UTF-8");
   settings.beginGroup("FullSearch");
 
-  m_fullDebug->setChecked(settings.value(SID_FULLSEARCH_DEBUG,false).toBool());
+  //  m_fullDebug->setChecked(settings.value(SID_FULLSEARCH_DEBUG,false).toBool());
   m_fullFragmentSize->setValue(settings.value(SID_FULLSEARCH_FRAGMENT_SIZE,50).toInt());
   m_fullIncludeHeads->setChecked(settings.value(SID_FULLSEARCH_INCLUDE_HEADS,true).toBool());
   m_fullOneRow->setChecked(settings.value(SID_FULLSEARCH_ONE_ROW,true).toBool());
   m_fullStep->setValue(settings.value(SID_FULLSEARCH_STEP,50).toInt());
   m_contextStyle->setText(settings.value(SID_FULLSEARCH_CONTEXT_STYLE,QString()).toString());
-
+  m_fullHeadText->setText(settings.value(SID_FULLSEARCH_HEAD_TEXT,QString()).toString());
   m_fullNewTab     = settings.value(SID_FULLSEARCH_NEW_TAB,true).toBool();
   m_fullGoTab      = settings.value(SID_FULLSEARCH_GO_TAB,true).toBool();
   m_fullWholeWord  = settings.value(SID_FULLSEARCH_WHOLE_WORD,true).toBool();
@@ -205,11 +204,12 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setIniCodec("UTF-8");
   settings.beginGroup("FullSearch");
 
-  settings.setValue(SID_FULLSEARCH_DEBUG,m_fullDebug->isChecked());
+  //  settings.setValue(SID_FULLSEARCH_DEBUG,m_fullDebug->isChecked());
   settings.setValue(SID_FULLSEARCH_FRAGMENT_SIZE,m_fullFragmentSize->value());
   settings.setValue(SID_FULLSEARCH_INCLUDE_HEADS,m_fullIncludeHeads->isChecked());
   settings.setValue(SID_FULLSEARCH_ONE_ROW,m_fullOneRow->isChecked());
   settings.setValue(SID_FULLSEARCH_STEP,m_fullStep->value());
+  settings.setValue(SID_FULLSEARCH_HEAD_TEXT,m_fullHeadText->text());
 
   settings.setValue(SID_FULLSEARCH_NEW_TAB,m_fullNewTab);
   settings.setValue(SID_FULLSEARCH_GO_TAB,m_fullGoTab);
@@ -275,11 +275,14 @@ bool FindOptions::isModified()  {
   settings.setIniCodec("UTF-8");
   settings.beginGroup("FullSearch");
 
+  /*
   if (compare(&settings,SID_FULLSEARCH_DEBUG,m_fullDebug))  {
     m_dirty = true;
   }
-
-
+  */
+  if (compare(&settings,SID_FULLSEARCH_HEAD_TEXT,m_fullHeadText)) {
+    m_dirty = true;
+  }
   if (compare(&settings,SID_FULLSEARCH_CONTEXT_STYLE,m_contextStyle)) {
     m_dirty = true;
   }
