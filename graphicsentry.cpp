@@ -2562,7 +2562,7 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
     return;
   }
   int c = 0;
-  QLOG_DEBUG() << "fixup" << findLink.value(1) << findLink.value(2) << findLink.value(3);
+  QLOG_DEBUG() << "link fixup" << findLink.value(1) << findLink.value(2) << findLink.value(3);
   QString node = item->getNode(); //findLink.value(2).toString();
 
   QString linkWord = findLink.value(3).toString();
@@ -2575,15 +2575,13 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
       return;
     }
   }
-  qDebug() << "Updating link details" << node;
   updateLink.bindValue(0,targetNode);
   updateLink.bindValue(1,orthid);
   if (! updateLink.exec()) {
     QLOG_WARN() << QString(tr("Update links error: %1")).arg(updateLink.lastError().text());
     return;
   }
-  qDebug() << "successfully updated link record";
-  qDebug() << "Updating entry xml" ;
+  QLOG_DEBUG() << "successfully updated link record";
   c++;
   /// Get the XML and update the <cref ...    select="target node>">
   ///
@@ -2592,7 +2590,6 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
     QString xml = nodefind.value("xml").toString();
     QDomDocument doc;
     doc.setContent(xml);
-    qDebug() << xml;
     QDomNodeList refs = doc.elementsByTagName("ref");
     for(int i=0;i < refs.size();i++) {
       QDomElement e = refs.at(i).toElement();
@@ -2606,14 +2603,10 @@ void GraphicsEntry::fixLink(const QStringList & params,bool reload) {
           QLOG_WARN() << QString(tr("Failed to update link details for node %1: %2")).arg(node).arg(nodeupdate.lastError().text());
           return;
         }
-        QLOG_DEBUG() << "Updated entry record for node" << node;
-        /// the page reload doesn't reread the xml so we need to update the in memory xml
-        ///
-        qDebug() << nxml;
-
         item->setXml(this->wrapEntry(nodefind.record(),nxml));
         QSqlDatabase::database().commit();
         statusMessage(QString(tr("Updated link details")));
+        QLOG_INFO() << QString(tr("Update link id: %1, from node : %2, to node : %3")).arg(orthid).arg(node).arg(targetNode);
         if (reload) {
           this->onReload();
         }
