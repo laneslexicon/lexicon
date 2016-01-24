@@ -1549,11 +1549,13 @@ void LanesLexicon::onLinkChanged() {
   m_linkAction->setChecked(m_linkContents);
   if (m_linkContents) {
     m_linkButton->setToolTip(tr("Contents are linked. Click to unlink"));
-    m_linkButton->setText(tr("Contents linked"));
+    str = tr("Contents linked");
+    m_linkButton->setText(str);
   }
   else {
     m_linkButton->setToolTip(tr("Contents are not linked. Click to link"));
-    m_linkButton->setText(tr("Contents not linked"));
+    str = tr("Contents not linked");
+    m_linkButton->setText(str);
   }
   setStatus(str);
 }
@@ -2730,7 +2732,6 @@ void LanesLexicon::setupBookmarkShortcuts() {
   settings.beginGroup("Bookmark");
   m_bookmarkMap = new QSignalMapper(this);
   QString key = settings.value(SID_BOOKMARK_ADD,"Ctrl+B").toString();
-  /// TODO get this from INI
   QString ids = settings.value(SID_BOOKMARK_ID,"abcdefghijklmnopqrstuvwxyz").toString();
   for(int i=0;i < ids.size();i++) {
     QString ks = QString("%1,%2").arg(key).arg(ids.at(i).toLower());
