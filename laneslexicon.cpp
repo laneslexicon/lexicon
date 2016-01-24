@@ -501,7 +501,7 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_SEARCH_HEAD) {
     searchForEntry();
   }
-  else if (key == SID_SHORTCUT_PAGE_SEARCH) {
+  else if (key == SID_SHORTCUT_SEARCH_PAGE) {
     searchForPage();
   }
   else if (key == SID_SHORTCUT_CONTENTS_COLLAPSE_ALL) {
