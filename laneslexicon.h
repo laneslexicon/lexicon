@@ -191,7 +191,7 @@ class LanesLexicon : public QMainWindow
       void historyAddition(const Place &);
 
       void bookmarkShortcut(const QString &);
-      void bookmarkAdd();
+      void bookmarkInput();
       void bookmarkAdd(const QString & id,const Place & p);
 
 

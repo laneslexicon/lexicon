@@ -579,8 +579,8 @@ void LanesLexicon::shortcut(const QString & key) {
       }
     }
   }
-  else if (key == SID_SHORTCUT_BOOKMARK_ADD) {
-    this->bookmarkAdd();
+  else if (key == SID_SHORTCUT_BOOKMARK_INPUT) {
+    this->bookmarkInput();
   }
   else if (key.startsWith("bookmark")) {
     bookmarkShortcut(key);
@@ -2801,10 +2801,10 @@ void LanesLexicon::setupBookmarkShortcuts() {
   connect(m_bookmarkClearAction,SIGNAL(triggered()),sc,SIGNAL(activated()));
   connect(m_bookmarkMap,SIGNAL(mapped(QString)),this,SLOT(bookmarkShortcut(const QString &)));
 
-  connect(m_bookmarkAddAction,SIGNAL(triggered()),this,SLOT(bookmarkAdd()));
+  connect(m_bookmarkAddAction,SIGNAL(triggered()),this,SLOT(bookmarkInput()));
 }
 
-void LanesLexicon::bookmarkAdd() {
+void LanesLexicon::bookmarkInput() {
   bool ok;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (! entry) {
