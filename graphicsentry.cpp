@@ -508,6 +508,10 @@ void GraphicsEntry::linkActivated(const QString & link) {
       if (query.first()) {
         p.setAction(Place::Link);
         p.setNode(query.value(0).toString());
+        if (this->hasNode(p.node())) {
+          this->focusNode(p.node());
+          return;
+        }
         emit(gotoNode(p,createTab,activateTab));
       }
       else {
