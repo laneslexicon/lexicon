@@ -16,6 +16,7 @@ BookmarkOptions::BookmarkOptions(const QString & theme,QWidget * parent) : Optio
   m_format = new QLineEdit;
   //  m_font = new QLineEdit;
   m_add = new QKeySequenceEdit;
+  m_input = new QKeySequenceEdit;
   m_list = new QKeySequenceEdit;
   m_jump = new QKeySequenceEdit;
   m_revert = new QKeySequenceEdit;
@@ -28,6 +29,7 @@ BookmarkOptions::BookmarkOptions(const QString & theme,QWidget * parent) : Optio
   QGroupBox * shortcutsbox = new QGroupBox(tr("Shortcuts"));
   QFormLayout * layout1 = new QFormLayout;
   layout1->addRow(tr("Add"),m_add);
+  layout1->addRow(tr("Input"),m_input);
   layout1->addRow(tr("List"),m_list);
   layout1->addRow(tr("Jump"),m_jump);
   layout1->addRow(tr("Revert"),m_revert);
@@ -95,6 +97,11 @@ void BookmarkOptions::readSettings() {
   //  value.remove(QChar(' '));
   m_clear->setKeySequence(QKeySequence(value));
 
+  settings.endGroup();
+  settings.beginGroup("Shortcut");
+  value = settings.value(SID_SHORTCUT_BOOKMARK_INPUT,QString()).toString();
+  m_input->setKeySequence(QKeySequence(value));
+
   m_dirty = false;
 }
 void BookmarkOptions::writeSettings(const QString & fileName) {
@@ -116,6 +123,9 @@ void BookmarkOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_BOOKMARK_GO_TAB,m_goTab->isChecked());
   settings.setValue(SID_BOOKMARK_ID,m_id->text());
   settings.setValue(SID_BOOKMARK_MENU_FORMAT,m_format->text());
+  settings.endGroup();
+  settings.beginGroup("Shortcut");
+  settings.setValue(SID_SHORTCUT_BOOKMARK_INPUT,m_input->keySequence().toString());
   //  settings.setValue(SID_BOOKMARK_ARABIC_FONT,m_font->text());
   settings.sync();
   m_dirty = false;
@@ -160,6 +170,12 @@ bool BookmarkOptions::isModified()  {
   if (compare(&settings,SID_BOOKMARK_MENU_FORMAT,m_format)) {
     m_dirty = true;
   }
+  settings.endGroup();
+  settings.beginGroup("Shortcut");
+  if (compare(&settings,SID_SHORTCUT_BOOKMARK_INPUT,m_input)) {
+    m_dirty = true;
+  }
+
   /*
   if (compare(&settings,SID_BOOKMARK_ARABIC_FONT,m_font)) {
     m_dirty = true;

@@ -20,6 +20,7 @@ class BookmarkOptions : public OptionsWidget {
     QCheckBox * m_newTab;
     QCheckBox * m_goTab;
     QKeySequenceEdit * m_add;
+    QKeySequenceEdit * m_input;
     QKeySequenceEdit * m_list;
     QKeySequenceEdit * m_jump;
     QKeySequenceEdit * m_revert;
