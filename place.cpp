@@ -210,23 +210,25 @@ QString Place::formatc(const QString & fmt) const {
   QString pattern = fmt;
   QStringList codes = v.keys();
 
-
   for(int i=0;i < codes.size();i++) {
-    QRegularExpression hx(QString("%%1\\?(.+)%%1").arg(codes[i]));
-    QRegularExpressionMatch m =  hx.match(pattern);
+    QRegularExpression ex(QString("\\?%1(.+)\\?%1").arg(codes[i]));
+    QRegularExpressionMatch m =  ex.match(pattern);
     if (m.hasMatch()) {
       QString m1 = m.captured(1);
       if (v.value(codes[i]).isEmpty())  {
-        pattern.replace(hx,"");
+        pattern.replace(ex,"");
       }
       else {
-        pattern.replace(hx,m1 + v.value(codes[i]));
+      	QString oldvalue = m1;
+      	m1.replace(QString("?%1").arg(codes[i]),"");
+	QString x = this->format(m1);
+	pattern.replace(QString("?%1%2?%3").arg(codes[i]).arg(oldvalue).arg(codes[i]),x);
       }
     }
     else {
-      pattern.replace(QString("%%1").arg(codes[i]),v.value(codes[i]));
+      //      pattern.replace(QString("%%1").arg(codes[i]),v.value(codes[i]));
     }
   }
-  return pattern;
+  return this->format(pattern);
 
 }
