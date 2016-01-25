@@ -1297,16 +1297,7 @@ Place LanesLexicon::setupHistory(int currPos) {
     QString word = p.getWord();
     int id = event->getId();
 
-    QString txt;
-    /*
-    if (! word.isEmpty()) {
-      txt = QString("%1 %2").arg(id).arg(word);
-    }
-    else {
-      txt = QString("%1 %2").arg(id).arg(root);
-    }
-    */
-    txt = p.formatc(m_historyMenuFormat);
+    QString txt = p.formatc(m_historyMenuFormat);
     txt = QString("%1 %2").arg(id).arg(txt);
     QAction * action = group->addAction(txt);
     action->setFont(m_historyMenuFont);
@@ -1573,8 +1564,7 @@ void LanesLexicon::onHistorySelection() {
   QVariant v = action->data();
   Place p = v.value<Place>();
   p.setAction(Place::History);
-  showPlace(p,false,true);
-
+  showPlace(p,m_historyNewTab,m_historyGoTab);
 }
 void LanesLexicon::onExit()
 {
@@ -2039,7 +2029,8 @@ void LanesLexicon::readSettings() {
   settings.beginGroup("History");
   m_historyEnabled = settings.value(SID_HISTORY_ENABLED,true).toBool();
   m_historyDbName = settings.value(SID_HISTORY_DATABASE,"history.sqlite").toString();
-
+  m_historyNewTab = settings.value(SID_HISTORY_NEW_TAB,false).toBool();
+  m_historyGoTab = settings.value(SID_HISTORY_GO_TAB,false).toBool();
   m_historyMenuFormat = settings.value(SID_HISTORY_MENU_FORMAT,
                                        QString("%R ?H Head %H?H  ?N(Node:%N)?N")).toString();
   v = settings.value(SID_HISTORY_MENU_ARABIC_FONT,QString()).toString();
@@ -2174,7 +2165,7 @@ void LanesLexicon::writeSettings() {
     settings.endGroup();
   }
   ///
-  /// History
+  /// HistorySID_HISTORY_MENU_FORMAT
   ///
   settings.beginGroup("History");
   settings.setValue("Enabled",m_historyEnabled);
@@ -2594,9 +2585,9 @@ Place LanesLexicon::getCurrentPlace() {
  *
  * @param key
  */
-void LanesLexicon::bookmarkShortcut(const QString & key) {
-  QLOG_DEBUG() << Q_FUNC_INFO << key;
-  key.toLower();
+void LanesLexicon::bookmarkShortcut(const QString & k) {
+  QLOG_DEBUG() << Q_FUNC_INFO << k;
+  QString key = k.toLower();
   if (key == "revert") {
     if (m_revertEnabled) {
       if (! m_bookmarks.contains("-here-")) {
@@ -2644,7 +2635,6 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
     return;
   }
   if (v == "jump") {
-    /// TODO document this
     bookmarkJump(id,false,false);
     return;
   }
@@ -3507,6 +3497,7 @@ int LanesLexicon::searchTabs(const Place & p,bool activate) {
       }
     }
   }
+  return -1;
 }
 /**
  * Searchs the tabs for the requested node

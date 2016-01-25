@@ -333,6 +333,8 @@ class LanesLexicon : public QMainWindow
       bool m_revertEnabled;
       bool m_menuWarning;
       bool m_allowDuplicates;
+      bool m_historyNewTab;
+      bool m_historyGoTab;
 
       QToolBar * m_mainbar;
       QToolBar * m_navigation;
