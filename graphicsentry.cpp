@@ -1749,20 +1749,25 @@ void GraphicsEntry::shiftFocus() {
   return;
 }
 /**
- * Sets the current item to the specified node.
+ * Sets the current item to the specified node or root if node = root
  * If not found, does nothing
  * @param node
  *
  * @return true when node found, false otherwise
  */
 bool GraphicsEntry::focusNode(const QString & node) {
+  if (m_items.size() == 0) {
+    return false;
+  }
   if (node.isEmpty()) {
     return true;
   }
-  QLOG_DEBUG() << Q_FUNC_INFO << node;
+  if (node == "root") {
+    this->setCurrentItem(m_items[0]);
+  }
   for(int i=0;i < m_items.size();i++) {
     Place p = m_items[i]->getPlace();
-    if (p.getNode() == node) {
+    if (p.getNode()  == node) {
       this->setCurrentItem(m_items[i]);
       return true;
     }
