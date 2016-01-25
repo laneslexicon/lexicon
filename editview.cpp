@@ -90,12 +90,14 @@ void EditPage::readFile(const QString & name) {
   }
   m_infoName->setText(QString(tr("F(ile:%1")).arg(name));
   // TODO remove this when screenshot done
+  /*
   if (m_type == EditPage::Css) {
     m_infoName->setText("/usr/home/andrewsg/Lexicon/Resources/themes/default/css/entry.css");
   }
   else {
     m_infoName->setText("/usr/home/andrewsg/Lexicon/Resources/themes/default/xslt/entry.xslt");
   }
+  */
   QTextStream in(&f);
   while(! in.atEnd()) {
     m_lines << in.readLine();

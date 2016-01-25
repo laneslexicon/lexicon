@@ -2557,6 +2557,12 @@ QString LanesLexicon::convertString(const QString & s) const {
   }
   return t;
 }
+/**
+ * Get the Place of the current widget. Returns invalid place if current widget
+ * is not an GraphicsEntry
+ *
+ * @return
+ */
 Place LanesLexicon::getCurrentPlace() {
   Place p;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
@@ -2586,7 +2592,8 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
         return;
       }
       Place p = m_bookmarks.value("-here-");
-      /// TODO document this
+      /// since we are reverting to a previous place it must exist
+      /// in one of the tabs
       showPlace(p,false,true);
       m_revertEnabled = false;
       return;
@@ -2622,7 +2629,7 @@ void LanesLexicon::bookmarkShortcut(const QString & key) {
     id = rx.cap(2);
   }
   else {
-    QLOG_WARN() << tr("Unknown bookmark shortcut activated") << key;
+    setStatus(QString(tr("Unknown bookmark shortcut activated:%1")).arg(key));
     return;
   }
   if (v == "jump") {
@@ -2696,6 +2703,7 @@ void LanesLexicon::bookmarkJump(const QString & id,bool newTab,bool switchTab) {
   Place cp = this->getCurrentPlace();
   cp.setAction(Place::Bookmark);
   m_bookmarks.insert("-here-",cp);
+  QLOG_DEBUG() << "-here- set to" << cp.toString();
   showPlace(p,newTab,switchTab);
   m_revertEnabled = true;
   updateMenu();
