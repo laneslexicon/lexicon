@@ -43,12 +43,12 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
     item = new QTableWidgetItem(QString("%1").arg(h->getId()));
     m_list->setItem(row,KEY_COLUMN,item);
 
-    label = m_list->createLabel(p.m_root,"bookmarklist");
+    label = m_list->createLabel(p.m_root,"historylist");
     label->setAlignment(Qt::AlignCenter);
     m_list->setCellWidget(row,ROOT_COLUMN,label);
 
 
-    label = m_list->createLabel(p.m_word,"bookmarklist");
+    label = m_list->createLabel(p.m_word,"historylist");
     label->setAlignment(Qt::AlignCenter);
     m_list->setCellWidget(row,WORD_COLUMN,label);
 
