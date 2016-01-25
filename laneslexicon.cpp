@@ -1287,6 +1287,8 @@ Place LanesLexicon::setupHistory(int currPos) {
   if (events.size() == 0) {
     return currentPlace;
   }
+
+  //  QString fmt("%R ?H Head %H?H  ?N(Node:%N)?N");
   QActionGroup * group = new QActionGroup(this);
   while(events.size() > 0) {
     HistoryEvent * event = events.takeFirst();
@@ -1296,12 +1298,16 @@ Place LanesLexicon::setupHistory(int currPos) {
     int id = event->getId();
 
     QString txt;
+    /*
     if (! word.isEmpty()) {
       txt = QString("%1 %2").arg(id).arg(word);
     }
     else {
       txt = QString("%1 %2").arg(id).arg(root);
     }
+    */
+    txt = p.formatc(m_historyMenuFormat);
+    txt = QString("%1 %2").arg(id).arg(txt);
     QAction * action = group->addAction(txt);
     action->setFont(m_historyMenuFont);
     action->setCheckable(true);
@@ -2032,6 +2038,9 @@ void LanesLexicon::readSettings() {
   settings.beginGroup("History");
   m_historyEnabled = settings.value(SID_HISTORY_ENABLED,true).toBool();
   m_historyDbName = settings.value(SID_HISTORY_DATABASE,"history.sqlite").toString();
+
+  m_historyMenuFormat = settings.value(SID_HISTORY_MENU_FORMAT,
+                                       QString("%R ?H Head %H?H  ?N(Node:%N)?N")).toString();
   v = settings.value(SID_HISTORY_MENU_ARABIC_FONT,QString()).toString();
   if (! v.isEmpty()) {
     m_historyMenuFont.fromString(v);
@@ -2679,7 +2688,7 @@ void LanesLexicon::addBookmarkMenuItem(const QString & id) {
     Place p = m_bookmarks.value(id);
     QAction * action = m_bookmarkMenu->addAction(QString("%1 - %2")
                                                  .arg(id)
-                                                 .arg(p.format(m_bookmarkMenuFormat)));
+                                                 .arg(p.formatc(m_bookmarkMenuFormat)));
     action->setShortcut(sc->key());
     action->setShortcutContext(Qt::WidgetShortcut);
     connect(action,SIGNAL(triggered()),sc,SIGNAL(activated()));
