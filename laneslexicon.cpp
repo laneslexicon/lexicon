@@ -2596,6 +2596,7 @@ Place LanesLexicon::getCurrentPlace() {
  */
 void LanesLexicon::bookmarkShortcut(const QString & key) {
   QLOG_DEBUG() << Q_FUNC_INFO << key;
+  key.toLower();
   if (key == "revert") {
     if (m_revertEnabled) {
       if (! m_bookmarks.contains("-here-")) {
