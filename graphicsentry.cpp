@@ -1763,7 +1763,9 @@ bool GraphicsEntry::focusNode(const QString & node) {
     return true;
   }
   if (node == "root") {
+    qDebug() << "Root >>>>>>>>>>>>>>>>>>";
     this->setCurrentItem(m_items[0]);
+    return true;
   }
   for(int i=0;i < m_items.size();i++) {
     Place p = m_items[i]->getPlace();

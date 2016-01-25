@@ -177,6 +177,8 @@ class LanesLexicon : public QMainWindow
 
       void onEditView();
 
+      void showHistory(const Place &p);
+
       void onOptions();
       void showHelp(const QString &,const QString & = QString());
       void onHelpLoaded(bool);

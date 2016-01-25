@@ -28,6 +28,20 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
     m_historyEnabled = false;
     return;
   }
+  QSqlQuery sql(m_db);
+  if (! sql.prepare(SQL_GET_MAX_HISTORY)) {
+    QLOG_WARN() << QString(QObject::tr("Unable to prepare SQL_GET_MAX_HISTORYL : %1")).arg(sql.lastError().text());
+    return;
+  }
+  sql.exec();
+  if (sql.first()) {
+    m_lastId = sql.value(0).toInt();
+  }
+  /// historyOn can be toggled to prevent history writes
+  /// historyEnabled
+  m_historyOn = true;
+  m_historyEnabled = true;
+  m_ok = true;
 
   m_getQuery = QSqlQuery(m_db);
   m_listQuery = QSqlQuery(m_db);
@@ -36,6 +50,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
   m_backQuery = QSqlQuery(m_db);
   m_lastQuery = QSqlQuery(m_db);
   m_firstQuery = QSqlQuery(m_db);
+  /*
   if (
       m_addQuery.prepare(QString(SQL_ADD_HISTORY)) &&
       m_backQuery.prepare(QString(SQL_PREV_HISTORY).arg(fields)) &&
@@ -62,7 +77,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
       QLOG_WARN() << "Error on listQuery" << m_listQuery.lastError().text();
     }
     if (m_addQuery.lastError().isValid()) {
-      QLOG_WARN() << "Error on addQuery" << m_addQuery.lastError().text();
+         QLOG_WARN() << "Error on addQuery" << m_addQuery.lastError().text();
     }
     if (m_forQuery.lastError().isValid()) {
       QLOG_WARN() << "Error on forQuery" << m_forQuery.lastError().text();
@@ -78,6 +93,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
     }
     QLOG_WARN() << "History not available" << m_db.lastError().text();
   }
+  */
 }
 HistoryMaster::~HistoryMaster() {
   if (m_db.isOpen()) {
@@ -106,40 +122,70 @@ void HistoryMaster::off() {
 Place HistoryMaster::getLastPlace() {
   Place p;
 
-  m_lastQuery.exec();
-  if (m_lastQuery.first()) {
-    p = this->toPlace(m_lastQuery);
+  QSqlQuery sql(m_db);
+
+  if (sql.prepare(SQL_LAST_HISTORY)) {
+    sql.exec();
+    if (sql.first()) {
+      return Place::fromString(sql.value("place").toString());
+    }
   }
   return p;
 }
 int HistoryMaster::getLastId() {
+  Place p;
+  QSqlQuery sql(m_db);
+
   m_lastId = -1;
-  m_lastQuery.exec();
-  if (m_lastQuery.first()) {
-    m_lastId = m_lastQuery.value(0).toInt();
+  if (sql.prepare(SQL_LAST_HISTORY)) {
+    sql.exec();
+    if (sql.first()) {
+      QString str = sql.value("id").toString();
+      bool ok;
+      int v = str.toInt(&ok);
+      if (ok) {
+        m_lastId = v;
+      }
+    }
   }
   return m_lastId;
 }
 Place HistoryMaster::getFirstPlace() {
   Place p;
 
-  m_firstQuery.exec();
-  if (m_firstQuery.first()) {
-    p = this->toPlace(m_firstQuery);
+  QSqlQuery sql(m_db);
+
+  if (sql.prepare(SQL_FIRST_HISTORY)) {
+    sql.exec();
+    if (sql.first()) {
+      return Place::fromString(sql.value("place").toString());
+    }
   }
   return p;
 }
 int HistoryMaster::getFirstId() {
   m_firstId = -1;
-  m_firstQuery.exec();
-  if (m_firstQuery.first()) {
-    m_firstId = m_firstQuery.value(0).toInt();
+
+
+  QSqlQuery sql(m_db);
+
+  if (sql.prepare(SQL_FIRST_HISTORY)) {
+    sql.exec();
+    if (sql.first()) {
+      QString str = sql.value("id").toString();
+      bool ok;
+      int v = str.toInt(&ok);
+      if (ok) {
+        m_firstId = v;
+      }
+    }
   }
   return m_firstId;
 }
 //  QString fields = "id,node,word,root,supplement,page,vol,timewhen,nodeOnly,pagemode";
 Place HistoryMaster::toPlace(QSqlQuery & sql) {
   Place p;
+  return p;
   p.setId(sql.value(0).toInt());
   p.setNode(sql.value(1).toString());
   p.setWord(sql.value(2).toString());
@@ -166,15 +212,21 @@ int HistoryMaster::hasPlace(const Place & p,int depth) {
     depth = m_duplicateDepth;
   }
   int id = getLastId();
-  m_backQuery.bindValue(0,id);
-  m_backQuery.exec();
   int count = 0;
-  while(m_backQuery.next()) {
-    Place hp = this->toPlace(m_backQuery);
+  QSqlQuery sql(m_db);
+  if (! sql.prepare(SQL_PREV_HISTORY)) {
+    QLOG_WARN() << QString(QObject::tr("Unable to prepare add SQL_PREV_HISTORY : %1")).arg(sql.lastError().text());
+    return -1;
+  }
+  sql.bindValue(0,id);
+  sql.exec();
+
+  while(sql.next()) {
+    Place hp = Place::fromString(sql.value("place").toString());
     if ((hp.getNode() == p.getNode()) &&
-      (hp.getRoot() == p.getRoot()) &&
-      (hp.getWord() == p.getWord())) {
-      return m_backQuery.value(0).toInt();
+        (hp.getRoot() == p.getRoot()) &&
+        (hp.getWord() == p.getWord())) {
+      return sql.value("id").toInt();
     }
     count++;
     if (count > depth) {
@@ -227,7 +279,22 @@ bool HistoryMaster::add(const Place & p) {
   /// TODO add other fields
   HistoryEvent * event = new HistoryEvent;
   event->setPlace(p);
+  QSqlQuery sql(m_db);
+  if (! sql.prepare(SQL_ADD_HISTORY_PLACE)) {
+    QLOG_WARN() << QString(QObject::tr("Unable to prepare add history SQL : %1")).arg(sql.lastError().text());
+    QLOG_WARN() << QString(QObject::tr("History disabled"));
+    m_historyEnabled = false;
+    return false;
 
+  }
+  sql.bindValue(0,p.toString());
+  sql.bindValue(1,event->getWhen());
+  if (! sql.exec()) {
+    QLOG_WARN() << QString(QObject::tr("Unable to add history record : %1")).arg(sql.lastError().text());
+    return false;
+  }
+  return true;
+  /*
   m_addQuery.bindValue(0,p.getNode());
   m_addQuery.bindValue(1,p.getWord());
   m_addQuery.bindValue(2,p.getRoot());
@@ -242,6 +309,7 @@ bool HistoryMaster::add(const Place & p) {
   else {
     QLOG_WARN() << QString(QObject::tr("Unable to add history record : %1")).arg(m_addQuery.lastError().text());
   }
+  */
   return false;
 
 
@@ -252,14 +320,19 @@ bool HistoryMaster::add(const Place & p) {
   //    return events;
   //  }
   QLOG_DEBUG() << Q_FUNC_INFO;
-  m_listQuery.exec();
-  while(m_listQuery.next()) {
+  QSqlQuery sql(m_db);
+  if (! sql.prepare(QString(SQL_LIST_HISTORY).arg(m_size))) {
+    QLOG_WARN() << QString(QObject::tr("Unable to prepare gethistory SQL : %1")).arg(sql.lastError().text());
+    return events;
+  }
+  sql.exec();
+  while(sql.next()) {
     HistoryEvent * event = new HistoryEvent();
-    int fno = m_listQuery.record().indexOf("id");
-    event->setId(m_listQuery.value(fno).toInt());
-    Place p = this->toPlace(m_listQuery);
+    int id = sql.value("id").toInt();
+    event->setId(id);
+    Place p  = Place::fromString(sql.value("place").toString());
     event->setPlace(p);
-    event->setWhen(m_listQuery.value(7).toDateTime());
+    event->setWhen(sql.value("timewhen").toDateTime());
     events << event;
   }
   return events;
@@ -269,13 +342,18 @@ HistoryEvent * HistoryMaster::getEvent(int id) {
    //   if ( ! m_historyEnabled ) {
    //     return event;
    //   }
-   m_getQuery.bindValue(0,id);
-   m_getQuery.exec();
-   if (m_getQuery.first()) {
-       event->setId(m_getQuery.value(0).toInt());
-       Place p = this->toPlace(m_getQuery);
-       event->setPlace(p);
-       event->setWhen(m_getQuery.value(7).toDateTime());
+   QSqlQuery sql(m_db);
+   if (! sql.prepare(SQL_GET_HISTORY))  {
+    QLOG_WARN() << QString(QObject::tr("Unable to prepare SQL_GET_HISTORY : %1")).arg(sql.lastError().text());
+    return event;
+  }
+   sql.bindValue(0,id);
+   sql.exec();
+   if (sql.first()) {
+     event->setId(sql.value("id").toInt());
+     Place p = Place::fromString(sql.value("place").toString());
+     event->setPlace(p);
+     event->setWhen(sql.value("timewhen").toDateTime());
    }
    return event;
 }

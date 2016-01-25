@@ -39,13 +39,15 @@
 
 /* history */
 
-#define SQL_ADD_HISTORY "insert into history (datasource,node,word,root,supplement,page,vol,timewhen) values (1,?,?,?,?,?,?,?)"
-#define SQL_PREV_HISTORY "select %1 from history where id <= ? order by id desc"
-#define SQL_NEXT_HISTORY "select %1 from history where id > ? order by id asc"
-#define SQL_LAST_HISTORY "select %1 from history where id = (select max(id) from history)"
-#define SQL_FIRST_HISTORY "select %1 from history order by id asc limit 1"
-#define SQL_LIST_HISTORY "select %1 from history order by id desc limit %2"
-#define SQL_GET_HISTORY "select %1 from history where id = ?"
+//#define SQL_ADD_HISTORY "insert into history (datasource,node,word,root,supplement,page,vol,timewhen) values (1,?,?,?,?,?,?,?)"
+#define SQL_ADD_HISTORY_PLACE "insert into history (place,timewhen) values (?,?)"
+
+#define SQL_PREV_HISTORY "select * from history where id <= ? order by id desc"
+#define SQL_NEXT_HISTORY "select * from history where id > ? order by id asc"
+#define SQL_LAST_HISTORY "select * from history where id = (select max(id) from history)"
+#define SQL_FIRST_HISTORY "select * from history order by id asc limit 1"
+#define SQL_LIST_HISTORY "select * from history order by id desc limit %1"
+#define SQL_GET_HISTORY "select * from history where id = ?"
 #define SQL_GET_MAX_HISTORY "select max(id) from history"
 #define SQL_DELETE_HISTORY "delete from history"
 
