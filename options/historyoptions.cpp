@@ -20,13 +20,14 @@ HistoryOptions::HistoryOptions(const QString & theme,QWidget * parent) : Options
   m_enabled = new QCheckBox ;
   //  m_database = new QLineEdit ;
   m_menuFont = new QLineEdit;
+  m_menuFormat = new QLineEdit;
   m_newTab = new QCheckBox ;
   m_goTab = new QCheckBox ;
   m_duplicateDepth = new QLineEdit;
   m_duplicateDepth->setValidator(new QIntValidator);;
   m_size = new QLineEdit ;
   m_size->setValidator(new QIntValidator);
-  m_listFont = new QLineEdit;
+  //  m_listFont = new QLineEdit;
 
  layout->addRow(tr("Enabled"),m_enabled);
  // layout->addRow(tr("Database"),m_database);
@@ -39,7 +40,8 @@ HistoryOptions::HistoryOptions(const QString & theme,QWidget * parent) : Options
  hlayout1->addStretch();
 
  layout->addRow(tr("Menu font"),hlayout1);
-
+ layout->addRow(tr("Menu format"),m_menuFormat);
+ /*
  QHBoxLayout * hlayout2 = new QHBoxLayout;
  m_listButton = new QPushButton(tr("Click to set font"));
  connect(m_listButton,SIGNAL(clicked()),this,SLOT(onSetFont()));
@@ -48,7 +50,7 @@ HistoryOptions::HistoryOptions(const QString & theme,QWidget * parent) : Options
  hlayout2->addStretch();
 
  layout->addRow(tr("List font"),hlayout2);
-
+ */
 
  layout->addRow(tr("Open in new tab"),m_newTab);
  layout->addRow(tr("Got to new tab"),m_goTab);
@@ -70,13 +72,14 @@ void HistoryOptions::readSettings() {
   settings.beginGroup(m_section);
 
   m_enabled->setChecked(settings.value(SID_HISTORY_ENABLED,true).toBool());
-  //  m_database->setText(settings.value(SID_HISTORY_DATABASE,"history.sqlite").toString());
+
+  m_menuFormat->setText(settings.value(SID_HISTORY_MENU_FORMAT,QString()).toString());
   m_menuFont->setText(settings.value(SID_HISTORY_MENU_ARABIC_FONT,QString()).toString());
   m_newTab->setChecked(settings.value(SID_HISTORY_NEW_TAB,true).toBool());
   m_goTab->setChecked(settings.value(SID_HISTORY_GO_TAB,true).toBool());
   m_duplicateDepth->setText(settings.value(SID_HISTORY_DUPLICATE_DEPTH,"20").toString());
   m_size->setText(settings.value(SID_HISTORY_SIZE,"100").toString());
-  m_listFont->setText(settings.value(SID_HISTORY_LIST_ARABIC_FONT,QString()).toString());
+  //  m_listFont->setText(settings.value(SID_HISTORY_LIST_ARABIC_FONT,QString()).toString());
 
   m_dirty = false;
 }
@@ -91,13 +94,13 @@ void HistoryOptions::writeSettings(const QString & fileName) {
   settings.beginGroup(m_section);
 
   settings.setValue(SID_HISTORY_ENABLED,m_enabled->isChecked());
-  //  settings.setValue(SID_HISTORY_DATABASE,m_database->text());
+  settings.setValue(SID_HISTORY_MENU_FORMAT,m_menuFormat->text());
   settings.setValue(SID_HISTORY_MENU_ARABIC_FONT,m_menuFont->text());
   settings.setValue(SID_HISTORY_NEW_TAB,m_newTab->isChecked());
   settings.setValue(SID_HISTORY_GO_TAB,m_goTab->isChecked());
   settings.setValue(SID_HISTORY_DUPLICATE_DEPTH,m_duplicateDepth->text());
   settings.setValue(SID_HISTORY_SIZE,m_size->text());
-  settings.setValue(SID_HISTORY_LIST_ARABIC_FONT,m_listFont->text());
+  //  settings.setValue(SID_HISTORY_LIST_ARABIC_FONT,m_listFont->text());
   settings.sync();
   m_dirty = false;
   emit(modified(false));
@@ -117,9 +120,9 @@ bool HistoryOptions::isModified()  {
   if (compare(&settings,SID_HISTORY_ENABLED,m_enabled)){
     m_dirty = true;
   }
-  //  if (compare(&settings,SID_HISTORY_DATABASE,m_database)) {
-  //    m_dirty = true;
-  //  }
+  if (compare(&settings,SID_HISTORY_MENU_FORMAT,m_menuFormat)) {
+      m_dirty = true;
+  }
   if (compare(&settings,SID_HISTORY_MENU_ARABIC_FONT,m_menuFont)) {
     m_dirty = true;
   }
@@ -135,23 +138,17 @@ bool HistoryOptions::isModified()  {
   if (compare(&settings,SID_HISTORY_SIZE,m_size)) {
     m_dirty = true;
   }
+  /*
   if (compare(&settings,SID_HISTORY_LIST_ARABIC_FONT,m_listFont)) {
     m_dirty = true;
   }
-
+  */
   return m_dirty;
 }
 void HistoryOptions::onSetFont() {
-  bool isList;
-  isList = (QObject::sender() == m_listButton);
   QFont f;
-  if  (isList) {
-    f.fromString(m_listFont->text());
-  }
-  else {
-    f.fromString(m_menuFont->text());
-  }
 
+  f.fromString(m_menuFont->text());
   QFontDialog * d = new QFontDialog(f);
   QList<QComboBox *> boxes = d->findChildren<QComboBox *>();
   if (boxes.size() == 1) {
@@ -164,14 +161,7 @@ void HistoryOptions::onSetFont() {
   d->setCurrentFont(f);
   if (d->exec() == QDialog::Accepted) {
     QFont font = d->currentFont();
-    if (isList) {
-      m_listFont->setText(font.toString());
-      //      m_listFont->setCursorPosition(0);
-    }
-    else {
-      m_menuFont->setText(font.toString());
-      //      m_menuFont->setCursorPosition(0);
-    }
+    m_menuFont->setText(font.toString());
   }
   delete d;
   return;

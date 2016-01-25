@@ -17,6 +17,7 @@ class HistoryOptions : public OptionsWidget {
  private:
     QCheckBox * m_enabled;
     QLineEdit * m_database;
+    QLineEdit * m_menuFormat;
     QLineEdit   * m_menuFont;
     QCheckBox * m_newTab;
     QCheckBox * m_goTab;
