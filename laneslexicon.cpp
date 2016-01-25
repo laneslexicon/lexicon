@@ -1691,6 +1691,7 @@ GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool acti
     return NULL;
   }
   int ix = this->searchTabs(p.node());
+
   if ((ix != -1) && activateTab) {
     m_tabs->setCurrentIndex(ix);
     entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
@@ -2713,6 +2714,9 @@ void LanesLexicon::bookmarkJump(const QString & id,bool newTab,bool switchTab) {
   cp.setAction(Place::Bookmark);
   m_bookmarks.insert("-here-",cp);
   QLOG_DEBUG() << "-here- set to" << cp.toString();
+  if (this->searchTabs(p,true) != -1) {
+    return;
+  }
   showPlace(p,newTab,switchTab);
   m_revertEnabled = true;
   updateMenu();
@@ -3477,23 +3481,56 @@ void LanesLexicon::currentTabChanged(int ix) {
 
 }
 /**
+ * We can look for a root or a node. If we have a headword then we have a node.
+ *
+ * @param place
+ * @param activate
+ *
+ * @return
+ */
+int LanesLexicon::searchTabs(const Place & p,bool activate) {
+  if (! p.node().isEmpty()) {
+    return this->searchTabs(p.node(),activate);
+  }
+  for(int i=0;i < m_tabs->count();i++) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+    if (entry) {
+      if (entry->getPlace().root() == p.root()) {
+        if (activate) {
+          m_tabs->setCurrentIndex(i);
+          entry->focusNode("root");
+          return i;
+        }
+        statusMessage(QString(tr("Requested entry already showing in tab %1")).arg(i + 1));
+        return i;
+      }
+    }
+  }
+}
+/**
  * Searchs the tabs for the requested node
  *
  * @param node
  *
  * @return tab index if found, otherwise -1
  */
-int LanesLexicon::searchTabs(const QString & node) {
+int LanesLexicon::searchTabs(const QString & node,bool activate) {
   QLOG_DEBUG() << Q_FUNC_INFO << node;
   if (m_allowDuplicates) {
     return -1;
   }
+
   if (node.isEmpty()) {
+
     return -1;
   }
   for(int i=0;i < m_tabs->count();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
     if (entry && entry->hasNode(node)) {
+      if (activate) {
+        m_tabs->setCurrentIndex(i);
+        return i;
+      }
       statusMessage(QString(tr("Requested entry already showing in tab %1")).arg(i + 1));
       return i;
     }

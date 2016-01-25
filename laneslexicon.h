@@ -239,7 +239,8 @@ class LanesLexicon : public QMainWindow
       void closeAllTabs();
       void updateStatusBar(const Place & p = Place());
       void updateMenu();
-      int searchTabs(const QString & node);
+      int searchTabs(const QString & node,bool activate = false);
+      int searchTabs(const Place & ,bool activate = false);
       void restoreBookmarks();
       void setupBookmarkShortcuts();
       void bookmarkJump(const QString & id,bool,bool);
