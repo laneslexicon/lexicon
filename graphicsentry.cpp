@@ -133,18 +133,7 @@ void GraphicsEntry::readSettings() {
 
   m_entryMargin = settings.value(SID_ENTRY_MARGIN,10).toInt();
 
-  vn = settings.value(SID_ENTRY_CLEAR_SCENE,true);
-  /**
-   *
-   * this produces compiler warnings but the documentation says to QMetaType
-   *
-   */
-  if (vn.type() != QMetaType::Bool) {
-    m_clearScene = true;
-  }
-  else {
-    m_clearScene = vn.toBool();
-  }
+  m_clearScene = settings.value(SID_ENTRY_CLEAR_SCENE,true).toBool();
   m_offPageMovement = settings.value(SID_ENTRY_OFF_PAGE,false).toBool();
 
   /// these are set to empty to disable the feature
@@ -208,21 +197,8 @@ void GraphicsEntry::readSettings() {
   settings.endGroup();
 
   settings.beginGroup("System");
-  vn  = settings.value(SID_SYSTEM_OPEN_LINK,true).toBool();
-  if (vn.type() != QMetaType::Bool) {
-    m_linksUseCurrentTab = true;
-  }
-  else {
-    m_linksUseCurrentTab = vn.toBool();
-  }
-
-  vn = settings.value(SID_SYSTEM_ACTIVATE_LINK,true).toBool();
-  if (vn.type() != QMetaType::Bool) {
-    m_activateLink = true;
-  }
-  else {
-    m_activateLink = vn.toBool();
-  }
+  m_linksUseCurrentTab  = settings.value(SID_SYSTEM_OPEN_LINK,true).toBool();
+  m_activateLink = settings.value(SID_SYSTEM_ACTIVATE_LINK,true).toBool();
   settings.endGroup();
 
 }
@@ -1287,17 +1263,6 @@ void GraphicsEntry::appendEntries(int startPos) {
     m_items[i]->setPos(xpos,ypos);
     m_scene->addItem(m_items[i]);
     r = m_items[i]->boundingRect();
-    /*
-    if (m_dumpHtml) {
-      QFileInfo fi(QDir::tempPath(),QString("%1.html").arg(m_items[i]->getNode()));
-      QFile f(fi.filePath());
-      if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream out(&f);
-        out.setCodec("UTF-8");
-        out << m_items[i]->toHtml();
-      }
-    }
-    */
     sz = m_items[i]->document()->size();
 
     if (m_items[i]->hasNotes()) {
