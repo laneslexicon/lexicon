@@ -244,6 +244,19 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   QLOG_INFO() << "-----------------------";
   QLOG_INFO() << "Initialisation complete";
   QLOG_INFO() << "-----------------------";
+  QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
+  if ( cmdOptions.contains("listicons")) {
+    QList<QMenu *> menus = m_mainmenu->findChildren<QMenu *>(QString(),Qt::FindDirectChildrenOnly);
+    for (int j=0;j < menus.size();j++) {
+      QList<QAction *> actions = menus[j]->actions();//m_viewMenu->actions();
+      if (! menus[j]->title().isEmpty()) {
+        //        QLOG_INFO() << QString(">> %1 (%2)").arg(menus[j]->title()).arg(actions.size());
+        for(int i=0;i < actions.size();i++) {
+          QLOG_INFO() << menus[j]->title() << i << actions[i]->isCheckable() << actions[i]->text() << actions[i]->property("FILENAME").toString();
+        }
+      }
+    }
+  }
 }
 
 LanesLexicon::~LanesLexicon()

@@ -126,10 +126,12 @@ int main(int argc, char *argv[])
     QCommandLineOption enableTestOption(QStringList() << "b" << "enable-test",QObject::tr("enable test"));
     parser.addOption(enableTestOption);
 
-    parser.addOption(enableTestOption);
-    QCommandLineOption noRestoreState(QStringList() << "a" << "no-restore-state",QObject::tr("Do not restore saved state"));
 
+    QCommandLineOption noRestoreState(QStringList() << "a" << "no-restore-state",QObject::tr("Do not restore saved state"));
     parser.addOption(noRestoreState);
+
+    QCommandLineOption listIconsOption(QStringList() << "i" << "list-icons",QObject::tr("List icons in log file"));
+    parser.addOption(listIconsOption);
     // Process the actual command line arguments
     parser.process(mansur);
     const QStringList args = parser.positionalArguments();
@@ -153,11 +155,10 @@ int main(int argc, char *argv[])
     if (parser.isSet(rootOption)) {
       options.insert(rootOption.valueName(),parser.value(rootOption));
     }
-    /*
-    if (parser.isSet(configOption)) {
-      options.insert(configOption.valueName(),parser.value(configOption));
+
+    if (parser.isSet(listIconsOption)) {
+      options.insert("listicons","");
     }
-    */
     if (parser.isSet(dbOption)) {
       options.insert(dbOption.valueName(),parser.value(dbOption));
     }
