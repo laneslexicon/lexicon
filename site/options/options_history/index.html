@@ -283,6 +283,27 @@
         
             <ul>
             
+                <li class="toctree-l3"><a href="#enabled">Enabled</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#menu-font">Menu font</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#menu-format">Menu format</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#open-in-new-tabgo-to-new-tab">Open in new tab/Go to new tab</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#duplicate-search-depth">Duplicate search depth</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#menu-entries-limit">Menu entries limit</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#maximum-database-records">Maximum database records</a></li>
+                
+            
             </ul>
         
     </li>
@@ -542,7 +563,57 @@
           <div role="main">
             <div class="section">
               
-                
+                <p><img alt="History options" src="../../images/options_history.png" /></p>
+<h4 id="enabled">Enabled</h4>
+<h4 id="menu-font">Menu font</h4>
+<p>Use the button to set the font for the items in the menu drop down list.</p>
+<h4 id="menu-format">Menu format</h4>
+<p>In the format text, replace the code by the value according to these rules:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Replace with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%R</td>
+<td>root</td>
+</tr>
+<tr>
+<td>%H</td>
+<td>headword</td>
+</tr>
+<tr>
+<td>%N</td>
+<td>node number</td>
+</tr>
+<tr>
+<td>%V</td>
+<td>volume</td>
+</tr>
+<tr>
+<td>%P</td>
+<td>page</td>
+</tr>
+</tbody>
+</table>
+<p>Blocks delimited by ?&lt;R/H/N/V/P&gt; will only be evaluated if the corresponding item is not empty.</p>
+<p>For example in:
+    ?N(Node %N)?N</p>
+<ul>
+<li>if the node is "n1234", then text "(Node n1234") will appear</li>
+<li>if the node is "", then no text will appear</li>
+</ul>
+<h4 id="open-in-new-tabgo-to-new-tab">Open in new tab/Go to new tab</h4>
+<p>When viewing history items, this controls where to show the item.</p>
+<h4 id="duplicate-search-depth">Duplicate search depth</h4>
+<p>When adding history entries, check back this many items and do not add the current item if it is already in the history.</p>
+<h4 id="menu-entries-limit">Menu entries limit</h4>
+<p>The maximum number of menu tiems to show on the <em>Main menu -&gt; History</em> drop down.</p>
+<h4 id="maximum-database-records">Maximum database records</h4>
+<p>The maximum number of records that can be saved in the database.</p>
               
             </div>
           </div>

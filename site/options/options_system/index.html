@@ -244,6 +244,9 @@
                 <li class="toctree-l3"><a href="#keyboard">Keyboard</a></li>
                 
             
+                <li class="toctree-l3"><a href="#message-duration">Message duration</a></li>
+                
+            
                 <li class="toctree-l3"><a href="#show-splash-screen">Show splash screen</a></li>
                 
             
@@ -574,8 +577,8 @@
               
                 <p><img alt="System Options" src="../../images/options_system.png" /></p>
 <h4 id="databases">Databases</h4>
-<p>The Lexicon database holds all the entries in the lexicon.</p>
-<p>The notes database stores user notes and pageset information.</p>
+<p>The Lexicon database is the main system databae and holds all the entries in the lexicon.</p>
+<p>The notes database stores user notes and pageset information while the history database stores visited locations for later retrieval (if enabled, see <a href="../options_history/">here</a>).</p>
 <h4 id="new-tab-behaviour">New tab behaviour</h4>
 <p>New tabs can be either inserted after the current tab or added at the end of the current tabs.</p>
 <h4 id="contents-linked">Contents linked</h4>
@@ -588,9 +591,11 @@
 <h4 id="toolbar-text">Toolbar text</h4>
 <p>When checked, short text descriptions of the toolbar icons are shown underneath the icon.</p>
 <h4 id="allow-duplicates">Allow duplicates</h4>
-<p>When not checked, a root cannot be shown in more that one tab</p>
+<p>When requesting a root or entry, the system checks whether the required entry is already visible in an existing tab and switches to that tab if it is. If this option is set, this check is skipped.</p>
 <h4 id="keyboard">Keyboard</h4>
-<p>The name of the current virtual keyboards. The drop-down box list the alternatives. (Details of virtual keyboards can be found <a href="../../dev-guide/vkeyboard/">here</a></p>
+<p>The name of the current virtual keyboard. The drop-down box list the alternatives. (Details of virtual keyboards can be found <a href="../../dev-guide/vkeyboard/">here</a></p>
+<h4 id="message-duration">Message duration</h4>
+<p>This setting specifies how long a message will remain on the status bar before being clear. Units are milliseconds.</p>
 <h4 id="show-splash-screen">Show splash screen</h4>
 <p>When checked, a random file from the images/splash subdirectory of the current theme directory is shown as the application starts.</p>
 <h4 id="documentation">Documentation</h4>
