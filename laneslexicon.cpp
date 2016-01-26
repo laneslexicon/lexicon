@@ -47,6 +47,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   setObjectName("lexicon");
   m_ok = false;
   m_history = 0;
+  m_historyPos = -1;
   m_revertEnabled = false;
   m_editView = NULL;
   m_mapper = im_new();
@@ -608,20 +609,44 @@ void LanesLexicon::shortcut(const QString & key) {
     onNavigationMenuChanged(m_navModePageAction);
   }
   else if (key == SID_SHORTCUT_HISTORY_NEXT) {
-    /// increment history pos
-      m_historyPos++;
-      Place p = setupHistory(m_historyPos);
-      if (p.isValid()) {
-        this->showHistory(p);
-      }
-  }
-  else if (key == SID_SHORTCUT_HISTORY_BACK) {
-     QLOG_DEBUG() << "history pos" << m_historyPos;
-     if (m_historyPos == -1) {
-       m_historyPos = m_history->getLastId();
+    if (m_historyPos == -1) {
+      return;
+    }
+     int id = m_history->getNewestId();
+     //     QLOG_DEBUG() << QString("history pos %1 (last = %2").arg(m_historyPos).arg(id);
+     if (m_historyPos < id) {
+       m_historyPos++;
+       Place p = setupHistory(m_historyPos);
+       if (p.isValid()) {
+         this->showHistory(p);
+       }
      }
      else {
+       statusMessage(tr("At start of history"));
+     }
+  }
+  else if (key == SID_SHORTCUT_HISTORY_BACK) {
+    // if we don't have a history pos show the first item in the list
+    int id;
+     if (m_historyPos == -1) {
+       m_historyPos = m_history->getNewestId();
+       if (m_historyPos == -1) {
+         setStatus(tr("No history available"));
+         return;
+       }
+       /// increment it, because we are going to decrement
+       m_historyPos++;
+     }
+
+     id = m_history->getOldestId();
+     //     QLOG_DEBUG() << QString("history pos %1 (last = %2").arg(m_historyPos).arg(id);
+     // if we are not at the beginning decrement it
+     if (m_historyPos > id) {
        m_historyPos--;
+     }
+     else {
+       statusMessage(tr("At end of history"));
+       return;
      }
      Place p = setupHistory(m_historyPos);
      if (p.isValid()) {
@@ -1252,8 +1277,8 @@ Place LanesLexicon::setupHistory(int currPos) {
   Place currentPlace;
   currentPlace.setAction(Place::History);
 
-  int lastId = m_history->getLastId();
-  int firstId = m_history->getFirstId();
+  int lastId = m_history->getNewestId();
+  int firstId = m_history->getOldestId();
   QLOG_DEBUG() << Q_FUNC_INFO << QString("First %1/Last %2/Current %3").arg(firstId).arg(lastId).arg(currPos);
   /// if we are out of range, set the history to the most recent entry
   //
@@ -1296,6 +1321,7 @@ Place LanesLexicon::setupHistory(int currPos) {
 
   //  QString fmt("%R ?H Head %H?H  ?N(Node:%N)?N");
   QActionGroup * group = new QActionGroup(this);
+  int pos = 1;
   while(events.size() > 0) {
     HistoryEvent * event = events.takeFirst();
     Place p = event->getPlace();
@@ -1304,7 +1330,8 @@ Place LanesLexicon::setupHistory(int currPos) {
     int id = event->getId();
 
     QString txt = p.formatc(m_historyMenuFormat);
-    txt = QString("%1 %2").arg(id).arg(txt);
+    //    txt = QString("%1 [id=%2] %3").arg(pos).arg(id).arg(txt);
+    pos++;
     QAction * action = group->addAction(txt);
     action->setFont(m_historyMenuFont);
     action->setCheckable(true);
@@ -1593,8 +1620,6 @@ void LanesLexicon::onHistorySelection() {
   }
 
   m_historyPos = action->property("HISTORY_ID").toInt();
-  //  action->setChecked(true);
-  //  qDebug() << "set checked >>>>>>>>>>>>>>>>>>>>";
   QVariant v = action->data();
 
   Place p = v.value<Place>();
@@ -3527,7 +3552,7 @@ int LanesLexicon::searchTabs(const Place & p,bool activate) {
           entry->focusNode("root");
           return i;
         }
-        statusMessage(QString(tr("Requested entry already showing in tab %1")).arg(i + 1));
+        //        statusMessage(QString(tr("Requested entry already showing in tab %1")).arg(i + 1));
         return i;
       }
     }

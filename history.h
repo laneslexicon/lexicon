@@ -38,10 +38,8 @@ class HistoryMaster {
   void readSettings();
   HistoryEvent * getEvent(int id) ;
   int hasPlace(const Place & p, int historyDepth = -1);
-  Place getLastPlace();
-  int getLastId();
-  Place getFirstPlace();
-  int getFirstId();
+  int getNewestId();
+  int getOldestId();
   Place getPlaceById(int);
   void setEnabled(bool v);
   bool add(const Place &);
@@ -58,21 +56,11 @@ class HistoryMaster {
   int m_size;
   int m_lastId;
   int m_firstId;
-  /// set to false if we failed to open the db
   bool m_ok;
   bool openDatabase(const QString & dbname);
-  /// this is turned on/off depending on user actions
   bool m_historyOn;
-    /// this disables history altogether
   bool m_historyEnabled;
-  Place toPlace(QSqlQuery &);
-  QSqlQuery m_listQuery;
-  QSqlQuery m_getQuery;
-  QSqlQuery m_addQuery;
-  QSqlQuery m_backQuery;
-  QSqlQuery m_forQuery;
-  QSqlQuery m_lastQuery;
-  QSqlQuery m_firstQuery;
+
 };
 extern HistoryMaster * getHistory();
 #endif
