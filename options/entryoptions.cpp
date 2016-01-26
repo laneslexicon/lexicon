@@ -72,6 +72,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_forward = new QLineEdit ;
   m_home = new QLineEdit ;
   m_margin = new QLineEdit ;
+  m_margin->setValidator(new QIntValidator);
   m_mark = new QLineEdit ;
   m_focusUp = new QLineEdit ;
   m_focusDown = new QLineEdit ;
@@ -93,17 +94,21 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_show = new QLineEdit ;
   m_showLinkWarning = new QCheckBox ;
   m_widenStep = new QLineEdit ;
+  m_widenStep->setValidator(new QIntValidator);
   m_scaleStep = new QLineEdit ;
+  m_scaleStep->setValidator(new QIntValidator);
   m_highlightColor = new QLineEdit ;
   m_textWidth = new QLineEdit ;
-  m_widen = new QLineEdit ;
+  m_textWidth->setValidator(new QIntValidator);
 
+  m_widen = new QLineEdit ;
   m_zoom = new QDoubleSpinBox ;
   this->setControlSize(m_zoom,75);
   m_zoom->setDecimals(2);
   m_zoom->setSingleStep(0.01);
   m_zoomIn = new QLineEdit ;
   this->setControlSize(m_zoomIn,SMALL_EDIT);
+
   m_zoomOut = new QLineEdit ;
   this->setControlSize(m_zoomOut,SMALL_EDIT);
   QVBoxLayout * vlayout = new QVBoxLayout;
