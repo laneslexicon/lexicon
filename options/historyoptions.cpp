@@ -27,6 +27,8 @@ HistoryOptions::HistoryOptions(const QString & theme,QWidget * parent) : Options
   m_duplicateDepth->setValidator(new QIntValidator);;
   m_size = new QLineEdit ;
   m_size->setValidator(new QIntValidator);
+  m_maximum = new QLineEdit ;
+  m_maximum->setValidator(new QIntValidator);
   //  m_listFont = new QLineEdit;
 
  layout->addRow(tr("Enabled"),m_enabled);
@@ -55,7 +57,8 @@ HistoryOptions::HistoryOptions(const QString & theme,QWidget * parent) : Options
  layout->addRow(tr("Open in new tab"),m_newTab);
  layout->addRow(tr("Got to new tab"),m_goTab);
  layout->addRow(tr("Duplicate search depth"),m_duplicateDepth);
- layout->addRow(tr("Size"),m_size);
+ layout->addRow(tr("Menu entries limit"),m_size);
+ layout->addRow(tr("Maximum database records"),m_maximum);
  vlayout->addLayout(layout);
  vlayout->addStretch();
   setLayout(vlayout);
@@ -78,7 +81,8 @@ void HistoryOptions::readSettings() {
   m_newTab->setChecked(settings.value(SID_HISTORY_NEW_TAB,true).toBool());
   m_goTab->setChecked(settings.value(SID_HISTORY_GO_TAB,true).toBool());
   m_duplicateDepth->setText(settings.value(SID_HISTORY_DUPLICATE_DEPTH,"20").toString());
-  m_size->setText(settings.value(SID_HISTORY_SIZE,"100").toString());
+  m_size->setText(settings.value(SID_HISTORY_SIZE,"20").toString());
+  m_maximum->setText(settings.value(SID_HISTORY_MAXIMUM,50).toString());
   //  m_listFont->setText(settings.value(SID_HISTORY_LIST_ARABIC_FONT,QString()).toString());
 
   m_dirty = false;
@@ -100,6 +104,7 @@ void HistoryOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_HISTORY_GO_TAB,m_goTab->isChecked());
   settings.setValue(SID_HISTORY_DUPLICATE_DEPTH,m_duplicateDepth->text());
   settings.setValue(SID_HISTORY_SIZE,m_size->text());
+  settings.setValue(SID_HISTORY_MAXIMUM,m_maximum->text());
   //  settings.setValue(SID_HISTORY_LIST_ARABIC_FONT,m_listFont->text());
   settings.sync();
   m_dirty = false;
@@ -136,6 +141,9 @@ bool HistoryOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_HISTORY_SIZE,m_size)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_HISTORY_MAXIMUM,m_maximum)) {
     m_dirty = true;
   }
   /*

@@ -23,6 +23,7 @@ class HistoryOptions : public OptionsWidget {
     QCheckBox * m_goTab;
     QLineEdit  * m_duplicateDepth;
     QLineEdit  * m_size;
+    QLineEdit  * m_maximum;
     QLineEdit   * m_listFont;
     QPushButton * m_listButton;
     QPushButton * m_menuButton;
