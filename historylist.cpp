@@ -8,26 +8,27 @@
 #include "definedsettings.h"
 #include "columnartablewidget.h"
 
-#define KEY_COLUMN 0
-#define ROOT_COLUMN 1
-#define WORD_COLUMN 2
-#define VOL_COLUMN 3
-#define WHEN_COLUMN 4
-#define NODE_COLUMN 5
 
+#define ROOT_COLUMN 0
+#define WORD_COLUMN 1
+#define VOL_COLUMN 2
+#define WHEN_COLUMN 3
+#define NODE_COLUMN 4
+#define KEY_COLUMN 5
 HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   : QDialog(parent) {
   readSettings();
   setWindowTitle(tr("Current History"));
   setObjectName("historywidget");
-  QList<HistoryEvent *> events = history->getHistory();
-  m_list = new ColumnarTableWidget(QStringList() << tr("Id") << tr("Root") << tr("Head") << tr("Vol/Page") << tr("Visited") << tr("Node"));
+  QList<HistoryEvent *> events = history->getHistory(true);
+  m_list = new ColumnarTableWidget(QStringList()  << tr("Root") << tr("Head") << tr("Vol/Page") << tr("Visited") << tr("Node") << tr("Id"));
   m_list->setObjectName("historylist");
 
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_list->setKey(ColumnarTableWidget::STATE,SID_HISTORY_LIST_STATE);
   m_list->setDefaultWidth(100);
+  //  m_list->verticalHeader()->setVisible(true);
 
   QTableWidgetItem * item;
   HistoryEvent * h;
@@ -99,18 +100,23 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   hlayout->addStretch();
   hlayout->addWidget(buttonBox);
   QVBoxLayout * layout = new QVBoxLayout;
-  //  m_list->setMinimumWidth(m_list->sizeHintForColumn(0));
+
   layout->addWidget(m_list);
   layout->addLayout(hlayout);
   setLayout(layout);
   m_list->installEventFilter(this);
+  //  m_list->setFocusPolicy(Qt::StrongFocus);
 }
 HistoryWidget::~HistoryWidget() {
   writeSettings();
 }
+/**
+ * if the user has pressed space,return or enter, get id the the current
+ * and save it to m_mark
+ */
 void HistoryWidget::setPlace() {
   int row = m_list->currentRow();
-  QTableWidgetItem * item = m_list->item(row,0);
+  QTableWidgetItem * item = m_list->item(row,KEY_COLUMN);
   if (item) {
     QString t = item->text();
     m_mark = item->text();

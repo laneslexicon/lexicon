@@ -347,6 +347,7 @@ They should not be translated.
 #define SID_ICON_DIRECTORY "Directory"
 #define SID_ICON_BOOKMARKS "Bookmarks"
 #define SID_ICON_CLEAR "Clear"
+#define SID_ICON_DELETE "Delete"
 #define SID_ICON_DOCS "Docs"
 #define SID_ICON_EXIT "Exit"
 #define SID_ICON_FIRST "First"
