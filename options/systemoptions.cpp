@@ -28,9 +28,13 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   lexiconlayout->addWidget(lexiconbutton);
   lexiconlayout->addStretch();
   //  this->setControlSize(m_lexicon,VLARGE_EDIT);
+  m_interval = new QLineEdit;
+  m_interval->setValidator(new QIntValidator);
 
   m_docked = new QCheckBox;
   m_focusTab = new QLineEdit;
+  m_focusTab->setValidator(new QIntValidator);
+
   //  this->setControlSize(m_focusTab,LARGE_EDIT);
   m_minimalInterface = new QCheckBox;
   m_restoreBookmarks = new QCheckBox;
@@ -105,20 +109,20 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
 
 
-
+  optionlayout->addRow(tr("Title"),m_title);
+  optionlayout->addRow(tr("Application stylesheet"),csslayout);
+  optionlayout->addRow(tr("Theme"),m_theme);
   optionlayout->addRow(tr("Docked"),m_docked);
   optionlayout->addRow(tr("New tab behaviour"),tablayout);
   optionlayout->addRow(tr("Current tab"),m_focusTab);
   optionlayout->addRow(tr("Contents linked"),m_contentsLinked);
   optionlayout->addRow(tr("Minimal interface"),m_minimalInterface);
   optionlayout->addRow(tr("Restore bookmarks"),m_restoreBookmarks);
-  optionlayout->addRow(tr("Restore tab"),m_restoreTabs);
+  optionlayout->addRow(tr("Restore tabs"),m_restoreTabs);
   optionlayout->addRow(tr("Save settings"),m_saveSettings);
   optionlayout->addRow(tr("Run date"),m_runDate);
   optionlayout->addRow(tr("Show interface warning"),m_showInterfaceWarning);
-  optionlayout->addRow(tr("Application stylesheet"),csslayout);
-  optionlayout->addRow(tr("Theme"),m_theme);
-  optionlayout->addRow(tr("Title"),m_title);
+  optionlayout->addRow(tr("Message duration (msecs)"),m_interval);
   optionlayout->addRow(tr("Toolbar text"),m_toolbarText);
   if (m_allowNavMode) {
     optionlayout->addRow(tr("Nav by root"),m_rootNavigation);
@@ -190,7 +194,7 @@ void SystemOptions::readSettings() {
   m_saveSettings->setChecked(settings.value(SID_SYSTEM_SAVE_SETTINGS,true).toBool());
   m_saveTabs->setChecked(settings.value(SID_SYSTEM_SAVE_TABS,true).toBool());
   m_rootNavigation->setChecked(settings.value(SID_SYSTEM_BY_ROOT,true).toBool());
-
+  m_interval->setText(settings.value(SID_SYSTEM_MESSAGE_TIMEOUT,2000).toString());
   m_appendNewTab->setChecked(settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool());
   m_insertNewTab->setChecked(! m_appendNewTab->isChecked());
 
@@ -253,6 +257,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
 
   settings.setValue(SID_SYSTEM_CONTENTS_LINKED,  m_contentsLinked->isChecked());
   settings.setValue(SID_SYSTEM_DATABASE,m_lexicon->text());
+  settings.setValue(SID_SYSTEM_MESSAGE_TIMEOUT,m_interval->text());
 
   settings.setValue(SID_SYSTEM_DOCKED,m_docked->isChecked());
   settings.setValue(SID_SYSTEM_CURRENT_TAB,m_focusTab->text());
@@ -314,6 +319,10 @@ bool SystemOptions::isModified()  {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
+
+  if (compare(&settings,SID_SYSTEM_MESSAGE_TIMEOUT,m_interval)) {
+    m_dirty = true;
+  }
 
   if (compare(&settings,SID_SYSTEM_CONTENTS_LINKED,m_contentsLinked)) {
     m_dirty = true;
