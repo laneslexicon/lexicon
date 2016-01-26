@@ -40,6 +40,8 @@ class HistoryMaster {
   int hasPlace(const Place & p, int historyDepth = -1);
   int getNewestId();
   int getOldestId();
+  int count() const;
+  int truncate(int max = -1);
   Place getPlaceById(int);
   void setEnabled(bool v);
   bool add(const Place &);
@@ -52,6 +54,8 @@ class HistoryMaster {
   QList<HistoryEvent *> getHistory();
  private:
   QSqlDatabase m_db;
+  int m_maximumHistory;
+  int m_maximumBuffer;
   int m_duplicateDepth;
   int m_size;
   int m_lastId;

@@ -28,6 +28,7 @@ HistoryMaster::HistoryMaster(const QString & dbname) {
     m_historyEnabled = false;
     return;
   }
+  this->truncate();
   QSqlQuery sql(m_db);
   if (! sql.prepare(SQL_GET_MAX_HISTORY)) {
     QLOG_WARN() << QString(QObject::tr("Unable to prepare SQL_GET_MAX_HISTORY : %1")).arg(sql.lastError().text());
@@ -182,8 +183,6 @@ bool HistoryMaster::add(const Place & p) {
     QLOG_DEBUG() << "History rejected, duplicate place";
     return false;
   }
-  /// TODO get last record and exit if sample place
-  /// TODO add other fields
   HistoryEvent * event = new HistoryEvent;
   event->setPlace(p);
   QSqlQuery sql(m_db);
@@ -201,26 +200,13 @@ bool HistoryMaster::add(const Place & p) {
     return false;
   }
   return true;
-  /*
-  m_addQuery.bindValue(0,p.getNode());
-  m_addQuery.bindValue(1,p.getWord());
-  m_addQuery.bindValue(2,p.getRoot());
-  m_addQuery.bindValue(3,p.getSupplement());
-  m_addQuery.bindValue(4,p.getPage());
-  m_addQuery.bindValue(5,p.getVol());
-  m_addQuery.bindValue(6,event->getWhen());
-  if (m_addQuery.exec()) {
-    QLOG_DEBUG() << "Successfully updated history table";
-    return true;
-  }
-  else {
-    QLOG_WARN() << QString(QObject::tr("Unable to add history record : %1")).arg(m_addQuery.lastError().text());
-  }
-  */
-  return false;
-
-
 }
+/**
+ * return  m_size history records
+ *
+ *
+ * @return
+ */
  QList<HistoryEvent *> HistoryMaster::getHistory() {
   QList<HistoryEvent *> events;
   //  if (! m_historyEnabled ) {
@@ -268,8 +254,10 @@ void HistoryMaster::readSettings() {
   SETTINGS
   settings.beginGroup("History");
   m_historyEnabled = settings.value(SID_HISTORY_ENABLED,true).toBool();
-  m_size = settings.value(SID_HISTORY_SIZE,10).toInt();
-  m_duplicateDepth = settings.value(SID_HISTORY_DUPLICATE_DEPTH,5).toInt();
+  m_size = settings.value(SID_HISTORY_SIZE,20).toInt();
+  m_duplicateDepth = settings.value(SID_HISTORY_DUPLICATE_DEPTH,10).toInt();
+  m_maximumHistory = settings.value(SID_HISTORY_MAXIMUM,50).toInt();
+  m_maximumBuffer = settings.value(SID_HISTORY_MAXIMUM_BUFFER,10).toInt();
 }
 bool HistoryMaster::clear() {
    if ( ! m_historyEnabled ) {
@@ -299,4 +287,51 @@ Place HistoryMaster::getPlaceById(int id) {
     p = Place::fromString(sql.value("place").toString());
   }
   return p;
+}
+int HistoryMaster::count() const {
+  QSqlQuery sql(m_db);
+  if (! sql.prepare(SQL_COUNT_HISTORY)) {
+    QLOG_WARN() << QString(QObject::tr("Unable to prepare SQL_COUNT_HISTORY : %1")).arg(sql.lastError().text());
+    return -1;
+  }
+  sql.exec();
+  if (sql.first()) {
+    return sql.value(0).toInt();
+  }
+  return -1;
+}
+int HistoryMaster::truncate(int maxrecords) {
+  QSqlQuery sql(m_db);
+  int x;
+  if (maxrecords == -1) {
+    maxrecords = m_maximumHistory;
+  }
+  x = this->count();
+
+  maxrecords += m_maximumBuffer;
+  int deleteCount = x - maxrecords;
+  QLOG_DEBUG() << Q_FUNC_INFO << QString("Delete count:%1").arg(deleteCount);
+  if (deleteCount <= 0) {
+    return 0;
+  }
+  if (!sql.prepare(SQL_GET_FIRST_HISTORY)) {
+    QLOG_WARN() << QString(QObject::tr("Unable to prepare SQL_TRUNCATE_HISTORY : %1")).arg(sql.lastError().text());
+  }
+  sql.bindValue(0,deleteCount);
+  sql.exec();
+  QList<int> deletes;
+  while(sql.next()) {
+    deletes << sql.value(0).toInt();
+  }
+  if (deletes.size() > 0) {
+    if (!sql.prepare(SQL_TRUNCATE_HISTORY)) {
+      QLOG_WARN() << QString(QObject::tr("Unable to prepare SQL_TRUNCATE_HISTORY : %1")).arg(sql.lastError().text());
+    }
+    for(int i=0;i < deletes.size();i++) {
+      sql.bindValue(0,deletes[i]);
+      sql.exec();
+    }
+    QLOG_DEBUG() << QString("truncated history delete %1, size now %2").arg(deletes.size()).arg(this->count());
+  }
+  return deletes.size();
 }

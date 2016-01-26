@@ -49,7 +49,10 @@
 #define SQL_LIST_HISTORY "select * from history order by id desc limit %1"
 #define SQL_GET_HISTORY "select * from history where id = ?"
 #define SQL_GET_MAX_HISTORY "select max(id) from history"
+#define SQL_COUNT_HISTORY "select count(id) from history"
 #define SQL_DELETE_HISTORY "delete from history"
+#define SQL_TRUNCATE_HISTORY "delete from history where id = ?"
+#define SQL_GET_FIRST_HISTORY "select id from history order by id asc limit ?"
 
 /* about.cpp */
 #define SQL_GET_INFO "select sourceid,description,createversion,createdate,xmlversion,dbid from lexicon where sourceid = 1"
