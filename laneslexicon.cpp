@@ -856,6 +856,7 @@ void LanesLexicon::createActions() {
   //  QScopedPointer<QSettings> settings((qobject_cast<Lexicon *>(qApp))->getSettings());
 
   m_exitAction = new QAction(tr("E&xit"),this);
+  //  m_exitAction->setProperty("ICONKEY",
   connect(m_exitAction,SIGNAL(triggered()),this,SLOT(onExit()));
 
   m_editViewAction = new QAction(tr("&Edit view"),this);
@@ -3888,6 +3889,7 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
   QIcon icon(fi.absoluteFilePath());
   if (! icon.isNull()) {
     action->setIcon(icon);
+    action->setProperty("FILENAME",iconfile);
   }
   else {
     QLOG_WARN() << QString(tr("Error loading %1 : icon is invalid")).arg(iconfile);
@@ -3912,97 +3914,97 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   }
 
   QString imgdir = imgd.absolutePath();
-  iconfile = settings.value("Exit",QString()).toString();
+  iconfile = settings.value(SID_ICON_EXIT,QString()).toString();
   setIcon(m_exitAction,imgdir,iconfile);
 
-  iconfile = settings.value("History",QString()).toString();
+  iconfile = settings.value(SID_ICON_HISTORY,QString()).toString();
   setIcon(m_historyAction,imgdir,iconfile);
 
 
-  iconfile = settings.value("Next",QString()).toString();
+  iconfile = settings.value(SID_ICON_NEXT,QString()).toString();
   setIcon(m_navNextAction,imgdir,iconfile);
 
-  iconfile = settings.value("Back",QString()).toString();
+  iconfile = settings.value(SID_ICON_BACK,QString()).toString();
   setIcon(m_navPrevAction,imgdir,iconfile);
 
-  iconfile = settings.value("First",QString()).toString();
+  iconfile = settings.value(SID_ICON_FIRST,QString()).toString();
   setIcon(m_navFirstAction,imgdir,iconfile);
 
-  iconfile = settings.value("Last",QString()).toString();
+  iconfile = settings.value(SID_ICON_LAST,QString()).toString();
   setIcon(m_navLastAction,imgdir,iconfile);
 
-  iconfile = settings.value("Docs",QString()).toString();
+  iconfile = settings.value(SID_ICON_DOCS,QString()).toString();
   setIcon(m_docAction,imgdir,iconfile);
 
-  iconfile = settings.value("About",QString()).toString();
+  iconfile = settings.value(SID_ICON_ABOUT,QString()).toString();
   setIcon(m_aboutAction,imgdir,iconfile);
 
-  iconfile = settings.value("Bookmarks",QString()).toString();
+  iconfile = settings.value(SID_ICON_BOOKMARKS,QString()).toString();
   setIcon(m_bookmarkAction,imgdir,iconfile);
 
-  iconfile = settings.value("Search",QString()).toString();
+  iconfile = settings.value(SID_ICON_SEARCH,QString()).toString();
   setIcon(m_searchAction,imgdir,iconfile);
 
-  iconfile = settings.value("Zoom",QString()).toString();
+  iconfile = settings.value(SID_ICON_ZOOM,QString()).toString();
   setIcon(m_defaultScaleAction,imgdir,iconfile);
 
-  iconfile = settings.value("ZoomIn",QString()).toString();
+  iconfile = settings.value(SID_ICON_ZOOM_IN,QString()).toString();
   setIcon(m_zoomInAction,imgdir,iconfile);
 
-  iconfile = settings.value("ZoomOut",QString()).toString();
+  iconfile = settings.value(SID_ICON_ZOOM_OUT,QString()).toString();
   setIcon(m_zoomOutAction,imgdir,iconfile);
 
-  iconfile = settings.value("Widen",QString()).toString();
+  iconfile = settings.value(SID_ICON_WIDEN,QString()).toString();
   setIcon(m_widenAction,imgdir,iconfile);
 
-  iconfile = settings.value("Narrow",QString()).toString();
+  iconfile = settings.value(SID_ICON_NARROW,QString()).toString();
   setIcon(m_narrowAction,imgdir,iconfile);
 
-  iconfile = settings.value("Print",QString()).toString();
+  iconfile = settings.value(SID_ICON_PRINT,QString()).toString();
   setIcon(m_printAction,imgdir,iconfile);
 
-  iconfile = settings.value("Local search",QString()).toString();
+  iconfile = settings.value(SID_ICON_LOCAL_SEARCH,QString()).toString();
   setIcon(m_localSearchAction,imgdir,iconfile);
 
-  iconfile = settings.value("Local search next",QString()).toString();
+  iconfile = settings.value(SID_ICON_LOCAL_SEARCH_NEXT,QString()).toString();
   setIcon(m_localSearchNextAction,imgdir,iconfile);
 
-  iconfile = settings.value("Clear",QString()).toString();
+  iconfile = settings.value(SID_ICON_CLEAR,QString()).toString();
   setIcon(m_clearAction,imgdir,iconfile);
   m_clearAction->setEnabled(false);
 
-  iconfile = settings.value("Keymaps",QString()).toString();
+  iconfile = settings.value(SID_ICON_KEYMAPS,QString()).toString();
   setIcon(m_keymapsAction,imgdir,iconfile);
 
-  iconfile = settings.value("Keymaps-disabled",QString()).toString();
+  iconfile = settings.value(SID_ICON_KEYMAPS_DISABLED,QString()).toString();
   setIcon(m_keymapsAction,imgdir,iconfile);
 
-  iconfile = settings.value("Preferences",QString()).toString();
+  iconfile = settings.value(SID_ICON_PREFERENCES,QString()).toString();
   setIcon(m_optionsAction,imgdir,iconfile);
 
-  iconfile = settings.value("Logs",QString()).toString();
+  iconfile = settings.value(SID_ICON_LOGS,QString()).toString();
   setIcon(m_logViewerAction,imgdir,iconfile);
 
-  iconfile = settings.value("Sync right",QString()).toString();
+  iconfile = settings.value(SID_ICON_SYNC_RIGHT,QString()).toString();
   setIcon(m_syncFromContentsAction,imgdir,iconfile);
 
-  iconfile = settings.value("Sync left",QString()).toString();
+  iconfile = settings.value(SID_ICON_SYNC_LEFT,QString()).toString();
   setIcon(m_syncFromEntryAction,imgdir,iconfile);
 
-  iconfile = settings.value("Navigation",QString()).toString();
+  iconfile = settings.value(SID_ICON_NAVIGATION,QString()).toString();
   setIcon(m_navModeRootAction,imgdir,iconfile);
 
-  iconfile = settings.value("Page navigation",QString()).toString();
+  iconfile = settings.value(SID_ICON_PAGE_NAVIGATION,QString()).toString();
   setIcon(m_navModePageAction,imgdir,iconfile);
     //  m_navigationModeMenu->addAction(m_navModePageAction);
 
   QIcon icon;
-  iconfile = settings.value("Link",QString()).toString();
+  iconfile = settings.value(SID_ICON_LINK,QString()).toString();
   if (!iconfile.isEmpty() && imgd.exists(iconfile)) {
     icon.addPixmap(imgd.absoluteFilePath(iconfile),QIcon::Normal,QIcon::On);
   }
 
-  iconfile = settings.value("Unlink",QString()).toString();
+  iconfile = settings.value(SID_ICON_UNLINK,QString()).toString();
   if (!iconfile.isEmpty() && imgd.exists(iconfile)) {
     icon.addPixmap(imgd.absoluteFilePath(iconfile),QIcon::Normal,QIcon::Off);
   }
