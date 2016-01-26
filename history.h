@@ -51,7 +51,7 @@ class HistoryMaster {
   bool isOn() { return m_historyOn;}
   bool isOk() { return m_ok;}
   bool clear();
-  QList<HistoryEvent *> getHistory();
+  QList<HistoryEvent *> getHistory(bool ignorelimit = false);
  private:
   QSqlDatabase m_db;
   int m_maximumHistory;

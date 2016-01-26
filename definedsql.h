@@ -47,6 +47,7 @@
 #define SQL_LAST_HISTORY "select * from history where id = (select max(id) from history)"
 #define SQL_FIRST_HISTORY "select * from history order by id asc limit 1"
 #define SQL_LIST_HISTORY "select * from history order by id desc limit %1"
+#define SQL_ALL_HISTORY "select * from history order by id desc"
 #define SQL_GET_HISTORY "select * from history where id = ?"
 #define SQL_GET_MAX_HISTORY "select max(id) from history"
 #define SQL_COUNT_HISTORY "select count(id) from history"

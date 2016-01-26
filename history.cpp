@@ -207,16 +207,24 @@ bool HistoryMaster::add(const Place & p) {
  *
  * @return
  */
- QList<HistoryEvent *> HistoryMaster::getHistory() {
+ QList<HistoryEvent *> HistoryMaster::getHistory(bool ignorelimit) {
   QList<HistoryEvent *> events;
   //  if (! m_historyEnabled ) {
   //    return events;
   //  }
   QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlQuery sql(m_db);
-  if (! sql.prepare(QString(SQL_LIST_HISTORY).arg(m_size))) {
-    QLOG_WARN() << QString(QObject::tr("Unable to prepare gethistory SQL : %1")).arg(sql.lastError().text());
-    return events;
+  if (ignorelimit) {
+    if (! sql.prepare(SQL_ALL_HISTORY)) {
+      QLOG_WARN() << QString(QObject::tr("Prepare error SQL_ALL_HISTORY : %1")).arg(sql.lastError().text());
+      return events;
+    }
+  }
+  else {
+    if (! sql.prepare(QString(SQL_LIST_HISTORY).arg(m_size))) {
+      QLOG_WARN() << QString(QObject::tr("Prepare error SQL_LIST_HISTORY : %1")).arg(sql.lastError().text());
+      return events;
+    }
   }
   sql.exec();
   while(sql.next()) {
