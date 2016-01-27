@@ -363,13 +363,13 @@ void LanesLexicon::cleanup() {
   for(int i=0;i < widgets.size();i++) {
     ShowMapWidget * w = qobject_cast<ShowMapWidget *>(widgets[i]);
     if (w) {
+        /// has DeleteOnClose
       w->close();
-      delete w;
     }
     OptionsDialog * d = qobject_cast<OptionsDialog *>(widgets[i]);
     if (d) {
-      d->close();
-      delete d;
+        /// has deleteOnClose
+      d->onClose();
     }
   }
   if (m_db.isOpen()) {

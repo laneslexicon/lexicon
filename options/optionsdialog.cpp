@@ -28,6 +28,8 @@
  */
 OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(parent) {
   QString useTheme = theme;
+  setAttribute(Qt::WA_DeleteOnClose);
+
   setWindowTitle(QString("Edit Theme:%1").arg(theme));
   setObjectName("optionsdialog");
   QVBoxLayout * vlayout = new QVBoxLayout;
