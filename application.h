@@ -13,6 +13,7 @@
 #include <QRegularExpression>
 #include <QDateTime>
 #include <QSysInfo>
+#include <QStyleFactory>
 #include <iostream>
 #include "QsLog.h"
 

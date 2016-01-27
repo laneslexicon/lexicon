@@ -9,6 +9,7 @@
 #include <QPixmap>
 #include <QLocale>
 #include <QTranslator>
+#include <QStyleFactory>
 #include "QsLog.h"
 #include "QsLogDest.h"
 #include "application.h"
@@ -80,6 +81,7 @@ void viewLogsMessage() {
 }
 int main(int argc, char *argv[])
 {
+
     Lexicon mansur(argc, argv);
     QCommandLineParser parser;
     parser.setApplicationDescription("\nEdward William Lane's Arabic-English Lexicon\n\nAny options specifiying a relative file path, will be relative to the Resources directory.");
@@ -135,7 +137,7 @@ int main(int argc, char *argv[])
     // Process the actual command line arguments
     parser.process(mansur);
     const QStringList args = parser.positionalArguments();
-
+    qDebug() << QStyleFactory::keys();
     if (parser.isSet(fontOption) ) {
       QFontDatabase fdb;
       QStringList fonts = fdb.families(QFontDatabase::Arabic);
@@ -146,6 +148,7 @@ int main(int argc, char *argv[])
       }
       return 0;
     }
+
     /// store the options we were interested in
     /// and pass them to the Lexicon
     QMap<QString,QString> options;
@@ -191,6 +194,29 @@ int main(int argc, char *argv[])
       mansur.setTheme(parser.value(themeOption));
     }
     mansur.startLogging();
+    ///
+    /// this may need to be windows only but we are trying to force Fusion
+    /// as looks better than the others
+    SETTINGS
+    settings.beginGroup("System");
+    QString style = settings.value("Qt style").toString();
+    QLOG_DEBUG() << QString("Got Setting Qt style:%1").arg(style);
+    QStringList styles = QStyleFactory::keys();
+    if (style.isEmpty() || ! styles.contains(style)) {
+      QStringList keys = QStyleFactory::keys();
+      QLOG_DEBUG() << QString("Requested style:%1 is unknown.(Supported style:%2)").arg(style).arg(keys.join(","));
+      if (keys.contains("Fusion")) {
+        style = "Fusion";
+      }
+      else {
+       style.clear();
+      }
+    }
+    if (! style.isEmpty()) {
+       QLOG_DEBUG() << QString("Setting Qt style:%1").arg(style);
+      QApplication::setStyle(QStyleFactory::create(style));
+    }
+
     /// we should be in the Resources directory
     mansur.scanForFonts(QDir("fonts"));
     QTranslator translator;

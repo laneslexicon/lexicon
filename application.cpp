@@ -35,6 +35,7 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QScopedPointer<QSettings> settings(new QSettings("config.ini",QSettings::IniFormat));
   settings->setIniCodec("UTF-8");
   settings->beginGroup("System");
+
   m_themeDirectory = settings->value("Theme directory","themes").toString();
   m_currentTheme =  settings->value("Theme","default").toString();
   /// check the theme directory exists
