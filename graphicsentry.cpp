@@ -989,6 +989,10 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   /// items added to the scene
   ///
   m_view->setSceneRect(m_scene->sceneRect());
+
+  if (m_reloading) {
+    return m_place;
+  }
   if (centerItem) {
     this->setCurrentItem(centerItem);
   }
@@ -2392,6 +2396,8 @@ void GraphicsEntry::onReload() {
   double scale = m_scale;
   QString title = m_userTitle;
   int textwidth = m_textWidth;
+  m_reloading = true;
+  this->blockSignals(true);
   readSettings();
   m_textWidth = textwidth;
   this->getXmlForRoot(m_place);
@@ -2414,18 +2420,8 @@ void GraphicsEntry::onReload() {
     }
     this->setUserTitle(title);
   }
-  /*
-  QString html;
-  for (int i=0;i < m_items.size();i++) {
-    html = transform(ENTRY_XSLT_RECOMPILE,m_entryXslt,m_items[i]->getXml());
-    m_items[i]->document()->clear();
-    m_items[i]->document()->setDefaultStyleSheet(m_currentCss);
-    m_items[i]->setHighlightColor(m_highlightColorName);
-    m_items[i]->setTextWidth(m_textWidth);
-    m_items[i]->setHtml(html);
-    m_items[i]->setOutputHtml(html);
-  }
-  */
+  m_reloading = false;
+  this->blockSignals(false);
   statusMessage(tr("Reloaded page"));
 }
 /**

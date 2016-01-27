@@ -167,6 +167,7 @@ class GraphicsEntry : public QWidget {
     bool m_dumpOutputHtml;
     bool m_offPageMovement;
     bool m_nodeinfoClose;
+    bool m_reloading;
     int  m_linkCheckMode;
 
     int m_pagingDir;
