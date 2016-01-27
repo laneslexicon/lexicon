@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     // Process the actual command line arguments
     parser.process(mansur);
     const QStringList args = parser.positionalArguments();
-    qDebug() << QStyleFactory::keys();
+
     if (parser.isSet(fontOption) ) {
       QFontDatabase fdb;
       QStringList fonts = fdb.families(QFontDatabase::Arabic);
@@ -195,8 +195,13 @@ int main(int argc, char *argv[])
     }
     mansur.startLogging();
     ///
-    /// this may need to be windows only but we are trying to force Fusion
-    /// as looks better than the others
+    /// FreeBSD has "Windows" and "Fusion".
+    /// OSX has ?
+    /// Linux has ?
+    /// Windows has Windows,WindowsXP,WindowsVista,Fusion
+    ///
+    /// on Windows Fusion looks at lot better than the others
+    ///
     SETTINGS
     settings.beginGroup("System");
     QString style = settings.value("Qt style").toString();
@@ -204,7 +209,7 @@ int main(int argc, char *argv[])
     QStringList styles = QStyleFactory::keys();
     if (style.isEmpty() || ! styles.contains(style)) {
       QStringList keys = QStyleFactory::keys();
-      QLOG_DEBUG() << QString("Requested style:%1 is unknown.(Supported style:%2)").arg(style).arg(keys.join(","));
+      QLOG_DEBUG() << QString("Requested style: [%1] is unknown.(Supported styles are : %2)").arg(style).arg(keys.join(","));
       if (keys.contains("Fusion")) {
         style = "Fusion";
       }
@@ -213,7 +218,7 @@ int main(int argc, char *argv[])
       }
     }
     if (! style.isEmpty()) {
-       QLOG_DEBUG() << QString("Setting Qt style:%1").arg(style);
+      QLOG_DEBUG() << QString("Setting Qt style: %1").arg(style);
       QApplication::setStyle(QStyleFactory::create(style));
     }
 
