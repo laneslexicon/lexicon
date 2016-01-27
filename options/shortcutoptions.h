@@ -13,6 +13,7 @@ class ShortcutOptions : public OptionsWidget {
     bool isModified();
  private:
     QMap<QString,QString> m_values;
+    QMap<QString,QString> m_labels;
     QTabWidget * m_tabs;
     void addTab(const QString &,const QStringList &);
 };

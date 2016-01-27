@@ -173,6 +173,7 @@ They should not be translated.
 #define SID_SHORTCUT_XREF_MODE                  "Xref mode"
 #define SID_SHORTCUT_LIST_TABS                  "List tabs"
 #define SID_SHORTCUT_BOOKMARK_INPUT            "Bookmark input"
+#define SID_SHORTCUT_ALLOW_DUPLICATES          "Allow duplicates"
 #define SID_SEARCH_IGNORE_DIACRITICS           "Ignore diacritics"
 #define SID_SEARCH_TYPE_REGEX                  "Regex"
 #define SID_SEARCH_WHOLE_WORD                  "Whole word"

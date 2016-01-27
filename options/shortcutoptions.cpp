@@ -18,6 +18,7 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
 
   keys << SID_SHORTCUT_CONTENTS_COLLAPSE_ALL << SID_SHORTCUT_CONTENTS_COLLAPSE_LETTER << SID_SHORTCUT_CONTENTS_SHOW;
   addTab("Contents",keys);
+
   keys.clear();
 
   keys << SID_SHORTCUT_DELETE_TAB << SID_SHORTCUT_DELETE_OTHER_TABS << SID_SHORTCUT_GO_TAB << SID_SHORTCUT_LIST_TABS;
@@ -44,7 +45,8 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
   addTab(tr("Local Search"),keys);
   keys.clear();
 
-  keys << SID_SHORTCUT_TOGGLE_INTERFACE << SID_SHORTCUT_SHOW_LOGS << SID_SHORTCUT_QUIT << SID_SHORTCUT_SYNC_PAGE_WITH_CONTENTS << SID_SHORTCUT_SYNC_CONTENTS_WITH_PAGE << SID_SHORTCUT_SHOW_NOTES << SID_SHORTCUT_MENU_SHOW << SID_SHORTCUT_KEEP_SYNCED << SID_SHORTCUT_OPTIONS << SID_SHORTCUT_FOCUS_TREE << SID_SHORTCUT_FOCUS_CONTENT;
+  keys << SID_SHORTCUT_TOGGLE_INTERFACE << SID_SHORTCUT_SHOW_LOGS << SID_SHORTCUT_QUIT << SID_SHORTCUT_SYNC_PAGE_WITH_CONTENTS << SID_SHORTCUT_SYNC_CONTENTS_WITH_PAGE << SID_SHORTCUT_SHOW_NOTES << SID_SHORTCUT_MENU_SHOW << SID_SHORTCUT_KEEP_SYNCED << SID_SHORTCUT_OPTIONS << SID_SHORTCUT_FOCUS_TREE << SID_SHORTCUT_FOCUS_CONTENT << SID_SHORTCUT_ALLOW_DUPLICATES;
+  m_labels.insert(SID_SHORTCUT_ALLOW_DUPLICATES,tr("Toggle allow duplicates"));
   addTab("Other",keys);
   keys.clear();
 
@@ -152,10 +154,17 @@ bool ShortcutOptions::isModified()  {
 void ShortcutOptions::addTab(const QString & title,const QStringList & keys) {
   QWidget * widget = new QWidget;
   QFormLayout * formlayout = new QFormLayout;
+  QString str;
   for(int i=0; i < keys.size();i++) {
     QKeySequenceEdit * edit = new QKeySequenceEdit;
     edit->setObjectName(keys[i]);
-    formlayout->addRow(new QLabel(keys[i]),edit);
+    if (m_labels.contains(keys[i])) {
+      str = m_labels.value(keys[i]);
+    }
+    else {
+      str = keys[i];
+    }
+    formlayout->addRow(new QLabel(str),edit);
   }
   widget->setLayout(formlayout);
   m_tabs->addTab(widget,title);

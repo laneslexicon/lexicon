@@ -102,6 +102,7 @@ class LanesLexicon : public QMainWindow
       void onLoadPageSet();
       void onEditPageSet();
     private slots:
+      void onAllowDuplicates();
       void onFocusContent();
       void onTabList();
       void onOptionsChanged(bool);
@@ -337,6 +338,7 @@ class LanesLexicon : public QMainWindow
       bool m_revertEnabled;
       bool m_menuWarning;
       bool m_allowDuplicates;
+      bool m_allowDuplicatesPermanent;
       bool m_historyNewTab;
       bool m_historyGoTab;
 

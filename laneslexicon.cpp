@@ -740,6 +740,9 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_LIST_TABS) {
     this->onTabList();
   }
+  else if (key == SID_SHORTCUT_ALLOW_DUPLICATES) {
+    this->onAllowDuplicates();
+  }
   else {
     QLOG_WARN() << "Unhandled shortcut" << key;
   }
@@ -2038,8 +2041,9 @@ void LanesLexicon::readSettings() {
   if (cmdOptions.contains("notabs")) {
     m_restoreTabs = false;
   }
+  /// we let them toggle this but need to keep the original
   m_allowDuplicates = settings.value(SID_SYSTEM_ALLOW_DUPLICATES,false).toBool();
-
+  m_allowDuplicatesPermanent = m_allowDuplicates;
   m_saveBookmarks = settings.value(SID_SYSTEM_SAVE_BOOKMARKS,true).toBool();
   m_restoreBookmarks = settings.value(SID_SYSTEM_RESTORE_BOOKMARKS,true).toBool();
 
@@ -2221,6 +2225,7 @@ void LanesLexicon::writeSettings() {
     settings.setValue(SID_SYSTEM_POS, pos());
     settings.setValue(SID_SYSTEM_CURRENT_TAB,m_tabs->currentIndex());
     settings.setValue(SID_SYSTEM_RUN_DATE,QDateTime::currentDateTime().toString(Qt::ISODate));
+    settings.setValue(SID_SYSTEM_ALLOW_DUPLICATES,m_allowDuplicatesPermanent);
     if (m_navMode == LanesLexicon::ByRoot) {
       settings.setValue(SID_SYSTEM_BY_ROOT,true);
     }
@@ -5231,4 +5236,17 @@ void LanesLexicon::onFocusContent() {
   else {
     m_tabs->currentWidget()->setFocus();
   }
+}
+void LanesLexicon::onAllowDuplicates() {
+  m_allowDuplicates = ! m_allowDuplicates;
+  SETTINGS
+
+ settings.beginGroup("System");
+ settings.setValue(SID_SYSTEM_ALLOW_DUPLICATES,m_allowDuplicates);
+ if (m_allowDuplicates) {
+   statusMessage(tr("Duplicates allowed"));
+ }
+ else {
+   statusMessage(tr("Duplicates not allowed"));
+ }
 }
