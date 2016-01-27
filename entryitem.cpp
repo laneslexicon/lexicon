@@ -473,8 +473,9 @@ void EntryItem::dropEvent(QGraphicsSceneDragDropEvent *event) {
     ///
     /// entry.xslt adds 200e after a link to force a left-to-right
     ///
-    t.remove(QChar(0x200e));
-    href.remove(QChar(0x200e));
+    QRegularExpression rx("[\u2000-\u202e]");
+    t.remove(rx);
+    href.remove(rx);
     anchor = c.selectedText();
     event->setDropAction(Qt::LinkAction);
     event->accept();
