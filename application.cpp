@@ -219,7 +219,7 @@ void Lexicon::startLogging() {
    QLOG_INFO() << "Mac version" << QSysInfo::macVersion();
 #endif
 #ifdef  Q_OS_WIN
-    QLOG_INFO << "Windows version" << QSysInfo::windowsVersion();
+    QLOG_INFO() << "Windows version" << QSysInfo::windowsVersion();
 #endif
     QLOG_INFO() << "Product version" << QSysInfo::productVersion();
     QLOG_INFO() << "Product name" << QSysInfo::prettyProductName();
