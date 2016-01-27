@@ -40,6 +40,7 @@ class FindOptions : public OptionsWidget {
     QCheckBox * m_headVertical;
     QCheckBox * m_headFocusTable;
     QCheckBox * m_nodeinfoClose;
+    QCheckBox * m_nodeinfoForce;
     bool m_headWholeWord;
     bool m_headDiacritics;
     bool m_headRegex;

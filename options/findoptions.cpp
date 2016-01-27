@@ -64,9 +64,11 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   this->setControlSize(m_headStep,MEDIUM_EDIT);
   m_headStep->setSingleStep(25);
   m_nodeinfoClose = new QCheckBox;
+  m_nodeinfoForce = new QCheckBox;
   QFormLayout * headlayout = new QFormLayout;
   headlayout->addRow(tr("Step interval"),m_headStep);
   headlayout->addRow(tr("Close entry info after load"),m_nodeinfoClose);
+  headlayout->addRow(tr("Entry info force new tab"),m_nodeinfoForce);
   QPushButton * headbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout2 = new QHBoxLayout;
   setlayout2->addWidget(headbtn);
@@ -162,6 +164,7 @@ void FindOptions::readSettings() {
 
   m_headPhrase->setChecked(settings.value(SID_HEADSEARCH_USE_PHRASE,false).toBool());
   m_nodeinfoClose->setChecked(settings.value(SID_HEADSEARCH_NODEINFO_CLOSE,true).toBool());
+  m_nodeinfoForce->setChecked(settings.value(SID_HEADSEARCH_NODEINFO_FORCE,true).toBool());
   m_headStep->setValue(settings.value(SID_HEADSEARCH_STEP,50).toInt());
 
   m_headNewTab     = settings.value(SID_HEADSEARCH_NEW_TAB,true).toBool();
@@ -228,6 +231,7 @@ void FindOptions::writeSettings(const QString & fileName) {
 
   */
   settings.setValue(SID_HEADSEARCH_NODEINFO_CLOSE,m_nodeinfoClose->isChecked());
+  settings.setValue(SID_HEADSEARCH_NODEINFO_FORCE,m_nodeinfoForce->isChecked());
   settings.setValue(SID_HEADSEARCH_STEP,m_headStep->value());
   settings.setValue(SID_HEADSEARCH_NEW_TAB,m_headNewTab);
   settings.setValue(SID_HEADSEARCH_GO_TAB,m_headGoTab);
@@ -334,6 +338,9 @@ bool FindOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_HEADSEARCH_NODEINFO_CLOSE,m_nodeinfoClose)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_HEADSEARCH_NODEINFO_FORCE,m_nodeinfoForce)) {
     m_dirty = true;
   }
   if (compare(&settings,SID_HEADSEARCH_STEP,m_headStep)) {
