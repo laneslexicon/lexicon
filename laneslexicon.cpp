@@ -862,7 +862,7 @@ void LanesLexicon::createActions() {
   m_editViewAction = new QAction(tr("&Edit view"),this);
   connect(m_editViewAction,SIGNAL(triggered()),this,SLOT(onEditView()));
 
-  m_minimalAction = new QAction(tr("&Minimal interface"),this);
+  m_minimalAction = new QAction(tr("Minimal &interface"),this);
   m_minimalAction->setCheckable(true);
   connect(m_minimalAction,SIGNAL(triggered(bool)),this,SLOT(onSetInterface(bool)));
 
@@ -872,6 +872,28 @@ void LanesLexicon::createActions() {
   m_logViewerAction = new QAction(tr("&View logs"),this);
   connect(m_logViewerAction,SIGNAL(triggered()),this,SLOT(onLogViewer()));
 
+  m_linkAction = new QAction(tr("Lin&k contents"),this);
+  m_linkAction->setCheckable(true);
+  m_linkAction->setChecked(m_linkContents);
+
+  m_syncFromEntryAction = new QAction(tr("Align co&ntents with entry"),this);
+  m_syncFromContentsAction = new QAction(tr("Align &entry with contents"),this);
+
+  m_defaultScaleAction = new QAction(tr("Set default &zoom"),this);
+  m_defaultWidthAction = new QAction(tr("Set default text &width"),this);
+
+  m_showContentsAction = new QAction(tr("Show &contents"),this);
+  m_showContentsAction->setCheckable(true);
+
+  m_showToolbarAction = new QAction(tr("Show &toolbar"),this);
+  m_showToolbarAction->setCheckable(true);
+  m_showMenuAction = new QAction(tr("Show &menu"),this);
+  m_showMenuAction->setCheckable(true);
+
+  m_showStatusBarAction = new QAction(tr("Show status &bar"),this);
+  m_showStatusBarAction->setCheckable(true);
+
+  m_tablistAction = new QAction(tr("&List tabs"),this);
   m_clearHistoryAction = new QAction(tr("&Clear"),this);
   connect(m_clearHistoryAction,SIGNAL(triggered()),this,SLOT(onClearHistory()));
 
@@ -948,15 +970,6 @@ void LanesLexicon::createActions() {
 
   m_keymapsAction = new QAction(tr("Keymaps"),this);
 
-  m_linkAction = new QAction(tr("&Link contents"),this);
-  m_linkAction->setCheckable(true);
-  m_linkAction->setChecked(m_linkContents);
-
-  m_syncFromEntryAction = new QAction(tr("Align &contents with entry"),this);
-  m_syncFromContentsAction = new QAction(tr("Align &entry with contents"),this);
-
-  m_defaultScaleAction = new QAction(tr("Set default &zoom"),this);
-  m_defaultWidthAction = new QAction(tr("Set default &text width"),this);
 
   m_selectThemeAction = new QAction(tr("&Switch"),this);
   m_editThemeAction = new QAction(tr("&Edit"),this);
@@ -965,15 +978,8 @@ void LanesLexicon::createActions() {
 
   m_changeArabicFontAction = new QAction(tr("Change &font"),this);
 
-  m_showContentsAction = new QAction(tr("Show &contents"),this);
-  m_showContentsAction->setCheckable(true);
 
-  m_showToolbarAction = new QAction(tr("Show &toolbar"),this);
-  m_showToolbarAction->setCheckable(true);
-  m_showMenuAction = new QAction(tr("Show &menu"),this);
-  m_showMenuAction->setCheckable(true);
-
-  m_exportLinksAction = new QAction(tr("&Export links"),this);
+  m_exportLinksAction = new QAction(tr("Ex&port links"),this);
   m_importLinksAction = new QAction(tr("&Import links"),this);
 
   m_importXmlAction = new QAction(tr("Import &Xml"),this);
@@ -984,7 +990,7 @@ void LanesLexicon::createActions() {
 
   m_showNoteBrowserAction = new QAction(tr("View &notes"),this);
 
-  m_tablistAction = new QAction(tr("List &tabs"),this);
+
 
   connect(m_tablistAction,SIGNAL(triggered()),this,SLOT(onTabList()));
   connect(m_changeArabicFontAction,SIGNAL(triggered()),this,SLOT(onChangeArabicFont()));
@@ -1011,6 +1017,7 @@ void LanesLexicon::createActions() {
   connect(m_showContentsAction,SIGNAL(triggered()),this,SLOT(onShowContents()));
   connect(m_showToolbarAction,SIGNAL(triggered()),this,SLOT(onShowToolbar()));
   connect(m_showMenuAction,SIGNAL(triggered()),this,SLOT(onShowMenubar()));
+  connect(m_showStatusBarAction,SIGNAL(triggered()),this,SLOT(onShowStatusbar()));
 
   connect(m_importLinksAction,SIGNAL(triggered()),this,SLOT(onImportLinks()));
   connect(m_exportLinksAction,SIGNAL(triggered()),this,SLOT(onExportLinks()));
@@ -1394,6 +1401,7 @@ void LanesLexicon::createMenus() {
   m_viewMenu->addAction(m_defaultWidthAction);
   m_viewMenu->addAction(m_showContentsAction);
   m_viewMenu->addAction(m_showToolbarAction);
+  m_viewMenu->addAction(m_showStatusBarAction);
   m_viewMenu->addAction(m_showMenuAction);
   m_viewMenu->addAction(m_tablistAction);
 
@@ -4564,6 +4572,9 @@ void LanesLexicon::onShowToolbar() {
     m_entrybar->show();
   }
 }
+void LanesLexicon::onShowStatusbar() {
+  this->statusBar()->setVisible(m_showStatusBarAction->isChecked());
+}
 void LanesLexicon::onShowMenubar() {
   if ( m_showMenuAction->isChecked()) {
     m_mainmenu->show();
@@ -4601,6 +4612,7 @@ void LanesLexicon::onReady() {
   }
   m_showToolbarAction->setChecked(m_mainbar->isVisible());
   m_showMenuAction->setChecked(m_mainmenu->isVisible());
+  m_showStatusBarAction->setChecked(this->statusBar()->isVisible());
   syncFromEntry();
 }
 void LanesLexicon::onImportLinks() {

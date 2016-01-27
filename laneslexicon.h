@@ -141,6 +141,7 @@ class LanesLexicon : public QMainWindow
       void onShowContents();
       void onShowToolbar();
       void onShowMenubar();
+      void onShowStatusbar();
       void onNavigationMenuChanged(QAction *);       // change navigation by menu
       void onNavNext();
       void onNavPrev();
@@ -467,6 +468,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_changeArabicFontAction;
       QAction * m_showContentsAction;
       QAction * m_showMenuAction;
+      QAction * m_showStatusBarAction;
       QAction * m_showToolbarAction;
       QAction * m_exportLinksAction;
       QAction * m_importLinksAction;
