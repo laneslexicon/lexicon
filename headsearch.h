@@ -44,7 +44,7 @@ class HeadSearchWidget : public QWidget
    void onCellDoubleClicked(int,int);
    void onExport();
    void selectFocus();
-   void openNode(const QString &);
+   void openNode(const QString &,bool);
  protected:
    void focusInEvent(QFocusEvent *);
    void focusOutEvent(QFocusEvent *);
@@ -73,10 +73,11 @@ class HeadSearchWidget : public QWidget
    bool m_headPhrase;
    bool m_cancelSearch;
    bool m_nodeinfoClose;
+   bool m_nodeinfoForce;
    QPushButton * m_exportButton;
  signals:
    void searchResult(const QString &);
    void deleteSearch();
-   void showNode(const QString &);
+   void showNode(const QString &,bool forceNewTab = false);
 };
 #endif

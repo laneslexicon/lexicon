@@ -251,7 +251,7 @@ class GraphicsEntry : public QWidget {
     void searchStarted();
     void searchFoundNext();
     void searchFinished();
-    void showNode(const QString &);
+    void showNode(const QString &,bool forceNewTab = false);
 };
 /*
 class LaneGraphicsView : public QGraphicsView {

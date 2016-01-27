@@ -102,6 +102,7 @@ class LanesLexicon : public QMainWindow
       void onLoadPageSet();
       void onEditPageSet();
     private slots:
+      void onFocusContent();
       void onTabList();
       void onOptionsChanged(bool);
       void onReady();
@@ -226,7 +227,7 @@ class LanesLexicon : public QMainWindow
       void onChangeArabicFont();
       void onExportLinks();
       void onImportLinks();
-      void showSearchNode(const QString &);
+      void showSearchNode(const QString &,bool forceNewTab = false);
 
  protected:
       void closeEvent(QCloseEvent *);

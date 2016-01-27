@@ -1012,7 +1012,7 @@ void FullSearchWidget::onExport() {
   statusMessage(m_rxlist->exportResults());
 }
 void FullSearchWidget::openNode(const QString & node) {
-  emit(showNode(node));
+  emit(showNode(node,false));
   this->setFocus();
 }
 int FullSearchWidget::findCount() const {

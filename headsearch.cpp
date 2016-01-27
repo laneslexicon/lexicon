@@ -18,8 +18,6 @@
 #define NODE_COLUMN 4
 #define VOL_COLUMN 5
 #define COLUMN_COUNT 6
-/// TODO
-/// some of these functions pass SearchOptions - why can't we use the class member
 extern LanesLexicon * getApp();
 HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   readSettings();
@@ -325,6 +323,7 @@ void HeadSearchWidget::readSettings() {
   m_headPhrase = settings.value(SID_HEADSEARCH_USE_PHRASE,false).toBool();
   m_focusTable = settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool();
   m_nodeinfoClose = settings.value(SID_HEADSEARCH_NODEINFO_CLOSE,true).toBool();
+  m_nodeinfoForce = settings.value(SID_HEADSEARCH_NODEINFO_FORCE,false).toBool();
   settings.endGroup();
 
   settings.beginGroup("Diacritics");
@@ -384,11 +383,12 @@ void HeadSearchWidget::showNode(int row)  {
   v->setCss(m_css);
   v->setHeader(Place::fromEntryRecord(m_nodeQuery.record()));
   v->setHtml(html);
+  v->setAlwaysLoad(m_nodeinfoForce);
   v->setCloseOnLoad(m_nodeinfoClose);
   v->show();
   v->raise();
   v->activateWindow();
-  connect(v,SIGNAL(openNode(const QString &)),this,SLOT(openNode(const QString &)));
+  connect(v,SIGNAL(openNode(const QString &,bool)),this,SLOT(openNode(const QString &,bool)));
 
 }
 QString HeadSearchWidget::transform(const QString & xml) const {
@@ -428,7 +428,11 @@ bool HeadSearchWidget::readCssFromFile(const QString & name) {
   f.close();
   return true;
 }
-void HeadSearchWidget::openNode(const QString & node) {
-  emit(showNode(node));
+void HeadSearchWidget::openNode(const QString & node,bool v ) {
+  NodeInfo * viewer = qobject_cast<NodeInfo *>(sender());
+  if (viewer != NULL) {
+    v = viewer->alwaysLoad();
+  }
+  emit(showNode(node,v));
   this->setFocus();
 }

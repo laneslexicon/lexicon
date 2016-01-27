@@ -51,7 +51,9 @@ NodeInfo::NodeInfo(QWidget * parent)
 
   QHBoxLayout * boxlayout = new QHBoxLayout;
   m_closeOnTabLoad = new QCheckBox(tr("Close after load"));
+  m_alwaysLoad = new QCheckBox(tr("Force load in new tab"));
   boxlayout->addWidget(m_closeOnTabLoad);
+  boxlayout->addWidget(m_alwaysLoad);
   boxlayout->addWidget(buttonBox);
 
   layout->addLayout(hlayout);
@@ -65,6 +67,12 @@ NodeInfo::~NodeInfo() {
 }
 void NodeInfo::setCloseOnLoad(bool v) {
   m_closeOnTabLoad->setChecked(v);
+}
+void NodeInfo::setAlwaysLoad(bool v) {
+  m_alwaysLoad->setChecked(v);
+}
+bool NodeInfo::alwaysLoad() const {
+  return m_alwaysLoad->isChecked();
 }
 void NodeInfo::setPreferredSize(const QString & szStr) {
   m_size.setWidth(400);
@@ -82,8 +90,11 @@ void NodeInfo::setPreferredSize(const QString & szStr) {
     }
   }
 }
+void NodeInfo::showForce(bool v) {
+  m_alwaysLoad->setVisible(v);
+}
 void NodeInfo::openEntry() {
-  emit(openNode(m_node));
+  emit(openNode(m_node,m_alwaysLoad->isChecked()));
   if (m_closeOnTabLoad->isChecked()) {
     this->accept();
   }

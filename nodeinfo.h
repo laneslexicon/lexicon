@@ -26,6 +26,9 @@ class NodeInfo : public QDialog {
   void setHeader(const QString & root,const QString & head,const QString & node,int page);
   void setHeader(const Place &);
   void setCloseOnLoad(bool v);
+  void setAlwaysLoad(bool v);
+  bool alwaysLoad() const;
+  void showForce(bool);
   public slots:
     void accept();
     void reject();
@@ -44,7 +47,8 @@ class NodeInfo : public QDialog {
     QString m_node;
     QString m_css;
     QCheckBox * m_closeOnTabLoad;
+    QCheckBox * m_alwaysLoad;
  signals:
-    void openNode(const QString & node);
+    void openNode(const QString & node,bool);
 };
 #endif

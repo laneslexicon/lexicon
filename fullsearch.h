@@ -121,7 +121,7 @@ class FullSearchWidget : public QWidget
     QFont m_resultsFont;
  signals:
     void searchResult(const QString &);
-    void showNode(const QString &);
+    void showNode(const QString &,bool);
     void setProgressMax(int);
     void setProgressValue(int);
     void printNode(const QString &);

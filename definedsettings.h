@@ -191,7 +191,7 @@ They should not be translated.
 #define SID_HEADSEARCH_USE_PHRASE               "Use phrase"
 #define SID_HEADSEARCH_COLUMNS                  "HeadSearch Export columns"
 #define SID_HEADSEARCH_NODEINFO_CLOSE           "Node info close"
-
+#define SID_HEADSEARCH_NODEINFO_FORCE          "Node info force tab"
 #define SID_LOCALSEARCH_SHOW_ALL               "Show all results"
 #define SID_LOCALSEARCH_DIACRITICS             "Ignore diacritics"
 #define SID_LOCALSEARCH_WHOLE_WORD             "Whole word"

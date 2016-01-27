@@ -48,7 +48,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   m_view->setAlignment(Qt::AlignTop);
   m_highlightCount = 0;
   m_findCount = 0;
-
+  m_reloading = false;
   m_view->setInteractive(true);
   /*  TODO what is this for ? Commented out on 16th Jan
       (adding the dummy item)
@@ -370,7 +370,6 @@ void GraphicsEntry::focusLast() {
 Place GraphicsEntry::getPlace(int index) const {
   QLOG_DEBUG() << Q_FUNC_INFO << index;
   if ((index >= 0) && (index < m_items.size())) {
-    QLOG_DEBUG() << "get_place_1";
       return m_items[index]->getPlace();
   }
   Place p;
@@ -378,7 +377,6 @@ Place GraphicsEntry::getPlace(int index) const {
   if (item) {
       p = item->getPlace();
       if (p.isValid()) {
-        //        QLOG_DEBUG() << "get_place_4";
         return p;
       }
   }
@@ -388,22 +386,17 @@ Place GraphicsEntry::getPlace(int index) const {
     if (sql.prepare(SQL_ENTRY_FOR_NODE)) {
       sql.bindValue(0,m_focusNode);
       if (sql.exec()  && sql.first()) {
-        //        QLOG_DEBUG() << "get_place_2";
         return Place::fromEntryRecord(sql.record());
       }
     }
-    //    QLOG_DEBUG() << "get_place_3";
     return Place::fromNode(m_focusNode);
   }
   if (m_focusPlace.isValid()) {
-    //    QLOG_DEBUG() << "get_place_5";
     return m_focusPlace;
   }
   if (m_items.size() > 1) {
-    //    QLOG_DEBUG() << "get_place_6";
     return m_items[1]->getPlace();
   }
-  //  QLOG_DEBUG() << "get_place_7";
   return m_focusPlace;
 }
 /**
@@ -651,10 +644,6 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
   nodeQuery.exec();
   if (nodeQuery.first()) {
     p = Place::fromEntryRecord(nodeQuery.record());
-    //    p.setRoot(nodeQuery.value("root").toString());
-    //    p.setSupplement(nodeQuery.value("supplement").toInt());
-    //    p.setWord(nodeQuery.value("word").toString());
-    //    p.setPage(nodeQuery.value("page").toInt());
     QString html =    transform(NODE_XSLT,m_entryXslt,nodeQuery.value("xml").toString());
     NodeInfo * info = new NodeInfo(this);
     info->setWindowTitle(tr("Link target"));
@@ -662,8 +651,10 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
     info->setCss(m_currentCss);
     info->setHtml(html);
     info->setCloseOnLoad(m_nodeinfoClose);
-    connect(info,SIGNAL(openNode(const QString &)),this,SIGNAL(showNode(const QString &)));
+    //    info->showForce(false);
+    connect(info,SIGNAL(openNode(const QString &,bool)),this,SIGNAL(showNode(const QString &,bool)));
     int ret = info->exec();
+    this->setFocus();
     delete info;
     //    if (ret == QDialog::Accepted) {
     //      emit(gotoNode(Place::fromNode(node),true,true));
@@ -990,14 +981,15 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
   ///
   m_view->setSceneRect(m_scene->sceneRect());
 
+  QLOG_DEBUG() << Q_FUNC_INFO << QString("Loaded %1 items").arg(m_items.size());
   if (m_reloading) {
     return m_place;
   }
   if (centerItem) {
     this->setCurrentItem(centerItem);
   }
-
   m_place = centerItem->getPlace();
+
   m_place.setAction(dp.getAction());
   if (m_place.isValid()) {
     if (m_place.getAction() == Place::History) {
@@ -1012,7 +1004,6 @@ Place GraphicsEntry::getXmlForRoot(const Place & dp) {
       }
     }
   }
-
 
   //  QLOG_DEBUG() << Q_FUNC_INFO << "exiting 2 with place" << m_place.toString();
   //  m_view->setBackgroundBrush(QBrush(Qt::cyan,Qt::Dense7Pattern));

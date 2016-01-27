@@ -437,7 +437,7 @@ void LanesLexicon::setSignals(GraphicsEntry * entry) {
 
   connect(entry,SIGNAL(gotoNode(const Place &,bool,bool)),this,SLOT(showPlace(const Place &,bool,bool)));
   connect(entry,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
-  connect(entry,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+  connect(entry,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
   connect(entry,SIGNAL(printPage()),this,SLOT(pagePrint()));
   connect(entry,SIGNAL(searchFinished()),this,SLOT(pageSearchComplete()));
   connect(entry,SIGNAL(searchStarted()),this,SLOT(pageSearchStart()));
@@ -574,13 +574,7 @@ void LanesLexicon::shortcut(const QString & key) {
   }
   else if (key == SID_SHORTCUT_FOCUS_CONTENT) {
     /// if an item has focus, this loses it
-    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
-    if (entry) {
-      entry->focusPlace();
-    }
-    else {
-      m_tabs->currentWidget()->setFocus();
-    }
+    this->onFocusContent();
   }
   else if (key == SID_SHORTCUT_FOCUS_TREE) {
     m_tree->setFocus();
@@ -1715,6 +1709,8 @@ void LanesLexicon::treeItemDoubleClicked(QTreeWidgetItem * item,int /* column */
   }
 }
 /**
+ * the user has selected something in roots tree
+ *
  * if the user clicks or hits space an entry (i.e. below a root) make
  * sure it is visible
  *
@@ -1760,6 +1756,7 @@ GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool acti
   QLOG_DEBUG() << Q_FUNC_INFO << p << createTab << activateTab;
   GraphicsEntry * entry = NULL;
   if (! p.isValid()) {
+    QLOG_DEBUG() << Q_FUNC_INFO << "Invalid place";
     return NULL;
   }
   int ix = this->searchTabs(p);//.node());
@@ -1799,6 +1796,7 @@ GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool acti
       return entry;
     }
     else {
+      QLOG_DEBUG() << Q_FUNC_INFO << "Entry get root returned invalid place";
       delete entry;
       return NULL;
     }
@@ -1809,6 +1807,7 @@ GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool acti
     /// tabs->tabContentsChanged() emits signa tabsChanged()
     /// which ends calling this->onTabsChanged()
     // and that inserts a number in tab title
+    QLOG_DEBUG() << Q_FUNC_INFO << __LINE__;
     np = entry->getXmlForRoot(p);
     if (np.isValid()) {
       m_tabs->setTabText(currentTab,np.getShortText());
@@ -3292,11 +3291,12 @@ void LanesLexicon::searchForRoot() {
         if (m_linkContents) {
           this->syncFromEntry();
         }
+        else {
+          m_tabs->currentWidget()->setFocus();
+        }
       }
     }
   }
-  /// TODO handle keyboard visibility as the the search dialog is only ever closed
-  /// at the end
   m_rootSearchDialog->hideKeyboard();
 }
 int LanesLexicon::addTab(bool create,QWidget * w,const QString & title) {
@@ -3314,6 +3314,7 @@ int LanesLexicon::addTab(bool create,QWidget * w,const QString & title) {
     this->onCloseTab(ix);
     ix = m_tabs->insertTab(ix,w,title);
   }
+  this->onFocusContent();
   return ix;
 }
 /**
@@ -3332,7 +3333,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
     s->setSearch(t,options);
     s->setForceLTR(d->getForceLTR());
     s->findTarget(true);
-    connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+    connect(s,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
     connect(s,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
     /// this is a count of search tabs (not search results)
     int c = this->getSearchCount();
@@ -3355,7 +3356,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       HeadSearchWidget * s = new HeadSearchWidget(this);
       connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
       connect(s,SIGNAL(deleteSearch()),this,SLOT(deleteSearch()));
-      connect(s,SIGNAL(showNode(const QString &)),this,SLOT(showSearchNode(const QString &)));
+      connect(s,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
 
       s->search(target,options);
       if (s->count() == 0) {
@@ -3562,6 +3563,9 @@ void LanesLexicon::currentTabChanged(int ix) {
  * @return
  */
 int LanesLexicon::searchTabs(const Place & p,bool activate) {
+  if (m_allowDuplicates) {
+    return -1;
+  }
   if (! p.node().isEmpty()) {
     return this->searchTabs(p.node(),activate);
   }
@@ -3589,24 +3593,39 @@ int LanesLexicon::searchTabs(const Place & p,bool activate) {
  * @return tab index if found, otherwise -1
  */
 int LanesLexicon::searchTabs(const QString & node,bool activate) {
-  QLOG_DEBUG() << Q_FUNC_INFO << node;
+  QLOG_DEBUG() << Q_FUNC_INFO << node << m_allowDuplicates;
   if (m_allowDuplicates) {
     return -1;
   }
 
   if (node.isEmpty()) {
-
     return -1;
   }
+  QList<int> tabs;
+  int ix = m_tabs->currentIndex();
+  if (ix == -1) {
+    return ix;
+  }
   for(int i=0;i < m_tabs->count();i++) {
-    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+    if (i != ix) {
+      tabs << i;
+    }
+  }
+  tabs.insert(0,ix);
+  qDebug() << Q_FUNC_INFO << tabs;
+  for(int i=0;i < tabs.size();i++) {
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(tabs[i]));
     if (entry && entry->hasNode(node)) {
-      if (activate) {
-        m_tabs->setCurrentIndex(i);
-        return i;
+      if (tabs[i] == ix) {
+        statusMessage(QString(tr("Requested entry is in current tab")));
       }
-      statusMessage(QString(tr("Requested entry already showing in tab %1")).arg(i + 1));
-      return i;
+      else {
+      statusMessage(QString(tr("Requested entry available in tab %1")).arg(tabs[i] + 1));
+      }
+      if (activate) {
+        m_tabs->setCurrentIndex(tabs[i]);
+      }
+      return tabs[i];
     }
   }
   return -1;
@@ -3665,32 +3684,72 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
  */
 
 /// TODO find out whether to do background loading
-void LanesLexicon::showSearchNode(const QString & node) {
-  QLOG_DEBUG() << Q_FUNC_INFO << node;
+void LanesLexicon::showSearchNode(const QString & node,bool forceNewTab) {
+  QLOG_DEBUG() << Q_FUNC_INFO << node << forceNewTab;
+  GraphicsEntry * entry;
+  /*
   FullSearchWidget * w = qobject_cast<FullSearchWidget *>(sender());
   if (w) {
-    QLOG_DEBUG() << ">>>>>>>>>>>>>>>>> fullsearch";
+    QLOG_DEBUG() << ">>>>>>>>>>>>>>>>> fullsearch" << node;
   }
   else {
     HeadSearchWidget * h = qobject_cast<HeadSearchWidget *>(sender());
     if (h) {
-      QLOG_DEBUG() << ">>>>>>>>>>>>>>>>> headsearch";
+      QLOG_DEBUG() << ">>>>>>>>>>>>>>>>> headsearch" << node;
     }
     else {
       GraphicsEntry * e = qobject_cast<GraphicsEntry *>(sender());
       if (e) {
-        QLOG_DEBUG() << ">>>>>>>>>>>>>>>>>>>> link view";
+        QLOG_DEBUG() << ">>>>>>>>>>>>>>>>>>>> link view" << node;
       }
     }
   }
+  */
+  bool v = m_allowDuplicates;
+  if (forceNewTab) {
+    m_allowDuplicates = true;
+  }
   Place p;
   p.setNode(node);
-  showPlace(p,true,false);
-  int ix = this->searchTabs(node);
+  int ix = this->searchTabs(node,false);
   if (ix != -1) {
-    statusMessage(QString(tr("Entry loaded into tab %1")).arg(ix+1));
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
+    if (entry) {
+      entry->focusNode(node);
+    }
+    m_allowDuplicates = v;
     return;
   }
+  entry = showPlace(p,true,false);
+  if (entry) {
+    entry->focusNode(node);
+    for(int i=0;i < m_tabs->count();i++) {
+      GraphicsEntry * g = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+      if (g == entry) {
+        statusMessage(QString(tr("Entry loaded into tab %1")).arg(i+1));
+        m_allowDuplicates = v;
+        return;
+      }
+    }
+  }
+  else {
+    qDebug() << Q_FUNC_INFO << "not found";
+
+  }
+    m_allowDuplicates = v;
+
+  /*
+  //  int ix = this->searchTabs(node);
+
+  if (ix != -1) {
+    statusMessage(QString(tr("Entry loaded into tab %1")).arg(ix+1));
+    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
+    if (entry) {
+      entry->focusNode(node);
+    }
+    return;
+  }
+  */
 
 }
 
@@ -5162,4 +5221,14 @@ void LanesLexicon::onTabList() {
 }
 QWidget * LanesLexicon::currentTab() {
   return m_tabs->currentWidget();
+}
+void LanesLexicon::onFocusContent() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
+  if (entry) {
+    entry->focusPlace();
+  }
+  else {
+    m_tabs->currentWidget()->setFocus();
+  }
 }
