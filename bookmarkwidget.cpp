@@ -25,7 +25,7 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
   m_list->setObjectName("arabicbookmarklist");
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
-
+  m_list->setFixedRowHeight(40);
   QTableWidgetItem * item;
   QLabel * label;
   int row;

@@ -33,6 +33,7 @@ class ColumnarTableWidget : public QTableWidget {
   void showEmpty(const QString &);
   void setMarkColumn(int);
   void setColumnWidth(int,int);
+  void setFixedRowHeight(int);
   void setExportIgnore(int,const QString &);
   enum { DEFAULT_WIDTH, COLUMN_WIDTHS,STATE };
   virtual void readConfiguration(QSettings &);

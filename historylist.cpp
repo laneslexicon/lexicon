@@ -28,6 +28,7 @@ HistoryWidget::HistoryWidget(HistoryMaster * history,QWidget * parent)
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
   m_list->setKey(ColumnarTableWidget::STATE,SID_HISTORY_LIST_STATE);
   m_list->setDefaultWidth(100);
+  m_list->setFixedRowHeight(40);
   //  m_list->verticalHeader()->setVisible(true);
 
   QTableWidgetItem * item;

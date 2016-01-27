@@ -33,6 +33,7 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_heads->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_heads->setSelectionMode(QAbstractItemView::SingleSelection);
   m_heads->setMarkColumn(SELECT_COLUMN);
+  m_heads->setFixedRowHeight(40);
   m_heads->installEventFilter(this);
 
   m_searchTitle = new QLabel("");
@@ -183,15 +184,15 @@ void HeadSearchWidget::search(const QString & searchpattern,const SearchOptions 
 
       m_heads->setCellWidget(row,SELECT_COLUMN,new CenteredCheckBox);
 
-      label = m_heads->createLabel(p.m_root,"headsearchresults");
+      label = m_heads->createLabel(p.m_root,"headsearchlist");
       label->setAlignment(Qt::AlignCenter);
       m_heads->setCellWidget(row,ROOT_COLUMN,label);
 
-      label = m_heads->createLabel(p.m_head,"headsearchresults");
+      label = m_heads->createLabel(p.m_head,"headsearchlist");
       label->setAlignment(Qt::AlignCenter);
       m_heads->setCellWidget(row,HEAD_COLUMN,label);
 
-      label = m_heads->createLabel(p.m_word,"headsearchresults");
+      label = m_heads->createLabel(p.m_word,"headsearchlist");
       label->setAlignment(Qt::AlignCenter);
       m_heads->setCellWidget(row,ENTRY_COLUMN,label);
 

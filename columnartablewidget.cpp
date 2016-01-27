@@ -22,6 +22,8 @@ ColumnarTableWidget::ColumnarTableWidget(const QStringList & headers,QWidget * p
   horizontalHeader()->setSectionsMovable(true);
   horizontalHeader()->setSectionsClickable(true);
   verticalHeader()->setVisible(false);
+  verticalHeader()->sectionResizeMode(QHeaderView::Fixed);
+  //verticalHeader()->setDefaultSectionSize(44);
   connect(this->horizontalHeader(),SIGNAL(sectionDoubleClicked(int)),this,SLOT(onColumnDialog(int)));
 }
 ColumnarTableWidget::~ColumnarTableWidget() {
@@ -30,6 +32,10 @@ ColumnarTableWidget::~ColumnarTableWidget() {
     delete m_settings;
   }
 }
+void ColumnarTableWidget::setFixedRowHeight(int h) {
+    verticalHeader()->setDefaultSectionSize(h);
+}
+
 void ColumnarTableWidget::setKey(int key,const QString & value) {
   switch(key) {
   case DEFAULT_WIDTH : { m_defaultWidthKey = value;break; }

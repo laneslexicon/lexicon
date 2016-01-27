@@ -85,6 +85,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_rxlist->setSelectionMode(QAbstractItemView::SingleSelection);
   m_rxlist->setMarkColumn(SELECT_COLUMN);
   m_rxlist->setExportIgnore(CONTEXT_COLUMN,m_headText);
+  m_rxlist->setFixedRowHeight(40);
   m_rxlist->installEventFilter(this);
   //  m_rxlist->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_progress = new QProgressBar;
@@ -554,11 +555,11 @@ int FullSearchWidget::addRow(const QSqlRecord & record, const QString & text,int
 
   m_rxlist->setCellWidget(row,SELECT_COLUMN,new CenteredCheckBox);
 
-  label = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(p.root(),"fullsearch"));
+  label = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(p.root(),"fullsearchlist"));
   label->setAlignment(Qt::AlignCenter);
   m_rxlist->setCellWidget(row,ROOT_COLUMN,label);
 
-  label = m_rxlist->createLabel(p.head(),"fullsearch");
+  label = m_rxlist->createLabel(p.head(),"fullsearchlist");
   label->setAlignment(Qt::AlignCenter);
   m_rxlist->setCellWidget(row,HEAD_COLUMN,label);
 
@@ -588,7 +589,7 @@ int FullSearchWidget::addRow(const QSqlRecord & record, const QString & text,int
     m_rxlist->setCellWidget(row,POSITION_COLUMN,label);
   }
 
-  label = m_rxlist->createLabel(text,"fullsearch");
+  label = m_rxlist->createLabel(text,"fullsearchlist");
   if (text == m_headText) {
     label->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
   }

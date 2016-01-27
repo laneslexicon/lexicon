@@ -25,7 +25,6 @@ TabListDialog::TabListDialog(QWidget * parent)
   m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_list->setSelectionMode(QAbstractItemView::SingleSelection);
 
-
   QDialogButtonBox *   buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
@@ -65,6 +64,7 @@ void TabListDialog::loadTabs() {
   QString str;
   m_list->clearContents();
   m_list->setRowCount(0);
+  m_list->setFixedRowHeight(44);
   for(int i=0;i < tabs->count();i++) {
     row = m_list->rowCount();
     m_list->insertRow(row);
