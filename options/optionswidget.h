@@ -38,6 +38,7 @@ class OptionsWidget : public QWidget {
   virtual bool isModified() = 0;
   virtual void setupConnections();
   virtual void addButtons();
+  QStringList getChanges() const;
   QSize sizeHint() const;
   void setDebug(bool);
   void setFileName(const QString &);
@@ -69,6 +70,7 @@ class OptionsWidget : public QWidget {
   //  QSettings * m_settings;
   QString m_section;
   QString m_settingsFileName;
+  QStringList m_changes;
   QLabel * m_info;
   void notifyChange();
   bool m_debug;

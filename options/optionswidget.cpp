@@ -215,19 +215,26 @@ void OptionsWidget::setupConnections() {
  */
 bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWidget * p) {
   QLineEdit * edit = qobject_cast<QLineEdit *>(p);
+
   if (edit) {
     if (settings->value(key).toString() != edit->text()) {
+        m_changes  << QString("%1 | %2 | %3").arg(key).arg(settings->value(key).toString()).arg(edit->text());
       if (m_debug) {
-        QLOG_INFO() << "Is modified" << key << settings->value(key).toString() << edit->text();
+        QLOG_INFO() << m_changes.last();
       }
+      //        QLOG_INFO() << "Changed:" << key << settings->value(key).toString() << edit->text();
       return true;
     }
   }
   QCheckBox * box = qobject_cast<QCheckBox *>(p);
   if (box) {
     if (settings->value(key).toBool() != box->isChecked()) {
+        m_changes  << QString("%1 | %2 | %3")
+          .arg(key)
+          .arg(settings->value(key).toBool())
+          .arg((box->isChecked()));
       if (m_debug) {
-        QLOG_INFO() << "Is modified" << key << settings->value(key).toBool() << box->isChecked();
+        QLOG_INFO() << m_changes.last();
       }
       return true;
     }
@@ -235,18 +242,28 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   QSpinBox * spin = qobject_cast<QSpinBox *>(p);
   if (spin) {
     if  (settings->value(key).toInt() != spin->value()) {
+      m_changes  << QString("%1 | %2 | %3")
+        .arg(key)
+        .arg(settings->value(key).toInt())
+        .arg(spin->value());
       if (m_debug) {
-        QLOG_INFO() << "Is modified" << key << settings->value(key).toInt() << spin->value();
+        QLOG_INFO() << m_changes.last();
       }
+      //        QLOG_INFO() << "Is modified" << key << settings->value(key).toInt() << spin->value();
       return true;
     }
   }
   QDoubleSpinBox * dspin = qobject_cast<QDoubleSpinBox *>(p);
   if (dspin) {
     if (settings->value(key).toDouble() != dspin->value()) {
+      m_changes  << QString("%1 | %2 | %3")
+        .arg(key)
+        .arg(settings->value(key).toDouble())
+        .arg(dspin->value());
       if (m_debug) {
-        QLOG_INFO() << "Is modified" << key << settings->value(key).toDouble() << dspin->value();
+        QLOG_INFO() << m_changes.last();
       }
+      //        QLOG_INFO() << "Is modified" << key << settings->value(key).toDouble() << dspin->value();
       return true;
     }
   }
@@ -257,18 +274,28 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
     k1.remove(QChar(' '));
     k2.remove(QChar(' '));
     if  (k1  != k2 ) {
+      m_changes  << QString("%1 | %2 | %3")
+        .arg(key)
+        .arg(k1)
+        .arg(k2);
       if (m_debug) {
-        QLOG_INFO() << "Is modified" << key << k1 << k2;
+        QLOG_INFO() << m_changes.last();
       }
+      //        QLOG_INFO() << "Is modified" << key << k1 << k2;
       return true;
     }
   }
   QDateTimeEdit * datetimeedit = qobject_cast<QDateTimeEdit *>(p);
   if (datetimeedit) {
     if  (settings->value(key).toString() != datetimeedit->dateTime().toString(Qt::ISODate)) {
+      m_changes  << QString("%1 | %2 | %3")
+        .arg(key)
+        .arg(settings->value(key).toString())
+        .arg(datetimeedit->dateTime().toString(Qt::ISODate));
       if (m_debug) {
-        QLOG_INFO() << "Is modified" << key << settings->value(key).toString() << datetimeedit->dateTime().toString(Qt::ISODate);
+        QLOG_INFO() << m_changes.last();
       }
+      //        QLOG_INFO() << "Is modified" << key << settings->value(key).toString() << datetimeedit->dateTime().toString(Qt::ISODate);
       return true;
 
     }
@@ -277,6 +304,12 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   if (combo) {
     QVariant v = combo->currentData();
     if (settings->value(key) != v) {
+        m_changes  << QString("%1 | %2 | %3")
+          .arg(key)
+          .arg(settings->value(key).toString())
+          .arg(v.toString());
+        QLOG_INFO() << m_changes.last();
+
       return true;
     }
   }
@@ -324,3 +357,6 @@ void OptionsWidget::setControlSize(QWidget * widget,int size) {
     widget->setMaximumWidth(size);
 #endif
  }
+QStringList OptionsWidget::getChanges() const {
+  return m_changes;
+}

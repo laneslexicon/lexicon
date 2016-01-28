@@ -316,6 +316,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
  */
 bool SystemOptions::isModified()  {
   m_dirty = false;
+  m_changes.clear();
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

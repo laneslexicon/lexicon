@@ -268,6 +268,8 @@ void IconOptions::writeSettings(const QString & fileName) {
  */
 bool IconOptions::isModified()  {
   m_dirty = false;
+  m_changes.clear();
+
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
 

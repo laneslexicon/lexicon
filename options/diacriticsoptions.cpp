@@ -176,6 +176,8 @@ bool DiacriticsOptions::isModified()  {
   QList<int> saved_cp;
   QList<int> selected_cp;
   QString hex;
+  m_changes.clear();
+
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
