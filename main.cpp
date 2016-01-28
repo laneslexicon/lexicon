@@ -196,12 +196,14 @@ int main(int argc, char *argv[])
     mansur.startLogging();
     ///
     /// FreeBSD has "Windows" and "Fusion".
-    /// OSX has ?
+    /// OSX has Windows, Fusion, Macintosh
     /// Linux has ?
     /// Windows has Windows,WindowsXP,WindowsVista,Fusion
     ///
     /// on Windows Fusion looks at lot better than the others
     ///
+#ifndef __APPLE__
+    
     SETTINGS
     settings.beginGroup("System");
     QString style = settings.value("Qt style").toString();
@@ -221,6 +223,7 @@ int main(int argc, char *argv[])
       QLOG_DEBUG() << QString("Setting Qt style: %1").arg(style);
       QApplication::setStyle(QStyleFactory::create(style));
     }
+#endif
 
     /// we should be in the Resources directory
     mansur.scanForFonts(QDir("fonts"));
