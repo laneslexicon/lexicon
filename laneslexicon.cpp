@@ -322,9 +322,6 @@ void LanesLexicon::cleanup() {
     delete m_history;
   }
 
-  while(m_tabs->count() > 0) {
-    this->onCloseTab(0);
-  }
   if (m_editView != NULL){
     delete m_editView;
     m_editView = 0;
@@ -371,6 +368,9 @@ void LanesLexicon::cleanup() {
         /// has deleteOnClose
       d->onClose();
     }
+  }
+  while(m_tabs->count() > 0) {
+    this->onCloseTab(0);
   }
   if (m_db.isOpen()) {
     m_db.close();
