@@ -14,10 +14,13 @@
 #include "spanningoptions.h"
 #include "QsLog.h"
 #include "definedsettings.h"
+#include "changesdialog.h"
 #ifndef STANDALONE
 #include "application.h"
 #include "externs.h"
 #endif
+
+
 /**
  * For use in the standalone app:
  *   read config.ini to get the current theme
@@ -60,7 +63,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   resize(settings.value("Size", QSize(600, 400)).toSize());
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
   bool writeTest = settings.value("Create",false).toBool();
-  m_showWarning = settings.value(SID_OPTIONS_CLOSE,true).toBool();
+  //  m_showWarning = settings.value(SID_OPTIONS_CLOSE,true).toBool();
   if (settings.value("System",true).toBool()) {
     SystemOptions * systems = new SystemOptions(useTheme,this);
     m_tabs->addTab(systems,tr("System"));
@@ -199,28 +202,91 @@ OptionsDialog::~OptionsDialog() {
     QFile::remove(m_tempFileName);
   }
 }
+/**
+ * This can be called by the applicaton as part of the the shutdown procedure
+ * In that case don't offer the cancel button
+ */
 void OptionsDialog::onClose() {
-  QLOG_DEBUG() << Q_FUNC_INFO << m_hasChanges << m_showWarning << m_changed;
-  if (m_hasChanges && m_showWarning) {
-    QCheckBox * noshow = new QCheckBox(tr("Check this box to stop this dialog showing again"));
+  QLOG_DEBUG() << Q_FUNC_INFO << m_hasChanges;
+
+  SETTINGS
+  settings.beginGroup("Options");
+  QString action = settings.value(SID_OPTIONS_ALWAYS,"ask").toString();
+  QDialogButtonBox * btn = qobject_cast<QDialogButtonBox *>(sender());
+  if (m_hasChanges && (action == "ask")) {
+    bool v = false;
+    if (btn) {
+      v = true;
+    }
+    ChangesDialog * d = new ChangesDialog(v);
+    d->setChanges(this->getChanges());
+
+    d->exec();
+    int ret = d->choice();
+    v = d->always();
+    delete d;
+    switch(ret) {
+    case QDialogButtonBox::Save :{
+      // Save was clicked
+      this->saveChanges();
+      break;
+    }
+    case QDialogButtonBox::Discard :{
+      break;
+    }
+    case QDialogButtonBox::Cancel : {
+      return;
+      break;
+    }
+    }
+    ///
+    SETTINGS
+    settings.beginGroup("Options");
+    if (v) {
+        if (ret == QDialogButtonBox::Save) {
+          settings.setValue(SID_OPTIONS_ALWAYS,"save");
+        }
+        if (ret == QDialogButtonBox::Discard) {
+          settings.setValue(SID_OPTIONS_ALWAYS,"discard");
+        }
+    }
+    else {
+          settings.setValue(SID_OPTIONS_ALWAYS,"ask");
+    }
+    /*
+    QCheckBox * noshow = new QCheckBox(tr("Check this box to make your choice the default and not show this dialog again"));
     QMessageBox msgBox;
     msgBox.setCheckBox(noshow);
     msgBox.setWindowTitle("Preferences");
     msgBox.setText("Some settings have been modified.");
     msgBox.setInformativeText("Do you want to save your changes?");
-    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    if (btn) {
+      msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    }
+    else {
+      msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
+    }
     msgBox.setDefaultButton(QMessageBox::Save);
     msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-    int ret = msgBox.exec();
-    m_showWarning = ! noshow->isChecked();
-    if (ret == QMessageBox::Save) {
+    ret = msgBox.exec();
+
+
+     m_showWarning = ! noshow->isChecked();
+
+    switch(ret) {
+    case QMessageBox::Save :{
       // Save was clicked
       this->saveChanges();
+      break;
     }
-
-    if (ret == QMessageBox::Cancel) {
+    case QMessageBox::Discard :{
+      break;
+    }
+    case QMessageBox::Cancel : {
       return;
     }
+    }
+    */
   }
 
   emit(hasChanges(m_changed));
@@ -238,7 +304,7 @@ void OptionsDialog::writeSettings() {
   settings.beginGroup("Options");
   settings.setValue("Size", size());
   settings.setValue("Pos", pos());
-  settings.setValue(SID_OPTIONS_CLOSE,m_showWarning);
+  //  settings.setValue(SID_OPTIONS_CLOSE,m_showWarning);
   settings.endGroup();
 }
 void OptionsDialog::enableButtons() {
@@ -247,9 +313,9 @@ void OptionsDialog::enableButtons() {
   for(int i=0;i < m_tabs->count();i++) {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab) {
-      tab->setDebug(m_debug);
+      //      tab->setDebug(m_debug);
       if (tab->isModified()) {
-        QLOG_DEBUG() << Q_FUNC_INFO << QString("Modified tab: %1, %2").arg(i).arg(m_tabs->tabText(i));
+        QLOG_INFO() << Q_FUNC_INFO << QString("Modified tab: %1, %2").arg(i).arg(m_tabs->tabText(i));
         m_hasChanges = v = true;
       }
     }
@@ -280,7 +346,6 @@ void OptionsDialog::saveChanges() {
       tab->blockSignals(false);
     }
   }
-
   m_hasChanges = false;
   this->accept();
 }
@@ -347,4 +412,18 @@ void OptionsDialog::setApplyReset(bool v) {
 */
 bool OptionsDialog::isModified() const {
   return m_hasChanges;
+}
+QStringList OptionsDialog::getChanges() const {
+  QStringList changes;
+  for(int i=0;i < m_tabs->count();i++) {
+    OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
+    if (tab) {
+      //      tab->setDebug(m_debug);
+      if (tab->isModified()) {
+        changes << m_tabs->tabText(i);
+        changes << tab->getChanges();
+      }
+    }
+  }
+  return changes;
 }

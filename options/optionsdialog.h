@@ -6,8 +6,8 @@
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
 #include <QPushButton>
-//class RootsOptions;
-
+#include <QCheckBox>
+#include <QTableWidget>
 class OptionsDialog : public QDialog {
   Q_OBJECT
 
@@ -16,6 +16,7 @@ class OptionsDialog : public QDialog {
   OptionsDialog(const QString & theme,QWidget * parent = 0);
   ~OptionsDialog();
   bool isModified() const;
+  QStringList getChanges() const;
   public slots:
     void valueChanged(bool);
     void saveChanges();
@@ -32,7 +33,6 @@ class OptionsDialog : public QDialog {
     QString m_theme;
     bool m_hasChanges;
     bool m_changed;
-    bool m_showWarning;
     bool m_debug;
     QString m_tempFileName;
   signals:

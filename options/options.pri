@@ -14,7 +14,8 @@ SOURCES += $$PWD/optionswidget.cpp \
            $$PWD/logoptions.cpp \
            $$PWD/historyoptions.cpp \
            $$PWD/iconoptions.cpp \
-           $$PWD/spanningoptions.cpp
+           $$PWD/spanningoptions.cpp \
+           $$PWD/changesdialog.cpp
 
 
 HEADERS += $$PWD/optionswidget.h \
@@ -32,4 +33,5 @@ HEADERS += $$PWD/optionswidget.h \
            $$PWD/logoptions.h \
            $$PWD/historyoptions.h \
            $$PWD/iconoptions.h \
-           $$PWD/spanningoptions.h
+           $$PWD/spanningoptions.h \
+           $$PWD/changesdialog.h
