@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QTableWidget>
+#include <QStyleFactory>
 class OptionsDialog : public QDialog {
   Q_OBJECT
 
