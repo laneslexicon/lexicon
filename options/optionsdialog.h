@@ -32,7 +32,9 @@ class OptionsDialog : public QDialog {
     QDialogButtonBox * m_buttons;
     QTabWidget * m_tabs;
     QString m_theme;
+    int m_action;
     bool m_hasChanges;
+    bool m_showWarning;
     bool m_changed;
     bool m_debug;
     QString m_tempFileName;

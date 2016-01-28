@@ -33,7 +33,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   QString useTheme = theme;
   setAttribute(Qt::WA_DeleteOnClose);
   setStyle(QStyleFactory::create("Fusion"));
-    
+
   setWindowTitle(QString("Edit Theme:%1").arg(theme));
   setObjectName("optionsdialog");
   QVBoxLayout * vlayout = new QVBoxLayout;
@@ -56,6 +56,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   QString testFileName(".vanilla.ini");
   settings.setIniCodec("UTF-8");
   settings.beginGroup("System");
+  m_showWarning = settings.value(SID_SYSTEM_OPTIONS_CLOSE,true).toBool();
   m_debug = settings.value(SID_SYSTEM_DEBUG,false).toBool();
   settings.endGroup();
   settings.beginGroup("Options");
@@ -63,8 +64,17 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   //  resize(QSize(600, 400));
   resize(settings.value("Size", QSize(600, 400)).toSize());
   move(settings.value("Pos", QPoint(200, 200)).toPoint());
+
+  QString str = settings.value(SID_OPTIONS_ALWAYS,"discard").toString();
+  if (str == "discard") {
+    m_action = QDialogButtonBox::Discard;
+  }
+  else {
+    m_action = QDialogButtonBox::Save;
+  }
+
   bool writeTest = settings.value("Create",false).toBool();
-  //  m_showWarning = settings.value(SID_OPTIONS_CLOSE,true).toBool();
+
   if (settings.value("System",true).toBool()) {
     SystemOptions * systems = new SystemOptions(useTheme,this);
     m_tabs->addTab(systems,tr("System"));
@@ -208,24 +218,29 @@ OptionsDialog::~OptionsDialog() {
  * In that case don't offer the cancel button
  */
 void OptionsDialog::onClose() {
-  QLOG_DEBUG() << Q_FUNC_INFO << m_hasChanges;
+  QLOG_DEBUG() << Q_FUNC_INFO << m_hasChanges << m_showWarning;;
 
   SETTINGS
   settings.beginGroup("Options");
-  QString action = settings.value(SID_OPTIONS_ALWAYS,"ask").toString();
   QDialogButtonBox * btn = qobject_cast<QDialogButtonBox *>(sender());
-  if (m_hasChanges && (action == "ask")) {
+  if (m_hasChanges) {
+    int ret;
     bool v = false;
-    if (btn) {
-      v = true;
+    if (m_showWarning) {
+      v = false;
+      if (btn) {
+        v = true;
+      }
+      ChangesDialog * d = new ChangesDialog(v);
+      d->setChanges(this->getChanges());
+      d->exec();
+      ret = d->choice();
+      v = d->always();
+      delete d;
     }
-    ChangesDialog * d = new ChangesDialog(v);
-    d->setChanges(this->getChanges());
-
-    d->exec();
-    int ret = d->choice();
-    v = d->always();
-    delete d;
+    else {
+      ret = m_action;
+    }
     switch(ret) {
     case QDialogButtonBox::Save :{
       // Save was clicked
@@ -242,18 +257,21 @@ void OptionsDialog::onClose() {
     }
     ///
     SETTINGS
-    settings.beginGroup("Options");
     if (v) {
-        if (ret == QDialogButtonBox::Save) {
-          settings.setValue(SID_OPTIONS_ALWAYS,"save");
-        }
-        if (ret == QDialogButtonBox::Discard) {
-          settings.setValue(SID_OPTIONS_ALWAYS,"discard");
-        }
+      settings.beginGroup("System");
+      settings.setValue(SID_SYSTEM_OPTIONS_CLOSE,false);
+      settings.endGroup();
+      settings.beginGroup("Options");
+      m_showWarning = false;
+      if (ret == QDialogButtonBox::Save) {
+        settings.setValue(SID_OPTIONS_ALWAYS,"save");
+      }
+      if (ret == QDialogButtonBox::Discard) {
+        settings.setValue(SID_OPTIONS_ALWAYS,"discard");
+      }
+      settings.sync();
     }
-    else {
-          settings.setValue(SID_OPTIONS_ALWAYS,"ask");
-    }
+
     /*
     QCheckBox * noshow = new QCheckBox(tr("Check this box to make your choice the default and not show this dialog again"));
     QMessageBox msgBox;

@@ -66,7 +66,8 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   m_useNotes = new QCheckBox;
 
   m_notesDb = new QLineEdit;
-  QHBoxLayout * noteslayout = new QHBoxLayout;
+  m_optionsWarning  = new QCheckBox;
+QHBoxLayout * noteslayout = new QHBoxLayout;
   QPushButton * notesbutton = new QPushButton(tr("..."));
   noteslayout->addWidget(m_notesDb);
   noteslayout->addWidget(notesbutton);
@@ -122,6 +123,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   optionlayout->addRow(tr("Save settings"),m_saveSettings);
   optionlayout->addRow(tr("Run date"),m_runDate);
   optionlayout->addRow(tr("Show interface warning"),m_showInterfaceWarning);
+  optionlayout->addRow(tr("Show preferences close warning"),m_optionsWarning);
   optionlayout->addRow(tr("Message duration (msecs)"),m_interval);
   optionlayout->addRow(tr("Toolbar text"),m_toolbarText);
   if (m_allowNavMode) {
@@ -215,7 +217,7 @@ void SystemOptions::readSettings() {
 
   m_title->setText(settings.value(SID_SYSTEM_TITLE,"Lane's Lexicon").toString());
   m_toolbarText->setChecked(settings.value(SID_SYSTEM_TOOLBAR_TEXT,true).toBool());
-
+  m_optionsWarning->setChecked(settings.value(SID_SYSTEM_OPTIONS_CLOSE,true).toBool());
   settings.endGroup();
   settings.beginGroup("Notes");
   //  m_useNotes->setChecked(settings.value(SID_NOTES_ENABLED,false).toBool());
@@ -277,6 +279,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_SYSTEM_TOOLBAR_TEXT,m_toolbarText->isChecked());
   settings.setValue(SID_SYSTEM_APPEND_NEW_TABS,m_appendNewTab->isChecked());
   settings.setValue(SID_SYSTEM_ALLOW_DUPLICATES,m_allowDuplicates->isChecked());
+  settings.setValue(SID_SYSTEM_OPTIONS_CLOSE,m_optionsWarning->isChecked());
   settings.endGroup();
   settings.beginGroup("Notes");
   //  settings.setValue(SID_NOTES_ENABLED,m_useNotes->isChecked());
@@ -381,6 +384,9 @@ bool SystemOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_SYSTEM_TOOLBAR_TEXT,m_toolbarText)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_OPTIONS_CLOSE,m_optionsWarning)) {
     m_dirty = true;
   }
 

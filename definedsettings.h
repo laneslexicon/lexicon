@@ -298,7 +298,7 @@ They should not be translated.
 #define SID_SYSTEM_SIZE                        "Size"
 #define SID_SYSTEM_POS                         "Pos"
 #define SID_SYSTEM_STATE                       "State"
-
+#define SID_SYSTEM_OPTIONS_CLOSE "Options close warning"
 #define SID_SYSTEM_OPEN_LINK                   "Open links in current tab"
 #define SID_SYSTEM_ACTIVATE_LINK               "Always Make link active"
 
@@ -397,7 +397,7 @@ They should not be translated.
 
 
 //#define SID_NOTES
-#define SID_OPTIONS_CLOSE "Close warning"
+
 #define SID_OPTIONS_ALWAYS "Close behaviour"
 // pagesetdialog
 #define SID_PAGESET_MAIN_CONTEXT            "Main context"

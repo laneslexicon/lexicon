@@ -51,7 +51,7 @@ class SystemOptions : public OptionsWidget {
     QCheckBox * m_useNotes;
     QLineEdit * m_notesDb;
     QCheckBox * m_splashScreen;
-
+    QCheckBox * m_optionsWarning;
     QLineEdit * m_onlineUrl;
     QLineEdit * m_onlineCurrentPage;
     QLineEdit * m_offlineLocation;
