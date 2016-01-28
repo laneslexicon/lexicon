@@ -147,7 +147,7 @@ void HeadSearchWidget::search(const QString & searchpattern,const SearchOptions 
 
   QProgressDialog *  pd = new QProgressDialog(tr("Searching..."), tr("Cancel"), 0,48000, getApp());
 #ifdef __APPLE__
-  m_progress->setStyle(QStyleFactory::create("Fusion"));
+  pd->setStyle(QStyleFactory::create("Fusion"));
 #endif
   connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
 
