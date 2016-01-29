@@ -45,7 +45,7 @@ void OptionsWidget::onSave() {
   setButtons(false);
 }
 void OptionsWidget::onReset() {
-  readSettings();
+  readSettings(true);
   setButtons(false);
 }
 void OptionsWidget::setButtons(bool dirty) {
@@ -302,12 +302,12 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   }
   QComboBox * combo = qobject_cast<QComboBox *>(p);
   if (combo) {
-    QVariant v = combo->currentData();
+    QString v = combo->currentText();
     if (settings->value(key) != v) {
         m_changes  << QString("%1 | %2 | %3")
           .arg(key)
           .arg(settings->value(key).toString())
-          .arg(v.toString());
+          .arg(v);
         QLOG_INFO() << m_changes.last();
 
       return true;

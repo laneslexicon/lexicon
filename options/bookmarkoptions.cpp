@@ -66,7 +66,7 @@ BookmarkOptions::BookmarkOptions(const QString & theme,QWidget * parent) : Optio
   //  m_font->setMinimumWidth(VLARGE_EDIT);
 }
 
-void BookmarkOptions::readSettings() {
+void BookmarkOptions::readSettings(bool reload) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

@@ -125,7 +125,7 @@ QHBoxLayout * IconOptions::addLine(QLineEdit * edit,const QString & sid) {
   layout->addWidget(icon);
   return layout;
 }
-void IconOptions::readSettings() {
+void IconOptions::readSettings(bool reload) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
 

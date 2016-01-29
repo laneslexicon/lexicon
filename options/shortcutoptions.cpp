@@ -72,7 +72,7 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
   this->setKeySequenceEditSize(VLARGE_EDIT);
 }
 
-void ShortcutOptions::readSettings() {
+void ShortcutOptions::readSettings(bool reload) {
   QString key;
   QString value;
   QSettings settings(m_settingsFileName,QSettings::IniFormat);

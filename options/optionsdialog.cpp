@@ -34,6 +34,7 @@ OptionsDialog::OptionsDialog(const QString & theme,QWidget * parent) : QDialog(p
   setAttribute(Qt::WA_DeleteOnClose);
   setStyle(QStyleFactory::create("Fusion"));
 
+
   setWindowTitle(QString("Edit Theme:%1").arg(theme));
   setObjectName("optionsdialog");
   QVBoxLayout * vlayout = new QVBoxLayout;
@@ -221,93 +222,50 @@ void OptionsDialog::onClose() {
   QLOG_DEBUG() << Q_FUNC_INFO << m_hasChanges << m_showWarning;;
 
   SETTINGS
-  settings.beginGroup("Options");
-  QDialogButtonBox * btn = qobject_cast<QDialogButtonBox *>(sender());
-  if (m_hasChanges) {
-    int ret;
-    bool v = false;
-    if (m_showWarning) {
-      v = false;
-      if (btn) {
-        v = true;
-      }
-      ChangesDialog * d = new ChangesDialog(v);
-      d->setChanges(this->getChanges());
-      d->exec();
-      ret = d->choice();
-      v = d->always();
-      delete d;
-    }
-    else {
-      ret = m_action;
-    }
-    switch(ret) {
-    case QDialogButtonBox::Save :{
-      // Save was clicked
-      this->saveChanges();
-      break;
-    }
-    case QDialogButtonBox::Discard :{
-      break;
-    }
-    case QDialogButtonBox::Cancel : {
-      return;
-      break;
-    }
-    }
-    ///
-    SETTINGS
-    if (v) {
-      settings.beginGroup("System");
-      settings.setValue(SID_SYSTEM_OPTIONS_CLOSE,false);
-      settings.endGroup();
-      settings.beginGroup("Options");
-      m_showWarning = false;
-      if (ret == QDialogButtonBox::Save) {
-        settings.setValue(SID_OPTIONS_ALWAYS,"save");
-      }
-      if (ret == QDialogButtonBox::Discard) {
-        settings.setValue(SID_OPTIONS_ALWAYS,"discard");
-      }
-      settings.sync();
-    }
-
-    /*
-    QCheckBox * noshow = new QCheckBox(tr("Check this box to make your choice the default and not show this dialog again"));
-    QMessageBox msgBox;
-    msgBox.setCheckBox(noshow);
-    msgBox.setWindowTitle("Preferences");
-    msgBox.setText("Some settings have been modified.");
-    msgBox.setInformativeText("Do you want to save your changes?");
-    if (btn) {
-      msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-    }
-    else {
-      msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
-    }
-    msgBox.setDefaultButton(QMessageBox::Save);
-    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-    ret = msgBox.exec();
-
-
-     m_showWarning = ! noshow->isChecked();
-
-    switch(ret) {
-    case QMessageBox::Save :{
-      // Save was clicked
-      this->saveChanges();
-      break;
-    }
-    case QMessageBox::Discard :{
-      break;
-    }
-    case QMessageBox::Cancel : {
-      return;
-    }
-    }
-    */
+    QDialogButtonBox * btn = qobject_cast<QDialogButtonBox *>(sender());
+  QStringList changes = this->getChanges();
+  if (! m_hasChanges) {
+    this->reject();
+    return;
   }
-
+  int ret;
+  bool v = false;
+  if (m_showWarning) {
+    v = false;
+    if (btn) {
+      v = true;
+    }
+    ChangesDialog * d = new ChangesDialog(v);
+    d->setChanges(changes);
+    d->exec();
+    ret = d->choice();
+    v = d->always();
+    delete d;
+  }
+  else {
+    ret = m_action;
+  }
+  if (ret == QDialogButtonBox::Cancel) {
+    return;
+  }
+  if (ret == QDialogButtonBox::Save) {
+    this->saveChanges();
+  }
+  /// update permanent behaviour
+  if (v) {
+    settings.beginGroup("System");
+    settings.setValue(SID_SYSTEM_OPTIONS_CLOSE,false);
+    settings.endGroup();
+    settings.beginGroup("Options");
+    m_showWarning = false;
+    if (ret == QDialogButtonBox::Save) {
+      settings.setValue(SID_OPTIONS_ALWAYS,"save");
+    }
+    if (ret == QDialogButtonBox::Discard) {
+      settings.setValue(SID_OPTIONS_ALWAYS,"discard");
+    }
+    settings.sync();
+  }
   emit(hasChanges(m_changed));
   m_hasChanges = false;
   m_changed = false;
@@ -359,7 +317,7 @@ void OptionsDialog::saveChanges() {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab && tab->isModified()) {
       tab->blockSignals(true);
-      QLOG_DEBUG() << "Tab has changes" << i << tab->metaObject()->className();
+      //      QLOG_DEBUG() << "Tab has changes" << i << tab->metaObject()->className();
       m_changed = true;
       tab->writeSettings();
       tab->blockSignals(false);
@@ -410,7 +368,7 @@ void OptionsDialog::resetChanges() {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab) {
       tab->blockSignals(true);
-      tab->readSettings();
+      tab->readSettings(true);
 
       tab->blockSignals(false);
     }

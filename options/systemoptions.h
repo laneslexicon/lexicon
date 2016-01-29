@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QRadioButton>
+#include <QStyleFactory>
 class SystemOptions : public OptionsWidget {
   Q_OBJECT
 
@@ -12,7 +13,7 @@ class SystemOptions : public OptionsWidget {
   SystemOptions(const QString & theme,QWidget * parent = 0);
   public slots:
     void writeSettings(const QString & fileName = QString());
-    void readSettings();
+    void readSettings(bool reload = false);
     bool isModified();
     void onSetFont();
     void onSetColor();
@@ -21,6 +22,7 @@ class SystemOptions : public OptionsWidget {
     void onSetNotesDatabase();
     void onSetHistoryDatabase();
     void onOfflineLocation();
+    void onStyleChanged(const QString &);
  private:
     QCheckBox * m_contentsLinked;
     QLineEdit * m_lexicon;
@@ -36,6 +38,7 @@ class SystemOptions : public OptionsWidget {
     QCheckBox * m_restoreTabs;
     // Root mode
     QDateTimeEdit * m_runDate;
+    QComboBox * m_qtStyle;
     // Save bookmarks ?
     QCheckBox * m_saveSettings;
     QCheckBox * m_saveTabs;

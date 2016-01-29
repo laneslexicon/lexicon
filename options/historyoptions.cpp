@@ -69,7 +69,7 @@ HistoryOptions::HistoryOptions(const QString & theme,QWidget * parent) : Options
 
 }
 
-void HistoryOptions::readSettings() {
+void HistoryOptions::readSettings(bool reload) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

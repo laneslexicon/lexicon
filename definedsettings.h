@@ -301,7 +301,7 @@ They should not be translated.
 #define SID_SYSTEM_OPTIONS_CLOSE "Options close warning"
 #define SID_SYSTEM_OPEN_LINK                   "Open links in current tab"
 #define SID_SYSTEM_ACTIVATE_LINK               "Always Make link active"
-
+#define SID_SYSTEM_QT_STYLE                    "Qt style"
 #define SID_SYSTEM_EXIT                        "Exit"
 #define SID_SYSTEM_MESSAGE_TIMEOUT             "Message time"
 #define SID_SYSTEM_HELP                         "Help"
@@ -391,9 +391,15 @@ They should not be translated.
 #define SID_EXPORT_SEARCH_SAVE    "Save settings"
 #define SID_EXPORT_SEARCH_HEADERS "Headers"
 
-#define SID_ALWAYS 0
-#define SID_NEVER  1
-#define SID_PROMPT 2
+#define SID_YES "Yes"
+#define SID_NO  "No"
+#define SID_PROMPT "Prompt"
+
+
+#define SID_NAMING_NODE "Node name"
+#define SID_NAMING_WORD "Arabic word"
+#define SID_NAMING_DATE "Date/Time"
+
 
 
 //#define SID_NOTES

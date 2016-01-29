@@ -29,9 +29,10 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   // these have to be in this order for it to work
   levels << tr("Trace") << tr("Debug") << tr("Info") << tr("Warn") << tr("Error");
   levels << tr("Fatal") << tr("Off");
-  for(int i=0; i < levels.size();i++) {
-    m_level->addItem(levels[i],i);
-  }
+  //  for(int i=0; i < levels.size();i++) {
+  //    m_level->addItem(levels[i],i);
+  //  }
+  m_level->addItems(levels);
   m_archive = new QSpinBox ;
   this->setControlSize(m_archive,MEDIUM_EDIT);
   m_maxLines = new QLineEdit ;
@@ -69,17 +70,14 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   this->setComboSize(VLARGE_EDIT);
 }
 
-void LogOptions::readSettings() {
+void LogOptions::readSettings(bool reload) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
   m_file->setText(settings.value(SID_LOGGING_FILE,"log.txt").toString());
   m_maxSize->setText(settings.value(SID_LOGGING_MAXSIZE,"64000").toString());
-  /// TODO check max/min
-  int m = settings.value(SID_LOGGING_LEVEL,2).toInt();
-  int ix = m_level->findData(m);
-  m_level->setCurrentIndex(ix);
+  m_level->setCurrentText(settings.value(SID_LOGGING_LEVEL,"Info").toString());
   m_archive->setValue(settings.value(SID_LOGGING_ARCHIVES,4).toInt());
   m_maxLines->setText(settings.value(SID_LOGGING_VIEWER_MAXLINES,"100").toString());
   m_interval->setText(settings.value(SID_LOGGING_VIEWER_INTERVAL,"10000").toString());
@@ -98,8 +96,7 @@ void LogOptions::writeSettings(const QString & fileName) {
   settings.beginGroup(m_section);
   settings.setValue(SID_LOGGING_FILE,m_file->text());
   settings.setValue(SID_LOGGING_MAXSIZE,m_maxSize->text());
-  /// TODO check max/min
-  settings.setValue(SID_LOGGING_LEVEL,m_level->currentData().toInt());
+  settings.setValue(SID_LOGGING_LEVEL,m_level->currentText());//Data().toInt());
   settings.setValue(SID_LOGGING_ARCHIVES,m_archive->value());
   settings.setValue(SID_LOGGING_VIEWER_MAXLINES,m_maxLines->text());
   settings.setValue(SID_LOGGING_VIEWER_INTERVAL,m_interval->text());

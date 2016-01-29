@@ -65,7 +65,7 @@ SpanningOptions::SpanningOptions(const QString & theme,QWidget * parent) : Optio
   readSettings();
   setupConnections();
 }
-void SpanningOptions::readSettings() {
+void SpanningOptions::readSettings(bool reload) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

@@ -202,11 +202,11 @@ int main(int argc, char *argv[])
     ///
     /// on Windows Fusion looks at lot better than the others
     ///
-#ifndef __APPLE__
-    
+    //#ifndef __APPLE__
+
     SETTINGS
     settings.beginGroup("System");
-    QString style = settings.value("Qt style").toString();
+    QString style = settings.value(SID_SYSTEM_QT_STYLE).toString();
     QLOG_DEBUG() << QString("Got Setting Qt style:%1").arg(style);
     QStringList styles = QStyleFactory::keys();
     if (style.isEmpty() || ! styles.contains(style)) {
@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
       QLOG_DEBUG() << QString("Setting Qt style: %1").arg(style);
       QApplication::setStyle(QStyleFactory::create(style));
     }
-#endif
+    //#endif
 
     /// we should be in the Resources directory
     mansur.scanForFonts(QDir("fonts"));

@@ -51,7 +51,7 @@ class OptionsWidget : public QWidget {
   public slots:
     virtual void onSave();
     virtual void onReset();
-    virtual void readSettings() = 0;
+    virtual void readSettings(bool reload = false) = 0;
     virtual void stateChanged(int);
     virtual void writeSettings(const QString & fileName = QString()) = 0;
     virtual void setButtons(bool);

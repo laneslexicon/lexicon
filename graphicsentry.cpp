@@ -2102,7 +2102,7 @@ QString GraphicsEntry::getOutputFilename(const QString & pdfdir,bool autoname,co
   if (autoname == false) {
     return QFileDialog::getSaveFileName(this,tr("PDF name"),pdfdir,tr("PDF (*.pdf)"));
   }
-  if (method == "node") {
+  if (method == SID_NAMING_NODE) {
     if (!node.isEmpty()) {
       base = node;
     }
@@ -2124,7 +2124,7 @@ QString GraphicsEntry::getOutputFilename(const QString & pdfdir,bool autoname,co
       base = QString("%1-%2").arg(first).arg(last);
     }
   }
-  else if (method == "arabic") {
+  else if (method == SID_NAMING_WORD) {
     base = m_place.getRoot();
   }
   else {
@@ -2275,20 +2275,20 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
   doc.setDefaultTextOption(m_textOption);
   settings.beginGroup("Entry");
 
-  int printNotes = settings.value(SID_ENTRY_PRINT_NOTES,-1).toInt();
-  int printNodes = settings.value(SID_ENTRY_PRINT_NODES,-1).toInt();
-  int printInfo = settings.value(SID_ENTRY_PRINT_INFO,-1).toInt();
+  QString printNotes = settings.value(SID_ENTRY_PRINT_NOTES).toString();
+  QString printNodes = settings.value(SID_ENTRY_PRINT_NODES).toString();
+  QString printInfo = settings.value(SID_ENTRY_PRINT_INFO).toString();
   settings.endGroup();
   bool pNotes = false;
   bool pNodes = false;
   bool pInfo = false;
-  if (printNotes == SID_ALWAYS) {
+  if (printNotes == SID_YES) {
     pNotes = true;
   }
-  if (printNodes == SID_ALWAYS) {
+  if (printNodes == SID_YES) {
     pNodes = true;
   }
-  if (printInfo == SID_ALWAYS) {
+  if (printInfo == SID_YES) {
     pInfo = true;
   }
   if ((printInfo == SID_PROMPT) ||
@@ -2300,13 +2300,13 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
     QCheckBox * t = new QCheckBox(tr("Print node summary"));
     QCheckBox * i = new QCheckBox(tr("Print system information"));
     QVBoxLayout * layout = new QVBoxLayout;
-    if (printInfo == SID_ALWAYS) {
+    if (printInfo == SID_YES) {
       i->setChecked(true);
     }
-    if (printNotes == SID_ALWAYS) {
+    if (printNotes == SID_YES) {
       n->setChecked(true);
     }
-    if (printNodes == SID_ALWAYS) {
+    if (printNodes == SID_YES) {
       t->setChecked(true);
     }
     layout->addWidget(n);

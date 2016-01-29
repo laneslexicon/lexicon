@@ -100,7 +100,7 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   readSettings();
   setupConnections();
 }
-void RootsOptions::readSettings() {
+void RootsOptions::readSettings(bool reload) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

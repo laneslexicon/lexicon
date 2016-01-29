@@ -10,7 +10,7 @@ class RootsOptions : public OptionsWidget {
   RootsOptions(const QString & theme,QWidget * parent = 0);
   public slots:
     void writeSettings(const QString & fileName = QString());
-    void readSettings();
+    void readSettings(bool reload = false);
     bool isModified();
     void onSetFont();
  private:

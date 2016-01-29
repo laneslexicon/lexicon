@@ -9,7 +9,7 @@ class ShortcutOptions : public OptionsWidget {
   ShortcutOptions(const QString & theme,QWidget * parent = 0);
   public slots:
     void writeSettings(const QString & fileName = QString());
-    void readSettings();
+    void readSettings(bool reload = false);
     bool isModified();
  private:
     QMap<QString,QString> m_values;

@@ -49,6 +49,9 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   // Save boo
   m_showInterfaceWarning = new QCheckBox;
 
+  m_qtStyle = new QComboBox;
+  m_qtStyle->addItems(QStyleFactory::keys());
+  connect(m_qtStyle,SIGNAL(currentTextChanged(const QString &)),this,SLOT(onStyleChanged(const QString &)));
   m_css = new QLineEdit;
   QHBoxLayout * csslayout = new QHBoxLayout;
   QPushButton * cssbutton = new QPushButton(tr("..."));
@@ -113,6 +116,7 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   optionlayout->addRow(tr("Title"),m_title);
   optionlayout->addRow(tr("Application stylesheet"),csslayout);
   optionlayout->addRow(tr("Theme"),m_theme);
+  optionlayout->addRow(tr("Qt style"),m_qtStyle);
   optionlayout->addRow(tr("Docked"),m_docked);
   optionlayout->addRow(tr("New tab behaviour"),tablayout);
   optionlayout->addRow(tr("Current tab"),m_focusTab);
@@ -180,7 +184,7 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   m_debug = true;
 }
 
-void SystemOptions::readSettings() {
+void SystemOptions::readSettings(bool reload) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
@@ -199,7 +203,14 @@ void SystemOptions::readSettings() {
   m_interval->setText(settings.value(SID_SYSTEM_MESSAGE_TIMEOUT,2000).toString());
   m_appendNewTab->setChecked(settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool());
   m_insertNewTab->setChecked(! m_appendNewTab->isChecked());
-
+  QString newStyle = m_qtStyle->currentText();
+  m_qtStyle->setCurrentText(settings.value(SID_SYSTEM_QT_STYLE).toString());
+  if (reload) {
+    QString oldStyle = m_qtStyle->currentText();
+    if (oldStyle != newStyle) {
+      QApplication::setStyle(QStyleFactory::create(oldStyle));
+    }
+  }
 #ifndef STANDALONE
   m_keyboard->addItems(getLexicon()->getKeyboards());
   m_keyboard->setCurrentText(getLexicon()->getDefaultKeyboard());
@@ -280,9 +291,14 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_SYSTEM_APPEND_NEW_TABS,m_appendNewTab->isChecked());
   settings.setValue(SID_SYSTEM_ALLOW_DUPLICATES,m_allowDuplicates->isChecked());
   settings.setValue(SID_SYSTEM_OPTIONS_CLOSE,m_optionsWarning->isChecked());
+  QString oldStyle = settings.value(SID_SYSTEM_QT_STYLE).toString();
+  QString newStyle = m_qtStyle->currentText();
+  settings.setValue(SID_SYSTEM_QT_STYLE,m_qtStyle->currentText());
+  if (oldStyle != newStyle) {
+    QApplication::setStyle(QStyleFactory::create(newStyle));
+  }
   settings.endGroup();
   settings.beginGroup("Notes");
-  //  settings.setValue(SID_NOTES_ENABLED,m_useNotes->isChecked());
   settings.setValue(SID_NOTES_DATABASE,m_notesDb->text());
   /*
 
@@ -387,6 +403,9 @@ bool SystemOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_SYSTEM_OPTIONS_CLOSE,m_optionsWarning)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_QT_STYLE,m_qtStyle)) {
     m_dirty = true;
   }
 
@@ -518,4 +537,8 @@ void SystemOptions::onOfflineLocation() {
     return;
   }
   m_offlineLocation->setText(dir);
+}
+void SystemOptions::onStyleChanged(const QString & style) {
+  qDebug() << Q_FUNC_INFO;
+  //  QApplication::setStyle(QStyleFactory::create(style));
 }

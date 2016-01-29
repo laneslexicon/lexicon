@@ -11,7 +11,7 @@ class DiacriticsOptions : public OptionsWidget {
   DiacriticsOptions(const QString &,QWidget * parent = 0);
   public slots:
     void writeSettings(const QString & fileName = QString());
-    void readSettings();
+    void readSettings(bool reload = false);
     bool isModified();
  private:
     QMap<int,QString> m_chars;

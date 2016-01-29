@@ -25,14 +25,16 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
   m_pdfName = new QComboBox(this);
 
-  m_namingMethods << "arabic";
-  m_namingMethods << "node";;
-  m_namingMethods << "date";
+  //  m_namingMethods << "arabic";
+  //  m_namingMethods << "node";;
+  //  m_namingMethods << "date";
 
-  m_pdfName->addItem(tr("Arabic word"),m_namingMethods[0]);
-  m_pdfName->addItem(tr("Node name"),m_namingMethods[1]);
-  m_pdfName->addItem(tr("Date/time"),m_namingMethods[2]);
+  //  m_pdfName->addItem(tr("Arabic word"),m_namingMethods[0]);
+  //  m_pdfName->addItem(tr("Node name"),m_namingMethods[1]);
+  //  m_pdfName->addItem(tr("Date/time"),m_namingMethods[2]);
 
+
+  m_pdfName->addItems(QStringList() << SID_NAMING_NODE << SID_NAMING_WORD << SID_NAMING_DATE);
   m_pdfAutoName= new QCheckBox(this);
 
   m_copyCount = new QLineEdit(this);
@@ -84,7 +86,11 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_printInfo = new QComboBox;
   m_printNodes = new QComboBox;
 
+  m_printNotes->addItems(QStringList() << "Yes" << "No" << "Prompt");
+  m_printNodes->addItems(QStringList() << "Yes" << "No" << "Prompt");
+  m_printInfo->addItems(QStringList() << "Yes" << "No" << "Prompt");
 
+  /*
   m_printNotes->addItem(tr("Always"),SID_ALWAYS);
   m_printNodes->addItem(tr("Always"),SID_ALWAYS);
   m_printInfo->addItem(tr("Always"),SID_ALWAYS);
@@ -94,7 +100,7 @@ PrintOptions::PrintOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_printNotes->addItem(tr("Prompt"),SID_PROMPT);
   m_printNodes->addItem(tr("Prompt"),SID_PROMPT);
   m_printInfo->addItem(tr("Prompt"),SID_PROMPT);
-
+  */
   QGroupBox * printbox  = new QGroupBox(tr("Supplementary information"));
   QFormLayout * printlayout = new QFormLayout;
   printlayout->addRow(tr("Print notes"),m_printNotes);
@@ -175,7 +181,7 @@ void PrintOptions::onPrinterSetup() {
   }
   delete printer;
 }
-void PrintOptions::readSettings() {
+void PrintOptions::readSettings(bool /* reload */) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
@@ -190,26 +196,28 @@ void PrintOptions::readSettings() {
   m_pdfOutput->setChecked(settings.value(SID_PRINTER_OUTPUT_PDF).toBool());
   m_pdfDirectory->setText(settings.value(SID_PRINTER_PDF_DIRECTORY,QDir::tempPath()).toString());
   m_pdfAutoName->setChecked(settings.value(SID_PRINTER_AUTONAME_PDF).toBool());
+  /*
   int ix = m_pdfName->findData(settings.value(SID_PRINTER_AUTONAME_METHOD).toString());
   if (ix == -1 ) {
     ix = 1;
   }
   m_pdfName->setCurrentIndex(ix);
-
+  */
+  m_pdfName->setCurrentText(settings.value(SID_PRINTER_AUTONAME_METHOD).toString());
   settings.endGroup();
   settings.beginGroup("Entry");
-  int x;
-  x = settings.value(SID_ENTRY_PRINT_NOTES,SID_ALWAYS).toInt();
-  ix = m_printNotes->findData(x);
-  m_printNotes->setCurrentIndex(ix);
+  //  int x;
+  //  x = settings.value(SID_ENTRY_PRINT_NOTES,SID_ALWAYS).toInt();
+  //  ix = m_printNotes->findData(x);
+  m_printNotes->setCurrentText(settings.value(SID_ENTRY_PRINT_NOTES,SID_YES).toString());
 
-  x = settings.value(SID_ENTRY_PRINT_NODES,SID_ALWAYS).toInt();
-  ix = m_printNodes->findData(x);
-  m_printNodes->setCurrentIndex(ix);
+  //  x = settings.value(SID_ENTRY_PRINT_NODES,SID_ALWAYS).toInt();
+  //  ix = m_printNodes->findData(x);
+  m_printNodes->setCurrentText(settings.value(SID_ENTRY_PRINT_NODES,SID_YES).toString());
 
-  x = settings.value(SID_ENTRY_PRINT_INFO,SID_ALWAYS).toInt();
-  ix = m_printInfo->findData(x);
-  m_printInfo->setCurrentIndex(ix);
+  //  x = settings.value(SID_ENTRY_PRINT_INFO,SID_ALWAYS).toInt();
+  //  ix = m_printInfo->findData(x);
+  m_printInfo->setCurrentText(settings.value(SID_ENTRY_PRINT_INFO,SID_YES).toString());
 
   settings.endGroup();
 }
@@ -232,14 +240,14 @@ void PrintOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_PRINTER_PDF_DIRECTORY,m_pdfDirectory->text());
   settings.setValue(SID_PRINTER_AUTONAME_PDF,m_pdfAutoName->isChecked());
 
-  settings.setValue(SID_PRINTER_AUTONAME_METHOD,m_pdfName->currentData().toString());
+  settings.setValue(SID_PRINTER_AUTONAME_METHOD,m_pdfName->currentText());//.toString());
 
 
   settings.endGroup();
   settings.beginGroup("Entry");
-  settings.setValue(SID_ENTRY_PRINT_NOTES,m_printNotes->currentData());
-  settings.setValue(SID_ENTRY_PRINT_NODES,m_printNodes->currentData());
-  settings.setValue(SID_ENTRY_PRINT_INFO,m_printInfo->currentData());
+  settings.setValue(SID_ENTRY_PRINT_NOTES,m_printNotes->currentText());
+  settings.setValue(SID_ENTRY_PRINT_NODES,m_printNodes->currentText());
+  settings.setValue(SID_ENTRY_PRINT_INFO,m_printInfo->currentText());
   settings.sync();
   emit(modified(false));
 }
@@ -251,38 +259,38 @@ bool PrintOptions::isModified()  {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
-  if (m_printerName->text() != settings.value(SID_PRINTER_NAME).toString()) {
+  if (compare(&settings,SID_PRINTER_NAME,m_printerName)) {
     m_dirty = true;
   }
-  if (m_orientation->text() != settings.value(SID_PRINTER_ORIENTATION).toString()) {
+  if (compare(&settings,SID_PRINTER_ORIENTATION,m_orientation)) {
     m_dirty = true;
   };
-  if (m_resolution->text() != settings.value(SID_PRINTER_RESOLUTION).toString()) {
+  if (compare(&settings,SID_PRINTER_RESOLUTION,m_resolution)) {
     m_dirty = true;
   }
-  if (m_paperSize->text() != settings.value(SID_PRINTER_PAPER_SIZE).toString()) {
+  if (compare(&settings,SID_PRINTER_PAPER_SIZE,m_paperSize)) {
     m_dirty = true;
   }
-  if (m_copyCount->text() != settings.value(SID_PRINTER_COPIES).toString()) {
+  if (compare(&settings,SID_PRINTER_COPIES,m_copyCount)) {
     m_dirty = true;
   }
-  if (m_fullPage->isChecked() != settings.value(SID_PRINTER_FULL_PAGE).toBool()) {
+  if (compare(&settings,SID_PRINTER_FULL_PAGE,m_fullPage)) {
     m_dirty = true;
   }
-  if (m_alwaysUse->isChecked() != settings.value(SID_PRINTER_USE).toBool()) {
+  if (compare(&settings,SID_PRINTER_USE,m_alwaysUse)) {
     m_dirty = true;
   }
-  if (m_pdfOutput->isChecked() != settings.value(SID_PRINTER_OUTPUT_PDF).toBool()) {
+  if (compare(&settings,SID_PRINTER_OUTPUT_PDF,m_pdfOutput)) {
     m_dirty = true;
   }
-  if (m_pdfDirectory->text() != settings.value(SID_PRINTER_PDF_DIRECTORY).toString()) {
+  if (compare(&settings,SID_PRINTER_PDF_DIRECTORY,m_pdfDirectory)) {
     m_dirty = true;
   }
-  if (m_pdfAutoName->isChecked() != settings.value(SID_PRINTER_AUTONAME_PDF).toBool()) {
+  if (compare(&settings,SID_PRINTER_AUTONAME_PDF,m_pdfAutoName)) {
     m_dirty = true;
   }
 
-  if (m_pdfName->currentData().toString() != settings.value(SID_PRINTER_AUTONAME_METHOD).toString()) {
+  if (compare(&settings,SID_PRINTER_AUTONAME_METHOD,m_pdfName)) {
     m_dirty = true;
   }
   settings.endGroup();
