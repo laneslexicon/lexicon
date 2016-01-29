@@ -400,6 +400,7 @@ They should not be translated.
 #define SID_NAMING_WORD "Arabic word"
 #define SID_NAMING_DATE "Date/Time"
 
+#define SID_LOGGING_LEVELS "trace,debug,info,warn,error,fatal,off"
 
 
 //#define SID_NOTES

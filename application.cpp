@@ -165,23 +165,36 @@ void Lexicon::startLogging() {
   QSettings * settings = getSettings();
   settings->setIniCodec("UTF-8");
   settings->beginGroup("Logging");
-  QString logfile = settings->value(SID_LOGGING_FILE,"log.txt").toString();
-  int loglevel = settings->value(SID_LOGGING_LEVEL,2).toInt();
+  QString logfile = settings->value(SID_LOGGING_FILE,"lexiconlog.txt").toString();
+  QString strlevel = settings->value(SID_LOGGING_LEVEL,"info").toString();
   int maxsize = settings->value(SID_LOGGING_MAXSIZE,64000).toInt();
   int archiveCount = settings->value(SID_LOGGING_ARCHIVES,4).toInt();
   bool rotate = settings->value(SID_LOGGING_ROTATE,true).toBool();
+
   delete settings;
+  QStringList levels = QString(SID_LOGGING_LEVELS).split(",");
+
+  int loglevel = -1;
+
+  loglevel = levels.indexOf(strlevel);
+
   if (m_options.contains("loglevel")) {
     QString v = m_options.value("loglevel");
-    bool ok = true;
-    int x = v.toInt(&ok);
-    if (ok) {
-      loglevel = x;
+    if (v.contains(QRegExp("^[0-6]$"))) {
+      bool ok = true;
+      int x = v.toInt(&ok);
+      if (ok && (x >= 0) && (x <= 6)) {
+        loglevel = x;
+      }
+    }
+    else {
+      v = v.trimmed().toLower();
+      loglevel = levels.indexOf(v);
     }
   }
   /// we need some settings that make sense
   if (logfile.isEmpty()) {
-    logfile = "log.txt";
+    logfile = "lexiconlog.txt";
   }
   if (maxsize < 1000) {
     maxsize = 64000;

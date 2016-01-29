@@ -25,14 +25,14 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   m_fullPath->setVisible(false);
   m_maxSize->setValidator(new QIntValidator);
   m_level = new QComboBox ;
-  QStringList levels;
+  //  QStringList levels;
   // these have to be in this order for it to work
-  levels << tr("Trace") << tr("Debug") << tr("Info") << tr("Warn") << tr("Error");
-  levels << tr("Fatal") << tr("Off");
+  //  levels << tr("Trace") << tr("Debug") << tr("Info") << tr("Warn") << tr("Error");
+  //  levels << tr("Fatal") << tr("Off");
   //  for(int i=0; i < levels.size();i++) {
   //    m_level->addItem(levels[i],i);
   //  }
-  m_level->addItems(levels);
+  m_level->addItems(QString(SID_LOGGING_LEVELS).split(","));
   m_archive = new QSpinBox ;
   this->setControlSize(m_archive,MEDIUM_EDIT);
   m_maxLines = new QLineEdit ;
@@ -75,9 +75,9 @@ void LogOptions::readSettings(bool reload) {
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);
 
-  m_file->setText(settings.value(SID_LOGGING_FILE,"log.txt").toString());
+  m_file->setText(settings.value(SID_LOGGING_FILE,"lexiconlog.txt").toString());
   m_maxSize->setText(settings.value(SID_LOGGING_MAXSIZE,"64000").toString());
-  m_level->setCurrentText(settings.value(SID_LOGGING_LEVEL,"Info").toString());
+  m_level->setCurrentText(settings.value(SID_LOGGING_LEVEL,"info").toString());
   m_archive->setValue(settings.value(SID_LOGGING_ARCHIVES,4).toInt());
   m_maxLines->setText(settings.value(SID_LOGGING_VIEWER_MAXLINES,"100").toString());
   m_interval->setText(settings.value(SID_LOGGING_VIEWER_INTERVAL,"10000").toString());
