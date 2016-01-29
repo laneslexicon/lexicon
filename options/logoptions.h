@@ -16,7 +16,6 @@ class LogOptions : public OptionsWidget {
     void onSetFont();
     void onSetColor();
     void onFullPath();
-    void onCopy();
  private:
     QLineEdit * m_file;
     QLineEdit * m_maxSize;

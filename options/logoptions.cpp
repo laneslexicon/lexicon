@@ -196,40 +196,5 @@ void LogOptions::onSetColor() {
   */
 }
 void LogOptions::onFullPath() {
-  QDialog * d = new QDialog;
-
-  //  QLabel * label = new QLabel(tr("Full path"));
-  QLineEdit * edit = new QLineEdit;
-  edit->setText(getLexicon()->logFilePath());
-  edit->setReadOnly(true);
-  m_fullPath->setText(getLexicon()->logFilePath());
-  SETTINGS
-
-  settings.beginGroup("EditView");
-  QString style;
-  style = settings.value(SID_EDITVIEW_FILE_STYLESHEET,QString()).toString();
-  if (! style.isEmpty()) {
-    edit->setStyleSheet(style);
-  }
-  d->setWindowTitle(tr("Log file path"));
-  QVBoxLayout * layout = new QVBoxLayout;
-  layout->addWidget(edit);
-  QDialogButtonBox * buttons = new QDialogButtonBox(QDialogButtonBox::Close);
-  QPushButton * button = new QPushButton(tr("Copy to clipboard"));
-  connect(button,SIGNAL(clicked()),this,SLOT(onCopy()));
-  buttons->addButton(button,QDialogButtonBox::ActionRole);
-  connect(buttons,SIGNAL(rejected()),d,SLOT(reject()));
-  layout->addWidget(buttons);
-  layout->addStretch();
-  d->setLayout(layout);
-  d->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-  d->resize(400,60);
-  d->exec();
-  delete d;
-}
-void LogOptions::onCopy() {
-  QString str = m_fullPath->text();
-  m_fullPath->setSelection(0,str.length());
-  m_fullPath->copy();
-
+  getLexicon()->showPath(Lexicon::Log);
 }
