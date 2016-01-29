@@ -2070,7 +2070,7 @@ void LanesLexicon::readSettings() {
   m_linkContents = settings.value(SID_SYSTEM_CONTENTS_LINKED,false).toBool();
   m_linkAction->setChecked(m_linkContents);
 
-  m_messageInterval = settings.value(SID_SYSTEM_MESSAGE_TIMEOUT,5000).toInt();
+  m_messageInterval = settings.value(SID_SYSTEM_MESSAGE_TIMEOUT,5).toInt();
 
   v = settings.value(SID_SYSTEM_HELP,"F1").toString();
   m_helpRequested = new QShortcut(QKeySequence(v),this);
@@ -2994,7 +2994,7 @@ void LanesLexicon::movePreviousHead(const Place & p) {
 }
 void LanesLexicon::setStatus(const QString & txt) {
   QLOG_INFO() << txt.toLocal8Bit().constData();
-  statusBar()->showMessage(txt,m_messageInterval);
+  statusBar()->showMessage(txt,m_messageInterval * 1000);
 }
 /**
  * Use the spanArabic function to set the font
