@@ -88,7 +88,9 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   m_keyboard = new QComboBox;
 
   m_splashScreen = new QCheckBox;
-
+  m_splashDuration = new QLineEdit;
+  m_splashDuration->setValidator(new QIntValidator);
+  this->setControlSize(m_splashDuration,SMALL_EDIT);
   m_allowDuplicates = new QCheckBox;
   /// there are no other radiobuttons, so just make this the parent
   QHBoxLayout * tablayout = new QHBoxLayout;
@@ -128,7 +130,7 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   optionlayout->addRow(tr("Run date"),m_runDate);
   optionlayout->addRow(tr("Show interface warning"),m_showInterfaceWarning);
   optionlayout->addRow(tr("Show preferences close warning"),m_optionsWarning);
-  optionlayout->addRow(tr("Message duration (msecs)"),m_interval);
+  optionlayout->addRow(tr("Message duration (secs)"),m_interval);
   optionlayout->addRow(tr("Toolbar text"),m_toolbarText);
   if (m_allowNavMode) {
     optionlayout->addRow(tr("Nav by root"),m_rootNavigation);
@@ -140,7 +142,19 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   //  optionlayout->addRow(tr("Use notes"),m_useNotes);
 
   optionlayout->addRow(tr("Keyboard"),m_keyboard);
-  optionlayout->addRow(tr("Show splash screen"),m_splashScreen);
+
+  QHBoxLayout * splashlayout = new QHBoxLayout;
+  splashlayout->addWidget(m_splashScreen);
+  splashlayout->addSpacing(10);
+  splashlayout->addWidget(new QLabel(tr("Duration (secs)")));
+  splashlayout->addWidget(m_splashDuration);
+  splashlayout->addSpacing(10);
+  QPushButton * splashbutton = new QPushButton(tr("Show location"));
+  splashlayout->addWidget(splashbutton);
+  connect(splashbutton,SIGNAL(clicked()),this,SLOT(onShowSplash()));
+  splashlayout->addStretch();
+
+  optionlayout->addRow(tr("Show splash screen"),splashlayout);
   optionlayout->setVerticalSpacing(VERTICAL_SPACING);
   othergroup->setLayout(optionlayout);
 
@@ -201,7 +215,7 @@ void SystemOptions::readSettings(bool reload) {
   m_saveSettings->setChecked(settings.value(SID_SYSTEM_SAVE_SETTINGS,true).toBool());
   m_saveTabs->setChecked(settings.value(SID_SYSTEM_SAVE_TABS,true).toBool());
   m_rootNavigation->setChecked(settings.value(SID_SYSTEM_BY_ROOT,true).toBool());
-  m_interval->setText(settings.value(SID_SYSTEM_MESSAGE_TIMEOUT,2000).toString());
+  m_interval->setText(settings.value(SID_SYSTEM_MESSAGE_TIMEOUT,2).toString());
   m_appendNewTab->setChecked(settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool());
   m_insertNewTab->setChecked(! m_appendNewTab->isChecked());
   QString newStyle = m_qtStyle->currentText();
@@ -237,6 +251,7 @@ void SystemOptions::readSettings(bool reload) {
   settings.endGroup();
   settings.beginGroup("Splash");
   m_splashScreen->setChecked(settings.value(SID_SPLASH_ENABLED,true).toBool());
+  m_splashDuration->setText(settings.value(SID_SPLASH_DELAY,3).toString());
   settings.endGroup();
   settings.beginGroup("History");
   m_historyDb->setText(settings.value(SID_HISTORY_DATABASE,"history.sqlite").toString());
@@ -311,6 +326,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.endGroup();
   settings.beginGroup("Splash");
   settings.setValue(SID_SPLASH_ENABLED,m_splashScreen->isChecked());
+  settings.setValue(SID_SPLASH_DELAY,m_splashDuration->text());
   settings.endGroup();
   settings.beginGroup("History");
   settings.setValue(SID_HISTORY_DATABASE,m_historyDb->text());
@@ -432,6 +448,9 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SPLASH_ENABLED,m_splashScreen)) {
     m_dirty = true;
   }
+  if (compare(&settings,SID_SPLASH_DELAY,m_splashDuration)) {
+    m_dirty = true;
+  }
   settings.endGroup();
   settings.beginGroup("History");
   if (compare(&settings,SID_HISTORY_DATABASE,m_historyDb)) {
@@ -538,4 +557,7 @@ void SystemOptions::onOfflineLocation() {
     return;
   }
   m_offlineLocation->setText(dir);
+}
+void SystemOptions::onShowSplash() {
+  getLexicon()->showPath(Lexicon::Splash);
 }

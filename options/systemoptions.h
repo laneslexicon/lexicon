@@ -22,6 +22,7 @@ class SystemOptions : public OptionsWidget {
     void onSetNotesDatabase();
     void onSetHistoryDatabase();
     void onOfflineLocation();
+    void onShowSplash();
  private:
     QCheckBox * m_contentsLinked;
     QLineEdit * m_lexicon;
@@ -53,6 +54,7 @@ class SystemOptions : public OptionsWidget {
     QCheckBox * m_useNotes;
     QLineEdit * m_notesDb;
     QCheckBox * m_splashScreen;
+    QLineEdit * m_splashDuration;
     QCheckBox * m_optionsWarning;
     QLineEdit * m_onlineUrl;
     QLineEdit * m_onlineCurrentPage;
