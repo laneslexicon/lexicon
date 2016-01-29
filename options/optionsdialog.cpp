@@ -228,6 +228,11 @@ void OptionsDialog::onClose() {
     this->reject();
     return;
   }
+  if (m_debug) {
+    for(int i=0; i < changes.size();i++) {
+      QLOG_INFO() << changes[i];
+    }
+  }
   int ret;
   bool v = false;
   if (m_showWarning) {
@@ -292,7 +297,7 @@ void OptionsDialog::enableButtons() {
     if (tab) {
       //      tab->setDebug(m_debug);
       if (tab->isModified()) {
-        QLOG_INFO() << Q_FUNC_INFO << QString("Modified tab: %1, %2").arg(i).arg(m_tabs->tabText(i));
+        //        QLOG_INFO() << Q_FUNC_INFO << QString("Modified tab: %1, %2").arg(i).arg(m_tabs->tabText(i));
         m_hasChanges = v = true;
       }
     }

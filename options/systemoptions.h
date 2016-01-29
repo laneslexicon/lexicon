@@ -22,7 +22,6 @@ class SystemOptions : public OptionsWidget {
     void onSetNotesDatabase();
     void onSetHistoryDatabase();
     void onOfflineLocation();
-    void onStyleChanged(const QString &);
  private:
     QCheckBox * m_contentsLinked;
     QLineEdit * m_lexicon;

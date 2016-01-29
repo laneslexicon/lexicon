@@ -51,7 +51,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 
   m_qtStyle = new QComboBox;
   m_qtStyle->addItems(QStyleFactory::keys());
-  connect(m_qtStyle,SIGNAL(currentTextChanged(const QString &)),this,SLOT(onStyleChanged(const QString &)));
+
   m_css = new QLineEdit;
   QHBoxLayout * csslayout = new QHBoxLayout;
   QPushButton * cssbutton = new QPushButton(tr("..."));
@@ -181,7 +181,8 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   connect(m_appendNewTab,SIGNAL(toggled(bool)),this,SLOT(valueChanged(bool)));
   this->setLineEditSize(VLARGE_EDIT);
   this->setComboSize(VLARGE_EDIT);
-  m_debug = true;
+
+
 }
 
 void SystemOptions::readSettings(bool reload) {
@@ -328,7 +329,7 @@ void SystemOptions::writeSettings(const QString & fileName) {
   emit(modified(false));
 }
 /**
- * TODO not complete
+ *
  *
  *
  * @return
@@ -353,7 +354,7 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SYSTEM_DOCKED,m_docked)) {
     m_dirty = true;
   }
-  if (m_appendNewTab->isChecked() != (settings.value(SID_SYSTEM_APPEND_NEW_TABS,true).toBool())) {
+  if (compare(&settings,SID_SYSTEM_APPEND_NEW_TABS,m_appendNewTab)) {
     m_dirty = true;
   }
   //  else {
@@ -537,8 +538,4 @@ void SystemOptions::onOfflineLocation() {
     return;
   }
   m_offlineLocation->setText(dir);
-}
-void SystemOptions::onStyleChanged(const QString & style) {
-  qDebug() << Q_FUNC_INFO;
-  //  QApplication::setStyle(QStyleFactory::create(style));
 }
