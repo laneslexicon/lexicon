@@ -66,6 +66,9 @@ QString Lexicon::getResourceFilePath(int type, const QString & name) const {
   settings.beginGroup("Resources");
   QString d(".");
   switch(type) {
+  case Lexicon::Log : {
+    return logFilePath();
+  }
   case Lexicon::ThemeRoot : {
     QDir d = QDir::current();
     QString t;
@@ -1163,4 +1166,64 @@ QString Lexicon::logFilePath() const {
 Lexicon::~Lexicon() {
   qDebug() << Q_FUNC_INFO;
 
+}
+void Lexicon::showPath(Lexicon::Resource what) {
+  QFileInfo f(m_settingsDir,m_configFile);
+  QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+    QDialog * d = new QDialog;
+
+  QLineEdit * edit = new QLineEdit;
+  edit->setText(this->getResourceFilePath(what));
+  edit->setReadOnly(true);
+  edit->setObjectName("pathinfo");
+  settings.beginGroup("EditView");
+  QString style;
+  style = settings.value(SID_EDITVIEW_FILE_STYLESHEET,QString()).toString();
+  if (! style.isEmpty()) {
+    edit->setStyleSheet(style);
+  }
+  QString title;
+  switch(what) {
+  case Lexicon::Stylesheet : title = tr("Stylesheet");break;
+  case Lexicon::Image : title = tr("Image");break;
+  case Lexicon::XSLT : title = tr("XSLT");break;
+  case Lexicon::Keyboard : title = tr("Keyboard");break;
+  case Lexicon::Map : title = tr("Keymap");break;
+  case Lexicon::ThemeRoot : title = tr("Themes");break;
+  case Lexicon::Splash : title = tr("Splash Directory");break;
+  case Lexicon::Log    : title = tr("Log File");break;
+  default: break;
+  }
+  d->setWindowTitle(title);
+  QVBoxLayout * layout = new QVBoxLayout;
+  layout->addWidget(edit);
+  QDialogButtonBox * buttons = new QDialogButtonBox(QDialogButtonBox::Close);
+  QPushButton * button = new QPushButton(tr("Copy to clipboard"));
+  button->setProperty("LexiconPath",edit->text());
+  connect(button,SIGNAL(clicked()),this,SLOT(onCopy()));
+  buttons->addButton(button,QDialogButtonBox::ActionRole);
+  connect(buttons,SIGNAL(rejected()),d,SLOT(reject()));
+  layout->addWidget(buttons);
+  layout->addStretch();
+  d->setLayout(layout);
+  d->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  d->resize(400,60);
+  d->exec();
+  delete d;
+
+}
+void Lexicon::onCopy() {
+  QPushButton * button = qobject_cast<QPushButton *>(sender());
+  if (button) {
+    QDialog * d = qobject_cast<QDialog *>(button->parent()->parent());
+    if (d) {
+      QLineEdit * edit = d->findChild<QLineEdit *>("pathinfo");
+      if (edit) {
+        QString str = edit->text();
+        edit->setSelection(0,str.length());
+        edit->copy();
+      }
+    }
+  }
 }
