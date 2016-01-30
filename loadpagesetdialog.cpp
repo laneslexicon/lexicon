@@ -63,7 +63,7 @@ LoadPageSetDialog::LoadPageSetDialog(QWidget * parent) : QDialog(parent) {
 
 }
 LoadPageSetDialog::~LoadPageSetDialog() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   writeSettings();
 }
 QString LoadPageSetDialog::pageSetTitle() const {
@@ -248,7 +248,6 @@ QList<int> LoadPageSetDialog::pages() const {
   if (! q.prepare(SQL_PAGESET_DETAIL)) {
     return p;
   }
-  qDebug() << m_pagesets;
   for(int i=0;i < m_setlist->rowCount();i++) {
     QString t = m_setlist->item(i,SET_LOAD_COUNT_COLUMN)->text();
     int c = t.toInt(&ok);
@@ -274,6 +273,5 @@ QList<int> LoadPageSetDialog::pages() const {
       }
     }
   }
-  qDebug() << p.size() << "pages:" << p;
   return p;
 }

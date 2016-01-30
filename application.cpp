@@ -1179,7 +1179,7 @@ QString Lexicon::logFilePath() const {
   return m_logFilePath;
 }
 Lexicon::~Lexicon() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 
 }
 void Lexicon::showPath(Lexicon::Resource what) {

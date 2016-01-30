@@ -84,11 +84,6 @@ bool HelpView::loadHelpSystem() {
     location = m_onlineRoot;
     startPage = m_currentOnlinePage;
   }
-  /*
-  qDebug() << "Offline" << m_localSource;
-  qDebug() << "Prefix" << prefix;
-  qDebug() << "Location" << location;
-  */
   if (startPage.isEmpty() || (startPage == QUrl("about:blank"))) {
     if (m_localSource) {
       if (location.endsWith(QDir::separator())) {
@@ -109,7 +104,7 @@ bool HelpView::loadHelpSystem() {
   return true;
 }
 HelpView::~HelpView() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   writeSettings();
 }
 void HelpView::linkclick(const QUrl & url) {

@@ -1,4 +1,5 @@
 #include "changesdialog.h"
+#include "QsLog.h"
 ChangesDialog::ChangesDialog(bool cancel,QWidget * parent) : QDialog(parent) {
     QVBoxLayout * layout = new QVBoxLayout;
     setWindowTitle(tr("Save changes"));
@@ -80,22 +81,22 @@ bool ChangesDialog::always() const {
   return m_always->isChecked();
 }
 void ChangesDialog::onSave() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_ret = QDialogButtonBox::Save;
  this->close();
 }
 void ChangesDialog::onCancel() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
  m_ret = QDialogButtonBox::Cancel;
  this->close();
 }
 void ChangesDialog::onDiscard() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
  m_ret = QDialogButtonBox::Discard;
  this->close();
 }
 void ChangesDialog::onDetails(int state) {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_details->setVisible(state == Qt::Checked);
   this->adjustSize();
 }

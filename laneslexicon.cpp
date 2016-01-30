@@ -1858,14 +1858,6 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
   if ((event->type() == QEvent::Close) && ((target == m_treeDock) || (target == m_tree))) {
     m_showContentsAction->setChecked(false);
   }
-  /*
-  if (target == m_tabs) {
-    qDebug() << "tab has focus";
-  }
-  if (target == m_tabs->tabBar()) {
-    qDebug() << "tab bar has focus";
-  }
-  */
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
     QLOG_DEBUG() << Q_FUNC_INFO << keyEvent->modifiers() << keyEvent->key() << keyEvent->text();
@@ -1985,7 +1977,6 @@ void LanesLexicon::onTest() {
     }
     delete d;
   }
-  qDebug() << ">>>>>" << getLexicon()->getSelectorCss("ImLineEdit");
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");
@@ -3595,7 +3586,6 @@ int LanesLexicon::searchTabs(const QString & node,bool activate) {
     }
   }
   tabs.insert(0,ix);
-  qDebug() << Q_FUNC_INFO << tabs;
   for(int i=0;i < tabs.size();i++) {
     GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(tabs[i]));
     if (entry && entry->hasNode(node)) {
@@ -3716,7 +3706,7 @@ void LanesLexicon::showSearchNode(const QString & node,bool forceNewTab) {
     }
   }
   else {
-    qDebug() << Q_FUNC_INFO << "not found";
+
 
   }
     m_allowDuplicates = v;
@@ -4965,7 +4955,7 @@ void LanesLexicon::importXml(const QString & filename) {
   statusMessage(QString(tr("Imported %1 %2")).arg(writeCount).arg(str));
 }
 void LanesLexicon::onDuplicateTab(int index) {
-  qDebug() << Q_FUNC_INFO << index;
+  QLOG_DEBUG() << Q_FUNC_INFO << index;
   GraphicsEntry * entry;
   Place p;
   entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(index));
@@ -5058,7 +5048,7 @@ void LanesLexicon::onXrefMode() {
 }
 
 void LanesLexicon::onSavePageSet() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
 
   SavePageSetDialog *  d = new SavePageSetDialog(m_tabs);
   if (d->exec() != QDialog::Accepted) {

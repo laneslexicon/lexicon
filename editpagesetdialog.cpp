@@ -69,7 +69,7 @@ EditPageSetDialog::EditPageSetDialog(QWidget * parent) : QDialog(parent) {
   m_setlist->readConfiguration(settings);
 }
 EditPageSetDialog::~EditPageSetDialog() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   writeSettings();
 }
 void EditPageSetDialog::onItemDoubleClicked(QTableWidgetItem * item) {

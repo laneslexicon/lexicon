@@ -1649,30 +1649,6 @@ void GraphicsEntry::onWiden() {
   int step = settings.value(SID_ENTRY_WIDEN_STEP,50).toInt();
 
   this->setTextWidth(m_textWidth + step,true);
-  /*
-  QLOG_DEBUG() << Q_FUNC_INFO;
-  QGraphicsItem * item = m_scene->focusItem();
-
-  for(int i=0;i < m_items.size();i++) {
-    if (m_items[i]->hasFocus()) {
-      qDebug() << Q_FUNC_INFO << "item" << i << "has focus";
-    }
-  }
-  m_textWidth += 50;
-  for(int i=0;i < m_items.size();i++) {
-    m_items[i]->setTextWidth(m_textWidth);
-  }
-  reposition();
-  m_view->setSceneRect(m_scene->sceneRect());
-
-  if ( ! item ) {
-
-  }
-  if (item) {
-    m_view->centerOn(item);//x,pos.y());
-    item->setFocus();
-  }
-  */
 }
 void GraphicsEntry::onNarrow() {
   SETTINGS
@@ -1758,7 +1734,6 @@ bool GraphicsEntry::focusNode(const QString & node) {
     return true;
   }
   if (node == "root") {
-    qDebug() << "Root >>>>>>>>>>>>>>>>>>";
     this->setCurrentItem(m_items[0]);
     return true;
   }
@@ -2621,7 +2596,6 @@ QString GraphicsEntry::userTitle() const {
 void GraphicsEntry::checkLink(const QString link) {
   bool ok;
 
-  qDebug() << Q_FUNC_INFO << link;
   QSqlQuery query;
   if (! query.prepare(SQL_LINK_TYPE)) {
     QLOG_WARN() << QString(tr("Prepare failed for SQL_LINK_TYPE query:%1")).arg(query.lastError().text());
@@ -2641,7 +2615,6 @@ void GraphicsEntry::checkLink(const QString link) {
     int status = dlg->getStatus();
     QString tonode = dlg->getTargetNode();
     QString note = dlg->getText();
-    qDebug() << QString("Status:%1,note:%2").arg(status).arg(note);
     QSqlQuery u;
     if (u.prepare(SQL_LINK_UPDATE_STATUS)) {
       u.bindValue(0,status);

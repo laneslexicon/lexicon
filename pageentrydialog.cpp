@@ -141,7 +141,7 @@ void PageEntryDialog::done(int r) {
   QDialog::done(r);
 }
 PageEntryDialog::~PageEntryDialog() {
-  qDebug() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   writeSettings();
 }
 void PageEntryDialog::readSettings() {

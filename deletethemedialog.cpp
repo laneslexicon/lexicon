@@ -9,7 +9,7 @@ DeleteThemeDialog::DeleteThemeDialog(QWidget * parent) : QDialog(parent) {
   m_themes = new QComboBox;
   QStringList themes = getLexicon()->getThemes();
   themes.sort();
-  qDebug() << "Themes" << themes;
+
   m_themes->addItems(themes);
   m_currentTheme = getLexicon()->currentTheme();
   m_themes->setCurrentText(m_currentTheme);

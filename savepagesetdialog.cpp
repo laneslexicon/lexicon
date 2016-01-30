@@ -263,7 +263,6 @@ QList<int> SavePageSetDialog::requestedTabs() const {
   QList<int> tabs;
   for(int i=0;i < m_tablist->rowCount();i++) {
     CenteredCheckBox * b = qobject_cast<CenteredCheckBox *>(m_tablist->cellWidget(i,TAB_SAVE_COLUMN));
-    qDebug() << Q_FUNC_INFO << __LINE__ << i;
     if (b->isChecked()) {
       QLabel * label = qobject_cast<QLabel *>(m_tablist->cellWidget(i,TAB_INDEX_COLUMN));
       if (label) {
