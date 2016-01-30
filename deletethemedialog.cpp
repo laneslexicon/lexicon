@@ -9,6 +9,7 @@ DeleteThemeDialog::DeleteThemeDialog(QWidget * parent) : QDialog(parent) {
   m_themes = new QComboBox;
   QStringList themes = getLexicon()->getThemes();
   themes.sort();
+  qDebug() << "Themes" << themes;
   m_themes->addItems(themes);
   m_currentTheme = getLexicon()->currentTheme();
   m_themes->setCurrentText(m_currentTheme);
@@ -22,7 +23,8 @@ DeleteThemeDialog::DeleteThemeDialog(QWidget * parent) : QDialog(parent) {
   connect(m_themes,SIGNAL(currentIndexChanged(int)),this,SLOT(onChangeTheme(int)));
   m_themes->setCurrentText(m_currentTheme);
 
-  m_switch->removeItem(m_themes->findText(m_currentTheme));
+  m_themes->removeItem(m_themes->findText(m_currentTheme));
+  //  m_switch->removeItem(m_themes->findText(m_currentTheme));
   QFormLayout * form = new QFormLayout;
   form->addRow(tr("Delete theme"),m_themes);
   form->addRow(tr("New theme"),m_switch);
@@ -33,7 +35,7 @@ DeleteThemeDialog::DeleteThemeDialog(QWidget * parent) : QDialog(parent) {
   connect(btns,SIGNAL(accepted()),this,SLOT(accept()));
   connect(btns,SIGNAL(rejected()),this,SLOT(reject()));
 
-  layout->addWidget(new QLabel(QString(tr("The current theme is:%1")).arg(m_currentTheme)));
+  layout->addWidget(new QLabel(QString(tr("The current theme is \"%1\" and cannot be deleted.")).arg(m_currentTheme)));
   layout->addLayout(form);
   layout->addWidget(btns);
   //  layout->addStretch();
@@ -50,6 +52,8 @@ void DeleteThemeDialog::onChangeTheme(int index) {
       m_switch->addItem(m_themes->itemText(i));
     }
   }
+  m_switch->addItem(m_currentTheme);
+  m_switch->setCurrentText(m_currentTheme);
 }
 QPair<QString,QString> DeleteThemeDialog::getThemes() {
   return qMakePair(m_themes->currentText(),m_switch->currentText());
