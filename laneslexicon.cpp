@@ -98,8 +98,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   connect(m_tabs,SIGNAL(closeThisTab(int)),this,SLOT(onCloseTab(int)));
   connect(m_tabs,SIGNAL(duplicateTab(int)),this,SLOT(onDuplicateTab(int)));
   connect(m_tabs,SIGNAL(savePageSet()),this,SLOT(onSavePageSet()));
-  /// at the end of the history, but we should be able to restore from settings
-  /// TODO would we want restore our current position in history?
+
   m_history = new HistoryMaster(m_historyDbName);
   if ( ! m_history->isOk()) {
     QLOG_WARN() << "History is not available";
@@ -830,7 +829,7 @@ void LanesLexicon::loadStyleSheet() {
     if (errors.size() >= 2) {
 
       msg = QString(tr("<p>Cannot find file: %1</p> \
-                        <p>Directory is:%2</p> \
+                        <p>Directory is: %2</p> \
                         <p>Please review Preferences -> Layout</p>")).arg(errors[2]).arg(errors[1]);
     }
     else {
@@ -2722,7 +2721,7 @@ void LanesLexicon::bookmarkShortcut(const QString & k) {
     id = rx.cap(2);
   }
   else {
-    setStatus(QString(tr("Unknown bookmark shortcut activated:%1")).arg(key));
+    setStatus(QString(tr("Unknown bookmark shortcut activated: %1")).arg(key));
     return;
   }
   if (v == "jump") {
@@ -2956,7 +2955,7 @@ void LanesLexicon::bookmarkRebuildMenu() {
 void LanesLexicon::bookmarkAdd(const QString & id,const Place & p) {
   m_bookmarks.insert(id,p);
   addBookmarkMenuItem(id);
-  setStatus(QString(tr("Added bookmark:%1")).arg(id));
+  setStatus(QString(tr("Added bookmark: %1")).arg(id));
 }
 /**
  * moveNext/movePrevious are connected to GraphicsEntry 'next/prev' signal
@@ -3200,7 +3199,7 @@ void LanesLexicon::searchForPage() {
 
   QSqlQuery q(m_db);
   if (! q.prepare(sql)) {
-    QLOG_WARN() << QString(tr("Error preparing page search SQL :%1")).arg(sql);
+    QLOG_WARN() << QString(tr("Error preparing page search SQL : %1")).arg(sql);
     QLOG_WARN() << q.lastError().text();
     viewLogsMessage();
     return;
@@ -3268,7 +3267,7 @@ void LanesLexicon::searchForRoot() {
         msgBox.setObjectName("rootnotfound");
         msgBox.setTextFormat(Qt::RichText);
         QString html = (qobject_cast<Lexicon *>(qApp))->spanArabic(t,"rootnotfound");
-        msgBox.setText(QString(tr("Root not found:%1")).arg(html));
+        msgBox.setText(QString(tr("Root not found: %1")).arg(html));
         msgBox.exec();
       }
       else {
@@ -3934,7 +3933,7 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
   QDir d(imgdir);
   QFileInfo fi(d,iconfile);
   if (! fi.exists()) {
-    QLOG_WARN() << QString(tr("Icon not found:%1")).arg(iconfile);
+    QLOG_WARN() << QString(tr("Icon not found: %1")).arg(iconfile);
     return;
   }
   QIcon icon(fi.absoluteFilePath());
@@ -4922,7 +4921,7 @@ void LanesLexicon::importXml(const QString & filename) {
   QString errorStr;
   QFile file(filename);
   if (!file.open(QFile::ReadOnly | QFile::Text)) {
-    QLOG_WARN() << QString("Cannot open XML file:%1").arg(filename);
+    QLOG_WARN() << QString("Cannot open XML file: %1").arg(filename);
     return;
   }
   if (!doc.setContent(&file,false,&errorStr,&errorLine,&errorColumn)) {
@@ -4931,7 +4930,7 @@ void LanesLexicon::importXml(const QString & filename) {
   }
   QSqlQuery q;
   if (!q.prepare(SQL_UPDATE_ENTRY_XML)) {
-    QLOG_WARN() << QString(tr("SQL prepare failed for update entry xml:%1")).arg(q.lastError().text());
+    QLOG_WARN() << QString(tr("SQL prepare failed for update entry xml: %1")).arg(q.lastError().text());
     return;
   }
   int writeCount = 0;
@@ -4948,7 +4947,7 @@ void LanesLexicon::importXml(const QString & filename) {
         q.bindValue(0,xml);
         q.bindValue(1,node);
         if (! q.exec()) {
-          QLOG_WARN() << QString(tr("Exec failed for SQL_LINK_UPDATE_STATSU query:%1")).arg(q.lastError().text());
+          QLOG_WARN() << QString(tr("Exec failed for SQL_LINK_UPDATE_STATSU query: %1")).arg(q.lastError().text());
         }
         else {
           writeCount++;
@@ -5078,12 +5077,12 @@ void LanesLexicon::onSavePageSet() {
   }
   QSqlQuery q(QSqlDatabase::database("notesdb"));
   if (! q.prepare(SQL_PAGESET_ADD_HEADER)) {
-    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_ADD_HEADER query:%1")).arg(q.lastError().text());
+    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_ADD_HEADER query: %1")).arg(q.lastError().text());
     return;
   }
   QSqlQuery p(QSqlDatabase::database("notesdb"));
   if (! p.prepare(SQL_PAGESET_ADD_PAGE)) {
-    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_ADD_PAGE query:%1")).arg(p.lastError().text());
+    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_ADD_PAGE query: %1")).arg(p.lastError().text());
     return;
   }
 
@@ -5092,12 +5091,12 @@ void LanesLexicon::onSavePageSet() {
   q.bindValue(0,title);
   q.bindValue(1,QDateTime::currentDateTime().toString());
   if (! q.exec()) {
-    QLOG_WARN() << QString(tr("Exec failed for SQL_PAGESET_ADD_HEADER query:%1")).arg(q.lastError().text());
+    QLOG_WARN() << QString(tr("Exec failed for SQL_PAGESET_ADD_HEADER query: %1")).arg(q.lastError().text());
     return;
   }
   QVariant v = q.lastInsertId().toInt();
   if (! v.isValid()) {
-    QLOG_WARN() << QString(tr("No valid id return from pageset insert:%1")).arg(q.lastError().text());
+    QLOG_WARN() << QString(tr("No valid id return from pageset insert: %1")).arg(q.lastError().text());
     return;
   }
   int id = v.toInt();
@@ -5124,7 +5123,7 @@ void LanesLexicon::onSavePageSet() {
       p.bindValue(2,data);
       p.bindValue(3,ix);
       if (!p.exec()) {
-        QLOG_WARN() << QString(tr("Exec failed for SQL_PAGESET_ADD_PAGE query:%1")).arg(p.lastError().text());
+        QLOG_WARN() << QString(tr("Exec failed for SQL_PAGESET_ADD_PAGE query: %1")).arg(p.lastError().text());
       }
     }
   }
@@ -5154,7 +5153,7 @@ void LanesLexicon::onLoadPageSet() {
   }
   QSqlQuery q(QSqlDatabase::database("notesdb"));
   if (! q.prepare(SQL_PAGESET_DETAIL_BY_ID)) {
-    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_DETAIL query:%1")).arg(q.lastError().text());
+    QLOG_WARN() << QString(tr("Prepare failed for SQL_PAGESET_DETAIL query: %1")).arg(q.lastError().text());
     return;
   }
   if (clearTabs) {
@@ -5204,7 +5203,7 @@ void LanesLexicon::onLoadPageSet() {
 	ix++;
       }
       else {
-	QLOG_WARN() << QString(tr("Invalid place not loaded:%1")).arg(str);
+	QLOG_WARN() << QString(tr("Invalid place not loaded: %1")).arg(str);
       }
     }
     else {
