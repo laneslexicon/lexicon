@@ -46,7 +46,7 @@ public:
   QStringList getKeyboards(int type = 0) ;
   QString     getDefaultKeyboard();
   bool        setDefaultKeyboard(const QString &);
-  QString getStylesheetFilePath(int type) const;
+  QString getStylesheetFilePath(int type,bool check=true) const;
   QString copyToTemp(const QString &);
   //  QString getResourcePath(int type);
   QString getResourceFilePath(int type,const QString & = QString()) const ;

@@ -58,6 +58,18 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
 bool Lexicon::isOk() const {
   return (m_status == Lexicon::Ok);
 }
+/**
+ * If it cannot find what is asked for it returns:
+      return QString("Error:%1:%2:%3")
+        .arg(QDir::current().relativeFilePath(rd.absolutePath()))
+        .arg(name)
+        .arg("Resource not found");
+ *
+ * @param type
+ * @param name
+ *
+ * @return
+ */
 QString Lexicon::getResourceFilePath(int type, const QString & name) const {
   QFile file;
   QFileInfo f(m_settingsDir,m_configFile);
@@ -849,7 +861,7 @@ QMap<QString,int> Lexicon::getUsedFont(const QString & selector, bool invertMatc
   }
   return fonts;
 }
-QString Lexicon::getStylesheetFilePath(int type) const {
+QString Lexicon::getStylesheetFilePath(int type,bool check) const {
   QString fileName;
   QFileInfo f(m_settingsDir,m_configFile);
   QSettings settings(f.absoluteFilePath(),QSettings::IniFormat);
@@ -871,6 +883,9 @@ QString Lexicon::getStylesheetFilePath(int type) const {
   }
   QDir cssDirectory(getResourceFilePath(Lexicon::Stylesheet));
   f.setFile(cssDirectory,fileName);
+  if (! check) {
+    return f.absoluteFilePath();
+  }
   if (f.exists()) {
     return f.absoluteFilePath();
   }
