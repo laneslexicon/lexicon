@@ -135,7 +135,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
       deleteNoteAction = menu.addAction(tr("&Delete note"));
     }
     else {
-      addNoteAction = menu.addAction(tr("Add &note"));
+      addNoteAction = menu.addAction(tr("&Add note"));
     }
   }
   QAction *markAction = menu.addAction(tr("&Bookmark"));
