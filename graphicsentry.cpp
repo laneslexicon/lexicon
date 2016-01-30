@@ -731,7 +731,7 @@ QString GraphicsEntry::readCssFromFile(const QString & name) {
 
       msg = QString(tr("<p>Cannot find file: %1</p> \
                         <p>Directory is:%2</p> \
-                        <p>Please review Preferences -> Layout</p>")).arg(errors[2]).arg(errors[1]);
+                        <p>Please review Preferences -> Entry</p>")).arg(errors[2]).arg(errors[1]);
     }
     else {
       msg = QString(tr("Cannot find file: %1")).arg(name);
