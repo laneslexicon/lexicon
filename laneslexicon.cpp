@@ -4374,48 +4374,59 @@ void LanesLexicon::onEditTheme() {
  * @return
  */
 bool LanesLexicon::sanityCheck(int type) {
+  QLOG_DEBUG() << Q_FUNC_INFO << type;
+
+  QStringList errors;
+  int level = 0;        // 0 for missing stylesheet , 1 is critical and terminate
+  QString filename = getLexicon()->getStylesheetFilePath(Lexicon::Entry,false);
+  if (! QFileInfo::exists(filename)) {
+    errors << QString(tr("CSS stylesheet: %1")).arg(QDir::current().relativeFilePath(filename));
+  }
   if (! openDatabase(m_dbName)) {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
-    QString errorMessage(tr("Database not found"));
     QDir d;
     QString currentDir = d.absoluteFilePath(m_dbName);
-    QString info = QString("Missing file %1").arg(QDir::cleanPath(currentDir));
-    QString next;
-    if (type == 0) {
-      next = tr("This application will terminate");
-    }
-    else {
-      next = tr("Theme change will be ignored");
-    }
-    msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
-                   + info + "</p><p>" + next + "</p></body></html>");
-    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-    msgBox.exec();
-    return false;
+    QString info = QString("Lexicon database: %1").arg(QDir::current().relativeFilePath(currentDir));
+    errors << info;
+    level = 1;
   }
   QString xslt =  getLexicon()->getXsltFileName();
   if (xslt.isEmpty() || ! QFileInfo::exists(xslt)) {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
-    QString errorMessage(tr("Critical file not found"));
     QDir d;
-    QString info = QString("Missing file %1").arg(QDir::current().relativeFilePath(xslt));
-    QString next;
-    if (type == 0) {
-      next = tr("This application will terminate");
-    }
-    else {
-      next = tr("Theme change will be ignored");
-    }
-    msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
-                   + info + "</p><p>" + next + "</p></body></html>");
-    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-    msgBox.exec();
-    return false;
-
+    level = 1;
+    QString info = QString("XSLT stylesheet: %1").arg(QDir::current().relativeFilePath(xslt));
+    errors << info;
   }
-  return true;
+  if (errors.size() == 0) {
+    return true;
+  }
+  QMessageBox msgBox;
+  msgBox.setWindowTitle(QGuiApplication::applicationDisplayName());
+  QString errorMessage(tr("Missing files"));
+  QString errorText;
+  errorText = "<ul>";
+  for(int i=0;i < errors.size();i++) {
+    errorText += QString("<li>%1</li>").arg(errors[i]);
+  }
+  errorText += "</ul>";
+  if (type == 0) {
+    errorText += "<p>";
+    errorText += tr("Please review the settings and restart the application.");
+    errorText += "</p>";
+  }
+  else {
+    errorText += "<p>";
+    errorText += tr("Theme change will be ignored");
+    errorText += "</p>";
+  }
+  msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>"
+                 + errorText + "</body></html>");
+  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+  msgBox.exec();
+
+  OptionsDialog * d  = new OptionsDialog(m_currentTheme);//,this);
+  connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
+  d->exec();
+  return false;
 }
 /**
  * For the optionsdialogs, section is metaObect()->className()
