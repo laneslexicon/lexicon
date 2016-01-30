@@ -256,7 +256,7 @@ void ArabicSearchDialog::setText(const QString & t) {
   m_edit->setText(t);
 }
 void ArabicSearchDialog::onHelp() {
-  emit(showHelp(QString("search"))); //.arg(m_searchType)));
+  emit(showHelp(this->metaObject()->className()));
 }
 /**
  *
