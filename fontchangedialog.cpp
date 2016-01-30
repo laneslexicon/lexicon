@@ -19,9 +19,11 @@ FontChangeWidget::FontChangeWidget(QLocale::Script script,QWidget * parent) : QW
   m_changeIni = new QCheckBox;
   m_changeApplicationCss = new QCheckBox;
   m_changeEntryCss = new QCheckBox;
+  m_changePrintCss = new QCheckBox;
   m_changeIni->setChecked(true);
   m_changeApplicationCss->setChecked(true);
   m_changeEntryCss->setChecked(true);
+  m_changePrintCss->setChecked(true);
   m_currentFont = new QLabel("");
   m_fontSize = new QLineEdit;
   m_fontSize->setText("-1");
@@ -55,6 +57,7 @@ FontChangeWidget::FontChangeWidget(QLocale::Script script,QWidget * parent) : QW
   formlayout->addRow(tr("  Configuration settings"),m_changeIni);
   formlayout->addRow(tr("  Application stylesheet"),m_changeApplicationCss);
   formlayout->addRow(tr("  Lexicon stylesheet"),m_changeEntryCss);
+  formlayout->addRow(tr("  Lexicon print stylesheet"),m_changePrintCss);
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(m_applyButton);
   hlayout->addStretch();
@@ -193,7 +196,7 @@ void FontChangeWidget::onApply() {
       ok = m_changeEntryCss->isChecked();
     }
     if (fileName == getLexicon()->getStylesheetFilePath(Lexicon::Print)) {
-      ok = m_changeEntryCss->isChecked();
+      ok = m_changePrintCss->isChecked();
     }
     if (ok) {
       t = QString(tr("CSS changes in %1")).arg(QDir::current().relativeFilePath(fileName));

@@ -38,6 +38,7 @@ class FontChangeWidget : public QWidget {
   QCheckBox * m_changeIni;
   QCheckBox * m_changeApplicationCss;
   QCheckBox * m_changeEntryCss;
+  QCheckBox * m_changePrintCss;
   QComboBox * m_arabicFont;
   QLineEdit * m_fontSize;
   QListWidget * m_changes;
