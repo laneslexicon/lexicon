@@ -65,6 +65,21 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   createActions();
   readSettings();
 
+  /**
+   * load the sitemap so that the help system works. The sanity check routines
+   * can show the optionsdialog with the help buttons
+   */
+
+  QSettings sitemap("sitemap.ini",QSettings::IniFormat);
+  sitemap.setIniCodec("UTF-8");
+  sitemap.beginGroup("Site Map");
+  QStringList keys = sitemap.childKeys();
+  for(int i=0;i < keys.size();i++) {
+    if (! keys[i].isEmpty()) {
+      m_siteMap.insert(keys[i].toLower(),sitemap.value(keys[i]).toString());
+    }
+  }
+
   if (! sanityCheck()) {
     return;
   }
@@ -182,16 +197,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
 
   setupHistory();
 
-  // load the sitemap
-  QSettings sitemap("sitemap.ini",QSettings::IniFormat);
-  sitemap.setIniCodec("UTF-8");
-  sitemap.beginGroup("Site Map");
-  QStringList keys = sitemap.childKeys();
-  for(int i=0;i < keys.size();i++) {
-    if (! keys[i].isEmpty()) {
-      m_siteMap.insert(keys[i].toLower(),sitemap.value(keys[i]).toString());
-    }
-  }
 
   onSetInterface();
   restoreSavedState();
