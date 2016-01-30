@@ -4446,19 +4446,43 @@ void LanesLexicon::onDeleteTheme() {
     return;
   }
   QPair<QString,QString> m = d.getThemes();
-  QString srcFilePath = getLexicon()->getResourceFilePath(Lexicon::ThemeRoot,m.first);
-  activateTheme(m.second);
+  deleteTheme(m.first);
+  if (m.second != getLexicon()->currentTheme()) {
+    activateTheme(m.second);
+  }
+}
+bool LanesLexicon::deleteTheme(const QString & theme) {
+
+  QString srcFilePath = getLexicon()->getResourceFilePath(Lexicon::ThemeRoot,theme);
+  int ret =  QMessageBox::warning(this,
+                                  tr("Delete theme"),
+                                  QString(tr("This will delete everything in the directory:\n%1\nDo you wish to continue?")).arg(srcFilePath),
+                    QMessageBox::Yes|QMessageBox::No);
+  if (ret == QMessageBox::Yes) {
+    if (removeDirectory(srcFilePath)) {
+      statusMessage(QString(tr("Successfully deleted theme: %1")).arg(theme));
+      return true;
+    }
+    else {
+      QLOG_INFO() << QString(tr("There was an error deleting theme: %1")).arg(theme);
+      QLOG_INFO() << QString(tr("Please manually remove: %1")).arg(srcFilePath);
+    }
+  }
+  return false;
 }
 
 void LanesLexicon::activateTheme(const QString & theme) {
-  QLOG_DEBUG() << Q_FUNC_INFO << theme;
+  QLOG_DEBUG() << Q_FUNC_INFO << m_currentTheme << theme;
+  QString saveTheme = m_currentTheme;
   int ret = getLexicon()->setTheme(theme);
+
   if (ret != Lexicon::Ok) {
     /// TODO say something
   }
+
   readSettings();
   if (! sanityCheck(1)) {
-    getLexicon()->setTheme(m_currentTheme);
+    getLexicon()->setTheme(saveTheme);
     readSettings();
     return;
   }
@@ -4506,23 +4530,42 @@ void LanesLexicon::onCreateTheme() {
     return;
   }
   QPair<QString,QString> m = d.getThemes();
+
+  if (d.overwrite()) {
+    if (! this->deleteTheme(m.second)) {
+      statusMessage(QString(tr("Create theme cancelled: %1")).arg(m.second));
+      return;
+    }
+  }
+
   QString themeRoot = getLexicon()->getResourceFilePath(Lexicon::ThemeRoot);
   QString srcFilePath = themeRoot + QDir::separator() + m.first;
   QString tgtFilePath = themeRoot + QDir::separator() + m.second;
 
   int copyCount = 0;
-  copyRecursively(srcFilePath,tgtFilePath,&copyCount);
-  if (d.activate()) {
-    this->activateTheme(m.second);
+  if (copyRecursively(srcFilePath,tgtFilePath,&copyCount)) {
+    statusMessage(QString(tr("Successfully created theme: %1")).arg(m.second));
+    if (d.activate()) {
+      this->activateTheme(m.second);
+    }
   }
+  else {
+    QMessageBox::warning(this, this->windowTitle(),
+                               tr("There was an error creating the theme.\n"
+                                  "Please review the logs."),
+                         QMessageBox::Ok);
+  }
+
 }
 bool LanesLexicon::copyRecursively(const QString & srcPath,const QString & targetPath,int * copyCount) {
   QFileInfo srcFileInfo(srcPath);
   if (srcFileInfo.isDir()) {
     QDir targetDir(targetPath);
     targetDir.cdUp();
-    if (!targetDir.mkdir(QFileInfo(targetPath).fileName()))
+    if (!targetDir.mkdir(QFileInfo(targetPath).fileName())) {
+      QLOG_INFO() << tr("Could not create directory: %1").arg(targetPath);
       return false;
+    }
     QDir sourceDir(srcPath);
     QStringList fileNames = sourceDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
     foreach (const QString &fileName, fileNames) {
@@ -4534,6 +4577,8 @@ bool LanesLexicon::copyRecursively(const QString & srcPath,const QString & targe
   }
   else {
     if (!QFile::copy(srcPath, targetPath)) {
+      QLOG_INFO() << tr("Copy error from: %1").arg(srcPath);
+      QLOG_INFO() << tr("             to: %1").arg(targetPath);
       return false;
     }
     else {

@@ -261,7 +261,7 @@ class LanesLexicon : public QMainWindow
       Place setupHistory(int startPos = -1);
       void createMenus();
       void createStatusBar();
-
+      bool deleteTheme(const QString &) ;
 
       bool m_keymapsEnabled;
       bool eventFilter(QObject * target, QEvent *);
