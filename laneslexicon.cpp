@@ -3114,40 +3114,13 @@ void LanesLexicon::onDocs() {
     QMessageBox::information(NULL,tr("Information"),tr("Not yet implemented"));
     return;
   }
-  /*
-  QWidget * w;
-  w = QApplication::activeWindow();
-  if (w) {
-    qDebug() << Q_FUNC_INFO  << "Active window" << w->objectName() << w->metaObject()->className();
-  }
-  w = QApplication::focusWidget();
-  if (w) {
-    qDebug() << Q_FUNC_INFO  << "Focus widget" << w->objectName() << w->metaObject()->className();
-  }
-  w = QApplication::activeModalWidget();
-  if (w) {
-    qDebug() << Q_FUNC_INFO  << "Active modal widget" << w->objectName() << w->metaObject()->className();
-  }
-  w = QApplication::activePopupWidget();
-  if (w) {
-    qDebug() << Q_FUNC_INFO  << "Active popup widget" << w->objectName() << w->metaObject()->className();
-  }
-  */
   if (m_helpview == NULL) {
     m_helpview = new HelpView();
     connect(m_helpview,SIGNAL(finished(bool)),this,SLOT(onHelpLoaded(bool)));
     m_helpview->loadHelpSystem();
   }
-  else {
-    if (m_helpview->isLoaded()) {
-      if (m_helpview->isHidden()) {
-        m_helpview->show();
-      }
-      else {
-        m_helpview->hide();
-      }
-    }
-  }
+  m_helpview->show();
+  m_helpview->activateWindow();
    return;
 }
 /**
@@ -3184,6 +3157,7 @@ void LanesLexicon::onHelpLoaded(bool ok) {
       QLOG_WARN() << "Error loading page"  << m_helpview->lastWishes();
     }
   }
+  m_helpview->show();
   m_helpview->activateWindow();
 }
 void LanesLexicon::onAbout() {
