@@ -8,6 +8,7 @@ CreateThemeDialog::CreateThemeDialog(QWidget * parent) : QDialog(parent) {
   setWindowTitle(tr("Create Theme"));
   setObjectName("createthemedialog");
   m_themes = new QComboBox;
+  m_overwrite = false;
   QStringList themes = getLexicon()->getThemes();
   themes.sort();
   m_themes->addItems(themes);
@@ -43,6 +44,15 @@ CreateThemeDialog::CreateThemeDialog(QWidget * parent) : QDialog(parent) {
 };
 void CreateThemeDialog::onCreate() {
   QString t = m_newTheme->text();
+  if (m_newTheme->text() == m_currentTheme) {
+    int ret = QMessageBox::warning(this, tr("Theme copy"),
+                                   tr("Cannot overwrite the current theme.\n"),
+                                   QMessageBox::Cancel);
+    if (ret == QMessageBox::Cancel) {
+      return;
+    }
+
+  }
   if (m_themes->findText(t,Qt::MatchFixedString) != -1) {
     int ret = QMessageBox::warning(this, tr("Theme copy"),
                                    tr("The new theme name is not unique.\n"
@@ -51,6 +61,7 @@ void CreateThemeDialog::onCreate() {
     if (ret == QMessageBox::Cancel) {
       return;
     }
+    m_overwrite = true;
   }
   this->accept();
 }
@@ -61,9 +72,12 @@ void CreateThemeDialog::onTextChanged(const QString & text) {
   }
   m_createButton->setEnabled(true);
 }
-QPair<QString,QString> CreateThemeDialog::getThemes() {
+QPair<QString,QString> CreateThemeDialog::getThemes() const {
   return qMakePair(m_themes->currentText(),m_newTheme->text());
 }
-bool CreateThemeDialog::activate() {
+bool CreateThemeDialog::activate() const {
   return m_activate->isChecked();
+}
+bool CreateThemeDialog::overwrite() const {
+  return m_overwrite;
 }

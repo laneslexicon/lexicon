@@ -15,8 +15,9 @@ class CreateThemeDialog : public QDialog {
 
  public:
   CreateThemeDialog(QWidget * parent = 0);
-  QPair<QString,QString> getThemes();
-  bool activate();
+  QPair<QString,QString> getThemes() const;
+  bool activate() const;
+  bool overwrite() const ;
   public slots:
     void onTextChanged(const QString &);
     void onCreate();
@@ -26,5 +27,6 @@ class CreateThemeDialog : public QDialog {
   QLineEdit * m_newTheme;
   QPushButton * m_createButton;
   QString m_currentTheme;
+  bool m_overwrite;
 };
 #endif
