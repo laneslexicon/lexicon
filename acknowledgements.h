@@ -10,6 +10,8 @@ str += "<li><p>The logging system, QsLog, Copyright (c) 2013, Razvan Petru</p></
 str += "<li><p>Sotheby's, for permission to use the <a href=\"http://www.sothebys.com/en/auctions/ecatalogue/2014/arts-islamic-world-l14223/lot.59.html\">image</a> of a printers' manuscript copy of Lane's Lexicon.</p></li>";
 
  str += "<li><p>The default virtual Arabic keyboard layout is by <a href=\"http://digitalorientalist.com\">Eric van Lit</a>.</p></li>";
+
+ str += "<li>The icons are from the <a href=\"https://techbase.kde.org/Projects/Oxygen/Licensing\">KDE project</a>  and are licensed under GPL3.</li>";
 str += "</ul>";
 return str;
 }
