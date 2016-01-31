@@ -344,7 +344,7 @@ QString Lexicon::settingsFileName(const QString & theme) {
 }
 void Lexicon::onFocusChange(QWidget * old, QWidget * now) {
   if (old && now) {
-    QLOG_DEBUG() << old->metaObject()->className() << "--->" << now->metaObject()->className();
+    //    QLOG_DEBUG() << old->metaObject()->className() << "--->" << now->metaObject()->className();
   }
 }
 /**
