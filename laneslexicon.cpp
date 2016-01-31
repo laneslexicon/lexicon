@@ -4745,19 +4745,27 @@ void LanesLexicon::onImportLinks() {
     statusMessage(str);
     return;
   }
+  SETTINGS
+
+  settings.beginGroup("System");
 
   int count=0;
   int skipCount = 0;
   int updateCount = 0;
-  bool ignoreDb = false;
+  bool ignoreDbVersion = settings.value(SID_SYSTEM_IMPORTLINKS_IGNORE,false).toBool();
+
   QString str;
+  bool skip;
+  bool skipAlways = false;
+  bool showWarning = settings.value(SID_SYSTEM_IMPORTLINKS_SHOW_WARNING,true).toBool();
 
   while(! in.atEnd()) {
     count++;
+    skip = false;
     str = in.readLine();
     QStringList p = str.split(",",QString::KeepEmptyParts);
     if (p.size() != 4) {
-      QLOG_WARN() << QString(tr("Skipping record %1, incorrect format:[%2]")).arg(count).arg(str);
+      QLOG_INFO() << QString(tr("Skipping record %1, incorrect format:[%2]")).arg(count).arg(str);
       skipCount++;
     }
     else {
@@ -4765,63 +4773,93 @@ void LanesLexicon::onImportLinks() {
       QString fromnode = p[2];
       QString targetnode = p[3];
       /// check db version are the same
-      if (!ignoreDb && (p[0] != dbVersion)) {
-        QString warn = QString(tr("The link update is for a different database version.\nThe links may not match.\n\nDo you wish to continue?"));
-        int ret = QMessageBox::warning(this, tr("Link import"),warn,
-                                       QMessageBox::Yes | QMessageBox::Cancel);
-        if (ret == QMessageBox::Yes) {
-          ignoreDb = true;
+      if (showWarning && (p[0] != dbVersion)) {
+        QString warn = QString(tr("The link update at line %1 is for a different database version. The links may not match.<br/>Do you wish to import this line?")).arg(count);
+        QCheckBox * noshow = new QCheckBox(tr("Make my choice permanent and stop this warning appearing"));
+        QMessageBox msgBox;
+        msgBox.addButton(QMessageBox::Yes);
+        msgBox.addButton(QMessageBox::No);
+
+        msgBox.setCheckBox(noshow);
+        msgBox.setWindowTitle(tr("Link import"));
+        QString errorMessage(tr("Warning"));
+        msgBox.setText("<html><head/><body><h2>" + errorMessage + "</h2><p>" + warn + "</p></body></html>");
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        int ret = msgBox.exec();
+        if (ret == QMessageBox::No) {
+          skip = true;
         }
-        else {
-          statusMessage(tr("Import cancelled, database version mismatch"));
-          return;
+        if (noshow->isChecked()) {
+          settings.setValue(SID_SYSTEM_IMPORTLINKS_SHOW_WARNING,false);
+          showWarning = false;
+          if (ret == QMessageBox::No) {
+            ignoreDbVersion = false;
+            settings.setValue(SID_SYSTEM_IMPORTLINKS_IGNORE,false);
+          }
+          else {
+            ignoreDbVersion = true;
+            settings.setValue(SID_SYSTEM_IMPORTLINKS_IGNORE,true);
+          }
         }
       }
+      // db mismatch, we're skipping db checks,
+      if (!showWarning && (p[0] != dbVersion)) {
+        skip =  ! ignoreDbVersion;
+      }
+      //      qDebug() << QString("skipalways %1, skip %2, noshow %3, ignoredb %4").arg(skipAlways).arg(skip).arg(showWarning).arg(ignoreDb);
+
       nodefind.bindValue(0,fromnode);
       if (! nodefind.exec()) {
         QString str = QString(tr("Import links error: SQL error : %1")).arg(nodefind.lastError().text());
-        QLOG_WARN() << str;
-        statusMessage(str);
-        return;
+        QLOG_INFO() << str;
+        //        statusMessage(str);
+        skip = true;
+        //        return;
       }
       if (! nodefind.first()) {
         QString str = QString(tr("Import links error: cannot find entry: %1")).arg(fromnode);
-        QLOG_WARN() << str;
+        //        QLOG_INFON() << str;
         statusMessage(str);
+        skip = true;
         return;
       }
       ///
       /// update the entry xml, sett <cref select="tonode">
       //
-      QString xml = nodefind.value("xml").toString();
-      QDomDocument doc;
-      doc.setContent(xml);
-      QDomNodeList refs = doc.elementsByTagName("ref");
-      for(int i=0;i < refs.size();i++) {
-        QDomElement e = refs.at(i).toElement();
-        QString cref = e.attribute("cref");
-        if (cref == orthid) {
-          e.setAttribute("select",targetnode);
-          QString nxml = doc.toString(-1);
-          nodeupdate.bindValue(0,nxml);
-          nodeupdate.bindValue(1,fromnode);
-          if (!nodeupdate.exec()) {
-            QString str = QString(tr("Import links error: failed to update link details for node %1: %2")).arg(fromnode).arg(nodeupdate.lastError().text());
-            QLOG_WARN() << str;
-            statusMessage(str);
-            return;
-          }
-          QLOG_DEBUG() << "Updated entry record for node" << fromnode;
-        }
-      }
-      query.bindValue(0,targetnode);
-      query.bindValue(1,orthid);
-      if (! query.exec()) {
-        QLOG_WARN() << QString(tr("Link id: %1, From : %2 , To : 3")).arg(orthid).arg(fromnode).arg(targetnode);
-        QLOG_WARN() << QString(tr("SQL error in update links: %1")).arg(query.lastError().text());
+      if ( skip ) {
+        skipCount++;
       }
       else {
-        updateCount++;
+        QString xml = nodefind.value("xml").toString();
+        QDomDocument doc;
+        doc.setContent(xml);
+        QDomNodeList refs = doc.elementsByTagName("ref");
+        for(int i=0;i < refs.size();i++) {
+          QDomElement e = refs.at(i).toElement();
+          QString cref = e.attribute("cref");
+          if (cref == orthid) {
+            e.setAttribute("select",targetnode);
+            QString nxml = doc.toString(-1);
+            nodeupdate.bindValue(0,nxml);
+            nodeupdate.bindValue(1,fromnode);
+            if (!nodeupdate.exec()) {
+              QString str = QString(tr("Import links error: failed to update link details for node %1: %2")).arg(fromnode).arg(nodeupdate.lastError().text());
+              QLOG_WARN() << str;
+              statusMessage(str);
+              return;
+            }
+            QLOG_DEBUG() << "Updated entry record for node" << fromnode;
+          }
+        }
+        query.bindValue(0,targetnode);
+        query.bindValue(1,orthid);
+        if (! query.exec()) {
+          QLOG_WARN() << QString(tr("Link id: %1, From : %2 , To : 3")).arg(orthid).arg(fromnode).arg(targetnode);
+          QLOG_WARN() << QString(tr("SQL error in update links: %1")).arg(query.lastError().text());
+        }
+        else {
+          updateCount++;
+        }
       }
     }
   }
@@ -4947,6 +4985,12 @@ void LanesLexicon::importXml(const QString & filename) {
   }
   if (writeCount > 0) {
     QSqlDatabase::database().commit();
+    for(int i=0;i < m_tabs->count();i++) {
+      GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+      if (entry) {
+        entry->onReload();
+      }
+    }
   }
   QString str = tr("entries");
   if (writeCount == 1) {

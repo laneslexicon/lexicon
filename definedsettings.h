@@ -309,6 +309,8 @@ They should not be translated.
 #define SID_SYSTEM_LINK_CHECK_MODE              "Link check mode"
 #define SID_SYSTEM_ALLOW_DUPLICATES             "Allow duplicates"
 #define SID_SYSTEM_TABLIST_STATE                "Tab list columns"
+#define SID_SYSTEM_IMPORTLINKS_IGNORE           "Link import ignore"
+#define SID_SYSTEM_IMPORTLINKS_SHOW_WARNING     "Link import show warning"
 #define SID_MAPS_CURRENT_MAP                    "Current map"
 #define SID_MAPS_ENABLED                        "Enabled"
 #define SID_MAPS_DEBUG                          "Debug"
