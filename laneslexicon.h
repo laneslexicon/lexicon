@@ -341,7 +341,7 @@ class LanesLexicon : public QMainWindow
       bool m_allowDuplicatesPermanent;
       bool m_historyNewTab;
       bool m_historyGoTab;
-
+      bool m_rootActivateTab;
       QToolBar * m_mainbar;
       QToolBar * m_navigation;
       QToolBar * m_entrybar;

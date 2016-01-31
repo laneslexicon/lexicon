@@ -1685,15 +1685,17 @@ void LanesLexicon::treeItemDoubleClicked(QTreeWidgetItem * item,int /* column */
   int p = 0;
   QLOG_DEBUG() << Q_FUNC_INFO << root << supp;
   /// check that the user has not clicked on a letter
+  bool newTab = false;
+
+    if ((QApplication::keyboardModifiers() & Qt::ShiftModifier)  ||
+        (QApplication::keyboardModifiers() & Qt::ControlModifier)) {
+    newTab = true;
+  }
+  /// click on a root
   if (item->parent() == 0) {
     Place m = Place::fromRoot(item->text(0));
-    showPlace(m,false,true);
+    showPlace(m,newTab,m_rootActivateTab);
     return;
-  }
-  /// TODO check this
-  bool newTab = false;
-  if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-    newTab = true;
   }
   /// check whether root or head word
   /// if root, add the child entries
@@ -1704,7 +1706,7 @@ void LanesLexicon::treeItemDoubleClicked(QTreeWidgetItem * item,int /* column */
     }
     Place m(root,p);
     m.setAction(Place::User);
-    showPlace(m,newTab,true);
+    showPlace(m,newTab,m_rootActivateTab);
   }
   else {
     /// double clicked on head word, highlight it
@@ -1753,7 +1755,7 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
     newTab = true;
   }
-  GraphicsEntry * entry = showPlace(p,newTab,true);
+  GraphicsEntry * entry = showPlace(p,newTab,m_rootActivateTab);
   m_place = entry->getPlace();
   return;
 }
@@ -1860,7 +1862,7 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
   }
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
-    QLOG_DEBUG() << Q_FUNC_INFO << keyEvent->modifiers() << keyEvent->key() << keyEvent->text();
+    //    QLOG_DEBUG() << Q_FUNC_INFO << keyEvent->modifiers() << keyEvent->key() << keyEvent->text();
     switch(keyEvent->key()) {
     case Qt::Key_Tab: {
         if (target == m_tabs) {
@@ -2080,6 +2082,9 @@ void LanesLexicon::readSettings() {
     m_tabStyle = LanesLexicon::InsertTab;
   }
 
+  settings.endGroup();
+  settings.beginGroup("Roots");
+  m_rootActivateTab = settings.value(SID_CONTENTS_ACTIVATE_NEW_TAB,false).toBool();
   settings.endGroup();
 
   settings.beginGroup("Maps");
@@ -4756,7 +4761,6 @@ void LanesLexicon::onImportLinks() {
 
   QString str;
   bool skip;
-  bool skipAlways = false;
   bool showWarning = settings.value(SID_SYSTEM_IMPORTLINKS_SHOW_WARNING,true).toBool();
 
   while(! in.atEnd()) {
