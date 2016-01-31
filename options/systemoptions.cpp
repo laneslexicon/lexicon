@@ -25,6 +25,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   QHBoxLayout * lexiconlayout = new QHBoxLayout;
   connect(lexiconbutton,SIGNAL(clicked()),this,SLOT(onSetDatabase()));
   lexiconlayout->addWidget(m_lexicon);
+  lexiconlayout->addSpacing(10);
   lexiconlayout->addWidget(lexiconbutton);
   lexiconlayout->addStretch();
   //  this->setControlSize(m_lexicon,VLARGE_EDIT);
@@ -32,8 +33,9 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   m_interval->setValidator(new QIntValidator);
 
   m_docked = new QCheckBox;
-  m_focusTab = new QLineEdit;
-  m_focusTab->setValidator(new QIntValidator);
+  m_importCheck = new QCheckBox;
+  m_importShow = new QCheckBox;
+
 
   //  this->setControlSize(m_focusTab,LARGE_EDIT);
   m_minimalInterface = new QCheckBox;
@@ -56,6 +58,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   QHBoxLayout * csslayout = new QHBoxLayout;
   QPushButton * cssbutton = new QPushButton(tr("..."));
   csslayout->addWidget(m_css);
+  csslayout->addSpacing(10);
   csslayout->addWidget(cssbutton);
   csslayout->addStretch();
   connect(cssbutton,SIGNAL(clicked()),this,SLOT(onSetCss()));
@@ -73,6 +76,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
 QHBoxLayout * noteslayout = new QHBoxLayout;
   QPushButton * notesbutton = new QPushButton(tr("..."));
   noteslayout->addWidget(m_notesDb);
+  noteslayout->addSpacing(10);
   noteslayout->addWidget(notesbutton);
   noteslayout->addStretch();
   connect(notesbutton,SIGNAL(clicked()),this,SLOT(onSetNotesDatabase()));
@@ -81,6 +85,7 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   QHBoxLayout * historylayout = new QHBoxLayout;
   QPushButton * historybutton = new QPushButton(tr("..."));
   historylayout->addWidget(m_historyDb);
+  historylayout->addSpacing(10);
   historylayout->addWidget(historybutton);
   historylayout->addStretch();
   connect(historybutton,SIGNAL(clicked()),this,SLOT(onSetHistoryDatabase()));
@@ -121,7 +126,8 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   optionlayout->addRow(tr("Qt style"),m_qtStyle);
   optionlayout->addRow(tr("Docked"),m_docked);
   optionlayout->addRow(tr("New tab behaviour"),tablayout);
-  optionlayout->addRow(tr("Current tab"),m_focusTab);
+  optionlayout->addRow(tr("Import links ignore db mismatch"),m_importCheck);
+  optionlayout->addRow(tr("Import links show warning"),m_importShow);
   optionlayout->addRow(tr("Contents linked"),m_contentsLinked);
   optionlayout->addRow(tr("Minimal interface"),m_minimalInterface);
   optionlayout->addRow(tr("Restore bookmarks"),m_restoreBookmarks);
@@ -165,6 +171,7 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   QHBoxLayout * locationlayout = new QHBoxLayout;
   QPushButton * locationbutton = new QPushButton(tr("..."));
   locationlayout->addWidget(m_offlineLocation);
+  locationlayout->addSpacing(10);
   locationlayout->addWidget(locationbutton);
   locationlayout->addStretch();
 
@@ -208,7 +215,8 @@ void SystemOptions::readSettings(bool reload) {
   m_lexicon->setText(settings.value(SID_SYSTEM_DATABASE,"lexicon.sqlite").toString());
 
   m_docked->setChecked(settings.value(SID_SYSTEM_DOCKED,true).toBool());
-  m_focusTab->setText(settings.value(SID_SYSTEM_CURRENT_TAB,"0").toString());
+  m_importCheck->setChecked(settings.value(SID_SYSTEM_IMPORTLINKS_IGNORE,false).toBool());
+  m_importShow->setChecked(settings.value(SID_SYSTEM_IMPORTLINKS_SHOW_WARNING,false).toBool());
   m_minimalInterface->setChecked(settings.value(SID_SYSTEM_MINIMAL,true).toBool());
   m_restoreBookmarks->setChecked(settings.value(SID_SYSTEM_RESTORE_BOOKMARKS,true).toBool());
   m_restoreTabs->setChecked(settings.value(SID_SYSTEM_RESTORE_TABS,true).toBool());
@@ -289,7 +297,8 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_SYSTEM_MESSAGE_TIMEOUT,m_interval->text());
 
   settings.setValue(SID_SYSTEM_DOCKED,m_docked->isChecked());
-  settings.setValue(SID_SYSTEM_CURRENT_TAB,m_focusTab->text());
+  settings.setValue(SID_SYSTEM_IMPORTLINKS_IGNORE,m_importCheck->isChecked());
+  settings.setValue(SID_SYSTEM_IMPORTLINKS_SHOW_WARNING,m_importShow->isChecked());
   settings.setValue(SID_SYSTEM_MINIMAL,m_minimalInterface->isChecked());
   settings.setValue(SID_SYSTEM_RESTORE_BOOKMARKS,m_restoreBookmarks->isChecked());
   settings.setValue(SID_SYSTEM_RESTORE_TABS,m_restoreTabs->isChecked());
@@ -377,7 +386,10 @@ bool SystemOptions::isModified()  {
   //    setButtons(false);
   //  }
 
-  if (compare(&settings,SID_SYSTEM_CURRENT_TAB,m_focusTab)) {
+  if (compare(&settings,SID_SYSTEM_IMPORTLINKS_IGNORE,m_importCheck)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_SYSTEM_IMPORTLINKS_SHOW_WARNING,m_importShow)) {
     m_dirty = true;
   }
   if (compare(&settings,SID_SYSTEM_MINIMAL,m_minimalInterface)) {

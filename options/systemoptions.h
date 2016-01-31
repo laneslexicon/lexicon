@@ -27,7 +27,8 @@ class SystemOptions : public OptionsWidget {
     QCheckBox * m_contentsLinked;
     QLineEdit * m_lexicon;
     QCheckBox * m_docked;
-    QLineEdit * m_focusTab;
+    QCheckBox * m_importCheck;
+    QCheckBox * m_importShow;
     QLineEdit * m_interval;
     QCheckBox * m_rootNavigation;
     // Icon size
