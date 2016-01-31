@@ -88,7 +88,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/docking/">Docking</a>
+        <a class="" href="../../user-guide/docking/">Appearance</a>
         
     </li>
 
@@ -177,17 +177,19 @@
         
             <ul>
             
-                <li class="toctree-l3"><a href="#background">Background</a></li>
+                <li class="toctree-l3"><a href="#application-stylesheet-default-applicationcss">Application stylesheet (default: application.css)</a></li>
                 
-                    <li><a class="toctree-l4" href="#application-stylesheet-default-appliciationcss">Application stylesheet (default: appliciation.css)</a></li>
+            
+                <li class="toctree-l3"><a href="#entry-stylesheet-default-entrycss">Entry stylesheet (default: entry.css)</a></li>
                 
-                    <li><a class="toctree-l4" href="#entry-stylesheet-default-entrycss">Entry stylesheet (default: entry.css)</a></li>
+            
+                <li class="toctree-l3"><a href="#settings-default-settingsini">Settings (default: settings.ini)</a></li>
                 
-                    <li><a class="toctree-l4" href="#settings-default-settingsini">Settings (default: settings.ini)</a></li>
+            
+                <li class="toctree-l3"><a href="#stylesheets">Stylesheets</a></li>
                 
-                    <li><a class="toctree-l4" href="#stylesheets">Stylesheets</a></li>
-                
-                    <li><a class="toctree-l4" href="#how-the-lexicon-is-presented">How the Lexicon is presented</a></li>
+            
+                <li class="toctree-l3"><a href="#how-the-lexicon-is-presented">How the Lexicon is presented</a></li>
                 
             
             </ul>
@@ -555,32 +557,37 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="background">Background</h2>
-<p>How the application looks and behaves is mainly dependent on the information contained in three configuration files. These files are in plain text format and can be viewed and edited with any plain text editor.</p>
+                <p>How the application looks and behaves is mainly dependent on the information contained in three configuration files. These files are in plain text format and can be viewed and edited with any plain text editor.</p>
 <p>The configuration dialogs in the application read and update these files as appropriate.</p>
-<h5 id="application-stylesheet-default-appliciationcss">Application stylesheet (default: appliciation.css)</h5>
-<p>The font used in menus, buttons and throughout the application. The foreground and background color of all widgets.</p>
+<h5 id="application-stylesheet-default-applicationcss">Application stylesheet (default: application.css)</h5>
+<p>Controls the appearance of the widgets (menus, buttons, checkboxes, combo boxes etc).</p>
 <h5 id="entry-stylesheet-default-entrycss">Entry stylesheet (default: entry.css)</h5>
 <p>The appearance of the Lexicon entries themselves: fonts, colors etc</p>
 <h5 id="settings-default-settingsini">Settings (default: settings.ini)</h5>
-<p>Keyboard shortcuts, default settings for e.g. 'open in new tab', settings for the default printer, bookmarks, current open tabs etc</p>
+<p>Keyboard shortcuts, default settings for e.g. 'open in new tab', settings for the default printer, bookmarks, current open tabs etc.</p>
 <p>Entries consist of key/value pairs grouped into sections.</p>
 <h3 id="stylesheets">Stylesheets</h3>
 <p>The stylesheet files will look familiar to anyone who is acquainted with CSS. To quote from the software framework that is used to create the application:</p>
 <p><em>the concepts, terminology, and syntax of Qt Style Sheets are heavily inspired by HTML Cascading Style Sheets (CSS) but adapted to the world of widgets.</em></p>
 <p>For a full explanation of the options and the syntax the user should consult the <a href="http://www.qt.io">Qt</a> website. (Entering 'Qt 5.5 style sheet reference' into a search engine should help locate the details. As of the time of writing, <a href="http://doc.qt.io/qt-5/stylesheet-reference.html">this</a> is a direct link to the relevant section of the website.)</p>
-<p>The majority of the entries in the two stylesheets specify the font family and size. A dialog is provided to change these settings without using a text editor <em>Menu -&gt; Tools -&gt; Change font</em> (See <a href="../font/">here</a> for details.) Adjusting the font specification using this method will change all font settings; for more fine-grained control manual editing is required. It is important to note that for the built-in font changer to work correctly is makes the following assumptions:</p>
+<p>A large number of the entries in the two stylesheets specify the font family and size; to assist with changing these entries without using a text editor, there is  dialog  <em>Menu -&gt; Tools -&gt; Change font</em> (See <a href="../font/">here</a> for details). Changing the font using this method will change all font settings; for more fine-grained control manual editing is required. It should also be noted that font changer makes the following assumptions:</p>
 <ul>
 <li>all CSS selectors that specify Arabic font must have 'arabic' in their name</li>
 <li>all settings key/value pairs that specifiy Arabic, must have 'arabic' in their key</li>
 </ul>
 <h3 id="how-the-lexicon-is-presented">How the Lexicon is presented</h3>
-<p>When viewing a Lexicon entry what is presented is a sequence of HTML pages arranged vertically with one page for each headword. However, what is stored in the database that drives the application is not HTML but rather XML. (At heart, the same XML that was created by Perseus digitization project.)</p>
-<p><em>Extensible Markup Language (XML) is a markup language that defines a set of rules for encoding documents in a format which is both human-readable and machine-readable. It is defined by the W3C's XML 1.0 Specification[2] and by several other related specifications,[3] all of which are free open standards.</em> <a href="http://en.wikipedia.org/wiki/XML">Wikipedia</a></p>
-<p>An entry's XML is passed to a built-in processor that uses a set of rules specified in one of configuration files ("entry.xslt") to convert it to HTML. The set of rules make up a simple XSLT stylesheet:</p>
-<p><em>XSLT (Extensible Stylesheet Language Transformations) is a language for transforming XML documents into other XML documents, or other formats such as HTML for web pages, plain text ..</em> <a href="http://en.wikipedia.org/wiki/XSLT">Wikipedia</a></p>
+<p>When viewing a Lexicon entry what is presented is a sequence of HTML pages arranged vertically with one "page" for each headword. However, what is stored in the database that drives the application is not HTML but rather XML. (At heart, the same XML that was created by Perseus digitization project.)</p>
+<!--
+*Extensible Markup Language (XML) is a markup language that defines a set of rules for encoding documents in a format which is both human-readable and machine-readable. It is defined by the W3C's XML 1.0 Specification[2] and by several other related specifications,[3] all of which are free open standards.* [Wikipedia](http://en.wikipedia.org/wiki/XML)
+-->
+
+<p>An entry's XML is passed to a built-in processor that uses a set of rules specified in one of the configuration files ("entry.xslt") to convert it to HTML. The set of rules make up what is called an XSLT stylesheet.</p>
+<!--
+*XSLT (Extensible Stylesheet Language Transformations) is a language for transforming XML documents into other XML documents, or other formats such as HTML for web pages, plain text ..* [Wikipedia](http://en.wikipedia.org/wiki/XSLT)
+-->
+
 <p>After the XML has been converted to HTML for viewing, the CSS stylesheet is applied.</p>
-<p>As a consequence, it is possible for the user to control both the appearance and the structure of the Lexicon entries by editing this file ("entry.xslt"). This can be done using any text editor, although a <a href="../editview/">dialog</a> is provided to assist with the process.</p>
+<p>As a consequence, it is possible for the user to control both the appearance and the structure of the Lexicon entries by editing the XSLT stylesheet. This can be done using any text editor, although a <a href="../editview/">dialog</a> is provided to assist with the process.</p>
               
             </div>
           </div>
