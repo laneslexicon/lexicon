@@ -224,82 +224,82 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   }
   QLOG_DEBUG() << Q_FUNC_INFO << event->modifiers() << event->key() << event->text();
   if (! m_reloadKey.isEmpty() && (event->text() == m_reloadKey)) {
-    statusMessage(tr("Reload"));
+    //   statusMessage(tr("Reload"));
     onReload();
     return;
   }
   if (! m_zoomInKey.isEmpty() && (event->text() == m_zoomInKey)) {
-    statusMessage(tr("Zoom in"));
+    //    statusMessage(tr("Zoom in"));
     onZoomIn();
     return;
   }
   if (! m_zoomOutKey.isEmpty() && (event->text() == m_zoomOutKey)) {
-    statusMessage(tr("Zoom out"));
+    //    statusMessage(tr("Zoom out"));
     onZoomOut();
     return;
   }
   if (! m_moveFocusDownKey.isEmpty() && (event->text() ==  m_moveFocusDownKey))  {
-    statusMessage(tr("Move down"));
+    //    statusMessage(tr("Move down"));
     moveFocusDown();
     return;
   }
   if (! m_moveFocusUpKey.isEmpty() && (event->text() ==  m_moveFocusUpKey)) {
-    statusMessage(tr("Move up"));
+    //    statusMessage(tr("Move up"));
     moveFocusUp();
     return;
   }
   if (! m_moveForwardKey.isEmpty() && (event->text() ==  m_moveForwardKey)) {
-    statusMessage(tr("Next root"));
+    //    statusMessage(tr("Next root"));
     moveForward();
     return;
   }
   if (! m_moveBackwardKey.isEmpty() && (event->text() ==  m_moveBackwardKey)) {
-    statusMessage(tr("Previous root"));
+    //    statusMessage(tr("Previous root"));
     moveBackward();
     return;
   }
   if (! m_widenKey.isEmpty() && (event->text() ==  m_widenKey)) {
-    statusMessage(tr("Widen text"));
+    //    statusMessage(tr("Widen text"));
     onWiden();
     return;
   }
   if (! m_narrowKey.isEmpty() && (event->text() ==  m_narrowKey)) {
-    statusMessage(tr("Narrow text"));
+    //    statusMessage(tr("Narrow text"));
     onNarrow();
     return;
   }
   if (! m_searchKey.isEmpty() && (event->text() == m_searchKey)) {
-    statusMessage(tr("Search this page"));
+    //    statusMessage(tr("Search this page"));
     this->search();
     return;
   }
   if (! m_searchNextKey.isEmpty() && (event->text() == m_searchNextKey)) {
-    statusMessage(tr("Find next on this page"));
+    //    statusMessage(tr("Find next on this page"));
     this->searchNext();
     return;
   }
   if (! m_clearKey.isEmpty() && (event->text() == m_clearKey)) {
-    statusMessage(tr("Clear highlights"));
+    //    statusMessage(tr("Clear highlights"));
     this->clearHighlights();
     return;
   }
   if (! m_showKey.isEmpty() && (event->text() == m_showKey)) {
-    statusMessage(tr("Show last search results"));
+    //    statusMessage(tr("Show last search results"));
     this->showSelections();
     return;
   }
   if (! m_markKey.isEmpty() && (event->text() == m_markKey)) {
-    statusMessage(tr("Mark"));
+    //    statusMessage(tr("Mark"));
     m_focusNode = m_place.getNode();
     return;
   }
   if (! m_homeKey.isEmpty() && (event->text() == m_homeKey)) {
-    statusMessage(tr("Go to to mark"));
+    //    statusMessage(tr("Go to to mark"));
     this->home();
     return;
   }
   if (! m_helpKey.isEmpty() && (event->text() == m_helpKey)) {
-    statusMessage(tr("Key help"));
+    //    statusMessage(tr("Key help"));
     return;
   }
   QWidget::keyPressEvent(event);

@@ -207,11 +207,10 @@ int main(int argc, char *argv[])
     SETTINGS
     settings.beginGroup("System");
     QString style = settings.value(SID_SYSTEM_QT_STYLE).toString();
-    QLOG_DEBUG() << QString("Got Setting Qt style:%1").arg(style);
     QStringList styles = QStyleFactory::keys();
     if (style.isEmpty() || ! styles.contains(style)) {
       QStringList keys = QStyleFactory::keys();
-      QLOG_DEBUG() << QString("Requested style: [%1] is unknown.(Supported styles are : %2)").arg(style).arg(keys.join(","));
+      QLOG_INFO() << QString("Requested style: \"%1\" is unknown.Supported styles are : %2").arg(style).arg(keys.join(","));
       if (keys.contains("Fusion")) {
         style = "Fusion";
       }

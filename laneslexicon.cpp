@@ -3006,7 +3006,7 @@ void LanesLexicon::updateStatusBar(const Place & p) {
     current = entry->getPlace();
   }
   if (! current.isValid()) {
-    QLOG_DEBUG() << Q_FUNC_INFO << "Invalid place" << p.toString();
+    //    QLOG_DEBUG() << Q_FUNC_INFO << "Invalid place" << p.toString();
     m_placeIndicator->setText("");
     return;
   }
