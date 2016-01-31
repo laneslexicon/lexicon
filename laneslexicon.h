@@ -66,6 +66,7 @@ class LogViewer;
 class HelpWidget;
 class OptionsDialog;
 class HelpView;
+class ContentsPanel;
 class LanesLexicon : public QMainWindow
 {
   Q_OBJECT
@@ -485,6 +486,7 @@ class LanesLexicon : public QMainWindow
 
       QShortcut * m_helpRequested;
       QMap<QString,QString> m_siteMap;
+      ContentsPanel * m_contentsPanel;
  signals:
       void nodeActivated(const QString & node,const QString & word);
 };

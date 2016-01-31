@@ -38,6 +38,7 @@
 #include "loadpagesetdialog.h"
 #include "tablistdialog.h"
 #include "textwidthdialog.h"
+#include "contentspanel.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -85,9 +86,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   loadStyleSheet();
 
-  m_tree = new ContentsWidget(this);
-  m_tree->setObjectName("treeroots");
-  m_tree->installEventFilter(this);
+  m_contentsPanel = new ContentsPanel(this);
+  ContentsWidget * tree = m_contentsPanel->tree();
+  tree->installEventFilter(this);
   m_tabs = new TabWidget(this);
   m_tabs->setTabsClosable(true);
   m_tabs->installEventFilter(this);
@@ -118,14 +119,14 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     m_treeDock->setObjectName("contentsdock");
     m_treeDock->setAllowedAreas(Qt::LeftDockWidgetArea |
                                 Qt::RightDockWidgetArea);
-    m_treeDock->setWidget(m_tree);
+    m_treeDock->setWidget(m_contentsPanel);
     addDockWidget(Qt::LeftDockWidgetArea, m_treeDock);
     m_treeDock->installEventFilter(this);
     setCentralWidget(m_tabs);
   }
   else {
     QSplitter * splitter = new QSplitter(this);
-    splitter->addWidget(m_tree);
+    splitter->addWidget(m_contentsPanel);
     splitter->addWidget(m_tabs);
     splitter->setStretchFactor(0,0);
     splitter->setStretchFactor(1,4);
@@ -159,7 +160,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   if (m_db.isOpen()) {
     setStatus(tr("Ready"));
     if (! m_valgrind ) {
-      m_tree->loadContents();
+      tree->loadContents();
       getFirstAndLast();
       m_ok = true;
     }
@@ -169,9 +170,9 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
 
 
-  connect(m_tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(treeItemDoubleClicked(QTreeWidgetItem *,int)));
+  connect(tree,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(treeItemDoubleClicked(QTreeWidgetItem *,int)));
 
-  connect(m_tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(entryActivated(QTreeWidgetItem *,int)));
+  connect(tree,SIGNAL(itemActivated(QTreeWidgetItem *,int)),this,SLOT(entryActivated(QTreeWidgetItem *,int)));
 
   connect(m_tabs,SIGNAL(tabCloseRequested(int)),this,SLOT(onCloseTab(int)));
   connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(currentTabChanged(int)));
@@ -192,7 +193,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
     restoreBookmarks();
   }
 
-  m_tree->resizeColumnToContents(0);
+  tree->resizeColumnToContents(0);
 
   setupHistory();
 
@@ -287,7 +288,7 @@ void LanesLexicon::showStartupEntry() {
 
   if (ix == -1) {  // not showing in another tab
     showPlace(p,false,true);
-    m_tree->ensurePlaceVisible(p);
+    m_contentsPanel->tree()->ensurePlaceVisible(p);
   }
   else {
     this->currentTabChanged(ix);
@@ -526,10 +527,10 @@ void LanesLexicon::shortcut(const QString & key) {
     searchForPage();
   }
   else if (key == SID_SHORTCUT_CONTENTS_COLLAPSE_ALL) {
-    m_tree->collapseAll();
+    m_contentsPanel->tree()->collapseAll();
   }
   else if (key == SID_SHORTCUT_CONTENTS_COLLAPSE_LETTER) {
-    QTreeWidgetItem * item = m_tree->currentItem();
+    QTreeWidgetItem * item = m_contentsPanel->tree()->currentItem();
     if (item) {
       /// if item is a root, get the parent (letter)
       if (item->childCount() == 0) {
@@ -539,10 +540,10 @@ void LanesLexicon::shortcut(const QString & key) {
         }
       }
       if (item->isExpanded()) {
-        m_tree->collapseItem(item);
+        m_contentsPanel->tree()->collapseItem(item);
       }
       else {
-        m_tree->expandItem(item);
+        m_contentsPanel->tree()->expandItem(item);
       }
     }
     else {
@@ -581,7 +582,7 @@ void LanesLexicon::shortcut(const QString & key) {
     this->onFocusContent();
   }
   else if (key == SID_SHORTCUT_FOCUS_TREE) {
-    m_tree->setFocus();
+    m_contentsPanel->tree()->setFocus();
   }
   else if (key.startsWith(SID_SHORTCUT_GO_TAB)) {
     QString nstr = key.right(1);
@@ -1700,7 +1701,7 @@ void LanesLexicon::treeItemDoubleClicked(QTreeWidgetItem * item,int /* column */
   /// check whether root or head word
   /// if root, add the child entries
   if  (item->parent()->parent() == 0) {
-    m_tree->addEntries(root,item);
+    m_contentsPanel->tree()->addEntries(root,item);
     if (supp == "*") {
       p = 1;
     }
@@ -1857,7 +1858,7 @@ void LanesLexicon::focusItemChanged(QGraphicsItem * newFocus, QGraphicsItem * /*
  * @return
  */
 bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
-  if ((event->type() == QEvent::Close) && ((target == m_treeDock) || (target == m_tree))) {
+  if ((event->type() == QEvent::Close) && ((target == m_treeDock) || (target == m_contentsPanel->tree()))) {
     m_showContentsAction->setChecked(false);
   }
   if (event->type() == QEvent::KeyPress) {
@@ -1871,10 +1872,6 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
         else if (target == m_tabs->tabBar()) {
           m_exitButton->setFocus();
           return true;
-        }
-        else if (target == m_tree) {
-        }
-        else {
         }
         break;
     }
@@ -1948,7 +1945,7 @@ void LanesLexicon::onTest() {
   }
   }
   if (0) {
-    Place p = m_tree->getCurrentPlace();
+    Place p = m_contentsPanel->tree()->getCurrentPlace();
     QLOG_DEBUG() << QString("Root %1, Word %2 , Node %3, Supplement %4")
       .arg(p.getRoot())
       .arg(p.getWord())
@@ -2351,7 +2348,7 @@ void LanesLexicon::restoreTabs() {
         }
         //      QLOG_DEBUG() << Q_FUNC_INFO << "adding tab" << p.getShortText();
         m_tabs->addTab(entry,title);
-        m_tree->ensurePlaceVisible(p,true);
+        m_contentsPanel->tree()->ensurePlaceVisible(p,true);
         j++;
       }
       else {
@@ -2386,26 +2383,26 @@ NoteMaster * LanesLexicon::notes() {
  ******************************************************************************/
 void LanesLexicon::findNextRoot(const QString & root) {
   GraphicsEntry * entry = dynamic_cast<GraphicsEntry *>(QObject::sender());
-  QString nroot = m_tree->findNextRoot(root);
+  QString nroot = m_contentsPanel->tree()->findNextRoot(root);
   if (entry && ! nroot.isEmpty()) {
     entry->setPagingForward();
     Place p;
     p.setRoot(nroot);
     p = entry->getXmlForRoot(p);
     if (m_linkContents) {
-      m_tree->ensurePlaceVisible(p,true);
+      m_contentsPanel->tree()->ensurePlaceVisible(p,true);
     }
   }
 }
 void LanesLexicon::findPrevRoot(const QString & root) {
   GraphicsEntry * entry = dynamic_cast<GraphicsEntry *>(QObject::sender());
-  QString nroot = m_tree->findPrevRoot(root);
+  QString nroot = m_contentsPanel->tree()->findPrevRoot(root);
   if (entry && ! nroot.isEmpty()) {
     Place p = Place::fromRoot(nroot);
     entry->setPagingBackward();
     p = entry->getXmlForRoot(p);
     if (m_linkContents) {
-      m_tree->ensurePlaceVisible(p,true);
+      m_contentsPanel->tree()->ensurePlaceVisible(p,true);
     }
   }
 }
@@ -2425,7 +2422,7 @@ void LanesLexicon::onNextRoot() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     Place p  =  entry->getPlace();
-    Place np = m_tree->findNextPlace(p);
+    Place np = m_contentsPanel->tree()->findNextPlace(p);
     if (! np.isEmpty()) {
       /// if it is, it move focus to it (if true is 2nd param)
       int ix = this->hasPlace(np,GraphicsEntry::RootSearch,true);
@@ -2438,7 +2435,7 @@ void LanesLexicon::onNextRoot() {
         m_tabs->setCurrentIndex(ix);
       }
       if (m_linkContents) {
-        m_tree->ensurePlaceVisible(np,true);
+        m_contentsPanel->tree()->ensurePlaceVisible(np,true);
       }
     }
     else {
@@ -2450,7 +2447,7 @@ void LanesLexicon::onPrevRoot() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   if (entry) {
     Place p  =  entry->getPlace();
-    Place np = m_tree->findPrevPlace(p);
+    Place np = m_contentsPanel->tree()->findPrevPlace(p);
     if (! np.isEmpty()) {
       /// if it is, it move focus to it (if true is 2nd param)
       int ix = this->hasPlace(np,GraphicsEntry::RootSearch,true);
@@ -2463,7 +2460,7 @@ void LanesLexicon::onPrevRoot() {
         m_tabs->setCurrentIndex(ix);
       }
       if (m_linkContents) {
-        m_tree->ensurePlaceVisible(np,true);
+        m_contentsPanel->tree()->ensurePlaceVisible(np,true);
       }
     }
     else {
@@ -2476,7 +2473,7 @@ void LanesLexicon::onFirstRoot() {
   p.setRoot(m_firstRoot);
   showPlace(p,false,true);
   if (m_linkContents) {
-    m_tree->ensurePlaceVisible(p);
+    m_contentsPanel->tree()->ensurePlaceVisible(p);
   }
 }
 void LanesLexicon::onLastRoot() {
@@ -2484,7 +2481,7 @@ void LanesLexicon::onLastRoot() {
   p.setRoot(m_lastRoot);
   showPlace(p,false,true);
   if (m_linkContents) {
-    m_tree->ensurePlaceVisible(p);
+    m_contentsPanel->tree()->ensurePlaceVisible(p);
   }
 }
 /********************************************************************************
@@ -2495,7 +2492,7 @@ void LanesLexicon::rootChanged(const QString & root,const QString & /* node */) 
   Place p;
   p.setRoot(root);
   if (m_linkContents) {
-  m_tree->ensurePlaceVisible(p,true);
+  m_contentsPanel->tree()->ensurePlaceVisible(p,true);
   }
 }
 /**
@@ -2519,7 +2516,7 @@ void LanesLexicon::placeChanged(const Place & p) {
     }
   }
   if (m_linkContents) {
-    m_tree->ensurePlaceVisible(p,true);
+    m_contentsPanel->tree()->ensurePlaceVisible(p,true);
   }
 }
 /***************************************************************************************************
@@ -3520,7 +3517,7 @@ void LanesLexicon::currentTabChanged(int ix) {
   if ( entry ) {
     Place p = entry->getPlace();
     if (m_linkContents) {
-      m_tree->ensurePlaceVisible(p,true);
+      m_contentsPanel->tree()->ensurePlaceVisible(p,true);
     }
     this->enableForPage(true);
     return;
@@ -4067,7 +4064,7 @@ void LanesLexicon::syncFromContents() {
     QLOG_WARN() << "Cannot sync to current tab";
     return;
   }
-  Place p = m_tree->getCurrentPlace();
+  Place p = m_contentsPanel->tree()->getCurrentPlace();
   if (p.isValid()) {
        this->showPlace(p,false,true);
   }
@@ -4085,7 +4082,7 @@ void LanesLexicon::syncFromEntry() {
 
   Place p = entry->getPlace();
   if (p.isValid()) {
-    m_tree->ensurePlaceVisible(p);
+    m_contentsPanel->tree()->ensurePlaceVisible(p);
     entry->focusPlace();
   }
 }
@@ -4101,8 +4098,8 @@ void LanesLexicon::sync() {
     QLOG_WARN() << "Cannot sync to current tab";
     return;
   }
-  if (w == m_tree) {
-    Place p = m_tree->getCurrentPlace();
+  if (w == m_contentsPanel->tree()) {
+    Place p = m_contentsPanel->tree()->getCurrentPlace();
     if (p.isValid()) {
       this->showPlace(p,false,true);
     }
@@ -4110,7 +4107,7 @@ void LanesLexicon::sync() {
   else {
     Place p = entry->getPlace();
     if (p.isValid()) {
-      m_tree->ensurePlaceVisible(p);
+      m_contentsPanel->tree()->ensurePlaceVisible(p);
     }
   }
 }
@@ -4608,7 +4605,7 @@ void LanesLexicon::onChangeArabicFont() {
         entry->onReload();
       }
     }
-    m_tree->reloadFont();
+    m_contentsPanel->tree()->reloadFont();
   }
   delete d;
 }
@@ -4644,7 +4641,7 @@ void LanesLexicon::onShowContents() {
     w = m_treeDock;
   }
   else {
-    w = m_tree;
+    w = m_contentsPanel->tree();
   }
   if (! m_showContentsAction->isChecked()) {
     w->hide();
@@ -4698,7 +4695,7 @@ void LanesLexicon::onReady() {
     w = m_treeDock;
   }
   else {
-    w = m_tree;
+    w = m_contentsPanel->tree();
   }
   if (w) {
     m_showContentsAction->setChecked(w->isVisible());

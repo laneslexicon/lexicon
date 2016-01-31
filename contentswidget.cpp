@@ -13,6 +13,7 @@
 #define HEADWORD_COLUMN 2
 #define HEAD_SUPPLEMENT_COLUMN 3
 #define NODE_COLUMN 4
+
 ContentsWidget::ContentsWidget(QWidget * parent) : QTreeWidget(parent) {
   setObjectName("contentswidget");
   readSettings();
@@ -305,7 +306,6 @@ void ContentsWidget::toggleExpand() {
     if (item) {
       /// if it is an entry item
       if ((item->parent() != 0)  && (item->parent()->parent() != 0)) {
-        /// TODO make this configurable
         emit(itemActivated(item,0));
       }
       else {
