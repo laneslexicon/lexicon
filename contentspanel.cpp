@@ -19,8 +19,6 @@ ContentsPanel::ContentsPanel(QWidget * parent) : QWidget(parent) {
   connect(m_collapseAction,SIGNAL(triggered()),this,SLOT(onCollapse()));
   connect(m_loadAction,SIGNAL(triggered()),this,SLOT(onLoad()));
   connect(m_flattenAction,SIGNAL(triggered()),this,SLOT(onFlatten()));
-  connect(m_newTabAction,SIGNAL(triggered()),this,SLOT(onToggle()));
-  connect(m_newBackgroundTabAction,SIGNAL(triggered()),this,SLOT(onToggle()));
 
   readSettings();
 
@@ -61,6 +59,20 @@ ContentsPanel::ContentsPanel(QWidget * parent) : QWidget(parent) {
   layout->addLayout(hlayout);
   layout->addWidget(m_tree);
   setLayout(layout);
+
+
+  readButtonSettings();
+
+  connect(m_newTabButton,SIGNAL(clicked()),this,SLOT(onClick()));
+  connect(m_newBackgroundTabButton,SIGNAL(clicked()),this,SLOT(onClick()));
+}
+void ContentsPanel::readButtonSettings() {
+  SETTINGS
+
+  settings.beginGroup("Roots");
+  m_newTabButton->setChecked(settings.value(SID_CONTENTS_NEW_TAB,false).toBool());
+  m_newBackgroundTabButton->setChecked(settings.value(SID_CONTENTS_ACTIVATE_NEW_TAB,false).toBool());
+  settings.endGroup();
 }
 void ContentsPanel::readSettings() {
   QDir images(getLexicon()->getResourceFilePath(Lexicon::Image));
@@ -139,6 +151,7 @@ void ContentsPanel::readSettings() {
   else {
     QLOG_INFO() << QString("Missing icon : %1 - %2").arg(SID_ICON_FLATTEN).arg(fi.absoluteFilePath());
   }
+
 }
 ContentsWidget * ContentsPanel::tree() {
   return m_tree;
@@ -188,11 +201,15 @@ void ContentsPanel::onLoad() {
   if (! item ) {
     return;
   }
-  if (! item->parent()) {
+  if (! item->parent()) { // letter
     return;
   }
   for(int i=0;i < item->columnCount();i++) {
     qDebug() << i << item->text(i);
+  }
+  if (! item->parent()->parent()) {
+    m_tree->itemDoubleClicked(item,0);
+    return;
   }
   m_tree->itemActivated(item,0);
 
@@ -212,22 +229,10 @@ bool ContentsPanel::isNewTabRequired() const {
 bool ContentsPanel::activateTab() const {
   return  m_newBackgroundTabButton->isChecked();
 }
-void ContentsPanel::onToggle() {
+void ContentsPanel::onClick() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 
-  QAction * action = qobject_cast<QAction *>(sender());
-  if (! action ) {
-    return;
-  }
-  QToolButton * button = NULL;
-  if (action == m_newTabAction) {
-    button = m_newTabButton;
-  }
-  else if (action == m_newBackgroundTabAction) {
-    button = m_newBackgroundTabButton;
-  }
-  if (button) {
-    button->setDown(! button->isChecked());
-    button->setChecked(!button->isChecked());
-  }
+  QToolButton * button  = qobject_cast<QToolButton *>(sender());
+  //  qDebug() << button->text() << button->isDown() << button->isChecked();
+  button->setChecked(! button->isChecked());
 }

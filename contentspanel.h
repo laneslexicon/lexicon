@@ -23,10 +23,12 @@ class ContentsPanel : public QWidget {
     void onCollapse();
     void onLoad();
     void onFlatten();
-    void onToggle();
+    //    void onToggle(bool);
+    void onClick();
  private:
   ContentsWidget * m_tree;
   void readSettings();
+  void readButtonSettings();
   QAction * m_expandAction;
   QAction * m_collapseAction;
   QAction * m_loadAction;
