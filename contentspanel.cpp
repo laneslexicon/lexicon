@@ -12,14 +12,19 @@ ContentsPanel::ContentsPanel(QWidget * parent) : QWidget(parent) {
   m_collapseAction = new QAction("Collapse",this);
   m_loadAction = new QAction("Load",this);
   m_flattenAction = new QAction("Collapse all",this);
+  m_newTabAction = new QAction("New tab",this);
+  m_newBackgroundTabAction = new QAction("Make current",this);
 
   connect(m_expandAction,SIGNAL(triggered()),this,SLOT(onExpand()));
   connect(m_collapseAction,SIGNAL(triggered()),this,SLOT(onCollapse()));
   connect(m_loadAction,SIGNAL(triggered()),this,SLOT(onLoad()));
   connect(m_flattenAction,SIGNAL(triggered()),this,SLOT(onFlatten()));
+  connect(m_newTabAction,SIGNAL(triggered()),this,SLOT(onToggle()));
+  connect(m_newBackgroundTabAction,SIGNAL(triggered()),this,SLOT(onToggle()));
 
   readSettings();
 
+  /// the buttons are defaulting to 15x15
   QToolButton * tool = new QToolButton;
   tool->setDefaultAction(m_expandAction);
   hlayout->addWidget(tool);
@@ -36,7 +41,20 @@ ContentsPanel::ContentsPanel(QWidget * parent) : QWidget(parent) {
   tool = new QToolButton;
   tool->setDefaultAction(m_loadAction);
   hlayout->addWidget(tool);
-    hlayout->addStretch();
+
+  m_newTabButton = new QToolButton;
+  m_newTabButton->setDefaultAction(m_newTabAction);
+  m_newTabButton->setCheckable(true);
+
+  hlayout->addWidget(m_newTabButton);
+
+  m_newBackgroundTabButton = new QToolButton;
+  m_newBackgroundTabButton->setDefaultAction(m_newBackgroundTabAction);
+  m_newBackgroundTabButton->setCheckable(true);
+
+  hlayout->addWidget(m_newBackgroundTabButton);
+
+  hlayout->addStretch();
 
   m_tree = new ContentsWidget(this);
   m_tree->setObjectName("treeroots");
@@ -98,6 +116,29 @@ void ContentsPanel::readSettings() {
   else {
     QLOG_INFO() << QString("Missing icon : %1 - %2").arg(SID_ICON_FLATTEN).arg(fi.absoluteFilePath());
   }
+  filename = settings.value(SID_ICON_NEW_TAB,"tab-new.svg").toString();
+  fi.setFile(images,filename);
+  if (fi.exists()) {
+    QIcon icon(fi.absoluteFilePath());
+    if (!icon.isNull()) {
+      m_newTabAction->setIcon(icon);
+    }
+  }
+  else {
+    QLOG_INFO() << QString("Missing icon : %1 - %2").arg(SID_ICON_FLATTEN).arg(fi.absoluteFilePath());
+  }
+
+  filename = settings.value(SID_ICON_NEW_BACKGROUND_TAB,"tab-new-background.svg").toString();
+  fi.setFile(images,filename);
+  if (fi.exists()) {
+    QIcon icon(fi.absoluteFilePath());
+    if (!icon.isNull()) {
+      m_newBackgroundTabAction->setIcon(icon);
+    }
+  }
+  else {
+    QLOG_INFO() << QString("Missing icon : %1 - %2").arg(SID_ICON_FLATTEN).arg(fi.absoluteFilePath());
+  }
 }
 ContentsWidget * ContentsPanel::tree() {
   return m_tree;
@@ -150,6 +191,9 @@ void ContentsPanel::onLoad() {
   if (! item->parent()) {
     return;
   }
+  for(int i=0;i < item->columnCount();i++) {
+    qDebug() << i << item->text(i);
+  }
   m_tree->itemActivated(item,0);
 
 }
@@ -161,4 +205,29 @@ void ContentsPanel::onFlatten() {
   }
   m_tree->blockSignals(false);
 
+}
+bool ContentsPanel::isNewTabRequired() const {
+  return m_newTabButton->isChecked();
+}
+bool ContentsPanel::activateTab() const {
+  return  m_newBackgroundTabButton->isChecked();
+}
+void ContentsPanel::onToggle() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+
+  QAction * action = qobject_cast<QAction *>(sender());
+  if (! action ) {
+    return;
+  }
+  QToolButton * button = NULL;
+  if (action == m_newTabAction) {
+    button = m_newTabButton;
+  }
+  else if (action == m_newBackgroundTabAction) {
+    button = m_newBackgroundTabButton;
+  }
+  if (button) {
+    button->setDown(! button->isChecked());
+    button->setChecked(!button->isChecked());
+  }
 }

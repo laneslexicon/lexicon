@@ -1730,6 +1730,7 @@ void LanesLexicon::treeItemDoubleClicked(QTreeWidgetItem * item,int /* column */
 void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   /// ignore clicks on the root or the letter
   QLOG_DEBUG() << Q_FUNC_INFO;
+
   if ((item->parent() == 0) || (item->parent()->parent() == 0)) {
     return;
   }
@@ -1752,11 +1753,12 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
       }
   }
   Place p = Place::fromNode(node);
-  bool newTab = false;
+  bool newTab = m_contentsPanel->isNewTabRequired();
+  bool activateTab = m_contentsPanel->activateTab();
   if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
     newTab = true;
   }
-  GraphicsEntry * entry = showPlace(p,newTab,m_rootActivateTab);
+  GraphicsEntry * entry = showPlace(p,newTab,activateTab);
   m_place = entry->getPlace();
   return;
 }
