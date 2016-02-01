@@ -1722,7 +1722,7 @@ void LanesLexicon::treeItemDoubleClicked(QTreeWidgetItem * item,int /* column */
     }
     Place m(root,p);
     m.setAction(Place::User);
-    showPlace(m,newTab,m_rootActivateTab);
+    showPlace(m,newTab,activateTab);
   }
   else {
     /// double clicked on head word, highlight it
@@ -1770,9 +1770,12 @@ void LanesLexicon::entryActivated(QTreeWidgetItem * item, int /* not used */) {
   Place p = Place::fromNode(node);
   bool newTab = m_contentsPanel->isNewTabRequired();
   bool activateTab = m_contentsPanel->activateTab();
-  if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+
+  if ((QApplication::keyboardModifiers() & Qt::ShiftModifier)  ||
+        (QApplication::keyboardModifiers() & Qt::ControlModifier)) {
     newTab = true;
   }
+
   GraphicsEntry * entry = showPlace(p,newTab,activateTab);
   m_place = entry->getPlace();
   return;
