@@ -109,21 +109,24 @@ void ContentsPanel::onExpand() {
   if (!item) {
     return;
   }
-  for(int i=0;i < item->columnCount();i++) {
-    qDebug() << item->text(i);
+
+  if (item->isExpanded()) {
+    item->setExpanded(false);
+    return;
   }
-  m_tree->blockSignals(true);
-  item->setExpanded(! item->isExpanded());
-  if (! item->parent()) {
-    qDebug() << "Letter";
+  if (! item->parent()) {    /// its a letter
+    item->setExpanded(true);
+    return;
   }
-  else if (! item->parent()->parent()) {
+  if (! item->parent()->parent()) { /// its a root
+    m_tree->blockSignals(true);
+    m_tree->addEntries(item->text(0),item);
+    item->setExpanded(true);
+    m_tree->blockSignals(false);
     qDebug() << "root";
+    return;
   }
- else {
-   qDebug() << "node";
- }
-  m_tree->blockSignals(false);
+
 
 }
 void ContentsPanel::onCollapse() {
@@ -139,6 +142,16 @@ void ContentsPanel::onCollapse() {
 }
 void ContentsPanel::onLoad() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+
+  QTreeWidgetItem * item = m_tree->currentItem();
+  if (! item ) {
+    return;
+  }
+  if (! item->parent()) {
+    return;
+  }
+  m_tree->itemActivated(item,0);
+
 }
 void ContentsPanel::onFlatten() {
   QLOG_DEBUG() << Q_FUNC_INFO;
