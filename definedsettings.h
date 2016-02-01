@@ -86,14 +86,6 @@ They should not be translated.
 #define SID_HISTORY_MAXIMUM          "Maximum size"
 #define SID_HISTORY_MAXIMUM_BUFFER   "Maximum buffer"
 
-#define SID_ROOTS_DEBUG "Debug"
-#define SID_ROOTS_EXPAND "Expand"
-#define SID_ROOTS_KEEP_FOCUS "Keep focus"
-#define SID_ROOTS_MOVE_UP "Move up"
-#define SID_ROOTS_MOVE_DOWN "Move down"
-#define SID_ROOTS_BACKGROUND_COLOR "Background"
-#define SID_ROOTS_ITYPE_FONT "Itype font"
-
 
 #define SID_PRINTER_NAME "Name"
 #define SID_PRINTER_ORIENTATION "Orientation"
@@ -141,16 +133,6 @@ They should not be translated.
 #define SID_SHORTCUT_NAV_PREV                  "Go prev"
 #define SID_SHORTCUT_NAV_LAST                  "Go last"
 
-/*
-#define SID_SHORTCUT_PAGE_FIRST                "Page first"
-#define SID_SHORTCUT_PAGE_LAST                 "Page last"
-#define SID_SHORTCUT_PAGE_NEXT                 "Page next"
-#define SID_SHORTCUT_PAGE_PREV                 "Page prev"
-#define SID_SHORTCUT_ROOT_FIRST                "Root first"
-#define SID_SHORTCUT_ROOT_LAST                 "Root last"
-#define SID_SHORTCUT_ROOT_NEXT                 "Root next"
-#define SID_SHORTCUT_ROOT_PREV                 "Root prev"
-*/
 #define SID_SHORTCUT_OPTIONS                   "Options"
 #define SID_SHORTCUT_QUIT                      "Quit"
 #define SID_SHORTCUT_SEARCH_DELETE             "Search delete"
@@ -248,6 +230,8 @@ They should not be translated.
 #define SID_CONTENTS_ROMAN_ITYPES              "Verb form number Roman"
 #define SID_CONTENTS_ITYPES                    "Itype"
 #define SID_CONTENTS_ACTIVATE_NEW_TAB          "Activate new tab"
+#define SID_CONTENTS_NEW_TAB                   "New tab"
+#define SID_CONTENTS_TOGGLE_BUTTONS            "Toggle"
 
 #define SID_LOGGING_FILE                       "Logfile"
 #define SID_LOGGING_MAXSIZE                    "Maximum size"
