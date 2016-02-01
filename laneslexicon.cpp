@@ -462,9 +462,12 @@ void LanesLexicon::onCloseOtherTabs(int /* index */) {
   this->closeAllTabs();
   m_tabs->addTab(w,label);
   m_tabs->setUpdatesEnabled(true);
+  this->onFocusContent();
+
   if (entry) {
     entry->setReposition(true);
   }
+
 }
 /**
  *
