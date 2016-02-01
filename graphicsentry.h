@@ -89,6 +89,7 @@ class GraphicsEntry : public QWidget {
     void setCurrentItem(QGraphicsItem *);
     QString userTitle() const;
     void setXrefMode(int);
+    void setReposition(bool);
   public slots:
     void setTextWidth(int, bool apply = false);
     void setUserTitle(const QString &);
@@ -168,6 +169,7 @@ class GraphicsEntry : public QWidget {
     bool m_offPageMovement;
     bool m_nodeinfoClose;
     bool m_reloading;
+    bool m_reposition;
     int  m_linkCheckMode;
 
     int m_pagingDir;

@@ -39,7 +39,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   /// 1 = paging backward, items are prepended
   m_pagingDir = 0;
   //  m_scale = 1.5;
-
+  m_reposition = true;
   m_scene = new QGraphicsScene(this);
   m_view = new QGraphicsView(m_scene,this);
   m_view->setObjectName("entryview");
@@ -1840,12 +1840,31 @@ void GraphicsEntry::focusPlace() {
 void GraphicsEntry::setCurrentItem(QGraphicsItem * item) {
   QLOG_DEBUG() << Q_FUNC_INFO;
   m_view->setFocus();
-  /// get the y position of the item
-  /// add half the view height so that we are centering on the point that
-  /// makes the top of the item, the top of the view
-  QPointF pos = item->scenePos();
-  pos += QPointF(0,m_view->height()/2);
-  m_view->centerOn(pos);
+  /**
+   *
+   * this is kind of a not ideal
+   * if the item fits in the current view then center on the item
+   * otherwise :
+   * get the y position of the item
+   * add half the view height so that we are centering on the point that
+   * makes the top of the item, the top of the view
+   *
+   * when we are loading in a new tab the m_reposition = false
+   *
+   * well, that's the theory
+   */
+
+
+  if (m_reposition) {
+    QPointF pos = item->scenePos();
+    if (item->boundingRect().height() <  m_view->height()) {
+      m_view->centerOn(item);
+    }
+    else {
+      pos += QPointF(0,m_view->height()/2);
+      m_view->centerOn(pos);
+    }
+  }
   m_scene->setFocusItem(item);
   EntryItem * entry = dynamic_cast<EntryItem *>(item);
   if (entry) {
@@ -2704,4 +2723,7 @@ void GraphicsEntry::onFocusItemChanged(QGraphicsItem * newFocus, QGraphicsItem *
   }
   /// this updates the status bar
   emit(focusItemChanged(newFocus,oldFocus,reason));
+}
+void GraphicsEntry::setReposition(bool v) {
+  m_reposition = v;
 }

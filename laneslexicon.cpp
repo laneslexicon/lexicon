@@ -453,10 +453,18 @@ void LanesLexicon::onCloseOtherTabs(int /* index */) {
   m_tabs->setUpdatesEnabled(false);
   QString label = m_tabs->tabText(m_tabs->currentIndex());
   QWidget * w = m_tabs->currentWidget();
+  GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(w);
+  /// stop it repositioning
+  if (entry) {
+    entry->setReposition(false);
+  }
   m_tabs->removeTab(m_tabs->currentIndex());
   this->closeAllTabs();
   m_tabs->addTab(w,label);
   m_tabs->setUpdatesEnabled(true);
+  if (entry) {
+    entry->setReposition(true);
+  }
 }
 /**
  *
@@ -1795,6 +1803,15 @@ GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool acti
     }
   }
   if (createTab) {
+    if (! activateTab) {
+      for(int i=0;i < m_tabs->count();i++) {
+        GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+        if (entry) {
+          entry->blockSignals(true);
+          entry->setReposition(false);
+        }
+      }
+    }
     entry = new GraphicsEntry(this);
     setSignals(entry);
     entry->installEventFilter(this);
@@ -1804,6 +1821,13 @@ GraphicsEntry * LanesLexicon::showPlace(const Place & p,bool createTab,bool acti
       int ix = this->addTab(true,entry,np.getShortText());
       if (activateTab) {
         m_tabs->setCurrentIndex(ix);
+      }
+      for(int i=0;i < m_tabs->count();i++) {
+        GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(i));
+        if (entry) {
+          entry->blockSignals(false);
+          entry->setReposition(true);
+        }
       }
       return entry;
     }
