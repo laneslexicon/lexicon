@@ -379,8 +379,10 @@ They should not be translated.
 #define SID_ICON_ZOOM "Zoom"
 #define SID_ICON_ZOOM_IN "ZoomIn"
 #define SID_ICON_ZOOM_OUT "ZoomOut"
-
-
+#define SID_ICON_EXPAND "Expand"
+#define SID_ICON_COLLAPSE "Collapse"
+#define SID_ICON_LOAD     "Load"
+#define SID_ICON_FLATTEN "Flatten"
 
 #define SID_RESOURCES_IMAGES  "Image"
 

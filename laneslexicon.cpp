@@ -257,7 +257,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
       if (! menus[j]->title().isEmpty()) {
         //        QLOG_INFO() << QString(">> %1 (%2)").arg(menus[j]->title()).arg(actions.size());
         for(int i=0;i < actions.size();i++) {
-          QLOG_INFO() << menus[j]->title() << i << actions[i]->isCheckable() << actions[i]->text() << actions[i]->property("FILENAME").toString();
+          //          QLOG_INFO() << menus[j]->title() << i << actions[i]->isCheckable() << actions[i]->text() << actions[i]->property("FILENAME").toString();
         }
       }
     }
@@ -3931,7 +3931,6 @@ void LanesLexicon::setIcon(QAction * action,const QString & imgdir,const QString
   QIcon icon(fi.absoluteFilePath());
   if (! icon.isNull()) {
     action->setIcon(icon);
-    action->setProperty("FILENAME",iconfile);
   }
   else {
     QLOG_WARN() << QString(tr("Error loading %1 : icon is invalid")).arg(iconfile);
@@ -4039,6 +4038,9 @@ void LanesLexicon::setIcons(const QString & /* theme */) {
   iconfile = settings.value(SID_ICON_PAGE_NAVIGATION,QString()).toString();
   setIcon(m_navModePageAction,imgdir,iconfile);
     //  m_navigationModeMenu->addAction(m_navModePageAction);
+
+  iconfile = settings.value(SID_ICON_PAGE_NAVIGATION,QString()).toString();
+  setIcon(m_navModePageAction,imgdir,iconfile);
 
   QIcon icon;
   iconfile = settings.value(SID_ICON_LINK,QString()).toString();
