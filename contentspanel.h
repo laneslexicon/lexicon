@@ -38,5 +38,6 @@ class ContentsPanel : public QWidget {
   QCheckBox * m_newTab;
   QToolButton * m_newTabButton;
   QToolButton * m_newBackgroundTabButton;
+  bool m_buttonsToggle;
 };
 #endif

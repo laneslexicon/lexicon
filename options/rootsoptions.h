@@ -30,5 +30,6 @@ class RootsOptions : public OptionsWidget {
     QCheckBox * m_debug;
     QCheckBox * m_activateTab;
     QCheckBox * m_newTab;
+    QCheckBox * m_toggleButton;
 };
 #endif

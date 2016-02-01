@@ -72,9 +72,12 @@ void ContentsPanel::readButtonSettings() {
   settings.beginGroup("Roots");
   m_newTabButton->setChecked(settings.value(SID_CONTENTS_NEW_TAB,false).toBool());
   m_newBackgroundTabButton->setChecked(settings.value(SID_CONTENTS_ACTIVATE_NEW_TAB,false).toBool());
+  m_buttonsToggle = settings.value(SID_CONTENTS_TOGGLE_BUTTONS,true).toBool();
   settings.endGroup();
 }
 void ContentsPanel::readSettings() {
+
+
   QDir images(getLexicon()->getResourceFilePath(Lexicon::Image));
   if (!images.exists()) {
     QLOG_WARN() << QString(tr("Theme image directory not found : %1")).arg(images.absolutePath());
@@ -163,9 +166,10 @@ void ContentsPanel::onExpand() {
   if (!item) {
     return;
   }
-
   if (item->isExpanded()) {
-    item->setExpanded(false);
+    if (m_buttonsToggle) {
+      item->setExpanded(false);
+    }
     return;
   }
   if (! item->parent()) {    /// its a letter
@@ -177,7 +181,6 @@ void ContentsPanel::onExpand() {
     m_tree->addEntries(item->text(0),item);
     item->setExpanded(true);
     m_tree->blockSignals(false);
-    qDebug() << "root";
     return;
   }
 
@@ -189,7 +192,12 @@ void ContentsPanel::onCollapse() {
   QTreeWidgetItem * item = m_tree->currentItem();
   if (item) {
     m_tree->blockSignals(true);
-    item->setExpanded(! item->isExpanded());
+    if (m_buttonsToggle) {
+      item->setExpanded(! item->isExpanded());
+    }
+    else {
+      item->setExpanded(false);
+    }
     m_tree->blockSignals(false);
   }
 

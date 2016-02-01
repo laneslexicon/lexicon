@@ -41,7 +41,7 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_romanItypes = new QCheckBox;
   m_activateTab = new QCheckBox;
   m_newTab = new QCheckBox;
-
+  m_toggleButton = new QCheckBox;
 
   formlayout->addRow(tr("Show head word"),m_showHeadColumn);
   formlayout->addRow(tr("Show multi-head word"),m_showEntryColumn);
@@ -52,6 +52,7 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   formlayout->addRow(tr("Expand/collapse"),m_expand);
   formlayout->addRow(tr("Load into new tab"),m_newTab);
   formlayout->addRow(tr("Make new tab current"),m_activateTab);
+  formlayout->addRow(tr("Collapse/Expand buttons toggle"),m_toggleButton);
 
 
 
@@ -124,6 +125,7 @@ void RootsOptions::readSettings(bool reload) {
   m_romanItypes->setChecked(settings.value(SID_CONTENTS_ROMAN_ITYPES,false).toBool());
   m_activateTab->setChecked(settings.value(SID_CONTENTS_ACTIVATE_NEW_TAB,false).toBool());
   m_newTab->setChecked(settings.value(SID_CONTENTS_NEW_TAB,false).toBool());
+  m_toggleButton->setChecked(settings.value(SID_CONTENTS_TOGGLE_BUTTONS,true).toBool());
   settings.endGroup();
   m_dirty = false;
 }
@@ -146,6 +148,7 @@ void RootsOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_CONTENTS_STANDARD_FONT,m_standardFont->text());
   settings.setValue(SID_CONTENTS_ACTIVATE_NEW_TAB,m_activateTab->isChecked());
   settings.setValue(SID_CONTENTS_NEW_TAB,m_newTab->isChecked());
+  settings.setValue(SID_CONTENTS_TOGGLE_BUTTONS,m_toggleButton->isChecked());
   settings.sync();
 
   settings.endGroup();
@@ -196,6 +199,9 @@ bool RootsOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_CONTENTS_NEW_TAB,m_newTab)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_CONTENTS_TOGGLE_BUTTONS,m_toggleButton)) {
     m_dirty = true;
   }
   settings.endGroup();
