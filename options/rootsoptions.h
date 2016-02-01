@@ -28,6 +28,7 @@ class RootsOptions : public OptionsWidget {
     QCheckBox * m_singleClick;
     QCheckBox * m_doubleClick;
     QCheckBox * m_debug;
-    QCheckBox *m_rootActivateTab;
+    QCheckBox * m_activateTab;
+    QCheckBox * m_newTab;
 };
 #endif

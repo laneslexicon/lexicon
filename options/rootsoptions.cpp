@@ -39,7 +39,8 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   m_showEntryColumn = new QCheckBox;
   m_showNodeColumn = new QCheckBox;
   m_romanItypes = new QCheckBox;
-  m_rootActivateTab = new QCheckBox;
+  m_activateTab = new QCheckBox;
+  m_newTab = new QCheckBox;
 
 
   formlayout->addRow(tr("Show head word"),m_showHeadColumn);
@@ -49,7 +50,8 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
   formlayout->addRow(tr("Move up"),m_moveUp);
   formlayout->addRow(tr("Move down"),m_moveDown);
   formlayout->addRow(tr("Expand/collapse"),m_expand);
-  formlayout->addRow(tr("Make new tab current"),m_rootActivateTab);
+  formlayout->addRow(tr("Load into new tab"),m_newTab);
+  formlayout->addRow(tr("Make new tab current"),m_activateTab);
 
 
 
@@ -120,7 +122,8 @@ void RootsOptions::readSettings(bool reload) {
   m_showEntryColumn->setChecked(settings.value(SID_CONTENTS_SHOWENTRY,false).toBool());
   m_showNodeColumn->setChecked(settings.value(SID_CONTENTS_SHOWNODE,false).toBool());
   m_romanItypes->setChecked(settings.value(SID_CONTENTS_ROMAN_ITYPES,false).toBool());
-  m_rootActivateTab->setChecked(settings.value(SID_CONTENTS_ACTIVATE_NEW_TAB,false).toBool());
+  m_activateTab->setChecked(settings.value(SID_CONTENTS_ACTIVATE_NEW_TAB,false).toBool());
+  m_newTab->setChecked(settings.value(SID_CONTENTS_NEW_TAB,false).toBool());
   settings.endGroup();
   m_dirty = false;
 }
@@ -141,7 +144,8 @@ void RootsOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_CONTENTS_EXPAND,m_expand->text());
   settings.setValue(SID_CONTENTS_ARABIC_FONT,m_arabicFont->text());
   settings.setValue(SID_CONTENTS_STANDARD_FONT,m_standardFont->text());
-  settings.setValue(SID_CONTENTS_ACTIVATE_NEW_TAB,m_rootActivateTab->isChecked());
+  settings.setValue(SID_CONTENTS_ACTIVATE_NEW_TAB,m_activateTab->isChecked());
+  settings.setValue(SID_CONTENTS_NEW_TAB,m_newTab->isChecked());
   settings.sync();
 
   settings.endGroup();
@@ -188,7 +192,10 @@ bool RootsOptions::isModified()  {
   if (compare(&settings,SID_CONTENTS_STANDARD_FONT,m_standardFont)) {
     m_dirty = true;
   }
-  if (compare(&settings,SID_CONTENTS_ACTIVATE_NEW_TAB,m_rootActivateTab)) {
+  if (compare(&settings,SID_CONTENTS_ACTIVATE_NEW_TAB,m_activateTab)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_CONTENTS_NEW_TAB,m_newTab)) {
     m_dirty = true;
   }
   settings.endGroup();
