@@ -1696,17 +1696,21 @@ void LanesLexicon::treeItemDoubleClicked(QTreeWidgetItem * item,int /* column */
   QString supp = item->text(1);
   int p = 0;
   QLOG_DEBUG() << Q_FUNC_INFO << root << supp;
-  /// check that the user has not clicked on a letter
-  bool newTab = false;
 
-    if ((QApplication::keyboardModifiers() & Qt::ShiftModifier)  ||
+  bool newTab = m_contentsPanel->isNewTabRequired();
+  bool activateTab = m_contentsPanel->activateTab();
+
+
+
+  if ((QApplication::keyboardModifiers() & Qt::ShiftModifier)  ||
         (QApplication::keyboardModifiers() & Qt::ControlModifier)) {
     newTab = true;
   }
+  qDebug() << newTab << activateTab;
   /// click on a root
   if (item->parent() == 0) {
     Place m = Place::fromRoot(item->text(0));
-    showPlace(m,newTab,m_rootActivateTab);
+    showPlace(m,newTab,activateTab);
     return;
   }
   /// check whether root or head word
@@ -2066,8 +2070,7 @@ void LanesLexicon::readSettings() {
   }
   /// we let them toggle this but need to keep the original
   m_allowDuplicates = settings.value(SID_SYSTEM_ALLOW_DUPLICATES,false).toBool();
-  m_allowDuplicatesPermanent = m_allowDuplicates;
-  m_saveBookmarks = settings.value(SID_SYSTEM_SAVE_BOOKMARKS,true).toBool();
+    m_saveBookmarks = settings.value(SID_SYSTEM_SAVE_BOOKMARKS,true).toBool();
   m_restoreBookmarks = settings.value(SID_SYSTEM_RESTORE_BOOKMARKS,true).toBool();
 
   m_docked = settings.value(SID_SYSTEM_DOCKED,false).toBool();
@@ -2251,7 +2254,6 @@ void LanesLexicon::writeSettings() {
     settings.setValue(SID_SYSTEM_POS, pos());
     settings.setValue(SID_SYSTEM_CURRENT_TAB,m_tabs->currentIndex());
     settings.setValue(SID_SYSTEM_RUN_DATE,QDateTime::currentDateTime().toString(Qt::ISODate));
-    settings.setValue(SID_SYSTEM_ALLOW_DUPLICATES,m_allowDuplicatesPermanent);
     if (m_navMode == LanesLexicon::ByRoot) {
       settings.setValue(SID_SYSTEM_BY_ROOT,true);
     }
@@ -3568,6 +3570,7 @@ void LanesLexicon::currentTabChanged(int ix) {
  * @return
  */
 int LanesLexicon::searchTabs(const Place & p,bool activate) {
+  QLOG_DEBUG() << Q_FUNC_INFO << QString("Allow duplicates:%1").arg(m_allowDuplicates);
   if (m_allowDuplicates) {
     return -1;
   }
@@ -5339,14 +5342,10 @@ void LanesLexicon::onFocusContent() {
 }
 void LanesLexicon::onAllowDuplicates() {
   m_allowDuplicates = ! m_allowDuplicates;
-  SETTINGS
-
- settings.beginGroup("System");
- settings.setValue(SID_SYSTEM_ALLOW_DUPLICATES,m_allowDuplicates);
- if (m_allowDuplicates) {
-   statusMessage(tr("Duplicates allowed"));
- }
- else {
-   statusMessage(tr("Duplicates not allowed"));
- }
+  if (m_allowDuplicates) {
+    statusMessage(tr("Duplicates allowed"));
+  }
+  else {
+    statusMessage(tr("Duplicates not allowed"));
+  }
 }
