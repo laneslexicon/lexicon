@@ -37,22 +37,36 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   m_about = new QLineEdit;
   leftlayout->addRow(tr("About"),addLine(m_about,SID_ICON_ABOUT));
+
   m_back = new QLineEdit;
   leftlayout->addRow(tr("Back"),addLine(m_back,SID_ICON_BACK));
+
+  m_background = new QLineEdit;
+  leftlayout->addRow(tr("Background tab"),addLine(m_background,SID_ICON_NEW_BACKGROUND_TAB)); // new
+
   m_bookmarks = new QLineEdit;
   leftlayout->addRow(tr("Bookmarks"),addLine(m_bookmarks,SID_ICON_BOOKMARKS));
   m_clear = new QLineEdit;
   leftlayout->addRow(tr("Clear"),addLine(m_clear,SID_ICON_CLEAR));
+
+  m_collapse = new QLineEdit;
+  leftlayout->addRow(tr("Collapse"),addLine(m_collapse,SID_ICON_COLLAPSE)); // new
+
   m_docs = new QLineEdit;
   leftlayout->addRow(tr("Docs"),addLine(m_docs,SID_ICON_DOCS));
   m_exit = new QLineEdit;
   leftlayout->addRow(tr("Exit"),addLine(m_exit,SID_ICON_EXIT));
+
+  m_expand = new QLineEdit;
+  leftlayout->addRow(tr("Expand"),addLine(m_expand,SID_ICON_EXPAND)); //new
+
+
   m_first = new QLineEdit;
   leftlayout->addRow(tr("First"),addLine(m_first,SID_ICON_FIRST));
   m_history = new QLineEdit;
   leftlayout->addRow(tr("History"),addLine(m_history,SID_ICON_HISTORY));
   m_insertLink = new QLineEdit;
-  leftlayout->addRow(tr("Inser tLink"),addLine(m_insertLink,SID_ICON_INSERT_LINK));
+  leftlayout->addRow(tr("Insert Link"),addLine(m_insertLink,SID_ICON_INSERT_LINK));
   m_keymaps = new QLineEdit;
   leftlayout->addRow(tr("Keymaps"),addLine(m_keymaps,SID_ICON_KEYMAPS));
   m_keymapsDisabled = new QLineEdit;
@@ -62,18 +76,28 @@ IconOptions::IconOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_link = new QLineEdit;
   leftlayout->addRow(tr("Link"),addLine(m_link,SID_ICON_LINK));
 
+  m_list = new QLineEdit;
+  leftlayout->addRow(tr("List"),addLine(m_list,SID_ICON_FLATTEN)); // new
 
-  m_localSearch = new QLineEdit;
-  leftlayout->addRow(tr("Local search"),addLine(m_localSearch,SID_ICON_LOCAL_SEARCH));
-  m_localSearchNext = new QLineEdit;
-  leftlayout->addRow(tr("Local search next"),addLine(m_localSearchNext,SID_ICON_LOCAL_SEARCH_NEXT));
-
+  m_load = new QLineEdit;
+  leftlayout->addRow(tr("Load"),addLine(m_load,SID_ICON_LOAD));  // new
 
   QFormLayout * rightlayout = new QFormLayout;
+  m_localSearch = new QLineEdit;
+  rightlayout->addRow(tr("Local search"),addLine(m_localSearch,SID_ICON_LOCAL_SEARCH));
+  m_localSearchNext = new QLineEdit;
+  rightlayout->addRow(tr("Local search next"),addLine(m_localSearchNext,SID_ICON_LOCAL_SEARCH_NEXT));
+
+
+
   m_logs = new QLineEdit;
   rightlayout->addRow(tr("Logs"),addLine(m_logs,SID_ICON_LOGS));
   m_narrow = new QLineEdit;
   rightlayout->addRow(tr("Narrow"),addLine(m_narrow,SID_ICON_NARROW));
+
+  m_newTab = new QLineEdit;
+  rightlayout->addRow(tr("New tab"),addLine(m_newTab,SID_ICON_NEW_TAB)); //
+
   m_next = new QLineEdit;
   rightlayout->addRow(tr("Next"),addLine(m_next,SID_ICON_NEXT));
   m_notes = new QLineEdit;
@@ -202,7 +226,26 @@ void IconOptions::readSettings(bool reload) {
 
   m_notes->setText(settings.value(SID_ICON_NOTES,QString()).toString());
   setIconFromField(m_notes,SID_ICON_NOTES);
+  //
+  // for the new contentspanel
+  //
+  m_expand->setText(settings.value(SID_ICON_EXPAND,QString()).toString());
+  setIconFromField(m_expand,SID_ICON_EXPAND);
 
+  m_collapse->setText(settings.value(SID_ICON_COLLAPSE,QString()).toString());
+  setIconFromField(m_collapse,SID_ICON_COLLAPSE);
+
+  m_load->setText(settings.value(SID_ICON_LOAD,QString()).toString());
+  setIconFromField(m_load,SID_ICON_LOAD);
+
+  m_list->setText(settings.value(SID_ICON_FLATTEN,QString()).toString());
+  setIconFromField(m_list,SID_ICON_FLATTEN);
+
+  m_newTab->setText(settings.value(SID_ICON_NEW_TAB,QString()).toString());
+  setIconFromField(m_newTab,SID_ICON_NEW_TAB);
+
+  m_background->setText(settings.value(SID_ICON_NEW_BACKGROUND_TAB,QString()).toString());
+  setIconFromField(m_background,SID_ICON_NEW_BACKGROUND_TAB);
 
   m_dirty = false;
 }
@@ -255,6 +298,20 @@ void IconOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ICON_ZOOM_IN,m_zoomIn->text());
   settings.setValue(SID_ICON_ZOOM_OUT,m_zoomOut->text());
   settings.setValue(SID_ICON_NOTES,m_notes->text());
+  //
+  // for the new contentspanel
+  //
+  settings.setValue(SID_ICON_EXPAND,m_expand->text());
+
+  settings.setValue(SID_ICON_COLLAPSE,m_collapse->text());
+
+  settings.setValue(SID_ICON_LOAD,m_load->text());
+
+  settings.value(SID_ICON_FLATTEN,m_list->text());
+
+  settings.value(SID_ICON_NEW_TAB,m_newTab->text());
+
+  settings.value(SID_ICON_NEW_BACKGROUND_TAB,m_background->text());
 
   m_dirty = false;
   settings.sync();
@@ -376,6 +433,29 @@ bool IconOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_ICON_NOTES,m_notes)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ICON_EXPAND,m_expand)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ICON_COLLAPSE,m_collapse)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ICON_LOAD,m_load)) {
+    m_dirty = true;
+
+  }
+  if (compare(&settings,SID_ICON_FLATTEN,m_list)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ICON_NEW_TAB,m_newTab)) {
+    m_dirty = true;
+  }
+
+  if (compare(&settings,SID_ICON_NEW_BACKGROUND_TAB,m_background)) {
     m_dirty = true;
   }
 
