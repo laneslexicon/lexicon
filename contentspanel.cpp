@@ -212,9 +212,6 @@ void ContentsPanel::onLoad() {
   if (! item->parent()) { // letter
     return;
   }
-  for(int i=0;i < item->columnCount();i++) {
-    qDebug() << i << item->text(i);
-  }
   if (! item->parent()->parent()) {
     m_tree->itemDoubleClicked(item,0);
     return;
@@ -241,6 +238,5 @@ void ContentsPanel::onClick() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 
   QToolButton * button  = qobject_cast<QToolButton *>(sender());
-  //  qDebug() << button->text() << button->isDown() << button->isChecked();
   button->setChecked(! button->isChecked());
 }

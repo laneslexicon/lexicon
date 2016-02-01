@@ -385,6 +385,8 @@ void LanesLexicon::cleanup() {
   QFontDatabase::removeAllApplicationFonts();
   freeXslt();
   im_free(m_mapper);
+  QLOG_INFO() << QDateTime::currentDateTime().toLocalTime().toString().toLocal8Bit().constData();
+  QLOG_INFO() << "Exiting";
 }
 void LanesLexicon::onSetInterface(bool triggered) {
   bool v = m_minimalAction->isChecked();
@@ -1706,8 +1708,7 @@ void LanesLexicon::treeItemDoubleClicked(QTreeWidgetItem * item,int /* column */
         (QApplication::keyboardModifiers() & Qt::ControlModifier)) {
     newTab = true;
   }
-  qDebug() << newTab << activateTab;
-  /// click on a root
+    /// click on a root
   if (item->parent() == 0) {
     Place m = Place::fromRoot(item->text(0));
     showPlace(m,newTab,activateTab);
@@ -1912,30 +1913,11 @@ bool LanesLexicon::eventFilter(QObject * target,QEvent * event) {
         break;
     }
     case Qt::Key_Left: {
-      //      qDebug() << "Left";
         break;
     }
     case Qt::Key_Right: {
-      //      qDebug() << "Right";
         break;
     }
-        /*
-      case Qt::Key_T: {
-        if (keyEvent->modifiers() && Qt::ControlModifier) {
-          m_tree->setFocus();
-          return true;
-        }
-        break;
-      }
-      case Qt::Key_E: {
-        if (keyEvent->modifiers() && Qt::ControlModifier) {
-          if (target == m_tree)
-          m_tabs->currentWidget()->setFocus();
-          return true;
-        }
-        break;
-      }
-        */
     default:
       break;
     }
@@ -4844,19 +4826,14 @@ void LanesLexicon::onImportLinks() {
       if (!showWarning && (p[0] != dbVersion)) {
         skip =  ! ignoreDbVersion;
       }
-      //      qDebug() << QString("skipalways %1, skip %2, noshow %3, ignoredb %4").arg(skipAlways).arg(skip).arg(showWarning).arg(ignoreDb);
-
       nodefind.bindValue(0,fromnode);
       if (! nodefind.exec()) {
         QString str = QString(tr("Import links error: SQL error : %1")).arg(nodefind.lastError().text());
         QLOG_INFO() << str;
-        //        statusMessage(str);
         skip = true;
-        //        return;
       }
       if (! nodefind.first()) {
         QString str = QString(tr("Import links error: cannot find entry: %1")).arg(fromnode);
-        //        QLOG_INFON() << str;
         statusMessage(str);
         skip = true;
         return;
