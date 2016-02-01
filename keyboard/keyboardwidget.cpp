@@ -9,16 +9,21 @@
  * @param parent
  */
 KeyboardWidget::KeyboardWidget(QWidget * parent) : QDialog(parent) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   setObjectName("keyboardwidget");
   m_keyboardConfig = "keyboard.ini";
   m_keyboardDirectory = ".";
   this->setup();
 }
 KeyboardWidget::KeyboardWidget(const QString & d,const QString & config,QWidget * parent) : QDialog(parent) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
   setObjectName("keyboardwidget");
   m_keyboardConfig = config;
   m_keyboardDirectory = d;
   this->setup();
+}
+KeyboardWidget::~KeyboardWidget() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
 }
 /**
  *
@@ -40,12 +45,15 @@ KeyboardWidget::KeyboardWidget(const QString & d,const QString & config,QWidget 
 
   m_transform = m_view->transform();
 
+  m_keyboards->setCurrentIndex(-1);
+
   connect(m_view,SIGNAL(virtualKeyPressed(int)),this,SLOT(virtualKeyPressed(int)));
   connect(m_view,SIGNAL(virtualKeyPressed(QList<int>)),this,SLOT(virtualKeyPressed(QList<int>)));
   connect(m_keyboards,SIGNAL(currentIndexChanged(int)),this,SLOT(loadKeyboard(int)));
 
   if (! m_defaultKeyboard.isEmpty()) {
     int ix = m_keyboards->findText(m_defaultKeyboard);
+    /// this loads the keyboards
     m_keyboards->setCurrentIndex(ix);
   }
 }
@@ -113,6 +121,8 @@ void KeyboardWidget::loadDefinitions(const QString & targetScript) {
 }
 void KeyboardWidget::loadKeyboard(int /*ix */) {
   QString name = m_keyboards->currentData().toString();
+
+  QLOG_DEBUG() << Q_FUNC_INFO << QDir::current().relativeFilePath(name);
   m_view->loadKeyboard(name);
   this->autoScale();
 }
@@ -190,11 +200,10 @@ void KeyboardWidget::virtualKeyPressed(QList<int> k) {
   }
 }
 void KeyboardWidget::readSettings() {
-  QLOG_DEBUG() << Q_FUNC_INFO << m_keyboardDirectory << m_keyboardConfig;
+  QLOG_DEBUG() << Q_FUNC_INFO;// << m_keyboardDirectory << m_keyboardConfig;
   QFileInfo fi(m_keyboardDirectory,m_keyboardConfig);
   QSettings settings(fi.absoluteFilePath(),QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
-  QLOG_DEBUG() << Q_FUNC_INFO << settings.fileName();
   settings.beginGroup("System");
   m_defaultKeyboard = settings.value("Default",QString()).toString();
   m_keepAspectRatio = settings.value("Keep aspect ratio",false).toBool();

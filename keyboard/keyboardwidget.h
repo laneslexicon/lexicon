@@ -25,6 +25,7 @@ class KeyboardWidget : public QDialog {
  public:
   KeyboardWidget(QWidget * parent = 0);
   KeyboardWidget(const QString & keyboardDir,const QString & configname,QWidget * parent = 0);
+  ~KeyboardWidget();
   void setTarget(QWidget * w) { m_target = w;};
   void loadDefinitions(const QString & targetScript = QString());
   bool isAttached();
