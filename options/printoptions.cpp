@@ -195,7 +195,7 @@ void PrintOptions::readSettings(bool /* reload */) {
   m_fullPage->setChecked(settings.value(SID_PRINTER_FULL_PAGE).toBool());
   m_alwaysUse->setChecked(settings.value(SID_PRINTER_USE).toBool());
   m_pdfOutput->setChecked(settings.value(SID_PRINTER_OUTPUT_PDF).toBool());
-  m_pdfDirectory->setText(settings.value(SID_PRINTER_PDF_DIRECTORY,QDir::tempPath()).toString());
+  m_pdfDirectory->setText(settings.value(SID_PRINTER_PDF_DIRECTORY,QString()).toString());
   m_pdfAutoName->setChecked(settings.value(SID_PRINTER_AUTONAME_PDF).toBool());
   /*
   int ix = m_pdfName->findData(settings.value(SID_PRINTER_AUTONAME_METHOD).toString());
