@@ -3142,36 +3142,57 @@ void LanesLexicon::onDocs() {
  * @param ok
  */
 void LanesLexicon::onHelpLoaded(bool ok) {
-  if (! ok ) {
-    /// check that the initial page has loaded
-    /// if that has failed, then warn the user
-    if (! m_helpview->isLoaded()) {
-      QString docSource;
-      if (m_helpview->isOffline()) {
-        docSource = "local";
-      }
-      else {
-        docSource = "online";
-      }
-      delete m_helpview;
-      m_helpview = NULL;
-      QMessageBox::warning(this, tr("Documentation Error"),
-                           QString(tr("There was a problem loading the %1 documentation.\n"
-                                      "Please check the settings and try again.")).arg(docSource),
-                           QMessageBox::Ok);
-      return;
+  if (ok) {
+    m_helpview->show();
+    m_helpview->activateWindow();
+    return;
+  }
+  /// check that the initial page has loaded
+  /// if that has failed, then warn the user
+
+  m_helpview->hide();
+  if (! m_helpview->isLoaded()) {
+    QString docSource;
+    if (m_helpview->isOffline()) {
+      docSource = "local";
     }
     else {
-      /// this is more of a 404 error with an individual page
-      QMessageBox::warning(this, tr("Documentation Error"),
-                           QString(tr("There was a problem loading the page:\n"
-                                      "%1")).arg(m_helpview->lastWishes().toString()),
-                           QMessageBox::Ok);
-      QLOG_WARN() << "Error loading page"  << m_helpview->lastWishes();
+      docSource = "online";
     }
+    delete m_helpview;
+    m_helpview = NULL;
+    QMessageBox::warning(this, tr("Documentation Error"),
+                         QString(tr("There was a problem loading the %1 documentation.\n"
+                                    "Please check the settings and try again.")).arg(docSource),
+                         QMessageBox::Ok);
+    return;
   }
-  m_helpview->show();
-  m_helpview->activateWindow();
+  /// this is more of a 404 error with an individual page
+  QString err;
+  if (m_helpview->isOffline()) {
+    QFileInfo fi(m_helpview->lastWishes().toLocalFile());
+    if (! fi.exists()) {
+      err =  QString("<body><p>%1<br/><br/>%2<br/><br/>%3</p></body>")
+        .arg(QString(tr("The local help file:")))
+        .arg(m_helpview->lastWishes().toString())
+        .arg(QString(tr("is missing. Please check the System tab in the Options dialog.")));
+    }
+    else {
+      err =  QString("<body><p>%1<br/><br/>%2<br/><br/>%3</p></body>")
+        .arg(QString(tr("There was a problem loading the local help file:")))
+        .arg(m_helpview->lastWishes().toString())
+        .arg(QString(tr("Please check the System tab in the Options dialog.")));
+    }
+    QMessageBox::warning(this, tr("Documentation Error"),err,QMessageBox::Ok);
+    QLOG_WARN() << "Missing local page"  << m_helpview->lastWishes().toLocalFile();
+    return;
+  }
+  err = QString("<body><p>%1<br/><br/>%2<br/><br/>%3</p></body>")
+        .arg(QString(tr("There was a problem loading the help file:")))
+        .arg(m_helpview->lastWishes().toString())
+        .arg(QString(tr("Please check the System tab in the Options dialog.")));
+  QMessageBox::warning(this, tr("Documentation Error"),err,QMessageBox::Ok);
+  QLOG_WARN() << "Error loading online page"  << m_helpview->lastWishes();
 }
 void LanesLexicon::onAbout() {
   AboutDialog d;
