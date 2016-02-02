@@ -222,7 +222,7 @@ void GraphicsEntry::keyPressEvent(QKeyEvent * event) {
   if (event->modifiers() && Qt::ControlModifier) {
     //    return;
   }
-  QLOG_DEBUG() << Q_FUNC_INFO << event->modifiers() << event->key() << event->text();
+  //  QLOG_DEBUG() << Q_FUNC_INFO << event->modifiers() << event->key() << event->text();
   if (! m_reloadKey.isEmpty() && (event->text() == m_reloadKey)) {
     //   statusMessage(tr("Reload"));
     onReload();
