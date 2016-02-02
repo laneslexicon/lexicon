@@ -132,6 +132,7 @@ void PrintOptions::onPrintDialog() {
     msgBox.setInformativeText(tr("All printing will be to PDF"));
     msgBox.exec();
     m_pdfOutput->setChecked(true);
+    m_alwaysUse->setChecked(true);
     return;
   }
   QPrinter * p = new QPrinter();
