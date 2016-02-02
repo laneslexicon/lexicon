@@ -1,12 +1,14 @@
 #-------------------------------------------------
 #
-#
+# This version requires webkitwidgets which is
+# deprecated as of 5.6 (?). When its replacement
+# is available on freeBSD the help system can be
+# rewritten to use it.
 #-------------------------------------------------
 QT       += core gui printsupport
 QT       += webkitwidgets
 QT       += xml
 QT       += sql
-#QT       += help
 QT       += svg
 CONFIG   += release
 CONFIG   += libxslt
@@ -23,6 +25,9 @@ TEMPLATE = app
     system(copy dummy_version.cpp version.cpp)
    }
 }
+#
+# Library and include paths LibXslt
+#
 libxslt {
 ! win32 {
   INCLUDEPATH += /usr/include/libxml2 /usr/local/include/libxml2 /usr/local/include
@@ -36,9 +41,16 @@ LIBS += -L"C:\Users\andrewsg\My Documents\libxslt-1.1.26.win32\lib" -llibxslt
   INCLUDEPATH += c:/Users/andrewsg/xslt/include
   LIBS += -Lc:/Users/andrewsg/xslt/lib -llibxml2 -llibxslt
 }
+#
+#
+#
 DEFINES += USE_LIBXSLT
 DEFINES += LANE
 }
+#
+# Never completed using Xalan. LibXslt seemed a lot easier to incorporate
+#
+#
 xalan {
 INCLUDEPATH += /usr/include/xalanc/PlatformSupport
 INCLUDEPATH += /usr/include/xalanc/XalanTransformer
@@ -47,8 +59,7 @@ DEFINES += USE_XALAN
 }
 INCLUDEPATH += ./qslog
 RESOURCES += laneslexicon.qrc
-#LIBS +=   -lboost_thread-mt -lboost_system -lboost_filesystem
-TRANSLATIONS = laneslexicon_de.ts laneslexicon_fr.ts
+#TRANSLATIONS = laneslexicon_de.ts laneslexicon_fr.ts
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 macx:ICON=$${PWD}/laneslexicon.icns
@@ -56,7 +67,7 @@ macx:ICON=$${PWD}/laneslexicon.icns
 QMAKE_CXXFLAGS += -Wunused-parameter
 include(qslog/QsLog.pri)
 include(imedit/imedit.pri)
-include(keyboard/keyboard.pri)
+include(keyboard/keyboard.pris)
 include(options/options.pri)
 include(notes/notes.pri)
 SOURCES += main.cpp\
@@ -71,8 +82,6 @@ SOURCES += main.cpp\
         history.cpp \
         place.cpp \
         fullsearch.cpp \
- #       focustable.cpp \
- #       helpviewer.cpp \
         menubar.cpp \
         tabwidget.cpp \
         application.cpp \
@@ -88,7 +97,6 @@ SOURCES += main.cpp\
         historylist.cpp \
         nodeinfo.cpp \
         fontchangedialog.cpp \
-#        arabicfontdialog.cpp \
         zoomdialog.cpp \
         editview.cpp \
         deletethemedialog.cpp \
@@ -120,8 +128,6 @@ HEADERS  += laneslexicon.h \
             history.h \
             place.h \
             fullsearch.h \
-#            focustable.h \
-#            helpviewer.h \
             menubar.h \
             tabwidget.h \
             application.h \
@@ -139,7 +145,6 @@ HEADERS  += laneslexicon.h \
             historylist.h \
             nodeinfo.h \
             fontchangedialog.h \
-#            arabicfontdialog.h \
             zoomdialog.h \
             editview.h \
             deletethemedialog.h \
