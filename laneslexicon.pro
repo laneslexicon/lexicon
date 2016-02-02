@@ -67,7 +67,7 @@ macx:ICON=$${PWD}/laneslexicon.icns
 QMAKE_CXXFLAGS += -Wunused-parameter
 include(qslog/QsLog.pri)
 include(imedit/imedit.pri)
-include(keyboard/keyboard.pris)
+include(keyboard/keyboard.pri)
 include(options/options.pri)
 include(notes/notes.pri)
 SOURCES += main.cpp\
