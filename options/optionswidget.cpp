@@ -119,6 +119,11 @@ void OptionsWidget::dateTimeChanged(const QDateTime & /* v */) {
   setButtons(v);
   emit(modified(v));
 }
+void OptionsWidget::toggled() {
+  bool v = isModified();
+  setButtons(v);
+  emit(modified(v));
+}
 /*
 bool OptionsWidget::isModified()  {
   return false;
@@ -135,6 +140,10 @@ void OptionsWidget::blockAllSignals(bool block) {
   }
   QList<QCheckBox *> checkboxes = this->findChildren<QCheckBox *>();
   foreach(QCheckBox *  widget,checkboxes) {
+    widget->blockSignals(block);
+  }
+  QList<QRadioButton *> radios = this->findChildren<QRadioButton *>();
+  foreach(QRadioButton *  widget,radios) {
     widget->blockSignals(block);
   }
   QList<QComboBox *> comboboxes = this->findChildren<QComboBox *>();
@@ -171,6 +180,10 @@ void OptionsWidget::setupConnections() {
   QList<QCheckBox *> checkboxes = this->findChildren<QCheckBox *>();
   foreach(QCheckBox *  widget,checkboxes) {
       connect(widget,SIGNAL(stateChanged(int)),this,SLOT(stateChanged(int)));
+  }
+  QList<QRadioButton *> radios = this->findChildren<QRadioButton *>();
+  foreach(QRadioButton *  widget,radios) {
+    connect(widget,SIGNAL(toggled()),this,SLOT(toggled()));
   }
   QList<QComboBox *> comboboxes = this->findChildren<QComboBox *>();
   foreach(QComboBox *  widget,comboboxes) {
@@ -308,6 +321,20 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
           .arg(key)
           .arg(settings->value(key).toString())
           .arg(v);
+        if (m_debug) {
+          QLOG_DEBUG() << m_changes.last();
+        }
+      return true;
+    }
+  }
+  QRadioButton * radio = qobject_cast<QRadioButton *>(p);
+  if (radio) {
+    QString v = radio->text();
+    if (settings->value(key).toBool() != radio->isChecked()) {
+        m_changes  << QString("%1 | %2 | %3")
+          .arg(key)
+          .arg(settings->value(key).toBool())
+          .arg(radio->isChecked());
         if (m_debug) {
           QLOG_DEBUG() << m_changes.last();
         }

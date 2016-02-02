@@ -23,6 +23,7 @@
 #include <QKeySequence>
 #include <QDateTimeEdit>
 #include <QTextCodec>
+#include <QRadioButton>
 #define SMALL_EDIT 30
 #define MEDIUM_EDIT 50
 #define LARGE_EDIT 100
@@ -63,6 +64,7 @@ class OptionsWidget : public QWidget {
   virtual void valueChanged(double);
   virtual void keySequenceChanged(const QKeySequence &);
   virtual void dateTimeChanged(const QDateTime &);
+  virtual void toggled();
    void textChanged(const QString &);
  protected:
   bool m_dirty;
