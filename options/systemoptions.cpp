@@ -198,8 +198,6 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   addButtons();
   readSettings();
   setupConnections();
-  connect(m_insertNewTab,SIGNAL(toggled(bool)),this,SLOT(valueChanged(bool)));
-  connect(m_appendNewTab,SIGNAL(toggled(bool)),this,SLOT(valueChanged(bool)));
   this->setLineEditSize(VLARGE_EDIT);
   this->setComboSize(VLARGE_EDIT);
 
@@ -486,7 +484,7 @@ bool SystemOptions::isModified()  {
   if (str != m_offlineCurrentPage->text()) {
     m_dirty = true;
     if (m_debug) {
-      QLOG_DEBUG() << "Is Modified" << SID_HELP_LOCAL_URL << str << m_offlineCurrentPage->text();
+      //      QLOG_DEBUG() << "Is Modified" << SID_HELP_LOCAL_URL << str << m_offlineCurrentPage->text();
     }
   }
   if (compare(&settings,SID_HELP_LOCAL,m_localDocs)) {
@@ -568,7 +566,7 @@ void SystemOptions::onOfflineLocation() {
   if (dir.isEmpty()) {
     return;
   }
-  m_offlineLocation->setText(dir);
+  m_offlineLocation->setText(QDir::current().relativeFilePath(dir));
 }
 void SystemOptions::onShowSplash() {
   getLexicon()->showPath(Lexicon::Splash);
