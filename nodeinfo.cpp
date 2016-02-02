@@ -51,7 +51,7 @@ NodeInfo::NodeInfo(QWidget * parent)
 
   QHBoxLayout * boxlayout = new QHBoxLayout;
   m_closeOnTabLoad = new QCheckBox(tr("Close after load"));
-  m_alwaysLoad = new QCheckBox(tr("Force load in new tab"));
+  m_alwaysLoad = new QCheckBox(tr("Load in new tab"));
   boxlayout->addWidget(m_closeOnTabLoad);
   boxlayout->addWidget(m_alwaysLoad);
   boxlayout->addWidget(buttonBox);
