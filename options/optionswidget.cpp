@@ -119,7 +119,7 @@ void OptionsWidget::dateTimeChanged(const QDateTime & /* v */) {
   setButtons(v);
   emit(modified(v));
 }
-void OptionsWidget::toggled() {
+void OptionsWidget::toggled(bool /* v */) {
   bool v = isModified();
   setButtons(v);
   emit(modified(v));
@@ -183,7 +183,7 @@ void OptionsWidget::setupConnections() {
   }
   QList<QRadioButton *> radios = this->findChildren<QRadioButton *>();
   foreach(QRadioButton *  widget,radios) {
-    connect(widget,SIGNAL(toggled()),this,SLOT(toggled()));
+    connect(widget,SIGNAL(toggled(bool)),this,SLOT(toggled(bool)));
   }
   QList<QComboBox *> comboboxes = this->findChildren<QComboBox *>();
   foreach(QComboBox *  widget,comboboxes) {

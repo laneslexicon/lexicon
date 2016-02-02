@@ -64,7 +64,7 @@ class OptionsWidget : public QWidget {
   virtual void valueChanged(double);
   virtual void keySequenceChanged(const QKeySequence &);
   virtual void dateTimeChanged(const QDateTime &);
-  virtual void toggled();
+  virtual void toggled(bool);
    void textChanged(const QString &);
  protected:
   bool m_dirty;
