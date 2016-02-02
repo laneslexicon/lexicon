@@ -1294,11 +1294,11 @@ void LanesLexicon::createToolBar() {
 void LanesLexicon::historyAddition(const Place & p) {
   QString t = p.getShortText();
   if (! t.isEmpty()) {
-    statusBar()->showMessage(tr("History added:") + p.getShortText());
+    //    statusBar()->showMessage(tr("History added:") + p.getShortText());
     setupHistory(-1);
   }
   else {
-    QLOG_DEBUG() << Q_FUNC_INFO << "empty text" << p.toString();
+    //    QLOG_DEBUG() << Q_FUNC_INFO << "empty text" << p.toString();
   }
 }
 void LanesLexicon::historyPositionChanged(int pos) {
@@ -1548,8 +1548,11 @@ void LanesLexicon::createStatusBar() {
     m_linkButton->setToolTip(tr("Contents are not linked. Click to link"));
     m_linkButton->setText(tr("Contents not linked"));
   }
-
-
+  m_statusMessage = new QLabel;
+  statusBar()->addWidget(m_statusMessage,1);
+  m_messageTimer = new QTimer(this);
+  m_messageTimer->setInterval(m_messageInterval * 1000);
+  connect(m_messageTimer,SIGNAL(timeout()),this,SLOT(onMessageTimeout()));
   connect(m_linkAction,SIGNAL(triggered()),this,SLOT(onLinkChanged()));
 
   statusBar()->addPermanentWidget(m_placeIndicator);
@@ -3015,8 +3018,14 @@ void LanesLexicon::movePreviousHead(const Place & p) {
   }
 }
 void LanesLexicon::setStatus(const QString & txt) {
-  QLOG_INFO() << txt.toLocal8Bit().constData();
-  statusBar()->showMessage(txt,m_messageInterval * 1000);
+  QLOG_INFO() << Q_FUNC_INFO << txt.toLocal8Bit().constData();
+  statusBar()->clearMessage();
+  m_messageTimer->stop();
+  m_statusMessage->setText(txt);
+  m_messageTimer->start();
+}
+void LanesLexicon::onMessageTimeout() {
+  m_statusMessage->setText("");
 }
 /**
  * Use the spanArabic function to set the font

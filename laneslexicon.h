@@ -41,7 +41,7 @@
 #include <QDockWidget>
 #include <QInputDialog>
 #include <QActionGroup>
-
+#include <QTimer>
 #include <QUrl>
 #include <QPrinter>
 #include <QPrintDialog>
@@ -103,6 +103,7 @@ class LanesLexicon : public QMainWindow
       void onLoadPageSet();
       void onEditPageSet();
     private slots:
+      void onMessageTimeout();
       void onAllowDuplicates();
       void onFocusContent();
       void onTabList();
@@ -311,6 +312,8 @@ class LanesLexicon : public QMainWindow
       int m_messageInterval;
 
       QLabel * m_placeIndicator;
+      QLabel * m_statusMessage;
+      QTimer * m_messageTimer;
 
       ArabicSearchDialog * m_rootSearchDialog;
       ArabicSearchDialog * m_wordSearchDialog;
