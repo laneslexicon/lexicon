@@ -153,6 +153,7 @@ class GraphicsEntry : public QWidget {
     SearchOptions m_currentSearchOptions;
 
     QList<int> m_searchItemIndexes;
+    QString getPdfDirectory();
     int m_searchItemPtr;
     int m_searchIndex;
 

@@ -2221,6 +2221,21 @@ void GraphicsEntry::print(QPrinter & printer,const QString & node) {
     if (pdfdir.isEmpty()) {
       pdfdir = QDir::tempPath();
     }
+    QDir d(pdfdir);
+    if (! d.exists()) {
+      int ret = QMessageBox::warning(this, tr("Print Error"),
+                         QString(tr("The print destination directory does not exist: %1 .\n"
+                                    "Do you wish to continue.")).arg(pdfdir),
+                           QMessageBox::Yes|QMessageBox::No);
+      if (ret == QMessageBox::No) {
+        return;
+      }
+
+      pdfdir = this->getPdfDirectory();
+      if (pdfdir.isEmpty()) {
+        statusMessage(tr("Printing cancelled"));
+      }
+    }
     QString filename;
     filename = getOutputFilename(pdfdir,settings.value(SID_PRINTER_AUTONAME_PDF).toBool(),
                                  settings.value(SID_PRINTER_AUTONAME_METHOD).toString(),node);
@@ -2726,4 +2741,18 @@ void GraphicsEntry::onFocusItemChanged(QGraphicsItem * newFocus, QGraphicsItem *
 }
 void GraphicsEntry::setReposition(bool v) {
   m_reposition = v;
+}
+QString GraphicsEntry::getPdfDirectory() {
+  QString directoryname = QFileDialog::getExistingDirectory();
+  if (directoryname.isEmpty()) {
+      QMessageBox::warning(this, tr("Print Error"),
+                                     QString(tr("No print destination directory. Printing will be cancelled.")),
+                                             QMessageBox::Ok);
+      return QString();
+  }
+  SETTINGS
+  settings.beginGroup("Printer");
+  settings.setValue(SID_PRINTER_PDF_DIRECTORY,QDir::current().relativeFilePath(directoryname));
+
+  return directoryname;
 }
