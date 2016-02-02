@@ -2182,6 +2182,15 @@ void LanesLexicon::readSettings() {
   settings.beginGroup("Bookmark");
   m_bookmarkMenuFormat = settings.value(SID_BOOKMARK_MENU_FORMAT,"Root:%R,Entry:%H, Vol %V/%P (%N)").toString();
   settings.endGroup();
+
+  QList<QPrinterInfo> printers = QPrinterInfo::availablePrinters();
+  if (printers.size() > 0) {
+      return;
+  }
+  settings.beginGroup("Printer");
+  settings.setValue(SID_PRINTER_USE,true);
+  settings.setValue(SID_PRINTER_OUTPUT_PDF,true);
+  settings.endGroup();
 }
 void LanesLexicon::writeSettings() {
 
