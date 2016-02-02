@@ -41,10 +41,10 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   connect(m_view,SIGNAL(loadProgress(int)),this,SLOT(loadProgress(int)));
   connect(m_view,SIGNAL(loadStarted()),this,SLOT(loadStarted()));
   connect(m_view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
-  if (m_initialPage) {
-    this->hide();
-    m_view->hide();
-  }
+  //  if (m_initialPage) {
+  //    this->hide();
+  //    m_view->hide();
+  //  }
 
   readSettings();
 }
@@ -96,6 +96,7 @@ bool HelpView::loadHelpSystem() {
       startPage = QUrl(prefix + "/" + "index.html");
     }
   }
+  m_currentUrl = startPage;
   QLOG_DEBUG() << Q_FUNC_INFO << "Loading initial page" << startPage;
   m_view->load(startPage);
   m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
@@ -144,7 +145,14 @@ void HelpView::readSettings() {
 
   m_localRoot = settings.value(SID_HELP_LOCAL_LOCATION,"site").toString();
   m_localPrefix = settings.value(SID_HELP_LOCAL_PREFIX,"file://").toString();
-  m_currentLocalPage = settings.value(SID_HELP_LOCAL_URL,QUrl()).toUrl();
+
+  QString str = settings.value(SID_HELP_LOCAL_URL,QString()).toString();
+
+
+  QDir d = QDir::current();
+  d.setPath(m_localRoot);
+  QFileInfo fi(d,str);
+  m_currentLocalPage = QUrl::fromLocalFile(fi.absoluteFilePath());
 
   m_onlineRoot = settings.value(SID_HELP_ONLINE_LOCATION,QString()).toString();
   m_onlinePrefix = settings.value(SID_HELP_ONLINE_PREFIX,"http://").toString();
@@ -162,9 +170,16 @@ void HelpView::writeSettings() {
   settings.beginGroup("Help");
   settings.setValue(SID_HELP_SIZE, size());
   settings.setValue(SID_HELP_POS, pos());
+
+  QString localbase = settings.value(SID_HELP_LOCAL_LOCATION,"site").toString();
+  //  QFileInfo fi(QDir::current(),localbase);
+  QString str;
+  QDir d = QDir::current();
+  d.setPath(localbase);
   if (m_localSource) {
     if (m_view->url().isLocalFile()) {
-      settings.setValue(SID_HELP_LOCAL_URL, m_view->url());
+      QString str = m_view->url().toLocalFile();
+      settings.setValue(SID_HELP_LOCAL_URL, d.relativeFilePath(str));//m_view->url());
     }
   }
   else {
@@ -186,12 +201,15 @@ void HelpView::loadProgress(int x) {
 }
 void HelpView::loadStarted() {
   if (m_initialPage) {
-    m_progress = new QProgressDialog("Loading ...", "Cancel", 0, 100);
+    this->showMinimized();
+    m_progress = new QProgressDialog(tr("Loading ..."), tr("Cancel"), 0, 100);
+    m_progress->setWindowTitle(tr("Help System"));
     //    m_progress->setCancelButton(0);
     m_timer = new QTimer(this);
     connect(m_progress, SIGNAL(canceled()), this, SLOT(onCancel()));
     m_timer->start(0);
     m_progress->show();
+    m_progress->activateWindow();
   }
 }
 /**
@@ -202,6 +220,7 @@ void HelpView::loadStarted() {
 void HelpView::loadFinished(bool ok) {
   QLOG_DEBUG() << Q_FUNC_INFO << m_view->url() << ok;
   if (m_initialPage) {
+    this->showNormal();
     m_view->show();
     m_initialPage = false;
     m_timer->stop();
@@ -215,10 +234,14 @@ void HelpView::loadFinished(bool ok) {
     emit(helpSystemLoaded(ok));
   }
   if (ok) {
-    this->show();
+    this->showNormal();
+    m_view->show();
     m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     m_forwardButton->setEnabled(m_view->page()->history()->canGoForward());
     m_backButton->setEnabled(m_view->page()->history()->canGoBack());
+  }
+  else {
+    QLOG_INFO() << "Load failed";
   }
   if (! m_initialPage ) {
     emit(finished(ok));
