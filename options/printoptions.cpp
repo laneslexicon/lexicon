@@ -310,7 +310,7 @@ bool PrintOptions::isModified()  {
 }
 void PrintOptions::onDirectory() {
   QString directoryName = QFileDialog::getExistingDirectory();
-  m_pdfDirectory->setText(directoryName);
+  m_pdfDirectory->setText(QDir::current().relativeFilePath(directoryName));
 }
 
 void PrintOptions::setupPaperSize() {
