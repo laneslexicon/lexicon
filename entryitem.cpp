@@ -209,20 +209,13 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     this->deleteNote();
   }
   else if ((jumpAction != NULL) && (selectedAction == jumpAction)) {
-    //    QLOG_DEBUG() << "bookmark goto" << jumpAction->data();
-    //    Place p;
-    //    p.setNode(jumpAction->data().toString());
-    /// TODO check boolean values
-    //    emit(gotoNode(p,true,true));
     emit(showLinkDetails(jumpAction->data().toString()));
 
   }
   else if (htmlAction && (selectedAction == htmlAction)) {
-    QLOG_DEBUG() << "Emit html action";
     emit(showHtml());
   }
   else if (selectedAction == printAction) {
-    QLOG_DEBUG() << "sending printNode signal" << m_place.getNode();
     emit(printNode(m_place.getNode()));
   }
   this->setFocus();
