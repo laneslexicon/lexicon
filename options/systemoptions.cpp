@@ -31,7 +31,7 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   //  this->setControlSize(m_lexicon,VLARGE_EDIT);
   m_interval = new QLineEdit;
   m_interval->setValidator(new QIntValidator);
-
+  this->setControlSize(m_interval,SMALL_EDIT);
   m_docked = new QCheckBox;
   m_importCheck = new QCheckBox;
   m_importShow = new QCheckBox;
@@ -41,12 +41,12 @@ SystemOptions::SystemOptions(const QString & theme,QWidget * parent) : OptionsWi
   m_minimalInterface = new QCheckBox;
   m_restoreBookmarks = new QCheckBox;
   m_restoreTabs = new QCheckBox;
-  m_saveSettings = new QCheckBox;
+  //  m_saveSettings = new QCheckBox;
   m_saveTabs = new QCheckBox;
   m_rootNavigation = new QCheckBox;
   // Root mod
-  m_runDate = new QDateTimeEdit;
-  this->setControlSize(m_runDate,VLARGE_EDIT);
+  //  m_runDate = new QDateTimeEdit;
+  //  this->setControlSize(m_runDate,VLARGE_EDIT);
 
   // Save boo
   m_showInterfaceWarning = new QCheckBox;
@@ -96,6 +96,7 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   m_splashDuration = new QLineEdit;
   m_splashDuration->setValidator(new QIntValidator);
   this->setControlSize(m_splashDuration,SMALL_EDIT);
+
   m_allowDuplicates = new QCheckBox;
   /// there are no other radiobuttons, so just make this the parent
   QHBoxLayout * tablayout = new QHBoxLayout;
@@ -126,14 +127,12 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   optionlayout->addRow(tr("Qt style"),m_qtStyle);
   optionlayout->addRow(tr("Docked"),m_docked);
   optionlayout->addRow(tr("New tab behaviour"),tablayout);
-  optionlayout->addRow(tr("Import links ignore db mismatch"),m_importCheck);
-  optionlayout->addRow(tr("Import links show warning"),m_importShow);
   optionlayout->addRow(tr("Contents linked"),m_contentsLinked);
-  optionlayout->addRow(tr("Minimal interface"),m_minimalInterface);
   optionlayout->addRow(tr("Restore bookmarks"),m_restoreBookmarks);
   optionlayout->addRow(tr("Restore tabs"),m_restoreTabs);
-  optionlayout->addRow(tr("Save settings"),m_saveSettings);
-  optionlayout->addRow(tr("Run date"),m_runDate);
+  //  optionlayout->addRow(tr("Save settings"),m_saveSettings);
+  //  optionlayout->addRow(tr("Run date"),m_runDate);
+  optionlayout->addRow(tr("Minimal interface"),m_minimalInterface);
   optionlayout->addRow(tr("Show interface warning"),m_showInterfaceWarning);
   optionlayout->addRow(tr("Show preferences close warning"),m_optionsWarning);
   optionlayout->addRow(tr("Message duration (secs)"),m_interval);
@@ -161,6 +160,8 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   splashlayout->addStretch();
 
   optionlayout->addRow(tr("Show splash screen"),splashlayout);
+  optionlayout->addRow(tr("Import links ignore db mismatch"),m_importCheck);
+  optionlayout->addRow(tr("Import links show warning"),m_importShow);
   optionlayout->setVerticalSpacing(VERTICAL_SPACING);
   othergroup->setLayout(optionlayout);
 
@@ -218,7 +219,7 @@ void SystemOptions::readSettings(bool reload) {
   m_minimalInterface->setChecked(settings.value(SID_SYSTEM_MINIMAL,true).toBool());
   m_restoreBookmarks->setChecked(settings.value(SID_SYSTEM_RESTORE_BOOKMARKS,true).toBool());
   m_restoreTabs->setChecked(settings.value(SID_SYSTEM_RESTORE_TABS,true).toBool());
-  m_saveSettings->setChecked(settings.value(SID_SYSTEM_SAVE_SETTINGS,true).toBool());
+  //  m_saveSettings->setChecked(settings.value(SID_SYSTEM_SAVE_SETTINGS,true).toBool());
   m_saveTabs->setChecked(settings.value(SID_SYSTEM_SAVE_TABS,true).toBool());
   m_rootNavigation->setChecked(settings.value(SID_SYSTEM_BY_ROOT,true).toBool());
   m_interval->setText(settings.value(SID_SYSTEM_MESSAGE_TIMEOUT,2).toString());
@@ -240,8 +241,8 @@ void SystemOptions::readSettings(bool reload) {
   m_theme->addItems(themes);
   m_theme->setCurrentText(getLexicon()->currentTheme());
 #endif
-  QString d = settings.value(SID_SYSTEM_RUN_DATE,QString()).toString();
-  m_runDate->setDateTime(QDateTime::fromString(d,Qt::ISODate));
+  //  QString d = settings.value(SID_SYSTEM_RUN_DATE,QString()).toString();
+  //  m_runDate->setDateTime(QDateTime::fromString(d,Qt::ISODate));
   m_allowDuplicates->setChecked(settings.value(SID_SYSTEM_ALLOW_DUPLICATES,false).toBool());
 
   m_showInterfaceWarning->setChecked(settings.value(SID_SYSTEM_INTERFACE_WARNING,true).toBool());
@@ -268,8 +269,10 @@ void SystemOptions::readSettings(bool reload) {
   m_offlineLocation->setText(settings.value(SID_HELP_LOCAL_LOCATION,"site").toString());
 
   QDir dd(m_offlineLocation->text());
-  QUrl u = settings.value(SID_HELP_LOCAL_URL,QUrl()).toUrl();
-  m_offlineCurrentPage->setText(dd.relativeFilePath(u.fileName()));
+  //  QUrl u = settings.value(SID_HELP_LOCAL_URL,QUrl()).toUrl();
+  //  m_offlineCurrentPage->setText(dd.relativeFilePath(u.fileName()));
+  m_offlineCurrentPage->setText(settings.value(SID_HELP_LOCAL_URL,"index.html").toString());
+  //u.tom_offlineLocation->text();
   m_localDocs->setChecked(settings.value(SID_HELP_LOCAL,true).toBool());
 
   m_dirty = false;
@@ -300,11 +303,11 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_SYSTEM_MINIMAL,m_minimalInterface->isChecked());
   settings.setValue(SID_SYSTEM_RESTORE_BOOKMARKS,m_restoreBookmarks->isChecked());
   settings.setValue(SID_SYSTEM_RESTORE_TABS,m_restoreTabs->isChecked());
-  settings.setValue(SID_SYSTEM_SAVE_SETTINGS,m_saveSettings->isChecked());
+  //  settings.setValue(SID_SYSTEM_SAVE_SETTINGS,m_saveSettings->isChecked());
   settings.setValue(SID_SYSTEM_SAVE_TABS,m_saveTabs->isChecked());
   settings.setValue(SID_SYSTEM_BY_ROOT,m_rootNavigation->isChecked());
 
-  settings.setValue(SID_SYSTEM_RUN_DATE,m_runDate->dateTime().toString(Qt::ISODate));
+  //  settings.setValue(SID_SYSTEM_RUN_DATE,m_runDate->dateTime().toString(Qt::ISODate));
 
   settings.setValue(SID_SYSTEM_INTERFACE_WARNING,m_showInterfaceWarning->isChecked());
   settings.setValue(SID_SYSTEM_STYLESHEET,m_css->text());
@@ -343,8 +346,9 @@ void SystemOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_HELP_ONLINE_PREFIX,m_onlineUrl->text());
   settings.setValue(SID_HELP_ONLINE_URL,QUrl(m_onlineCurrentPage->text()));
   settings.setValue(SID_HELP_LOCAL_LOCATION,m_offlineLocation->text());
-  QFileInfo fi(QDir(m_offlineLocation->text()),m_offlineCurrentPage->text());
-  settings.setValue(SID_HELP_LOCAL_URL,QUrl::fromLocalFile(fi.absoluteFilePath()));
+  //  QFileInfo fi(QDir(m_offlineLocation->text()),m_offlineCurrentPage->text());
+  //  settings.setValue(SID_HELP_LOCAL_URL,QUrl::fromLocalFile(fi.absoluteFilePath()));
+  settings.setValue(SID_HELP_LOCAL_URL,m_offlineCurrentPage->text());
   settings.setValue(SID_HELP_LOCAL,m_localDocs->isChecked());
 
    settings.sync();
@@ -399,9 +403,11 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_SYSTEM_RESTORE_TABS,m_restoreTabs)) {
     m_dirty = true;
   }
+  /*
   if (compare(&settings,SID_SYSTEM_SAVE_SETTINGS,m_saveSettings)) {
     m_dirty = true;
   }
+  */
   if (compare(&settings,SID_SYSTEM_SAVE_TABS,m_saveTabs)) {
     m_dirty = true;
   }
@@ -410,9 +416,9 @@ bool SystemOptions::isModified()  {
       m_dirty = true;
     }
   }
-  if (compare(&settings,SID_SYSTEM_RUN_DATE,m_runDate)) {
-    m_dirty = true;
-  }
+  //  if (compare(&settings,SID_SYSTEM_RUN_DATE,m_runDate)) {
+  //    m_dirty = true;
+  //  }
   if (compare(&settings,SID_SYSTEM_INTERFACE_WARNING,m_showInterfaceWarning)) {
     m_dirty = true;
   }
@@ -478,6 +484,7 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_HELP_LOCAL_LOCATION,m_offlineLocation)) {
     m_dirty = true;
   }
+  /*
   QDir dd(m_offlineLocation->text());
   QUrl u = settings.value(SID_HELP_LOCAL_URL,QUrl()).toUrl();
   QString str = dd.relativeFilePath(u.fileName());
@@ -486,6 +493,10 @@ bool SystemOptions::isModified()  {
     if (m_debug) {
       //      QLOG_DEBUG() << "Is Modified" << SID_HELP_LOCAL_URL << str << m_offlineCurrentPage->text();
     }
+  }
+  */
+  if (compare(&settings,SID_HELP_LOCAL_URL,m_offlineCurrentPage)) {
+    m_dirty = true;
   }
   if (compare(&settings,SID_HELP_LOCAL,m_localDocs)) {
     m_dirty = true;
