@@ -69,6 +69,7 @@ public:
   QFont fontFromCss(const QString & css);
   void setEditFont(QWidget *,const QString & selector,const QString & sample = QString(),int margin = 4);
   QString logFilePath() const;
+  QDir executableDir() const;
   public slots:
     void onFocusChange(QWidget *,QWidget *);
     void onCopy();
@@ -81,6 +82,7 @@ public:
     QString m_currentTheme;
     QString m_logFilePath;
     QDir m_settingsDir;
+    QDir m_execDir;
     int m_status;
     QMap<QString,QString> m_options;
 

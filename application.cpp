@@ -12,7 +12,7 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
 #else
   resourceDir = QCoreApplication::applicationDirPath() + QDir::separator() + "Resources";
 #endif
-
+  m_execDir = QDir::current();
   if ( ! QDir::setCurrent(resourceDir)) {
     QString errmsg  = QString(QObject::tr("Warning failed to change application working directory to : %1")).arg(resourceDir);
     std::cout << errmsg.toLocal8Bit().data() << std::endl;
@@ -1241,4 +1241,7 @@ void Lexicon::onCopy() {
       }
     }
   }
+}
+QDir Lexicon::executableDir() const {
+  return m_execDir;
 }

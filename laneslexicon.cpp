@@ -1671,6 +1671,7 @@ void LanesLexicon::onExit()
   close();
 }
 bool LanesLexicon::openDatabase(const QString & dbname) {
+  QLOG_DEBUG() << Q_FUNC_INFO << dbname;
   QFile dbfile(dbname);
 
   if (! dbfile.exists() ) {
@@ -2033,13 +2034,27 @@ void LanesLexicon::readSettings() {
   }
   if (cmdOptions.contains("db")) {
     m_dbName = cmdOptions.value("db");
-  }
-  QDir dd = QDir::current();
-  QFileInfo fi(dd,m_dbName);
 
-  m_applicationCssFile = settings.value(SID_SYSTEM_STYLESHEET,"app.css").toString();
+  }
+  //
+  // try to find the database, allowing for path to be relative to either the current working directory
+  // "Resources" or the executable path
+  //
+  QFileInfo fi(QDir::current(),m_dbName);
+  if (fi.exists()) {
+    m_dbName = QDir::current().relativeFilePath(m_dbName);
+  }
+  else {
+    fi.setFile(getLexicon()->executableDir(),m_dbName);
+    if (fi.exists()) {
+      m_dbName = QDir::current().relativeFilePath(fi.absoluteFilePath());
+    }
+  }
+
+
+  m_applicationCssFile = settings.value(SID_SYSTEM_STYLESHEET,"application.css").toString();
   if (m_applicationCssFile.isEmpty()) {
-    m_applicationCssFile = "app.css";
+    m_applicationCssFile = "application.css";
   }
 
   m_toolbarText = settings.value(SID_SYSTEM_TOOLBAR_TEXT,false).toBool();
@@ -4437,9 +4452,17 @@ bool LanesLexicon::sanityCheck(int type) {
     errors << QString(tr("CSS stylesheet: %1")).arg(QDir::current().relativeFilePath(filename));
   }
   if (! openDatabase(m_dbName)) {
+    QMap<QString,QString> cmdOptions = getLexicon()->getOptions();
+
     QDir d;
     QString currentDir = d.absoluteFilePath(m_dbName);
-    QString info = QString("Lexicon database: %1").arg(QDir::current().relativeFilePath(currentDir));
+    QString info;
+    if ( cmdOptions.contains("db")) {
+      info = QString("Lexicon database: %1").arg(QDir::current().relativeFilePath(currentDir));
+    }
+    else {
+      info = QString("Lexicon database: %1").arg(currentDir);
+    }
     errors << info;
     level = 1;
   }
