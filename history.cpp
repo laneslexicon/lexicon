@@ -19,6 +19,7 @@ CREATE TABLE history(id integer primary key,timewhen text,place text);
 */
 HistoryMaster::HistoryMaster(const QString & dbname) {
   m_historyOn = false;
+  m_dbname = dbname;
   m_ok = false;
   readSettings();
 
@@ -55,6 +56,9 @@ HistoryMaster::~HistoryMaster() {
  * @param v
  */
 void HistoryMaster::setEnabled(bool v) {
+  if (v && !m_db.isOpen()) {
+      openDatabase(m_dbname);
+  }
   if (m_ok) {
     m_historyEnabled = v;
   }

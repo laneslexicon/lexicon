@@ -60,6 +60,7 @@ class HistoryMaster {
   int m_size;
   int m_lastId;
   int m_firstId;
+  QString m_dbname;
   bool m_ok;
   bool openDatabase(const QString & dbname);
   bool m_historyOn;
