@@ -1391,6 +1391,7 @@ Place LanesLexicon::setupHistory(int currPos) {
     //    m_historyButton->addActions(group->actions());//setMenu(m);
     //    m_historyButton->setMenu(m);
   m_history->setEnabled(m_historyEnabled);
+  m_historyMenu->setEnabled(m_historyEnabled);
   currentPlace.setAction(Place::History);
   return currentPlace;
 }
@@ -1443,6 +1444,8 @@ void LanesLexicon::createMenus() {
   m_historyMenu->setFocusPolicy(Qt::StrongFocus);
   m_historyMenu->addAction(m_clearHistoryAction);
   m_historyMenu->addAction(m_showHistoryAction);
+
+  m_historyMenu->setEnabled(m_historyEnabled);
 
   m_moveMenu = m_mainmenu->addMenu(tr("&Roots"));
   m_moveMenu->setObjectName("navigationmenu");
@@ -2293,9 +2296,9 @@ void LanesLexicon::writeSettings() {
   ///
   /// HistorySID_HISTORY_MENU_FORMAT
   ///
-  settings.beginGroup("History");
-  settings.setValue("Enabled",m_historyEnabled);
-  settings.endGroup();
+  //  settings.beginGroup("History");
+  //  settings.setValue("Enabled",m_historyEnabled);
+  //  settings.endGroup();
 
 }
 void LanesLexicon::restoreTabs() {
