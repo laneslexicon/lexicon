@@ -26,6 +26,7 @@ ShortcutOptions::ShortcutOptions(const QString & theme,QWidget * parent) : Optio
   keys.clear();
 
   keys << SID_SHORTCUT_HISTORY_BACK << SID_SHORTCUT_HISTORY_NEXT << SID_SHORTCUT_HISTORY_CLEAR;
+  keys << SID_SHORTCUT_HISTORY_ENABLE << SID_SHORTCUT_HISTORY_DISABLE;
   addTab("History",keys);
   keys.clear();
 
