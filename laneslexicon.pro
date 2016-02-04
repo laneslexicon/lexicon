@@ -36,8 +36,8 @@ libxslt {
 win32 {
 INCLUDEPATH += "libxml2-2.7.8.win32\include"
 INCLUDEPATH += "libxslt-1.1.26.win32\include"
-LIBS += -L"libxml2-2.7.8.win32\lib" -llibxml2
-LIBS += -L"libxslt-1.1.26.win32\lib" -llibxslt
+LIBS += -L"$$PWD\libxml2-2.7.8.win32\lib" -llibxml2
+LIBS += -L"$$PWD\libxslt-1.1.26.win32\lib" -llibxslt
 }
 #
 #
