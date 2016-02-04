@@ -95,7 +95,14 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../moving/">Contents and entry</a>
+        <a class="" href="../contents/">Contents</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../moving/">Entry</a>
         
     </li>
 
@@ -174,13 +181,10 @@
                 <li class="toctree-l3"><a href="#head-entries-multi-word-heads">Head entries - multi-word heads</a></li>
                 
             
-                <li class="toctree-l3"><a href="#notes-from-the-editor">Notes from the editor</a></li>
+                <li class="toctree-l3"><a href="#textual-notes">Textual notes</a></li>
                 
             
                 <li class="toctree-l3"><a href="#lanes-citations">Lane's citations</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#assumed-tropical">Assumed tropical</a></li>
                 
             
             </ul>
@@ -347,7 +351,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../errors/">Reporting errors</a>
+        <a class="" href="../../other/errors/">Reporting errors</a>
         
     </li>
 
@@ -462,6 +466,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../../lane/note/">Note</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../../lane/preface/">Preface</a>
         
     </li>
@@ -570,17 +581,21 @@
 <p>For each of these forms a full entry has been written for the first word in the list but every other entry has a link back to the first. Using the above example:</p>
 <p><img alt="Second root" src="../../images/secondroot.png" /></p>
 <h4 id="supplement-merge">Supplement merge</h4>
-<p>TODO screenshot
-Supplement colour</p>
-<p>.supplement { background-color : lightgray }</p>
+<p>Entries from the Supplement in Volume 8 of the original text have, where possible, been merged with the appropriate root from the main text. To distinguish them from other entries, they have a light gray background color, as in this example:</p>
+<p><img alt="Supplement" src="../../images/supplement.png" /></p>
+<p>The background color is controlled via a configurable CSS setting:</p>
+<pre><code>.supplement { background-color : lightgray }
+</code></pre>
+<p>How to change it is described <a href="../../custom/editview.png">here</a>.</p>
 <h4 id="head-entries-multi-word-heads">Head entries - multi-word heads</h4>
 <p><a name="headword"></a></p>
 <p>Many entries, such as the one below, contain not a single head word but a head phrase. The software attempts to identify a single headword for each entry and, by default, shows this in the contents panel. The <em>Head search</em> dialog also targets this single headword by default. This behaviour can changed by setting the relevant option <a href="../../options/options_contents/#headphrase">here</a> or <a href="../../options/options_entry/#headphrase">here</a>.</p>
 <p><img alt="Head phrase" src="../../images/headphrase.png" /></p>
-<h4 id="notes-from-the-editor">Notes from the editor</h4>
+<h4 id="textual-notes">Textual notes</h4>
+<p>During digitization it seems that at certain points those involved were unable to decide what the text should be. In the original XML files from the Perseus Project these points usually indicated by a (??) in the file. Most of these have been resolved but there are 26 remaining where the problem appears to lie in original the text. These are marked by the appearance of a Note, as below</p>
 <p><img alt="Editors note" src="../../images/editorsnote.png" /></p>
 <h4 id="lanes-citations">Lane's citations</h4>
-<h4 id="assumed-tropical">Assumed tropical</h4>
+<p>Citations in the original text contains characters such Ḳ. During digitization these diacritics were removed and it has not proved possible to restore them. The original citations as listed in the <a href="../../lane/preface/#authorities">Indication of Authorities</a>.</p>
               
             </div>
           </div>

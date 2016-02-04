@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Contents and entry - Lane's Arabic-English Lexicon</title>
+  <title>Entry - Lane's Arabic-English Lexicon</title>
   
 
   <link rel="shortcut icon" href="../../img/favicon.ico">
@@ -23,7 +23,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Contents and entry";
+    var mkdocs_page_name = "Entry";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js"></script>
@@ -94,17 +94,23 @@
 
         
             
+    <li class="toctree-l1 ">
+        <a class="" href="../contents/">Contents</a>
+        
+    </li>
+
+        
+            
     <li class="toctree-l1 current">
-        <a class="current" href="./">Contents and entry</a>
+        <a class="current" href="./">Entry</a>
         
             <ul>
-            
-                <li class="toctree-l3"><a href="#contents">Contents</a></li>
-                
             
                 <li class="toctree-l3"><a href="#viewing-an-entry">Viewing an entry</a></li>
                 
                     <li><a class="toctree-l4" href="#context-menu">Context menu</a></li>
+                
+                    <li><a class="toctree-l4" href="#printing">Printing</a></li>
                 
                     <li><a class="toctree-l4" href="#zooming">Zooming</a></li>
                 
@@ -338,7 +344,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../errors/">Reporting errors</a>
+        <a class="" href="../../other/errors/">Reporting errors</a>
         
     </li>
 
@@ -453,6 +459,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../../lane/note/">Note</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../../lane/preface/">Preface</a>
         
     </li>
@@ -544,7 +557,7 @@
         
       
     
-    <li>Contents and entry</li>
+    <li>Entry</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -554,23 +567,7 @@
           <div role="main">
             <div class="section">
               
-                <h3 id="contents">Contents</h3>
-<p>The contents and the currently viewed entry can be made to be behave independently or set so that any movement in one is reflected in the other. This behaviour, linked vs not linked, can be set by clicking on the icon in the status bar:</p>
-<p><img alt="Content link" src="../../images/contentlinking.png" /></p>
-<p>This behaviour can also be turned on and off using the shortcut Ctrl+L.</p>
-<p>Irrespective of whether the contents and the entry are linked, single-clicking an the arrow to the left of a letter or a root, will expand to show the roots or the root derivatives respectively. Pressing spacebar has the same effect.</p>
-<p>Double-clicking an entry will always load that entry.</p>
-<p><img alt="Expand root" src="../../images/expandroot.png" /></p>
-<p>An "expand" arrow will only be visible to the left of a root if it is being, or has been, displayed in the current session. If no expand arrow is visible a root may be expanded by pressing the spacebar when the root is selected (shown by a blue blackground). To select a root without loading it, single click on the root.</p>
-<p>To move between roots with the keyboard, use the  up/down arrows or the 'w' and 's' keys. To expand/contract a root use the spacebar or the 'x' key.  (By default, see <a href="../../options/options_contents/">contents options</a>).</p>
-<p>To switch focus between contents and entry using the keyboard there are two shortcuts : to focus on the contents Ctrl+M,C , Ctrl+M,E to focus on the entry. (For a list of shortcuts see <a href="../../options/options_shortcuts/">here</a>.)</p>
-<p>If the contents are not linked, they can be brought into alignment using the two options:</p>
-<ul>
-<li>align contents to entry  - causes the highlighted root to be set to match the currently viewed item</li>
-<li>align entry to contents  - load the currently highlighted root into the current tab</li>
-</ul>
-<p>These actions can be performed either via  <em>Menu -&gt; View</em>, the toolbar items or the appropriate shortcuts.</p>
-<h3 id="viewing-an-entry">Viewing an entry</h3>
+                <h3 id="viewing-an-entry">Viewing an entry</h3>
 <p>Double-click on a root to load the root and all of its derivatives into the current tab. Holding the shift or control key while clicking will load the root into a new tab.</p>
 <p>To load a root using the keyboard, press return when one if its children is selected.</p>
 <p>When a tab has loaded, the current item is shown with a dashed border, as below. This will be the root or one of its children, depending on which was double-clicked.</p>
@@ -584,12 +581,43 @@
 <p>There two sections: the upper actions apply to the current entry item, the lower to all items in the current tab.</p>
 <p>Further information about notes can be found <a href="../notes/">here</a> and bookmarks <a href="../bookmarks/">here</a>.</p>
 <p>Text can be selected with the mouse or the context menu and copied to the clipboard. (The context menu item "Copy" will copy all the selected text, not just that of the currenty entry.)</p>
+<h4 id="printing">Printing</h4>
+<p>An individual headword or the root and its its derivatives can be printed. Further information about how to setup printer is described <a href="../../options/options_printer/">here</a>. <a href="../../sample.pdf">This</a> is a sample pdf.</p>
 <h4 id="zooming">Zooming</h4>
-<p>The current page may be zoomed using either the +/- keys or from the toolbar. Each tab has its own zoom level but a default zoom can be set for all tabs using  *Menu -&gt; View -&gt; Set default zoom".</p>
+<p>The current page may be zoomed using either the +/- keys or from the toolbar. Each tab has its own zoom level but a default zoom can be set for all tabs using  <em>Menu -&gt; View -&gt; Set default zoom</em> or via the Options [dialog] (../options/options_entry.md).</p>
 <p>The dialog can retrieve the zoom from the current tab allowing the user to adjust the zoom for the current page and then use the dialog to set that value as the default.</p>
 <p><img alt="Default zoom" src="../../images/defaultzoom.png" /></p>
+<p>This work as follows:</p>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ok</td>
+<td>Set the default value for all new tabs from the spin box</td>
+</tr>
+<tr>
+<td>Get from current tab</td>
+<td>Populate the spin box with the zoom from the current tab</td>
+</tr>
+<tr>
+<td>Set for current tab</td>
+<td>Set the zoom for the current tab from the spin box</td>
+</tr>
+<tr>
+<td>Apply zoom to all tabs</td>
+<td>If Ok, is clicked, sets the zoom for all open tabs from the spin box</td>
+</tr>
+</tbody>
+</table>
 <h4 id="text-width">Text width</h4>
-<p>The text width (in pixels) of the entries can be adjusted in a similiar fashion to the zoom but using <em>Menu -&gt; View -&gt; set default text width</em></p>
+<p>If the user maximizes the application or otherwise increase its width, the text width will not automatically increase. This must be done manually using either the <em>Menu -&gt; Entry -&gt; Widen</em> or the toolbar buttons widen <img alt="widen" src="../../images/zoom-fit-width.png" /> and narrow <img alt="narrow" src="../../images/zoom-fit-narrow.png" />.</p>
+<p>While the text in each tab can be adjusted independently, there is a default text width that can be set via the Options <a href="../../options/options_entry/">dialog</a>. This setting only applies to new tabs.</p>
+<p>To adjust the text width for all current tabs use  <em>Menu -&gt; View -&gt; Set text width</em> which works in a similar to fashion to the zoom dialog described immediately above.</p>
               
             </div>
           </div>
@@ -600,7 +628,7 @@
         <a href="../tabs/" class="btn btn-neutral float-right" title="Tabs"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../docking/" class="btn btn-neutral" title="Appearance"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../contents/" class="btn btn-neutral" title="Contents"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -626,7 +654,7 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../docking/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../contents/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../tabs/" style="color: #fcfcfc">Next &raquo;</a></span>

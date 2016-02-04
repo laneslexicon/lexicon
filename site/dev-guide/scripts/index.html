@@ -95,7 +95,14 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/moving/">Contents and entry</a>
+        <a class="" href="../../user-guide/contents/">Contents</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../user-guide/moving/">Entry</a>
         
     </li>
 
@@ -322,7 +329,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/errors/">Reporting errors</a>
+        <a class="" href="../../other/errors/">Reporting errors</a>
         
     </li>
 
@@ -444,6 +451,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../../lane/note/">Note</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../../lane/preface/">Preface</a>
         
     </li>
@@ -547,23 +561,45 @@
               
                 <h4 id="orthspl">orths.pl</h4>
 <p><a name="orths"></a></p>
-<p>Analyses XML file and reports on &lt;orth&gt; usage and attempts to <em>fix</em> known patterns. Outputs to log file.</p>
-<p>perl orths.pl --db lexicon.sqlite --xml ../xml/_A0.xml  --node n1126  --verbose</p>
-<p>perl orths.pl --dry-run --db lexicon.sqlite --xml ../xml/_A0.xml  --node n1126  --verbose</p>
-<pre><code>perl orths.pl -h
-   --db              Name of input database (required)
-   --dbout           Name of output database if different (optional)
-   --node            Do &lt;orths&gt; for only the given node or comma separated list of nodes
-   --log-dir         Write log file to given directory, defaults to current
-   --dry-run         Do not update the database
-   --show            Show the before/after XML
-   --export          Export the current link table records before updating
-   --verbose         Show relevant node text in log
-   --xml             XML source file for use with --node
-   --backup          Create a backup copy of each node before updating
-   --out-template    Output XML using the supplied value as a filename template, replacing
-                     the literal NODE by the node number. For example, --out-template test-NODE.xml
-   --help            Print this
+<pre><code>perl orths.pl
+    --db   &lt;db file&gt;            Name of input database
+    --dbout &lt;db file&gt;           Name of output database if different (optional)
+    --node                      Process only the given node or comma separated list of nodes
+    --nodes &lt;filename&gt;          Process the nodes listed one per line in the supplied file
+    --log-dir                   Write log file to given directory, defaults to current
+    --dry-run                   Do not update the database
+    --xml-out  &lt;output file&gt;    Output fixed XML as either one file or individual files if the supplied
+                                names contains NODE, with NODE being replaced by the actual node id
+    --show                      Show the before/after XML
+    --export                    Export the current link table records before updating
+    --verbose                   Show relevant node text in log
+    --xml                       XML source file or directory
+    --backup                    Create a backup copy of each node before updating
+    --help                      Print this
+</code></pre>
+<p>Use cases</p>
+<ul>
+<li>To report on all the &lt;orths&gt; in a file</li>
+</ul>
+<pre><code>perl orths.pl --report --xml ../xml/b0.xml
+</code></pre>
+
+<ul>
+<li>To show the original XML, the fixed XML and orth analysis for a node</li>
+</ul>
+<pre><code>perl orths.pl --report --xml ../xml/b0.xml --node n2033 --show
+</code></pre>
+
+<ul>
+<li>To generate a fixe file for a node</li>
+</ul>
+<pre><code>perl orths.pl --db lexicon.sqlite --xml ../xml/b0.xml --node n2033 --dry-run --xml-out fixed.xml
+</code></pre>
+
+<ul>
+<li>To apply corrected xml directly to the database</li>
+</ul>
+<pre><code>perl orths.pl --db lexicon.sqlite --xml ../xml/b0.xml --node n2033
 </code></pre>
               
             </div>

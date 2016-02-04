@@ -95,7 +95,14 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/moving/">Contents and entry</a>
+        <a class="" href="../../user-guide/contents/">Contents</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../user-guide/moving/">Entry</a>
         
     </li>
 
@@ -223,7 +230,16 @@
                 <li class="toctree-l3"><a href="#databases">Databases</a></li>
                 
             
-                <li class="toctree-l3"><a href="#restore-tabs">Restore tabs</a></li>
+                <li class="toctree-l3"><a href="#application-stylesheet">Application stylesheet</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#theme">Theme</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#qt-theme">Qt theme</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#docked">Docked</a></li>
                 
             
                 <li class="toctree-l3"><a href="#new-tab-behaviour">New tab behaviour</a></li>
@@ -232,10 +248,22 @@
                 <li class="toctree-l3"><a href="#contents-linked">Contents linked</a></li>
                 
             
-                <li class="toctree-l3"><a href="#application-stylesheet">Application stylesheet</a></li>
+                <li class="toctree-l3"><a href="#restore-bookmarks">Restore bookmarks</a></li>
                 
             
-                <li class="toctree-l3"><a href="#theme">Theme</a></li>
+                <li class="toctree-l3"><a href="#restore-tabs">Restore tabs</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#minimal-interface">Minimal interface</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#show-interface-warning">Show interface warning</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#show-preferences-close-warning">Show preferences close warning</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#message-duration">Message duration</a></li>
                 
             
                 <li class="toctree-l3"><a href="#toolbar-text">Toolbar text</a></li>
@@ -247,10 +275,13 @@
                 <li class="toctree-l3"><a href="#keyboard">Keyboard</a></li>
                 
             
-                <li class="toctree-l3"><a href="#message-duration">Message duration</a></li>
+                <li class="toctree-l3"><a href="#show-splash-screen">Show splash screen</a></li>
                 
             
-                <li class="toctree-l3"><a href="#show-splash-screen">Show splash screen</a></li>
+                <li class="toctree-l3"><a href="#import-links-ignore-db-mismatch">Import links ignore db mismatch</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#import-links-show-warning">Import links show warning</a></li>
                 
             
                 <li class="toctree-l3"><a href="#documentation">Documentation</a></li>
@@ -362,7 +393,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/errors/">Reporting errors</a>
+        <a class="" href="../../other/errors/">Reporting errors</a>
         
     </li>
 
@@ -477,6 +508,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../../lane/note/">Note</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../../lane/preface/">Preface</a>
         
     </li>
@@ -582,18 +620,36 @@
 <h4 id="databases">Databases</h4>
 <p>The Lexicon database is the main system databae and holds all the entries in the lexicon.</p>
 <p>The notes database stores user notes and pageset information while the history database stores visited locations for later retrieval (if enabled, see <a href="../options_history/">here</a>).</p>
-<h4 id="restore-tabs">Restore tabs</h4>
-<p><a name="restoretabs></a></p>
-<h4 id="new-tab-behaviour">New tab behaviour</h4>
-<p><a name="newtab"></a>
-New tabs can be either inserted after the current tab or added at the end of the current tabs.</p>
-<p>Reload the set of tabs that was open when the application last run.</p>
-<h4 id="contents-linked">Contents linked</h4>
-<p>Whether the current entry in the tree of roots is to be kept in sync with the current tab. This setting is displayed on the status bar.</p>
 <h4 id="application-stylesheet">Application stylesheet</h4>
 <p>The name of the stylesheet that controls the appearance of the application. The name must not include path information and the file must be placed in the correct directory (as described <a href="../../custom/themes/">here</a>.</p>
 <h4 id="theme">Theme</h4>
 <p>The name of the current theme. The drop-down box shows available themes. Changing the theme here has no effect on the theme of the currently running application.</p>
+<h4 id="qt-theme">Qt theme</h4>
+<p>The Qt Framework that was used to build this application provides a number of themes that control the overall appearance of the application.</p>
+<h4 id="docked">Docked</h4>
+<p>Whether to use docking windows as described <a href="../../user-guide/docking/">here</a>.</p>
+<h4 id="new-tab-behaviour">New tab behaviour</h4>
+<p><a name="newtab"></a>
+New tabs can be either inserted after the current tab or added at the end of the current tabs.</p>
+<h4 id="contents-linked">Contents linked</h4>
+<p>Whether the current entry in the tree of roots is to be kept in sync with the current tab. This setting is displayed on the status bar.</p>
+<h4 id="restore-bookmarks">Restore bookmarks</h4>
+<p>Bookmarks are saved in the configuration file. This option controls whether to restore the bookmars when the application starts.</p>
+<h4 id="restore-tabs">Restore tabs</h4>
+<p><a name="restoretabs"></a></p>
+<p>Reload the set of tabs that was open when the application last ran.</p>
+<!--
+#### Save settings
+-->
+
+<h4 id="minimal-interface">Minimal interface</h4>
+<p>The minimal interface (no menu, toolbar, or status bar) is being used. It can be turned on and off using the shortcut listed <a href="../options_shortcuts/">here</a>.</p>
+<h4 id="show-interface-warning">Show interface warning</h4>
+<p>When the minimal interface is activated a warning dialog appears. This options prevents the dialog from showing.</p>
+<h4 id="show-preferences-close-warning">Show preferences close warning</h4>
+<p>Warn that there are unsaved changes to the settings when the application exits.</p>
+<h4 id="message-duration">Message duration</h4>
+<p>This setting specifies how long a message will remain on the status bar before being clear. Units are milliseconds.</p>
 <p><a name="toolbartext"></a></p>
 <h4 id="toolbar-text">Toolbar text</h4>
 <p>When checked, short text descriptions of the toolbar icons are shown underneath the icon.</p>
@@ -601,13 +657,17 @@ New tabs can be either inserted after the current tab or added at the end of the
 <p>When requesting a root or entry, the system checks whether the required entry is already visible in an existing tab and switches to that tab if it is. If this option is set, this check is skipped.</p>
 <h4 id="keyboard">Keyboard</h4>
 <p>The name of the current virtual keyboard. The drop-down box list the alternatives. (Details of virtual keyboards can be found <a href="../../dev-guide/vkeyboard/">here</a></p>
-<h4 id="message-duration">Message duration</h4>
-<p>This setting specifies how long a message will remain on the status bar before being clear. Units are milliseconds.</p>
 <h4 id="show-splash-screen">Show splash screen</h4>
 <p>When checked, a random file from the images/splash subdirectory of the current theme directory is shown as the application starts.</p>
+<p>The delay is the time period for which the splash screen will be visible.</p>
+<h4 id="import-links-ignore-db-mismatch">Import links ignore db mismatch</h4>
+<p>When importing cross-references fixes, as described <a href="../../user-guide/missinglinks/">here</a>, the system normally checks that the database version of the fixes matches that of the current database.</p>
+<h4 id="import-links-show-warning">Import links show warning</h4>
+<p>Warn the user that there is a database version mismatch when import links..</p>
 <h4 id="documentation">Documentation</h4>
 <p>The application documentation can be viewed either locally or online and the entries in this section specify the location of both.</p>
 <p>The offline location is relative to the current working directory.</p>
+<p>If "Local documentation" is checked, local version is used.</p>
               
             </div>
           </div>

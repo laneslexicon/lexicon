@@ -95,7 +95,14 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/moving/">Contents and entry</a>
+        <a class="" href="../../user-guide/contents/">Contents</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../user-guide/moving/">Entry</a>
         
     </li>
 
@@ -332,7 +339,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../user-guide/errors/">Reporting errors</a>
+        <a class="" href="../errors/">Reporting errors</a>
         
     </li>
 
@@ -447,6 +454,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../../lane/note/">Note</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../../lane/preface/">Preface</a>
         
     </li>
@@ -548,16 +562,18 @@
           <div role="main">
             <div class="section">
               
-                <h4 id="the-problem">The problem</h4>
+                <p>In a small number of cases the Arabic word order associated with a link/cross-references will be incorrect.</p>
+<h4 id="the-problem">The problem</h4>
 <p>Consider the following image taken from Perseus (<a href="http://www.perseus.tufts.edu/hopper/text?doc=Perseus%3Atext%3A2002.02.0019%3Aroot%3Djdr%3Aentry%3DjadiyrN">External link</a>) in which the highlighted text is associated with the text as it appears in Lane (in this case Volume 2, page 390).</p>
 <p><img alt="Perseus" src="../../images/n5217.png" /></p>
 <p>One description of this problem would be: whenever Arabic text precedes a cross-reference, the two blocks of text either side of <span style="font-size:150%">↓</span> are reversed. The correct word order can be recovered by flipping them around.</p>
 <p>(To view this example search for node 5217.)</p>
-<p>Unfortunately it is not that simple.</p>
-<pre><code>It is said in a trad., &lt;foreign lang="ar" TEIform="foreign"&gt;mano SaA
-    ma&lt;/foreign&gt; &lt;lb/&gt; ↓
-  &lt;orth type="arrow" lang="ar"&gt;Ald~ahora falaA SaAma walaA A^al~aY&lt;/orth&gt;
-</code></pre>
+<p>Unfortunately it is not that simple.
+<!---
+    It is said in a trad., <foreign lang="ar" TEIform="foreign">mano SaA
+        ma</foreign> <lb/> ↓
+      <orth type="arrow" lang="ar">Ald~ahora falaA SaAma walaA A^al~aY</orth>
+---></p>
 <p>To understand the difficulty we need to look at the details of the markup applied to the original text during digitization.</p>
 <p>First, a simple piece of Arabic text in this excerpt from the same entry to show the two structures involved:</p>
 <p><img alt="Markup example 1" src="../../images/wordandlink.png" /></p>
@@ -569,7 +585,7 @@
 <foreign>laA  A=luwka nuSoHFA</foreign>
 --->
 
-<p>Standalone Arabic text is wrapped in  &lt;foreign&gt; tags; Arabic text in a cross-reference in &lt;orth&gt; tags.</p>
+<p>Standalone Arabic text is wrapped in  &lt;foreign&gt; tags; Arabic text in a cross-reference is wrapped in &lt;orth&gt; tags.</p>
 <!---
 The three Arabic words are transliterated (see [here](../other/buckwalter.md) for details) and wrapped in &lt;foreign&gt; tags in the correct word order.
 --->
@@ -578,7 +594,7 @@ The three Arabic words are transliterated (see [here](../other/buckwalter.md) fo
 <pre><code>  And &lt;foreign lang="ar"&gt;A^ano yafoEala&lt;/foreign&gt; ↓
   &lt;orth type="arrow"&gt;A_in~ahu lamajodarapN&lt;/orth&gt;, (K,) and in like manner
 </code></pre>
-<p>Note the structure: a  &lt;foreign&gt; tag and an &lt;orth&gt; either side of <span style="font-size:150%">↓</span>.</p>
+<p>Note the structure: a  &lt;foreign&gt; tag and an &lt;orth&gt; either side of <span style="font-size:150%">↓</span> with no intervening non-Arabic text.</p>
 <!---
 
 When there is a cross-reference within a piece of text like this from column 1 line 28:
@@ -625,9 +641,12 @@ It is the same sequence: a &lt;foreign&gt; followed by an &lt;orth&gt;,  each wi
     ma&lt;/foreign&gt; &lt;lb/&gt; ↓
   &lt;orth type="arrow" lang="ar"&gt;Ald~ahora falaA SaAma walaA A^al~aY&lt;/orth&gt;
 </code></pre>
-<p>The fix has to be applied to the XML and then processed and loaded into the database using the provided <a href="../../dev-guide/scripts/#orths">script</a>. So for example, the above entry (n1226) occurs in the file _A0.xml:</p>
+<p>The fix has to be applied to the XML and then processed and loaded into the database using the provided <a href="../../dev-guide/scripts/#orths">script</a>. For example, the above entry (n1226) occurs in the file _A0.xml. After the XML has been edited:</p>
 <pre><code>perl orths.pl --db lexicon.sqlite --node n1126 --perseus ../xml/_A0.xml
 </code></pre>
+<p>The script will apply the changes to the database.</p>
+<p>As the author of the software gradually identifies which of the 3577 cases fall on line breaks, updates will be made available and distributed as XML files. (See <a href="../dbupdate/">here</a> for information how to apply partial updates.)</p>
+<p>Please <a href="../../contact/">report</a>  any cases you find.</p>
               
             </div>
           </div>
@@ -635,7 +654,7 @@ It is the same sequence: a &lt;foreign&gt; followed by an &lt;orth&gt;,  each wi
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../user-guide/errors/" class="btn btn-neutral float-right" title="Reporting errors"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../errors/" class="btn btn-neutral float-right" title="Reporting errors"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../editing/" class="btn btn-neutral" title="Editing the text"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -667,7 +686,7 @@ It is the same sequence: a &lt;foreign&gt; followed by an &lt;orth&gt;,  each wi
         <span><a href="../editing/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../../user-guide/errors/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../errors/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
