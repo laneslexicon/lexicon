@@ -1,22 +1,9 @@
-gui
-===
+This is the gui application repository for the laneslexicon application.
 
-Sources for building the app.
+It should be used in conjuction with these repositories:
 
-Notes:
++ parser
++ xml
++ documentation
 
-Version.cpp is required for the build but it is not in the repository as it is created everytime a commit is made.
-The 'post-commit' hook has this:
-
-#!/bin/bash
-revisioncount=`git log --oneline | wc -l`
-projectversion=`git describe --tags --long`
-cleanversion=${projectversion%%-*}
-version="version.cpp"
-echo "#include <QString>" > $version
-echo "QString buildVersion() {"  >> $version
-echo "     return  \"$projectversion-$revisioncount\";" >> $version
-echo "}" >> $version
-
-
-If there is no version.cpp file, the project file (laneslexicon.pro) will copy dummy_verson.cpp as version.cpp.
+Please see [here](http://laneslexicon.github.io/lexicon/site/dev-guide/build/index.html) for a description and for build instructions.
