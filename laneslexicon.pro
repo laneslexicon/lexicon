@@ -61,7 +61,7 @@ RESOURCES += laneslexicon.qrc
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 macx:ICON=$${PWD}/laneslexicon.icns
-#win32: RC_FILE = $${PWD}/laneslexicon.rc
+win32: RC_ICONS += $${PWD}/frontis.ico
 QMAKE_CXXFLAGS += -Wunused-parameter
 include(qslog/QsLog.pri)
 include(imedit/imedit.pri)
