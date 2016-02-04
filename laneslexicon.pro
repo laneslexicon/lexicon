@@ -34,12 +34,10 @@ libxslt {
   LIBS += -L $$[QT_INSTALL_LIBS] -lxml2 -lxslt
 }
 win32 {
-INCLUDEPATH += "C:\Users\andrewsg\My Documents\libxml2-2.7.8.win32\include"
-INCLUDEPATH += "C:\Users\andrewsg\My Documents\libxslt-1.1.26.win32\include"
-LIBS += -L"C:\Users\andrewsg\My Documents\libxml2-2.7.8.win32\lib" -llibxml2
-LIBS += -L"C:\Users\andrewsg\My Documents\libxslt-1.1.26.win32\lib" -llibxslt
-  INCLUDEPATH += c:/Users/andrewsg/xslt/include
-  LIBS += -Lc:/Users/andrewsg/xslt/lib -llibxml2 -llibxslt
+INCLUDEPATH += "libxml2-2.7.8.win32\include"
+INCLUDEPATH += "libxslt-1.1.26.win32\include"
+LIBS += -L"libxml2-2.7.8.win32\lib" -llibxml2
+LIBS += -L"libxslt-1.1.26.win32\lib" -llibxslt
 }
 #
 #
