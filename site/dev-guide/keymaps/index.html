@@ -404,6 +404,15 @@
         
             <ul>
             
+                <li class="toctree-l3"><a href="#setting-up-a-map">Setting up a map</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#processing-the-map">Processing the map</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#making-the-map-available">Making the map available</a></li>
+                
+            
             </ul>
         
     </li>
@@ -556,7 +565,75 @@
           <div role="main">
             <div class="section">
               
-                
+                <p>Keymaps are provided as means of entering Arabic text without an Arabic keyboard.</p>
+<p>There are three steps</p>
+<ul>
+<li>Setup a text file mapping of Latin characters to Arabic character.</li>
+<li>Run a perl script to convert the text file into a format usable by the software</li>
+<li>Make the mapping available</li>
+</ul>
+<h4 id="setting-up-a-map">Setting up a map</h4>
+<p>The essential part of a keymap contains a sequence of lines each of which has the names of two characters as they appear in the Unicode specification. (See <a href="http://www.unicode.org/Public/UNIDATA/UnicodeData.txt">here</a>.)</p>
+<p>For example,</p>
+<pre><code>LATIN SMALL LETTER R;ARABIC LETTER REH
+</code></pre>
+
+<p>The character to the left of the semi-colon is what will be typed on the keyboard; the character to the right will appear in the dialog using the keymap i.e. the search dialogs.</p>
+<p>The full Buckwalter keymap is <a href="../../appendix/buckwalterkeymap/">here</a>.</p>
+<p>The Buckwalter map file (buckwalter.txt) is distributed with the software. I would recommend editing this instead of starting from scratch.</p>
+<h4 id="processing-the-map">Processing the map</h4>
+<p>Once all the mappings have been setups a script (jsdata.pl) is run to convert the map.</p>
+<pre><code>perl jdata.pl &lt;options&gt;
+
+Where options are:
+
+   --map &lt;map file name&gt;       Full path to the map file. Required.
+   --out &lt;output file name&gt;    Name of the ouput file. If not supplied the input file name is used with the suffix
+                               replaced by 'js' (if present) or with '.js' appended (if not present)
+   --outdir &lt;output directory&gt; Where the output file is created. Optional.
+                               If not supplied the systems tmp directory is used
+   --unicode &lt;file name&gt;       The full path to UnicodeData.txt. If not supplied assumes ../data/UnicodeData.txt
+   --overwrite                 Overwrite an existing output file
+
+</code></pre>
+
+<p>For example,</p>
+<pre><code>perl jsdata.pl --map buckwalter.txt --out buckwalter-1.7.js --unicode UnicodeData.txt
+</code></pre>
+
+<p>Here, "buckwalter.txt" is the file containing the keymap.</p>
+<p>A second script is provided that will generate an HTML page showing the mapping:</p>
+<pre><code>perl map2html.pl &lt;options&gt;
+
+     --map &lt;map file name&gt;     - required, map file e.g buckwalter.txt
+     --html &lt;output file&gt;      - optional to standard output
+
+</code></pre>
+
+<p>For example,</p>
+<pre><code>perl map2html.pl --map buckwalter.txt --html buckwalter.html
+</code></pre>
+
+<h4 id="making-the-map-available">Making the map available</h4>
+<p>To make the map available to the software, the files need to be copied to the Map directory for the current theme. In the above example the files are "buckwalter-1.7.js" and "buckwalter.html".</p>
+<p>The directory structure is described <a href="../../custom/themes/">here</a></p>
+<p>Also the configuration file for the current theme needs to be aware of the new mapping. A third script is provided to do this:</p>
+<pre><code>perl addmap.pl &lt;options&gt;
+     --name    &lt;map name&gt;         - required,
+     --mapfile &lt;map file name&gt;    - required, map file e.g buckwalter-16.js
+     --html    &lt;html file name&gt;   - optional html file name
+     --config  &lt;file name&gt;        - required, the full path to the settings.ini file
+     --out     &lt;file name&gt;        - optional, if not entered the original config file will be overwritten
+     --overwrite                  - if the map name is already in use overwrite otherwise cancel
+</code></pre>
+
+<p>For example,</p>
+<pre><code>perl addmap.pl --name MyKeyMap --mapfile buckwalter-1.7.js --html buckwalter.html
+</code></pre>
+
+<p>(The script simply insert two lines into the [Maps] section of settings.ini.)</p>
+<p>Once this process is done, the next time the application is run, the map will be available:</p>
+<p><img alt="keymap" src="../../images/mykeymap.png" /></p>
               
             </div>
           </div>
