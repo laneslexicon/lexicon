@@ -129,7 +129,7 @@ sub get_template {
 .striped { background-color : lightblue }
 .letters  { text-align : center }
 .names { font-size : 12px }
-.ar { font-family : Droid Arabic Naskh; font-size : 14px;text-align : center }
+.arabic { font-family : Amiri; font-size : 14px;text-align : center }
 .lang { <!-- TMPL_VAR NAME=FONT --> }
 </style>
 </head>
@@ -272,7 +272,7 @@ sub generate_html {
   $template->param(TITLE => sprintf "Keyboard to %s character table",$p->{LANGUAGE});
   $template->param(COLHEAD => $p->{LANGUAGE});
   $template->param(MAPNAME => $p->{NAME});
-  $template->param(FONT => "font-family : Gentium; font-size : 14px;text-align : center");
+#  $template->param(FONT => "font-family : Gentium; font-size : 14px;text-align : center");
 
   $template->param(ROWS => \@data);
   $template->param(UNICODE => \@unicode);
