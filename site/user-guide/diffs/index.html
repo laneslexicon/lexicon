@@ -171,20 +171,15 @@
             
                 <li class="toctree-l3"><a href="#some-things-that-are-different">Some things that are different</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#handling-of-root-entries">Handling of root entries</a></li>
+                    <li><a class="toctree-l4" href="#handling-of-root-entries">Handling of root entries</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#supplement-merge">Supplement merge</a></li>
+                    <li><a class="toctree-l4" href="#supplement-merge">Supplement merge</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#head-entries-multi-word-heads">Head entries - multi-word heads</a></li>
+                    <li><a class="toctree-l4" href="#head-entries-multi-word-heads">Head entries - multi-word heads</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#textual-notes">Textual notes</a></li>
+                    <li><a class="toctree-l4" href="#textual-notes">Textual notes</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#lanes-citations">Lane's citations</a></li>
+                    <li><a class="toctree-l4" href="#lanes-citations">Lane's citations</a></li>
                 
             
             </ul>
@@ -575,27 +570,27 @@
             <div class="section">
               
                 <h4 id="some-things-that-are-different">Some things that are different</h4>
-<h4 id="handling-of-root-entries">Handling of root entries</h4>
+<h5 id="handling-of-root-entries">Handling of root entries</h5>
 <p>Lane has a number of entries which take the forms: <em>xxx yyy zzz</em> or <em>xxx and yyy</em> or <em>xxx or yyy</em>, such as the following from Volume 3, page 850:</p>
 <p><img alt="Two roots" src="../../images/tworoots.png" /></p>
 <p>For each of these forms a full entry has been written for the first word in the list but every other entry has a link back to the first. Using the above example:</p>
 <p><img alt="Second root" src="../../images/secondroot.png" /></p>
-<h4 id="supplement-merge">Supplement merge</h4>
+<h5 id="supplement-merge">Supplement merge</h5>
 <p>Entries from the Supplement in Volume 8 of the original text have, where possible, been merged with the appropriate root from the main text. To distinguish them from other entries, they have a light gray background color, as in this example:</p>
 <p><img alt="Supplement" src="../../images/supplement.png" /></p>
 <p>The background color is controlled via a configurable CSS setting:</p>
 <pre><code>.supplement { background-color : lightgray }
 </code></pre>
 <p>How to change it is described <a href="../../custom/editview.png">here</a>.</p>
-<h4 id="head-entries-multi-word-heads">Head entries - multi-word heads</h4>
+<h5 id="head-entries-multi-word-heads">Head entries - multi-word heads</h5>
 <p><a name="headword"></a></p>
 <p>Many entries, such as the one below, contain not a single head word but a head phrase. The software attempts to identify a single headword for each entry and, by default, shows this in the contents panel. The <em>Head search</em> dialog also targets this single headword by default. This behaviour can changed by setting the relevant option <a href="../../options/options_contents/#headphrase">here</a> or <a href="../../options/options_entry/#headphrase">here</a>.</p>
 <p><img alt="Head phrase" src="../../images/headphrase.png" /></p>
-<h4 id="textual-notes">Textual notes</h4>
-<p>During digitization it seems that at certain points those involved were unable to decide what the text should be. In the original XML files from the Perseus Project these points usually indicated by a (??) in the file. Most of these have been resolved but there are 26 remaining where the problem appears to lie in original the text. These are marked by the appearance of a Note, as below</p>
+<h5 id="textual-notes">Textual notes</h5>
+<p>During digitization it seems that at certain points those involved were unable to decide what the text should be. In the original XML files from the Perseus Project these points usually indicated by a (??) in the file. Most of these have been resolved but there are 26 remaining where the problem appears to lie in the original text. These are marked by the appearance of a Note, as below</p>
 <p><img alt="Editors note" src="../../images/editorsnote.png" /></p>
-<h4 id="lanes-citations">Lane's citations</h4>
-<p>Citations in the original text contains characters such Ḳ. During digitization these diacritics were removed and it has not proved possible to restore them. The original citations as listed in the <a href="../../lane/preface/#authorities">Indication of Authorities</a>.</p>
+<h5 id="lanes-citations">Lane's citations</h5>
+<p>Citations in the original text contains characters such Ḳ i.e characters with diacritics. During digitization these diacritics were removed and it has not proved possible to restore them. The original citations are listed in the <a href="../../lane/preface/#authorities">Indication of Authorities</a>.</p>
               
             </div>
           </div>

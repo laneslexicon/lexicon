@@ -577,7 +577,7 @@
     --backup                    Create a backup copy of each node before updating
     --help                      Print this
 </code></pre>
-<p>Use cases</p>
+<p>Use cases:</p>
 <ul>
 <li>To report on all the &lt;orths&gt; in a file</li>
 </ul>
@@ -591,13 +591,14 @@
 </code></pre>
 
 <ul>
-<li>To generate a fixe file for a node</li>
+<li>To generate a fix file for a node</li>
 </ul>
 <pre><code>perl orths.pl --db lexicon.sqlite --xml ../xml/b0.xml --node n2033 --dry-run --xml-out fixed.xml
 </code></pre>
 
+<p>The generated file, in this case  "fixed.xml", can be distributed and imported by the application to apply the fix.</p>
 <ul>
-<li>To apply corrected xml directly to the database</li>
+<li>To apply the corrected xml directly to the database</li>
 </ul>
 <pre><code>perl orths.pl --db lexicon.sqlite --xml ../xml/b0.xml --node n2033
 </code></pre>
