@@ -191,13 +191,8 @@
             "title": "Updating the Lexicon"
         }, 
         {
-            "location": "/sharing/", 
-            "text": "", 
-            "title": "Sharing"
-        }, 
-        {
             "location": "/obtaining/", 
-            "text": "The latest version of the software can be downloaded from \nhere\n.\n\n\nBinary versions exist for Windows and OSX users.\n\n\n*BSD and Linux should review the build instructions.", 
+            "text": "The latest version of the software can be downloaded from \nhere\n.\n\n\nBinary versions exist for Windows and OSX users.\n\n\n*BSD and Linux users should review the build instructions.\n\n\nFor those who wish to verify the downloads, a signature file is available at the download page. You should download the executable and the matching signature file to the same directory and do, for example:\n\n\ngpg --verify laneslexicon-v1.0.dmg.sig\ngpg: assuming signed data in 'laneslexicon-v1.0.dmg'\ngpg: Signature made Fri  5 Feb 19:43:23 2016 GMT using RSA key ID E98D7DF6\ngpg: Good signature from \nGraeme Andrews \nlaneslexicon@theunwalledcity.com\n [ultimate]\n\n\n\n\nThe public key is \nhere\n\n\nIts gpg fingerprint is : B8DC 629D 4791 ADF1 619A  ADB8 4FC2 8F17 C4A3 7E83", 
             "title": "Obtaining"
         }, 
         {

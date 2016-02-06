@@ -359,13 +359,6 @@
 <li>
           
             <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../sharing/">Sharing</a>
-        
-    </li>
-<li>
-          
-            <li>
     <li class="toctree-l1 current">
         <a class="current" href="./">Obtaining</a>
         
@@ -554,7 +547,16 @@
               
                 <p>The latest version of the software can be downloaded from <a href="https://github.com/laneslexicon/lexicon/releases">here</a>.</p>
 <p>Binary versions exist for Windows and OSX users.</p>
-<p>*BSD and Linux should review the build instructions.</p>
+<p>*BSD and Linux users should review the build instructions.</p>
+<p>For those who wish to verify the downloads, a signature file is available at the download page. You should download the executable and the matching signature file to the same directory and do, for example:</p>
+<pre><code>gpg --verify laneslexicon-v1.0.dmg.sig
+gpg: assuming signed data in 'laneslexicon-v1.0.dmg'
+gpg: Signature made Fri  5 Feb 19:43:23 2016 GMT using RSA key ID E98D7DF6
+gpg: Good signature from &quot;Graeme Andrews &lt;laneslexicon@theunwalledcity.com&gt;&quot; [ultimate]
+</code></pre>
+
+<p>The public key is <a href="../laneslexicon.asc">here</a></p>
+<p>Its gpg fingerprint is : B8DC 629D 4791 ADF1 619A  ADB8 4FC2 8F17 C4A3 7E83</p>
               
             </div>
           </div>
@@ -565,7 +567,7 @@
         <a href="../contact/" class="btn btn-neutral float-right" title="Contact"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../sharing/" class="btn btn-neutral" title="Sharing"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../other/dbupdate/" class="btn btn-neutral" title="Updating the Lexicon"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -591,7 +593,7 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../sharing/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../other/dbupdate/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../contact/" style="color: #fcfcfc">Next &raquo;</a></span>
