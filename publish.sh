@@ -39,6 +39,6 @@ rsync -avz $projectroot/documentation/site/ $projectroot/config/site
 perl $projectroot/documentation/ar_markup.pl --site $projectroot/config/site --verbose
 find $projectroot/gui/Resources/site -iname "*.html" -exec perl -i -ne 'print unless /googleapis.com/' {} \;
 }
-
-remote
+local
+config
 echo "you did do a  mkdocs build --clean   ?????"
