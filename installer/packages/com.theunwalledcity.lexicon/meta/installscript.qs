@@ -62,7 +62,7 @@ Component.prototype.installationFinishedPageIsShown = function()
 {
     try {
         if (installer.isInstaller() && installer.status == QInstaller.Success) {
-            installer.addWizardPageItem( component, "ReadMeCheckBoxForm", QInstaller.InstallationFinished );
+ //           installer.addWizardPageItem( component, "ReadMeCheckBoxForm", QInstaller.InstallationFinished );
         }
     } catch(e) {
         console.log(e);
