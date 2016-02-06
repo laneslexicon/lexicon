@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Installer>
-  <Name>Lane's Lexicon</Name>
-  <Version>0.1</Version>
+  <Name>Edward William Lane's Arabic-English Lexicon</Name>
+  <Version>1.0.0</Version>
   <Title>Lane's Lexicon Installer</Title>
   <Publisher>Graeme Andrews</Publisher>
-  <ProductUrl>http://www.theunwalledcity.com</ProductUrl>
+  <ProductUrl>https://laneslexicon.github.io/lexicon/site/</ProductUrl>
   <StartMenuDir>Lane</StartMenuDir>
   <RunProgram>@TargetDir@/laneslexicon.exe</RunProgram>
   <RunProgramDescription>Run the program after installation.</RunProgramDescription>
