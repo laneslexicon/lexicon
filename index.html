@@ -60,7 +60,16 @@
         
             <ul>
             
-                <li class="toctree-l3"><a href="#so-what-is-it">So what is it ?</a></li>
+                <li class="toctree-l3"><a href="#quick-links">Quick links</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#what-is-it">What is it ?</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#sample">Sample</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#project">Project</a></li>
                 
             
             </ul>
@@ -101,7 +110,7 @@
             <div class="section">
               
                 <p>Welcome to the landing page for the desktop version of Edward William Lane's Arabic-English Lexicon.</p>
-<p>Here are some quick links:</p>
+<h4 id="quick-links">Quick links</h4>
 <ul>
 <li>
 <p>Documentation is <a href="http://laneslexicon.github.io/lexicon/site/">here</a></p>
@@ -113,7 +122,7 @@
 <p>Issue tracker is <a href="https://github.com/laneslexicon/lexicon/issues">here</a></p>
 </li>
 </ul>
-<h4 id="so-what-is-it">So what is it ?</h4>
+<h4 id="what-is-it">What is it ?</h4>
 <p>A presentation of Lane's Lexicon based on the digitization work of the Perseus Digital Library. It is a standalone desktop application, not a front-end to the Perseus website.</p>
 <p>While PDFs of the original text are free available on the internet, this version offers</p>
 <ul>
@@ -123,16 +132,18 @@
 <li>Print</li>
 <li>Customization</li>
 </ul>
-<p>and most importantly, it is, I hope, a little closer to the beauty of the original text.</p>
-<p>The screenshot below will give you and idea of what if offers. If you're interested, follow one of the above links. There's a contact page in the documentation if you need to get in touch.</p>
-<script>
-function sample() {
-    window.open("images/example.png","Sample","menubar=1,width=800,960");
-}
-</script>
-
-<p><a href="" onclick="sample()">Sample</a></p>
-<p><img alt="Sample" src="./images/example.png" /></p>
+<p>as well as being, I hope, a little closer to the beauty of the original text.</p>
+<p>The screenshot below will give you and idea of what it offers. If you're interested, follow one of the above links. There's a contact <a href="http://laneslexicon.github.io/lexicon/site/contact/">page</a> in the documentation if you need to get in touch.</p>
+<h4 id="sample">Sample</h4>
+<p><img alt="" src="./images/example.png" /></p>
+<h4 id="project">Project</h4>
+<p>This repository is one of four that make up the entire project:</p>
+<ul>
+<li>XML  - Contains the orginal XML from the Perseus project with amendments</li>
+<li>Parser - Some Perl scripts to parse the XML and load it into the SQLite database that drives the GUI application</li>
+<li>Documentation</li>
+</ul>
+<p>The documentation build <a href="http://laneslexicon.github.io/lexicon/site/dev-guide/build/">instructions</a> contains a more detailed description.</p>
               
             </div>
           </div>
@@ -169,5 +180,5 @@ function sample() {
 
 <!--
 MkDocs version : 0.15.1
-Build Date UTC : 2016-02-07 10:49:35.127381
+Build Date UTC : 2016-02-07 11:30:07.639296
 -->
