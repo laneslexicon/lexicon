@@ -1,0 +1,14 @@
+{
+    "docs": [
+        {
+            "location": "/", 
+            "text": "Welcome to the landing page for the desktop version of Edward William Lane's Arabic-English Lexicon.\n\n\nHere are some quick links:\n\n\n\n\n\n\nDocumentation is \nhere\n\n\n\n\n\n\nInstall binaries for Windows and OSX users are \nhere\n\n\n\n\n\n\nIssue tracker is \nhere\n\n\n\n\n\n\nSo what is it ?\n\n\nA presentation of Lane's Lexicon based on the digitization work of the Perseus Digital Library. It is a standalone desktop application, not a front-end to the Perseus website.\n\n\nWhile PDFs of the original text are free available on the internet, this version offers\n\n\n\n\nClearer presentation\n\n\nEasy navigation\n\n\nSearch\n\n\nPrint\n\n\nCustomization\n\n\n\n\nand most importantly, it is, I hope, a little closer to the beauty of the original text.\n\n\nThe screenshot below will give you and idea of what if offers. If you're interested, follow one of the above links. There's a contact page in the documentation if you need to get in touch.\n\n\n\nfunction sample() {\n    window.open(\"images/example.png\",\"Sample\",\"menubar=1,width=800,960\");\n}\n\n\n\n\nSample", 
+            "title": "Welcome"
+        }, 
+        {
+            "location": "/#so-what-is-it", 
+            "text": "A presentation of Lane's Lexicon based on the digitization work of the Perseus Digital Library. It is a standalone desktop application, not a front-end to the Perseus website.  While PDFs of the original text are free available on the internet, this version offers   Clearer presentation  Easy navigation  Search  Print  Customization   and most importantly, it is, I hope, a little closer to the beauty of the original text.  The screenshot below will give you and idea of what if offers. If you're interested, follow one of the above links. There's a contact page in the documentation if you need to get in touch.  \nfunction sample() {\n    window.open(\"images/example.png\",\"Sample\",\"menubar=1,width=800,960\");\n}  Sample", 
+            "title": "So what is it ?"
+        }
+    ]
+}

@@ -21,17 +21,13 @@
   <link rel="stylesheet" href="./css/highlight.css">
 
   
-  <script>
-    // Current page data
-    var mkdocs_page_name = "None";
-    var mkdocs_page_input_path = "index.md";
-    var mkdocs_page_url = "/";
-  </script>
-  
   <script src="./js/jquery-2.1.1.min.js"></script>
   <script src="./js/modernizr-2.8.3.min.js"></script>
   <script type="text/javascript" src="./js/highlight.pack.js"></script>
-  <script src="./js/theme.js"></script> 
+  <script src="./js/theme.js"></script>
+  <script>var base_url = '.';</script>
+  <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
+
 
   
 </head>
@@ -55,15 +51,8 @@
         <ul class="current">
           
             <li>
-    <li class="toctree-l1 current">
-        <a class="current" href=".">Welcome</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#so-what-is-it">So what is it ?</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href=".">Welcome</a>
         
     </li>
 <li>
@@ -88,9 +77,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".">Docs</a> &raquo;</li>
     
-      
     
-    <li>Welcome</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -100,40 +87,19 @@
           <div role="main">
             <div class="section">
               
-                <p>Welcome to the landing page for the desktop version of Edward William Lane's Arabic-English Lexicon.</p>
-<p>Here are some quick links:</p>
-<ul>
-<li>
-<p>Documentation is <a href="http://laneslexicon.github.io/lexicon/site/">here</a></p>
-</li>
-<li>
-<p>Install binaries for Windows and OSX users are <a href="https://github.com/laneslexicon/lexicon/releases">here</a></p>
-</li>
-<li>
-<p>Issue tracker is <a href="https://github.com/laneslexicon/lexicon/issues">here</a></p>
-</li>
-</ul>
-<h4 id="so-what-is-it">So what is it ?</h4>
-<p>A presentation of Lane's Lexicon based on the digitization work of the Perseus Digital Library. It is a standalone desktop application, not a front-end to the Perseus website.</p>
-<p>While PDFs of the original text are free available on the internet, this version offers</p>
-<ul>
-<li>Clearer presentation</li>
-<li>Easy navigation</li>
-<li>Search</li>
-<li>Print</li>
-<li>Customization</li>
-</ul>
-<p>and most importantly, it is, I hope, a little closer to the beauty of the original text.</p>
-<p>The screenshot below will give you and idea of what if offers. If you're interested, follow one of the above links. There's a contact page in the documentation if you need to get in touch.</p>
-<script>
-function sample() {
-    window.open("images/example.png","Sample","menubar=1,width=800,960");
-}
-</script>
 
-<p><a href="" onclick="sample()">Sample</a></p>
-<p><img alt="Sample" src="./images/example.png" /></p>
-              
+  <h1 id="search">Search Results</h1>
+
+  <form id="content_search" action="search.html">
+    <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>
+    <input name="q" id="mkdocs-search-query" type="text" class="search_input search-query ui-autocomplete-input" placeholder="Search the Docs" autocomplete="off" autofocus>
+  </form>
+
+  <div id="mkdocs-search-results">
+    Sorry, page not found.
+  </div>
+
+
             </div>
           </div>
           <footer>
@@ -166,8 +132,3 @@ function sample() {
 
 </body>
 </html>
-
-<!--
-MkDocs version : 0.15.1
-Build Date UTC : 2016-02-07 10:49:35.127381
--->
