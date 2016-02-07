@@ -3,7 +3,10 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
   
   <title>Obtaining - Lane's Arabic-English Lexicon</title>
   
@@ -24,6 +27,8 @@
   <script>
     // Current page data
     var mkdocs_page_name = "Obtaining";
+    var mkdocs_page_input_path = "obtaining.md";
+    var mkdocs_page_url = "/obtaining/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -548,7 +553,42 @@
                 <p>The latest version of the software can be downloaded from <a href="https://github.com/laneslexicon/lexicon/releases">here</a>.</p>
 <p>Binary versions exist for Windows and OSX users.</p>
 <p>*BSD and Linux users should review the build instructions.</p>
-<p>For those who wish to verify the downloads, a signature file is available at the download page. You should download the executable and the matching signature file to the same directory and do, for example:</p>
+<p>It is has been tested on the following operating systems:</p>
+<table>
+<thead>
+<tr>
+<th>OS</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows</td>
+<td>7, 8</td>
+</tr>
+<tr>
+<td>OSX</td>
+<td>Mountain Lion</td>
+</tr>
+<tr>
+<td>FreeBSD</td>
+<td>10.2</td>
+</tr>
+<tr>
+<td>Linux Mint</td>
+<td>17</td>
+</tr>
+<tr>
+<td>Debian</td>
+<td>8.2</td>
+</tr>
+<tr>
+<td>Ubuntu</td>
+<td>14</td>
+</tr>
+</tbody>
+</table>
+<p>For those who wish to verify the downloads, a signature file is available at the download page. You should download the executable and the matching signature file to the same directory and, after importing my public key, do for example:</p>
 <pre><code>gpg --verify laneslexicon-v1.0.dmg.sig
 gpg: assuming signed data in 'laneslexicon-v1.0.dmg'
 gpg: Signature made Fri  5 Feb 19:43:23 2016 GMT using RSA key ID E98D7DF6
@@ -564,7 +604,7 @@ gpg: Good signature from &quot;Graeme Andrews &lt;laneslexicon@theunwalledcity.c
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../contact/" class="btn btn-neutral float-right" title="Contact"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../contact/" class="btn btn-neutral float-right" title="Contact">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../other/dbupdate/" class="btn btn-neutral" title="Updating the Lexicon"><span class="icon icon-circle-arrow-left"></span> Previous</a>
