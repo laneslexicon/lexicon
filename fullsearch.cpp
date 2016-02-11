@@ -85,7 +85,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_rxlist->setSelectionMode(QAbstractItemView::SingleSelection);
   m_rxlist->setMarkColumn(SELECT_COLUMN);
   m_rxlist->setExportIgnore(CONTEXT_COLUMN,m_headText);
-  m_rxlist->setFixedRowHeight(40);
+  m_rxlist->setFixedRowHeight(m_rowHeight);
   m_rxlist->installEventFilter(this);
   //  m_rxlist->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_progress = new QProgressBar;
@@ -468,6 +468,9 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     ///
     ///
     m_rxlist->resizeColumnToContents(CONTEXT_COLUMN);
+    if (m_resizeRows) {
+      m_rxlist->resizeRowsToContents();
+    }
     m_exportButton->setEnabled(true);
     m_container->removeItem(m_spacer);
     m_rxlist->show();
@@ -659,6 +662,9 @@ void FullSearchWidget::readSettings() {
   if (! f.isEmpty()) {
     m_resultsFont.fromString(f);
   }
+  m_resizeRows = settings.value(SID_FULLSEARCH_RESIZE_ROWS,true).toBool();
+  m_rowHeight  = settings.value(SID_FULLSEARCH_ROW_HEIGHT,40).toInt();;
+
   m_debug = settings.value(SID_FULLSEARCH_DEBUG,false).toBool();
   m_fragmentSize = settings.value(SID_FULLSEARCH_FRAGMENT_SIZE,40).toInt();
 

@@ -70,6 +70,8 @@ class HeadSearchWidget : public QWidget
    QLabel * m_resultsText;
    ColumnarTableWidget * m_heads;
    GraphicsEntry * m_entry;
+   bool m_resizeRows;
+   int m_rowHeight;
    bool m_headPhrase;
    bool m_cancelSearch;
    bool m_nodeinfoClose;

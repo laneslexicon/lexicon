@@ -65,6 +65,7 @@ BookmarkWidget::BookmarkWidget(const QMap<QString,Place> & marks,QWidget * paren
 
   if (keys.size() > 0) {
     m_list->selectRow(0);
+    m_list->resizeRowsToContents();
   }
   else {
     m_list->showEmpty(tr("No bookmarks"));

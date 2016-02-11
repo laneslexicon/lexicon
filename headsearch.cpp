@@ -33,7 +33,7 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   m_heads->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_heads->setSelectionMode(QAbstractItemView::SingleSelection);
   m_heads->setMarkColumn(SELECT_COLUMN);
-  m_heads->setFixedRowHeight(40);
+  m_heads->setFixedRowHeight(m_rowHeight);
   m_heads->installEventFilter(this);
 
   m_searchTitle = new QLabel("");
@@ -221,6 +221,9 @@ void HeadSearchWidget::search(const QString & searchpattern,const SearchOptions 
   m_resultsText->show();
 
   if (m_heads->rowCount() > 0) {
+    if (m_resizeRows) {
+      m_heads->resizeRowsToContents();
+    }
     m_heads->selectRow(0);
     m_exportButton->setEnabled(true);
     m_exportButton->setVisible(true);
@@ -325,6 +328,10 @@ void HeadSearchWidget::readSettings() {
   m_focusTable = settings.value(SID_HEADSEARCH_FOCUS_TABLE,true).toBool();
   m_nodeinfoClose = settings.value(SID_HEADSEARCH_NODEINFO_CLOSE,true).toBool();
   m_nodeinfoForce = settings.value(SID_HEADSEARCH_NODEINFO_FORCE,false).toBool();
+
+  m_resizeRows = settings.value(SID_HEADSEARCH_RESIZE_ROWS,true).toBool();
+  m_rowHeight  = settings.value(SID_HEADSEARCH_ROW_HEIGHT,40).toInt();;
+
   settings.endGroup();
 
   settings.beginGroup("Diacritics");

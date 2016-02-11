@@ -174,7 +174,10 @@ They should not be translated.
 #define SID_HEADSEARCH_USE_PHRASE               "Use phrase"
 #define SID_HEADSEARCH_COLUMNS                  "HeadSearch Export columns"
 #define SID_HEADSEARCH_NODEINFO_CLOSE           "Node info close"
+#define SID_HEADSEARCH_ROW_HEIGHT              "Row height"
+#define SID_HEADSEARCH_RESIZE_ROWS             "Resize rows"
 #define SID_HEADSEARCH_NODEINFO_FORCE          "Node info force tab"
+
 #define SID_LOCALSEARCH_SHOW_ALL               "Show all results"
 #define SID_LOCALSEARCH_DIACRITICS             "Ignore diacritics"
 #define SID_LOCALSEARCH_WHOLE_WORD             "Whole word"
@@ -202,6 +205,8 @@ They should not be translated.
 #define SID_FULLSEARCH_LIST_STATE              "List state"
 #define SID_FULLSEARCH_LIST_COLUMNS            "Default column widths"
 #define SID_FULLSEARCH_CONTEXT_STYLE            "Context style"
+#define SID_FULLSEARCH_ROW_HEIGHT              "Row height"
+#define SID_FULLSEARCH_RESIZE_ROWS             "Resize rows"
 
 #define SID_ROOTSEARCH_NEW_TAB                 "Root new tab"
 #define SID_ROOTSEARCH_GO_TAB                  "Root activate tab"

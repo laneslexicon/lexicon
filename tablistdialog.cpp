@@ -99,6 +99,7 @@ void TabListDialog::loadTabs() {
 
     if (m_list->rowCount() > 0) {
       m_list->selectRow(0);
+      m_list->resizeRowsToContents();
     }
     else {
       m_list->showEmpty(tr("No tabs"));
