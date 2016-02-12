@@ -598,10 +598,10 @@ int FullSearchWidget::addRow(const QSqlRecord & record, const QString & text,int
   }
   else {
     if (this->startsWithArabic(text)) {
-      label->setAlignment(Qt::AlignRight);
+      label->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     }
     else {
-      label->setAlignment(Qt::AlignLeft);
+      label->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     }
   }
   if ( ! m_contextStyle.isEmpty()) {
@@ -609,8 +609,8 @@ int FullSearchWidget::addRow(const QSqlRecord & record, const QString & text,int
     str = QString("<span style=\"%1\">%2</span>").arg(m_contextStyle).arg(str);
     label->setText(str);
   }
-  m_rxlist->setCellWidget(row,CONTEXT_COLUMN,label);
 
+  m_rxlist->setCellWidget(row,CONTEXT_COLUMN,label);
   label = m_rxlist->createLabel(p.format("%V/%P"));
   label->setAlignment(Qt::AlignCenter);
   m_rxlist->setCellWidget(row,VOL_COLUMN,label);
