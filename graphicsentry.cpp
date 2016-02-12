@@ -1776,10 +1776,8 @@ void GraphicsEntry::closeEvent(QCloseEvent * event) {
 void GraphicsEntry::notesButtonPressed() {
   ToolButtonData * btn = qobject_cast<ToolButtonData *>(QObject::sender());
   if (btn) {
-    QLOG_DEBUG() << "index" << btn->getIndex();
     EntryItem * item = m_items[btn->getIndex()];
     item->showNote();
-
   }
 }
 void GraphicsEntry::addButtonDecoration(bool ok) {

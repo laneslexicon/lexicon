@@ -110,6 +110,7 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   }
   m_history->setEnabled(m_historyEnabled);
   QLOG_DEBUG() << "history enabled" << m_historyEnabled;
+  // notemaster keeps the pointer to settings
   QSettings * settings  = (qobject_cast<Lexicon *>(qApp))->getSettings();
   settings->setIniCodec("UTF-8");
   m_notes = new NoteMaster(settings);

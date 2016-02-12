@@ -60,6 +60,7 @@ class NoteMaster {
  private:
   QSettings * m_settings;
   QSqlDatabase m_db;
+  QString m_schemaFile;
   /*
   QSqlQuery * addQuery;
   QSqlQuery * updateQuery;
@@ -71,5 +72,6 @@ class NoteMaster {
   bool m_autosave;
   bool m_enabled;
   void readSettings();
+  bool createDatabase();
 };
 #endif

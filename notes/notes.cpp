@@ -36,7 +36,7 @@ int Note::getId() const {
 }
 
 NoteMaster::NoteMaster(QSettings * settings) {
-  QLOG_DEBUG() << Q_FUNC_INFO << settings;
+  QLOG_DEBUG() << Q_FUNC_INFO;
   m_settings = settings;
   readSettings();
   if (m_enabled)
@@ -52,10 +52,8 @@ bool NoteMaster::openDb() {
   if ( ! m_db.isOpen()) {
     QFile dbfile(m_dbName);
     if (! dbfile.exists()) {
-      /// TODO maybe create database
-      m_enabled = false;
-      QLOG_WARN() << "Cannot find notes database" << m_dbName;
-      return false;
+      m_enabled = this->createDatabase();
+      return m_enabled;
     }
   }
   else {
@@ -327,6 +325,7 @@ void NoteMaster::readSettings() {
   m_dbName = m_settings->value("Database","notes.sqlite").toString();
   m_autosave = m_settings->value("Autosave",true).toBool();
   m_enabled = m_settings->value("Enabled",true).toBool();
+  m_schemaFile = m_settings->value("Schema","sql/notes_schema.sql").toString();
   m_settings->endGroup();
 }
 /**
@@ -370,4 +369,43 @@ QList<int> NoteMaster::deleteNotes(QList<int> ids) {
 }
 void NoteMaster::close() {
   m_db.close();
+}
+bool NoteMaster::createDatabase() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  QFile sqlFile(m_schemaFile);
+  if (! sqlFile.exists()) {
+    QLOG_WARN() << QString("Cannot create notes database, schema file not found : %1").arg(m_schemaFile);
+    return false;
+  }
+  if ( ! sqlFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    QLOG_WARN() << QString(QObject::tr("Error opening notes schema : %1")).arg(m_schemaFile);
+    return false;
+  }
+
+  m_db = QSqlDatabase::addDatabase("QSQLITE","notesdb");
+  m_db.setDatabaseName(m_dbName);
+  if (! m_db.open()) {
+    QLOG_WARN() << QString(QObject::tr("Error opening notes db : %1")).arg(m_dbName);
+    return false;
+  }
+
+  QTextStream in(&sqlFile);
+  in.setCodec("UTF-8");
+  QString sql;
+  bool ok = true;
+  while(! in.atEnd() && ok) {
+    sql = in.readLine();
+    QSqlQuery q = m_db.exec(sql);
+    if (q.lastError().isValid()) {
+      QLOG_INFO() << QString(QObject::tr("Error executing notes schema sql: %1").arg(q.lastError().text()));
+      return false;
+    }
+
+  }
+  sqlFile.close();
+  QLOG_INFO() << "=====================================";
+  QLOG_INFO() << "Notes system successfully created";
+  QLOG_INFO() << "=====================================";
+  return true;
+
 }

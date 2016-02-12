@@ -61,11 +61,12 @@ class HistoryMaster {
   int m_lastId;
   int m_firstId;
   QString m_dbname;
+  QString m_schemaFile;
   bool m_ok;
   bool openDatabase(const QString & dbname);
   bool m_historyOn;
   bool m_historyEnabled;
-
+  bool createDatabase();
 };
 extern HistoryMaster * getHistory();
 #endif

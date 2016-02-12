@@ -151,7 +151,7 @@ int HistoryMaster::hasPlace(const Place & p,int depth) {
 bool HistoryMaster::openDatabase(const QString & dbname) {
   QFile dbfile(dbname);
   if (! dbfile.exists()) {
-    return false;
+    return this->createDatabase();
   }
   if (m_db.isOpen()) {
     m_db.close();
@@ -184,7 +184,7 @@ bool HistoryMaster::add(const Place & p) {
   QLOG_DEBUG() << Q_FUNC_INFO << p.toString();
   /// don't add two adjacent identical places
   if (this->hasPlace(p) != -1) {
-    QLOG_DEBUG() << "History rejected, duplicate place";
+    //    QLOG_DEBUG() << "History rejected, duplicate place";
     return false;
   }
   HistoryEvent * event = new HistoryEvent;
@@ -213,9 +213,9 @@ bool HistoryMaster::add(const Place & p) {
  */
  QList<HistoryEvent *> HistoryMaster::getHistory(bool ignorelimit) {
   QList<HistoryEvent *> events;
-  //  if (! m_historyEnabled ) {
-  //    return events;
-  //  }
+  if (! m_historyEnabled ) {
+      return events;
+  }
   QLOG_DEBUG() << Q_FUNC_INFO;
   QSqlQuery sql(m_db);
   if (ignorelimit) {
@@ -270,6 +270,7 @@ void HistoryMaster::readSettings() {
   m_duplicateDepth = settings.value(SID_HISTORY_DUPLICATE_DEPTH,10).toInt();
   m_maximumHistory = settings.value(SID_HISTORY_MAXIMUM,50).toInt();
   m_maximumBuffer = settings.value(SID_HISTORY_MAXIMUM_BUFFER,10).toInt();
+  m_schemaFile = settings.value("Schema","sql/history_schema.sql").toString();
 }
 bool HistoryMaster::clear() {
    if ( ! m_historyEnabled ) {
@@ -346,4 +347,43 @@ int HistoryMaster::truncate(int maxrecords) {
     QLOG_DEBUG() << QString("truncated history delete %1, size now %2").arg(deletes.size()).arg(this->count());
   }
   return deletes.size();
+}
+bool HistoryMaster::createDatabase() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  QFile sqlFile(m_schemaFile);
+  if (! sqlFile.exists()) {
+    QLOG_WARN() << QString("Cannot create history database, schema file not found : %1").arg(m_schemaFile);
+    return false;
+  }
+  if ( ! sqlFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    QLOG_WARN() << QString(QObject::tr("Error opening history schema : %1")).arg(m_schemaFile);
+    return false;
+  }
+
+  m_db = QSqlDatabase::addDatabase("QSQLITE","historyb");
+  m_db.setDatabaseName(m_dbname);
+  if (! m_db.open()) {
+    QLOG_WARN() << QString(QObject::tr("Error opening history db : %1")).arg(m_dbname);
+    return false;
+  }
+
+  QTextStream in(&sqlFile);
+  in.setCodec("UTF-8");
+  QString sql;
+  bool ok = true;
+  while(! in.atEnd() && ok) {
+    sql = in.readLine();
+    QSqlQuery q = m_db.exec(sql);
+    if (q.lastError().isValid()) {
+      QLOG_INFO() << QString(QObject::tr("Error executing history schema sql: %1").arg(q.lastError().text()));
+      return false;
+    }
+
+  }
+  sqlFile.close();
+  QLOG_INFO() << "=====================================";
+  QLOG_INFO() << "History system successfully created";
+  QLOG_INFO() << "=====================================";
+  return true;
+
 }
