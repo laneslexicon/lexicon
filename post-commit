@@ -1,0 +1,13 @@
+#!env bash
+#
+# set version number -
+#revisioncount=`git log --oneline | wc -l | sed 's/ //g'`
+projectversion=`git describe --tags --long`
+cleanversion=${projectversion%%-*}
+version="version.cpp"
+echo "#include <QString>" > $version
+echo "QString buildVersion() {"  >> $version
+echo "     return  \"$projectversion\";" >> $version
+echo "}" >> $version
+#echo "$projectversion-$revisioncount"
+#echo "$cleanversion.$revisioncount"
