@@ -2,7 +2,7 @@
     "docs": [
         {
             "location": "/", 
-            "text": "Welcome to the landing page for the desktop version of Edward William Lane's Arabic-English Lexicon.\n\n\nQuick links\n\n\n\n\n\n\nDocumentation is \nhere\n\n\n\n\n\n\nInstall binaries for Windows and OSX users are \nhere\n\n\n\n\n\n\nIssue tracker is \nhere\n\n\n\n\n\n\nWhat is it ?\n\n\nA presentation of Lane's Lexicon based on the digitization work of the Perseus Digital Library. It is a standalone desktop application, not a front-end to the Perseus website.\n\n\nWhile PDFs of the original text are free available on the internet, this version offers\n\n\n\n\nClearer presentation\n\n\nEasy navigation\n\n\nSearch\n\n\nPrint\n\n\nCustomization\n\n\n\n\nas well as being, I hope, a little closer to the beauty of the original text.\n\n\nThe screenshot below will give you and idea of what it offers. If you're interested, follow one of the above links. There's a contact \npage\n in the documentation if you need to get in touch.\n\n\nSample\n\n\n\n\nProject\n\n\nThis repository is one of four that make up the entire project:\n\n\n\n\nXML  - Contains the orginal XML from the Perseus project with amendments\n\n\nParser - Some Perl scripts to parse the XML and load it into the SQLite database that drives the GUI application\n\n\nDocumentation\n\n\n\n\nThe documentation build \ninstructions\n contains a more detailed description.", 
+            "text": "Welcome to the landing page for the desktop version of Edward William Lane's Arabic-English Lexicon.\n\n\nQuick links\n\n\n\n\n\n\nDocumentation is \nhere\n\n\n\n\n\n\nInstall binaries for Windows and OSX users are \nhere\n\n\n\n\n\n\nIssue tracker is \nhere\n\n\n\n\n\n\nWhat is it ?\n\n\nA presentation of Lane's Lexicon based on the digitization work of the Perseus Digital Library. It is a standalone desktop application, not a front-end to the Perseus website.\n\n\nWhile PDFs of the original text are freely available on the internet, this version offers\n\n\n\n\nClearer presentation\n\n\nEasy navigation\n\n\nSearch\n\n\nPrint\n\n\nCustomization\n\n\n\n\nas well as being, I hope, just a little closer to the beauty of the original text.\n\n\nThe screenshot below will give you and idea of what it offers. If you're interested, follow one of the above links. There's a contact \npage\n in the documentation if you need to get in touch.\n\n\nSample\n\n\n\n\nClick for a full size\n\n\nProject\n\n\nThis repository is one of four that make up the entire project:\n\n\n\n\nXML  - Contains the orginal XML from the Perseus project with amendments\n\n\nParser - Some Perl scripts to parse the XML and load it into the SQLite database that drives the GUI application\n\n\nDocumentation\n\n\n\n\nThe documentation build \ninstructions\n contains a more detailed description.", 
             "title": "Welcome"
         }, 
         {
@@ -12,12 +12,12 @@
         }, 
         {
             "location": "/#what-is-it", 
-            "text": "A presentation of Lane's Lexicon based on the digitization work of the Perseus Digital Library. It is a standalone desktop application, not a front-end to the Perseus website.  While PDFs of the original text are free available on the internet, this version offers   Clearer presentation  Easy navigation  Search  Print  Customization   as well as being, I hope, a little closer to the beauty of the original text.  The screenshot below will give you and idea of what it offers. If you're interested, follow one of the above links. There's a contact  page  in the documentation if you need to get in touch.", 
+            "text": "A presentation of Lane's Lexicon based on the digitization work of the Perseus Digital Library. It is a standalone desktop application, not a front-end to the Perseus website.  While PDFs of the original text are freely available on the internet, this version offers   Clearer presentation  Easy navigation  Search  Print  Customization   as well as being, I hope, just a little closer to the beauty of the original text.  The screenshot below will give you and idea of what it offers. If you're interested, follow one of the above links. There's a contact  page  in the documentation if you need to get in touch.", 
             "title": "What is it ?"
         }, 
         {
             "location": "/#sample", 
-            "text": "", 
+            "text": "Click for a full size", 
             "title": "Sample"
         }, 
         {
