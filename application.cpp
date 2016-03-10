@@ -506,7 +506,7 @@ QString Lexicon::spanArabic(const QString & ar,const QString & spanstyle) {
       fontSize = sz;
     }
   }
-  style  = QString("<span style=\"font-family : %1;font-size : %2\">%3</span>")
+  style  = QString("<span style=\"font-family : %1;font-size : %2px\">%3</span>")
     .arg(fontFamily)
     .arg(fontSize)
     .arg(ar);
