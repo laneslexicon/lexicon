@@ -1497,7 +1497,7 @@ int GraphicsEntry::hasPlace(const Place & p,int type,bool setFocus) {
   }
   if ((ix != -1) && setFocus) {
     m_scene->setFocusItem(m_items[ix]);
-    m_view->ensureVisible(m_items[ix]);
+    //  m_view->ensureVisible(m_items[ix]);
   }
   return ix;
 }

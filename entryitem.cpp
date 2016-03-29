@@ -99,6 +99,7 @@ p, li { white-space: pre-wrap; }
 */
 void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
+  QLOG_DEBUG() << Q_FUNC_INFO << "Scene Pos" << event->scenePos() << "Screenpos" << event->screenPos();
   QString href;
   QString anchor;
   QAction *jumpAction = 0;
@@ -109,7 +110,6 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   QTextCursor c = textCursor();
   c.setPosition(document()->documentLayout()->hitTest(event->pos(), Qt::FuzzyHit));
   c.select(QTextCursor::WordUnderCursor);
-
   QString f = c.selection().toHtml();
   QRegExp rx("<!--StartFragment--><a\\s+href=\"\\d+\\.\\d+\\.\\d+\\.\\d+\\?([^\"]+)\">");
   if (rx.indexIn(f) != -1) {
@@ -222,7 +222,7 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   else if (selectedAction == printAction) {
     emit(printNode(m_place.getNode()));
   }
-  this->setFocus();
+  //  this->setFocus();
 }
 void EntryItem::selectAll() {
     QTextCursor c = this->textCursor();
