@@ -101,10 +101,10 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   //  QGraphicsTextItem::contextMenuEvent(event);
   QString href;
   QString anchor;
-  QAction *jumpAction;
-  QAction *addNoteAction;
-  QAction *deleteNoteAction;
-  QAction *showNoteAction;
+  QAction *jumpAction = 0;
+  QAction *addNoteAction = 0;
+  QAction *deleteNoteAction = 0;
+  QAction *showNoteAction = 0;
 
   QTextCursor c = textCursor();
   c.setPosition(document()->documentLayout()->hitTest(event->pos(), Qt::FuzzyHit));
@@ -175,6 +175,10 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   }
   Place p = this->getPlace();
   QAction *selectedAction = menu.exec(event->screenPos());
+  QLOG_DEBUG() << "selected action" << selectedAction;
+  if (selectedAction == 0) {
+    return;
+  }
   if (selectedAction == perseusAction) {
     emit(showXml(p));
   }
@@ -198,17 +202,17 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   else if (selectedAction == selectAllAction) {
     emit(selectAllItems());
   }
-  else if (selectedAction == addNoteAction) {
+  else if (addNoteAction && (selectedAction == addNoteAction)) {
     this->addNote();
 
   }
-  else if (selectedAction == showNoteAction) {
+  else if (showNoteAction && (selectedAction == showNoteAction)) {
     this->showNote();
   }
-  else if (selectedAction == deleteNoteAction) {
+  else if (deleteNoteAction && (selectedAction == deleteNoteAction)) {
     this->deleteNote();
   }
-  else if ((jumpAction != NULL) && (selectedAction == jumpAction)) {
+  else if (jumpAction && (selectedAction == jumpAction)) {
     emit(showLinkDetails(jumpAction->data().toString()));
 
   }
