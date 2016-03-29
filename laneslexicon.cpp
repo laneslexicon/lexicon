@@ -3065,6 +3065,7 @@ void LanesLexicon::updateStatusBar(const Place & p) {
     m_placeIndicator->setText("");
     return;
   }
+  /// TODO add span class
   QString root = tr("Root:") + qobject_cast<Lexicon *>(qApp)->spanArabic(current.getRoot());
   QString head = current.getWord();
   if (! head.isEmpty()) {
