@@ -390,28 +390,25 @@
             
                 <li class="toctree-l3"><a href="#platforms">Platforms</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#requirements">Requirements</a></li>
+                    <li><a class="toctree-l4" href="#build-requirements">Build requirements</a></li>
+                
+                    <li><a class="toctree-l4" href="#qt">Qt</a></li>
+                
+                    <li><a class="toctree-l4" href="#mkdocs">mkdocs</a></li>
                 
             
-                <li class="toctree-l3"><a href="#qt">Qt</a></li>
+                <li class="toctree-l3"><a href="#quick-build-instructions-for-linux-and-42bsd">Quick build instructions for Linux and *BSD</a></li>
                 
             
-                <li class="toctree-l3"><a href="#mkdocs">mkdocs</a></li>
+                <li class="toctree-l3"><a href="#detailed-build-instructions">Detailed build instructions</a></li>
                 
-                    <li><a class="toctree-l4" href="#libxslt">LibXSLT</a></li>
+                    <li><a class="toctree-l4" href="#building-the-database">Building the database</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#building-the-database">Building the database</a></li>
+                    <li><a class="toctree-l4" href="#building-the-gui">Building the GUI</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#building-the-gui">Building the GUI</a></li>
+                    <li><a class="toctree-l4" href="#build-the-help">Build the Help</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#build-the-help">Build the Help</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#building-a-local-version-of-the-help-files-for-the-program-documentation">Building a local version of the help files for the program documentation</a></li>
+                    <li><a class="toctree-l4" href="#building-a-local-version-of-the-help-files-for-the-program-documentation">Building a local version of the help files for the program documentation</a></li>
                 
             
             </ul>
@@ -580,8 +577,49 @@
           <div role="main">
             <div class="section">
               
-                <h4 id="platforms">Platforms</h4>
-<p>The application can be built on Windows,FreeBSD, Linux and OSX provided the required software is installed.</p>
+                <h3 id="platforms">Platforms</h3>
+<p>The application can be built on Windows, FreeBSD, Linux and OSX provided the required software is installed.</p>
+<h5 id="build-requirements">Build requirements</h5>
+<h4 id="qt">Qt</h4>
+<p>The application is built with the Qt Framework available from <a href="http://qt-project.org">here</a>. The Open Source edition is suitable. On Linux systems, the version provided by the package manager can be used.</p>
+<p>Please note that the current version of this software requires a Qt version that includes the QWebView module, which is deprecated but still available in Qt 5.5. Once its replacement, QWebEngine, is available on all platforms this software will be updated.</p>
+<h4 id="mkdocs">mkdocs</h4>
+<p>The documentation is built using <a href="http://www.mkdocs.org">mkDocs</a>. Please see their website for details on how to install to your platform. If you have the Python package manager <em>pip</em> installed then simply do:</p>
+<pre><code>pip install mkdocs
+</code></pre>
+<h5 id="libxslt">LibXSLT</h5>
+<h6 id="debian-based-systems-eg-linux-mint-ubuntu">Debian based systems (e.g. Linux Mint, Ubuntu)</h6>
+<pre><code class="sh">sudo apt-get install libxml2-dev libxslt1-dev
+</code></pre>
+
+<h6 id="windows">Windows</h6>
+<p>Please see <a href="http://xmlsoft.org/XSLT/downloads.html">here</a> for details on obtaining libxslt for Windows.</p>
+<h6 id="osx">OSX</h6>
+<p>No action necessary (?).</p>
+<h6 id="freebsd">FreeBSD</h6>
+<pre><code>pkg install libxslt libxml2
+</code></pre>
+<h3 id="quick-build-instructions-for-linux-and-42bsd">Quick build instructions for Linux and *BSD</h3>
+<p>Once the requirements have been met, to build the application:</p>
+<pre><code># fetch the sources
+&gt; git clone https://github.com/laneslexicon/lexicon
+&gt; cd lexicon
+# generate the make file
+&gt; qmake laneslexicon.pro
+# build it. On FreeBSD this is 'gmake'
+&gt; make
+# fetch the database, images, documentation etc
+&gt;git clone https://github.com/laneslexicon/lexicon_config
+# give it the right name
+&gt;mv lexicon_config Resources
+&gt;cd Resources
+&gt;unzip lexicon.sqlite.zip
+&gt;cd ..
+## run the application
+&gt;./laneslexicon
+</code></pre>
+
+<h3 id="detailed-build-instructions">Detailed build instructions</h3>
 <p>The project as a whole is made up of four parts:</p>
 <ul>
 <li>The XML data files originating from the Perseus project</li>
@@ -597,33 +635,6 @@
     |--- parser
     |--- gui
     |--- documentation
-</code></pre>
-<h4 id="requirements">Requirements</h4>
-<ul>
-<li>Qt Framework</li>
-<li>Perseus XML</li>
-<li>Perl (and various modules)</li>
-<li>LibXSLT</li>
-<li>mkDocs</li>
-</ul>
-<h4 id="qt">Qt</h4>
-<p>The application is built with the Qt Framework available from <a href="http://qt-project.org">here</a>. The Open Source edition is suitable.</p>
-<p>Please note that the current version of this software requires a Qt version that includes the QWebView module, which is deprecated but still available in Qt 5.5. Once its replacement, QWebEngine, is available on all platforms this software will be updated.</p>
-<h4 id="mkdocs">mkdocs</h4>
-<p>The documentation is built using <a href="http://www.mkdocs.org">mkDocs</a>. Please see their website for details on how to install to your platform. If you have the Python package manager <em>pip</em> installed then simply do:</p>
-<pre><code>pip install mkdocs
-</code></pre>
-<h5 id="libxslt">LibXSLT</h5>
-<h6 id="debian-based-systems-eg-linux-mintubuntu">Debian based systems (e.g. Linux Mint,Ubuntu)</h6>
-<pre><code class="sh">sudo apt-get install libxml2-dev libxslt1-dev
-</code></pre>
-
-<h6 id="windows">Windows</h6>
-<p>Please see <a href="http://xmlsoft.org/XSLT/downloads.html">here</a> for details on obtaining libxslt for Windows.</p>
-<h6 id="osx">OSX</h6>
-<p>No action necessary (?).</p>
-<h6 id="freebsd">FreeBSD</h6>
-<pre><code>pkg install libxslt libxml2
 </code></pre>
 <h4 id="building-the-database">Building the database</h4>
 <p>The database is built by a number of Perl scripts, which can be run via a supplied  makefile:</p>
