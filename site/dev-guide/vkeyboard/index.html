@@ -620,17 +620,17 @@ vertical%20spacing=5
 
 <p>Key values and key decorations contain a colon separated list of values to output when the key is pressed. The first item is for level 1 output/decoraton, the 2nd for level 2 etc. The actual values may be given either as the character or as its hexadecimal value.</p>
 <p>For instance the following:</p>
-<pre><code>3,5,ب‎:0x005b
+<pre><code>3,5,<span class="arabic">ب</span>‎:0x005b
 </code></pre>
 
-<p>specifies that the key at row 3, column 5 is to output 'ب' at level 1, and '[' at level 2 (i.e. when the shift key is pressed). Since no decoration field is given, the same values will appear on the key in the keyboard layout.</p>
+<p>specifies that the key at row 3, column 5 is to output '<span class="arabic">ب'</span>at level 1, and '[' at level 2 (i.e. when the shift key is pressed). Since no decoration field is given, the same values will appear on the key in the keyboard layout.</p>
 <p>If the key is required to output more than one value, the values should be separated by a semi-colon. For example
  <a name="key36"></a></p>
 <pre><code>#3,6 shift gives: lam + alef with hamza above (0x644,0x623)
-3,6,ل‎:0x0644;0x0623,ل‎:لأ‎
+3,6,<span class="arabic">ل</span>‎:0x0644;0x0623,<span class="arabic">ل</span>‎:<span class="arabic">ل</span>‎
 </code></pre>
 
-<p>Without shifting, the key outputs 'ل'. When shifted two characters are output: lam (0x644) and alef with hamza above (0x623). They keyboard decoration shows the two values.</p>
+<p>Without shifting, the key outputs '<span class="arabic">ل'.</span>When shifted two characters are output: lam (0x644) and alef with hamza above (0x623). They keyboard decoration shows the two values.</p>
 <p>The Alt Gr key illustrates some of the properties than be specified:</p>
 <pre><code>5,13,&lt;AltGr&gt;,Alt Gtr,[type=level3,sticky=true,span=2]
 </code></pre>
@@ -639,7 +639,7 @@ vertical%20spacing=5
 <p>"sticky=true" that the key will remain pressed until the next key</p>
 <p>"span=2" that the key occupies two columns</p>
 <p>An often needed property is 'vpos', used to adjust the position of the decoration:</p>
-<pre><code>3,3,س‎:ٍ,‎[level2/vpos=10]
+<pre><code>3,3,<span class="arabic">س</span>‎:<span class="arabic">ٍ</span>‎[level2/vpos=10]
 </code></pre>
 
 <p>Adjusts the position of the level 2 character (kasratan) downwards 10 pixels. (A negative number moves it upwards.)</p>
@@ -655,10 +655,8 @@ vertical%20spacing=5
 row=3
 col=6
 type=char
-level1/value=ل
-level2/value=&quot;0x0644,0x0623&quot;
-level1/decoration=ل
-level2/decoration=لأ
+level1/value=<span class="arabic">ل</span>level2/value=&quot;0x0644,0x0623&quot;
+level1/decoration=<span class="arabic">ل</span>level2/decoration=<span class="arabic">ل</span>
 </code></pre>
 
 <p>The file contains a header section, a mandatory 'CharacterCodes' section and one section for each key.</p>
