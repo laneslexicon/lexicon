@@ -25,7 +25,7 @@ ThemeDialog::ThemeDialog(QWidget * parent) : QDialog(parent) {
   connect(btns, SIGNAL(rejected()), this, SLOT(reject()));
   connect(btns, SIGNAL(accepted()), this, SLOT(accept()));
 
-  connect(m_themes,SIGNAL(currentTextChanged(const QString &)),this,SLOT(onThemeChanged(const QString &)));
+//  connect(m_themes,SIGNAL(currentTextChanged(const QString &)),this,SLOT(onThemeChanged(const QString &)));
   vlayout->addWidget(btns);
   setLayout(vlayout);
 }

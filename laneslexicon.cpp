@@ -4437,8 +4437,8 @@ void LanesLexicon::onEditTheme() {
   if (d.exec() == QDialog::Rejected) {
     return;
   }
-  OptionsDialog opts(d.theme());
-  opts.exec();
+  OptionsDialog *  opts = new OptionsDialog(d.theme());
+  opts->exec();
 }
 /**
  *
