@@ -6,7 +6,8 @@
 # rewritten to use it.
 #-------------------------------------------------
 QT       += core gui printsupport
-QT       += webkitwidgets
+equals(QT_MAJOR_VERSION,5):lessThan(QT_MINOR_VERSION,7) { QT       += webkitwidgets }
+lessThan(QT_MAJOR_VERSION,5) { QT       += webkitwidgets }
 QT       += xml
 QT       += sql
 QT       += svg

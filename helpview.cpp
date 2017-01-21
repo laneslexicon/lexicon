@@ -7,7 +7,7 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   setObjectName("helpview");
   setWindowTitle(tr("Documentation"));
   QVBoxLayout * layout = new QVBoxLayout;
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
   m_forwardButton = new QPushButton(QIcon(QPixmap(":/qrc/arrow-right.svg")),tr("Forward"));
   m_backButton = new QPushButton(QIcon(QPixmap(":/qrc/arrow-left.svg")),tr("Back"));
   m_closeButton = new QPushButton(QIcon(QPixmap(":/qrc/window-close.svg")),tr("Close"));
@@ -24,13 +24,10 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   layout->addLayout(btnlayout);
 
 
+
   m_view = new QWebView(this);
 
   layout->addWidget(m_view);
-  /*
-  QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Close);
-  layout->addWidget(btns);
-  */
   setLayout(layout);
   m_initialPage = true;
   m_timer = 0;
@@ -41,12 +38,32 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   connect(m_view,SIGNAL(loadProgress(int)),this,SLOT(loadProgress(int)));
   connect(m_view,SIGNAL(loadStarted()),this,SLOT(loadStarted()));
   connect(m_view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
-  //  if (m_initialPage) {
-  //    this->hide();
-  //    m_view->hide();
-  //  }
-
   readSettings();
+
+
+#else
+  QTextBrowser * b = new QTextBrowser;
+
+  QString html = "<p>Versions of this software built with Qt 5.7.1 or newer do not provide an inbuilt documentation viewer and will try to use your browser to view the online documenation located <a href=\"http://laneslexicon.github.io/lexicon/site/\">here.</a> This may change. ";
+
+  b->setHtml(html);
+  
+  b->setReadOnly(true);
+  b->setOpenExternalLinks(true);
+  m_closeButton = new QPushButton(QIcon(QPixmap(":/qrc/window-close.svg")),tr("Close"));
+  connect(m_closeButton,SIGNAL(clicked()),this,SLOT(onClose()));
+  QHBoxLayout * btnlayout = new QHBoxLayout;
+  btnlayout->addWidget(m_closeButton);
+
+  btnlayout->addStretch();
+  layout->addWidget(b);
+  layout->addLayout(btnlayout);
+  setLayout(layout);
+  readSettings();
+  resize(QSize(400,200));
+  m_localSource = false;
+#endif
+
 }
 /**
  * First time through, try to make a sensible decision about what the
@@ -98,10 +115,15 @@ bool HelpView::loadHelpSystem() {
   }
   m_currentUrl = startPage;
   QLOG_DEBUG() << Q_FUNC_INFO << "Loading initial page" << startPage;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
   m_view->load(startPage);
   m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
   m_forwardButton->setEnabled(false);
   m_backButton->setEnabled(false);
+#else
+  QLOG_DEBUG() << "desktop services" << startPage;
+  QDesktopServices::openUrl(startPage);
+#endif
   return true;
 }
 HelpView::~HelpView() {
@@ -110,7 +132,7 @@ HelpView::~HelpView() {
 }
 void HelpView::linkclick(const QUrl & url) {
   QLOG_DEBUG() << Q_FUNC_INFO << url;
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
   /**
    *  external links opened via QDesktopServices
    *
@@ -132,6 +154,10 @@ void HelpView::linkclick(const QUrl & url) {
   }
   QUrl f(str + QDir::separator() + "index.html");
   m_view->load(f);
+#else
+      QDesktopServices::openUrl(url);
+      return;
+#endif
 }
 void HelpView::onClose() {
   this->hide();
@@ -166,7 +192,7 @@ void HelpView::readSettings() {
  */
 void HelpView::writeSettings() {
   SETTINGS
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
   settings.beginGroup("Help");
   settings.setValue(SID_HELP_SIZE, size());
   settings.setValue(SID_HELP_POS, pos());
@@ -186,7 +212,7 @@ void HelpView::writeSettings() {
     settings.setValue(SID_HELP_ONLINE_URL, m_view->url());
   }
   settings.endGroup();
-
+#endif
 }
 /**
  * The first load can sometimes take a few seconds so we are showing
@@ -200,6 +226,8 @@ void HelpView::loadProgress(int x) {
   }
 }
 void HelpView::loadStarted() {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+
   if (m_initialPage) {
     this->showMinimized();
     m_progress = new QProgressDialog(tr("Loading ..."), tr("Cancel"), 0, 100);
@@ -211,6 +239,7 @@ void HelpView::loadStarted() {
     m_progress->show();
     m_progress->activateWindow();
   }
+#endif
 }
 /**
  *
@@ -218,6 +247,7 @@ void HelpView::loadStarted() {
  * @param ok
  */
 void HelpView::loadFinished(bool ok) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
   QLOG_DEBUG() << Q_FUNC_INFO << m_view->url() << ok;
   if (m_initialPage) {
     this->showNormal();
@@ -246,6 +276,7 @@ void HelpView::loadFinished(bool ok) {
   if (! m_initialPage ) {
     emit(finished(ok));
   }
+#endif
 }
 bool HelpView::isLoaded() const {
   return ! m_initialPage;
@@ -268,14 +299,18 @@ void HelpView::showEvent(QShowEvent * event) {
   QWidget::showEvent(event);
 }
 void HelpView::onPageForward() {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
   if (m_view->page()->history()->canGoForward()) {
     m_view->page()->history()->forward();
   }
+#endif
 }
 void HelpView::onPageBack() {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
   if (m_view->page()->history()->canGoBack()) {
     m_view->page()->history()->back();
   }
+#endif
 }
 void HelpView::showSection(const QString & section) {
   QUrl startPage;
@@ -303,13 +338,19 @@ void HelpView::showSection(const QString & section) {
   }
   QLOG_DEBUG() << Q_FUNC_INFO << "Loading section" << section << startPage;
   /// save the requested url so if it fails
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
   m_currentUrl = startPage;
   if ( m_initialPage ) {
     m_stack << m_currentUrl;
     return;
   }
+
   m_view->load(startPage);
   m_view->show();
+#else
+  QLOG_DEBUG() << "section via desktopservices" << startPage;
+  QDesktopServices::openUrl(startPage);
+#endif
 }
 QUrl  HelpView::lastWishes() const {
   return m_currentUrl;

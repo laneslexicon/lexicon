@@ -4,10 +4,15 @@
 #include <QFormLayout>
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QTextBrowser>
+#include <QLabel>
 #include <QSettings>
+#include <QtGlobal>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
 #include <QtWebKitWidgets/QWebView>
 #include <QtWebKitWidgets/QWebPage>
 #include <QWebHistoryItem>
+#endif
 #include <QUrl>
 #include <QFile>
 #include <QFileInfo>
@@ -20,12 +25,24 @@
 #include <QPixmap>
 #include <QTimer>
 #include <QDesktopServices>
+/*
+class NoHelp : QWidget {
+  Q_OBJECT
+ public:
+  NoHelp(QWidget * parent = 0);
+  void load(const QString &);
+};
+*/
 class HelpView : public QWidget {
   Q_OBJECT
  public:
   HelpView(QWidget * parent = 0);
   ~HelpView();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
   QWebView * m_view;
+#else
+  QWidget * m_view;
+#endif
   bool isLoaded() const;
   bool isOffline() const;
   QUrl lastWishes() const;
