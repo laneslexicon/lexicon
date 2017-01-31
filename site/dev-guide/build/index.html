@@ -582,7 +582,7 @@
 <h5 id="build-requirements">Build requirements</h5>
 <h4 id="qt">Qt</h4>
 <p>The application is built with the Qt Framework available from <a href="http://qt-project.org">here</a>. The Open Source edition is suitable. On Linux systems, the version provided by the package manager can be used.</p>
-<p>Please note that the current version of this software requires a Qt version that includes the QWebView module, which is deprecated but still available in Qt 5.5. Once its replacement, QWebEngine, is available on all platforms this software will be updated.</p>
+<p>For versions of Qt prior to 5.7.1 this software uses the QWebView module to view the program documentation/help. For later versions where this module is not available, the software will try to connect to the online documentation using the user's browser. When a better cross-platform solution is available, this may change.</p>
 <h4 id="mkdocs">mkdocs</h4>
 <p>The documentation is built using <a href="http://www.mkdocs.org">mkDocs</a>. Please see their website for details on how to install to your platform. If you have the Python package manager <em>pip</em> installed then simply do:</p>
 <pre><code>pip install mkdocs
