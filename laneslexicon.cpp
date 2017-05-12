@@ -3389,6 +3389,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
     /// this is a count of search tabs (not search results)
     int c = this->getSearchCount();
     ix = this->addTab(options.newTab(),s,QString(tr("Search %1")).arg(c+1));
+
     if (options.activateTab()) {
       m_tabs->setCurrentIndex(ix);
     }

@@ -311,6 +311,7 @@ void FullSearchWidget::findTarget(bool showProgress) {
   }
   else {
     this->textSearch(m_findTarget->text(),options);
+
   }
   m_progress->hide();
 
@@ -728,6 +729,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   m_searchOptions = options;
   QRegExp rx;
   QRegExp rxclass(m_diacritics);
+  qint64 fStart = QDateTime::currentMSecsSinceEpoch();
 
   QString pattern;
   m_currentRx = rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
@@ -767,6 +769,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   m_rxlist->setRowCount(0);
   m_resultsText->hide();
 
+  int rowsLoaded = 0;
   int headCount = 0;
   int textCount = 0;
   int readCount = 0;
@@ -798,6 +801,8 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   m_cancelSearch = false;
   m_query.exec();
   m_rxlist->setUpdatesEnabled(false);
+  m_rxlist->setSortingEnabled(false);
+  m_rxlist->blockSignals(true);
   qint64 st = QDateTime::currentMSecsSinceEpoch();
   QString xml;
   while(m_query.next() && ! m_cancelSearch) {
@@ -874,20 +879,24 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
           textCount += m_fragments.size();
         }
       }
-
+      //      if ((entryCount % 100) == 0) {
+      //        m_rxlist->setUpdatesEnabled(!m_rxlist->updatesEnabled());
+      //        m_rxlist->resizeRowsToContents();
+      //      }
   //    else {
   //      QLOG_DEBUG() << "Error in node Query sql";
   //    }
   }
-
+  QLOG_DEBUG() << QString("Read finished : %1 ms").arg(QDateTime::currentMSecsSinceEpoch() - fStart);
   qint64 et = QDateTime::currentMSecsSinceEpoch();
-  if (pd) {
-    delete pd;
-  }
-  m_rxlist->setUpdatesEnabled(true);
-
+  pd->setLabelText(tr("Loading results into table"));
+  ep.processEvents();
+  ep.exit();
   m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
   m_resultsText->show();
+  QLOG_DEBUG() << QString("Set results text : %1 ms").arg(QDateTime::currentMSecsSinceEpoch() - fStart);
+  m_rxlist->setUpdatesEnabled(true);
+  QLOG_DEBUG() << QString("Updates enabled : %1 ms").arg(QDateTime::currentMSecsSinceEpoch() - fStart);
   if (m_rxlist->rowCount() > 0) {
     ////
     ///
@@ -895,12 +904,16 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     ///
     ///
     m_rxlist->resizeColumnToContents(CONTEXT_COLUMN);
+    QLOG_DEBUG() << QString("Table resize columns time : %1 ms").arg(QDateTime::currentMSecsSinceEpoch() - fStart);
     if (m_resizeRows) {
       m_rxlist->resizeRowsToContents();
+      QLOG_DEBUG() << QString("Table resize rows time : %1 ms").arg(QDateTime::currentMSecsSinceEpoch() - fStart);
     }
+
     m_exportButton->setEnabled(true);
     m_container->removeItem(m_spacer);
     m_rxlist->show();
+    QLOG_DEBUG() << QString("Table show time : %1 ms").arg(QDateTime::currentMSecsSinceEpoch() - fStart);
     m_rxlist->selectRow(0);
     m_rxlist->setFocus(Qt::OtherFocusReason);
 
@@ -909,6 +922,11 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     m_findTarget->setFocus(Qt::OtherFocusReason);
     m_exportButton->setEnabled(false);
   }
+  if (pd) {
+    delete pd;
+  }
+  m_rxlist->blockSignals(false);
+  QLOG_DEBUG() << QString("Function exec : %1 ms").arg(QDateTime::currentMSecsSinceEpoch() - fStart);
 }
 
 void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & options) {
