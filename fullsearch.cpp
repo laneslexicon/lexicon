@@ -299,6 +299,13 @@ void FullSearchWidget::findTarget(bool showProgress) {
   t.remove(QChar(0x202d));
 
   QRegExp rx("[a-z]+");
+  // move code that builds regex for arabic to here
+  // allow for english word search: standard or regex
+  // and pass the pattern and a possibly empty regex to the search functions, so that when the regex is empty
+  // it does a QTextDocument->find(QString) otherwise QTextDocument->find(QRegExp)
+  // arabic searches that include diacritics should be treated as string search not regex
+  // build a QTextDocument::FindFlags
+  options.setArabic(false);
   if ((options.getSearchType() == SearchOptions::Regex) || (rx.indexIn(t,0) != -1)) {
     this->regexSearch(t,options);
   }
@@ -334,21 +341,38 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
 
   QString pattern;
   m_currentRx = rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
-  QString sql(SQL_FIND_XREF_ENTRIES);
-  if (m_query.prepare(sql)) {
-    sql = SQL_FIND_ENTRY_DETAILS;
-    if (! m_nodeQuery.prepare(sql)) {
+  //
+  // for arabic searches we lookup the entry in the xref table first and then
+  // if the pattern matches, fetch the corresponding full entry record
+  //
+  if (options.arabic()) {
+    QString sql(SQL_FIND_XREF_ENTRIES);
+    if (m_query.prepare(sql)) {
+      sql = SQL_FIND_ENTRY_DETAILS;
+      if (! m_nodeQuery.prepare(sql)) {
+        QLOG_WARN() << QString("SQL prepare error %1 : %2")
+          .arg(sql)
+          .arg(m_nodeQuery.lastError().text());
+        return;
+      }
+    }
+    else {
       QLOG_WARN() << QString("SQL prepare error %1 : %2")
         .arg(sql)
-        .arg(m_nodeQuery.lastError().text());
+        .arg(m_query.lastError().text());
       return;
     }
   }
   else {
-    QLOG_WARN() << QString("SQL prepare error %1 : %2")
-      .arg(sql)
-      .arg(m_query.lastError().text());
-    return;
+    QString sql(SQL_ALL_ENTRIES);
+    if (m_query.prepare(sql)) {
+    }
+    else {
+      QLOG_WARN() << QString("SQL prepare error %1 : %2")
+        .arg(sql)
+        .arg(m_query.lastError().text());
+      return;
+    }
   }
   m_rxlist->clearContents();
   m_rxlist->setRowCount(0);
@@ -374,6 +398,13 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     pd->setWindowModality(Qt::WindowModal);
     pd->show();
   }
+  QSqlQuery entryQuery;
+  if (options.arabic()) {
+    entryQuery = m_nodeQuery;
+  }
+  else {
+    entryQuery = m_query;
+  }
 
   m_progress->setMaximum(max);
   m_cancelSearch = false;
@@ -390,74 +421,71 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
       //      emit(setProgressValue(readCount));
       ep.processEvents();
     }
-    QString word = m_query.value("word").toString();
-    page = m_query.value("page").toInt();
-    /// strip diacritics if required
-    if (replaceSearch && (options.getSearchType() == SearchOptions::Normal)) {
-      if (options.ignoreDiacritics())
-        word =  word.replace(rxclass,QString());
-    }
-    if ((word.indexOf(rx) != -1) && (node != m_query.value("node").toString())) {
-      entryCount++;
-      node = m_query.value("node").toString();
-      m_nodeQuery.bindValue(0,node);
-      if ( m_nodeQuery.exec() &&  m_nodeQuery.first()) {
-        root = m_nodeQuery.value("root").toString();
-        headword = m_nodeQuery.value("word").toString();
-        /// strip diacritics if required
-        if (replaceSearch) {
-          if (options.ignoreDiacritics())
-            headword =  headword.replace(rxclass,QString());
-        }
-        if (headword.indexOf(rx) != -1) {
-          if (options.includeHeads()) {
-            int row = addRow(m_nodeQuery.record(),m_headText,-1);
-            QLabel * label = qobject_cast<QLabel *>(m_rxlist->cellWidget(row,NODE_COLUMN));
-            if (label) {
-              label->setProperty("HEADWORD",true);
-            }
-            headCount++;
-            /// TODO fix or remove
-            /*
-            if (m_headBackgroundColor.isValid()) {
-              QBrush b(m_headBackgroundColor);
-              for(int i=0;i < m_rxlist->columnCount();i++) {
-                m_rxlist->item(row,i)->setBackground(b);
-              }
-            }
-            */
+    if (options.arabic()) {
+      QString word = m_query.value("word").toString();
+      page = m_query.value("page").toInt();
+      /// strip diacritics if required
+      if (replaceSearch && (options.getSearchType() == SearchOptions::Normal)) {
+        if (options.ignoreDiacritics())
+          word =  word.replace(rxclass,QString());
+      }
+      QString xml;
+      if ((word.indexOf(rx) != -1) && (node != m_query.value("node").toString())) {
+        entryCount++;
+        node = m_query.value("node").toString();
+        m_nodeQuery.bindValue(0,node);
+        if ( m_nodeQuery.exec() &&  m_nodeQuery.first()) {
+          root = m_nodeQuery.value("root").toString();
+          headword = m_nodeQuery.value("word").toString();
+          /// strip diacritics if required
+          if (replaceSearch) {
+            if (options.ignoreDiacritics())
+              headword =  headword.replace(rxclass,QString());
           }
-        }
-        headword = m_nodeQuery.value("word").toString();
-        QString xml = m_nodeQuery.value("xml").toString();
-        QTextDocument * doc  = fetchDocument(xml);
-          if (doc->characterCount() > 0) {
-            getTextFragments(doc,target,options);
-            if (m_fragments.size() > 0) {
-              if (m_singleRow) {
-                addRow(m_nodeQuery.record(),m_fragments[0],m_fragments.size());
+          if (headword.indexOf(rx) != -1) {
+            if (options.includeHeads()) {
+              int row = addRow(m_nodeQuery.record(),m_headText,-1);
+              QLabel * label = qobject_cast<QLabel *>(m_rxlist->cellWidget(row,NODE_COLUMN));
+              if (label) {
+                label->setProperty("HEADWORD",true);
               }
-              else {
-                for(int i=0;i < m_fragments.size();i++) {
-                  if (m_fragments[i].size() > 0) {
-                    addRow(m_nodeQuery.record(),m_fragments[i],i);
-                  }
-                }
-              }
-              textCount += m_fragments.size();
+              headCount++;
             }
           }
+          headword = m_nodeQuery.value("word").toString();
+          xml = m_nodeQuery.value("xml").toString();
+        }
       }
       else {
-        QLOG_DEBUG() << "Error in node Query sql";
+        xml = m_query.value("xml").toString();
+      }
+      QTextDocument * doc  = fetchDocument(xml);
+      if (doc->characterCount() > 0) {
+        getTextFragments(doc,target,options);
+        if (m_fragments.size() > 0) {
+          if (m_singleRow) {
+            addRow(entryQuery.record(),m_fragments[0],m_fragments.size());
+          }
+          else {
+            for(int i=0;i < m_fragments.size();i++) {
+              if (m_fragments[i].size() > 0) {
+                addRow(entryQuery.record(),m_fragments[i],i);
+              }
+            }
+          }
+          textCount += m_fragments.size();
+        }
       }
     }
+    else {
+      QLOG_DEBUG() << "Error in node Query sql";
+    }
   }
+
   qint64 et = QDateTime::currentMSecsSinceEpoch();
   if (pd) {
     delete pd;
   }
-
 
   m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
   m_resultsText->show();
@@ -705,7 +733,7 @@ void FullSearchWidget::readSettings() {
   m_keyboardConfig = settings.value("Config","keyboard.ini").toString();
 
 }
-void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & regex) {
+void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & /*regex */) {
   QRegExp rx;
   QRegularExpression leadingSpaces("^\\s+");
   QRegularExpression lineBreaks("\\r|\\n");
@@ -715,14 +743,34 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
   if (options.getSearchType() == SearchOptions::Regex) {
     rx.setPattern(target);
   }
-  else {
+  else if (options.arabic()) {
     rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   }
+
+
 
   m_fragments.clear();
   m_positions.clear();
   int position = 0;
-  QTextCursor c = doc->find(rx,position);
+  QTextCursor c;
+
+
+
+  if ((options.getSearchType() == SearchOptions::Regex) || options.arabic()) {
+     c = doc->find(rx,position);
+  }
+  else {
+    QTextDocument::FindFlags f;
+    if (! options.ignoreCase()) {
+      f = QTextDocument::FindCaseSensitively;
+    }
+    if (options.wholeWordMatch()) {
+      f |= QTextDocument::FindWholeWords;
+    }
+
+
+    c = doc->find(target,position,f);
+      }
   QString src = doc->toPlainText();
   QStringList f;
   int sx;
@@ -957,15 +1005,6 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
       if (options.includeHeads()) {
         int row = addRow(m_query.record(),m_headText,0);
         headCount++;
-        /// TODO fix or remove
-        /*
-        if (m_headBackgroundColor.isValid()) {
-          QBrush b(m_headBackgroundColor);
-          for(int i=0;i < m_rxlist->columnCount();i++) {
-            m_rxlist->item(row,i)->setBackground(b);
-          }
-        }
-        */
       }
     }
     QString xml = m_query.value("xml").toString();
