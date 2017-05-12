@@ -306,7 +306,7 @@ void FullSearchWidget::findTarget(bool showProgress) {
   // arabic searches that include diacritics should be treated as string search not regex
   // build a QTextDocument::FindFlags
   options.setArabic(false);
-  if ((options.getSearchType() == SearchOptions::Regex) || (rx.indexIn(t,0) != -1)) {
+  if ((options.getSearchType() == SearchOptions::Regex) && (rx.indexIn(t,0) != -1)) {
     this->regexSearch(t,options);
   }
   else {
@@ -314,202 +314,6 @@ void FullSearchWidget::findTarget(bool showProgress) {
   }
   m_progress->hide();
 
-}
-/**
- * There are two ways of doing the search if ignore diacritics are set
- *    (1)  build a regex with with each with each character in the search string
- *         followed by an optional character class of all the diacritics
- *
- *    (2)  For each search word from the db, replace all characters from the
- *         the diacritics class by an empty string and then do the search
- *         i.e strip the diacritics and then attempt to match
- *
- *    In the code below, if replaceSearch is true, the 2nd method is used
- *    otherwise the first.
- *
- *  On my timings there second method adds about 200ms.
- * @param target
- * @param options
- */
-void FullSearchWidget::textSearch(const QString & target,const SearchOptions & options) {
-  bool replaceSearch = true;
-  QLOG_DEBUG() << Q_FUNC_INFO;
-  m_target = target;
-  m_searchOptions = options;
-  QRegExp rx;
-  QRegExp rxclass(m_diacritics);
-
-  QString pattern;
-  m_currentRx = rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
-  //
-  // for arabic searches we lookup the entry in the xref table first and then
-  // if the pattern matches, fetch the corresponding full entry record
-  //
-  if (options.arabic()) {
-    QString sql(SQL_FIND_XREF_ENTRIES);
-    if (m_query.prepare(sql)) {
-      sql = SQL_FIND_ENTRY_DETAILS;
-      if (! m_nodeQuery.prepare(sql)) {
-        QLOG_WARN() << QString("SQL prepare error %1 : %2")
-          .arg(sql)
-          .arg(m_nodeQuery.lastError().text());
-        return;
-      }
-    }
-    else {
-      QLOG_WARN() << QString("SQL prepare error %1 : %2")
-        .arg(sql)
-        .arg(m_query.lastError().text());
-      return;
-    }
-  }
-  else {
-    QString sql(SQL_ALL_ENTRIES);
-    if (m_query.prepare(sql)) {
-    }
-    else {
-      QLOG_WARN() << QString("SQL prepare error %1 : %2")
-        .arg(sql)
-        .arg(m_query.lastError().text());
-      return;
-    }
-  }
-  m_rxlist->clearContents();
-  m_rxlist->setRowCount(0);
-  m_resultsText->hide();
-
-  int headCount = 0;
-  int textCount = 0;
-  int readCount = 0;
-  int entryCount = 0;
-  QString node;
-  QString root;
-  QString headword;
-  int page;
-  /// Added QEventLoop because under OSX nothing was shown
-  /// the loop was finished
-  QEventLoop ep;
-  QProgressDialog * pd = 0;
-  int max = this->getMaxRecords("xref");
-
-  if (m_showProgressDialog) {
-    pd = new QProgressDialog("Searching...", "Cancel", 0,max, getApp());
-    connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
-    pd->setWindowModality(Qt::WindowModal);
-    pd->show();
-  }
-  QSqlQuery entryQuery;
-  if (options.arabic()) {
-    entryQuery = m_nodeQuery;
-  }
-  else {
-    entryQuery = m_query;
-  }
-
-  m_progress->setMaximum(max);
-  m_cancelSearch = false;
-  m_query.exec();
-  //  m_rxlist->setUpdatesEnabled(false);
-  qint64 st = QDateTime::currentMSecsSinceEpoch();
-  while(m_query.next() && ! m_cancelSearch) {
-    readCount++;
-    if ((readCount % 500) == 0) {
-      m_progress->setValue(readCount);
-      if (pd) {
-        pd->setValue(readCount);
-      }
-      //      emit(setProgressValue(readCount));
-      ep.processEvents();
-    }
-    if (options.arabic()) {
-      QString word = m_query.value("word").toString();
-      page = m_query.value("page").toInt();
-      /// strip diacritics if required
-      if (replaceSearch && (options.getSearchType() == SearchOptions::Normal)) {
-        if (options.ignoreDiacritics())
-          word =  word.replace(rxclass,QString());
-      }
-      QString xml;
-      if ((word.indexOf(rx) != -1) && (node != m_query.value("node").toString())) {
-        entryCount++;
-        node = m_query.value("node").toString();
-        m_nodeQuery.bindValue(0,node);
-        if ( m_nodeQuery.exec() &&  m_nodeQuery.first()) {
-          root = m_nodeQuery.value("root").toString();
-          headword = m_nodeQuery.value("word").toString();
-          /// strip diacritics if required
-          if (replaceSearch) {
-            if (options.ignoreDiacritics())
-              headword =  headword.replace(rxclass,QString());
-          }
-          if (headword.indexOf(rx) != -1) {
-            if (options.includeHeads()) {
-              int row = addRow(m_nodeQuery.record(),m_headText,-1);
-              QLabel * label = qobject_cast<QLabel *>(m_rxlist->cellWidget(row,NODE_COLUMN));
-              if (label) {
-                label->setProperty("HEADWORD",true);
-              }
-              headCount++;
-            }
-          }
-          headword = m_nodeQuery.value("word").toString();
-          xml = m_nodeQuery.value("xml").toString();
-        }
-      }
-      else {
-        xml = m_query.value("xml").toString();
-      }
-      QTextDocument * doc  = fetchDocument(xml);
-      if (doc->characterCount() > 0) {
-        getTextFragments(doc,target,options);
-        if (m_fragments.size() > 0) {
-          if (m_singleRow) {
-            addRow(entryQuery.record(),m_fragments[0],m_fragments.size());
-          }
-          else {
-            for(int i=0;i < m_fragments.size();i++) {
-              if (m_fragments[i].size() > 0) {
-                addRow(entryQuery.record(),m_fragments[i],i);
-              }
-            }
-          }
-          textCount += m_fragments.size();
-        }
-      }
-    }
-    else {
-      QLOG_DEBUG() << "Error in node Query sql";
-    }
-  }
-
-  qint64 et = QDateTime::currentMSecsSinceEpoch();
-  if (pd) {
-    delete pd;
-  }
-
-  m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
-  m_resultsText->show();
-  if (m_rxlist->rowCount() > 0) {
-    ////
-    ///
-    /// THIS makes the horizontal scrollbar appear. WTF
-    ///
-    ///
-    m_rxlist->resizeColumnToContents(CONTEXT_COLUMN);
-    if (m_resizeRows) {
-      m_rxlist->resizeRowsToContents();
-    }
-    m_exportButton->setEnabled(true);
-    m_container->removeItem(m_spacer);
-    m_rxlist->show();
-    m_rxlist->selectRow(0);
-    m_rxlist->setFocus(Qt::OtherFocusReason);
-
-  }
-  else {
-    m_findTarget->setFocus(Qt::OtherFocusReason);
-    m_exportButton->setEnabled(false);
-  }
 }
 /**
  *
@@ -576,11 +380,11 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
  *
  * @return
  */
-int FullSearchWidget::addRow(const QSqlRecord & record, const QString & text,int pos) {
+int FullSearchWidget::addRow(const Place & p, const QString & text,int pos) {
 
   QTableWidgetItem * item;
   QLabel * label;
-  Place p = Place::fromEntryRecord(record);
+
   int row = m_rxlist->rowCount();
   m_rxlist->insertRow(row);
 
@@ -754,25 +558,22 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
   int position = 0;
   QTextCursor c;
 
-
+    QTextDocument::FindFlags ff;
 
   if ((options.getSearchType() == SearchOptions::Regex) || options.arabic()) {
      c = doc->find(rx,position);
   }
   else {
-    QTextDocument::FindFlags f;
     if (! options.ignoreCase()) {
-      f = QTextDocument::FindCaseSensitively;
+      ff = QTextDocument::FindCaseSensitively;
     }
     if (options.wholeWordMatch()) {
-      f |= QTextDocument::FindWholeWords;
+      ff |= QTextDocument::FindWholeWords;
     }
-
-
-    c = doc->find(target,position,f);
-      }
+    c = doc->find(target,position,ff);
+  }
   QString src = doc->toPlainText();
-  QStringList f;
+
   int sx;
   int ex;
   int sz = m_fragmentSize;
@@ -801,7 +602,12 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     //
     str = "‪" + str;
     m_fragments << str;
-    c = doc->find(rx,position);
+    if (options.arabic() || (options.getSearchType() == SearchOptions::Regex)) {
+      c = doc->find(rx,position);
+    }
+    else {
+      c = doc->find(target,position,ff);
+    }
   }
   //  if (m_positions.size() > 0) {
   //    QLOG_DEBUG() << Q_FUNC_INFO << m_positions;
@@ -816,6 +622,7 @@ int FullSearchWidget::getMaxRecords(const QString & table) {
     max = maxq.value(0).toInt(&ok);
 
   if (! ok ) {
+    QLOG_DEBUG() << QString("Error reading max records for %1").arg(table);
     if (table == "xref") {
       max = 544695;
     }
@@ -823,6 +630,7 @@ int FullSearchWidget::getMaxRecords(const QString & table) {
       max = 49000;
     }
   }
+  QLOG_DEBUG() << QString("Max records for %1 : %2").arg(table).arg(max);
   return max;
 }
 
@@ -897,6 +705,212 @@ void FullSearchWidget::showKeyboard() {
     m_attached = false;
   }
 }
+/**
+ * There are two ways of doing the search if ignore diacritics are set
+ *    (1)  build a regex with with each with each character in the search string
+ *         followed by an optional character class of all the diacritics
+ *
+ *    (2)  For each search word from the db, replace all characters from the
+ *         the diacritics class by an empty string and then do the search
+ *         i.e strip the diacritics and then attempt to match
+ *
+ *    In the code below, if replaceSearch is true, the 2nd method is used
+ *    otherwise the first.
+ *
+ *  On my timings there second method adds about 200ms.
+ * @param target
+ * @param options
+ */
+void FullSearchWidget::textSearch(const QString & target,const SearchOptions & options) {
+  bool replaceSearch = true;
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  m_target = target;
+  m_searchOptions = options;
+  QRegExp rx;
+  QRegExp rxclass(m_diacritics);
+
+  QString pattern;
+  m_currentRx = rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
+  //
+  // for arabic searches we lookup the entry in the xref table first and then
+  // if the pattern matches, fetch the corresponding full entry record
+  //
+  QString sql = SQL_FIND_ENTRY_DETAILS;
+  if (! m_nodeQuery.prepare(sql)) {
+    QLOG_WARN() << QString("SQL prepare error %1 : %2")
+      .arg(sql)
+      .arg(m_nodeQuery.lastError().text());
+  }
+  if (options.arabic()) {
+    QString sql(SQL_FIND_XREF_ENTRIES);
+    if (m_query.prepare(sql)) {
+    }
+    else {
+      QLOG_WARN() << QString("SQL prepare error %1 : %2")
+        .arg(sql)
+        .arg(m_query.lastError().text());
+      return;
+    }
+  }
+  else {
+    QString sql(SQL_ALL_ENTRIES);
+    if (m_query.prepare(sql)) {
+    }
+    else {
+      QLOG_WARN() << QString("SQL prepare error %1 : %2")
+        .arg(sql)
+        .arg(m_query.lastError().text());
+      return;
+    }
+  }
+  m_rxlist->clearContents();
+  m_rxlist->setRowCount(0);
+  m_resultsText->hide();
+
+  int headCount = 0;
+  int textCount = 0;
+  int readCount = 0;
+  int entryCount = 0;
+  QString node;
+  QString root;
+  QString headword;
+  int page;
+  /// Added QEventLoop because under OSX nothing was shown
+  /// the loop was finished
+  QEventLoop ep;
+  QProgressDialog * pd = 0;
+  int max;
+  if (options.arabic()) {
+     max = this->getMaxRecords("xref");
+  }
+  else {
+     max = this->getMaxRecords("entry");
+  }
+
+  if (m_showProgressDialog) {
+    pd = new QProgressDialog("Searching...", "Cancel", 0,max, getApp());
+    connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
+    pd->setWindowModality(Qt::WindowModal);
+    pd->show();
+  }
+
+  m_progress->setMaximum(max);
+  m_cancelSearch = false;
+  m_query.exec();
+  m_rxlist->setUpdatesEnabled(false);
+  qint64 st = QDateTime::currentMSecsSinceEpoch();
+  QString xml;
+  while(m_query.next() && ! m_cancelSearch) {
+    readCount++;
+    if ((readCount % m_stepCount) == 0) {
+      m_progress->setValue(readCount);
+    }
+    if (pd) {
+        pd->setValue(readCount);
+    }
+    ep.processEvents();
+    page = m_query.value("page").toInt();
+    if (options.arabic()) {
+      QString word = m_query.value("word").toString();
+
+      /// strip diacritics if required
+      if (replaceSearch && (options.getSearchType() == SearchOptions::Normal)) {
+        if (options.ignoreDiacritics())
+          word =  word.replace(rxclass,QString());
+      }
+      if ((word.indexOf(rx) != -1) && (node != m_query.value("node").toString())) {
+        //        entryCount++;
+        node = m_query.value("node").toString();
+        m_nodeQuery.bindValue(0,node);
+        if ( m_nodeQuery.exec() &&  m_nodeQuery.first()) {
+          root = m_nodeQuery.value("root").toString();
+          headword = m_nodeQuery.value("word").toString();
+          /// strip diacritics if required
+          if (replaceSearch) {
+            if (options.ignoreDiacritics())
+              headword =  headword.replace(rxclass,QString());
+          }
+          if (headword.indexOf(rx) != -1) {
+            if (options.includeHeads()) {
+              Place p = Place::fromEntryRecord(m_nodeQuery.record());
+              int row = addRow(p,m_headText,-1);
+              QLabel * label = qobject_cast<QLabel *>(m_rxlist->cellWidget(row,NODE_COLUMN));
+              if (label) {
+                label->setProperty("HEADWORD",true);
+              }
+              headCount++;
+            }
+          }
+          headword = m_nodeQuery.value("word").toString();
+          xml = m_nodeQuery.value("xml").toString();
+        }
+      }
+    }
+    else {
+      xml = m_query.value("xml").toString();
+    }
+      QTextDocument * doc  = fetchDocument(xml);
+      Place p;
+      if (options.arabic()) {
+        p = Place::fromEntryRecord(m_nodeQuery.record());
+      }
+      else {
+        p = Place::fromEntryRecord(m_query.record());
+      }
+      if (doc->characterCount() > 0) {
+        getTextFragments(doc,target,options);
+        if (m_fragments.size() > 0) {
+          entryCount++;
+          if (m_singleRow) {
+            addRow(p,m_fragments[0],m_fragments.size());
+          }
+          else {
+            for(int i=0;i < m_fragments.size();i++) {
+              if (m_fragments[i].size() > 0) {
+                addRow(p,m_fragments[i],i);
+              }
+            }
+          }
+          textCount += m_fragments.size();
+        }
+      }
+
+  //    else {
+  //      QLOG_DEBUG() << "Error in node Query sql";
+  //    }
+  }
+
+  qint64 et = QDateTime::currentMSecsSinceEpoch();
+  if (pd) {
+    delete pd;
+  }
+  m_rxlist->setUpdatesEnabled(true);
+
+  m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
+  m_resultsText->show();
+  if (m_rxlist->rowCount() > 0) {
+    ////
+    ///
+    /// THIS makes the horizontal scrollbar appear. WTF
+    ///
+    ///
+    m_rxlist->resizeColumnToContents(CONTEXT_COLUMN);
+    if (m_resizeRows) {
+      m_rxlist->resizeRowsToContents();
+    }
+    m_exportButton->setEnabled(true);
+    m_container->removeItem(m_spacer);
+    m_rxlist->show();
+    m_rxlist->selectRow(0);
+    m_rxlist->setFocus(Qt::OtherFocusReason);
+
+  }
+  else {
+    m_findTarget->setFocus(Qt::OtherFocusReason);
+    m_exportButton->setEnabled(false);
+  }
+}
+
 void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & options) {
   QLOG_DEBUG() << Q_FUNC_INFO;
   m_target = target;
@@ -1001,9 +1015,10 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
     root = m_query.value("root").toString();
     node = m_query.value("nodeid").toString();
     page = m_query.value("page").toInt();
+    Place p = Place::fromEntryRecord(m_query.record());
     if (headword.indexOf(rx) != -1) {
       if (options.includeHeads()) {
-        int row = addRow(m_query.record(),m_headText,0);
+        int row = addRow(p,m_headText,0);
         headCount++;
       }
     }
@@ -1016,13 +1031,13 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
 
               if (m_singleRow) {
                 /// pass the first text fragments and the total number of fragments
-                addRow(m_query.record(),m_fragments[0],m_fragments.size());
+                addRow(p,m_fragments[0],m_fragments.size());
               }
               else {
                 for(int i=0;i < m_fragments.size();i++) {
                   if (m_fragments[i].size() > 0) {
                     /// pass the i'th fragment and the index of the fragment
-                    addRow(m_query.record(),m_fragments[i],i);
+                    addRow(p,m_fragments[i],i);
                   }
                 }
               }

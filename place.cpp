@@ -185,7 +185,13 @@ Place Place::fromEntryRecord(const QSqlRecord & rec) {
   p.m_page = rec.value("page").toInt();
   p.m_vol = volume(p.m_page);
   p.m_action = Place::User;
+  if (p.m_node == "n830") {
+    qDebug() << "xxxxxxxxxxxxxxxx" << rec;
+  }
   p.m_head = rec.value("headword").toString();
+  //  if (p.m_head.size() == 0) {
+  //    p.m_head = rec.value("word").toString();
+  //  }
   return p;
 }
 void Place::setHead(const QString & x) {

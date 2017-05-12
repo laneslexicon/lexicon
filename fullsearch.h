@@ -29,6 +29,7 @@
 #include <QStyleFactory>
 #endif
 #include "searchoptionswidget.h"
+#include "place.h"
 class ImLineEdit;
 class GraphicsEntry;
 class SearchOptionsWidget;
@@ -73,7 +74,7 @@ class FullSearchWidget : public QWidget
     int getMaxRecords(const QString & tablename);
     bool eventFilter(QObject * target,QEvent * event);
     bool startsWithArabic(const QString & ) const;
-    int addRow(const QSqlRecord &,const QString &,int);
+    int addRow(const Place &,const QString &,int);
     void getTextFragments(QTextDocument * doc,const QString & target,const SearchOptions & options,const QRegExp & rx = QRegExp());
     QTextDocument * fetchDocument(const QString & node);
     QString transform(const QString & xml);
