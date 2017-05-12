@@ -37,6 +37,12 @@ void SearchOptions::setSearchScope(SearchScope_t x) {
 
   m_target = x;
 }
+bool SearchOptions::arabic() const {
+  return m_Arabic;
+}
+void SearchOptions::setArabic(bool v) {
+  m_Arabic = v;
+}
 SearchOptions::SearchScope_t SearchOptions::getSearchScope() const {
   return m_target;
 }

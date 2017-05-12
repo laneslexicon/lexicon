@@ -40,6 +40,9 @@ class SearchOptions {
   bool ignoreCase() const;
   void setIgnoreCase(bool);
 
+  bool arabic() const;
+  void setArabic(bool);
+
   bool headPhrase() const;
   void setHeadPhrase(bool);
 
@@ -49,6 +52,7 @@ class SearchOptions {
   bool isValid() const;
 
  private:
+  bool m_Arabic;
   bool m_ignoreDiacritics;
   bool m_wholeWordMatch;
   bool m_keymaps;
