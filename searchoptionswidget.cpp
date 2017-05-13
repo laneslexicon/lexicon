@@ -94,6 +94,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   //  gridlayout->addWidget(m_buckwalterTarget,row,1);
 
   m_stack = new QTabWidget;
+  connect(m_stack,SIGNAL(currentChanged(int)),this,SIGNAL(onLanguageSwitch(int)));
   QWidget * arwidget = new QWidget;
   arwidget->setLayout(gridlayout);
   QWidget * enwidget = new QWidget;
@@ -125,7 +126,7 @@ SearchOptionsWidget::~SearchOptionsWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
 bool SearchOptionsWidget::isArabicSearch() const {
-  return m_stack->currentIndex() == 1;
+  return m_stack->currentIndex() == 0;
 }
 /**
  * This was originally written to have a 'More' button to show/hide

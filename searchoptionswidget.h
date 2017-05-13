@@ -41,6 +41,7 @@ class SearchOptionsWidget : public QWidget {
   void keymapChanged();
   void onForceLeftToRight(int);
   void onNewTab(int);
+
  private:
   void setup(QWidget * parent);
   bool m_hasMaps;
@@ -73,5 +74,6 @@ class SearchOptionsWidget : public QWidget {
  signals:
   void loadKeymap(const QString &);
   void force(bool);
+  void onLanguageSwitch(int);
 };
 #endif

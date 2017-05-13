@@ -45,15 +45,6 @@ ArabicSearchDialog::ArabicSearchDialog(SearchOptions::SearchScope_t searchType,Q
     m_edit->loadMap(iter.value(),iter.key());
   }
   m_edit->setCurrentMap(mapname);
-  /*
-  if (! mapfile.isEmpty()) {
-    m_edit->loadMap(mapfile,mapname);
-    m_edit->setCurrentMap(mapname);
-  }
-  else {
-    getApp()->enableKeymaps(false);
-  }
-  */
   m_prompt->setBuddy(m_edit);
   m_findButton = new QPushButton(tr("&Find"));
   m_findButton->setDefault(true);
@@ -94,6 +85,7 @@ ArabicSearchDialog::ArabicSearchDialog(SearchOptions::SearchScope_t searchType,Q
   connect(m_options,SIGNAL(force(bool)),m_edit,SLOT(setForceLTR(bool)));
 
   connect(m_options,SIGNAL(loadKeymap(const QString &)),this,SLOT(loadKeymap(const QString &)));
+  connect(m_options,SIGNAL(onLanguageSwitch(int)),this,SLOT(languageSwitch(int)));
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->currentMap();
@@ -105,7 +97,7 @@ ArabicSearchDialog::ArabicSearchDialog(SearchOptions::SearchScope_t searchType,Q
   */
   m_options->addKeymaps(map,maps);
   m_options->setOptions(m_searchType);
-
+  m_mapEnabled = m_edit->isMappingEnabled();
   connect(m_moreButton, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
 
   QVBoxLayout * leftlayout = new QVBoxLayout;
@@ -258,6 +250,17 @@ void ArabicSearchDialog::setText(const QString & t) {
 }
 void ArabicSearchDialog::onHelp() {
   emit(showHelp(this->metaObject()->className()));
+}
+void ArabicSearchDialog::languageSwitch(int /* index */) {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+  if (m_options->isArabicSearch()) {
+    m_edit->enableMapping(m_mapEnabled);
+  }
+  else {
+    m_edit->enableMapping(false);
+  }
+  QLOG_DEBUG() << "isArabicSearch" << m_options->isArabicSearch();
+  QLOG_DEBUG() << "edit map enabled" << m_edit->isMappingEnabled();
 }
 /**
  *

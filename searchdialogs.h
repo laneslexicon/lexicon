@@ -35,11 +35,13 @@ class ArabicSearchDialog : public QDialog {
     void keyboardClosed();
     void onKeyboardShortcut(const QString &);
     void onHelp();
+    void languageSwitch(int);
  protected:
     SearchOptions::SearchScope_t m_searchType;
     int m_count;
     KeyboardWidget * m_keyboard;
     bool m_attached;
+    bool m_mapEnabled;
     QLabel * m_prompt;
     QGroupBox * m_group;
     ImLineEdit * m_edit;
