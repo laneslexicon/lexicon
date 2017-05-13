@@ -7,6 +7,9 @@
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QStackedLayout>
+#include <QStackedWidget>
+#include <QTabWidget>
 #include <QSpacerItem>
 #include "searchoptions.h"
 #ifndef qStrip
@@ -30,6 +33,7 @@ class SearchOptionsWidget : public QWidget {
   void showMore(bool);
   void addKeymaps(const QString &activeMap,const QStringList & maps);
   void setKeymapsEnabled(bool v);
+  bool isArabicSearch() const;
   bool getForceLTR();
   static QRegExp buildRx(const QString & target,const QString & diacritics,const SearchOptions &,const QString & metacharacters = QString("()[].?"));
  public slots:
@@ -43,6 +47,7 @@ class SearchOptionsWidget : public QWidget {
   bool m_more;                   // false basic, 1 show more
   bool m_keymapsEnabled;
   SearchOptions m_options;
+  QTabWidget * m_stack;
   QSpacerItem * m_spacer;
   QGroupBox *  m_targetGroup;
   QGroupBox * m_typeGroup;
@@ -50,6 +55,7 @@ class SearchOptionsWidget : public QWidget {
   QGroupBox * m_keymapGroup;
   QCheckBox * m_ignoreDiacritics;
   QCheckBox * m_wholeWordMatch;
+  QCheckBox * m_enWholeWordMatch;
   QCheckBox * m_includeHeads;
   QCheckBox * m_ignoreCase;
   QCheckBox * m_showAllSearch;

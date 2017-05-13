@@ -305,7 +305,6 @@ void FullSearchWidget::findTarget(bool showProgress) {
   // it does a QTextDocument->find(QString) otherwise QTextDocument->find(QRegExp)
   // arabic searches that include diacritics should be treated as string search not regex
   // build a QTextDocument::FindFlags
-  options.setArabic(false);
   if ((options.getSearchType() == SearchOptions::Regex) && (rx.indexIn(t,0) != -1)) {
     this->regexSearch(t,options);
   }

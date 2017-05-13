@@ -241,6 +241,7 @@ void ArabicSearchDialog::setOptions(SearchOptions & opts) {
 void ArabicSearchDialog::getOptions(SearchOptions & opts) const {
   m_options->getOptions(opts);
   opts.setPattern(m_edit->text());
+  opts.setArabic(m_options->isArabicSearch());
 }
 void ArabicSearchDialog::setOptions(SearchOptions & opts)  {
   m_options->setOptions(opts);
