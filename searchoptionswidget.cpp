@@ -85,13 +85,13 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   row++;
   gridlayout->addWidget(m_showAllSearch,row,0);
   row++;
-  gridlayout->addWidget(m_ignoreCase,row,0);
-  row++;
+  //  gridlayout->addWidget(m_ignoreCase,row,0);
+  //  row++;
   //  gridlayout->addWidget(m_newTab,row,0);
   //  gridlayout->addWidget(m_makeActive,row,1);
   //  row++;
-  gridlayout->addWidget(m_arabicTarget,row,0);
-  gridlayout->addWidget(m_buckwalterTarget,row,1);
+  //  gridlayout->addWidget(m_arabicTarget,row,0);
+  //  gridlayout->addWidget(m_buckwalterTarget,row,1);
 
   m_stack = new QTabWidget;
   QWidget * arwidget = new QWidget;
@@ -139,7 +139,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
   m_arabicTarget->hide();
   m_buckwalterTarget->hide();
   m_showAllSearch->hide();
-  m_ignoreCase->hide();
+  //  m_ignoreCase->hide();
     switch(type) {
   case SearchOptions::Root : {
     m_ignoreDiacritics->hide();
@@ -212,7 +212,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
     m_makeActive->hide();
     m_showAllSearch->show();
     m_typeGroup->show();
-    m_ignoreCase->show();
+    //    m_ignoreCase->show();
     if (USE_KEYMAPS) {
       if (m_hasMaps && m_keymapsEnabled)
         m_keymapGroup->setVisible(false);
@@ -423,6 +423,8 @@ void SearchOptionsWidget::setOptions(int type) {
     m_newTab->setChecked(settings.value(SID_FULLSEARCH_NEW_TAB,false).toBool());
     m_makeActive->setChecked(settings.value(SID_FULLSEARCH_GO_TAB,true).toBool());
     m_includeHeads->setChecked(settings.value(SID_FULLSEARCH_INCLUDE_HEADS,false).toBool());
+    m_ignoreCase->setChecked(settings.value(SID_FULLSEARCH_IGNORE_CASE,true).toBool());
+    m_enWholeWordMatch->setChecked(settings.value(SID_FULLSEARCH_EN_WHOLE_WORD,true).toBool());
     settings.endGroup();
     break;
     //  m_keymapsEnabled = options.keymaps();

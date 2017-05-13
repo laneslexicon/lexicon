@@ -207,6 +207,8 @@ They should not be translated.
 #define SID_FULLSEARCH_CONTEXT_STYLE            "Context style"
 #define SID_FULLSEARCH_ROW_HEIGHT              "Row height"
 #define SID_FULLSEARCH_RESIZE_ROWS             "Resize rows"
+#define SID_FULLSEARCH_IGNORE_CASE             "Ignore case"
+#define SID_FULLSEARCH_EN_WHOLE_WORD           "English whole word"
 
 #define SID_ROOTSEARCH_NEW_TAB                 "Root new tab"
 #define SID_ROOTSEARCH_GO_TAB                  "Root activate tab"
