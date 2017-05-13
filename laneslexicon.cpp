@@ -963,6 +963,8 @@ void LanesLexicon::createActions() {
 
   m_searchWordAction = new QAction(tr("Arabic &word"),this);
   connect(m_searchWordAction,SIGNAL(triggered()),this,SLOT(searchForWord()));
+  m_searchEnglishWordAction = new QAction(tr("English &word"),this);
+  connect(m_searchEnglishWordAction,SIGNAL(triggered()),this,SLOT(searchForEnglishWord()));
   m_searchPageAction = new QAction(tr("&Page"),this);
   connect(m_searchPageAction,SIGNAL(triggered()),this,SLOT(searchForPage()));
   m_searchRootAction = new QAction(tr("&Root"),this);
@@ -1466,6 +1468,7 @@ void LanesLexicon::createMenus() {
   m_searchMenu->addAction(m_searchRootAction);
   m_searchMenu->addAction(m_searchEntryAction);
   m_searchMenu->addAction(m_searchWordAction);
+  m_searchMenu->addAction(m_searchEnglishWordAction);
   m_searchMenu->addAction(m_searchPageAction);
   m_searchMenu->addAction(m_searchNodeAction);
 
@@ -3429,14 +3432,22 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       }
   }
 }
+void LanesLexicon::searchForEnglishWord() {
+  this->wordSearch("en");
+}
 void LanesLexicon::searchForWord() {
+  this->wordSearch("ar");
+}
+void LanesLexicon::wordSearch(const QString & lang) {
   if (m_wordSearchDialog == NULL) {
     m_wordSearchDialog = new ArabicSearchDialog(SearchOptions::Word);
+
     connect(m_wordSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   }
   else {
     m_wordSearchDialog->setText("");
   }
+  m_wordSearchDialog->setArabic(lang == "ar");
   //  d.setOptions(m_searchOptions);
   if (m_wordSearchDialog->exec()) {
     QString t = m_wordSearchDialog->getText();

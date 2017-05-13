@@ -178,6 +178,9 @@ void ArabicSearchDialog::onKeyboardShortcut(const QString & key) {
 }
 ArabicSearchDialog::~ArabicSearchDialog() {
 }
+void ArabicSearchDialog::setArabic(bool v) {
+  m_options->setArabic(v);
+}
 void ArabicSearchDialog::keyboardClosed() {
   showKeyboard();
 }

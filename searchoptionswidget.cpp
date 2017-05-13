@@ -128,6 +128,15 @@ SearchOptionsWidget::~SearchOptionsWidget() {
 bool SearchOptionsWidget::isArabicSearch() const {
   return m_stack->currentIndex() == 0;
 }
+void SearchOptionsWidget::setArabic(bool v) {
+  QLOG_DEBUG() << Q_FUNC_INFO << v;
+  if (v) {
+    m_stack->setCurrentIndex(0);
+  }
+  else {
+    m_stack->setCurrentIndex(1);
+  }
+}
 /**
  * This was originally written to have a 'More' button to show/hide
  * additional options. All options are now shown

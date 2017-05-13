@@ -168,11 +168,12 @@ class LanesLexicon : public QMainWindow
       void onCreateTheme();
 
       void searchForWord();
+      void searchForEnglishWord();
       void searchForPage();
       void searchForNode();
       void searchForRoot();
       void searchForEntry();
-
+      void wordSearch(const QString & language);
       void onClearHistory();
       void onShowHistory();
       void onHistorySelection();
@@ -440,6 +441,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_bookmarkAction;
       QAction * m_searchAction;
       QAction * m_searchWordAction;
+      QAction * m_searchEnglishWordAction;
       QAction * m_searchPageAction;
       QAction * m_searchRootAction;
       QAction * m_searchNodeAction;
