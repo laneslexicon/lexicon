@@ -92,7 +92,7 @@ SOURCES += main.cpp\
         about.cpp \
         logviewer.cpp \
         version.cpp \
-        htmldelegate.cpp \
+#       htmldelegate.cpp \
         historylist.cpp \
         nodeinfo.cpp \
         fontchangedialog.cpp \
@@ -140,7 +140,7 @@ HEADERS  += laneslexicon.h \
             externs.h \
             logviewer.h \
             version.h \
-            htmldelegate.h \
+#            htmldelegate.h \
             historylist.h \
             nodeinfo.h \
             fontchangedialog.h \
