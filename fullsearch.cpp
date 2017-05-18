@@ -938,33 +938,39 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
 
   QRegExp rxclass(m_diacritics);
   QString pattern;
-  if (options.getSearchType() == SearchOptions::Normal) {
-    if (options.ignoreDiacritics()) {
-      m_target = m_target.replace(QRegExp(rxclass),QString());
-      for(int i=0;i < target.size();i++) {
-        QChar sp = m_target.at(i);
-        pattern += QString(sp);
-        if ( sp.isLetter() ) {
-          /// if it's in the Arabic block, append to allow for optional diacritics
-          if ((sp.unicode() >= 0x600) && (sp.unicode() <= 0x6ff)) {
-            pattern += m_diacritics;
+  if (options.arabic()) {
+    if (options.getSearchType() == SearchOptions::Normal) {
+      if (options.ignoreDiacritics()) {
+        m_target = m_target.replace(QRegExp(rxclass),QString());
+        for(int i=0;i < target.size();i++) {
+          QChar sp = m_target.at(i);
+          pattern += QString(sp);
+          if ( sp.isLetter() ) {
+            /// if it's in the Arabic block, append to allow for optional diacritics
+            if ((sp.unicode() >= 0x600) && (sp.unicode() <= 0x6ff)) {
+              pattern += m_diacritics;
+            }
           }
         }
       }
+      else {
+        pattern = target;
+      }
+      if (options.wholeWordMatch()) {
+        pattern = "\\b" + m_target + "\\b";
+      }
+      rx.setPattern(pattern);
     }
     else {
-      pattern = target;
+      rx.setPattern(target);
     }
-    if (options.wholeWordMatch()) {
-      pattern = "\\b" + m_target + "\\b";
-    }
-    rx.setPattern(pattern);
   }
-  else {
+  else {                           // English or mixed
     rx.setPattern(target);
   }
   QLOG_DEBUG() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
   m_currentRx = rx;
+  if (options.arabic()) {
   QString sql(SQL_REGEX_FIND_ENTRY_DETAILS);
   if (m_query.prepare(sql)) {
     sql = SQL_FIND_ENTRY_DETAILS;// "select root,word,xml,page from entry where datasource = 1 and nodeid = ?";
@@ -980,6 +986,18 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
       .arg(sql)
       .arg(m_query.lastError().text());
     return;
+  }
+  }
+  else {
+    QString sql(SQL_ALL_ENTRIES);
+    if (m_query.prepare(sql)) {
+    }
+    else {
+      QLOG_WARN() << QString("SQL prepare error %1 : %2")
+        .arg(sql)
+        .arg(m_query.lastError().text());
+      return;
+    }
   }
   if (m_debug) {
     m_rxlist->showColumn(NODE_COLUMN);
