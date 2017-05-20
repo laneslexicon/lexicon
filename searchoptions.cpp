@@ -5,6 +5,7 @@
 SearchOptions::SearchOptions() {
   m_ignoreDiacritics = true;
   m_wholeWordMatch = false;
+  m_enWholeWordMatch = false;
   m_keymaps = false;
   m_type = SearchOptions::Normal;
   m_includeHeads = false;
@@ -14,6 +15,7 @@ SearchOptions::SearchOptions() {
   m_newTab = false;
   m_activateTab = false;
   m_ignoreCase = false;
+  m_arabic = true;
 }
 bool SearchOptions::ignoreDiacritics() const {
   return m_ignoreDiacritics;
@@ -27,6 +29,21 @@ bool SearchOptions::wholeWordMatch() const {
 void SearchOptions::setWholeWordMatch(bool v) {
   m_wholeWordMatch = v;
 }
+bool SearchOptions::enWholeWordMatch() const {
+  return m_enWholeWordMatch;
+}
+void SearchOptions::setEnWholeWordMatch(bool v) {
+  m_enWholeWordMatch = v;
+}
+bool SearchOptions::isWholeWord() const {
+  if (m_arabic) {
+    return m_wholeWordMatch;
+  }
+  else {
+    return m_enWholeWordMatch;
+  }
+}
+
 void SearchOptions::setSearchType(SearchType_t x) {
   m_type = x;
 }
@@ -38,10 +55,10 @@ void SearchOptions::setSearchScope(SearchScope_t x) {
   m_target = x;
 }
 bool SearchOptions::arabic() const {
-  return m_Arabic;
+  return m_arabic;
 }
 void SearchOptions::setArabic(bool v) {
-  m_Arabic = v;
+  m_arabic = v;
 }
 SearchOptions::SearchScope_t SearchOptions::getSearchScope() const {
   return m_target;

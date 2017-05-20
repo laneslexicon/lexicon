@@ -19,6 +19,9 @@ class SearchOptions {
   bool wholeWordMatch() const;
   void setWholeWordMatch(bool v);
 
+  bool enWholeWordMatch() const;
+  void setEnWholeWordMatch(bool v);
+
   bool showAll() const;
   void setShowAll(bool);
 
@@ -50,11 +53,12 @@ class SearchOptions {
   void setPattern(const QString &);
 
   bool isValid() const;
-
+  bool isWholeWord() const;   // returns value according to whether isArabic is set
  private:
-  bool m_Arabic;
+  bool m_arabic;
   bool m_ignoreDiacritics;
   bool m_wholeWordMatch;
+  bool m_enWholeWordMatch;
   bool m_keymaps;
   SearchType_t  m_type;
   bool m_includeHeads;
