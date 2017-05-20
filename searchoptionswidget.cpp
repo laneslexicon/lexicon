@@ -121,6 +121,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   connect(m_normalSearch,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
   connect(m_regexSearch,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
   showMore(false);
+  setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Minimum);
 }
 SearchOptionsWidget::~SearchOptionsWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -181,16 +182,16 @@ void SearchOptionsWidget::showMore(bool /* show */) {
         m_keymapGroup->setVisible(false);
       }
     }
-    if (m_regexSearch->isChecked()) {
-      m_forceLTR->show();
-      m_ignoreDiacritics->hide();
-      m_wholeWordMatch->hide();
-    }
-    else {
-      m_forceLTR->hide();
-      m_ignoreDiacritics->show();
-      m_wholeWordMatch->show();
-    }
+      //    if (m_regexSearch->isChecked()) {
+      m_forceLTR->setEnabled(! m_regexSearch->isChecked());
+      m_ignoreDiacritics->setEnabled(m_regexSearch->isChecked());
+      m_wholeWordMatch->setEnabled(m_regexSearch->isChecked());
+      //    }
+      //    else {
+      //      m_forceLTR->hide();
+      //      m_ignoreDiacritics->show();
+      //      m_wholeWordMatch->show();
+      //    }
     break;
   }
   case SearchOptions::Word : {
@@ -204,15 +205,30 @@ void SearchOptionsWidget::showMore(bool /* show */) {
         m_keymapGroup->setVisible(false);
     }
     m_includeHeads->show();
+    m_forceLTR->setEnabled(m_regexSearch->isChecked());
+    m_ignoreDiacritics->setEnabled(!m_regexSearch->isChecked());
+    m_wholeWordMatch->setEnabled(!m_regexSearch->isChecked());
     if (m_regexSearch->isChecked()) {
-      m_forceLTR->show();
-      m_ignoreDiacritics->hide();
-      m_wholeWordMatch->hide();
+      //      m_forceLTR->show();
+      //      m_ignoreDiacritics->hide();
+      //      m_wholeWordMatch->hide();
+      //      m_ignoreCase->hide();
+      if (! this->isArabicSearch()) {
+        m_enWholeWordMatch->setEnabled(false);
+        m_ignoreCase->show();
+        m_ignoreCase->setEnabled(false);
+      }
     }
     else {
-      m_forceLTR->hide();
-      m_ignoreDiacritics->show();
-      m_wholeWordMatch->show();
+      //      m_forceLTR->hide();
+      //      m_ignoreDiacritics->show();
+      //      m_wholeWordMatch->show();
+      //      m_ignoreCase->show();
+      if (! this->isArabicSearch()) {
+        m_enWholeWordMatch->setEnabled(true);
+        m_ignoreCase->show();
+        m_ignoreCase->setEnabled(true);
+      }
     }
     break;
   }
@@ -403,9 +419,6 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   m_newTab->setChecked(options.newTab());
   m_makeActive->setChecked(options.activateTab());
   m_makeActive->setEnabled(options.newTab());
-  // m_arabicTarget->setChecked(x & Lane::Arabic);
-
-  // m_buckwalterTarget->setChecked(x & Lane::Buckwalter);
 
   m_includeHeads->setChecked(options.includeHeads());
 
@@ -416,6 +429,7 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
 
   m_ignoreCase->setChecked(options.ignoreCase());
   m_headPhrase->setChecked(options.headPhrase());
+  this->setArabic(options.arabic());
 }
 void SearchOptionsWidget::setOptions(int type) {
   QLOG_DEBUG() << Q_FUNC_INFO << type;
