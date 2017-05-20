@@ -39,6 +39,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
     m_findTarget->loadMap(mapfile,mapname);
     m_findTarget->setCurrentMap(mapname);
   }
+  m_mapEnabled = m_findTarget->isMappingEnabled();
 
   //  m_findTarget->readSettings(getLexicon()->settingsFileName());
 
@@ -56,6 +57,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   connect(m_hideOptionsButton,SIGNAL(clicked()),this,SLOT(hideOptions()));
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
 
+
   QHBoxLayout * targetlayout = new QHBoxLayout;
   targetlayout->addWidget(m_findTarget);
   targetlayout->addWidget(m_findButton);
@@ -67,7 +69,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   m_search = new SearchOptionsWidget(m_defaultOptions,this);
 
   connect(m_search,SIGNAL(force(bool)),m_findTarget,SLOT(setForceLTR(bool)));
-
+  connect(m_search,SIGNAL(onLanguageSwitch(int)),this,SLOT(languageSwitch(int)));
   //  QWidget * container = new QWidget;
   m_container = new QVBoxLayout;
   QStringList headings;
@@ -1137,4 +1139,12 @@ bool FullSearchWidget::startsWithArabic(const QString & t) const {
 
   }
   return false;
+}
+void FullSearchWidget::languageSwitch(int /* index */) {
+  if (m_search->isArabicSearch()) {
+    m_findTarget->enableMapping(m_mapEnabled);
+  }
+  else {
+    m_findTarget->enableMapping(false);
+  }
 }

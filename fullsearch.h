@@ -62,6 +62,7 @@ class FullSearchWidget : public QWidget
     void onExport();
     void selectFocus();
     void openNode(const QString &);
+    void languageSwitch(int /* index */);
  protected:
     void focusInEvent(QFocusEvent *);
     void focusOutEvent(QFocusEvent *);
@@ -88,8 +89,10 @@ class FullSearchWidget : public QWidget
     bool m_cancelSearch;
     bool m_singleRow;
     bool m_resizeRows;
+    bool m_mapEnabled;               // keep this so we can turn on/off when switching Ar/En search
     int m_rowHeight;
     int m_stepCount;
+
     QProgressBar * m_progress;
     QTextDocument m_nodeDoc;
     ImLineEdit * m_findTarget;
