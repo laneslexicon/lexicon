@@ -386,12 +386,9 @@ void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
     opts.setSearchType(SearchOptions::Normal);
 
   opts.setArabic(this->isArabicSearch());
-  if (this->isArabicSearch()) {
-    opts.setWholeWordMatch(m_wholeWordMatch->isChecked());
-  }
-  else {
-    opts.setWholeWordMatch(m_enWholeWordMatch->isChecked());
-  }
+  opts.setWholeWordMatch(m_wholeWordMatch->isChecked());
+  opts.setEnWholeWordMatch(m_enWholeWordMatch->isChecked());
+
   opts.setIncludeHeads(m_includeHeads->isChecked());
   opts.setShowAll(m_showAllSearch->isChecked());
 
@@ -409,8 +406,9 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
   QLOG_DEBUG() << Q_FUNC_INFO;
   m_options = options;
   m_ignoreDiacritics->setChecked(options.ignoreDiacritics());
-
+  this->setArabic(options.arabic());
   m_wholeWordMatch->setChecked(options.wholeWordMatch());
+  m_enWholeWordMatch->setChecked(options.enWholeWordMatch());
 
   m_regexSearch->setChecked((options.getSearchType() == SearchOptions::Regex));
   m_normalSearch->setChecked((options.getSearchType() == SearchOptions::Normal));
@@ -429,7 +427,7 @@ void SearchOptionsWidget::setOptions(const SearchOptions & options) {
 
   m_ignoreCase->setChecked(options.ignoreCase());
   m_headPhrase->setChecked(options.headPhrase());
-  this->setArabic(options.arabic());
+
 }
 void SearchOptionsWidget::setOptions(int type) {
   QLOG_DEBUG() << Q_FUNC_INFO << type;

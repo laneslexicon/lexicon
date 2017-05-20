@@ -98,6 +98,7 @@ FullSearchWidget::FullSearchWidget(QWidget * parent) : QWidget(parent) {
   resultslayout->addStretch();
   resultslayout->addWidget(m_exportButton);
   m_container->addLayout(targetlayout);
+
   m_container->addWidget(m_search);
   m_spacer = new QSpacerItem(0, 20,QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
   m_container->addWidget(m_progress);
@@ -355,10 +356,18 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
     t += tr(", regular expression search");
   }
   else {
-    if (m_searchOptions.ignoreDiacritics())
-      t += tr(", ignoring diacritics");
-    if (m_searchOptions.wholeWordMatch())
-      t += tr(", whole word match");
+    if (m_searchOptions.arabic()) {
+      if (m_searchOptions.ignoreDiacritics())
+        t += tr(", ignoring diacritics");
+      if (m_searchOptions.isWholeWord())
+        t += tr(", whole word match");
+    }
+    else {
+      if (m_searchOptions.ignoreCase())
+        t += tr(", ignoring case");
+      if (m_searchOptions.isWholeWord())
+        t += tr(", whole word match");
+    }
   }
   if (ms != -1) {
     qreal x = (ms/1000) + 0.5;
@@ -888,7 +897,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   }
   QLOG_DEBUG() << QString("Read finished : %1 ms").arg(QDateTime::currentMSecsSinceEpoch() - fStart);
   qint64 et = QDateTime::currentMSecsSinceEpoch();
-  pd->setLabelText(tr("Loading results into table"));
+
   ep.processEvents();
   ep.exit();
   m_resultsText->setText(buildText(entryCount,headCount,textCount,et - st));
