@@ -121,7 +121,11 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   connect(m_normalSearch,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
   connect(m_regexSearch,SIGNAL(clicked()),this,SLOT(searchTypeChanged()));
   showMore(false);
-  setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Minimum);
+  // when showing the search options, expand horizontally only
+  QSizePolicy sp;
+  sp.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
+  sp.setVerticalStretch(0);
+  setSizePolicy(sp);
 }
 SearchOptionsWidget::~SearchOptionsWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
