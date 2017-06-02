@@ -2005,6 +2005,10 @@ void LanesLexicon::onTest() {
     }
     delete d;
   }
+  if (1) {
+    TextSearchDialog * d = new TextSearchDialog(SearchOptions::Text);
+    d->exec();
+  }
 }
 /**
  * Read settings from INIFILE (by default : "default.ini");
