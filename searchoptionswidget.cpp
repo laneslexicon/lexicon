@@ -154,7 +154,7 @@ void SearchOptionsWidget::showMore(bool /* show */) {
   m_arabicTarget->hide();
   m_buckwalterTarget->hide();
   m_showAllSearch->hide();
-  //  m_ignoreCase->hide();
+  m_ignoreCase->hide();
     switch(type) {
   case SearchOptions::Root : {
     m_ignoreDiacritics->hide();

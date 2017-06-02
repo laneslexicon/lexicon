@@ -39,6 +39,7 @@
 #include "tablistdialog.h"
 #include "textwidthdialog.h"
 #include "contentspanel.h"
+#include "textsearchdialog.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -961,9 +962,9 @@ void LanesLexicon::createActions() {
   connect(m_docAction,SIGNAL(triggered()),this,SLOT(onDocs()));
   connect(m_aboutAction,SIGNAL(triggered()),this,SLOT(onAbout()));
 
-  m_searchWordAction = new QAction(tr("Arabic &word"),this);
+  m_searchWordAction = new QAction(tr("Arabic single &word"),this);
   connect(m_searchWordAction,SIGNAL(triggered()),this,SLOT(searchForWord()));
-  m_searchEnglishWordAction = new QAction(tr("English &word"),this);
+  m_searchEnglishWordAction = new QAction(tr("English/Arabic &text"),this);
   connect(m_searchEnglishWordAction,SIGNAL(triggered()),this,SLOT(searchForEnglishWord()));
   m_searchPageAction = new QAction(tr("&Page"),this);
   connect(m_searchPageAction,SIGNAL(triggered()),this,SLOT(searchForPage()));

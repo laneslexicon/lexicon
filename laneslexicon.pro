@@ -114,7 +114,8 @@ SOURCES += main.cpp\
         columnartablewidget.cpp \
         tablistdialog.cpp \
         textwidthdialog.cpp \
-        contentspanel.cpp
+        contentspanel.cpp \
+        textsearchdialog.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -164,4 +165,5 @@ HEADERS  += laneslexicon.h \
             columnartablewidget.h \
             tablistdialog.h \
             textwidthdialog.h \
-            contentspanel.h
+            contentspanel.h \
+            textsearchdialog.h

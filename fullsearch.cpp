@@ -485,7 +485,7 @@ QString FullSearchWidget::transform(const QString & xml) {
   }
   QMessageBox msgBox;
   msgBox.setText(errors.join("\n"));
-  msgBox.exec();
+  //  msgBox.exec();
   clearParseErrors();
   return QString();
 }
@@ -734,7 +734,7 @@ void FullSearchWidget::showKeyboard() {
  */
 void FullSearchWidget::textSearch(const QString & target,const SearchOptions & options) {
   bool replaceSearch = true;
-  QLOG_DEBUG() << Q_FUNC_INFO;
+  QLOG_DEBUG() << Q_FUNC_INFO << target << "arabic" << options.arabic();
   m_target = target;
   m_searchOptions = options;
   QRegExp rx;

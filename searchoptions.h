@@ -5,7 +5,7 @@ class SearchOptions {
  public:
   enum SearchType_t { Normal, Regex };
   /// Word == HeadSearch , Entry == FullSearch
-  enum SearchScope_t { Unknown, Root , Entry, Word, Local, Node, Page };
+  enum SearchScope_t { Unknown, Root , Entry, Word, Local, Node, Page, Text };
   SearchOptions();
   bool ignoreDiacritics() const;
   void setIgnoreDiacritics(bool);
