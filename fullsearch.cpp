@@ -812,16 +812,18 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   qint64 st = QDateTime::currentMSecsSinceEpoch();
   QString xml;
   int maxRows = 100;
+  int totalReadCount = 0;
   while(m_query.next() && ! m_cancelSearch) {
     //    QLOG_DEBUG() << m_query.executedQuery();
     readCount++;
+    totalReadCount++;
     if ((readCount % m_stepCount) == 0) {
       m_progress->setValue(readCount);
-    }
-    if (pd) {
+      if (pd) {
         pd->setValue(readCount);
+      }
+      ep.processEvents();
     }
-    ep.processEvents();
     page = m_query.value("page").toInt();
     xml.clear();
     if (options.arabic()) {
@@ -836,6 +838,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
         node = m_query.value("node").toString();
         QLOG_DEBUG() << "found in node:" << node;
         m_nodeQuery.bindValue(0,node);
+        totalReadCount++;
         if ( m_nodeQuery.exec() &&  m_nodeQuery.first()) {
           root = m_nodeQuery.value("root").toString();
           headword = m_nodeQuery.value("word").toString();
@@ -845,7 +848,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
               headword =  headword.replace(rxclass,QString());
           }
           if (headword.indexOf(rx) != -1) {
-            if (options.includeHeads()) {
+            if (options.includeHeads()) {   // add headword row if required
               Place p = Place::fromEntryRecord(m_nodeQuery.record());
               int row = addRow(p,m_headText,-1);
               QLabel * label = qobject_cast<QLabel *>(m_rxlist->cellWidget(row,NODE_COLUMN));
@@ -859,42 +862,47 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
           xml = m_nodeQuery.value("xml").toString();
         }
       }
+      else {
+      // not found in 'word'
+      }
     }
     else {
       xml = m_query.value("xml").toString();
     }
     if (xml.length() > 0) {
-    QTextDocument * doc  = fetchDocument(xml);
-    Place p;
-    if (options.arabic()) {
-      p = Place::fromEntryRecord(m_nodeQuery.record());
-    }
-    else {
-      p = Place::fromEntryRecord(m_query.record());
-    }
-    if (doc->characterCount() > 0) {
-      getTextFragments(doc,target,options);
-      if (m_fragments.size() > 0) {
-        entryCount++;
-        if (m_singleRow) {
-          addRow(p,m_fragments[0],m_fragments.size());
+      QTextDocument * doc  = fetchDocument(xml);
+      if (doc->characterCount() > 0) {
+        Place p;
+        if (options.arabic()) {
+          p = Place::fromEntryRecord(m_nodeQuery.record());
         }
         else {
-          for(int i=0;i < m_fragments.size();i++) {
-            if (m_fragments[i].size() > 0) {
-              addRow(p,m_fragments[i],i);
+          p = Place::fromEntryRecord(m_query.record());
+        }
+        getTextFragments(doc,target,options);
+        if (m_fragments.size() > 0) {
+          entryCount++;
+          if (m_singleRow) {
+            addRow(p,m_fragments[0],m_fragments.size());
+          }
+          else {
+            for(int i=0;i < m_fragments.size();i++) {
+              if (m_fragments[i].size() > 0) {
+                addRow(p,m_fragments[i],i);
+              }
             }
           }
+          textCount += m_fragments.size();
         }
-        textCount += m_fragments.size();
       }
-    }
+      delete doc;
     }
     if (m_rxlist->rowCount() >= maxRows) {
       m_cancelSearch = true;
     }
   }
   QLOG_DEBUG() << QString("Read finished : %1 ms").arg(QDateTime::currentMSecsSinceEpoch() - fStart);
+  QLOG_DEBUG() << QString("Total reads %1, main dataset reads %2").arg(totalReadCount).arg(readCount);
   qint64 et = QDateTime::currentMSecsSinceEpoch();
 
   ep.processEvents();
