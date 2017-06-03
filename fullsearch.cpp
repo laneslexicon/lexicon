@@ -620,6 +620,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
       c = doc->find(target,position,ff);
     }
   }
+  QLOG_DEBUG() << Q_FUNC_INFO << "fragments" << m_fragments.size();
   //  if (m_positions.size() > 0) {
   //    QLOG_DEBUG() << Q_FUNC_INFO << m_positions;
   //  }
@@ -746,31 +747,26 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   //
   // for arabic searches we lookup the entry in the xref table first and then
   // if the pattern matches, fetch the corresponding full entry record
-  //
-  QString sql = SQL_FIND_ENTRY_DETAILS;
-  if (! m_nodeQuery.prepare(sql)) {
+  // m_nodeQuery looks up the entry from node saved in the xref table
+
+  if (! m_nodeQuery.prepare(SQL_FIND_ENTRY_DETAILS)) {
     QLOG_WARN() << QString("SQL prepare error %1 : %2")
-      .arg(sql)
+      .arg(SQL_FIND_ENTRY_DETAILS)
       .arg(m_nodeQuery.lastError().text());
   }
+  // m_query is the loop-driver
   if (options.arabic()) {
-    QString sql(SQL_FIND_XREF_ENTRIES);
-    if (m_query.prepare(sql)) {
-    }
-    else {
+    if (! m_query.prepare(SQL_FIND_XREF_ENTRIES)) {
       QLOG_WARN() << QString("SQL prepare error %1 : %2")
-        .arg(sql)
+        .arg(SQL_FIND_XREF_ENTRIES)
         .arg(m_query.lastError().text());
       return;
     }
   }
   else {
-    QString sql(SQL_ALL_ENTRIES);
-    if (m_query.prepare(sql)) {
-    }
-    else {
+    if (! m_query.prepare(SQL_ALL_ENTRIES)) {
       QLOG_WARN() << QString("SQL prepare error %1 : %2")
-        .arg(sql)
+        .arg(SQL_ALL_ENTRIES)
         .arg(m_query.lastError().text());
       return;
     }
@@ -815,7 +811,9 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   m_rxlist->blockSignals(true);
   qint64 st = QDateTime::currentMSecsSinceEpoch();
   QString xml;
+  int maxRows = 100;
   while(m_query.next() && ! m_cancelSearch) {
+    //    QLOG_DEBUG() << m_query.executedQuery();
     readCount++;
     if ((readCount % m_stepCount) == 0) {
       m_progress->setValue(readCount);
@@ -825,9 +823,9 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     }
     ep.processEvents();
     page = m_query.value("page").toInt();
+    xml.clear();
     if (options.arabic()) {
       QString word = m_query.value("word").toString();
-
       /// strip diacritics if required
       if (replaceSearch && (options.getSearchType() == SearchOptions::Normal)) {
         if (options.ignoreDiacritics())
@@ -836,6 +834,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
       if ((word.indexOf(rx) != -1) && (node != m_query.value("node").toString())) {
         //        entryCount++;
         node = m_query.value("node").toString();
+        QLOG_DEBUG() << "found in node:" << node;
         m_nodeQuery.bindValue(0,node);
         if ( m_nodeQuery.exec() &&  m_nodeQuery.first()) {
           root = m_nodeQuery.value("root").toString();
@@ -864,38 +863,36 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     else {
       xml = m_query.value("xml").toString();
     }
-      QTextDocument * doc  = fetchDocument(xml);
-      Place p;
-      if (options.arabic()) {
-        p = Place::fromEntryRecord(m_nodeQuery.record());
-      }
-      else {
-        p = Place::fromEntryRecord(m_query.record());
-      }
-      if (doc->characterCount() > 0) {
-        getTextFragments(doc,target,options);
-        if (m_fragments.size() > 0) {
-          entryCount++;
-          if (m_singleRow) {
-            addRow(p,m_fragments[0],m_fragments.size());
-          }
-          else {
-            for(int i=0;i < m_fragments.size();i++) {
-              if (m_fragments[i].size() > 0) {
-                addRow(p,m_fragments[i],i);
-              }
+    if (xml.length() > 0) {
+    QTextDocument * doc  = fetchDocument(xml);
+    Place p;
+    if (options.arabic()) {
+      p = Place::fromEntryRecord(m_nodeQuery.record());
+    }
+    else {
+      p = Place::fromEntryRecord(m_query.record());
+    }
+    if (doc->characterCount() > 0) {
+      getTextFragments(doc,target,options);
+      if (m_fragments.size() > 0) {
+        entryCount++;
+        if (m_singleRow) {
+          addRow(p,m_fragments[0],m_fragments.size());
+        }
+        else {
+          for(int i=0;i < m_fragments.size();i++) {
+            if (m_fragments[i].size() > 0) {
+              addRow(p,m_fragments[i],i);
             }
           }
-          textCount += m_fragments.size();
         }
+        textCount += m_fragments.size();
       }
-      //      if ((entryCount % 100) == 0) {
-      //        m_rxlist->setUpdatesEnabled(!m_rxlist->updatesEnabled());
-      //        m_rxlist->resizeRowsToContents();
-      //      }
-  //    else {
-  //      QLOG_DEBUG() << "Error in node Query sql";
-  //    }
+    }
+    }
+    if (m_rxlist->rowCount() >= maxRows) {
+      m_cancelSearch = true;
+    }
   }
   QLOG_DEBUG() << QString("Read finished : %1 ms").arg(QDateTime::currentMSecsSinceEpoch() - fStart);
   qint64 et = QDateTime::currentMSecsSinceEpoch();
