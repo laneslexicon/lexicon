@@ -48,6 +48,7 @@ TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidg
     m_edit->loadMap(iter.value(),iter.key());
   }
   m_edit->setCurrentMap(mapname);
+  m_edit->enableMapping(false);
   m_prompt->setBuddy(m_edit);
 
   m_text = new QLabel;
@@ -90,7 +91,6 @@ TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidg
   connect(m_options,SIGNAL(force(bool)),m_edit,SLOT(setForceLTR(bool)));
 
   connect(m_options,SIGNAL(loadKeymap(const QString &)),this,SLOT(loadKeymap(const QString &)));
-  connect(m_options,SIGNAL(onLanguageSwitch(int)),this,SLOT(languageSwitch(int)));
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->currentMap();
@@ -186,9 +186,6 @@ void TextSearchDialog::onKeyboardShortcut(const QString & key) {
 TextSearchDialog::~TextSearchDialog() {
   this->hideKeyboard();
 }
-void TextSearchDialog::setArabic(bool v) {
-  m_options->setArabic(v);
-}
 void TextSearchDialog::keyboardClosed() {
   showKeyboard();
 }
@@ -245,7 +242,7 @@ void TextSearchDialog::setOptions(SearchOptions & opts) {
 void TextSearchDialog::getOptions(SearchOptions & opts) const {
   m_options->getOptions(opts);
   opts.setPattern(m_edit->text());
-  opts.setArabic(m_options->isArabicSearch());
+  opts.setTextSearch(true);
 }
 void TextSearchDialog::setOptions(SearchOptions & opts)  {
   m_options->setOptions(opts);
@@ -263,17 +260,19 @@ void TextSearchDialog::setText(const QString & t) {
 void TextSearchDialog::onHelp() {
   emit(showHelp(this->metaObject()->className()));
 }
-void TextSearchDialog::languageSwitch(int /* index */) {
+/*
+void TextSearchDialog::languageSwitch(int  index ) {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  if (m_options->isArabicSearch()) {
+  if (m_options->isTextSearch()) {
     m_edit->enableMapping(m_mapEnabled);
   }
   else {
     m_edit->enableMapping(false);
   }
-  QLOG_DEBUG() << "isArabic" << m_options->isArabicSearch();
+  QLOG_DEBUG() << "text search" << m_options->isTextSearch();
   QLOG_DEBUG() << "edit map enabled" << m_edit->isMappingEnabled();
 }
+*/
 void TextSearchDialog::onTextChanged(const QString & txt) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << txt;
   bool rtl = false;

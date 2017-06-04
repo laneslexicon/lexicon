@@ -15,7 +15,7 @@ SearchOptions::SearchOptions() {
   m_newTab = false;
   m_activateTab = false;
   m_ignoreCase = false;
-  m_arabic = true;
+  m_textSearch = false;
 }
 bool SearchOptions::ignoreDiacritics() const {
   return m_ignoreDiacritics;
@@ -36,7 +36,7 @@ void SearchOptions::setEnWholeWordMatch(bool v) {
   m_enWholeWordMatch = v;
 }
 bool SearchOptions::isWholeWord() const {
-  if (m_arabic) {
+  if (! m_textSearch) {
     return m_wholeWordMatch;
   }
   else {
@@ -54,11 +54,11 @@ void SearchOptions::setSearchScope(SearchScope_t x) {
 
   m_target = x;
 }
-bool SearchOptions::arabic() const {
-  return m_arabic;
+bool SearchOptions::textSearch() const {
+  return m_textSearch;
 }
-void SearchOptions::setArabic(bool v) {
-  m_arabic = v;
+void SearchOptions::setTextSearch(bool v) {
+  m_textSearch = v;
 }
 SearchOptions::SearchScope_t SearchOptions::getSearchScope() const {
   return m_target;

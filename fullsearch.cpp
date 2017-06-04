@@ -358,7 +358,7 @@ QString FullSearchWidget::buildText(int entryCount,int headCount,int bodyCount,i
     t += tr(", regular expression search");
   }
   else {
-    if (m_searchOptions.arabic()) {
+    if (m_searchOptions.textSearch()) {
       if (m_searchOptions.ignoreDiacritics())
         t += tr(", ignoring diacritics");
       if (m_searchOptions.isWholeWord())
@@ -554,11 +554,12 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
   QRegularExpression lineBreaks("\\r|\\n");
   //  QString pattern;
   //  QRegExp rxclass(m_diacritics);
-
+  QLOG_DEBUG() << "target" << target;
   if (options.getSearchType() == SearchOptions::Regex) {
+    QLOG_DEBUG() << "regex search";
     rx.setPattern(target);
   }
-  else if (options.arabic()) {
+  else { //if (options.textSearch()) {
     rx = SearchOptionsWidget::buildRx(target,m_diacritics,options);
   }
 
@@ -569,9 +570,10 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
   int position = 0;
   QTextCursor c;
 
-    QTextDocument::FindFlags ff;
-
-  if ((options.getSearchType() == SearchOptions::Regex) || options.arabic()) {
+  QTextDocument::FindFlags ff;
+  // textSearch is doing two things that need to be separated
+  // textSearch with arabic text will be a regex if ignore diacritics is set
+  if ((options.getSearchType() == SearchOptions::Regex) || ! options.textSearch()) {
      c = doc->find(rx,position);
   }
   else {
@@ -584,7 +586,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     c = doc->find(target,position,ff);
   }
   QString src = doc->toPlainText();
-
+  qDebug() << src;
   int sx;
   int ex;
   int sz = m_fragmentSize;
@@ -613,7 +615,7 @@ void FullSearchWidget::getTextFragments(QTextDocument * doc,const QString & targ
     //
     str = "‪" + str;
     m_fragments << str;
-    if (options.arabic() || (options.getSearchType() == SearchOptions::Regex)) {
+    if (!options.textSearch() || (options.getSearchType() == SearchOptions::Regex)) {
       c = doc->find(rx,position);
     }
     else {
@@ -735,7 +737,7 @@ void FullSearchWidget::showKeyboard() {
  */
 void FullSearchWidget::textSearch(const QString & target,const SearchOptions & options) {
   bool replaceSearch = true;
-  QLOG_DEBUG() << Q_FUNC_INFO << target << "arabic" << options.arabic();
+  QLOG_DEBUG() << Q_FUNC_INFO << target << "textSearch" << options.textSearch();
   m_target = target;
   m_searchOptions = options;
   QRegExp rx;
@@ -755,7 +757,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
       .arg(m_nodeQuery.lastError().text());
   }
   // m_query is the loop-driver
-  if (options.arabic()) {
+  if (! options.textSearch()) {
     if (! m_query.prepare(SQL_FIND_XREF_ENTRIES)) {
       QLOG_WARN() << QString("SQL prepare error %1 : %2")
         .arg(SQL_FIND_XREF_ENTRIES)
@@ -789,7 +791,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   QEventLoop ep;
   QProgressDialog * pd = 0;
   int max;
-  if (options.arabic()) {
+  if (! options.textSearch()) {
      max = this->getMaxRecords("xref");
   }
   else {
@@ -828,7 +830,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
     }
     page = m_query.value("page").toInt();
     xml.clear();
-    if (options.arabic()) {
+    if (! options.textSearch()) {
       QString word = m_query.value("word").toString();
       /// strip diacritics if required
       if (replaceSearch && (options.getSearchType() == SearchOptions::Normal)) {
@@ -837,6 +839,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
       }
       if ((word.indexOf(rx) != -1) && (node != m_query.value("node").toString())) {
         node = m_query.value("node").toString();
+        QLOG_DEBUG() << "Found in node" << node;
         m_nodeQuery.bindValue(0,node);
         totalReadCount++;
         if ( m_nodeQuery.exec() &&  m_nodeQuery.first()) {
@@ -873,7 +876,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
       QTextDocument * doc  = fetchDocument(xml);
       if (doc->characterCount() > 0) {
         Place p;
-        if (options.arabic()) {
+        if (! options.textSearch()) {
           p = Place::fromEntryRecord(m_nodeQuery.record());
         }
         else {
@@ -954,7 +957,7 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
 
   QRegExp rxclass(m_diacritics);
   QString pattern;
-  if (options.arabic()) {
+  if (! options.textSearch()) {
     if (options.getSearchType() == SearchOptions::Normal) {
       if (options.ignoreDiacritics()) {
         m_target = m_target.replace(QRegExp(rxclass),QString());
@@ -986,7 +989,7 @@ void FullSearchWidget::regexSearch(const QString & target,const SearchOptions & 
   }
   QLOG_DEBUG() << Q_FUNC_INFO << "regex pattern" << rx.pattern();
   m_currentRx = rx;
-  if (options.arabic()) {
+  if (options.textSearch()) {
   QString sql(SQL_REGEX_FIND_ENTRY_DETAILS);
   if (m_query.prepare(sql)) {
     sql = SQL_FIND_ENTRY_DETAILS;// "select root,word,xml,page from entry where datasource = 1 and nodeid = ?";
@@ -1146,10 +1149,12 @@ bool FullSearchWidget::startsWithArabic(const QString & t) const {
   return false;
 }
 void FullSearchWidget::languageSwitch(int /* index */) {
+  /*
   if (m_search->isArabicSearch()) {
     m_findTarget->enableMapping(m_mapEnabled);
   }
   else {
     m_findTarget->enableMapping(false);
   }
+  */
 }

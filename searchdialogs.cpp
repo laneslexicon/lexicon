@@ -179,7 +179,7 @@ void ArabicSearchDialog::onKeyboardShortcut(const QString & key) {
 ArabicSearchDialog::~ArabicSearchDialog() {
 }
 void ArabicSearchDialog::setArabic(bool v) {
-  m_options->setArabic(v);
+  //  m_options->setArabic(v);
 }
 void ArabicSearchDialog::keyboardClosed() {
   showKeyboard();
@@ -236,7 +236,8 @@ void ArabicSearchDialog::setOptions(SearchOptions & opts) {
 void ArabicSearchDialog::getOptions(SearchOptions & opts) const {
   m_options->getOptions(opts);
   opts.setPattern(m_edit->text());
-  opts.setArabic(m_options->isArabicSearch());
+  /// TODO
+  //  opts.setArabic(m_options->isArabicSearch());
 }
 void ArabicSearchDialog::setOptions(SearchOptions & opts)  {
   m_options->setOptions(opts);
@@ -255,6 +256,7 @@ void ArabicSearchDialog::onHelp() {
   emit(showHelp(this->metaObject()->className()));
 }
 void ArabicSearchDialog::languageSwitch(int /* index */) {
+  /*
   QLOG_DEBUG() << Q_FUNC_INFO;
   if (m_options->isArabicSearch()) {
     m_edit->enableMapping(m_mapEnabled);
@@ -264,6 +266,7 @@ void ArabicSearchDialog::languageSwitch(int /* index */) {
   }
   QLOG_DEBUG() << "isArabicSearch" << m_options->isArabicSearch();
   QLOG_DEBUG() << "edit map enabled" << m_edit->isMappingEnabled();
+  */
 }
 /**
  *

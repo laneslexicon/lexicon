@@ -43,8 +43,8 @@ class SearchOptions {
   bool ignoreCase() const;
   void setIgnoreCase(bool);
 
-  bool arabic() const;
-  void setArabic(bool);
+  bool textSearch() const;
+  void setTextSearch(bool);
 
   bool headPhrase() const;
   void setHeadPhrase(bool);
@@ -55,7 +55,7 @@ class SearchOptions {
   bool isValid() const;
   bool isWholeWord() const;   // returns value according to whether isArabic is set
  private:
-  bool m_arabic;
+  bool m_textSearch;
   bool m_ignoreDiacritics;
   bool m_wholeWordMatch;
   bool m_enWholeWordMatch;
