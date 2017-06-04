@@ -86,7 +86,7 @@ TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidg
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
   connect(m_edit,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
-  m_options = new SearchOptionsWidget(searchType,this);
+  m_options = new SearchOptionsWidget(SearchOptions::Text,this);
 
   connect(m_options,SIGNAL(force(bool)),m_edit,SLOT(setForceLTR(bool)));
 

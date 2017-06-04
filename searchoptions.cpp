@@ -55,7 +55,8 @@ void SearchOptions::setSearchScope(SearchScope_t x) {
   m_target = x;
 }
 bool SearchOptions::textSearch() const {
-  return m_textSearch;
+  //  return m_textSearch;
+  return (m_target == SearchOptions::Text);
 }
 void SearchOptions::setTextSearch(bool v) {
   m_textSearch = v;

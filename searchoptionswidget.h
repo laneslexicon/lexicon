@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSpacerItem>
+#include <QLabel>
 #include "searchoptions.h"
 #ifndef qStrip
 #define qStrip qDebug()
@@ -66,7 +67,9 @@ class SearchOptionsWidget : public QWidget {
   QRadioButton * m_regexSearch;
   QRadioButton * m_arabicTarget;
   QRadioButton * m_buckwalterTarget;
-
+  QLabel * m_diacriticsText;
+  QLabel * m_caseText;
+  QLabel * m_wholeText;
  signals:
   void loadKeymap(const QString &);
   void force(bool);

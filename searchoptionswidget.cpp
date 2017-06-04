@@ -49,8 +49,17 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   m_normalSearch = new QRadioButton(tr("Normal"),m_typeGroup);
   m_regexSearch = new QRadioButton(tr("Regular expression"),m_typeGroup);
   m_ignoreCase = new QCheckBox(tr("Ignore case"));
-  /// for head search
-  m_headPhrase = new QCheckBox(tr("Search entry heading"));
+  ///
+    m_diacriticsText = new QLabel(tr("For Arabic text"));
+    QFont f = m_diacriticsText->font();
+    f.setItalic(true);
+    m_diacriticsText->setFont(f);
+    m_wholeText = new QLabel(tr("(For single word searches)"));
+    m_wholeText->setFont(f);
+    m_caseText = new QLabel(tr("(For English text)"));
+    m_caseText->setFont(f);
+
+    m_headPhrase = new QCheckBox(tr("Search entry heading"));
   QHBoxLayout * typelayout = new QHBoxLayout;
   typelayout->addWidget(m_normalSearch);
   typelayout->addWidget(m_regexSearch);
@@ -72,18 +81,30 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   int row = 0;
   gridlayout->addWidget(m_typeGroup,row,0,2,2);
   row += 2;
-  gridlayout->addWidget(m_ignoreDiacritics,row,0);
-  gridlayout->addWidget(m_wholeWordMatch,row,1);
-  row++;
-  gridlayout->addWidget(m_forceLTR,row,0);
-  row++;
-  gridlayout->addWidget(m_includeHeads,row,0);
-  row++;
-  gridlayout->addWidget(m_headPhrase,row,0);
-  row++;
-  gridlayout->addWidget(m_showAllSearch,row,0);
-  row++;
-  gridlayout->addWidget(m_ignoreCase,row,0);
+  if ( ! m_options.textSearch()) {
+    gridlayout->addWidget(m_ignoreDiacritics,row,0);
+    gridlayout->addWidget(m_wholeWordMatch,row,1);
+    row++;
+    gridlayout->addWidget(m_forceLTR,row,0);
+    row++;
+    gridlayout->addWidget(m_includeHeads,row,0);
+    row++;
+    gridlayout->addWidget(m_headPhrase,row,0);
+    row++;
+    gridlayout->addWidget(m_showAllSearch,row,0);
+    row++;
+    gridlayout->addWidget(m_ignoreCase,row,0);
+  }
+  else {
+    gridlayout->addWidget(m_ignoreDiacritics,row,0);
+    gridlayout->addWidget(m_diacriticsText,row,1);
+    row++;
+    gridlayout->addWidget(m_ignoreCase,row,0);
+    gridlayout->addWidget(m_caseText,row,1);
+    row++;
+    gridlayout->addWidget(m_wholeWordMatch,row,0);
+    gridlayout->addWidget(m_wholeText,row,1);
+  }
   row++;
   gridlayout->addWidget(m_newTab,row,0);
   gridlayout->addWidget(m_makeActive,row,1);
@@ -111,13 +132,12 @@ SearchOptionsWidget::~SearchOptionsWidget() {
  *
  */
 void SearchOptionsWidget::showMore(bool /* show */) {
-  //  m_more = show;
   int type = m_options.getSearchScope();
   m_arabicTarget->hide();
   m_buckwalterTarget->hide();
   m_showAllSearch->hide();
   m_ignoreCase->hide();
-    switch(type) {
+  switch(type) {
   case SearchOptions::Root : {
     m_ignoreDiacritics->hide();
     m_wholeWordMatch->hide();
@@ -208,6 +228,21 @@ void SearchOptionsWidget::showMore(bool /* show */) {
       m_ignoreDiacritics->show();
       m_wholeWordMatch->show();
     }
+    break;
+  }
+  case SearchOptions::Text : {
+    m_includeHeads->hide();
+    m_ignoreDiacritics->show();
+    m_ignoreCase->show();
+    m_wholeWordMatch->show();
+    m_headPhrase->hide();
+    m_forceLTR->hide();
+    m_ignoreDiacritics->setEnabled(! m_regexSearch->isChecked());
+    m_ignoreCase->setEnabled(! m_regexSearch->isChecked());
+    m_wholeWordMatch->setEnabled(! m_regexSearch->isChecked());
+    m_caseText->setEnabled(! m_regexSearch->isChecked());
+    m_wholeText->setEnabled(! m_regexSearch->isChecked());
+    m_diacriticsText->setEnabled(! m_regexSearch->isChecked());
     break;
   }
   default :
@@ -430,6 +465,16 @@ void SearchOptionsWidget::setOptions(int type) {
     m_normalSearch->setChecked(! m_regexSearch->isChecked());
     m_showAllSearch->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
     m_ignoreCase->setChecked(settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool());
+    settings.endGroup();
+    break;
+  }
+  case SearchOptions::Text : {
+    settings.beginGroup("TextSearch");
+    m_ignoreDiacritics->setChecked(settings.value(SID_TEXTSEARCH_DIACRITICS,true).toBool());
+    m_wholeWordMatch->setChecked(settings.value(SID_TEXTSEARCH_WHOLE_WORD,true).toBool());
+    m_regexSearch->setChecked(settings.value(SID_TEXTSEARCH_TYPE_REGEX,false).toBool());
+    m_normalSearch->setChecked(! m_regexSearch->isChecked());
+    m_ignoreCase->setChecked(settings.value(SID_TEXTSEARCH_IGNORE_CASE,true).toBool());
     settings.endGroup();
     break;
   }
