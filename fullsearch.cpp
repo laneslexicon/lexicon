@@ -811,6 +811,8 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
   m_rxlist->blockSignals(true);
   qint64 st = QDateTime::currentMSecsSinceEpoch();
   QString xml;
+  // set max rows from the command line and settings.ini
+  // loading large tables can take a long time
   int maxRows = 100;
   int totalReadCount = 0;
   while(m_query.next() && ! m_cancelSearch) {
@@ -834,9 +836,7 @@ void FullSearchWidget::textSearch(const QString & target,const SearchOptions & o
           word =  word.replace(rxclass,QString());
       }
       if ((word.indexOf(rx) != -1) && (node != m_query.value("node").toString())) {
-        //        entryCount++;
         node = m_query.value("node").toString();
-        QLOG_DEBUG() << "found in node:" << node;
         m_nodeQuery.bindValue(0,node);
         totalReadCount++;
         if ( m_nodeQuery.exec() &&  m_nodeQuery.first()) {
