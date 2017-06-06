@@ -1,0 +1,13 @@
+#include <QObject>
+#include <QFile>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QTextDocument>
+#include <QTextCursor>
+#include <QDir>
+#include <QFileInfo>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
