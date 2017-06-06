@@ -964,8 +964,8 @@ void LanesLexicon::createActions() {
 
   m_searchWordAction = new QAction(tr("Arabic single &word"),this);
   connect(m_searchWordAction,SIGNAL(triggered()),this,SLOT(searchForWord()));
-  m_searchEnglishWordAction = new QAction(tr("English/Arabic &text"),this);
-  connect(m_searchEnglishWordAction,SIGNAL(triggered()),this,SLOT(searchForEnglishWord()));
+  m_textSearchAction = new QAction(tr("Tex&t (English/Arabic)"),this);
+  connect(m_textSearchAction,SIGNAL(triggered()),this,SLOT(searchForText()));
   m_searchPageAction = new QAction(tr("&Page"),this);
   connect(m_searchPageAction,SIGNAL(triggered()),this,SLOT(searchForPage()));
   m_searchRootAction = new QAction(tr("&Root"),this);
@@ -1469,7 +1469,7 @@ void LanesLexicon::createMenus() {
   m_searchMenu->addAction(m_searchRootAction);
   m_searchMenu->addAction(m_searchEntryAction);
   m_searchMenu->addAction(m_searchWordAction);
-  m_searchMenu->addAction(m_searchEnglishWordAction);
+  m_searchMenu->addAction(m_textSearchAction);
   m_searchMenu->addAction(m_searchPageAction);
   m_searchMenu->addAction(m_searchNodeAction);
 
@@ -3437,7 +3437,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
       }
   }
 }
-void LanesLexicon::searchForEnglishWord() {
+void LanesLexicon::searchForText() {
   this->wordSearch("en");
 }
 void LanesLexicon::searchForWord() {

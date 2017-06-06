@@ -168,7 +168,7 @@ class LanesLexicon : public QMainWindow
       void onCreateTheme();
 
       void searchForWord();
-      void searchForEnglishWord();
+      void searchForText();
       void searchForPage();
       void searchForNode();
       void searchForRoot();
@@ -441,7 +441,7 @@ class LanesLexicon : public QMainWindow
       QAction * m_bookmarkAction;
       QAction * m_searchAction;
       QAction * m_searchWordAction;
-      QAction * m_searchEnglishWordAction;
+      QAction * m_textSearchAction;
       QAction * m_searchPageAction;
       QAction * m_searchRootAction;
       QAction * m_searchNodeAction;
