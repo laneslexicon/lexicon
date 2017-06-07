@@ -22,6 +22,8 @@ QString TextSearch::fixHtml(const QString & t) {
 }
 
 TextSearch::TextSearch() {
+  m_padding = 30;
+  m_verbose = false;
 }
 void TextSearch::setNode(const QString & node) {
     QRegularExpression nrx("^\\d+$");
@@ -32,6 +34,9 @@ void TextSearch::setNode(const QString & node) {
        m_nodes <<  "n" + n[i];
       }
     }
+}
+void TextSearch::setPadding(int sz) {
+  m_padding = sz;
 }
 QString TextSearch::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
@@ -164,13 +169,13 @@ QMap<int,QString> TextSearch::searchEntry(QString xml) {
   }
   int start;
   int end;
-  int fsize = 20;
+
   QString fragment;
   while (! c.isNull()) {
     fragment.clear();
     fc++;
-    start = c.selectionStart() - fsize;
-    end = c.selectionEnd() + fsize;
+    start = c.selectionStart() - m_padding;
+    end = c.selectionEnd() + m_padding;
     if (start < 0) {
       start = 0;
     }

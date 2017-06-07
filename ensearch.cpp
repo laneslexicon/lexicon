@@ -142,6 +142,9 @@ int main(int argc, char *argv[])
   QCommandLineOption dbOption(QStringList() <<"f" << "file",QObject::tr("Database path relative to current directory"));
   parser.addOption(dbOption);
 
+  QCommandLineOption sizeOption(QStringList() <<"z" << "size",QObject::tr("Fragment padding"),"padding");
+  parser.addOption(sizeOption);
+
   QCoreApplication app(argc,argv);
   parser.process(app);
 
@@ -214,6 +217,18 @@ int main(int argc, char *argv[])
   TextSearch searcher;
   searcher.m_separator = parser.value(separatorOption);
   searcher.m_pattern = pattern;
+  if (parser.isSet(sizeOption)) {
+    bool ok = true;
+    QString v = parser.value(sizeOption);
+    int sz = v.toInt(&ok);
+    if (ok) {
+      searcher.setPadding(sz);
+    }
+  }
+  if (pattern.length() == 0) {
+    std::cerr << qPrintable(QString("No search pattern supplied")) << std::endl;
+    return 0;
+  }
 
   QRegularExpression rx;
   if (! parser.isSet(regexOption)) {

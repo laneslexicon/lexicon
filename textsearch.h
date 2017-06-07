@@ -36,6 +36,7 @@ class TextSearch : public QObject {
   void searchAll();
   void searchNodes();
   void setNode(const QString & node);
+  void setPadding(int);
   QList<SearchResult>  m_results;
   QString m_pattern;
   qint64 m_time;
@@ -43,5 +44,6 @@ class TextSearch : public QObject {
   QStringList m_nodes;
   QRegularExpression m_rx;
   bool m_verbose;
+  int m_padding;
 };
 #endif
