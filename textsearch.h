@@ -31,12 +31,18 @@ class TextSearch : public QObject {
   QString getDiacritics(QList<QChar> & points);
   QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
   QString fixHtml(const QString & t);
+  void setSearch(const QString & pattern,bool regex,bool caseSensitive,bool wholeWord,bool diacritics);
   void toFile(const QString & fileName = QString()) const;
   void search();
   void searchAll();
   void searchNodes();
+  void setVerbose(bool);
   void setNode(const QString & node);
   void setPadding(int);
+  void setCaseSensitive(bool);
+  void setWholeWord(bool);
+  void setDiacritics(bool);
+  void setSearchType(bool);
   QList<SearchResult>  m_results;
   QString m_pattern;
   qint64 m_time;
@@ -44,6 +50,10 @@ class TextSearch : public QObject {
   QStringList m_nodes;
   QRegularExpression m_rx;
   bool m_verbose;
+  bool m_caseSensitive;
+  bool m_wholeWord;
   int m_padding;
+  bool m_diacritics;
+  bool m_regex;
 };
 #endif

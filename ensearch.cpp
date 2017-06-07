@@ -101,6 +101,7 @@ void test() {
 }
 int main(int argc, char *argv[])
 {
+  bool verbose;
   QString settingsFile("Resources/themes/default/settings.ini");
   QCommandLineParser parser;
   parser.addHelpOption();
@@ -119,8 +120,8 @@ int main(int argc, char *argv[])
   separatorOption.setDefaultValue("|");
   parser.addOption(separatorOption);
 
-  QCommandLineOption showOption(QStringList() <<"v" << "verbose",QObject::tr("Show matching entries"));
-  parser.addOption(showOption);
+  QCommandLineOption verboseOption(QStringList() <<"v" << "verbose",QObject::tr("Show matching entries"));
+  parser.addOption(verboseOption);
   QCommandLineOption headOption(QStringList() <<"r" << "root",QObject::tr("Show root/headword for matching entries"));
   parser.addOption(headOption);
 
@@ -130,7 +131,7 @@ int main(int argc, char *argv[])
   QCommandLineOption diacriticsOption(QStringList() <<"d" << "ignore-diacritics",QObject::tr("Ignore diacritics (Arabic only)"));
   parser.addOption(diacriticsOption);
 
-  QCommandLineOption caseOption(QStringList() <<"i" << "ignore-case",QObject::tr("Ignore case"));
+  QCommandLineOption caseOption(QStringList() <<"c" << "case-sensitive",QObject::tr("Case sensitive"));
   parser.addOption(caseOption);
 
   QCommandLineOption wholeOption(QStringList() <<"w" << "whole-word",QObject::tr("Whole word match"));
@@ -152,6 +153,7 @@ int main(int argc, char *argv[])
     test();
     return 0;
   }
+  verbose = parser.isSet(verboseOption);
   QFile dbfile;
   QSqlDatabase db;
   int nodeCount = 0; // number of nodes read
@@ -194,25 +196,21 @@ int main(int argc, char *argv[])
   if (db.isOpen()) {
     db.close();
   }
-  showData = parser.isSet(showOption);
+
   bool showHead = parser.isSet(headOption);
-
-  QStringList posargs = parser.positionalArguments();
-  if (! parser.isSet(patternOption) && (posargs.size() == 0)) {
-    qDebug() << "No pattern given";
-    return 1;
-
-  }
   QString pattern;
-  if (parser.isSet(patternOption)) {
-    pattern = parser.value(patternOption);
+  QStringList posargs = parser.positionalArguments();
+  if (! parser.isSet(patternOption)) {
+      if (posargs.size() > 0) {
+        pattern = posargs[0];
+      }
   }
   else {
-    pattern = posargs[0];
+    pattern = parser.value(patternOption);
   }
-  if (pattern.isEmpty())  {
-    qDebug() << "No pattern given";
-    return 1;
+  if (pattern.length() == 0) {
+    std::cerr << qPrintable(QString("No search pattern supplied")) << std::endl;
+    return 0;
   }
   TextSearch searcher;
   searcher.m_separator = parser.value(separatorOption);
@@ -225,28 +223,11 @@ int main(int argc, char *argv[])
       searcher.setPadding(sz);
     }
   }
-  if (pattern.length() == 0) {
-    std::cerr << qPrintable(QString("No search pattern supplied")) << std::endl;
-    return 0;
-  }
-
-  QRegularExpression rx;
-  if (! parser.isSet(regexOption)) {
-    pattern = QRegularExpression::escape(pattern);
-    rx = searcher.buildRx(pattern,
-                          parser.isSet(diacriticsOption),
-                          parser.isSet(wholeOption),
-                          parser.isSet(caseOption));
-  }
-  else {
-    rx.setPattern(pattern);
-    searcher.m_rx = rx;
-  }
-  if (! rx.isValid()) {
-    std::cerr << qPrintable(rx.pattern()) << std::endl;
-    std::cerr << qPrintable(QString("Invalid regular expression: %1").arg(rx.errorString())) << std::endl;
-    return 0;
-  }
+  searcher.setSearch(pattern,
+                     parser.isSet(regexOption),
+                     parser.isSet(caseOption),
+                     parser.isSet(wholeOption),
+                     parser.isSet(diacriticsOption));
 
   db = QSqlDatabase::addDatabase("QSQLITE");
   db.setDatabaseName(dbname);

@@ -18,12 +18,16 @@ QString TextSearch::fixHtml(const QString & t) {
     QRegularExpressionMatch m = iter.next();
     html.replace(m.captured(0),m.captured(1));
   }
+  html.remove(QChar(0x2029));
   return html;
 }
 
 TextSearch::TextSearch() {
   m_padding = 30;
   m_verbose = false;
+}
+void TextSearch::setVerbose(bool v) {
+  m_verbose = v;
 }
 void TextSearch::setNode(const QString & node) {
     QRegularExpression nrx("^\\d+$");
@@ -37,6 +41,12 @@ void TextSearch::setNode(const QString & node) {
 }
 void TextSearch::setPadding(int sz) {
   m_padding = sz;
+}
+void TextSearch::setCaseSensitive(bool v) {
+  m_caseSensitive = v;
+}
+void TextSearch::setWholeWord(bool v) {
+  m_wholeWord = v;
 }
 QString TextSearch::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
@@ -146,20 +156,25 @@ QMap<int,QString> TextSearch::searchEntry(QString xml) {
   if (html.isEmpty()) {
     return results;
   }
-  //  html = fixHtml(html);
-  //  qDebug() << html;
+  html = fixHtml(html);
+  //qDebug() << ">>>>" << html;
   QTextDocument doc;
-  QTextDocument xdoc(xml);
+  //QTextDocument xdoc(xml);
   //  qDebug() << html;
-  doc.setHtml(QString(xml.toUtf8()));//"<html><body>fuck</body></html>");
+  // ??????? doc.setHtml(QString(xml.toUtf8()));
+  doc.setHtml(QString(html.toUtf8()));
 
   //  QTextCursor xc = xdoc.find("camel");
   //  if (! xc.isNull() && c.isNull()) {
   //    qDebug() << "find in xml, not in html";
   int fc = 0;
   QTextDocument::FindFlags f;
-  f = QTextDocument::FindCaseSensitively;
+  if (m_caseSensitive) {
+    f = QTextDocument::FindCaseSensitively;
+  }
+  if (m_wholeWord) {
   f |= QTextDocument::FindWholeWords;
+  }
   QTextCursor c;
   if (regex) {
     c = doc.find(m_rx,0);
@@ -185,6 +200,7 @@ QMap<int,QString> TextSearch::searchEntry(QString xml) {
     for(int i=start;i < end;i++) {
       fragment += QString(doc.characterAt(i));
     }
+    fragment.remove(QChar(0x2029));
     results[c.selectionStart()] = fragment;
     if (regex) {
       c = doc.find(m_rx,c.selectionEnd());
@@ -423,4 +439,50 @@ void TextSearch::search() {
     this->searchNodes();
   }
   m_time = t.elapsed();
+}
+void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool wholeWord,bool diacritics) {
+  // TODO set defaults for search options
+  // TODO if text has Arabic and not ignoring diacritics, do a text search
+  // TODO if text has Arabic and ignoring diacritics do a regex search and set the whole word and case options
+  // TODO if no Arabic in text, set the case and whole word text search options
+  QRegularExpression rx;
+  m_caseSensitive = caseSensitive;
+  m_wholeWord = wholeWord;
+  m_regex = regex;
+  m_diacritics = diacritics;
+  QString pattern = p;
+  if (! regex) {
+    QRegularExpression rx("\\[\\x{0600}-\\x{06ff}\\]+");
+    if (rx.match(pattern).hasMatch()) { // text contains arabic
+      if (diacritics) {
+        pattern = QRegularExpression::escape(pattern);
+        rx = buildRx(pattern,diacritics,wholeWord,!caseSensitive);
+        if (m_verbose) {
+          std::cerr << "Arabic regex search (forced by diacritics):" << std::endl;
+          std::cerr << qPrintable(rx.pattern()) << std::endl;
+        }
+        m_rx = rx;
+      }
+      else {
+        if (m_verbose) {
+          std::cerr << "Text search (including Arabic)" << std::endl;
+        }
+      }
+    }
+    else {
+        if (m_verbose) {
+          std::cerr << "Arabic regex search" << std::endl;
+        }
+      // non Arabic search
+      qDebug() << "plain text search";
+    }
+  }
+  else {    // doing a regex search so just set the pattern
+    m_pattern = pattern;
+    m_rx.setPattern(pattern);
+  }
+  if (! m_rx.isValid()) {
+    std::cerr << qPrintable(m_rx.pattern()) << std::endl;
+    std::cerr << qPrintable(QString("Invalid regular expression: %1").arg(m_rx.errorString())) << std::endl;
+  }
 }
