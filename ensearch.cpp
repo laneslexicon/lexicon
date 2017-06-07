@@ -214,23 +214,30 @@ int main(int argc, char *argv[])
   TextSearch searcher;
   searcher.m_separator = parser.value(separatorOption);
   searcher.m_pattern = pattern;
+
   QRegularExpression rx;
-  if (parser.isSet(regexOption)) {
+  if (! parser.isSet(regexOption)) {
+    pattern = QRegularExpression::escape(pattern);
     rx = searcher.buildRx(pattern,
-                 parser.isSet(diacriticsOption),
-                 parser.isSet(wholeOption),
-                 parser.isSet(caseOption));
+                          parser.isSet(diacriticsOption),
+                          parser.isSet(wholeOption),
+                          parser.isSet(caseOption));
+  }
+  else {
+    rx.setPattern(pattern);
+    searcher.m_rx = rx;
   }
   if (! rx.isValid()) {
-    rx.setPattern("");
+    std::cerr << qPrintable(rx.pattern()) << std::endl;
+    std::cerr << qPrintable(QString("Invalid regular expression: %1").arg(rx.errorString())) << std::endl;
+    return 0;
   }
 
   db = QSqlDatabase::addDatabase("QSQLITE");
-  qDebug() << "Db" << dbname;
   db.setDatabaseName(dbname);
   db.open();
   if (! db.isOpen()) {
-    qDebug() << "Could not open database";
+    std::cerr  << qPrintable(QString("Could not open database:%1").arg(dbname)) << std::endl;
     return 0;
   }
   QStringList nodes;
