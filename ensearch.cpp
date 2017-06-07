@@ -343,13 +343,21 @@ int main(int argc, char *argv[])
   QString settingsFile("Resources/themes/default/settings.ini");
   QCommandLineParser parser;
   parser.addHelpOption();
-  QCommandLineOption nodeOption(QStringList() <<"n" << "node",QObject::tr("Node to search"),"node");
+  QCommandLineOption nodeOption(QStringList() <<"n" << "node",QObject::tr("Node or comma delimited list of nodes to be searched"),"node");
   parser.addOption(nodeOption);
 
   parser.addHelpOption();
 
-  QCommandLineOption patternOption(QStringList() <<"s" << "search",QObject::tr("Search pattern"),"pattern");
+  QCommandLineOption patternOption(QStringList() <<"p" << "pattern",QObject::tr("Search pattern"),"pattern");
   parser.addOption(patternOption);
+
+  QCommandLineOption outputOption(QStringList() <<"o" << "output",QObject::tr("Output file"),"output");
+  parser.addOption(outputOption);
+
+  QCommandLineOption separatorOption(QStringList() <<"s" << "separator",QObject::tr("Output file field separator"),"separator");
+  separatorOption.setDefaultValue("|");
+  parser.addOption(separatorOption);
+
   QCommandLineOption showOption(QStringList() <<"v" << "verbose",QObject::tr("Show matching entries"));
   parser.addOption(showOption);
   QCommandLineOption headOption(QStringList() <<"r" << "root",QObject::tr("Show root/headword for matching entries"));
@@ -367,7 +375,7 @@ int main(int argc, char *argv[])
   QCommandLineOption wholeOption(QStringList() <<"w" << "whole-word",QObject::tr("Whole word match"));
   parser.addOption(wholeOption);
 
-  QCommandLineOption regexOption(QStringList() <<"x" << "regex",QObject::tr("Regular expression set"));
+  QCommandLineOption regexOption(QStringList() <<"x" << "regex",QObject::tr("Regular expression search"));
   parser.addOption(regexOption);
 
   QCommandLineOption dbOption(QStringList() <<"f" << "file",QObject::tr("Database path relative to current directory"));
@@ -396,18 +404,24 @@ int main(int argc, char *argv[])
   else {
     dbname = parser.value(dbOption);
   }
-  QFile f(dbname);
-  if (! f.exists()) {
-    qDebug() << "Database not found,using standard name" << dbname;
+  QFileInfo fi(dbname);
+  if (! fi.exists()) {
     dbname = "Resources/lexicon.sqlite";
+    fi = QFileInfo(dbname);
   }
+  if (! fi.exists()) {
+    qDebug() << "Database not found:" << dbname;
+  }
+
+
+  QFile f(dbname);
   if (! f.exists()) {
     qDebug() << QString("Cannot find database: %1").arg(dbname);
     return 0;
   }
 
 
-  dbfile.setFileName(dbname);
+  dbfile.setFileName(fi.absoluteFilePath());
 
   if (! dbfile.exists() ) {
     QLOG_WARN() << QString(QObject::tr("Cannot find database : %1")).arg(dbname);
@@ -477,7 +491,7 @@ int main(int argc, char *argv[])
   QString root;
   QString headword;
   QString node;
-  int maxFinds = 100;
+  int maxFinds = 0;
   int maxReads = 0;
   int readCount = 0;
   int findCount = 0;
@@ -571,17 +585,40 @@ int main(int argc, char *argv[])
     }
 
   }
-  qDebug() << QString("%1 : found in %2 entr%3, total count %4 (search time took %5ms)").arg(pattern).arg(findCount).arg(findCount > 1 ? "ies" : "y").arg(wordCount).arg(t.elapsed());
   dbfile.close();
   db.close();
   qDebug() << ">>>>" << results.size();
+  bool fileOutput = false;
+  QFile of;
+  if (parser.isSet(outputOption)) {
+    of.setFileName(parser.value(outputOption));
+    if (! of.open(QIODevice::WriteOnly)) {
+      std::cerr << "Cannot open output file for writing: ";
+      std::cerr << qPrintable(of.errorString()) << std::endl;
+    }
+    else {
+      fileOutput = true;
+    }
+  }
+  QTextStream out(&of);
+  out.setCodec("UTF-8");
   for(int i=0;i < results.size();i++) {
-    qDebug() << results[i].node << results[i].root << results[i].head;
     QMapIterator<int,QString> iter(results[i].fragments);
     while(iter.hasNext()) {
       iter.next();
-      qDebug() << iter.key() << iter.value();
+      QStringList o;
+      o << results[i].node << results[i].root << results[i].head  << QString("%1").arg(iter.key()) << iter.value();
+      if (fileOutput) {
+        out << o.join(parser.value(separatorOption));
+        out << "\n";
+      }
+      else {
+        std::cout << qPrintable(o.join(parser.value(separatorOption))) << std::endl;
+      }
     }
   }
+ QString summary =  QString("Search %1 : found in %2 entr%3, total count %4 (time %5ms)").arg(pattern).arg(findCount).arg(findCount > 1 ? "ies" : "y").arg(wordCount).arg(t.elapsed());
+  of.close();
+  std::cerr << qPrintable(summary) << std::endl;
   return 0;
 }
