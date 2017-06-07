@@ -13,13 +13,6 @@
 #include <iostream>
 #include "ensearch.h"
 bool showData;
-class   SearchResult {
-public:
-  QString root;
-  QString node;
-  QString head;
-  QMap<int,QString> fragments;
-};
 
 /*
   QFile dbfile;
@@ -65,8 +58,9 @@ QString fixHtml(const QString & t) {
   }
   return html;
 }
-
-QString transform(int type,const QString & xsl,const QString & xml) {
+TextSearch::TextSearch() {
+}
+QString TextSearch::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
   if (xsl.isEmpty()) {
     qDebug() << "No XSLT supplied";
@@ -105,7 +99,7 @@ QString transform(int type,const QString & xsl,const QString & xml) {
   return QString();
 
 }
-QList<QPair<QString,QString> > splitText(const QString & txt) {
+QList<QPair<QString,QString> > TextSearch::splitText(const QString & txt) {
   QList<QPair<QString,QString>> texts;
   int rtlCount = 0;
   int ltrCount = 0;
@@ -162,7 +156,7 @@ QList<QPair<QString,QString> > splitText(const QString & txt) {
   return texts;
 }
 
-QMap<int,QString> searchEntry(QString pattern,QString xml,QRegularExpression rx) {
+QMap<int,QString> TextSearch::searchEntry(QString pattern,QString xml,QRegularExpression rx) {
   QMap<int,QString> results;
   //  QTextDocument doc(xml);
   //  int cnt = doc.characterCount();
@@ -273,7 +267,7 @@ void testSplit(const QString & txt) {
   Return the regex to make the diacritics optional and fill the passed array with the characters
   so the calling function can remove them from the search pattern
 */
-QString getDiacritics(QList<QChar> & points) {
+QString TextSearch::getDiacritics(QList<QChar> & points) {
   QSettings settings("Resources/themes/default/settings.ini",QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Diacritics");
@@ -293,7 +287,7 @@ QString getDiacritics(QList<QChar> & points) {
   rx += "]*";
   return rx;
 }
-QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase) {
+QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase) {
   QList<QChar> dc;
   QString diacritics = getDiacritics(dc);//("[0x6710x64c0x6500x651]*");
   QString pattern;
@@ -319,21 +313,60 @@ QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,b
   }
   return rx;
 }
+void TextSearch::toFile(const QString & fileName) const {
+  bool fileOutput = false;
+  QFile of;
+
+  if (fileName.length() > 0) {
+  of.setFileName(fileName);
+  if (! of.open(QIODevice::WriteOnly)) {
+    std::cerr << "Cannot open output file for writing: ";
+    std::cerr << qPrintable(of.errorString()) << std::endl;
+  }
+  else {
+    fileOutput = true;
+  }
+  }
+  QTextStream out(&of);
+  out.setCodec("UTF-8");
+  int entryCount = m_results.size();
+  int findCount = 0;
+  for(int i=0;i < m_results.size();i++) {
+    QMapIterator<int,QString> iter(m_results[i].fragments);
+    findCount += m_results[i].fragments.size();
+    while(iter.hasNext()) {
+      iter.next();
+      QStringList o;
+      o << m_results[i].node << m_results[i].root << m_results[i].head  << QString("%1").arg(iter.key()) << iter.value();
+      if (fileOutput) {
+        out << o.join(m_separator);
+        out << "\n";
+      }
+      else {
+        std::cout << qPrintable(o.join(m_separator)) << std::endl;
+      }
+    }
+  }
+ QString summary =  QString("Search %1 : found in %2 entr%3, total count %4 (time %5ms)").arg(m_pattern).arg(entryCount).arg(entryCount > 1 ? "ies" : "y").arg(findCount).arg(m_time);
+  of.close();
+  std::cerr << qPrintable(summary) << std::endl;
+}
 void test() {
+  TextSearch searcher;
   QList<QChar> dc;
 
   QString text("This is a test فتح for Graeme's crap code");
-  QRegularExpression rx = buildRx("فَتَح",true,true,true);
+  QRegularExpression rx = searcher.buildRx("فَتَح",true,true,true);
   qDebug() << rx.pattern() << rx.isValid() << rx.match(text);
-  rx = buildRx("graeme",true,true,true);
+  rx = searcher.buildRx("graeme",true,true,true);
   qDebug() << rx.pattern() << rx.isValid() << rx.match(text);
-  rx = buildRx("graeme",true,true,false);
+  rx = searcher.buildRx("graeme",true,true,false);
   qDebug() << rx.pattern() << rx.isValid() << rx.match(text);
-  rx = buildRx("rap",true,true,true);
+  rx = searcher.buildRx("rap",true,true,true);
   qDebug() << rx.pattern() << rx.isValid() << rx.match(text);
   //  QString diacritics = QString("[\\x%1]*").arg(points.join("\\x"));
   testSplit("graeme برتن is an idiot شَمس");
-  qDebug() << splitText("graeme برتن is an idiot شَمس");
+  qDebug() << searcher.splitText("graeme برتن is an idiot شَمس");
   testSplit("برتن is an idiot");
   testSplit("graeme");
   testSplit("برتن");
@@ -450,9 +483,12 @@ int main(int argc, char *argv[])
     qDebug() << "No pattern given";
     return 1;
   }
+  TextSearch searcher;
+  searcher.m_separator = parser.value(separatorOption);
+  searcher.m_pattern = pattern;
   QRegularExpression rx;
   if (parser.isSet(regexOption)) {
-    rx = buildRx(pattern,
+    rx = searcher.buildRx(pattern,
                  parser.isSet(diacriticsOption),
                  parser.isSet(wholeOption),
                  parser.isSet(caseOption));
@@ -486,8 +522,6 @@ int main(int argc, char *argv[])
     }
 
   }
-  QTime t;
-  t.start();
   QString root;
   QString headword;
   QString node;
@@ -503,8 +537,10 @@ int main(int argc, char *argv[])
   else {
     qDebug() << "Text search" << pattern;
   }
-  QList<SearchResult> results;
+  searcher.m_results.clear();
   QMap<int,QString> ret;
+  QTime t;
+  t.start();
   if (nodes.size() == 0) {
     if (! query.exec()) {
       qDebug() << "Error search all nodes" << query.executedQuery() << query.lastError();
@@ -518,14 +554,14 @@ int main(int argc, char *argv[])
         if (maxReads && (nodeCount > maxReads)) {
           return 0;
         }
-        ret = searchEntry(pattern,xml,rx);
+        ret = searcher.searchEntry(pattern,xml,rx);
         if (ret.size() > 0) {
           SearchResult r;
           r.node = query.value("nodeid").toString();
           r.root = query.value("root").toString().toUtf8();
           r.head = query.value("word").toString().toUtf8();
           r.fragments = ret;
-          results << r;
+          searcher.m_results << r;
           findCount++;
           wordCount += ret.size();
         }
@@ -561,7 +597,7 @@ int main(int argc, char *argv[])
             if (maxReads && (nodeCount > maxReads)) {
               return 0;
             }
-            ret = searchEntry(pattern,xml,rx);
+            ret = searcher.searchEntry(pattern,xml,rx);
             if (ret.size() > 0) {
               SearchResult r;
               r.node = query.value("nodeid").toString();
@@ -570,7 +606,7 @@ int main(int argc, char *argv[])
               r.fragments = ret;
               findCount++;
               wordCount += ret.size();
-              results << r;
+              searcher.m_results << r;
             }
 
             if (maxFinds && (findCount > maxFinds)) {
@@ -585,12 +621,20 @@ int main(int argc, char *argv[])
     }
 
   }
+  searcher.m_time = t.elapsed();
   dbfile.close();
   db.close();
-  qDebug() << ">>>>" << results.size();
+
   bool fileOutput = false;
   QFile of;
   if (parser.isSet(outputOption)) {
+    searcher.toFile(parser.value(outputOption));
+  }
+  else {
+    searcher.toFile();
+  }
+
+    /*
     of.setFileName(parser.value(outputOption));
     if (! of.open(QIODevice::WriteOnly)) {
       std::cerr << "Cannot open output file for writing: ";
@@ -620,5 +664,6 @@ int main(int argc, char *argv[])
  QString summary =  QString("Search %1 : found in %2 entr%3, total count %4 (time %5ms)").arg(pattern).arg(findCount).arg(findCount > 1 ? "ies" : "y").arg(wordCount).arg(t.elapsed());
   of.close();
   std::cerr << qPrintable(summary) << std::endl;
+    */
   return 0;
 }
