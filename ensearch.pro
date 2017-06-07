@@ -30,5 +30,5 @@ OBJECTS_DIR = ./obj
 MOC_DIR = ./moc
 INCLUDEPATH += ./qslog
 include(qslog/QsLog.pri)
-SOURCES += ensearch.cpp xsltsupport.cpp
-HEADERS += ensearch.h  xsltsupport.h
+SOURCES += ensearch.cpp xsltsupport.cpp textsearch.cpp
+HEADERS += textsearch.h  xsltsupport.h

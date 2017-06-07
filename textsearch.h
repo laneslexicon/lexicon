@@ -30,6 +30,7 @@ class TextSearch : public QObject {
   QMap<int,QString> searchEntry(QString pattern,QString xml);
   QString getDiacritics(QList<QChar> & points);
   QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
+  QString fixHtml(const QString & t);
   void toFile(const QString & fileName = QString()) const;
   void search();
   void searchAll();
