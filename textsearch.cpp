@@ -129,7 +129,7 @@ QList<QPair<QString,QString> > TextSearch::splitText(const QString & txt) {
   return texts;
 }
 
-QMap<int,QString> TextSearch::searchEntry(QString pattern,QString xml) {
+QMap<int,QString> TextSearch::searchEntry(QString xml) {
   QMap<int,QString> results;
   //  QTextDocument doc(xml);
   //  int cnt = doc.characterCount();
@@ -338,7 +338,7 @@ void TextSearch::searchAll() {
     QString xml = query.value("xml").toString();
     QString node = query.value("nodeid").toString();
     if (! node.startsWith("j")) {
-      ret = searchEntry(m_pattern,xml);
+      ret = searchEntry(xml);
       if (ret.size() > 0) {
         SearchResult r;
         r.node = query.value("nodeid").toString();
@@ -382,7 +382,7 @@ void TextSearch::searchNodes() {
         QString xml = query.value("xml").toString();
         QString node = query.value("nodeid").toString();
         if (! node.startsWith("j")) {
-          ret = searchEntry(m_pattern,xml);
+          ret = searchEntry(xml);
           if (ret.size() > 0) {
             SearchResult r;
             r.node = query.value("nodeid").toString();

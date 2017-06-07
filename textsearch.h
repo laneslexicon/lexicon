@@ -27,7 +27,7 @@ class TextSearch : public QObject {
   TextSearch();
   QString transform(int type,const QString & xsl,const QString & xml);
   QList<QPair<QString,QString> > splitText(const QString & txt);
-  QMap<int,QString> searchEntry(QString pattern,QString xml);
+  QMap<int,QString> searchEntry(QString xml);
   QString getDiacritics(QList<QChar> & points);
   QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
   QString fixHtml(const QString & t);
@@ -42,5 +42,6 @@ class TextSearch : public QObject {
   QString m_separator;
   QStringList m_nodes;
   QRegularExpression m_rx;
+  bool m_verbose;
 };
 #endif
