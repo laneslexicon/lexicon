@@ -326,11 +326,7 @@ QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString 
   QString pattern;
 
   if (options.getSearchType() == SearchOptions::Normal) {
-    /// escape the metacharacters that will cause the regex to fail
-    QStringList metachars = metacharacters.split("",QString::SkipEmptyParts);
-    for(int i=0;i < metachars.size();i++) {
-      target.replace(metachars[i],QString("\\%1").arg(metachars[i]));
-    }
+    target = QRegularExpression::escape(target);
     if (options.ignoreDiacritics()) {
       target = target.replace(rxclass,QString());
       for(int i=0;i < target.size();i++) {
