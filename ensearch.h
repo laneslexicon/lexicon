@@ -27,15 +27,19 @@ class TextSearch : public QObject {
   TextSearch();
   QString transform(int type,const QString & xsl,const QString & xml);
   QList<QPair<QString,QString> > splitText(const QString & txt);
-  QMap<int,QString> searchEntry(QString pattern,QString xml,QRegularExpression rx);
+  QMap<int,QString> searchEntry(QString pattern,QString xml);
   QString getDiacritics(QList<QChar> & points);
   QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
   void toFile(const QString & fileName = QString()) const;
-
-
+  void search();
+  void searchAll();
+  void searchNodes();
+  void setNode(const QString & node);
   QList<SearchResult>  m_results;
   QString m_pattern;
   qint64 m_time;
   QString m_separator;
+  QStringList m_nodes;
+  QRegularExpression m_rx;
 };
 #endif

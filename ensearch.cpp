@@ -60,6 +60,16 @@ QString fixHtml(const QString & t) {
 }
 TextSearch::TextSearch() {
 }
+void TextSearch::setNode(const QString & node) {
+    QRegularExpression nrx("^\\d+$");
+    QStringList n = node.split(",");
+
+    for(int i=0;i < n.size();i++) {
+      if (nrx.match(n[i]).hasMatch()) {
+       m_nodes <<  "n" + n[i];
+      }
+    }
+}
 QString TextSearch::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
   if (xsl.isEmpty()) {
@@ -156,11 +166,11 @@ QList<QPair<QString,QString> > TextSearch::splitText(const QString & txt) {
   return texts;
 }
 
-QMap<int,QString> TextSearch::searchEntry(QString pattern,QString xml,QRegularExpression rx) {
+QMap<int,QString> TextSearch::searchEntry(QString pattern,QString xml) {
   QMap<int,QString> results;
   //  QTextDocument doc(xml);
   //  int cnt = doc.characterCount();
-  bool regex = (rx.pattern().length() > 0);
+  bool regex = (m_rx.pattern().length() > 0);
 
   xml = QString("<word>%1</word>").arg(xml);
   QString html =
@@ -184,10 +194,10 @@ QMap<int,QString> TextSearch::searchEntry(QString pattern,QString xml,QRegularEx
   f |= QTextDocument::FindWholeWords;
   QTextCursor c;
   if (regex) {
-    c = doc.find(rx,0);
+    c = doc.find(m_rx,0);
   }
   else {
-    c = doc.find(pattern,0,f);
+    c = doc.find(m_pattern,0,f);
   }
   int start;
   int end;
@@ -209,17 +219,12 @@ QMap<int,QString> TextSearch::searchEntry(QString pattern,QString xml,QRegularEx
     }
     results[c.selectionStart()] = fragment;
     if (regex) {
-      c = doc.find(rx,c.selectionEnd());
+      c = doc.find(m_rx,c.selectionEnd());
     }
     else {
-      c = doc.find(pattern,c.selectionEnd(),f);
+      c = doc.find(m_pattern,c.selectionEnd(),f);
     }
   }
-  if (fc && showData) {
-    qDebug() << html;
-    qDebug() << xml;
-  }
-
   return results;
 }
 void testSplit(const QString & txt) {
@@ -311,6 +316,7 @@ QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool
   if (ignorecase) {
     rx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   }
+  m_rx = rx;
   return rx;
 }
 void TextSearch::toFile(const QString & fileName) const {
@@ -350,6 +356,103 @@ void TextSearch::toFile(const QString & fileName) const {
  QString summary =  QString("Search %1 : found in %2 entr%3, total count %4 (time %5ms)").arg(m_pattern).arg(entryCount).arg(entryCount > 1 ? "ies" : "y").arg(findCount).arg(m_time);
   of.close();
   std::cerr << qPrintable(summary) << std::endl;
+}
+void TextSearch::searchAll() {
+  QSqlQuery query;
+  query.prepare(SQL_ALL_ENTRIES);
+  if (! query.exec()) {
+    qDebug() << "Error search all nodes" << query.executedQuery() << query.lastError();
+    return;
+  }
+  int readCount = 0;
+  int findCount = 0;
+  bool finished = false;
+  QMap<int,QString> ret;
+  while (query.next() && ! finished) {
+    readCount++;
+    QString xml = query.value("xml").toString();
+    QString node = query.value("nodeid").toString();
+    if (! node.startsWith("j")) {
+      ret = searchEntry(m_pattern,xml);
+      if (ret.size() > 0) {
+        SearchResult r;
+        r.node = query.value("nodeid").toString();
+        r.root = query.value("root").toString().toUtf8();
+        r.head = query.value("word").toString().toUtf8();
+        r.fragments = ret;
+        m_results << r;
+        findCount++;
+      }
+    }
+    /*
+    if (maxFinds && (findCount > maxFinds)) {
+      finished = true;
+    }
+    if (maxReads && (readCount > maxReads)) {
+      finished = true;
+    }
+    */
+    //    if ((readCount % 500) == 0) {
+    //      qDebug() << QString(".....%1....").arg(readCount);
+    //    }
+  }
+}
+void TextSearch::searchNodes() {
+  int readCount = 0;
+  int findCount = 0;
+  bool finished = false;
+  QSqlQuery query;
+  query.prepare(SQL_FIND_ENTRY_DETAILS);
+  QMap<int,QString> ret;
+  for(int i=0;(i < m_nodes.size()) && ! finished ;i++) {
+    //query.prepare(SQL_FIND_ENTRY_DETAILS);
+    query.bindValue(0,m_nodes[i]);
+    if (! query.exec()) {
+      qDebug() << "node query" << query.lastError();
+      finished = true;
+    }
+    else {
+      if (query.next()) {
+        readCount++;
+        QString xml = query.value("xml").toString();
+        QString node = query.value("nodeid").toString();
+        if (! node.startsWith("j")) {
+          ret = searchEntry(m_pattern,xml);
+          if (ret.size() > 0) {
+            SearchResult r;
+            r.node = query.value("nodeid").toString();
+            r.root = query.value("root").toString().toUtf8();
+            r.head = query.value("word").toString().toUtf8();
+            r.fragments = ret;
+            findCount++;
+            m_results << r;
+          }
+          /*
+          if (maxFinds && (findCount > maxFinds)) {
+            finished = true;
+          }
+          if (maxReads && (readCount > maxReads)) {
+            finished = true;
+          }
+          */
+        }
+      }
+    }
+  }
+
+}
+
+void TextSearch::search() {
+  m_results.clear();
+  QTime t;
+  t.start();
+  if (m_nodes.size() == 0) {
+    this->searchAll();
+  }
+  else {
+    this->searchNodes();
+  }
+  m_time = t.elapsed();
 }
 void test() {
   TextSearch searcher;
@@ -507,21 +610,10 @@ int main(int argc, char *argv[])
   }
   QStringList nodes;
   QSqlQuery query;
-  if (! parser.isSet(nodeOption)) {
-    query.prepare(SQL_ALL_ENTRIES);
-  }
-  else {
-    QString node = parser.value(nodeOption);
-    QRegularExpression nrx("^\\d+$");
-    QStringList n = node.split(",");
 
-    for(int i=0;i < n.size();i++) {
-      if (nrx.match(n[i]).hasMatch()) {
-        nodes <<  "n" + n[i];
-      }
-    }
-
-  }
+  searcher.setNode(parser.value(nodeOption));
+  searcher.search();
+  /*
   QString root;
   QString headword;
   QString node;
@@ -554,7 +646,7 @@ int main(int argc, char *argv[])
         if (maxReads && (nodeCount > maxReads)) {
           return 0;
         }
-        ret = searcher.searchEntry(pattern,xml,rx);
+        ret = searcher.searchEntry(pattern,xml);
         if (ret.size() > 0) {
           SearchResult r;
           r.node = query.value("nodeid").toString();
@@ -572,9 +664,6 @@ int main(int argc, char *argv[])
       if (maxReads && (readCount > maxReads)) {
         finished = true;
       }
-      //    if ((readCount % 500) == 0) {
-      //      qDebug() << QString(".....%1....").arg(readCount);
-      //    }
     }
   }
   else {
@@ -622,6 +711,7 @@ int main(int argc, char *argv[])
 
   }
   searcher.m_time = t.elapsed();
+  */
   dbfile.close();
   db.close();
 
