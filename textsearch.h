@@ -13,6 +13,15 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
+#ifndef LANE
+class SearchRunner : public QObject {
+  Q_OBJECT
+ public:
+  SearchRunner();
+ public slots:
+  void recordsRead(int);
+};
+#endif
 class   SearchResult {
 public:
   QString root;
@@ -27,7 +36,7 @@ class TextSearch : public QObject {
   TextSearch();
   QString transform(int type,const QString & xsl,const QString & xml);
   QList<QPair<QString,QString> > splitText(const QString & txt);
-  QMap<int,QString> searchEntry(QString xml);
+  QMap<int,QString> searchEntry(QString xml,QString node = QString());
   QString getDiacritics(QList<QChar> & points);
   QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
   QString fixHtml(const QString & t);
@@ -55,5 +64,7 @@ class TextSearch : public QObject {
   int m_padding;
   bool m_diacritics;
   bool m_regex;
+ signals:
+  void recordsRead(int);
 };
 #endif

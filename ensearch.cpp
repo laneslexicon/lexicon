@@ -1,10 +1,12 @@
-#include <QCoreApplication>
+#include <QApplication>
 #include <QCommandLineOption>
 #include <QCommandLineParser>
 #include <QTime>
 #include <QLocale>
 #include <QSettings>
 #include <QSqlError>
+#include <QPalette>
+#include <QFont>
 #include "QsLog.h"
 #include "QsLogDest.h"
 #include "definedsettings.h"
@@ -79,7 +81,8 @@ void testSplit(const QString & txt) {
   qDebug() << QString("%1 : [%2]").arg(txt.size()).arg(txt);
   qDebug() << "words" << words;
 }
-void test() {
+void test(QString & fileName) {
+  /*
   TextSearch searcher;
   QList<QChar> dc;
 
@@ -98,9 +101,35 @@ void test() {
   testSplit("برتن is an idiot");
   testSplit("graeme");
   testSplit("برتن");
+  */
+  if (fileName.length() == 0) {
+    fileName = "test_node.html";
+  }
+  QString css;
+  QFile f("test.css");
+  if (f.open(QIODevice::ReadOnly)) {
+    QTextStream in(&f);
+    css = in.readAll();
+    f.close();
+  }
+  f.setFileName(fileName);
+  if (f.open(QIODevice::ReadOnly)) {
+    QTextStream in(&f);
+    QString txt = in.readAll();
+    qDebug() << css << "\n" << txt;
+    QTextDocument doc;
+    if (! css.isEmpty()) {
+      //      doc.setDefaultStyleSheet(css);
+    }
+    //    QFont font("Amiri");
+    //    doc.setDefaultFont(font);
+    doc.setHtml(txt);
+  }
 }
 int main(int argc, char *argv[])
 {
+
+
   bool verbose;
   QString settingsFile("Resources/themes/default/settings.ini");
   QCommandLineParser parser;
@@ -146,11 +175,16 @@ int main(int argc, char *argv[])
   QCommandLineOption sizeOption(QStringList() <<"z" << "size",QObject::tr("Fragment padding"),"padding");
   parser.addOption(sizeOption);
 
-  QCoreApplication app(argc,argv);
+  QApplication app(argc,argv);
   parser.process(app);
+  QStringList posargs = parser.positionalArguments();
 
   if (parser.isSet(testOption)) {
-    test();
+    QString fileName;
+    if (posargs.size() > 0) {
+      fileName = posargs[0];
+    }
+    test(fileName);
     return 0;
   }
   verbose = parser.isSet(verboseOption);
@@ -199,7 +233,7 @@ int main(int argc, char *argv[])
 
   bool showHead = parser.isSet(headOption);
   QString pattern;
-  QStringList posargs = parser.positionalArguments();
+
   if (! parser.isSet(patternOption)) {
       if (posargs.size() > 0) {
         pattern = posargs[0];
@@ -238,9 +272,13 @@ int main(int argc, char *argv[])
   }
   QStringList nodes;
   QSqlQuery query;
-
+  SearchRunner * r = new SearchRunner;
   searcher.setNode(parser.value(nodeOption));
+  if (verbose) {
+    QObject::connect(&searcher,SIGNAL(recordsRead(int)),r,SLOT(recordsRead(int)));
+  }
   searcher.search();
+  delete r;
   /*
   QString root;
   QString headword;

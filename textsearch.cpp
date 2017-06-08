@@ -9,7 +9,13 @@
 #include "xsltsupport.h"
 #include <iostream>
 #include "textsearch.h"
-
+#ifndef LANE
+SearchRunner::SearchRunner() {
+}
+void SearchRunner::recordsRead(int r) {
+  std::cerr << qPrintable(QString("..%1..").arg(r));
+}
+#endif
 QString TextSearch::fixHtml(const QString & t) {
   QString html = t;
   QRegularExpression rxInsert("<!--insert{([^}]+)}-->",QRegularExpression::MultilineOption);
@@ -144,25 +150,29 @@ QList<QPair<QString,QString> > TextSearch::splitText(const QString & txt) {
   return texts;
 }
 
-QMap<int,QString> TextSearch::searchEntry(QString xml) {
+QMap<int,QString> TextSearch::searchEntry(QString xml,QString node) {
   QMap<int,QString> results;
   //  QTextDocument doc(xml);
   //  int cnt = doc.characterCount();
   bool regex = (m_rx.pattern().length() > 0);
 
   xml = QString("<word>%1</word>").arg(xml);
+
+  // TODO get this from somewhere
   QString html =
     transform(ENTRY_XSLT,"Resources/themes/default/xslt/entry.xslt",xml);
   if (html.isEmpty()) {
     return results;
   }
+  //qDebug() << node;
   html = fixHtml(html);
-  //qDebug() << ">>>>" << html;
+  html.replace("\n","");
   QTextDocument doc;
   //QTextDocument xdoc(xml);
   //  qDebug() << html;
-  // ??????? doc.setHtml(QString(xml.toUtf8()));
+  //doc.setHtml(QString(xml.toUtf8()));
   doc.setHtml(QString(html.toUtf8()));
+
 
   //  QTextCursor xc = xdoc.find("camel");
   //  if (! xc.isNull() && c.isNull()) {
@@ -201,6 +211,7 @@ QMap<int,QString> TextSearch::searchEntry(QString xml) {
       fragment += QString(doc.characterAt(i));
     }
     fragment.remove(QChar(0x2029));
+    fragment.remove(QChar(0x200e));
     results[c.selectionStart()] = fragment;
     if (regex) {
       c = doc.find(m_rx,c.selectionEnd());
@@ -359,7 +370,7 @@ void TextSearch::searchAll() {
     QString xml = query.value("xml").toString();
     QString node = query.value("nodeid").toString();
     if (! node.startsWith("j")) {
-      ret = searchEntry(xml);
+      ret = searchEntry(xml,node);
       if (ret.size() > 0) {
         SearchResult r;
         r.node = query.value("nodeid").toString();
@@ -378,9 +389,9 @@ void TextSearch::searchAll() {
       finished = true;
     }
     */
-    //    if ((readCount % 500) == 0) {
-    //      qDebug() << QString(".....%1....").arg(readCount);
-    //    }
+    if ((readCount % 1000) == 0) {
+      emit(recordsRead(readCount));
+    }
   }
 }
 void TextSearch::searchNodes() {
@@ -403,7 +414,7 @@ void TextSearch::searchNodes() {
         QString xml = query.value("xml").toString();
         QString node = query.value("nodeid").toString();
         if (! node.startsWith("j")) {
-          ret = searchEntry(xml);
+          ret = searchEntry(xml,node);
           if (ret.size() > 0) {
             SearchResult r;
             r.node = query.value("nodeid").toString();
@@ -473,8 +484,9 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
         if (m_verbose) {
           std::cerr << "Arabic regex search" << std::endl;
         }
-      // non Arabic search
-      qDebug() << "plain text search";
+        if (m_verbose) {
+          std::cerr << "Plain text search" << std::endl;
+        }
     }
   }
   else {    // doing a regex search so just set the pattern

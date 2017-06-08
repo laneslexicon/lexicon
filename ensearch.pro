@@ -3,14 +3,10 @@
 #
 #-------------------------------------------------
 
-QT       += core sql xml
-
-QT       += gui
+QT       += core sql xml gui widgets
 CONFIG   += debug
 CONFIG   += libxslt
 TARGET = ensearch
-CONFIG   += console
-CONFIG   -= app_bundle
 TEMPLATE = app
 QMAKE_CXXFLAGS += -pthread -Wunused-parameter -g
 DEFINES += USE_LIBXSLT
