@@ -31,9 +31,76 @@ QString TextSearch::fixHtml(const QString & t) {
 TextSearch::TextSearch() {
   m_padding = 30;
   m_verbose = false;
+  QMap<QChar,QChar> safe;
+  m_safe.insert(QChar('C'),QChar(0x621));
+  m_safe.insert(QChar('M'),QChar(0x622));
+  m_safe.insert(QChar('O'),QChar(0x623));
+  m_safe.insert(QChar('W'),QChar(0x624));
+  m_safe.insert(QChar('I'),QChar(0x625));
+  m_safe.insert(QChar('Q'),QChar(0x626));
+  m_safe.insert(QChar('A'),QChar(0x627));
+  m_safe.insert(QChar('b'),QChar(0x628));
+  m_safe.insert(QChar('p'),QChar(0x629));
+  m_safe.insert(QChar('t'),QChar(0x62A));
+  m_safe.insert(QChar('v'),QChar(0x62B));
+  m_safe.insert(QChar('j'),QChar(0x62C));
+  m_safe.insert(QChar('H'),QChar(0x62D));
+  m_safe.insert(QChar('x'),QChar(0x62E));
+  m_safe.insert(QChar('d'),QChar(0x62F));
+  m_safe.insert(QChar('V'),QChar(0x630));
+  m_safe.insert(QChar('r'),QChar(0x631));
+  m_safe.insert(QChar('z'),QChar(0x632));
+  m_safe.insert(QChar('s'),QChar(0x633));
+  m_safe.insert(QChar('c'),QChar(0x634));
+  m_safe.insert(QChar('S'),QChar(0x635));
+  m_safe.insert(QChar('D'),QChar(0x636));
+  m_safe.insert(QChar('T'),QChar(0x637));
+  m_safe.insert(QChar('Z'),QChar(0x638));
+  m_safe.insert(QChar('E'),QChar(0x639));
+  m_safe.insert(QChar('g'),QChar(0x63A));
+  m_safe.insert(QChar('f'),QChar(0x641));
+  m_safe.insert(QChar('q'),QChar(0x642));
+  m_safe.insert(QChar('k'),QChar(0x643));
+  m_safe.insert(QChar('l'),QChar(0x644));
+  m_safe.insert(QChar('m'),QChar(0x645));
+  m_safe.insert(QChar('n'),QChar(0x646));
+  m_safe.insert(QChar('h'),QChar(0x647));
+  m_safe.insert(QChar('w'),QChar(0x648));
+  m_safe.insert(QChar('Y'),QChar(0x649));
+  m_safe.insert(QChar('y'),QChar(0x64A));
+  m_safe.insert(QChar('F'),QChar(0x64B));
+  m_safe.insert(QChar('N'),QChar(0x64C));
+  m_safe.insert(QChar('K'),QChar(0x64D));
+  m_safe.insert(QChar('a'),QChar(0x64E));
+  m_safe.insert(QChar('u'),QChar(0x64F));
+  m_safe.insert(QChar('i'),QChar(0x650));
+  m_safe.insert(QChar('~'),QChar(0x651));
+  m_safe.insert(QChar('e'),QChar(0x670));
+  m_safe.insert(QChar('L'),QChar(0x671));
+  m_safe.insert(QChar('_'),QChar(0x640));
+  m_safe.insert(QChar(','),QChar(0x60C));
+  m_safe.insert(QChar('-'),QChar(0x0AD));
+  m_safe.insert(QChar(';'),QChar(0x61b));
+  m_safe.insert(QChar('?'),QChar(0x60f));
+  m_safe.insert(QChar('P'),QChar(0x67E));
+  m_safe.insert(QChar('J'),QChar(0x686));
+  m_safe.insert(QChar('B'),QChar(0x6A4));
+  m_safe.insert(QChar('G'),QChar(0x6AF));
 }
 void TextSearch::setVerbose(bool v) {
   m_verbose = v;
+}
+QString TextSearch::fromSafe(const QString & v) {
+  QString ot;
+  for(int i=0;i < v.length();i++) {
+    if (m_safe.contains(v.at(i))) {
+      ot.append(m_safe.value(v.at(i)));
+    }
+    else {
+      ot.append(v.at(i));
+    }
+  }
+  return ot;
 }
 void TextSearch::setNode(const QString & node) {
     QRegularExpression nrx("^\\d+$");
@@ -150,7 +217,7 @@ QList<QPair<QString,QString> > TextSearch::splitText(const QString & txt) {
   return texts;
 }
 
-QMap<int,QString> TextSearch::searchEntry(QString xml,QString node) {
+QMap<int,QString> TextSearch::searchEntry(QString xml,QString head,QString node) {
   QMap<int,QString> results;
   //  QTextDocument doc(xml);
   //  int cnt = doc.characterCount();
@@ -159,8 +226,11 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString node) {
   xml = QString("<word>%1</word>").arg(xml);
 
   // TODO get this from somewhere
+  // NODE_XSLT cause the html to include the headword(s) i.e. the value
+  // of <entryType @key="<head word>"
+  //
   QString html =
-    transform(ENTRY_XSLT,"Resources/themes/default/xslt/entry.xslt",xml);
+    transform(NODE_XSLT,"Resources/themes/default/xslt/entry.xslt",xml);
   if (html.isEmpty()) {
     return results;
   }
@@ -169,7 +239,6 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString node) {
   html.replace("\n","");
   QTextDocument doc;
   //QTextDocument xdoc(xml);
-  //  qDebug() << html;
   //doc.setHtml(QString(xml.toUtf8()));
   doc.setHtml(QString(html.toUtf8()));
 
@@ -184,6 +253,9 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString node) {
   }
   if (m_wholeWord) {
   f |= QTextDocument::FindWholeWords;
+  }
+  if (m_verbose) {
+    //    qDebug() << doc.toHtml();
   }
   QTextCursor c;
   if (regex) {
@@ -204,14 +276,17 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString node) {
     if (start < 0) {
       start = 0;
     }
+
     if (end > doc.characterCount()) {
       end = doc.characterCount();
     }
+
     for(int i=start;i < end;i++) {
       fragment += QString(doc.characterAt(i));
     }
     fragment.remove(QChar(0x2029));
     fragment.remove(QChar(0x200e));
+    //    qDebug() << QString("%1 -> %2:[%3]").arg(start).arg(end).arg(fragment);
     results[c.selectionStart()] = fragment;
     if (regex) {
       c = doc.find(m_rx,c.selectionEnd());
@@ -369,13 +444,14 @@ void TextSearch::searchAll() {
     readCount++;
     QString xml = query.value("xml").toString();
     QString node = query.value("nodeid").toString();
+    QString head = query.value("word").toString();
     if (! node.startsWith("j")) {
-      ret = searchEntry(xml,node);
+      ret = searchEntry(xml,head,node);
       if (ret.size() > 0) {
         SearchResult r;
         r.node = query.value("nodeid").toString();
         r.root = query.value("root").toString().toUtf8();
-        r.head = query.value("word").toString().toUtf8();
+        r.head = query.value("headword").toString().toUtf8();
         r.fragments = ret;
         m_results << r;
         findCount++;
@@ -413,13 +489,14 @@ void TextSearch::searchNodes() {
         readCount++;
         QString xml = query.value("xml").toString();
         QString node = query.value("nodeid").toString();
+        QString head = query.value("word").toString();
         if (! node.startsWith("j")) {
-          ret = searchEntry(xml,node);
+          ret = searchEntry(xml,head,node);
           if (ret.size() > 0) {
             SearchResult r;
             r.node = query.value("nodeid").toString();
             r.root = query.value("root").toString().toUtf8();
-            r.head = query.value("word").toString().toUtf8();
+            r.head = query.value("headword").toString().toUtf8();
             r.fragments = ret;
             findCount++;
             m_results << r;

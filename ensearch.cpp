@@ -102,6 +102,76 @@ void test(QString & fileName) {
   testSplit("graeme");
   testSplit("برتن");
   */
+  QByteArray a;
+  QByteArray b;
+  QMap<QChar,QChar> safe;
+  safe.insert(QChar('C'),QChar(0x621));
+  safe.insert(QChar('M'),QChar(0x622));
+  safe.insert(QChar('O'),QChar(0x623));
+  safe.insert(QChar('W'),QChar(0x624));
+  safe.insert(QChar('I'),QChar(0x625));
+  safe.insert(QChar('Q'),QChar(0x626));
+  safe.insert(QChar('A'),QChar(0x627));
+  safe.insert(QChar('b'),QChar(0x628));
+  safe.insert(QChar('p'),QChar(0x629));
+  safe.insert(QChar('t'),QChar(0x62A));
+  safe.insert(QChar('v'),QChar(0x62B));
+  safe.insert(QChar('j'),QChar(0x62C));
+  safe.insert(QChar('H'),QChar(0x62D));
+  safe.insert(QChar('x'),QChar(0x62E));
+  safe.insert(QChar('d'),QChar(0x62F));
+  safe.insert(QChar('V'),QChar(0x630));
+  safe.insert(QChar('r'),QChar(0x631));
+  safe.insert(QChar('z'),QChar(0x632));
+  safe.insert(QChar('s'),QChar(0x633));
+  safe.insert(QChar('c'),QChar(0x634));
+  safe.insert(QChar('S'),QChar(0x635));
+  safe.insert(QChar('D'),QChar(0x636));
+  safe.insert(QChar('T'),QChar(0x637));
+  safe.insert(QChar('Z'),QChar(0x638));
+  safe.insert(QChar('E'),QChar(0x639));
+  safe.insert(QChar('g'),QChar(0x63A));
+  safe.insert(QChar('f'),QChar(0x641));
+  safe.insert(QChar('q'),QChar(0x642));
+  safe.insert(QChar('k'),QChar(0x643));
+  safe.insert(QChar('l'),QChar(0x644));
+  safe.insert(QChar('m'),QChar(0x645));
+  safe.insert(QChar('n'),QChar(0x646));
+  safe.insert(QChar('h'),QChar(0x647));
+  safe.insert(QChar('w'),QChar(0x648));
+  safe.insert(QChar('Y'),QChar(0x649));
+  safe.insert(QChar('y'),QChar(0x64A));
+  safe.insert(QChar('F'),QChar(0x64B));
+  safe.insert(QChar('N'),QChar(0x64C));
+  safe.insert(QChar('K'),QChar(0x64D));
+  safe.insert(QChar('a'),QChar(0x64E));
+  safe.insert(QChar('u'),QChar(0x64F));
+  safe.insert(QChar('i'),QChar(0x650));
+  safe.insert(QChar('~'),QChar(0x651));
+  safe.insert(QChar('e'),QChar(0x670));
+  safe.insert(QChar('L'),QChar(0x671));
+  safe.insert(QChar('_'),QChar(0x640));
+  safe.insert(QChar(','),QChar(0x60C));
+  safe.insert(QChar('-'),QChar(0x0AD));
+  safe.insert(QChar(';'),QChar(0x61b));
+  safe.insert(QChar('?'),QChar(0x60f));
+  safe.insert(QChar('P'),QChar(0x67E));
+  safe.insert(QChar('J'),QChar(0x686));
+  safe.insert(QChar('B'),QChar(0x6A4));
+  safe.insert(QChar('G'),QChar(0x6AF));
+
+  QString t("fataHa");
+  QString ot;
+  for(int i=0;i < t.length();i++) {
+    if (safe.contains(t.at(i))) {
+      ot.append(safe.value(t.at(i)));
+    }
+    else {
+      ot.append(t.at(i));
+    }
+  }
+  qDebug() << ot;
+
   if (fileName.length() == 0) {
     fileName = "test_node.html";
   }
@@ -175,6 +245,9 @@ int main(int argc, char *argv[])
   QCommandLineOption sizeOption(QStringList() <<"z" << "size",QObject::tr("Fragment padding"),"padding");
   parser.addOption(sizeOption);
 
+  QCommandLineOption buckOption(QStringList() <<"b" << "buckwalter-input",QObject::tr("Buckwalter safe input"));
+  parser.addOption(buckOption);
+
   QApplication app(argc,argv);
   parser.process(app);
   QStringList posargs = parser.positionalArguments();
@@ -247,6 +320,12 @@ int main(int argc, char *argv[])
     return 0;
   }
   TextSearch searcher;
+  if (parser.isSet(buckOption) && ! parser.isSet(regexOption)) {
+    QString t(pattern);
+    pattern = searcher.fromSafe(pattern);
+    qDebug() << QString("%1 converted to %2").arg(t).arg(pattern);
+  }
+  searcher.setVerbose(verbose);
   searcher.m_separator = parser.value(separatorOption);
   searcher.m_pattern = pattern;
   if (parser.isSet(sizeOption)) {

@@ -22,12 +22,19 @@ class SearchRunner : public QObject {
   void recordsRead(int);
 };
 #endif
+class  SearchFragment {
+  int pos;
+  bool headMatch;
+  QString fragment;
+};
+
 class   SearchResult {
 public:
   QString root;
   QString node;
   QString head;
   QMap<int,QString> fragments;
+  QList<SearchFragment> f;
 };
 
 class TextSearch : public QObject {
@@ -36,12 +43,14 @@ class TextSearch : public QObject {
   TextSearch();
   QString transform(int type,const QString & xsl,const QString & xml);
   QList<QPair<QString,QString> > splitText(const QString & txt);
-  QMap<int,QString> searchEntry(QString xml,QString node = QString());
+  QMap<int,QString> searchEntry(QString xml,QString headword,QString node = QString());
   QString getDiacritics(QList<QChar> & points);
   QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
   QString fixHtml(const QString & t);
   void setSearch(const QString & pattern,bool regex,bool caseSensitive,bool wholeWord,bool diacritics);
+
   void toFile(const QString & fileName = QString()) const;
+  QString fromSafe(const QString & v);
   void search();
   void searchAll();
   void searchNodes();
@@ -53,6 +62,7 @@ class TextSearch : public QObject {
   void setDiacritics(bool);
   void setSearchType(bool);
   QList<SearchResult>  m_results;
+
   QString m_pattern;
   qint64 m_time;
   QString m_separator;
@@ -64,6 +74,7 @@ class TextSearch : public QObject {
   int m_padding;
   bool m_diacritics;
   bool m_regex;
+  QMap<QChar,QChar> m_safe;
  signals:
   void recordsRead(int);
 };
