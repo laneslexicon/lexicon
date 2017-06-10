@@ -134,8 +134,8 @@ QString xsltTransform(int type,const QString & xml) {
   case NODE_XSLT:{
     params[nbparams++] = "entrytype";
     params[nbparams++] = "\"node\"";
-    res = xsltApplyStylesheet(cur, doc, params);
     params[nbparams] = NULL;
+    res = xsltApplyStylesheet(curNode, doc, params);
     xsltSaveResultToString(&buf,&sz, res,curNode);
     break;
   }
