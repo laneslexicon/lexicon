@@ -171,6 +171,34 @@ void test(QString & fileName) {
     }
   }
   qDebug() << ot;
+  QRegularExpression rx("[\u0600-\u06ff]+"); // seems to work but the backslashes
+  //QRegularExpression rx("[0x0600-0x06ff]+");
+  QRegularExpression en("[a-zA-Z]+");
+  QStringList tests;
+  tests << QString("termed خبب. (TA");
+  tests << "english test";
+  tests << QString(" خبب.");
+  tests << QString("خبب");
+  tests << QString("خَبَب");
+  bool ok;
+  QString tee("0074");
+  qDebug() << QString("%1").arg(QChar(tee.toInt(&ok,16)));
+
+  qDebug() << rx.isValid() << rx.pattern();
+
+  for (int i=0;i < tests.length();i++) {
+    qDebug() << "Check rx" << tests[i] << rx.match(tests[i]).hasMatch() << en.match(tests[i]).hasMatch();
+  }
+  QRegularExpression dx("خ[\u064e\u064f\u0650]*ب");
+  qDebug() << "diacritic test :true" << dx.match(tests[tests.size() - 1]).hasMatch() << dx.pattern();
+  QString r = tests[tests.size() - 1];
+
+  TextSearch ts;
+  QRegularExpression q = ts.buildRx(r,true,false,false);
+  qDebug() << "buildRx" << q.isValid() << q.pattern();
+  QString src("it is termed خبب. (TA");
+  qDebug() << q.match(src).hasMatch();
+  return;
 
   if (fileName.length() == 0) {
     fileName = "test_node.html";
@@ -201,28 +229,37 @@ int main(int argc, char *argv[])
 
 
   bool verbose;
+  QApplication app(argc,argv);
   QString settingsFile("Resources/themes/default/settings.ini");
   QCommandLineParser parser;
   parser.addHelpOption();
-  QCommandLineOption nodeOption(QStringList() <<"n" << "node",QObject::tr("Node or comma delimited list of nodes to be searched"),"node");
+  //  parser.setApplicationDescription("Full text search of Lane's Lexicon.");
+  parser.addPositionalArgument("<search pattern>", QCoreApplication::translate("main", "Search pattern"));
+ QCommandLineOption nodeOption(QStringList() <<"n" << "node",QObject::tr("Node or comma delimited list of nodes to be searched"),"node");
   parser.addOption(nodeOption);
 
   parser.addHelpOption();
 
-  QCommandLineOption patternOption(QStringList() <<"p" << "pattern",QObject::tr("Search pattern"),"pattern");
+  QCommandLineOption patternOption(QStringList() <<"p" << "pattern",QObject::tr("Search pattern, enclose multi-word patterns in quotes"),"pattern");
   parser.addOption(patternOption);
 
-  QCommandLineOption outputOption(QStringList() <<"o" << "output",QObject::tr("Output file"),"output");
+  QCommandLineOption outputOption(QStringList() <<"o" << "output",QObject::tr("Send results to file"),"output file name");
   parser.addOption(outputOption);
 
-  QCommandLineOption separatorOption(QStringList() <<"s" << "separator",QObject::tr("Output file field separator"),"separator");
+  QCommandLineOption separatorOption(QStringList() <<"s" << "separator",QObject::tr("Output field separator,default \"|\""),"separator character");
   separatorOption.setDefaultValue("|");
   parser.addOption(separatorOption);
 
-  QCommandLineOption verboseOption(QStringList() <<"v" << "verbose",QObject::tr("Show matching entries"));
+  QCommandLineOption verboseOption(QStringList() <<"v" << "verbose",QObject::tr("Show search progress"));
   parser.addOption(verboseOption);
-  QCommandLineOption headOption(QStringList() <<"r" << "root",QObject::tr("Show root/headword for matching entries"));
-  parser.addOption(headOption);
+  QCommandLineOption resourcesOption(QStringList() <<"r" << "resources",QObject::tr("Location of Resources directory"),"Path to resources directory");
+#ifdef __APPLE__
+    resourcesOption.setDefaultValue(QCoreApplication::applicationDirPath() + "/../Resources");
+#else
+    resourcesOption.setDefaultValue(QCoreApplication::applicationDirPath() + QDir::separator() + "Resources");
+#endif
+
+  parser.addOption(resourcesOption);
 
   QCommandLineOption testOption(QStringList() <<"t" << "test",QObject::tr("Invoke test routine"));
   parser.addOption(testOption);
@@ -239,16 +276,19 @@ int main(int argc, char *argv[])
   QCommandLineOption regexOption(QStringList() <<"x" << "regex",QObject::tr("Regular expression search"));
   parser.addOption(regexOption);
 
-  QCommandLineOption dbOption(QStringList() <<"f" << "file",QObject::tr("Database path relative to current directory"));
+  QCommandLineOption dbOption(QStringList() <<"b" << "db-file",QObject::tr("Database file name relative to current directory"),"dbfile name");
   parser.addOption(dbOption);
 
-  QCommandLineOption sizeOption(QStringList() <<"z" << "size",QObject::tr("Fragment padding"),"padding");
+  QCommandLineOption sizeOption(QStringList() <<"z" << "size",QObject::tr("Show number of characters to the left and right of search hit"),"number");
   parser.addOption(sizeOption);
 
-  QCommandLineOption buckOption(QStringList() <<"b" << "buckwalter-input",QObject::tr("Buckwalter safe input"));
+  QCommandLineOption buckOption(QStringList() <<"i" << "buckwalter-input",QObject::tr("Buckwalter safe input"));
   parser.addOption(buckOption);
 
-  QApplication app(argc,argv);
+
+  QCommandLineOption fieldOption(QStringList() <<"f" << "fields",QObject::tr("Specify output information: R(oot), H(ead word, N(ode), P(osition), T(ext). Defaults to all.)"),"RHNPT");
+  fieldOption.setDefaultValue("RHNPT");
+  parser.addOption(fieldOption);
   parser.process(app);
   QStringList posargs = parser.positionalArguments();
 
@@ -257,54 +297,84 @@ int main(int argc, char *argv[])
     if (posargs.size() > 0) {
       fileName = posargs[0];
     }
-    test(fileName);
+
+    //    test(fileName);
     return 0;
   }
+  TextSearch searcher;
+
+  QString resourcesDir = parser.value(resourcesOption);
   verbose = parser.isSet(verboseOption);
-  QFile dbfile;
+  QFileInfo configFile(resourcesDir,"config.ini");
+
+  if (! configFile.exists()) {
+    std::cerr << qPrintable(QString("Cannot find \"config.ini\" in %1").arg(parser.value(resourcesOption))) << std::endl;
+    std::cerr << "Use -r option to specify the directory containing \"config.ini\"" << std::endl;
+    return 1;
+  }
+  QSettings config(configFile.absoluteFilePath(),QSettings::IniFormat);
+  config.beginGroup("System");
+  QString currentTheme = config.value("Theme","default").toString();
+  QString themeDirectory = config.value("Theme directory","themes").toString();
+  QFileInfo sd(resourcesDir,themeDirectory);
+  sd.setFile(sd.absoluteFilePath(),currentTheme);
+  QFileInfo si(sd.absoluteFilePath(),"settings.ini");
+  if (si.exists()) {
+    searcher.setSettingsPath(si.absoluteFilePath());
+    // set the XSLT file name
+    QSettings settings(si.absoluteFilePath(),QSettings::IniFormat);
+    settings.beginGroup("Resources");
+    QString xsltdir = settings.value("XSLT","xslt").toString();
+    settings.endGroup();
+    settings.beginGroup("XSLT");
+    QString xslt = settings.value(SID_XSLT_ENTRY,"entry.xslt").toString();
+    settings.endGroup();
+    QFileInfo xsltFile(sd.absoluteFilePath(),xsltdir);
+    xsltFile.setFile(xsltFile.absoluteFilePath(),xslt);
+    if (xsltFile.exists()) {
+      searcher.setXsltFileName(xsltFile.absoluteFilePath());
+    }
+    // set the database name
+    settings.beginGroup("System");
+    QString db = settings.value(SID_SYSTEM_DATABASE).toString();
+    settings.endGroup();
+    QFileInfo dbFile(resourcesDir,db);
+    if (dbFile.exists()) {
+      searcher.setDbFileName(dbFile.absoluteFilePath());
+    }
+  }
+
+  //  QFile dbfile;
   QSqlDatabase db;
-  int nodeCount = 0; // number of nodes read
-  int wordCount = 0; // total number of pattern found
-  QString dbname;
-  //  QSettings settings(settingsFile,QSettings::IniFormat);
-  //  settings.beginGroup("System");
-  //  dbname = settings.value("Database",QString()).toString();
-  //  if (dbname.length() == 0) {
-  //    qDebug() << "Using hard-code dbname";
-  if (! parser.isSet(dbOption)) {
-    dbname = "Resources/lexicon.sqlite";
-  }
-  else {
-    dbname = parser.value(dbOption);
-  }
-  QFileInfo fi(dbname);
-  if (! fi.exists()) {
-    dbname = "Resources/lexicon.sqlite";
-    fi = QFileInfo(dbname);
-  }
-  if (! fi.exists()) {
-    qDebug() << "Database not found:" << dbname;
+///  QString dbname;
+
+  if (parser.isSet(dbOption)) {
+    QString dbname = parser.value(dbOption);
+    QFileInfo fi(dbname);
+    if (! fi.exists()) {
+      std::cerr <<  qPrintable(QString("Cannot find supplied database file: %1").arg(dbname)) << std::endl;
+      return 0;
+    }
+    else {
+      searcher.setDbFileName(fi.absoluteFilePath());
+    }
   }
 
 
-  QFile f(dbname);
-  if (! f.exists()) {
-    qDebug() << QString("Cannot find database: %1").arg(dbname);
-    return 0;
-  }
+  //  dbfile.setFileName(searcher.dbFile());
 
-
-  dbfile.setFileName(fi.absoluteFilePath());
-
-  if (! dbfile.exists() ) {
-    QLOG_WARN() << QString(QObject::tr("Cannot find database : %1")).arg(dbname);
-    return false;
-  }
   if (db.isOpen()) {
     db.close();
   }
+  db = QSqlDatabase::addDatabase("QSQLITE");
+  db.setDatabaseName(searcher.dbFile()); //dbname);
+  db.open();
+  if (! db.isOpen()) {
+    std::cerr  << qPrintable(QString("Could not open database:%1").arg(searcher.dbFile())) << std::endl;
+    return 0;
+  }
 
-  bool showHead = parser.isSet(headOption);
+  QFileInfo fi;
   QString pattern;
 
   if (! parser.isSet(patternOption)) {
@@ -317,13 +387,22 @@ int main(int argc, char *argv[])
   }
   if (pattern.length() == 0) {
     std::cerr << qPrintable(QString("No search pattern supplied")) << std::endl;
+    parser.showHelp();
     return 0;
   }
-  TextSearch searcher;
+
   if (parser.isSet(buckOption) && ! parser.isSet(regexOption)) {
     QString t(pattern);
     pattern = searcher.fromSafe(pattern);
-    qDebug() << QString("%1 converted to %2").arg(t).arg(pattern);
+  }
+  //  fi.setFile(parser.value(iniOption));
+  //  if (fi.exists()) {
+  //    searcher.setSettingsPath(fi.absoluteFilePath());
+  //  }
+  QString fields = parser.value(fieldOption);
+  QRegularExpression fx("[^RHPNT]+");
+  if (fx.match(fields).hasMatch()) {
+    std::cerr << qPrintable(QString("Unknown output field requested, ignored (use only RHNPT)")) << std::endl;
   }
   searcher.setVerbose(verbose);
   searcher.m_separator = parser.value(separatorOption);
@@ -336,19 +415,13 @@ int main(int argc, char *argv[])
       searcher.setPadding(sz);
     }
   }
+  searcher.setFields(parser.value(fieldOption));
   searcher.setSearch(pattern,
                      parser.isSet(regexOption),
                      parser.isSet(caseOption),
                      parser.isSet(wholeOption),
                      parser.isSet(diacriticsOption));
 
-  db = QSqlDatabase::addDatabase("QSQLITE");
-  db.setDatabaseName(dbname);
-  db.open();
-  if (! db.isOpen()) {
-    std::cerr  << qPrintable(QString("Could not open database:%1").arg(dbname)) << std::endl;
-    return 0;
-  }
   QStringList nodes;
   QSqlQuery query;
   SearchRunner * r = new SearchRunner;
@@ -358,106 +431,6 @@ int main(int argc, char *argv[])
   }
   searcher.search();
   delete r;
-  /*
-  QString root;
-  QString headword;
-  QString node;
-  int maxFinds = 0;
-  int maxReads = 0;
-  int readCount = 0;
-  int findCount = 0;
-  bool finished = false;
-
-  if (rx.pattern().length() > 0) {
-    qDebug() << "Regular expression search" << rx.pattern();
-  }
-  else {
-    qDebug() << "Text search" << pattern;
-  }
-  searcher.m_results.clear();
-  QMap<int,QString> ret;
-  QTime t;
-  t.start();
-  if (nodes.size() == 0) {
-    if (! query.exec()) {
-      qDebug() << "Error search all nodes" << query.executedQuery() << query.lastError();
-    }
-    while (query.next() && ! finished) {
-      readCount++;
-      QString xml = query.value("xml").toString();
-      QString node = query.value("nodeid").toString();
-      if (! node.startsWith("j")) {
-        nodeCount++;
-        if (maxReads && (nodeCount > maxReads)) {
-          return 0;
-        }
-        ret = searcher.searchEntry(pattern,xml);
-        if (ret.size() > 0) {
-          SearchResult r;
-          r.node = query.value("nodeid").toString();
-          r.root = query.value("root").toString().toUtf8();
-          r.head = query.value("word").toString().toUtf8();
-          r.fragments = ret;
-          searcher.m_results << r;
-          findCount++;
-          wordCount += ret.size();
-        }
-      }
-      if (maxFinds && (findCount > maxFinds)) {
-        finished = true;
-      }
-      if (maxReads && (readCount > maxReads)) {
-        finished = true;
-      }
-    }
-  }
-  else {
-    query.prepare(SQL_FIND_ENTRY_DETAILS);
-    qDebug() << "nodes" << nodes;
-    for(int i=0;(i < nodes.size()) && ! finished ;i++) {
-      //query.prepare(SQL_FIND_ENTRY_DETAILS);
-      query.bindValue(0,nodes[i]);
-      if (! query.exec()) {
-        qDebug() << "node query" << query.lastError();
-        finished = true;
-      }
-      else {
-        if (query.next()) {
-          readCount++;
-          QString xml = query.value("xml").toString();
-          QString node = query.value("nodeid").toString();
-          if (! node.startsWith("j")) {
-            nodeCount++;
-            if (maxReads && (nodeCount > maxReads)) {
-              return 0;
-            }
-            ret = searcher.searchEntry(pattern,xml,rx);
-            if (ret.size() > 0) {
-              SearchResult r;
-              r.node = query.value("nodeid").toString();
-              r.root = query.value("root").toString().toUtf8();
-              r.head = query.value("word").toString().toUtf8();
-              r.fragments = ret;
-              findCount++;
-              wordCount += ret.size();
-              searcher.m_results << r;
-            }
-
-            if (maxFinds && (findCount > maxFinds)) {
-              finished = true;
-            }
-            if (maxReads && (readCount > maxReads)) {
-              finished = true;
-            }
-          }
-        }
-      }
-    }
-
-  }
-  searcher.m_time = t.elapsed();
-  */
-  dbfile.close();
   db.close();
 
   bool fileOutput = false;
@@ -469,36 +442,5 @@ int main(int argc, char *argv[])
     searcher.toFile();
   }
 
-    /*
-    of.setFileName(parser.value(outputOption));
-    if (! of.open(QIODevice::WriteOnly)) {
-      std::cerr << "Cannot open output file for writing: ";
-      std::cerr << qPrintable(of.errorString()) << std::endl;
-    }
-    else {
-      fileOutput = true;
-    }
-  }
-  QTextStream out(&of);
-  out.setCodec("UTF-8");
-  for(int i=0;i < results.size();i++) {
-    QMapIterator<int,QString> iter(results[i].fragments);
-    while(iter.hasNext()) {
-      iter.next();
-      QStringList o;
-      o << results[i].node << results[i].root << results[i].head  << QString("%1").arg(iter.key()) << iter.value();
-      if (fileOutput) {
-        out << o.join(parser.value(separatorOption));
-        out << "\n";
-      }
-      else {
-        std::cout << qPrintable(o.join(parser.value(separatorOption))) << std::endl;
-      }
-    }
-  }
- QString summary =  QString("Search %1 : found in %2 entr%3, total count %4 (time %5ms)").arg(pattern).arg(findCount).arg(findCount > 1 ? "ies" : "y").arg(wordCount).arg(t.elapsed());
-  of.close();
-  std::cerr << qPrintable(summary) << std::endl;
-    */
   return 0;
 }

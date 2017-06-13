@@ -13,7 +13,8 @@
 SearchRunner::SearchRunner() {
 }
 void SearchRunner::recordsRead(int r) {
-  std::cerr << qPrintable(QString("..%1..").arg(r));
+  double d = 100 * (r/47919.0) ;
+  std::cerr << qPrintable(QString("..%1%..").arg(d,0,'g',4));
 }
 #endif
 QString TextSearch::fixHtml(const QString & t) {
@@ -31,6 +32,11 @@ QString TextSearch::fixHtml(const QString & t) {
 TextSearch::TextSearch() {
   m_padding = 30;
   m_verbose = false;
+  m_caseSensitive = false;
+  m_wholeWord = false;
+  m_regex = false;
+  m_diacritics = true;
+
   QMap<QChar,QChar> safe;
   m_safe.insert(QChar('C'),QChar(0x621));
   m_safe.insert(QChar('M'),QChar(0x622));
@@ -90,6 +96,22 @@ TextSearch::TextSearch() {
 void TextSearch::setVerbose(bool v) {
   m_verbose = v;
 }
+void TextSearch::setFields(const QString & v) {
+  m_fields = v;
+}
+void TextSearch::setXsltFileName(const QString & v) {
+  m_xsltFile = v;
+}
+void TextSearch::setDbFileName(const QString & v) {
+  m_dbFile = v;
+}
+QString TextSearch::dbFile() const {
+  return m_dbFile;
+}
+void TextSearch::setSettingsPath(const QString & p) {
+  m_iniFileName = p;
+}
+
 QString TextSearch::fromSafe(const QString & v) {
   QString ot;
   for(int i=0;i < v.length();i++) {
@@ -217,7 +239,7 @@ QList<QPair<QString,QString> > TextSearch::splitText(const QString & txt) {
   return texts;
 }
 
-QMap<int,QString> TextSearch::searchEntry(QString xml,QString head,QString node) {
+QMap<int,QString> TextSearch::searchEntry(QString xml,QString /* head */,QString /* node */) {
   QMap<int,QString> results;
   //  QTextDocument doc(xml);
   //  int cnt = doc.characterCount();
@@ -230,7 +252,9 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString head,QString node)
   // of <entryType @key="<head word>"
   //
   QString html =
-    transform(NODE_XSLT,"Resources/themes/default/xslt/entry.xslt",xml);
+    transform(NODE_XSLT,m_xsltFile,xml);
+
+
   if (html.isEmpty()) {
     return results;
   }
@@ -286,7 +310,7 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString head,QString node)
     }
     fragment.remove(QChar(0x2029));
     fragment.remove(QChar(0x200e));
-    //    qDebug() << QString("%1 -> %2:[%3]").arg(start).arg(end).arg(fragment);
+
     results[c.selectionStart()] = fragment;
     if (regex) {
       c = doc.find(m_rx,c.selectionEnd());
@@ -345,7 +369,11 @@ void testSplit(const QString & txt) {
   so the calling function can remove them from the search pattern
 */
 QString TextSearch::getDiacritics(QList<QChar> & points) {
-  QSettings settings("Resources/themes/default/settings.ini",QSettings::IniFormat);
+  if (m_iniFileName.isEmpty()) {
+    std::cerr << qPrintable("Cannot locate settings.ini, diacritics option ignored") << std::endl;
+    return QString();
+  }
+  QSettings settings(m_iniFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Diacritics");
   QStringList keys = settings.childKeys();
@@ -355,29 +383,36 @@ QString TextSearch::getDiacritics(QList<QChar> & points) {
   for(int i=0;i < keys.size();i++) {
     if (keys[i].startsWith("Char")) {
       v = settings.value(keys[i],QString()).toString();
+      QChar c = QChar(v.toInt(&ok,16));
       if (ok) {
-        rx += QString("0x%1").arg(v);
+        rx.append(c);
       }
-      points << QChar(v.toInt(&ok,16));
+      else {
+        //        qDebug() << "Cannot convert" << v;
+      }
+      points << c;
     }
   }
-  rx += "]*";
+  rx.append("]*");
+
   return rx;
 }
-QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase) {
+QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool wholeword,bool casesensitive) {
   QList<QChar> dc;
   QString diacritics = getDiacritics(dc);//("[0x6710x64c0x6500x651]*");
   QString pattern;
+  //  qDebug() << Q_FUNC_INFO << diacritics << diacritics.length();
+  // remove diacritics from the search pattern
   for(int i=0;i < dc.size();i++) {
     target.remove(dc[i]);
   }
   for(int i=0;i < target.size();i++) {
     QChar sp = target.at(i);
-    pattern += QString(sp);
+    pattern.append(sp);
     if ( sp.isLetter() ) {
       /// if it's in the Arabic block, append to allow for optional diacritics
       if (ignorediacritics && ((sp.unicode() >= 0x600) && (sp.unicode() <= 0x6ff))) {
-        pattern += diacritics;
+        pattern.append(diacritics);
       }
     }
   }
@@ -385,10 +420,11 @@ QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool
     pattern = "\\b" + pattern + "\\b";
   }
   QRegularExpression rx(pattern);
-  if (ignorecase) {
+  if (! casesensitive) {
     rx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   }
   m_rx = rx;
+  //  qDebug() << Q_FUNC_INFO << rx.isValid() << rx.pattern();
   return rx;
 }
 void TextSearch::toFile(const QString & fileName) const {
@@ -407,15 +443,33 @@ void TextSearch::toFile(const QString & fileName) const {
   }
   QTextStream out(&of);
   out.setCodec("UTF-8");
-  int entryCount = m_results.size();
+
   int findCount = 0;
+  QStringList fields = m_fields.split("",QString::SkipEmptyParts);
+
   for(int i=0;i < m_results.size();i++) {
     QMapIterator<int,QString> iter(m_results[i].fragments);
     findCount += m_results[i].fragments.size();
     while(iter.hasNext()) {
       iter.next();
       QStringList o;
-      o << m_results[i].node << m_results[i].root << m_results[i].head  << QString("%1").arg(iter.key()) << iter.value();
+      for(int j=0;j < fields.size();j++) {
+        if (fields[j] == "N") {
+          o << m_results[i].node;
+        }
+        if (fields[j] == "R") {
+          o << m_results[i].root;
+        }
+        if (fields[j] == "H") {
+          o << m_results[i].head;
+        }
+        if (fields[j] == "P") {
+          o << QString("%1").arg(iter.key());
+        }
+        if (fields[j] == "T") {
+          o << iter.value();
+        }
+      }
       if (fileOutput) {
         out << o.join(m_separator);
         out << "\n";
@@ -425,15 +479,16 @@ void TextSearch::toFile(const QString & fileName) const {
       }
     }
   }
- QString summary =  QString("Search %1 : found in %2 entr%3, total count %4 (time %5ms)").arg(m_pattern).arg(entryCount).arg(entryCount > 1 ? "ies" : "y").arg(findCount).arg(m_time);
+  // QString summary =  QString("Search for: %1 : found in %2 entr%3, total count %4 (time %5ms)").arg(m_pattern).arg(entryCount).arg(entryCount > 1 ? "ies" : "y").arg(findCount).arg(m_time);
   of.close();
-  std::cerr << qPrintable(summary) << std::endl;
+  std::cerr << qPrintable(this->summary()) << std::endl;
 }
 void TextSearch::searchAll() {
   QSqlQuery query;
   query.prepare(SQL_ALL_ENTRIES);
   if (! query.exec()) {
-    qDebug() << "Error search all nodes" << query.executedQuery() << query.lastError();
+    QString err = query.lastError().text();
+    std::cerr << qPrintable(QString("SQL error %1 , %2").arg(SQL_ALL_ENTRIES).arg(err)) << std::endl;
     return;
   }
   int readCount = 0;
@@ -526,30 +581,48 @@ void TextSearch::search() {
   else {
     this->searchNodes();
   }
-  m_time = t.elapsed();
+ m_time = t.elapsed();
+}
+QString TextSearch::summary() const {
+
+  int entryCount = m_results.size();
+  int findCount = 0;
+  for(int i=0;i < m_results.size();i++) {
+    findCount += m_results[i].fragments.size();
+  }
+  QString t = QString("%1 search for \"%2\" - %3 occurrence%4 in %5 entr%6")
+    .arg(m_regex ? "Regex" : "Text")
+    .arg(m_pattern)
+    .arg(findCount)
+    .arg(findCount == 1 ? "" : "s")
+    .arg(entryCount).arg(entryCount == 1 ? "y" : "ies");
+  QString options;
+  if (! m_regex ) {
+    options = QString("Case %1sensitive, \"whole word match\" is %2. ").arg(m_caseSensitive == 0 ? "in" : "" ).arg(m_wholeWord == 1 ? "on" : "off");
+  }
+  t = QString("%1 (%2Search took %3 ms.)").arg(t).arg(options).arg(m_time);
+  return t;
 }
 void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool wholeWord,bool diacritics) {
-  // TODO set defaults for search options
-  // TODO if text has Arabic and not ignoring diacritics, do a text search
-  // TODO if text has Arabic and ignoring diacritics do a regex search and set the whole word and case options
-  // TODO if no Arabic in text, set the case and whole word text search options
   QRegularExpression rx;
   m_caseSensitive = caseSensitive;
   m_wholeWord = wholeWord;
   m_regex = regex;
   m_diacritics = diacritics;
   QString pattern = p;
+
   if (! regex) {
-    QRegularExpression rx("\\[\\x{0600}-\\x{06ff}\\]+");
+    QRegularExpression rx("[\u0600-\u06ff]+");
     if (rx.match(pattern).hasMatch()) { // text contains arabic
       if (diacritics) {
         pattern = QRegularExpression::escape(pattern);
-        rx = buildRx(pattern,diacritics,wholeWord,!caseSensitive);
+        m_rx = buildRx(pattern,diacritics,wholeWord,caseSensitive);
         if (m_verbose) {
           std::cerr << "Arabic regex search (forced by diacritics):" << std::endl;
-          std::cerr << qPrintable(rx.pattern()) << std::endl;
+          std::cerr << qPrintable(m_rx.pattern()) << std::endl;
+          qDebug() << m_rx.pattern();
         }
-        m_rx = rx;
+        m_regex = true;
       }
       else {
         if (m_verbose) {
@@ -559,9 +632,6 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     }
     else {
         if (m_verbose) {
-          std::cerr << "Arabic regex search" << std::endl;
-        }
-        if (m_verbose) {
           std::cerr << "Plain text search" << std::endl;
         }
     }
@@ -569,6 +639,9 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
   else {    // doing a regex search so just set the pattern
     m_pattern = pattern;
     m_rx.setPattern(pattern);
+    if (m_verbose) {
+      std::cerr << "Regex search" << std::endl;
+    }
   }
   if (! m_rx.isValid()) {
     std::cerr << qPrintable(m_rx.pattern()) << std::endl;
