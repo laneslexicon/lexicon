@@ -21,6 +21,13 @@ class SearchRunner : public QObject {
  public slots:
   void recordsRead(int);
 };
+#define COUT  std::cout
+#define CERR  std::cerr
+#define ENDL  std::endl
+#else
+#define COUT  QLOG_INFO()
+#define CERR  QLOG_WARN()
+#define ENDL  "\n"
 #endif
 /*
 class  SearchFragment {
@@ -34,8 +41,9 @@ public:
   QString root;
   QString node;
   QString head;
+  int vol;
+  int page;
   QMap<int,QString> fragments;
-  //  QList<SearchFragment> f;
 };
 
 class TextSearch : public QObject {
@@ -67,11 +75,11 @@ class TextSearch : public QObject {
   void setDiacritics(bool);
   void setSearchType(bool);
   QString summary() const;
-  QList<SearchResult>  m_results;
-
   QString m_pattern;
-  qint64 m_time;
   QString m_separator;
+ private:
+  QList<SearchResult>  m_results;
+  qint64 m_time;
   QStringList m_nodes;
   QString m_fields;
   QRegularExpression m_rx;

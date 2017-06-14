@@ -26,5 +26,22 @@ OBJECTS_DIR = ./obj
 MOC_DIR = ./moc
 INCLUDEPATH += ./qslog
 include(qslog/QsLog.pri)
-SOURCES += ensearch.cpp xsltsupport.cpp textsearch.cpp
-HEADERS += textsearch.h  xsltsupport.h
+#include(imedit/imedit.pri)
+#include(keyboard/keyboard.pri)
+
+SOURCES += ensearch.cpp \
+xsltsupport.cpp \
+place.cpp \
+           textsearch.cpp
+
+#textsearchwidget.cpp \
+#searchoptionswidget.cpp \
+#searchoptions.cpp \
+#columnselectdialog.cpp \
+#columnartablewidget.cpp \
+#centeredcheckbox.cpp \
+#nodeview.cpp \
+
+HEADERS += textsearch.h \
+place.h \
+xsltsupport.h

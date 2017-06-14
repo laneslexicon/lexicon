@@ -285,10 +285,18 @@ int main(int argc, char *argv[])
   QCommandLineOption buckOption(QStringList() <<"i" << "buckwalter-input",QObject::tr("Buckwalter safe input"));
   parser.addOption(buckOption);
 
+  //
+  // have paged table with option of number of rows in table
+  //
+  QCommandLineOption guiOption(QStringList() <<"g" << "gui",QObject::tr("Show graphical interface"));
+  parser.addOption(guiOption);
 
-  QCommandLineOption fieldOption(QStringList() <<"f" << "fields",QObject::tr("Specify output information: R(oot), H(ead word, N(ode), P(osition), T(ext). Defaults to all.)"),"RHNPT");
-  fieldOption.setDefaultValue("RHNPT");
+
+  QCommandLineOption fieldOption(QStringList() <<"f" << "fields",QObject::tr("Specify output information: R(oot), H(ead word, N(ode), O(ffset),P(age), T(ext), V(olume). Defaults to all.)"),"RHNOTVP");
+  fieldOption.setDefaultValue("RHNOTVP");
   parser.addOption(fieldOption);
+
+
   parser.process(app);
   QStringList posargs = parser.positionalArguments();
 
@@ -400,9 +408,9 @@ int main(int argc, char *argv[])
   //    searcher.setSettingsPath(fi.absoluteFilePath());
   //  }
   QString fields = parser.value(fieldOption);
-  QRegularExpression fx("[^RHPNT]+");
+  QRegularExpression fx("[^RHOPNTV]+");
   if (fx.match(fields).hasMatch()) {
-    std::cerr << qPrintable(QString("Unknown output field requested, ignored (use only RHNPT)")) << std::endl;
+    std::cerr << qPrintable(QString("Unknown output field requested, ignored (use only RHNOPTV)")) << std::endl;
   }
   searcher.setVerbose(verbose);
   searcher.m_separator = parser.value(separatorOption);
@@ -441,6 +449,8 @@ int main(int argc, char *argv[])
   else {
     searcher.toFile();
   }
+  if (parser.isSet(guiOption)) {
 
+  }
   return 0;
 }
