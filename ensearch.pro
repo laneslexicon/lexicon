@@ -6,7 +6,12 @@
 QT       += core sql xml gui widgets printsupport
 CONFIG   += debug
 CONFIG   += libxslt
+CONFIG   += gui
+gui {
+TARGET = ensearch-gui
+} else {
 TARGET = ensearch
+}
 TEMPLATE = app
 QMAKE_CXXFLAGS += -pthread -Wunused-parameter -g
 DEFINES += USE_LIBXSLT
@@ -22,13 +27,15 @@ LIBS += -L"$$PWD\libxml2-2.7.8.win32\lib" -llibxml2
 LIBS += -L"$$PWD\libxslt-1.1.26.win32\lib" -llibxslt
 }
 }
-OBJECTS_DIR = ./obj
-MOC_DIR = ./moc
+OBJECTS_DIR = ./ensearch-obj
+MOC_DIR = ./ensearch-moc
 INCLUDEPATH += ./qslog
 include(qslog/QsLog.pri)
+
+gui {
 include(imedit/imedit.pri)
 include(keyboard/keyboard.pri)
-
+}
 SOURCES += ensearch.cpp \
 xsltsupport.cpp \
 place.cpp \
@@ -42,7 +49,7 @@ lanesupport.h
 #
 # following sources are for GUI
 #
-#gui {
+gui {
 SOURCES += textsearchwidget.cpp \
 columnartablewidget.cpp \
 columnselectdialog.cpp \
@@ -55,4 +62,4 @@ exportsearchdialog.h \
 centeredcheckbox.h \
 textsearchwidget.h
 
-#}
+}
