@@ -1,4 +1,5 @@
 #include "place.h"
+#include "textsearch.h"
 /*
    Place p;
    p.setNode("test node");
@@ -189,6 +190,19 @@ Place Place::fromEntryRecord(const QSqlRecord & rec) {
   if (p.m_head.size() == 0) {
       p.m_head = rec.value("word").toString();
   }
+  return p;
+}
+Place Place::fromSearchHit(const SearchHit & rec) {
+  Place p;
+  p.m_root = rec.root;
+  p.m_node = rec.node;
+  p.m_word = rec.head;
+  p.m_page = rec.page;
+  p.m_vol =  rec.vol;
+  p.m_action = Place::User;
+  p.m_head = rec.head;
+  //  p.m_data = rec.fragment;
+  //  p.m_ix = rec.ix;
   return p;
 }
 void Place::setHead(const QString & x) {

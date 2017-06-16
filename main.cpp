@@ -33,6 +33,10 @@ int RandomUnder(int topPlusOne)
     }
 }
 #endif
+LaneSupport * support = 0;
+LaneSupport * getSupport() {
+  return support;
+}
 
 int random_in_range (unsigned int min, unsigned int max)
 {

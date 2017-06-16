@@ -4,6 +4,8 @@
 #include "QsLog.h"
 #include "exportsearchdialog.h"
 #include "centeredcheckbox.h"
+#include "lanesupport.h"
+#include "externs.h"
 //#include "focustable.h"
 ColumnarTableWidget::ColumnarTableWidget(const QStringList & headers,QWidget * parent) : QTableWidget(parent) {
   m_settings = 0;
@@ -137,13 +139,14 @@ QLabel * ColumnarTableWidget::createLabel(const QString & text,const QString & s
 
   QLabel * l;
   if (! style.isEmpty()) {
-    l = new QLabel(qobject_cast<Lexicon *>(qApp)->scanAndStyle(str,style));
+    l = new QLabel(getSupport()->scanAndStyle(str,style));
   }
   else {
     l = new QLabel(str);
   }
   return l;
 }
+/*
 bool ColumnarTableWidget::startsWithArabic(const QString & t) const {
   for(int i=0;i < t.size();i++) {
     if (t.at(i).direction() == QChar::DirAL) {
@@ -156,6 +159,7 @@ bool ColumnarTableWidget::startsWithArabic(const QString & t) const {
   }
   return false;
 }
+*/
 void ColumnarTableWidget::showEmpty(const QString & text) {
   this->insertRow(0);
   for(int i=1;i < this->columnCount();i++) {

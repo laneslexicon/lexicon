@@ -8,6 +8,7 @@
 #include <QSqlRecord>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+class SearchHit;
 /*
   Using the QVariant;
     Place p;
@@ -62,6 +63,7 @@ class Place    {
   static Place fromNode(const QString &);
   static Place fromPage(int);
   static Place fromEntryRecord(const QSqlRecord &);
+  static Place fromSearchHit(const SearchHit &);
   static int   volume(int);
   QString getText(bool pageOnlyMode = false) const;
   QString getShortText() const;

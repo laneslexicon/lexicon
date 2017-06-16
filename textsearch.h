@@ -90,6 +90,8 @@ class TextSearch : public QObject {
   QString m_pattern;
   QString m_separator;
   QList<SearchHit> getHits(int start,int sz,bool summary = false) const;
+  int rows(bool summary) const;
+
  private:
   QList<SearchResult>  m_results;
   qint64 m_time;

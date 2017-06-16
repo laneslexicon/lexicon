@@ -14,7 +14,13 @@
 #include "xsltsupport.h"
 #include <iostream>
 #include "textsearch.h"
+#include "lanesupport.h"
+#include "textsearchwidget.h"
 bool showData;
+LaneSupport * support = 0;
+LaneSupport * getSupport() {
+  return support;
+}
 QString fixHtml(const QString & t) {
   QString html = t;
 
@@ -320,6 +326,8 @@ int main(int argc, char *argv[])
     std::cerr << "Use -r option to specify the directory containing \"config.ini\"" << std::endl;
     return 1;
   }
+  support = new LaneSupport(resourcesDir);
+
   QSettings config(configFile.absoluteFilePath(),QSettings::IniFormat);
   config.beginGroup("System");
   QString currentTheme = config.value("Theme","default").toString();
@@ -379,6 +387,9 @@ int main(int argc, char *argv[])
   db.open();
   if (! db.isOpen()) {
     std::cerr  << qPrintable(QString("Could not open database:%1").arg(searcher.dbFile())) << std::endl;
+    if (support != 0) {
+      delete support;
+    }
     return 0;
   }
 
@@ -449,8 +460,19 @@ int main(int argc, char *argv[])
   else {
     searcher.toFile();
   }
+  qDebug()  << searcher.getHits(2,10,true);
   if (parser.isSet(guiOption)) {
 
+  }
+  qDebug()  << searcher.getHits(2,10,false);
+  if (parser.isSet(guiOption)) {
+    TextSearchWidget * w = new TextSearchWidget(true);
+    w->load(searcher);
+    w->show();
+    app.exec();
+  }
+  if (support != 0) {
+    delete support;
   }
   return 0;
 }

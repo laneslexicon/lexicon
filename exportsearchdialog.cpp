@@ -1,5 +1,6 @@
 #include "exportsearchdialog.h"
 #include "application.h"
+#include "lanesupport.h"
 #include "externs.h"
 #include "definedsettings.h"
 ExportSearchDialog::ExportSearchDialog(const QStringList & columns,const QString & columnKey,QWidget * parent) : QDialog(parent) {

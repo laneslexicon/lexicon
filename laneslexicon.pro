@@ -115,7 +115,9 @@ SOURCES += main.cpp\
         tablistdialog.cpp \
         textwidthdialog.cpp \
         contentspanel.cpp \
-        textsearchdialog.cpp
+        textsearchdialog.cpp \
+        textsearch.cpp \
+        lanesupport.cpp
 
 
 HEADERS  += laneslexicon.h \
@@ -166,4 +168,6 @@ HEADERS  += laneslexicon.h \
             tablistdialog.h \
             textwidthdialog.h \
             contentspanel.h \
-            textsearchdialog.h
+            textsearchdialog.h \
+            textsearch.h \
+            lanesupport.h

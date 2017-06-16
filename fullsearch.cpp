@@ -1,6 +1,6 @@
 #include "fullsearch.h"
 #include "searchoptionswidget.h"
-#include "graphicsentry.h"
+//#include "graphicsentry.h"
 #include "application.h"
 #include "laneslexicon.h"
 #include "imlineedit.h"

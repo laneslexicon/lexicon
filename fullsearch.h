@@ -25,6 +25,7 @@
 #include <QProgressDialog>
 #include <QEventLoop>
 #include <QHeaderView>
+#include <QSqlError>
 #ifdef __APPLE__
 #include <QStyleFactory>
 #endif

@@ -700,7 +700,7 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     CERR << qPrintable(QString("Invalid regular expression: %1").arg(m_rx.errorString())) << ENDL;
   }
 }
-// page numbers start at one
+
 QList<SearchHit> TextSearch::getHits(int offset,int pageSize,bool summary) const {
   qDebug() << offset << pageSize;
   QList<SearchHit> ret;
@@ -714,11 +714,39 @@ QList<SearchHit> TextSearch::getHits(int offset,int pageSize,bool summary) const
       h.page = m_results[i].page;
       h.vol = m_results[i].vol;
       h.ix = m_results[i].fragments.size();
-      //      int x = m_results[i].fragments.first();
       h.fragment = m_results[i].fragments.first();
       ret << h;
     }
     return ret;
   }
+  int ix = 0;
+  for(int i = 0;(i < m_results.size()) && (ret.size() < pageSize);i++) {
+    QMapIterator<int,QString> iter(m_results[i].fragments);
+    while(iter.hasNext()) {
+      iter.next();
+      if (ix >= offset) {
+        SearchHit h;
+        h.root = m_results[i].root;
+        h.head = m_results[i].head;
+        h.node = m_results[i].node;
+        h.page = m_results[i].page;
+        h.vol = m_results[i].vol;
+        h.ix = iter.key();
+        h.fragment = iter.value();
+        ret << h;
+      }
+      ix++;
+    }
+  }
   return ret;
+}
+int TextSearch::rows(bool summary) const {
+  if (summary) {
+    return m_results.size();
+  }
+  int c = 0;
+  for(int i = 0;i < m_results.size();i++) {
+    c += m_results[i].fragments.size();
+  }
+  return c;
 }

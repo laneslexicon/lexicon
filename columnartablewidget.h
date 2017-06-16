@@ -45,7 +45,7 @@ class ColumnarTableWidget : public QTableWidget {
  private:
     QString textForColumn(int row,int col) const;
     QString removeSpan(const QString &) const;
-    bool startsWithArabic(const QString &) const;
+    //    bool startsWithArabic(const QString &) const;
     QStringList m_columnHeadings;
     QString m_defaultWidthKey;
     QString m_columnWidthsKey;

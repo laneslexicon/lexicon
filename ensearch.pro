@@ -3,7 +3,7 @@
 #
 #-------------------------------------------------
 
-QT       += core sql xml gui widgets
+QT       += core sql xml gui widgets printsupport
 CONFIG   += debug
 CONFIG   += libxslt
 TARGET = ensearch
@@ -26,22 +26,33 @@ OBJECTS_DIR = ./obj
 MOC_DIR = ./moc
 INCLUDEPATH += ./qslog
 include(qslog/QsLog.pri)
-#include(imedit/imedit.pri)
-#include(keyboard/keyboard.pri)
+include(imedit/imedit.pri)
+include(keyboard/keyboard.pri)
 
 SOURCES += ensearch.cpp \
 xsltsupport.cpp \
 place.cpp \
-           textsearch.cpp
-
-#textsearchwidget.cpp \
-#searchoptionswidget.cpp \
-#searchoptions.cpp \
-#columnselectdialog.cpp \
-#columnartablewidget.cpp \
-#centeredcheckbox.cpp \
-#nodeview.cpp \
+textsearch.cpp \
+lanesupport.cpp
 
 HEADERS += textsearch.h \
 place.h \
-xsltsupport.h
+xsltsupport.h \
+lanesupport.h
+#
+# following sources are for GUI
+#
+#gui {
+SOURCES += textsearchwidget.cpp \
+columnartablewidget.cpp \
+columnselectdialog.cpp \
+exportsearchdialog.cpp \
+centeredcheckbox.cpp
+
+HEADERS += columnartablewidget.h \
+columnselectdialog.h \
+exportsearchdialog.h \
+centeredcheckbox.h \
+textsearchwidget.h
+
+#}
