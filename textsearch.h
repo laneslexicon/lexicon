@@ -36,6 +36,17 @@ class  SearchFragment {
   QString fragment;
 };
 */
+class SearchHit {
+ public:
+  QString root;
+  QString node;
+  QString head;
+  int vol;
+  int page;
+  int ix;                // hit count
+  QString fragment;
+  friend QDebug operator<<(QDebug, const SearchHit &);
+};
 class   SearchResult {
 public:
   QString root;
@@ -44,8 +55,9 @@ public:
   int vol;
   int page;
   QMap<int,QString> fragments;
+  friend QDataStream &operator<<(QDataStream &, const SearchResult &);
+  friend QDebug operator<<(QDebug, const SearchResult &);
 };
-
 class TextSearch : public QObject {
   Q_OBJECT
  public:
@@ -77,6 +89,7 @@ class TextSearch : public QObject {
   QString summary() const;
   QString m_pattern;
   QString m_separator;
+  QList<SearchHit> getHits(int start,int sz,bool summary = false) const;
  private:
   QList<SearchResult>  m_results;
   qint64 m_time;

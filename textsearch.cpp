@@ -10,6 +10,8 @@
 #include <iostream>
 #include "textsearch.h"
 #include "place.h"
+#include "lanesupport.h"
+extern LaneSupport * getSupport();
 #ifndef LANE
 SearchRunner::SearchRunner() {
 }
@@ -18,6 +20,42 @@ void SearchRunner::recordsRead(int r) {
   CERR << qPrintable(QString("..%1%..").arg(d,0,'g',4));
 }
 #endif
+QDataStream &operator<<(QDataStream &s, const SearchResult& obj)
+{
+  QMapIterator<int,QString> iter(obj.fragments);
+  while(iter.hasNext()) {
+    iter.next();
+    s << obj.root << obj.node << obj.head << iter.key() << iter.value() << "\n";
+  }
+
+ return s;
+}
+
+QDebug operator<<(QDebug debug, const SearchResult& obj)
+{
+  QMapIterator<int,QString> iter(obj.fragments);
+  while(iter.hasNext()) {
+    iter.next();
+    debug.nospace() << obj.root << "   "
+                    << obj.node << "   "
+                    << obj.head << "   "
+                    << iter.key() << "    "
+                    << iter.value() << "\n";
+  }
+
+  return debug.space();
+}
+QDebug operator<<(QDebug debug, const SearchHit& obj)
+{
+    debug.nospace() << obj.root << "   "
+                    << obj.node << "   "
+                    << obj.head << "   "
+                    << obj.ix << "    "
+                    << obj.fragment << "\n";
+
+  return debug.space();
+}
+
 QString TextSearch::fixHtml(const QString & t) {
   QString html = t;
   QRegularExpression rxInsert("<!--insert{([^}]+)}-->",QRegularExpression::MultilineOption);
@@ -93,6 +131,8 @@ TextSearch::TextSearch() {
   m_safe.insert(QChar('J'),QChar(0x686));
   m_safe.insert(QChar('B'),QChar(0x6A4));
   m_safe.insert(QChar('G'),QChar(0x6AF));
+
+
 }
 void TextSearch::setVerbose(bool v) {
   m_verbose = v;
@@ -147,11 +187,11 @@ void TextSearch::setWholeWord(bool v) {
 QString TextSearch::transform(int type,const QString & xsl,const QString & xml) {
   int ok;
   if (xsl.isEmpty()) {
-    qDebug() << "No XSLT supplied";
+    std::cerr << qPrintable("No XSLT filename supplied") << std::endl;
     return QString();
   }
   if (type == ENTRY_XSLT && ! QFileInfo::exists(xsl)) {
-    qDebug() << QString("Cannot find XSLT file: %1").arg(QDir::current().relativeFilePath(xsl));
+    std::cerr << qPrintable(QString("Cannot find XSLT file: %1").arg(QDir::current().relativeFilePath(xsl))) << std::endl;
     return QString();
   }
 
@@ -168,11 +208,11 @@ QString TextSearch::transform(int type,const QString & xsl,const QString & xml) 
     }
   }
   else {
-    qDebug() << "XSLT compile errors";
+    std::cerr << "XSLT compile errors" << std::endl;
   }
   QStringList errors = getParseErrors();
   if (errors.size() > 0) {
-    qDebug() << "XSLT errors" << errors.size();
+    std::cerr << qPrintable(QString("%1  XSLT compile errors").arg(errors.size())) << std::endl;
     /// TODO fix this
     //  errors.prepend("Errors when processing entry styesheet:");
     //  QMessageBox msgBox;
@@ -488,6 +528,7 @@ void TextSearch::toFile(const QString & fileName) const {
   }
   // QString summary =  QString("Search for: %1 : found in %2 entr%3, total count %4 (time %5ms)").arg(m_pattern).arg(entryCount).arg(entryCount > 1 ? "ies" : "y").arg(findCount).arg(m_time);
   of.close();
+  COUT << ENDL;
   CERR << qPrintable(this->summary()) << ENDL;
 }
 void TextSearch::searchAll() {
@@ -658,4 +699,26 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     CERR << qPrintable(m_rx.pattern()) << ENDL;
     CERR << qPrintable(QString("Invalid regular expression: %1").arg(m_rx.errorString())) << ENDL;
   }
+}
+// page numbers start at one
+QList<SearchHit> TextSearch::getHits(int offset,int pageSize,bool summary) const {
+  qDebug() << offset << pageSize;
+  QList<SearchHit> ret;
+
+  if (summary) {
+    for(int i = offset;(i < m_results.size()) && (ret.size() < pageSize);i++) {
+      SearchHit h;
+      h.root = m_results[i].root;
+      h.head = m_results[i].head;
+      h.node = m_results[i].node;
+      h.page = m_results[i].page;
+      h.vol = m_results[i].vol;
+      h.ix = m_results[i].fragments.size();
+      //      int x = m_results[i].fragments.first();
+      h.fragment = m_results[i].fragments.first();
+      ret << h;
+    }
+    return ret;
+  }
+  return ret;
 }
