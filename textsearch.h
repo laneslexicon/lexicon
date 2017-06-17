@@ -90,10 +90,13 @@ class TextSearch : public QObject {
   QString m_pattern;
   QString m_separator;
   QList<SearchHit> getHits(int start,int sz,bool summary = false) const;
+  QList<SearchHit> getPage(int page,bool summary) const;
   int rows(bool summary) const;
-
+  QPair<int,int> setPages(int pagesize);
+  void dumpPages(bool);
  private:
   QList<SearchResult>  m_results;
+  void setOffsets();
   qint64 m_time;
   QStringList m_nodes;
   QString m_fields;
@@ -107,6 +110,10 @@ class TextSearch : public QObject {
   QString m_iniFileName;
   QString m_xsltFile;
   QString m_dbFile;
+  int m_pageSize;
+  QMap<int,int> m_pages;
+  QMap<int,QPair<int,int> > m_summaryPages;
+  QMap<int,QPair<int,int> > m_fullPages;
   QMap<QChar,QChar> m_safe;
  signals:
   void recordsRead(int);

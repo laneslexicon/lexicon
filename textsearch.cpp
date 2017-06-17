@@ -40,7 +40,7 @@ QDebug operator<<(QDebug debug, const SearchResult& obj)
                     << obj.node << "   "
                     << obj.head << "   "
                     << iter.key() << "    "
-                    << iter.value() << "\n";
+                    << iter.value() ;
   }
 
   return debug.space();
@@ -702,7 +702,6 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
 }
 
 QList<SearchHit> TextSearch::getHits(int offset,int pageSize,bool summary) const {
-  qDebug() << offset << pageSize;
   QList<SearchHit> ret;
 
   if (summary) {
@@ -749,4 +748,128 @@ int TextSearch::rows(bool summary) const {
     c += m_results[i].fragments.size();
   }
   return c;
+}
+void TextSearch::setOffsets() {
+  int c = 0;
+  for(int i = 0;i < m_results.size();i++) {
+    c += m_results[i].fragments.size();
+  }
+}
+QPair<int,int> TextSearch::setPages(int sz) {
+  m_pageSize = sz;
+  m_summaryPages.clear();
+  int page=1;
+  for(int i = 0;i < m_results.size();i += sz) {
+    //      m_summaryPages.insert(i,qMakePair0);
+    if ((i + sz) > m_results.size()) {
+      m_summaryPages.insert(page,qMakePair(i,m_results.size() % sz));
+    }
+    else {
+      m_summaryPages.insert(page,qMakePair(i,sz));
+    }
+    page++;
+  }
+
+
+
+  m_fullPages.clear();
+  int j=0;
+  int currentEntry=0;
+  int currentFragment=0;
+  QString pp(" ");
+  page=0;
+  for(int i = 0;i < m_results.size();i++) {
+    QMapIterator<int,QString> iter(m_results[i].fragments);
+    int k = 0;
+    while(iter.hasNext()) {
+      iter.next();
+      if ((j % m_pageSize) == 0) {
+        page++;
+        m_fullPages.insert(page,qMakePair(i,k));
+        pp = "P";
+        currentFragment = k;
+        currentEntry = i;
+      }
+      //      qDebug() << QString("%1 [%2][%3:%4] %5").arg(pp).arg(j).arg(i).arg(k).arg(j % m_pageSize);
+      pp = " ";
+      k++;
+      j++;
+    }
+  }
+  //  qDebug() << m_summaryPages;
+  //  qDebug() << m_fullPages;
+  return qMakePair(m_summaryPages.size(),m_fullPages.size());
+}
+
+QList<SearchHit> TextSearch::getPage(int page,bool summary) const {
+  QList<SearchHit> ret;
+  if (summary) {
+    if (! m_summaryPages.contains(page)) {
+      return ret;
+    }
+    QPair<int,int> ix = m_summaryPages.value(page);
+    int offset = ix.first;
+    int pageSize = ix.second;
+    //    qDebug() << Q_FUNC_INFO << page  << offset << pageSize;
+    int c = pageSize;
+    for(int i = offset;c > 0;i++) {
+      SearchHit h;
+      h.root = m_results[i].root;
+      h.head = m_results[i].head;
+      h.node = m_results[i].node;
+      h.page = m_results[i].page;
+      h.vol = m_results[i].vol;
+      h.ix = m_results[i].fragments.size();
+      h.fragment = m_results[i].fragments.first();
+      ret << h;
+      c--;
+    }
+    return ret;
+  }
+  if (! m_fullPages.contains(page)) {
+    return ret;
+  }
+  QPair<int,int> ix = m_fullPages.value(page);
+  int entryIx  = ix.first;
+  int fragmentIx = ix.second;
+  //  qDebug() << "page" << page << entryIx << fragmentIx;
+  bool ok = false;
+  for(int i = entryIx;(i < m_results.size()) && (ret.size() < m_pageSize);i++) {
+    int j = 0;
+    QMapIterator<int,QString> iter(m_results[i].fragments);
+    while(iter.hasNext() && (ret.size() < m_pageSize)) {
+      iter.next();
+      if ((i == entryIx) && (j == fragmentIx)) {
+        ok = true;
+      }
+      if (ok) {
+        SearchHit h;
+        h.root = m_results[i].root;
+        h.head = m_results[i].head;
+        h.node = m_results[i].node;
+        h.page = m_results[i].page;
+        h.vol = m_results[i].vol;
+        h.ix = iter.key();
+        h.fragment = iter.value();
+        ret << h;
+      }
+      j++;
+    }
+  }
+  return ret;
+}
+void TextSearch::dumpPages(bool summary) {
+  if (! summary) {
+    qDebug() << "Full Pages" << m_fullPages.size();
+    qDebug() << m_fullPages;
+    int ix = 0;
+    for(int i=0;i < m_fullPages.size();i++) {
+      QList<SearchHit> hits = getPage(i+1,summary);
+      for(int j=0;j < hits.size();j++) {
+        qDebug() << QString("[%1] %2 %3").arg(ix).arg(i).arg(j) << hits[j];
+        ix++;
+      }
+      qDebug() << "--------------------------------------------";
+    }
+  }
 }
