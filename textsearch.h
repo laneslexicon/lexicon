@@ -107,9 +107,9 @@ class TextSearch : public QObject {
   int m_padding;
   bool m_diacritics;
   bool m_regex;
-  QString m_iniFileName;
-  QString m_xsltFile;
-  QString m_dbFile;
+  QString m_iniFileName; // do we need to keep these three?
+  QString m_xsltFile;    //
+  QString m_dbFile;      //
   int m_pageSize;
   QMap<int,int> m_pages;
   QMap<int,QPair<int,int> > m_summaryPages;

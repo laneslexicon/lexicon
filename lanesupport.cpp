@@ -223,7 +223,7 @@ QString LaneSupport::scanAndStyle(const QString & str,const QString & spanstyle)
   }
   return html;
 }
-QString LaneSupport::getResourceFilePath(int type, const QString & name) {
+QString LaneSupport::getResourceFilePath(int type, const QString & name) const {
   QFile file;
   QString d(".");
   switch(type) {
@@ -328,4 +328,15 @@ bool LaneSupport::startsWithArabic(const QString & txt) const {
     }
   }
   return false;
+}
+QString LaneSupport::xsltFileName() const {
+  QString fileName;
+  m_settings->beginGroup("XSLT");
+  fileName = m_settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
+  if (fileName.isEmpty()) {
+    fileName = "entry.xslt";
+  }
+  QString xsltDir = getResourceFilePath(LaneSupport::XSLT);
+  QFileInfo fi(xsltDir,fileName);
+  return fi.absoluteFilePath();
 }

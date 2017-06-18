@@ -15,6 +15,7 @@
 #include <iostream>
 #include "textsearch.h"
 #include "lanesupport.h"
+#include "ensearchwidget.h"
 #include "textsearchwidget.h"
 bool showData;
 LaneSupport * support = 0;
@@ -108,127 +109,18 @@ void test(QString & fileName) {
   testSplit("graeme");
   testSplit("برتن");
   */
-  QByteArray a;
-  QByteArray b;
-  QMap<QChar,QChar> safe;
-  safe.insert(QChar('C'),QChar(0x621));
-  safe.insert(QChar('M'),QChar(0x622));
-  safe.insert(QChar('O'),QChar(0x623));
-  safe.insert(QChar('W'),QChar(0x624));
-  safe.insert(QChar('I'),QChar(0x625));
-  safe.insert(QChar('Q'),QChar(0x626));
-  safe.insert(QChar('A'),QChar(0x627));
-  safe.insert(QChar('b'),QChar(0x628));
-  safe.insert(QChar('p'),QChar(0x629));
-  safe.insert(QChar('t'),QChar(0x62A));
-  safe.insert(QChar('v'),QChar(0x62B));
-  safe.insert(QChar('j'),QChar(0x62C));
-  safe.insert(QChar('H'),QChar(0x62D));
-  safe.insert(QChar('x'),QChar(0x62E));
-  safe.insert(QChar('d'),QChar(0x62F));
-  safe.insert(QChar('V'),QChar(0x630));
-  safe.insert(QChar('r'),QChar(0x631));
-  safe.insert(QChar('z'),QChar(0x632));
-  safe.insert(QChar('s'),QChar(0x633));
-  safe.insert(QChar('c'),QChar(0x634));
-  safe.insert(QChar('S'),QChar(0x635));
-  safe.insert(QChar('D'),QChar(0x636));
-  safe.insert(QChar('T'),QChar(0x637));
-  safe.insert(QChar('Z'),QChar(0x638));
-  safe.insert(QChar('E'),QChar(0x639));
-  safe.insert(QChar('g'),QChar(0x63A));
-  safe.insert(QChar('f'),QChar(0x641));
-  safe.insert(QChar('q'),QChar(0x642));
-  safe.insert(QChar('k'),QChar(0x643));
-  safe.insert(QChar('l'),QChar(0x644));
-  safe.insert(QChar('m'),QChar(0x645));
-  safe.insert(QChar('n'),QChar(0x646));
-  safe.insert(QChar('h'),QChar(0x647));
-  safe.insert(QChar('w'),QChar(0x648));
-  safe.insert(QChar('Y'),QChar(0x649));
-  safe.insert(QChar('y'),QChar(0x64A));
-  safe.insert(QChar('F'),QChar(0x64B));
-  safe.insert(QChar('N'),QChar(0x64C));
-  safe.insert(QChar('K'),QChar(0x64D));
-  safe.insert(QChar('a'),QChar(0x64E));
-  safe.insert(QChar('u'),QChar(0x64F));
-  safe.insert(QChar('i'),QChar(0x650));
-  safe.insert(QChar('~'),QChar(0x651));
-  safe.insert(QChar('e'),QChar(0x670));
-  safe.insert(QChar('L'),QChar(0x671));
-  safe.insert(QChar('_'),QChar(0x640));
-  safe.insert(QChar(','),QChar(0x60C));
-  safe.insert(QChar('-'),QChar(0x0AD));
-  safe.insert(QChar(';'),QChar(0x61b));
-  safe.insert(QChar('?'),QChar(0x60f));
-  safe.insert(QChar('P'),QChar(0x67E));
-  safe.insert(QChar('J'),QChar(0x686));
-  safe.insert(QChar('B'),QChar(0x6A4));
-  safe.insert(QChar('G'),QChar(0x6AF));
+  QRegularExpression crx("Reliance");
 
-  QString t("fataHa");
-  QString ot;
-  for(int i=0;i < t.length();i++) {
-    if (safe.contains(t.at(i))) {
-      ot.append(safe.value(t.at(i)));
-    }
-    else {
-      ot.append(t.at(i));
-    }
-  }
-  qDebug() << ot;
-  QRegularExpression rx("[\u0600-\u06ff]+"); // seems to work but the backslashes
-  //QRegularExpression rx("[0x0600-0x06ff]+");
-  QRegularExpression en("[a-zA-Z]+");
-  QStringList tests;
-  tests << QString("termed خبب. (TA");
-  tests << "english test";
-  tests << QString(" خبب.");
-  tests << QString("خبب");
-  tests << QString("خَبَب");
-  bool ok;
-  QString tee("0074");
-  qDebug() << QString("%1").arg(QChar(tee.toInt(&ok,16)));
+  QTextDocument doc;
+  doc.setPlainText("This is reliance");
+  QTextCursor c = doc.find(crx,0);
+  qDebug() << "Find case mismatch" <<  c.position();
+  crx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+  c = doc.find(crx,0);
+  qDebug() << "Find case insensitive" << c.position();
 
-  qDebug() << rx.isValid() << rx.pattern();
-
-  for (int i=0;i < tests.length();i++) {
-    qDebug() << "Check rx" << tests[i] << rx.match(tests[i]).hasMatch() << en.match(tests[i]).hasMatch();
-  }
-  QRegularExpression dx("خ[\u064e\u064f\u0650]*ب");
-  qDebug() << "diacritic test :true" << dx.match(tests[tests.size() - 1]).hasMatch() << dx.pattern();
-  QString r = tests[tests.size() - 1];
-
-  TextSearch ts;
-  QRegularExpression q = ts.buildRx(r,true,false,false);
-  qDebug() << "buildRx" << q.isValid() << q.pattern();
-  QString src("it is termed خبب. (TA");
-  qDebug() << q.match(src).hasMatch();
   return;
 
-  if (fileName.length() == 0) {
-    fileName = "test_node.html";
-  }
-  QString css;
-  QFile f("test.css");
-  if (f.open(QIODevice::ReadOnly)) {
-    QTextStream in(&f);
-    css = in.readAll();
-    f.close();
-  }
-  f.setFileName(fileName);
-  if (f.open(QIODevice::ReadOnly)) {
-    QTextStream in(&f);
-    QString txt = in.readAll();
-    qDebug() << css << "\n" << txt;
-    QTextDocument doc;
-    if (! css.isEmpty()) {
-      //      doc.setDefaultStyleSheet(css);
-    }
-    //    QFont font("Amiri");
-    //    doc.setDefaultFont(font);
-    doc.setHtml(txt);
-  }
 }
 int main(int argc, char *argv[])
 {
@@ -312,7 +204,7 @@ int main(int argc, char *argv[])
       fileName = posargs[0];
     }
 
-    //    test(fileName);
+    test(fileName);
     return 0;
   }
   TextSearch searcher;
@@ -327,7 +219,6 @@ int main(int argc, char *argv[])
     return 1;
   }
   support = new LaneSupport(resourcesDir);
-
   QSettings config(configFile.absoluteFilePath(),QSettings::IniFormat);
   config.beginGroup("System");
   QString currentTheme = config.value("Theme","default").toString();
@@ -425,7 +316,7 @@ int main(int argc, char *argv[])
   }
   searcher.setVerbose(verbose);
   searcher.m_separator = parser.value(separatorOption);
-  searcher.m_pattern = pattern;
+  //  searcher.m_pattern = pattern;
   if (parser.isSet(sizeOption)) {
     bool ok = true;
     QString v = parser.value(sizeOption);
@@ -441,38 +332,44 @@ int main(int argc, char *argv[])
                      parser.isSet(wholeOption),
                      parser.isSet(diacriticsOption));
 
+  searcher.setNode(parser.value(nodeOption));
   QStringList nodes;
   QSqlQuery query;
-  SearchRunner * r = new SearchRunner;
-  searcher.setNode(parser.value(nodeOption));
-  if (verbose) {
-    QObject::connect(&searcher,SIGNAL(recordsRead(int)),r,SLOT(recordsRead(int)));
-  }
-  searcher.search();
-  delete r;
-  db.close();
+  if (! parser.isSet(guiOption)) {
+    SearchRunner * r = new SearchRunner;
 
-  bool fileOutput = false;
-  QFile of;
-  if (parser.isSet(outputOption)) {
-    searcher.toFile(parser.value(outputOption));
+    if (verbose) {
+      QObject::connect(&searcher,SIGNAL(recordsRead(int)),r,SLOT(recordsRead(int)));
+    }
+    searcher.search();
+    delete r;
+    QFile of;
+    if (parser.isSet(outputOption)) {
+      searcher.toFile(parser.value(outputOption));
+    }
+    else {
+      searcher.toFile();
+    }
+    searcher.setPages(10);
+    qDebug() << searcher.getPage(1,false);
+    //    searcher.dumpPages(false);
   }
   else {
-    searcher.toFile();
-  }
-  qDebug()  << searcher.getHits(2,10,true);
-  if (parser.isSet(guiOption)) {
-
-  }
-  qDebug()  << searcher.getHits(2,10,false);
-  if (parser.isSet(guiOption)) {
-    TextSearchWidget * w = new TextSearchWidget(true);
-    w->load(searcher);
+    EnsearchWidget * w = new EnsearchWidget;
+    w->setPadding(20);
+    w->setFields("RHOPNTV");
+    w->setSearch(pattern,
+                 parser.isSet(regexOption),
+                 parser.isSet(caseOption),
+                 parser.isSet(wholeOption),
+                 parser.isSet(diacriticsOption));
+    w->search();
     w->show();
     app.exec();
   }
   if (support != 0) {
     delete support;
   }
+  db.close();
   return 0;
 }

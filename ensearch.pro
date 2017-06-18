@@ -7,11 +7,9 @@ QT       += core sql xml gui widgets printsupport
 CONFIG   += debug
 CONFIG   += libxslt
 CONFIG   += gui
-gui {
-TARGET = ensearch-gui
-} else {
+
 TARGET = ensearch
-}
+
 TEMPLATE = app
 QMAKE_CXXFLAGS += -pthread -Wunused-parameter -g
 DEFINES += USE_LIBXSLT
@@ -50,16 +48,18 @@ lanesupport.h
 # following sources are for GUI
 #
 gui {
-SOURCES += textsearchwidget.cpp \
-columnartablewidget.cpp \
+SOURCES += columnartablewidget.cpp \
 columnselectdialog.cpp \
 exportsearchdialog.cpp \
-centeredcheckbox.cpp
+centeredcheckbox.cpp \
+textsearchwidget.cpp \
+ensearchwidget.cpp
 
 HEADERS += columnartablewidget.h \
 columnselectdialog.h \
 exportsearchdialog.h \
 centeredcheckbox.h \
-textsearchwidget.h
+textsearchwidget.h \
+ensearchwidget.h
 
 }

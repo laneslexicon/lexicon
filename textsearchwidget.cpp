@@ -13,17 +13,42 @@
 #define VOL_COLUMN 5
 #define CONTEXT_COLUMN 6
 extern LaneSupport * getSupport();
-TextSearchWidget::TextSearchWidget(bool summary,QWidget * parent) : QWidget(parent) {
+TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) : QWidget(parent) {
   QStringList headings;
   headings << tr("Mark") << tr("Root") << tr("Headword") << tr("Node") << tr("Occurs")  << tr("Vol/Page") << tr("Context");
   if (! summary) {
     headings[POSITION_COLUMN] = tr("Position");
   }
   m_summary = summary;
+  m_pageSize = pageSize;
   m_results = new ColumnarTableWidget(headings,this);
   QVBoxLayout * layout = new QVBoxLayout;
   layout->addWidget(m_results);
+  m_page = new QComboBox(this);
+  connect(m_page,SIGNAL(currentIndexChanged(const QString &)),this,SLOT(pageChanged(const QString &)));
+  QHBoxLayout * hlayout = new QHBoxLayout;
+  hlayout->addWidget(new QLabel(tr("Page")));
+  hlayout->addWidget(m_page);
+  hlayout->addStretch();
+  layout->addLayout(hlayout);
+  m_results->setRowCount(pageSize);
   setLayout(layout);
+  m_data = new TextSearch();
+  m_data->setXsltFileName(getSupport()->xsltFileName());
+}
+TextSearch * TextSearchWidget::searcher() {
+  return m_data;
+}
+void TextSearchWidget::setPages(int pages) {
+  m_page->blockSignals(true);
+  m_page->clear();
+  for(int i=0;i < pages;i++) {
+    m_page->addItem(QString("%1").arg(i+1));
+  }
+  if (pages > 0) {
+    m_page->setCurrentIndex(0);
+  }
+  m_page->blockSignals(false);
 }
 void TextSearchWidget::load(const TextSearch & data) {
   int rows = data.rows(m_summary);
@@ -31,6 +56,22 @@ void TextSearchWidget::load(const TextSearch & data) {
   for(int i=0;i < d.size();i++) {
     Place p = Place::fromSearchHit(d[i]);
     addRow(p,d[i].fragment,d[i].ix);
+  }
+}
+void TextSearchWidget::loadPage(int page) {
+  m_results->setRowCount(0);
+  //  int rows = data.rows(m_summary);
+  QList<SearchHit> d = m_data->getPage(page,m_summary);
+  for(int i=0;i < d.size();i++) {
+    Place p = Place::fromSearchHit(d[i]);
+    addRow(p,d[i].fragment,d[i].ix);
+  }
+}
+void TextSearchWidget::pageChanged(const QString & page) {
+  bool ok;
+  int p = page.toInt(&ok,10);
+  if (ok) {
+    this->loadPage(p);
   }
 }
 int TextSearchWidget::addRow(const Place & p, const QString & text,int pos) {

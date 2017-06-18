@@ -284,7 +284,7 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString /* head */,QString
   QMap<int,QString> results;
   //  QTextDocument doc(xml);
   //  int cnt = doc.characterCount();
-  bool regex = (m_rx.pattern().length() > 0);
+  //  bool regex = (m_rx.pattern().length() > 0);
 
   xml = QString("<word>%1</word>").arg(xml);
 
@@ -308,9 +308,6 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString /* head */,QString
   doc.setHtml(QString(html.toUtf8()));
 
 
-  //  QTextCursor xc = xdoc.find("camel");
-  //  if (! xc.isNull() && c.isNull()) {
-  //    qDebug() << "find in xml, not in html";
   int fc = 0;
   QTextDocument::FindFlags f;
   if (m_caseSensitive) {
@@ -323,8 +320,8 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString /* head */,QString
     //    qDebug() << doc.toHtml();
   }
   QTextCursor c;
-  if (regex) {
-    c = doc.find(m_rx,0);
+  if (m_regex) {
+    c = doc.find(m_rx,0,f);
   }
   else {
     c = doc.find(m_pattern,0,f);
@@ -353,8 +350,8 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString /* head */,QString
     fragment.remove(QChar(0x200e));
 
     results[c.selectionStart()] = fragment;
-    if (regex) {
-      c = doc.find(m_rx,c.selectionEnd());
+    if (m_regex) {
+      c = doc.find(m_rx,c.selectionEnd(),f);
     }
     else {
       c = doc.find(m_pattern,c.selectionEnd(),f);
@@ -539,6 +536,7 @@ void TextSearch::searchAll() {
     CERR << qPrintable(QString("SQL error %1 , %2").arg(SQL_ALL_ENTRIES).arg(err)) << ENDL;
     return;
   }
+  qDebug() << Q_FUNC_INFO << m_rx.pattern() << m_pattern;
   int readCount = 0;
   int findCount = 0;
   bool finished = false;
@@ -664,6 +662,7 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
   QString pattern = p;
 
   if (! regex) {
+    m_pattern = pattern;
     QRegularExpression rx("[\u0600-\u06ff]+");
     if (rx.match(pattern).hasMatch()) { // text contains arabic
       if (diacritics) {
@@ -671,33 +670,36 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
         m_rx = buildRx(pattern,diacritics,wholeWord,caseSensitive);
         if (m_verbose) {
           CERR << "Arabic regex search (forced by diacritics):" << ENDL;
-          CERR << qPrintable(m_rx.pattern()) << ENDL;
-          qDebug() << m_rx.pattern();
         }
         m_regex = true;
       }
       else {
-        if (m_verbose) {
-          CERR << "Text search (including Arabic)" << ENDL;
-        }
       }
     }
     else {
-        if (m_verbose) {
-          CERR << "Plain text search" << ENDL;
-        }
     }
   }
   else {    // doing a regex search so just set the pattern
-    m_pattern = pattern;
+    //    m_pattern = pattern;
     m_rx.setPattern(pattern);
-    if (m_verbose) {
-      CERR << "Regex search" << ENDL;
-    }
+  }
+  if (m_regex && ! caseSensitive) {
+    m_rx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   }
   if (! m_rx.isValid()) {
     CERR << qPrintable(m_rx.pattern()) << ENDL;
     CERR << qPrintable(QString("Invalid regular expression: %1").arg(m_rx.errorString())) << ENDL;
+  }
+  if (m_verbose) {
+    CERR << qPrintable(QString("Regex search                   :%1").arg(m_regex)) << ENDL;
+    CERR << qPrintable(QString("Case sensitive                 :%1").arg(m_caseSensitive)) << ENDL;
+    CERR << qPrintable(QString("Whole word match               :%1").arg(m_wholeWord)) << ENDL;
+    CERR << qPrintable(QString("Ignore diacritics              :%1").arg(m_diacritics)) << ENDL;
+    CERR << qPrintable(QString("Pattern                        :%1").arg(m_pattern)) << ENDL;
+    CERR << qPrintable(QString("Regex pattern                  :%1").arg(m_rx.pattern())) << ENDL;
+    CERR << qPrintable(QString("Regex case insensitive  option :%1").arg(m_rx.patternOptions() && QRegularExpression::CaseInsensitiveOption)) << ENDL;
+
+
   }
 }
 
@@ -860,13 +862,13 @@ QList<SearchHit> TextSearch::getPage(int page,bool summary) const {
 }
 void TextSearch::dumpPages(bool summary) {
   if (! summary) {
-    qDebug() << "Full Pages" << m_fullPages.size();
-    qDebug() << m_fullPages;
+    qDebug() << "Pages (non-summary)" << m_fullPages.size();
+    //    qDebug() << m_fullPages;
     int ix = 0;
     for(int i=0;i < m_fullPages.size();i++) {
       QList<SearchHit> hits = getPage(i+1,summary);
       for(int j=0;j < hits.size();j++) {
-        qDebug() << QString("[%1] %2 %3").arg(ix).arg(i).arg(j) << hits[j];
+        qDebug() << QString("[%1] Page %2-%3").arg(ix,4).arg(i+1).arg(j,2,10,QChar('0')) << hits[j];
         ix++;
       }
       qDebug() << "--------------------------------------------";

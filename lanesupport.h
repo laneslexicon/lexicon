@@ -10,8 +10,9 @@ class LaneSupport : public QObject {
   QString scanAndSpan(const QString & str,const QString & css);
   QString spanArabic(const QString & ar,const QString & spanstyle);
   QString scanAndStyle(const QString & str,const QString & spanstyle);
-  QString getResourceFilePath(int type, const QString & name = QString());
+  QString getResourceFilePath(int type, const QString & name = QString()) const;
   QString settingsFileName() const;
+  QString xsltFileName() const;
   bool startsWithArabic(const QString & txt) const;
 enum Resource { Stylesheet, Image,XSLT,Keyboard,Map,Splash,ThemeRoot,Log};
   QString logFilePath() const;
