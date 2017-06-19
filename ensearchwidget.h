@@ -12,7 +12,7 @@ class EnsearchWidget : public QWidget {
   Q_OBJECT
 
  public:
-  EnsearchWidget(QWidget * parent = 0);
+  EnsearchWidget(int rows = 10,QWidget * parent = 0);
   QSize sizeHint() const;
   void search();
   void setSearch(const QString & pattern,bool regex,bool caseSensitive,bool wholeWord,bool diacritics);
@@ -20,6 +20,7 @@ class EnsearchWidget : public QWidget {
   void setPadding(int);
   void setNode(const QString & n);
  private:
+  int m_pageSize;
   TextSearchWidget * m_search;
   QLabel * m_summary;
   QPushButton * m_quit;

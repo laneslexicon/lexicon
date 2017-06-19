@@ -55,6 +55,9 @@ void TextSearchWidget::setPages(int pages) {
   if (pages > 0) {
     m_page->setCurrentIndex(0);
   }
+  if (pages == 1) {
+    m_page->setEnabled(false);
+  }
   m_page->blockSignals(false);
 }
 void TextSearchWidget::load(const TextSearch & data) {

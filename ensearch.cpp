@@ -169,8 +169,8 @@ QString arbInput(QString & str) {
 }
 int main(int argc, char *argv[])
 {
-
-
+  QString str;
+  bool ok;
   bool verbose;
   QApplication app(argc,argv);
   QString settingsFile("Resources/themes/default/settings.ini");
@@ -234,6 +234,10 @@ int main(int argc, char *argv[])
   //
   QCommandLineOption guiOption(QStringList() <<"g" << "gui",QObject::tr("Show graphical interface"));
   parser.addOption(guiOption);
+
+  QCommandLineOption listOption(QStringList() <<"l" << "list-size",QObject::tr("Table rows for graphical interface"),"rows");
+  listOption.setDefaultValue("10");
+  parser.addOption(listOption);
 
 
   QCommandLineOption fieldOption(QStringList() <<"f" << "fields",QObject::tr("Specify output information: R(oot), H(ead word, N(ode), O(ffset),P(age), T(ext), V(olume). Defaults to all.)"),"RHNOTVP");
@@ -368,7 +372,7 @@ int main(int argc, char *argv[])
   int padding = 30;
   //  searcher.m_pattern = pattern;
   if (parser.isSet(sizeOption)) {
-    bool ok = true;
+
     QString v = parser.value(sizeOption);
     int sz  = v.toInt(&ok);
     if (ok) {
@@ -387,6 +391,15 @@ int main(int argc, char *argv[])
   searcher.setNode(parser.value(nodeOption));
   QStringList nodes;
   QSqlQuery query;
+  int rows = 0;
+
+  str = parser.value(listOption);
+
+  rows = str.toInt(&ok,10);
+  if (! ok ) {
+    rows = 10;
+  }
+
   if (! parser.isSet(guiOption)) {
     SearchRunner * r = new SearchRunner;
 
@@ -402,12 +415,13 @@ int main(int argc, char *argv[])
     else {
       searcher.toFile();
     }
-    searcher.setPages(10);
+    searcher.setPages(rows);
     qDebug() << searcher.getPage(1,false);
     //    searcher.dumpPages(false);
   }
   else {
-    EnsearchWidget * w = new EnsearchWidget;
+    qDebug() << rows;
+    EnsearchWidget * w = new EnsearchWidget(rows);
     w->setPadding(padding);
     w->setFields("RHOPNTV");
     w->setNode(parser.value(nodeOption));

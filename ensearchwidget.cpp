@@ -2,8 +2,9 @@
 #include "textsearchwidget.h"
 #include "textsearch.h"
 
-EnsearchWidget::EnsearchWidget(QWidget * parent) : QWidget(parent) {
-  m_search = new TextSearchWidget(10,false);
+EnsearchWidget::EnsearchWidget(int rows,QWidget * parent) : QWidget(parent) {
+  m_search = new TextSearchWidget(rows,false);
+  m_pageSize = rows;
   setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
   QVBoxLayout * layout = new QVBoxLayout;
   layout->addWidget(m_search);
@@ -28,7 +29,7 @@ QSize EnsearchWidget::sizeHint() const {
 }
 void EnsearchWidget::search() {
   m_search->searcher()->search();
-  QPair<int,int> pages = m_search->searcher()->setPages(10);
+  QPair<int,int> pages = m_search->searcher()->setPages(m_pageSize);
 
   m_search->setPages(pages.second);
   m_search->loadPage(1);
