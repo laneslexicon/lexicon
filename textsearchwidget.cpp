@@ -5,6 +5,8 @@
 #include "textsearch.h"
 #include "centeredcheckbox.h"
 #include "place.h"
+#include "definedsettings.h"
+#include "externs.h"
 #define SELECT_COLUMN 0
 #define ROOT_COLUMN 1
 #define HEAD_COLUMN 2
@@ -15,13 +17,18 @@
 extern LaneSupport * getSupport();
 TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) : QWidget(parent) {
   QStringList headings;
-  headings << tr("Mark") << tr("Root") << tr("Headword") << tr("Node") << tr("Occurs")  << tr("Vol/Page") << tr("Context");
+  headings << tr("Mark") << tr("Root") << tr("Headword") << tr(" Node ") << tr("Occurs")  << tr("Vol/Page") << tr("Context");
   if (! summary) {
     headings[POSITION_COLUMN] = tr("Position");
   }
+  readSettings();
   m_summary = summary;
   m_pageSize = pageSize;
   m_results = new ColumnarTableWidget(headings,this);
+  m_results->setFixedRowHeight(m_rowHeight);
+  m_results->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_results->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_results->setMarkColumn(SELECT_COLUMN);
   QVBoxLayout * layout = new QVBoxLayout;
   layout->addWidget(m_results);
   m_page = new QComboBox(this);
@@ -65,6 +72,13 @@ void TextSearchWidget::loadPage(int page) {
   for(int i=0;i < d.size();i++) {
     Place p = Place::fromSearchHit(d[i]);
     addRow(p,d[i].fragment,d[i].ix);
+  }
+  m_results->resizeColumnToContents(SELECT_COLUMN);
+  m_results->resizeColumnToContents(NODE_COLUMN);
+  m_results->resizeColumnToContents(POSITION_COLUMN);
+  m_results->resizeColumnToContents(CONTEXT_COLUMN);
+  if (m_resizeRows) {
+    m_results->resizeRowsToContents();
   }
 }
 void TextSearchWidget::pageChanged(const QString & page) {
@@ -121,4 +135,18 @@ int TextSearchWidget::addRow(const Place & p, const QString & text,int pos) {
   m_results->setCellWidget(row,VOL_COLUMN,label);
 
   return row;
+}
+void TextSearchWidget::readSettings() {
+  SETTINGS
+
+  settings.beginGroup("FullSearch");
+  m_contextStyle = settings.value(SID_FULLSEARCH_CONTEXT_STYLE,QString()).toString();
+  //  m_singleRow = settings.value(SID_FULLSEARCH_ONE_ROW,true).toBool();
+  QString f = settings.value(SID_FULLSEARCH_RESULTS_FONT,QString()).toString();
+  if (! f.isEmpty()) {
+    //    m_resultsFont.fromString(f);
+  }
+  m_resizeRows = settings.value(SID_FULLSEARCH_RESIZE_ROWS,true).toBool();
+  m_rowHeight  = settings.value(SID_FULLSEARCH_ROW_HEIGHT,40).toInt();;
+
 }

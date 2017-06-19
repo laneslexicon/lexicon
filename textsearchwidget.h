@@ -15,6 +15,7 @@ class TextSearchWidget : public QWidget {
   void loadPage(int page);
   void setPages(int);
   TextSearch * searcher();
+  void readSettings();
  private:
   TextSearch * m_data;
   bool m_summary;
@@ -23,6 +24,9 @@ class TextSearchWidget : public QWidget {
   int addRow(const Place & p, const QString & text,int pos);
   int m_pageSize;
   QComboBox * m_page;
+  bool m_resizeRows;
+  int m_rowHeight;
+  int m_stepCount;
   private slots:
     void pageChanged(const QString &);
 

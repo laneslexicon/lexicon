@@ -4,6 +4,7 @@
 #include <QSettings>
 #include <QFont>
 #include <QDir>
+#include <QDebug>
 class LaneSupport : public QObject {
  public:
   LaneSupport(const QString & fileName);

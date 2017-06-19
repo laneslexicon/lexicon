@@ -91,6 +91,8 @@ class TextSearch : public QObject {
   QString m_separator;
   QList<SearchHit> getHits(int start,int sz,bool summary = false) const;
   QList<SearchHit> getPage(int page,bool summary) const;
+  QString buckwalterCharacters();
+
   int rows(bool summary) const;
   QPair<int,int> setPages(int pagesize);
   void dumpPages(bool);

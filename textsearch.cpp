@@ -134,6 +134,14 @@ TextSearch::TextSearch() {
 
 
 }
+QString TextSearch::buckwalterCharacters() {
+  QString v;
+  QList<QChar> k = m_safe.keys();
+  for(int i=0;i < k.size();i++) {
+    v.append(k[i]);
+  }
+  return v;
+}
 void TextSearch::setVerbose(bool v) {
   m_verbose = v;
 }
@@ -536,7 +544,7 @@ void TextSearch::searchAll() {
     CERR << qPrintable(QString("SQL error %1 , %2").arg(SQL_ALL_ENTRIES).arg(err)) << ENDL;
     return;
   }
-  qDebug() << Q_FUNC_INFO << m_rx.pattern() << m_pattern;
+
   int readCount = 0;
   int findCount = 0;
   bool finished = false;
@@ -586,7 +594,7 @@ void TextSearch::searchNodes() {
     //query.prepare(SQL_FIND_ENTRY_DETAILS);
     query.bindValue(0,m_nodes[i]);
     if (! query.exec()) {
-      qDebug() << "node query" << query.lastError();
+      CERR  << qPrintable("node query error:") << qPrintable(query.lastError().text());
       finished = true;
     }
     else {
@@ -642,7 +650,7 @@ QString TextSearch::summary() const {
   }
   QString t = QString("%1 search for \"%2\" - %3 occurrence%4 in %5 entr%6")
     .arg(m_regex ? "Regex" : "Text")
-    .arg(m_pattern)
+    .arg(m_regex ? m_rx.pattern() : m_pattern)
     .arg(findCount)
     .arg(findCount == 1 ? "" : "s")
     .arg(entryCount).arg(entryCount == 1 ? "y" : "ies");
@@ -798,8 +806,6 @@ QPair<int,int> TextSearch::setPages(int sz) {
       j++;
     }
   }
-  //  qDebug() << m_summaryPages;
-  //  qDebug() << m_fullPages;
   return qMakePair(m_summaryPages.size(),m_fullPages.size());
 }
 
@@ -812,7 +818,6 @@ QList<SearchHit> TextSearch::getPage(int page,bool summary) const {
     QPair<int,int> ix = m_summaryPages.value(page);
     int offset = ix.first;
     int pageSize = ix.second;
-    //    qDebug() << Q_FUNC_INFO << page  << offset << pageSize;
     int c = pageSize;
     for(int i = offset;c > 0;i++) {
       SearchHit h;
@@ -834,7 +839,7 @@ QList<SearchHit> TextSearch::getPage(int page,bool summary) const {
   QPair<int,int> ix = m_fullPages.value(page);
   int entryIx  = ix.first;
   int fragmentIx = ix.second;
-  //  qDebug() << "page" << page << entryIx << fragmentIx;
+
   bool ok = false;
   for(int i = entryIx;(i < m_results.size()) && (ret.size() < m_pageSize);i++) {
     int j = 0;

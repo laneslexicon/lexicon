@@ -13,7 +13,8 @@ LaneSupport::LaneSupport(const QString & resourcesDir) {
     sd.setFile(sd.absoluteFilePath(),currentTheme);
     QFileInfo si(sd.absoluteFilePath(),"settings.ini");
     if (si.exists()) {
-      m_settings = new QSettings(si.absolutePath(), QSettings::IniFormat);
+      m_settings = new QSettings(si.absoluteFilePath(), QSettings::IniFormat);
+      m_settings->setIniCodec("UTF-8");
       m_settingsDir = si.dir();
     }
   }
@@ -29,7 +30,7 @@ LaneSupport::~LaneSupport() {
   if (m_config != 0) {
     delete m_config;
   }
-  std::cerr << "Delete LaneSupport" << std::endl;
+  //  std::cerr << "Delete LaneSupport" << std::endl;
 }
 QString LaneSupport::settingsFileName() const {
   return m_settings->fileName();
@@ -113,6 +114,9 @@ QString LaneSupport::spanArabic(const QString & ar,const QString & spanstyle) {
   QString fontFamily;
   int fontSize = 10;
   QString style;
+  while(! m_settings->group().isEmpty()) {
+    m_settings->endGroup();
+  }
 
   if ( ! spanstyle.isEmpty() ) {
     m_settings->beginGroup("SpannedText");
@@ -159,9 +163,12 @@ QString LaneSupport::scanAndStyle(const QString & str,const QString & spanstyle)
   QString fontFamily;
   int fontSize = 10;
   QString style;
-
+  while(! m_settings->group().isEmpty()) {
+    m_settings->endGroup();
+  }
   if ( ! spanstyle.isEmpty() ) {
     m_settings->beginGroup("SpannedText");
+
     m_settings->beginGroup("Arabic");
     style = m_settings->value(spanstyle,QString()).toString();
     m_settings->endGroup();
@@ -331,6 +338,9 @@ bool LaneSupport::startsWithArabic(const QString & txt) const {
 }
 QString LaneSupport::xsltFileName() const {
   QString fileName;
+  while(! m_settings->group().isEmpty()) {
+    m_settings->endGroup();
+  }
   m_settings->beginGroup("XSLT");
   fileName = m_settings->value(SID_XSLT_ENTRY,QString("entry.xslt")).toString();
   if (fileName.isEmpty()) {

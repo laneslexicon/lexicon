@@ -223,6 +223,7 @@ int main(int argc, char *argv[])
   parser.addOption(dbOption);
 
   QCommandLineOption sizeOption(QStringList() <<"z" << "size",QObject::tr("Show number of characters to the left and right of search hit"),"number");
+  sizeOption.setDefaultValue("30");
   parser.addOption(sizeOption);
 
   QCommandLineOption buckOption(QStringList() <<"i" << "buckwalter-input",QObject::tr("Buckwalter safe input"));
@@ -364,15 +365,18 @@ int main(int argc, char *argv[])
   }
   searcher.setVerbose(verbose);
   searcher.m_separator = parser.value(separatorOption);
+  int padding = 30;
   //  searcher.m_pattern = pattern;
   if (parser.isSet(sizeOption)) {
     bool ok = true;
     QString v = parser.value(sizeOption);
-    int sz = v.toInt(&ok);
+    int sz  = v.toInt(&ok);
     if (ok) {
-      searcher.setPadding(sz);
+      padding = sz;
+      searcher.setPadding(padding);
     }
   }
+
   searcher.setFields(parser.value(fieldOption));
   searcher.setSearch(pattern,
                      parser.isSet(regexOption),
@@ -404,8 +408,9 @@ int main(int argc, char *argv[])
   }
   else {
     EnsearchWidget * w = new EnsearchWidget;
-    w->setPadding(20);
+    w->setPadding(padding);
     w->setFields("RHOPNTV");
+    w->setNode(parser.value(nodeOption));
     w->setSearch(pattern,
                  parser.isSet(regexOption),
                  parser.isSet(caseOption),
