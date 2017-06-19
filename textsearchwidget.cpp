@@ -80,6 +80,20 @@ void TextSearchWidget::loadPage(int page) {
   if (m_resizeRows) {
     m_results->resizeRowsToContents();
   }
+  m_currentPage = page;
+  // new restore the marks
+  if (m_marks.contains(page)) {
+    QSet<int> s = m_marks.value(page);
+    QSetIterator<int> iter(m_marks.value(page));
+    int row;
+    while(iter.hasNext()) {
+      row = iter.next();
+      CenteredCheckBox * cb = qobject_cast<CenteredCheckBox *>(m_results->cellWidget(row,SELECT_COLUMN));
+      if (cb) {
+        cb->setChecked(true);
+      }
+    }
+  }
 }
 void TextSearchWidget::pageChanged(const QString & page) {
   bool ok;
@@ -95,8 +109,10 @@ int TextSearchWidget::addRow(const Place & p, const QString & text,int pos) {
 
   int row = m_results->rowCount();
   m_results->insertRow(row);
-
-  m_results->setCellWidget(row,SELECT_COLUMN,new CenteredCheckBox);
+  CenteredCheckBox * cb = new CenteredCheckBox;
+  cb->setRow(row);
+  m_results->setCellWidget(row,SELECT_COLUMN,cb);
+  connect(cb,SIGNAL(stateChanged(int)),this,SLOT(rowMarked(int)));
 
   label = new QLabel(getSupport()->scanAndStyle(p.root(),"fullsearchlist"));
   label->setAlignment(Qt::AlignCenter);
@@ -135,6 +151,27 @@ int TextSearchWidget::addRow(const Place & p, const QString & text,int pos) {
   m_results->setCellWidget(row,VOL_COLUMN,label);
 
   return row;
+}
+void TextSearchWidget::rowMarked(int state) {
+   CenteredCheckBox * cb = qobject_cast<CenteredCheckBox *>(sender());
+   QSet<int> s;
+   if (cb) {
+     int row = cb->row();
+     if (state == Qt::Checked) {
+       if (m_marks.contains(m_currentPage)) {
+         s  = m_marks.value(m_currentPage);
+       }
+       s.insert(row);
+       m_marks.insert(m_currentPage,s);
+     }
+     else {
+       if (m_marks.contains(m_currentPage)) {
+         s  = m_marks.value(m_currentPage);
+       }
+       s.remove(row);
+       m_marks.insert(m_currentPage,s);
+     }
+   }
 }
 void TextSearchWidget::readSettings() {
   SETTINGS
