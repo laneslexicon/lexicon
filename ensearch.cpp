@@ -88,7 +88,7 @@ void testSplit(const QString & txt) {
   qDebug() << QString("%1 : [%2]").arg(txt.size()).arg(txt);
   qDebug() << "words" << words;
 }
-void test(QString & fileName) {
+void test(QString & str) {
   /*
   TextSearch searcher;
   QList<QChar> dc;
@@ -109,17 +109,62 @@ void test(QString & fileName) {
   testSplit("graeme");
   testSplit("برتن");
   */
-  QRegularExpression crx("Reliance");
 
-  QTextDocument doc;
-  doc.setPlainText("This is reliance");
-  QTextCursor c = doc.find(crx,0);
-  qDebug() << "Find case mismatch" <<  c.position();
-  crx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
-  c = doc.find(crx,0);
-  qDebug() << "Find case insensitive" << c.position();
 
+  TextSearch t;
+  QString bc = t.buckwalterCharacters();
+  QString pattern("\\\\arb{([" + bc + "]+)}");
+  //  QString pp = QRegularExpression::escape(pattern);
+  //  QRegularExpression rx("\\\\arb");//rb{[" + bc + "]+}");
+  QRegularExpression rx(pattern);
+  qDebug() << "input" << str << str.length();
+  qDebug() << "pattern" << rx.pattern() << rx.pattern().length();
+  qDebug() << "match" << rx.match(str).hasMatch();
+  int pos = 0;
+  QRegularExpressionMatch m = rx.match(str,pos);
+  QList<QStringList> matches;
+  while(m.hasMatch()) {
+    matches << m.capturedTexts();
+    pos = m.capturedEnd(0) + 1;
+    m = rx.match(str,pos);
+  }
+  QString ostr = str;
+  for(int i=0;i < matches.size();i++) {
+    if (matches[i].size() == 2) {
+      ostr.replace(matches[i][0],t.fromSafe(matches[i][1]));
+    }
+  }
+  qDebug() << ostr;
   return;
+
+}
+/*
+convert and \arb{...} sequences to their Buckwalter safe equivalent
+ */
+QString arbInput(QString & str) {
+  TextSearch t;
+  QString bc = t.buckwalterCharacters();
+  QString pattern("\\\\arb{([" + bc + "]+)}");
+  QRegularExpression rx(pattern);
+  //  qDebug() << "input" << str << str.length();
+  //  qDebug() << "pattern" << rx.pattern() << rx.pattern().length();
+  //  qDebug() << "match" << rx.match(str).hasMatch();
+  int pos = 0;
+  QRegularExpressionMatch m = rx.match(str,pos);
+  QList<QStringList> matches;
+  while(m.hasMatch()) {
+    matches << m.capturedTexts();
+    pos = m.capturedEnd(0) + 1;
+    m = rx.match(str,pos);
+  }
+  QString ostr = str;
+  for(int i=0;i < matches.size();i++) {
+    if (matches[i].size() == 2) {
+      ostr.replace(matches[i][0],t.fromSafe(matches[i][1]));
+    }
+  }
+  //  qDebug() << ostr;
+  return ostr;
 
 }
 int main(int argc, char *argv[])
@@ -198,15 +243,6 @@ int main(int argc, char *argv[])
   parser.process(app);
   QStringList posargs = parser.positionalArguments();
 
-  if (parser.isSet(testOption)) {
-    QString fileName;
-    if (posargs.size() > 0) {
-      fileName = posargs[0];
-    }
-
-    test(fileName);
-    return 0;
-  }
   TextSearch searcher;
 
   QString resourcesDir = parser.value(resourcesOption);
@@ -219,6 +255,16 @@ int main(int argc, char *argv[])
     return 1;
   }
   support = new LaneSupport(resourcesDir);
+  if (parser.isSet(testOption)) {
+    QString fileName;
+    if (posargs.size() > 0) {
+      fileName = posargs[0];
+    }
+
+    test(fileName);
+    return 0;
+  }
+  //
   QSettings config(configFile.absoluteFilePath(),QSettings::IniFormat);
   config.beginGroup("System");
   QString currentTheme = config.value("Theme","default").toString();
@@ -305,6 +351,8 @@ int main(int argc, char *argv[])
     QString t(pattern);
     pattern = searcher.fromSafe(pattern);
   }
+
+  pattern = arbInput(pattern);
   //  fi.setFile(parser.value(iniOption));
   //  if (fi.exists()) {
   //    searcher.setSettingsPath(fi.absoluteFilePath());
