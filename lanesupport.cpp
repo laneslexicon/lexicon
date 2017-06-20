@@ -148,6 +148,26 @@ QString LaneSupport::spanArabic(const QString & ar,const QString & spanstyle) {
     .arg(ar);
   return style;
 }
+/*
+Return the style attribute for the matching value in settings/SpannedText
+ */
+QString LaneSupport::getSpanStyle(const QString & spanstyle) {
+  QString fontFamily;
+  int fontSize = 10;
+  QString style;
+  while(! m_settings->group().isEmpty()) {
+    m_settings->endGroup();
+  }
+  if ( ! spanstyle.isEmpty() ) {
+    m_settings->beginGroup("SpannedText");
+
+    m_settings->beginGroup("Arabic");
+    style = m_settings->value(spanstyle,QString()).toString();
+    m_settings->endGroup();
+    m_settings->endGroup();
+  }
+  return style;
+}
 /**
  * This is for mixed language text and will wrap any Arabic in a <span>
  * with the style included in the "style" attribute.
