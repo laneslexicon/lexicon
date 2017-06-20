@@ -49,7 +49,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   m_normalSearch = new QRadioButton(tr("Normal"),m_typeGroup);
   m_regexSearch = new QRadioButton(tr("Regular expression"),m_typeGroup);
   m_ignoreCase = new QCheckBox(tr("Ignore case"));
-  ///
+  /*
     m_diacriticsText = new QLabel(tr("For Arabic text"));
     QFont f = m_diacriticsText->font();
     f.setItalic(true);
@@ -58,7 +58,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
     m_wholeText->setFont(f);
     m_caseText = new QLabel(tr("(For English text)"));
     m_caseText->setFont(f);
-
+  */
     m_headPhrase = new QCheckBox(tr("Search entry heading"));
   QHBoxLayout * typelayout = new QHBoxLayout;
   typelayout->addWidget(m_normalSearch);
@@ -97,13 +97,13 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   }
   else {
     gridlayout->addWidget(m_ignoreDiacritics,row,0);
-    gridlayout->addWidget(m_diacriticsText,row,1);
+    //    gridlayout->addWidget(m_diacriticsText,row,1);
     row++;
     gridlayout->addWidget(m_ignoreCase,row,0);
-    gridlayout->addWidget(m_caseText,row,1);
+    //    gridlayout->addWidget(m_caseText,row,1);
     row++;
     gridlayout->addWidget(m_wholeWordMatch,row,0);
-    gridlayout->addWidget(m_wholeText,row,1);
+    //    gridlayout->addWidget(m_wholeText,row,1);
   }
   row++;
   gridlayout->addWidget(m_newTab,row,0);
@@ -238,11 +238,11 @@ void SearchOptionsWidget::showMore(bool /* show */) {
     m_headPhrase->hide();
     m_forceLTR->hide();
     m_ignoreDiacritics->setEnabled(! m_regexSearch->isChecked());
-    m_ignoreCase->setEnabled(! m_regexSearch->isChecked());
+    m_ignoreCase->setEnabled(true);//! m_regexSearch->isChecked());
     m_wholeWordMatch->setEnabled(! m_regexSearch->isChecked());
-    m_caseText->setEnabled(! m_regexSearch->isChecked());
-    m_wholeText->setEnabled(! m_regexSearch->isChecked());
-    m_diacriticsText->setEnabled(! m_regexSearch->isChecked());
+    //    m_caseText->setEnabled(true); //! m_regexSearch->isChecked());
+    //    m_wholeText->setEnabled(! m_regexSearch->isChecked());
+    //    m_diacriticsText->setEnabled(! m_regexSearch->isChecked());
     break;
   }
   default :
