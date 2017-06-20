@@ -288,7 +288,7 @@ QList<QPair<QString,QString> > TextSearch::splitText(const QString & txt) {
   return texts;
 }
 
-QMap<int,QString> TextSearch::searchEntry(QString xml,QString /* head */,QString /* node */) {
+QMap<int,QString> TextSearch::searchEntry(QString xml) { //,QString /* head */,QString /* node */) {
   QMap<int,QString> results;
   //  QTextDocument doc(xml);
   //  int cnt = doc.characterCount();
@@ -366,6 +366,28 @@ QMap<int,QString> TextSearch::searchEntry(QString xml,QString /* head */,QString
     }
   }
   return results;
+}
+bool TextSearch::searchWord(const QString & word) {
+  QTextDocument doc;
+  doc.setPlainText(word);
+  QTextDocument::FindFlags f;
+  if (m_caseSensitive) {
+    f = QTextDocument::FindCaseSensitively;
+  }
+  if (m_wholeWord) {
+  f |= QTextDocument::FindWholeWords;
+  }
+  if (m_verbose) {
+    //    qDebug() << doc.toHtml();
+  }
+  QTextCursor c;
+  if (m_regex) {
+    c = doc.find(m_rx,0,f);
+  }
+  else {
+    c = doc.find(m_pattern,0,f);
+  }
+  return ! c.isNull();
 }
 /*
 void testSplit(const QString & txt) {
@@ -556,7 +578,7 @@ void TextSearch::searchAll() {
     QString head = query.value("word").toString();
 
     if (! node.startsWith("j")) {
-      ret = searchEntry(xml,head,node);
+      ret = searchEntry(xml);//,head,node);
       if (ret.size() > 0) {
         SearchResult r;
         r.node = query.value("nodeid").toString();
@@ -568,6 +590,68 @@ void TextSearch::searchAll() {
         r.fragments = ret;
         m_results << r;
         findCount++;
+      }
+    }
+    /*
+    if (maxFinds && (findCount > maxFinds)) {
+      finished = true;
+    }
+    if (maxReads && (readCount > maxReads)) {
+      finished = true;
+    }
+    */
+    if ((readCount % 1000) == 0) {
+      emit(recordsRead(readCount));
+    }
+  }
+}
+/**
+ * For single word arabic search, read xref entry first, then look up full entry on match
+ *
+ */
+void TextSearch::searchSingle() {
+  QSqlQuery query;
+  query.prepare(SQL_FIND_XREF_ENTRIES);
+  if (! query.exec()) {
+    QString err = query.lastError().text();
+    CERR << qPrintable(QString("SQL error %1 , %2").arg(SQL_FIND_XREF_ENTRIES).arg(err)) << ENDL;
+    return;
+  }
+  QSqlQuery nodeQuery;
+  if (! nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE)) {
+    QString err = nodeQuery.lastError().text();
+    CERR << qPrintable(QString("SQL error %1 , %2").arg(SQL_FIND_ENTRY_BY_NODE).arg(err)) << ENDL;
+    return;
+  }
+
+  int readCount = 0;
+  int findCount = 0;
+  bool finished = false;
+  QMap<int,QString> ret;
+  QSet<QString> nodes;
+  while (query.next() && ! finished) {
+    readCount++;
+    QString node  = query.value("node").toString();
+    if (! nodes.contains(node) && searchWord(query.value("word").toString())) {
+      nodeQuery.bindValue(0,node);
+      if ( nodeQuery.exec() &&  nodeQuery.first()) {
+        QString xml = nodeQuery.value("xml").toString();
+        if (! node.startsWith("j")) {
+          ret = searchEntry(xml);//,head,node);
+          nodes.insert(node);
+          if (ret.size() > 0) {
+            SearchResult r;
+            r.node = nodeQuery.value("nodeid").toString();
+            r.root = nodeQuery.value("root").toString().toUtf8();
+            r.head = nodeQuery.value("headword").toString().toUtf8();
+            Place p = Place::fromEntryRecord(nodeQuery.record());
+            r.vol = p.volume();
+            r.page = p.page();
+            r.fragments = ret;
+            m_results << r;
+            findCount++;
+          }
+        }
       }
     }
     /*
@@ -604,7 +688,7 @@ void TextSearch::searchNodes() {
         QString node = query.value("nodeid").toString();
         QString head = query.value("word").toString();
         if (! node.startsWith("j")) {
-          ret = searchEntry(xml,head,node);
+          ret = searchEntry(xml);//,head,node);
           if (ret.size() > 0) {
             SearchResult r;
             r.node = query.value("nodeid").toString();
@@ -634,7 +718,12 @@ void TextSearch::search() {
   QTime t;
   t.start();
   if (m_nodes.size() == 0) {
-    this->searchAll();
+    if (m_singleArabic) {
+      this->searchSingle();
+    }
+    else {
+      this->searchAll();
+    }
   }
   else {
     this->searchNodes();
@@ -691,6 +780,13 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     //    m_pattern = pattern;
     m_rx.setPattern(pattern);
   }
+  //
+  // test for a single word of Arabic so we can use the xref table
+  // later
+  //
+  QRegularExpression srx("^[\u0600-\u06ff]+$");
+  m_singleArabic = srx.match(p.trimmed()).hasMatch();
+
   if (m_regex && ! caseSensitive) {
     m_rx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   }

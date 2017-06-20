@@ -64,7 +64,8 @@ class TextSearch : public QObject {
   TextSearch();
   QString transform(int type,const QString & xsl,const QString & xml);
   QList<QPair<QString,QString> > splitText(const QString & txt);
-  QMap<int,QString> searchEntry(QString xml,QString headword,QString node = QString());
+  QMap<int,QString> searchEntry(QString xml);//,QString headword,QString node = QString());
+  bool searchWord(const QString &);
   QString getDiacritics(QList<QChar> & points);
   QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
   QString fixHtml(const QString & t);
@@ -79,6 +80,7 @@ class TextSearch : public QObject {
   void search();
   void searchAll();
   void searchNodes();
+  void searchSingle();
   void setVerbose(bool);
   void setNode(const QString & node);
   void setPadding(int);
@@ -109,6 +111,7 @@ class TextSearch : public QObject {
   int m_padding;
   bool m_diacritics;
   bool m_regex;
+  bool m_singleArabic;
   QString m_iniFileName; // do we need to keep these three?
   QString m_xsltFile;    //
   QString m_dbFile;      //

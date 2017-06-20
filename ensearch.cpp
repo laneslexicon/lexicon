@@ -89,33 +89,10 @@ void testSplit(const QString & txt) {
   qDebug() << "words" << words;
 }
 void test(QString & str) {
-  /*
-  TextSearch searcher;
-  QList<QChar> dc;
-
-  QString text("This is a test فتح for Graeme's crap code");
-  QRegularExpression rx = searcher.buildRx("فَتَح",true,true,true);
-  qDebug() << rx.pattern() << rx.isValid() << rx.match(text);
-  rx = searcher.buildRx("graeme",true,true,true);
-  qDebug() << rx.pattern() << rx.isValid() << rx.match(text);
-  rx = searcher.buildRx("graeme",true,true,false);
-  qDebug() << rx.pattern() << rx.isValid() << rx.match(text);
-  rx = searcher.buildRx("rap",true,true,true);
-  qDebug() << rx.pattern() << rx.isValid() << rx.match(text);
-  //  QString diacritics = QString("[\\x%1]*").arg(points.join("\\x"));
-  testSplit("graeme برتن is an idiot شَمس");
-  qDebug() << searcher.splitText("graeme برتن is an idiot شَمس");
-  testSplit("برتن is an idiot");
-  testSplit("graeme");
-  testSplit("برتن");
-  */
-
-
+  if (0) {
   TextSearch t;
   QString bc = t.buckwalterCharacters();
   QString pattern("\\\\arb{([" + bc + "]+)}");
-  //  QString pp = QRegularExpression::escape(pattern);
-  //  QRegularExpression rx("\\\\arb");//rb{[" + bc + "]+}");
   QRegularExpression rx(pattern);
   qDebug() << "input" << str << str.length();
   qDebug() << "pattern" << rx.pattern() << rx.pattern().length();
@@ -135,6 +112,18 @@ void test(QString & str) {
     }
   }
   qDebug() << ostr;
+  }
+  if (1) {
+    TextSearch t;
+    QStringList tests;
+    tests << "graeme" << "فتح" << "وجد و وصل" << "وجدSو وصل";
+    tests <<  t.fromSafe(str).trimmed();
+
+    QRegularExpression rx("^[\u0600-\u06ff]+$");
+    for(int i=0;i < tests.size();i++) {
+      qDebug() << tests[i] << "has match" << rx.match(tests[i]).hasMatch();
+    }
+  }
   return;
 
 }
