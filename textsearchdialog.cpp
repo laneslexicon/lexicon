@@ -52,6 +52,7 @@ TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidg
   m_prompt->setBuddy(m_edit);
 
   m_text = new QLabel;
+
   m_findButton = new QPushButton(tr("&Find"));
   m_findButton->setDefault(true);
 
@@ -301,6 +302,7 @@ void TextSearchDialog::onTextChanged(const QString & txt) {
     m_edit->setText(str);
     m_edit->blockSignals(false);
     m_text->setText(showText(txt));
+    //    m_text->setText(getSupport()->scanAndStyle(txt,"pageset"));
   }
   else {
     m_text->setText("");
@@ -362,14 +364,18 @@ QString TextSearchDialog::showText(const QString & txt) {
       css << "en";
     }
   }
-  // TODO set arabic font
-  QString html("<body>");
+  // embed the Arabic font info in the style attribute as QLabel does not
+  // support CSS classes
+  QString style = getSupport()->getSpanStyle("searchsummary");
+  QString html("<html><body>");
   for(int i=0;i < words.size();i++) {
-    html += QString("<span class=\"%1\">%2</span>").arg(css[i]).arg(words[i]);
+    if (css[i] == "ar") {
+      html += QString("<span style=\"%1\">%2</span>").arg(style).arg(words[i]);
+    }
+    else {
+      html += QString("<span style=\"%1\">%2</span>").arg(css[i]).arg(words[i]);
+    }
   }
-  html += "</html>";
-  qDebug() << html;
-  //  qDebug() << QString("%1 : [%2]").arg(txt.size()).arg(txt);
-  //  qDebug() << "words" << words;
+  html += "</body></html>";
   return html;
 }

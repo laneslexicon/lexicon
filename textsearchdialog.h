@@ -9,6 +9,7 @@
 #include <QGridLayout>
 #include <QDialogButtonBox>
 #include <QLabel>
+#include <QTextBrowser>
 #include "application.h"
 #include "imedit.h"
 #include "imlineedit.h"
@@ -51,6 +52,7 @@ class TextSearchDialog : public QDialog {
     QPushButton * m_findButton;
     QPushButton * m_keyboardButton;
     SearchOptionsWidget  * m_options;
+
  signals:
     void showHelp(const  QString &);
 };
