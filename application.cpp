@@ -1,8 +1,9 @@
 #include "application.h"
 #include "QsLog.h"
 #include "definedsettings.h"
+#include "lanesupport.h"
 #include "version.h"
-
+extern LaneSupport * support;
 Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   QString resourceDir;
   m_status = Lexicon::Ok;
@@ -22,7 +23,9 @@ Lexicon::Lexicon(int & argc, char ** argv) : QApplication(argc,argv) {
   //  if (fonts.exists()) {
   //    scanForFonts(fonts);
   //  }
-
+  if (support == 0) {
+    support = new LaneSupport(resourceDir);
+  }
   addLibraryPath(resourceDir + QDir::separator() + "lib");
 
   QCoreApplication::setOrganizationName("Gabanjo");

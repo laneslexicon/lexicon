@@ -10,6 +10,7 @@ extern void testfocus();
 extern Lexicon * getLexicon();
 extern LaneSupport * getSupport();
 #ifdef LANE
+
 #define SETTINGS   QSettings settings(getLexicon()->settingsFileName(),QSettings::IniFormat); \
   settings.setIniCodec("UTF-8");
 #else
