@@ -51,6 +51,11 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
 TextSearch * TextSearchWidget::searcher() {
   return m_data;
 }
+/*
+void TextSearchWidget::search() {
+  m_data->search();
+}
+*/
 void TextSearchWidget::setPages(int pages) {
   m_page->blockSignals(true);
   m_page->clear();
@@ -59,6 +64,12 @@ void TextSearchWidget::setPages(int pages) {
   }
   if (pages > 0) {
     m_page->setCurrentIndex(0);
+    m_page->setEnabled(true);
+    m_summaryTable->setEnabled(true);
+  }
+  else {
+    m_page->setEnabled(false);
+    m_summaryTable->setEnabled(false);
   }
   if (pages == 1) {
     m_page->setEnabled(false);

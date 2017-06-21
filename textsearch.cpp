@@ -769,12 +769,30 @@ QString TextSearch::summary() const {
   for(int i=0;i < m_results.size();i++) {
     findCount += m_results[i].fragments.size();
   }
-  QString t = QString("%1 search for \"%2\" - %3 occurrence%4 in %5 entr%6")
-    .arg(m_regex ? "Regex" : "Text")
-    .arg(m_regex ? m_rx.pattern() : m_pattern)
-    .arg(findCount)
-    .arg(findCount == 1 ? "" : "s")
-    .arg(entryCount).arg(entryCount == 1 ? "y" : "ies");
+  QString t;
+  switch(findCount) {
+  case 0 : {
+    t = QString(tr("%1 search for \"%2\" - Found no occurrences"))
+      .arg(m_regex ? "Regex" : "Text")
+      .arg(m_regex ? m_rx.pattern() : m_pattern);
+    break;
+  }
+  case 1 : {
+    t = QString(tr("%1 search for \"%2\" - Found one occurrence"))
+      .arg(m_regex ? "Regex" : "Text")
+      .arg(m_regex ? m_rx.pattern() : m_pattern);
+    break;
+  }
+  default : {
+     t = QString(tr("%1 search for \"%2\" - Found %3 occurrence%4 in %5 entr%6"))
+       .arg(m_regex ? "Regex" : "Text")
+       .arg(m_regex ? m_rx.pattern() : m_pattern)
+       .arg(findCount)
+       .arg(findCount == 1 ? "" : "s")
+       .arg(entryCount).arg(entryCount == 1 ? "y" : "ies");
+     break;
+  }
+  }
   QString options;
   if (! m_regex ) {
     options = QString("Case %1sensitive, \"whole word match\" is %2. ").arg(m_caseSensitive == 0 ? "in" : "" ).arg(m_wholeWord == 1 ? "on" : "off");
