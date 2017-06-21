@@ -55,6 +55,29 @@ QDebug operator<<(QDebug debug, const SearchHit& obj)
 
   return debug.space();
 }
+QDebug operator<<(QDebug debug, const SearchParams& obj)
+{
+    debug.nospace() << obj.node << "   "
+                    << obj.regex << "   "
+                    << obj.pattern << "   "
+                    << obj.pos << "    ";
+
+    if (obj.flags && QTextDocument::FindCaseSensitively) {
+      debug.nospace() << "case sensitive   ";
+    }
+    else {
+      debug.nospace() << "case insensitive   ";
+    }
+    if (obj.flags && QTextDocument::FindWholeWords) {
+      debug.nospace() << "whole words on     ";
+    }
+    else {
+      debug.nospace() << "whole words off     ";
+    }
+
+
+  return debug.space();
+}
 
 QString TextSearch::fixHtml(const QString & t) {
   QString html = t;
@@ -166,6 +189,18 @@ void TextSearch::setSettingsPath(const QString & p) {
 }
 void TextSearch::setCancel(bool v) {
   m_cancel = v;
+}
+SearchParams TextSearch::params() const {
+  SearchParams p;
+  p.flags = m_findFlags;
+  p.regex = m_regex;
+  if (m_regex) {
+    p.pattern = m_rx.pattern();
+  }
+  else {
+    p.pattern = m_pattern;
+  }
+  return p;
 }
 QString TextSearch::fromSafe(const QString & v) {
   QString ot;
@@ -330,6 +365,7 @@ QMap<int,QString> TextSearch::searchEntry(QString xml) { //,QString /* head */,Q
   if (m_wholeWord) {
   f |= QTextDocument::FindWholeWords;
   }
+  m_findFlags = f;
   if (m_verbose) {
     //    qDebug() << doc.toHtml();
   }
@@ -383,6 +419,7 @@ bool TextSearch::searchWord(const QString & word) {
   if (m_wholeWord) {
   f |= QTextDocument::FindWholeWords;
   }
+  m_findFlags = f;
   if (m_verbose) {
     //    qDebug() << doc.toHtml();
   }

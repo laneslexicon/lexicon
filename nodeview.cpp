@@ -106,8 +106,13 @@ void NodeView::reject() {
   QDialog::reject();
 }
 void NodeView::setHeader(const QString & root,const QString & head,const QString & node,int page) {
+#ifdef LANE
   m_rlabel->setText(getLexicon()->spanArabic(root,"nodeview"));
   m_hlabel->setText(getLexicon()->spanArabic(head,"nodeview"));
+#else
+  m_rlabel->setText(getSupport()->spanArabic(root,"nodeview"));
+  m_hlabel->setText(getSupport()->spanArabic(head,"nodeview"));
+#endif
   m_node = node;
   if (page > 0) {
     m_pageLabel->setText(QString("(v%1/%2)").arg(Place::volume(page)).arg(page));

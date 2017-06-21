@@ -2,6 +2,7 @@
 #include "textsearchwidget.h"
 #include "textsearch.h"
 #include "externs.h"
+#include "nodeview.h"
 EnsearchWidget::EnsearchWidget(int rows,QWidget * parent) : QWidget(parent) {
   m_search = new TextSearchWidget(rows,false);
   m_pageSize = rows;

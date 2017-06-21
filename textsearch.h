@@ -13,6 +13,7 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
+#include <iostream>
 #ifndef LANE
 class SearchRunner : public QObject {
   Q_OBJECT
@@ -29,13 +30,21 @@ class SearchRunner : public QObject {
 #define CERR  QLOG_WARN()
 #define ENDL  "\n"
 #endif
-/*
-class  SearchFragment {
+/**
+ * Helper class that contains all the info
+ * required to search a node
+ *
+ */
+class  SearchParams {
+ public:
+  QString node;
+  QTextDocument::FindFlags flags;
+  bool regex;
+  QString pattern;
   int pos;
-  bool headMatch;
-  QString fragment;
+  friend QDebug operator<<(QDebug, const SearchParams &);
 };
-*/
+
 class SearchHit {
  public:
   QString root;
@@ -90,6 +99,7 @@ class TextSearch : public QObject {
   void setSearchType(bool);
   void setIgnoreXref(bool);
   void setCancel(bool);
+  SearchParams params() const;
   QPair<int,int> getPageCounts() const;
   QString summary() const;
   QString m_pattern;
@@ -109,6 +119,7 @@ class TextSearch : public QObject {
   QStringList m_nodes;
   QString m_fields;
   QRegularExpression m_rx;
+  QTextDocument::FindFlags m_findFlags;
   bool m_cancel;
   bool m_verbose;
   bool m_caseSensitive;

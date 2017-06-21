@@ -47,6 +47,9 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
   setLayout(layout);
   m_data = new TextSearch();
   m_data->setXsltFileName(getSupport()->xsltFileName());
+  connect(m_results,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
+          this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
+  connect(m_results,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(onCellDoubleClicked(int,int)));
 }
 TextSearch * TextSearchWidget::searcher() {
   return m_data;
@@ -222,4 +225,45 @@ void TextSearchWidget::summaryChanged(int state) {
     }
     this->loadPage(1);
   }
+}
+/**
+ * To view the node we need:
+ *     node number
+ *     QTextDocument::FindFlags
+ *     QRegularExpression or QString pattern
+ *
+ * @param row
+ */
+void TextSearchWidget::onCellDoubleClicked(int row,int /* col */) {
+   this->viewNode(row);
+}
+void TextSearchWidget::itemDoubleClicked(QTableWidgetItem * item) {
+  if (item) {
+    this->viewNode(item->row());
+  }
+}
+void TextSearchWidget::viewNode(int row) {
+  QString node;
+  QLabel * label = qobject_cast<QLabel *>(m_results->cellWidget(row,NODE_COLUMN));
+  if (label) {
+    node = label->text();
+  }
+  else {
+    CERR << qPrintable(QString("Cannot find node cell at %1/%2").arg(row).arg(NODE_COLUMN)) << ENDL;
+    return;
+  }
+  SearchParams p = m_data->params();
+  p.node = node;
+  p.pos = 0;
+  if (! m_summary) {
+    QLabel * label = qobject_cast<QLabel *>(m_results->cellWidget(row,POSITION_COLUMN));
+    if (label) {
+      bool ok;
+      int i = label->text().toInt(&ok);
+      if (ok) {
+        p.pos = i;
+      }
+    }
+  }
+  qDebug() << p;
 }

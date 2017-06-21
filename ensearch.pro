@@ -53,13 +53,15 @@ columnselectdialog.cpp \
 exportsearchdialog.cpp \
 centeredcheckbox.cpp \
 textsearchwidget.cpp \
-ensearchwidget.cpp
+ensearchwidget.cpp  \
+nodeview.cpp
 
 HEADERS += columnartablewidget.h \
 columnselectdialog.h \
 exportsearchdialog.h \
 centeredcheckbox.h \
 textsearchwidget.h \
-ensearchwidget.h
+ensearchwidget.h \
+nodeview.h
 
 }

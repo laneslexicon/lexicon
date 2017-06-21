@@ -5,6 +5,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QSet>
+#include <QTableWidgetItem>
 class TextSearch;
 class ColumnarTableWidget;
 class Place;
@@ -18,6 +19,7 @@ class TextSearchWidget : public QWidget {
   void setPages(int);
   TextSearch * searcher();
   void readSettings();
+  void viewNode(int row);
  private:
   TextSearch * m_data;
   bool m_summary;
@@ -37,5 +39,7 @@ class TextSearchWidget : public QWidget {
     void pageChanged(const QString &);
     void rowMarked(int);
     void summaryChanged(int);
+    void onCellDoubleClicked(int row,int /* col */);
+    void itemDoubleClicked(QTableWidgetItem * item);
 };
 #endif
