@@ -75,7 +75,7 @@ TextSearch::TextSearch() {
   m_wholeWord = false;
   m_regex = false;
   m_diacritics = true;
-
+  m_noXref = false;
   QMap<QChar,QChar> safe;
   m_safe.insert(QChar('C'),QChar(0x621));
   m_safe.insert(QChar('M'),QChar(0x622));
@@ -141,6 +141,9 @@ QString TextSearch::buckwalterCharacters() {
     v.append(k[i]);
   }
   return v;
+}
+void TextSearch::setIgnoreXref(bool v) {
+  m_noXref = v;
 }
 void TextSearch::setVerbose(bool v) {
   m_verbose = v;
@@ -718,7 +721,7 @@ void TextSearch::search() {
   QTime t;
   t.start();
   if (m_nodes.size() == 0) {
-    if (m_singleArabic) {
+    if (m_singleArabic && ! m_noXref) {
       this->searchSingle();
     }
     else {

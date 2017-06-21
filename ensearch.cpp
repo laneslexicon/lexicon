@@ -118,7 +118,6 @@ void test(QString & str) {
     QStringList tests;
     tests << "graeme" << "فتح" << "وجد و وصل" << "وجدSو وصل";
     tests <<  t.fromSafe(str).trimmed();
-
     QRegularExpression rx("^[\u0600-\u06ff]+$");
     for(int i=0;i < tests.size();i++) {
       qDebug() << tests[i] << "has match" << rx.match(tests[i]).hasMatch();
@@ -232,6 +231,9 @@ int main(int argc, char *argv[])
   QCommandLineOption fieldOption(QStringList() <<"f" << "fields",QObject::tr("Specify output information: R(oot), H(ead word, N(ode), O(ffset),P(age), T(ext), V(olume). Defaults to all.)"),"RHNOTVP");
   fieldOption.setDefaultValue("RHNOTVP");
   parser.addOption(fieldOption);
+
+  QCommandLineOption noxrefOption(QStringList() <<"e" << "no-xref",QObject::tr("Do not use cross-reference table"));
+  parser.addOption(noxrefOption);
 
 
   parser.process(app);
@@ -368,6 +370,9 @@ int main(int argc, char *argv[])
       padding = sz;
       searcher.setPadding(padding);
     }
+  }
+  if (parser.isSet(noxrefOption)) {
+    searcher.setIgnoreXref(true);
   }
 
   searcher.setFields(parser.value(fieldOption));

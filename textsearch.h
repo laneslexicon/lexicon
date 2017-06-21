@@ -88,6 +88,7 @@ class TextSearch : public QObject {
   void setWholeWord(bool);
   void setDiacritics(bool);
   void setSearchType(bool);
+  void setIgnoreXref(bool);
   QString summary() const;
   QString m_pattern;
   QString m_separator;
@@ -108,6 +109,7 @@ class TextSearch : public QObject {
   bool m_verbose;
   bool m_caseSensitive;
   bool m_wholeWord;
+  bool m_noXref;
   int m_padding;
   bool m_diacritics;
   bool m_regex;
