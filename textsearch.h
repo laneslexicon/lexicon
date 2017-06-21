@@ -89,6 +89,7 @@ class TextSearch : public QObject {
   void setDiacritics(bool);
   void setSearchType(bool);
   void setIgnoreXref(bool);
+  void setCancel(bool);
   QPair<int,int> getPageCounts() const;
   QString summary() const;
   QString m_pattern;
@@ -100,6 +101,7 @@ class TextSearch : public QObject {
   int rows(bool summary) const;
   QPair<int,int> setPages(int pagesize);
   void dumpPages(bool);
+  int readSize() const;
  private:
   QList<SearchResult>  m_results;
   void setOffsets();
@@ -107,6 +109,7 @@ class TextSearch : public QObject {
   QStringList m_nodes;
   QString m_fields;
   QRegularExpression m_rx;
+  bool m_cancel;
   bool m_verbose;
   bool m_caseSensitive;
   bool m_wholeWord;

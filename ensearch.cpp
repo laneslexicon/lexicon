@@ -419,6 +419,7 @@ int main(int argc, char *argv[])
     w->setPadding(padding);
     w->setFields("RHOPNTV");
     w->setNode(parser.value(nodeOption));
+    w->searcher()->setIgnoreXref(parser.isSet(noxrefOption));
     w->setSearch(pattern,
                  parser.isSet(regexOption),
                  parser.isSet(caseOption),

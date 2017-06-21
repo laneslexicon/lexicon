@@ -76,6 +76,7 @@ TextSearch::TextSearch() {
   m_regex = false;
   m_diacritics = true;
   m_noXref = false;
+  m_cancel = false;
   QMap<QChar,QChar> safe;
   m_safe.insert(QChar('C'),QChar(0x621));
   m_safe.insert(QChar('M'),QChar(0x622));
@@ -163,7 +164,9 @@ QString TextSearch::dbFile() const {
 void TextSearch::setSettingsPath(const QString & p) {
   m_iniFileName = p;
 }
-
+void TextSearch::setCancel(bool v) {
+  m_cancel = v;
+}
 QString TextSearch::fromSafe(const QString & v) {
   QString ot;
   for(int i=0;i < v.length();i++) {
@@ -574,7 +577,7 @@ void TextSearch::searchAll() {
   int findCount = 0;
   bool finished = false;
   QMap<int,QString> ret;
-  while (query.next() && ! finished) {
+  while (query.next() && ! finished && ! m_cancel) {
     readCount++;
     QString xml = query.value("xml").toString();
     QString node = query.value("nodeid").toString();
@@ -632,7 +635,7 @@ void TextSearch::searchSingle() {
   bool finished = false;
   QMap<int,QString> ret;
   QSet<QString> nodes;
-  while (query.next() && ! finished) {
+  while (query.next() && ! finished && ! m_cancel) {
     readCount++;
     QString node  = query.value("node").toString();
     if (! nodes.contains(node) && searchWord(query.value("word").toString())) {
@@ -677,7 +680,7 @@ void TextSearch::searchNodes() {
   QSqlQuery query;
   query.prepare(SQL_FIND_ENTRY_DETAILS);
   QMap<int,QString> ret;
-  for(int i=0;(i < m_nodes.size()) && ! finished ;i++) {
+  for(int i=0;(i < m_nodes.size()) && ! finished && ! m_cancel;i++) {
     //query.prepare(SQL_FIND_ENTRY_DETAILS);
     query.bindValue(0,m_nodes[i]);
     if (! query.exec()) {
@@ -715,7 +718,33 @@ void TextSearch::searchNodes() {
   }
 
 }
+int TextSearch::readSize() const {
+  QString table;
+  if (m_singleArabic && ! m_noXref) {
+    table = "xref";
+  }
+  else {
+    table = "entry";
+  }
+  bool ok = false;
+  QString sql = QString(SQL_FIND_MAXIMUM).arg(table);
+  QSqlQuery maxq(sql);
+  int max;
+  if (maxq.exec() && maxq.first()) {
+    max = maxq.value(0).toInt(&ok);
+    qDebug() << "max" << max;
+  }
 
+  if (! ok ) {
+    if (table == "xref") {
+      max = 544695;
+    }
+    else {
+      max = 49000;
+    }
+  }
+  return max;
+}
 void TextSearch::search() {
   m_results.clear();
   QTime t;
@@ -805,9 +834,12 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     CERR << qPrintable(QString("Pattern                        :%1").arg(m_pattern)) << ENDL;
     CERR << qPrintable(QString("Regex pattern                  :%1").arg(m_rx.pattern())) << ENDL;
     CERR << qPrintable(QString("Regex case insensitive  option :%1").arg(m_rx.patternOptions() && QRegularExpression::CaseInsensitiveOption)) << ENDL;
-
+    if (m_singleArabic) {
+      CERR << qPrintable(QString("Using cross-ref table        :%1").arg(m_singleArabic)) << ENDL;
+    }
 
   }
+  qDebug() << m_singleArabic << m_noXref;
 }
 
 QList<SearchHit> TextSearch::getHits(int offset,int pageSize,bool summary) const {

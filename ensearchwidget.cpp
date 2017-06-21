@@ -27,9 +27,20 @@ TextSearchWidget * EnsearchWidget::searcher() {
 QSize EnsearchWidget::sizeHint() const {
   return QSize(800,400);
 }
-void EnsearchWidget::search() {
-  m_search->searcher()->search();
+TextSearch * EnsearchWidget::searcher() {
+  return m_search->searcher();
+}
 
+void EnsearchWidget::search() {
+  int max = m_search->searcher()->readSize();
+  m_pd = new QProgressDialog("Searching...", "Cancel", 0,max, this);
+  m_pd->setWindowTitle(tr("Text Search"));
+  connect(m_pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
+  m_pd->setWindowModality(Qt::WindowModal);
+  m_pd->show();
+  this->recordsRead(1);
+  m_search->searcher()->search();
+  delete m_pd;
   m_pageCounts = m_search->searcher()->setPages(m_pageSize);
   // TODO make dependant on somethng
   m_search->setPages(m_pageCounts.second);
@@ -38,7 +49,8 @@ void EnsearchWidget::search() {
   m_summary->setText(getSupport()->scanAndSpan(txt,"searchsummary",true));//m_search->searcher()->summary());
 }
 void EnsearchWidget::recordsRead(int x) {
-
+  m_pd->setValue(x);
+  m_ep.processEvents();
 }
 void EnsearchWidget::setSearch(const QString & pattern,bool regex,bool caseSensitive,bool wholeWord,bool diacritics) {
   //  qDebug() << Q_FUNC_INFO << pattern << regex << caseSensitive << wholeWord << diacritics;
@@ -55,4 +67,7 @@ void EnsearchWidget::setPadding(int sz) {
 }
 void EnsearchWidget::onExit() {
   this->close();
+}
+void EnsearchWidget::cancelSearch() {
+  searcher()->setCancel(true);
 }
