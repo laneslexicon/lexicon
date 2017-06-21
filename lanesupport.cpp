@@ -35,17 +35,32 @@ LaneSupport::~LaneSupport() {
 QString LaneSupport::settingsFileName() const {
   return m_settings->fileName();
 }
-QString LaneSupport::scanAndSpan(const QString & str,const QString & css) {
+/**
+ *
+ *
+ * @param str   text to process
+ * @param css   the value of the entry in the [SpannedText] section of settings.ini
+ * @param embed if true,use style attribute, otherwise class attribute
+ *
+ * @return
+ */
+QString LaneSupport::scanAndSpan(const QString & str,const QString & css,bool embed) {
   QString teststr("You say, كَتَبَ إِلَىَّ يَسْتَبْطِئُنِى He wrote وَجَدَ هَ          and thats it");
   QString ar = str;
   //  ar = teststr;
   bool inArabic = false;
   QString html;
+  QString embedStyle = getSpanStyle(css);
   for(int i=0;i < ar.size();i++) {
     QChar c = ar.at(i);
     if ((c.unicode() >= 0x600) && (c.unicode() <= 0x6ff)) {
       if (! inArabic) {
-        html.append(QString("<span class=\"%1\">").arg(css));
+        if (embed) {
+          html.append(QString("<span style=\"%1\">").arg(embedStyle));
+        }
+        else {
+          html.append(QString("<span class=\"%1\">").arg(css));
+        }
       }
       html.append(c);
       inArabic = true;

@@ -8,7 +8,7 @@
 class LaneSupport : public QObject {
  public:
   LaneSupport(const QString & fileName);
-  QString scanAndSpan(const QString & str,const QString & css);
+  QString scanAndSpan(const QString & str,const QString & css,bool embed = false);
   QString spanArabic(const QString & ar,const QString & spanstyle);
   QString scanAndStyle(const QString & str,const QString & spanstyle);
   QString getResourceFilePath(int type, const QString & name = QString()) const;
