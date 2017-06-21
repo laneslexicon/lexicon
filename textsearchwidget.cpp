@@ -33,9 +33,14 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
   layout->addWidget(m_results);
   m_page = new QComboBox(this);
   connect(m_page,SIGNAL(currentIndexChanged(const QString &)),this,SLOT(pageChanged(const QString &)));
+
+  m_summaryTable = new QCheckBox(tr("One row per entry"));
+  connect(m_summaryTable,SIGNAL(stateChanged(int)),this,SLOT(summaryChanged(int)));
+
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(new QLabel(tr("Page")));
   hlayout->addWidget(m_page);
+  hlayout->addWidget(m_summaryTable);
   hlayout->addStretch();
   layout->addLayout(hlayout);
   m_results->setRowCount(pageSize);
@@ -189,4 +194,21 @@ void TextSearchWidget::readSettings() {
   m_resizeRows = settings.value(SID_FULLSEARCH_RESIZE_ROWS,true).toBool();
   m_rowHeight  = settings.value(SID_FULLSEARCH_ROW_HEIGHT,40).toInt();;
 
+}
+void TextSearchWidget::summaryChanged(int state) {
+  bool summary = (state == Qt::Checked);
+  if (summary != m_summary) {
+    m_summary = summary;
+    m_marks.clear();
+    QPair<int,int> pages = m_data->getPageCounts();
+    if (m_summary) {
+      m_results->setHorizontalHeaderItem(POSITION_COLUMN,new QTableWidgetItem("Count"));
+      setPages(pages.first);
+    }
+    else {
+      m_results->setHorizontalHeaderItem(POSITION_COLUMN,new QTableWidgetItem("Position"));
+      setPages(pages.second);
+    }
+    this->loadPage(1);
+  }
 }

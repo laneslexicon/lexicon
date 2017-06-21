@@ -1,7 +1,7 @@
 #include "ensearchwidget.h"
 #include "textsearchwidget.h"
 #include "textsearch.h"
-
+#include "externs.h"
 EnsearchWidget::EnsearchWidget(int rows,QWidget * parent) : QWidget(parent) {
   m_search = new TextSearchWidget(rows,false);
   m_pageSize = rows;
@@ -29,11 +29,13 @@ QSize EnsearchWidget::sizeHint() const {
 }
 void EnsearchWidget::search() {
   m_search->searcher()->search();
-  QPair<int,int> pages = m_search->searcher()->setPages(m_pageSize);
 
-  m_search->setPages(pages.second);
+  m_pageCounts = m_search->searcher()->setPages(m_pageSize);
+  // TODO make dependant on somethng
+  m_search->setPages(m_pageCounts.second);
   m_search->loadPage(1);
-  m_summary->setText(m_search->searcher()->summary());
+  QString txt = m_search->searcher()->summary();
+  m_summary->setText(getSupport()->scanAndSpan(txt,"searchsummary",true));//m_search->searcher()->summary());
 }
 void EnsearchWidget::recordsRead(int x) {
 

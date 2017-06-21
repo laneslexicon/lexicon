@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QSet>
 class TextSearch;
 class ColumnarTableWidget;
@@ -26,12 +27,15 @@ class TextSearchWidget : public QWidget {
   int m_pageSize;
   int m_currentPage;
   QComboBox * m_page;
+  QCheckBox * m_summaryTable;
   bool m_resizeRows;
   int m_rowHeight;
   int m_stepCount;
+
   QMap<int,QSet<int>> m_marks;
   private slots:
     void pageChanged(const QString &);
     void rowMarked(int);
+    void summaryChanged(int);
 };
 #endif

@@ -89,6 +89,7 @@ class TextSearch : public QObject {
   void setDiacritics(bool);
   void setSearchType(bool);
   void setIgnoreXref(bool);
+  QPair<int,int> getPageCounts() const;
   QString summary() const;
   QString m_pattern;
   QString m_separator;
@@ -118,7 +119,7 @@ class TextSearch : public QObject {
   QString m_xsltFile;    //
   QString m_dbFile;      //
   int m_pageSize;
-  QMap<int,int> m_pages;
+  //  QMap<int,int> m_pages;
   QMap<int,QPair<int,int> > m_summaryPages;
   QMap<int,QPair<int,int> > m_fullPages;
   QMap<QChar,QChar> m_safe;

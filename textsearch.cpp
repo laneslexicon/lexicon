@@ -979,3 +979,6 @@ void TextSearch::dumpPages(bool summary) {
     }
   }
 }
+QPair<int,int> TextSearch::getPageCounts() const {
+  return qMakePair(m_summaryPages.size(),m_fullPages.size());
+}

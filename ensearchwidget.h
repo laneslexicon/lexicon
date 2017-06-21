@@ -24,6 +24,7 @@ class EnsearchWidget : public QWidget {
   TextSearchWidget * m_search;
   QLabel * m_summary;
   QPushButton * m_quit;
+  QPair<int,int> m_pageCounts;  // first is summary,second is full
   public slots:
     void recordsRead(int);
     void onExit();
