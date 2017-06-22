@@ -254,6 +254,11 @@ void TextSearchWidget::viewNode(int row) {
     CERR << qPrintable(QString("Cannot find node cell at %1/%2").arg(row).arg(NODE_COLUMN)) << ENDL;
     return;
   }
+  /**
+   * SearchParams will be used by NodeView to search the document, highlighting/selecting the search
+   * results, so it needs to node search type(regex/normal), pattern and findflags
+   */
+
   SearchParams p = m_data->params();
   p.node = node;
   p.pos = 0;
@@ -267,7 +272,6 @@ void TextSearchWidget::viewNode(int row) {
       }
     }
   }
-  qDebug() << p;
   QSqlQuery nodeQuery;
   if (! nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE)) {
     QString err = nodeQuery.lastError().text();
@@ -286,25 +290,11 @@ void TextSearchWidget::viewNode(int row) {
   NodeView * v = new NodeView(p,this);
   v->setAttribute(Qt::WA_DeleteOnClose);
   v->setWindowTitle(QString(tr("Showing result %1").arg(row + 1)));
-  //  v->setPattern(m_currentRx);
-  //  v->setCSS(m_currentCSS);
-  /**
-   * get the page, check it is for a valid volume and pass it if it is, otherwise passs 0
-   *
-   */
-
   int page = nodeQuery.value("page").toInt();
   if (Place::volume(page) == 0) {
     page = 0;
   }
   v->setHeader(np.root(),np.word(),node,page);
-  /**
-   * set the index for which occurrence to show first time through
-   *
-   */
-
-  //  v->setStartPosition(pos);
-  //  v->setHtml(html);
   v->findFirst();
   v->show();
   v->raise();

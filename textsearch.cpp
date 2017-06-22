@@ -298,7 +298,6 @@ QList<QPair<QString,QString> > TextSearch::splitText(const QString & txt) {
       break;
     }
   }
-  //  qDebug() << QString("%1 : [%2]").arg(p.size()).arg(p);
   QStringList words;
   QStringList css;
   int pos = 0;
@@ -351,7 +350,6 @@ QMap<int,QString> TextSearch::searchEntry(QString xml) { //,QString /* head */,Q
   if (html.isEmpty()) {
     return results;
   }
-  //qDebug() << node;
   html = fixHtml(html);
   html.replace("\n","");
   QTextDocument doc;
@@ -369,9 +367,6 @@ QMap<int,QString> TextSearch::searchEntry(QString xml) { //,QString /* head */,Q
   f |= QTextDocument::FindWholeWords;
   }
   m_findFlags = f;
-  if (m_verbose) {
-    //    qDebug() << doc.toHtml();
-  }
   QTextCursor c;
   if (m_regex) {
     c = doc.find(m_rx,0,f);
@@ -423,9 +418,6 @@ bool TextSearch::searchWord(const QString & word) {
   f |= QTextDocument::FindWholeWords;
   }
   m_findFlags = f;
-  if (m_verbose) {
-    //    qDebug() << doc.toHtml();
-  }
   QTextCursor c;
   if (m_regex) {
     c = doc.find(m_rx,0,f);
@@ -462,7 +454,7 @@ void testSplit(const QString & txt) {
     }
   }
 
-  //  qDebug() << QString("%1 : [%2]").arg(p.size()).arg(p);
+
   QStringList words;
   int pos = 0;
   for(int i=1;i < p.length();i++) {
@@ -772,7 +764,6 @@ int TextSearch::readSize() const {
   int max;
   if (maxq.exec() && maxq.first()) {
     max = maxq.value(0).toInt(&ok);
-    qDebug() << "max" << max;
   }
 
   if (! ok ) {
@@ -897,7 +888,6 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     }
 
   }
-  qDebug() << m_singleArabic << m_noXref;
 }
 
 QList<SearchHit> TextSearch::getHits(int offset,int pageSize,bool summary) const {
@@ -1057,7 +1047,6 @@ QList<SearchHit> TextSearch::getPage(int page,bool summary) const {
 void TextSearch::dumpPages(bool summary) {
   if (! summary) {
     qDebug() << "Pages (non-summary)" << m_fullPages.size();
-    //    qDebug() << m_fullPages;
     int ix = 0;
     for(int i=0;i < m_fullPages.size();i++) {
       QList<SearchHit> hits = getPage(i+1,summary);

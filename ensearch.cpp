@@ -414,7 +414,6 @@ int main(int argc, char *argv[])
     //    searcher.dumpPages(false);
   }
   else {
-    qDebug() << rows;
     EnsearchWidget * w = new EnsearchWidget(rows);
     w->setPadding(padding);
     w->setFields("RHOPNTV");

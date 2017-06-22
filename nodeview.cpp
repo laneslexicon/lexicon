@@ -16,8 +16,9 @@ NodeView::NodeView(const SearchParams & p,QWidget * parent)
   this->setHtml(p.html);
   m_positionIndex = 0;
   m_positions.clear();
-  /// build index of positions
-  ///
+  /// build index of positions by using the appropriate find routines
+  /// once all positions are setup, set m_startPosition to point at the
+  /// at the entry in the array that matches the position in SearchParams
   QTextCursor c;
   QRegularExpression rx;
   if (p.regex) {
@@ -30,9 +31,6 @@ NodeView::NodeView(const SearchParams & p,QWidget * parent)
   int position;
   while(!c.isNull()) {
     position = c.position();
-    if (position == p.pos) {
-      m_startPosition = m_positions.size();
-    }
     m_positions << (position - c.selectedText().size());
     if (p.regex) {
       c = m_browser->document()->find(rx,position,p.flags);
@@ -42,7 +40,12 @@ NodeView::NodeView(const SearchParams & p,QWidget * parent)
     }
 
   }
-  qDebug() << m_positions;
+  for(int i=0;i < m_positions.size();i++) {
+    if (m_positions[i] == p.pos) {
+      m_startPosition = i;
+    }
+  }
+  qDebug() << Q_FUNC_INFO << p.pos << m_positions << "start index" << m_startPosition;;
   if (m_positions.size() > 0) {
     m_findFirstButton->setEnabled(true);
     m_findNextButton->setEnabled(true);
@@ -62,23 +65,17 @@ void NodeView::setup() {
 
   settings.endGroup();
   settings.beginGroup("Node");
-  //  QString fontString = settings.value(SID_NODE_ARABIC_FONT).toString();
   QString sz = settings.value(SID_NODE_VIEWER_SIZE,QString()).toString();
   if (! sz.isEmpty())
     this->setPreferredSize(sz);
 
   m_startPosition = 0;
   setObjectName("nodeview");
-  //  QFont f;
-  //  if (! fontString.isEmpty())
-  //    f.fromString(fontString);
   setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
   setSizeGripEnabled(true);
   QVBoxLayout * layout = new QVBoxLayout;
   m_rlabel = new QLabel("",this);
-  //  m_rlabel->setFont(f);
   m_hlabel = new QLabel("",this);
-  //  m_hlabel->setFont(f);
   m_pageLabel = new QLabel("",this);
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(new QLabel(tr("Root"),this));
@@ -90,7 +87,6 @@ void NodeView::setup() {
 
   m_browser = new QTextBrowser;
   m_browser->document()->setDefaultStyleSheet(m_css);
-  //  m_browser->setHtml(html);
 
   QDialogButtonBox * buttonBox = new QDialogButtonBox();
 
