@@ -6,6 +6,8 @@
 #include <QCheckBox>
 #include <QSet>
 #include <QTableWidgetItem>
+#include <QSqlQuery>
+#include <QSqlError>
 class TextSearch;
 class ColumnarTableWidget;
 class Place;

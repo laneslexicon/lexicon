@@ -6,7 +6,9 @@
 #include "centeredcheckbox.h"
 #include "place.h"
 #include "definedsettings.h"
+#include "definedsql.h"
 #include "externs.h"
+#include "nodeview.h"
 #define SELECT_COLUMN 0
 #define ROOT_COLUMN 1
 #define HEAD_COLUMN 2
@@ -266,4 +268,45 @@ void TextSearchWidget::viewNode(int row) {
     }
   }
   qDebug() << p;
+  QSqlQuery nodeQuery;
+  if (! nodeQuery.prepare(SQL_FIND_ENTRY_BY_NODE)) {
+    QString err = nodeQuery.lastError().text();
+    CERR << qPrintable(QString("SQL error %1 , %2").arg(SQL_FIND_ENTRY_BY_NODE).arg(err)) << ENDL;
+    return;
+  }
+  nodeQuery.bindValue(0,node);
+  if ( ! nodeQuery.exec() || ! nodeQuery.first()) {
+    QString err = nodeQuery.lastError().text();
+    CERR << qPrintable(QString("SQL error %1 , %2").arg(SQL_FIND_ENTRY_BY_NODE).arg(err)) << ENDL;
+    return;
+  }
+  Place np = Place::fromEntryRecord(nodeQuery.record());
+  QString xml = nodeQuery.value("xml").toString();
+  p.html = m_data->toHtml(xml);
+  NodeView * v = new NodeView(p,this);
+  v->setAttribute(Qt::WA_DeleteOnClose);
+  v->setWindowTitle(QString(tr("Showing result %1").arg(row + 1)));
+  //  v->setPattern(m_currentRx);
+  //  v->setCSS(m_currentCSS);
+  /**
+   * get the page, check it is for a valid volume and pass it if it is, otherwise passs 0
+   *
+   */
+
+  int page = nodeQuery.value("page").toInt();
+  if (Place::volume(page) == 0) {
+    page = 0;
+  }
+  v->setHeader(np.root(),np.word(),node,page);
+  /**
+   * set the index for which occurrence to show first time through
+   *
+   */
+
+  //  v->setStartPosition(pos);
+  //  v->setHtml(html);
+  v->findFirst();
+  v->show();
+  v->raise();
+  v->activateWindow();
 }

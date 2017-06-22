@@ -328,7 +328,10 @@ QList<QPair<QString,QString> > TextSearch::splitText(const QString & txt) {
   }
   return texts;
 }
-
+QString TextSearch::toHtml(const QString & xml) {
+  QString str =    transform(NODE_XSLT,m_xsltFile,xml);
+  return str;
+}
 QMap<int,QString> TextSearch::searchEntry(QString xml) { //,QString /* head */,QString /* node */) {
   QMap<int,QString> results;
   //  QTextDocument doc(xml);

@@ -42,6 +42,7 @@ class  SearchParams {
   bool regex;
   QString pattern;
   int pos;
+  QString html;
   friend QDebug operator<<(QDebug, const SearchParams &);
 };
 
@@ -102,6 +103,7 @@ class TextSearch : public QObject {
   SearchParams params() const;
   QPair<int,int> getPageCounts() const;
   QString summary() const;
+  QString toHtml(const QString & xml);
   QString m_pattern;
   QString m_separator;
   QList<SearchHit> getHits(int start,int sz,bool summary = false) const;

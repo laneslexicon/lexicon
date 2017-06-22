@@ -10,11 +10,13 @@
 #include <QFont>
 #include <QPushButton>
 #include <QRegExp>
+#include "textsearch.h"
 class NodeView : public QDialog {
   Q_OBJECT
 
  public:
   NodeView(QWidget * parent = 0);
+  NodeView(const SearchParams &,QWidget * parent = 0);
   ~NodeView();
   void setCSS(const QString &);
   void setHtml(const QString &);
@@ -31,6 +33,8 @@ class NodeView : public QDialog {
     void print();
     void openEntry();
  private:
+    void setup();
+    SearchParams m_params;
     void getPositions();
     QTextCursor m_cursor;
     QSize m_size;
@@ -48,7 +52,7 @@ class NodeView : public QDialog {
     QString m_node;
     int m_startPosition;
     QRegExp m_pattern;
-    QString m_css;
+     QString m_css;
     QList<int> m_positions;
     int m_positionIndex;
  signals:

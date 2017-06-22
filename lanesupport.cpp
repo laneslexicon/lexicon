@@ -385,3 +385,16 @@ QString LaneSupport::xsltFileName() const {
   QFileInfo fi(xsltDir,fileName);
   return fi.absoluteFilePath();
 }
+QString LaneSupport::readTextFile(const QString & name) const {
+  QFile f(name);
+  QString txt;
+  if (! f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    //    QLOG_WARN()  << QString(tr("Error reading CSS file :%1, error: %2 ")).arg(name).arg(f.errorString());
+    return txt;
+
+  }
+  QTextStream in(&f);
+  txt = in.readAll();
+  f.close();
+  return txt;
+}

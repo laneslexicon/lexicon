@@ -16,6 +16,8 @@ class LaneSupport : public QObject {
   QString settingsFileName() const;
   QString xsltFileName() const;
   bool startsWithArabic(const QString & txt) const;
+  QString readTextFile(const QString & name) const;
+
 enum Resource { Stylesheet, Image,XSLT,Keyboard,Map,Splash,ThemeRoot,Log};
   QString logFilePath() const;
   ~LaneSupport();

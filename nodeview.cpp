@@ -3,11 +3,64 @@
 #include "definedsettings.h"
 #include "externs.h"
 #include "place.h"
+#include "textsearch.h"
 NodeView::NodeView(QWidget * parent)
   : QDialog(parent) {
 
+  this->setup();
+}
+NodeView::NodeView(const SearchParams & p,QWidget * parent)
+  : QDialog(parent) {
+  m_params = p;
+  this->setup();
+  this->setHtml(p.html);
+  m_positionIndex = 0;
+  m_positions.clear();
+  /// build index of positions
+  ///
+  QTextCursor c;
+  QRegularExpression rx;
+  if (p.regex) {
+    rx.setPattern(p.pattern);
+    c = m_browser->document()->find(rx,0,p.flags);
+  }
+  else {
+    c = m_browser->document()->find(p.pattern,0,p.flags);
+  }
+  int position;
+  while(!c.isNull()) {
+    position = c.position();
+    if (position == p.pos) {
+      m_startPosition = m_positions.size();
+    }
+    m_positions << (position - c.selectedText().size());
+    if (p.regex) {
+      c = m_browser->document()->find(rx,position,p.flags);
+    }
+    else {
+      c = m_browser->document()->find(p.pattern,position,p.flags);
+    }
+
+  }
+  qDebug() << m_positions;
+  if (m_positions.size() > 0) {
+    m_findFirstButton->setEnabled(true);
+    m_findNextButton->setEnabled(true);
+  }
+}
+void NodeView::setup() {
   SETTINGS
 
+  settings.beginGroup("Entry");
+  QString css = settings.value(SID_ENTRY_CSS,QString("entry.css")).toString();
+#ifdef LANE
+  css = getLexicon()->getResourceFilePath(Lexicon::Stylesheet,css);
+#else
+  css = getSupport()->getResourceFilePath(Lexicon::Stylesheet,css);
+#endif
+  m_css = getSupport()->readTextFile(css);
+
+  settings.endGroup();
   settings.beginGroup("Node");
   //  QString fontString = settings.value(SID_NODE_ARABIC_FONT).toString();
   QString sz = settings.value(SID_NODE_VIEWER_SIZE,QString()).toString();
@@ -36,6 +89,7 @@ NodeView::NodeView(QWidget * parent)
   hlayout->addStretch();
 
   m_browser = new QTextBrowser;
+  m_browser->document()->setDefaultStyleSheet(m_css);
   //  m_browser->setHtml(html);
 
   QDialogButtonBox * buttonBox = new QDialogButtonBox();
@@ -159,7 +213,14 @@ void NodeView::findFirst() {
   else {
   m_positionIndex = 0;
   }
-  QTextCursor c = m_browser->document()->find(m_pattern,m_positions[m_positionIndex]);
+  QTextCursor c;// = m_browser->document()->find(m_pattern,m_positions[m_positionIndex]);
+  if (m_params.regex) {
+    QRegularExpression rx(m_params.pattern);
+    c = m_browser->document()->find(rx,m_positions[m_positionIndex],m_params.flags);
+  }
+  else {
+    c = m_browser->document()->find(m_params.pattern,m_positions[m_positionIndex],m_params.flags);
+  }
   m_browser->setTextCursor(c);
   if (m_positionIndex == (m_positions.size() -1 )) {
     m_findNextButton->setEnabled(false);
@@ -172,7 +233,14 @@ void NodeView::findFirst() {
 void NodeView::findNext() {
   m_positionIndex++;
   if (m_positionIndex < m_positions.size()) {
-    QTextCursor c = m_browser->document()->find(m_pattern,m_positions[m_positionIndex]);
+    QTextCursor c;// = m_browser->document()->find(m_pattern,m_positions[m_positionIndex]);
+    if (m_params.regex) {
+      QRegularExpression rx(m_params.pattern);
+      c = m_browser->document()->find(rx,m_positions[m_positionIndex],m_params.flags);
+    }
+    else {
+      c = m_browser->document()->find(m_params.pattern,m_positions[m_positionIndex],m_params.flags);
+    }
     m_browser->setTextCursor(c);
   }
   if (m_positionIndex == (m_positions.size() -1 )) {
