@@ -113,7 +113,7 @@ void test(QString & str) {
   }
   qDebug() << ostr;
   }
-  if (1) {
+  if (0) {
     TextSearch t;
     QStringList tests;
     tests << "graeme" << "فتح" << "وجد و وصل" << "وجدSو وصل";
@@ -122,6 +122,22 @@ void test(QString & str) {
     for(int i=0;i < tests.size();i++) {
       qDebug() << tests[i] << "has match" << rx.match(tests[i]).hasMatch();
     }
+  }
+  if (1) {
+    QList<QChar> points;
+    QString d =  TextSearch::getDiacritics(points);
+    //    tests <<  "فَتح" ;
+    qDebug() << d << d.length() << points;
+    TestRunner t("فَتح");
+    t.add("graeme",false);
+    t.add("فَتَح",false);
+    t.add("فَتَح",true,false,false,true);
+    t.run();
+
+    TestRunner t1("graeme");
+    t1.add("Graeme",false,false,true,false);
+    t1.add("Graeme",true,false,false,false);
+    t1.run();
   }
   return;
 

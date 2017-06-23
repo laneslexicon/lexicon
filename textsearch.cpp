@@ -20,6 +20,26 @@ void SearchRunner::recordsRead(int r) {
   CERR << qPrintable(QString("..%1%..").arg(d,0,'g',4));
 }
 #endif
+TestRunner::TestRunner(const QString & p) {
+  pattern = p;
+}
+void TestRunner::add(const QString & t,bool r,bool w,bool c,bool i) {
+  TestOption o;
+  o.wholeWord = w;
+  o.caseSensitive = c;
+  o.ignoreDiacritics = i;
+  o.target = t;
+  o.result = r;
+  tests << o;
+}
+void TestRunner::run() {
+
+  for(int i=0;i < tests.size();i++) {
+    TestOption o = tests[i];
+    QRegularExpression rx = TextSearch::buildRx(pattern,o.ignoreDiacritics,o.wholeWord,o.caseSensitive);
+    qDebug() << i << rx.match(o.target).hasMatch() << o.result;
+  }
+}
 QDataStream &operator<<(QDataStream &s, const SearchResult& obj)
 {
   QMapIterator<int,QString> iter(obj.fragments);
@@ -475,11 +495,22 @@ void testSplit(const QString & txt) {
   so the calling function can remove them from the search pattern
 */
 QString TextSearch::getDiacritics(QList<QChar> & points) {
+  /*
   if (m_iniFileName.isEmpty()) {
     CERR << qPrintable("Cannot locate settings.ini, diacritics option ignored") << ENDL;
     return QString();
   }
   QSettings settings(m_iniFileName,QSettings::IniFormat);
+  */
+#ifdef LANE
+  QSettings settings(getLexicon()->settingsFileName(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+#else
+  QSettings settings(getSupport()->settingsFileName(),QSettings::IniFormat);
+  settings.setIniCodec("UTF-8");
+#endif
+
+
   settings.setIniCodec("UTF-8");
   settings.beginGroup("Diacritics");
   QStringList keys = settings.childKeys();
@@ -529,7 +560,6 @@ QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool
   if (! casesensitive) {
     rx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   }
-  m_rx = rx;
   //  qDebug() << Q_FUNC_INFO << rx.isValid() << rx.pattern();
   return rx;
 }

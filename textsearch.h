@@ -30,6 +30,22 @@ class SearchRunner : public QObject {
 #define CERR  QLOG_WARN()
 #define ENDL  "\n"
 #endif
+class TestOption {
+ public:
+  bool wholeWord;
+  bool caseSensitive;
+  bool ignoreDiacritics;
+  QString target;
+  bool result;
+};
+class TestRunner {
+ public:
+  TestRunner(const QString & p);
+  void add(const QString &,bool result,bool wholeWord = false,bool caseSensitive = false,bool ignore = false);
+  void run();
+  QString pattern;
+  QList<TestOption> tests;
+};
 /**
  * Helper class that contains all the info
  * required to search a node
@@ -76,8 +92,8 @@ class TextSearch : public QObject {
   QList<QPair<QString,QString> > splitText(const QString & txt);
   QMap<int,QString> searchEntry(QString xml);//,QString headword,QString node = QString());
   bool searchWord(const QString &);
-  QString getDiacritics(QList<QChar> & points);
-  QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
+  static QString getDiacritics(QList<QChar> & points);
+  static QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
   QString fixHtml(const QString & t);
   void setSearch(const QString & pattern,bool regex,bool caseSensitive,bool wholeWord,bool diacritics);
   void setSettingsPath(const QString &);
