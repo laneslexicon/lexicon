@@ -100,7 +100,7 @@ void NodeView::setup() {
   m_findNextButton = new QPushButton(tr("Find &next"));
   buttonBox->addButton(m_findNextButton,QDialogButtonBox::ActionRole);
   connect(m_findNextButton,SIGNAL(clicked()),this, SLOT(findNext()));
-
+#ifdef LANE
   button = new QPushButton(tr("&Print"));
   connect(button,SIGNAL(clicked()),this,SLOT(print()));
   buttonBox->addButton(button,QDialogButtonBox::ActionRole);
@@ -108,6 +108,7 @@ void NodeView::setup() {
   button = new QPushButton(tr("&Open in tab"));
   buttonBox->addButton(button,QDialogButtonBox::ActionRole);
   connect(button,SIGNAL(clicked()),this,SLOT(openEntry()));
+#endif
 
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
