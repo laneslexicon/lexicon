@@ -27,6 +27,7 @@ class TextSearchWidget : public QWidget {
   TextSearch * searcher();
   void readSettings();
   void viewNode(int row);
+  void focusTable();
  private:
   TextSearch * m_data;
   bool m_summary;
@@ -48,5 +49,9 @@ class TextSearchWidget : public QWidget {
     void summaryChanged(int);
     void onCellDoubleClicked(int row,int /* col */);
     void itemDoubleClicked(QTableWidgetItem * item);
+    void openNode(const QString &);
+   signals:
+      void printNode(const QString &);
+      void showNode(const QString &,bool);
 };
 #endif

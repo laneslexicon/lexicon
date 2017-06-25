@@ -1469,7 +1469,7 @@ void LanesLexicon::createMenus() {
   m_searchMenu->setObjectName("searchmenu");
   m_searchMenu->addAction(m_searchRootAction);
   m_searchMenu->addAction(m_searchEntryAction);
-  m_searchMenu->addAction(m_searchWordAction);
+  //  m_searchMenu->addAction(m_searchWordAction);
   m_searchMenu->addAction(m_textSearchAction);
   m_searchMenu->addAction(m_searchPageAction);
   m_searchMenu->addAction(m_searchNodeAction);
@@ -3060,9 +3060,16 @@ void LanesLexicon::onMessageTimeout() {
  *
  */
 void LanesLexicon::updateStatusBar(const Place & p) {
+  QLOG_DEBUG() << Q_FUNC_INFO << p;
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());
   QString headseparator;
   Place current;
+  /// TODO what about search widgets
+  if (! entry) {
+    //    QLOG_DEBUG() << Q_FUNC_INFO << "Invalid place" << p.toString();
+    m_placeIndicator->setText("");
+    return;
+  }
   if (p.isValid()) {
     current = p;
   }
@@ -3455,10 +3462,12 @@ void LanesLexicon::searchForText() {
     QPair<bool,bool> tabOpts = d->tabOptions();  // first = new,second = go
     int n = w->search();
     int c = this->getSearchCount();
-    int ix = this->addTab(tabOpts.first,w,QString(tr("Search %1")).arg(c+1));
+    int ix = this->addTab(tabOpts.first,w,QString(tr("Search for: %1")).arg(o.target));
     if (tabOpts.second) {
       m_tabs->setCurrentIndex(ix);
     }
+    connect(w,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
+    connect(w,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
     w->show();
     statusMessage(QString(tr("Search returned %1 %2")).arg(n).arg(n == 1 ? "result" : "results"));
 
@@ -3646,7 +3655,11 @@ void LanesLexicon::currentTabChanged(int ix) {
   if (full)  {
     full->selectFocus();
   }
-
+  EnsearchWidget * ensearch = qobject_cast<EnsearchWidget *>(m_tabs->currentWidget());
+  if (ensearch)  {
+    ensearch->focusTable();
+  }
+  this->updateStatusBar(Place());
   this->enableForPage(false);
 
 }
@@ -3823,6 +3836,10 @@ int LanesLexicon::getSearchCount() {
   for(int i=0;i < m_tabs->count();i++) {
     FullSearchWidget * w = qobject_cast<FullSearchWidget *>(m_tabs->widget(i));
     if (w) {
+      c++;
+    }
+    EnsearchWidget * e = qobject_cast<EnsearchWidget *>(m_tabs->widget(i));
+    if (e) {
       c++;
     }
   }
@@ -4219,10 +4236,12 @@ void LanesLexicon::printNode(const QString & node) {
     printCurrentPage(node);
     return;
   }
+  /*
   FullSearchWidget * search = qobject_cast<FullSearchWidget *>(sender());
   if (! search) {
     return;
   }
+  */
   Place p;
   p.setNode(node);
   int i = this->hasPlace(p,GraphicsEntry::NodeSearch,false);

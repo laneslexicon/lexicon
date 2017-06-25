@@ -21,6 +21,7 @@ class EnsearchWidget : public QWidget {
   void setFields(const QString &);
   void setPadding(int);
   void setNode(const QString & n);
+  void focusTable();
   TextSearch * searcher();
  private:
   int m_pageSize;
@@ -34,5 +35,8 @@ class EnsearchWidget : public QWidget {
     void recordsRead(int);
     void onExit();
     void cancelSearch();
+ signals:
+    void showNode(const QString &,bool);
+    void printNode(const QString &);
 };
 #endif

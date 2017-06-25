@@ -837,19 +837,19 @@ QString TextSearch::summary() const {
   case 0 : {
     t = QString(tr("%1 search for \"%2\" - Found no occurrences"))
       .arg(m_regex ? "Regex" : "Text")
-      .arg(m_regex ? m_rx.pattern() : m_pattern);
+      .arg(m_regex ? m_pattern : m_pattern);
     break;
   }
   case 1 : {
     t = QString(tr("%1 search for \"%2\" - Found one occurrence"))
       .arg(m_regex ? "Regex" : "Text")
-      .arg(m_regex ? m_rx.pattern() : m_pattern);
+      .arg(m_regex ? m_pattern : m_pattern);
     break;
   }
   default : {
      t = QString(tr("%1 search for \"%2\" - Found %3 occurrence%4 in %5 entr%6"))
        .arg(m_regex ? "Regex" : "Text")
-       .arg(m_regex ? m_rx.pattern() : m_pattern)
+       .arg(m_regex ? m_pattern : m_pattern)
        .arg(findCount)
        .arg(findCount == 1 ? "" : "s")
        .arg(entryCount).arg(entryCount == 1 ? "y" : "ies");

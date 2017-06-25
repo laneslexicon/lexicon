@@ -155,7 +155,16 @@ int TextSearchWidget::addRow(const Place & p, const QString & text,int pos) {
   label->setAlignment(Qt::AlignCenter);
   m_results->setCellWidget(row,POSITION_COLUMN,label);
 
-  label = m_results->createLabel(text,"fullsearchlist");
+  QString str = "‪" + text;
+  QRegularExpression leadingSpaces("^\\s+");
+  QRegularExpression lineBreaks("\\r|\\n");
+  // remove the formatting characters surrounding Arabic quoted text
+  str.remove(QChar(0xfdd0));
+  str.remove(QChar(0xfdd1));
+  str = str.remove(leadingSpaces);
+  str = str.remove(lineBreaks);
+
+  label = m_results->createLabel(str,"fullsearchlist");
 
   if (getSupport()->startsWithArabic(text)) {
     label->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
@@ -165,7 +174,7 @@ int TextSearchWidget::addRow(const Place & p, const QString & text,int pos) {
   }
 
   if ( ! m_contextStyle.isEmpty()) {
-    QString str = label->text();
+    str = label->text();
     str = QString("<span style=\"%1\">%2</span>").arg(m_contextStyle).arg(str);
     label->setText(str);
   }
@@ -300,4 +309,13 @@ void TextSearchWidget::viewNode(int row) {
   v->show();
   v->raise();
   v->activateWindow();
+  connect(v,SIGNAL(openNode(const QString &)),this,SLOT(openNode(const QString &)));
+  connect(v,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
+}
+void TextSearchWidget::openNode(const QString & node) {
+  emit(showNode(node,false));
+  m_results->setFocus();
+}
+void TextSearchWidget::focusTable() {
+  m_results->setFocus();
 }

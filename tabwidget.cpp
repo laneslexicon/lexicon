@@ -3,6 +3,7 @@
 #include "graphicsentry.h"
 #include "headsearch.h"
 #include "fullsearch.h"
+#include "ensearchwidget.h"
 #include "application.h"
 #include "definedsettings.h"
 #include "externs.h"
@@ -35,6 +36,11 @@ void TabWidget::keyPressEvent(QKeyEvent * event) {
       FullSearchWidget * fullsearch = qobject_cast<FullSearchWidget *>(this->currentWidget());
       if (fullsearch) {
         fullsearch->focusTable();
+        return;
+      }
+      EnsearchWidget * textsearch = qobject_cast<EnsearchWidget *>(this->currentWidget());
+      if (textsearch) {
+        textsearch->focusTable();
         return;
       }
       break;
