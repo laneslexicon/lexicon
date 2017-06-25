@@ -30,11 +30,12 @@ class SearchRunner : public QObject {
 #define CERR  QLOG_WARN()
 #define ENDL  "\n"
 #endif
-class TestOption {
+class TextOption {
  public:
   bool wholeWord;
   bool caseSensitive;
   bool ignoreDiacritics;
+  bool regex;
   QString target;
   bool result;
 };
@@ -44,7 +45,7 @@ class TestRunner {
   void add(const QString &,bool result,bool wholeWord = false,bool caseSensitive = false,bool ignore = false);
   void run();
   QString pattern;
-  QList<TestOption> tests;
+  QList<TextOption> tests;
 };
 /**
  * Helper class that contains all the info
@@ -103,7 +104,7 @@ class TextSearch : public QObject {
   QString  dbFile() const;
   void toFile(const QString & fileName = QString()) const;
   QString fromSafe(const QString & v);
-  void search();
+  int search();
   void searchAll();
   void searchNodes();
   void searchSingle();
@@ -151,6 +152,7 @@ class TextSearch : public QObject {
   QString m_xsltFile;    //
   QString m_dbFile;      //
   int m_pageSize;
+  int m_findCount;
   //  QMap<int,int> m_pages;
   QMap<int,QPair<int,int> > m_summaryPages;
   QMap<int,QPair<int,int> > m_fullPages;

@@ -11,14 +11,16 @@ EnsearchWidget::EnsearchWidget(int rows,QWidget * parent) : QWidget(parent) {
   layout->addWidget(m_search);
   m_summary = new QLabel("");
   layout->addWidget(m_summary);
+#ifndef LANE
   QHBoxLayout * hlayout = new QHBoxLayout;
   m_quit = new QPushButton(tr("Quit"));
   hlayout->addWidget(m_quit);
   hlayout->addStretch();
   layout->addLayout(hlayout);
+  connect(m_quit,SIGNAL(clicked()),this,SLOT(onExit()));
+#endif
   setLayout(layout);
   connect(m_search->searcher(),SIGNAL(recordsRead(int)),this,SLOT(recordsRead(int)));
-  connect(m_quit,SIGNAL(clicked()),this,SLOT(onExit()));
 }
 /*
 TextSearchWidget * EnsearchWidget::searcher() {
@@ -32,7 +34,7 @@ TextSearch * EnsearchWidget::searcher() {
   return m_search->searcher();
 }
 
-void EnsearchWidget::search() {
+int EnsearchWidget::search() {
   int max = m_search->searcher()->readSize();
   m_pd = new QProgressDialog("Searching...", "Cancel", 0,max, this);
   m_pd->setWindowTitle(tr("Text Search"));
@@ -40,14 +42,19 @@ void EnsearchWidget::search() {
   m_pd->setWindowModality(Qt::WindowModal);
   m_pd->show();
   this->recordsRead(1);
-  m_search->searcher()->search();
+  int findCount = m_search->searcher()->search();
   delete m_pd;
   m_pageCounts = m_search->searcher()->setPages(m_pageSize);
-  // TODO make dependant on somethng
+  // TextSearchWidget needs to readSettings for:
+  // summary/full
+  // rows per table
+  // fragment size
+  // fields
   m_search->setPages(m_pageCounts.second);
   m_search->loadPage(1);
   QString txt = m_search->searcher()->summary();
-  m_summary->setText(getSupport()->scanAndSpan(txt,"searchsummary",true));//m_search->searcher()->summary());
+  m_summary->setText(getSupport()->scanAndSpan(txt,"searchsummary",true));
+  return findCount;
 }
 void EnsearchWidget::recordsRead(int x) {
   m_pd->setValue(x);

@@ -17,6 +17,7 @@
 #define VOL_COLUMN 5
 #define CONTEXT_COLUMN 6
 extern LaneSupport * getSupport();
+
 TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) : QWidget(parent) {
   QStringList headings;
   headings << tr("Mark") << tr("Root") << tr("Headword") << tr(" Node ") << tr("Occurs")  << tr("Vol/Page") << tr("Context");

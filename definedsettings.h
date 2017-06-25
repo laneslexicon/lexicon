@@ -187,11 +187,6 @@ They should not be translated.
 #define SID_LOCALSEARCH_IGNORE_CASE            "Ignore case"
 
 
-#define SID_TEXTSEARCH_DIACRITICS             "Ignore diacritics"
-#define SID_TEXTSEARCH_WHOLE_WORD             "Whole word"
-#define SID_TEXTSEARCH_FORCE_LTR              "Force LTR"
-#define SID_TEXTSEARCH_TYPE_REGEX             "Regex"
-#define SID_TEXTSEARCH_IGNORE_CASE            "Ignore case"
 
 #define SID_FULLSEARCH_ONE_ROW                 "One row"
 #define SID_FULLSEARCH_RESULTS_FONT            "Results Arabic font"
@@ -216,6 +211,34 @@ They should not be translated.
 #define SID_FULLSEARCH_RESIZE_ROWS             "Resize rows"
 #define SID_FULLSEARCH_IGNORE_CASE             "Ignore case"
 #define SID_FULLSEARCH_EN_WHOLE_WORD           "English whole word"
+
+#define SID_FULLSEARCH_ONE_ROW                 "One row"
+#define SID_FULLSEARCH_RESULTS_FONT            "Results Arabic font"
+#define SID_FULLSEARCH_DEBUG                   "Debug"
+#define SID_FULLSEARCH_FRAGMENT_SIZE           "Fragment size"
+#define SID_FULLSEARCH_INCLUDE_HEADS           "Include heads"
+#define SID_FULLSEARCH_HEAD_BACKGROUND         "Head word background"
+#define SID_FULLSEARCH_HEAD_TEXT               "Head text"
+
+
+#define SID_TEXTSEARCH_ONE_ROW                 "One row"
+#define SID_TEXTSEARCH_FRAGMENT_SIZE           "Fragment size"
+#define SID_TEXTSEARCH_VIEWER_POSITION         "Viewer position"
+#define SID_TEXTSEARCH_STEP                    "Step"
+#define SID_TEXTSEARCH_WHOLE_WORD              "Whole word"
+#define SID_TEXTSEARCH_DIACRITICS              "Ignore diacritics"
+#define SID_TEXTSEARCH_TYPE_REGEX              "Regex"
+#define SID_TEXTSEARCH_NEW_TAB                 "New tab"
+#define SID_TEXTSEARCH_GO_TAB                  "Activate tab"
+#define SID_TEXTSEARCH_LIST_STATE              "List state"
+#define SID_TEXTSEARCH_LIST_COLUMNS            "Default column widths"
+#define SID_TEXTSEARCH_CONTEXT_STYLE            "Context style"
+#define SID_TEXTSEARCH_ROW_HEIGHT              "Row height"
+#define SID_TEXTSEARCH_RESIZE_ROWS             "Resize rows"
+#define SID_TEXTSEARCH_IGNORE_CASE             "Ignore case"
+
+
+
 
 #define SID_ROOTSEARCH_NEW_TAB                 "Root new tab"
 #define SID_ROOTSEARCH_GO_TAB                  "Root activate tab"

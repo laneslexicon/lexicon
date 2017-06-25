@@ -5,12 +5,17 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QSet>
+#include <QList>
+#include <QByteArray>
+#include <QPoint>
+#include <QVariant>
 #include <QTableWidgetItem>
 #include <QSqlQuery>
 #include <QSqlError>
 class TextSearch;
 class ColumnarTableWidget;
 class Place;
+
 class TextSearchWidget : public QWidget {
   Q_OBJECT
 

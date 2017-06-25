@@ -11,7 +11,8 @@
 #include "textsearch.h"
 #include "place.h"
 #include "lanesupport.h"
-extern LaneSupport * getSupport();
+#include "externs.h"
+//extern LaneSupport * getSupport();
 #ifndef LANE
 SearchRunner::SearchRunner() {
 }
@@ -24,7 +25,7 @@ TestRunner::TestRunner(const QString & p) {
   pattern = p;
 }
 void TestRunner::add(const QString & t,bool r,bool w,bool c,bool i) {
-  TestOption o;
+  TextOption o;
   o.wholeWord = w;
   o.caseSensitive = c;
   o.ignoreDiacritics = i;
@@ -35,7 +36,7 @@ void TestRunner::add(const QString & t,bool r,bool w,bool c,bool i) {
 void TestRunner::run() {
 
   for(int i=0;i < tests.size();i++) {
-    TestOption o = tests[i];
+    TextOption o = tests[i];
     QRegularExpression rx = TextSearch::buildRx(pattern,o.ignoreDiacritics,o.wholeWord,o.caseSensitive);
     qDebug() << i << rx.match(o.target).hasMatch() << o.result;
   }
@@ -636,7 +637,7 @@ void TextSearch::searchAll() {
   }
 
   int readCount = 0;
-  int findCount = 0;
+  m_findCount = 0;
   bool finished = false;
   QMap<int,QString> ret;
   while (query.next() && ! finished && ! m_cancel) {
@@ -657,7 +658,7 @@ void TextSearch::searchAll() {
         r.page = p.page();
         r.fragments = ret;
         m_results << r;
-        findCount++;
+        m_findCount += ret.size();
       }
     }
     /*
@@ -693,7 +694,7 @@ void TextSearch::searchSingle() {
   }
 
   int readCount = 0;
-  int findCount = 0;
+  m_findCount = 0;
   bool finished = false;
   QMap<int,QString> ret;
   QSet<QString> nodes;
@@ -717,7 +718,7 @@ void TextSearch::searchSingle() {
             r.page = p.page();
             r.fragments = ret;
             m_results << r;
-            findCount++;
+            m_findCount += ret.size();
           }
         }
       }
@@ -737,7 +738,7 @@ void TextSearch::searchSingle() {
 }
 void TextSearch::searchNodes() {
   int readCount = 0;
-  int findCount = 0;
+  m_findCount = 0;
   bool finished = false;
   QSqlQuery query;
   query.prepare(SQL_FIND_ENTRY_DETAILS);
@@ -763,7 +764,7 @@ void TextSearch::searchNodes() {
             r.root = query.value("root").toString().toUtf8();
             r.head = query.value("headword").toString().toUtf8();
             r.fragments = ret;
-            findCount++;
+            m_findCount += ret.size();
             m_results << r;
           }
           /*
@@ -806,7 +807,7 @@ int TextSearch::readSize() const {
   }
   return max;
 }
-void TextSearch::search() {
+int TextSearch::search() {
   m_results.clear();
   QTime t;
   t.start();
@@ -822,6 +823,7 @@ void TextSearch::search() {
     this->searchNodes();
   }
  m_time = t.elapsed();
+ return m_findCount;
 }
 QString TextSearch::summary() const {
 

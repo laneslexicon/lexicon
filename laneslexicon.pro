@@ -117,6 +117,8 @@ SOURCES += main.cpp\
         contentspanel.cpp \
         textsearchdialog.cpp \
         textsearch.cpp \
+        ensearchwidget.cpp \
+        textsearchwidget.cpp \
         lanesupport.cpp
 
 
@@ -170,4 +172,6 @@ HEADERS  += laneslexicon.h \
             contentspanel.h \
             textsearchdialog.h \
             textsearch.h \
+            ensearchwidget.h \
+            textsearchwidget.h \
             lanesupport.h

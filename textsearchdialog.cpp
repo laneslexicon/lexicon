@@ -6,10 +6,11 @@
 #include "definedsettings.h"
 extern Lexicon * getLexicon();
 
-TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidget * parent,Qt::WindowFlags f) :
+TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QDialog(parent,f) {
   setObjectName("arabicsearchdialog");
-  m_searchType = searchType;
+  //  m_searchType = searchType;
+  /*
   QLOG_DEBUG() << Q_FUNC_INFO << searchType;
   switch(searchType) {
   case SearchOptions::Root :
@@ -31,9 +32,10 @@ TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidg
     setWindowTitle("Unknown search type");
     break;
   }
+  */
+  setWindowTitle(tr("Text Search"));
 
-
-  m_count = 0;
+  //  m_count = 0;
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
   m_edit->setObjectName("arabicedit");
@@ -63,22 +65,26 @@ TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidg
   m_moreButton->setCheckable(true);
   m_moreButton->setAutoDefault(false);
 
-
-
+  //
+  // the order of the buttons in the QDialogButtonBox depends
+  // on the platform and the role of each button
+  //
   m_buttonBox = new QDialogButtonBox(Qt::Vertical);
   m_buttonBox->addButton(m_findButton, QDialogButtonBox::AcceptRole);
   //  m_buttonBox->addButton(new QPushButton("&Cancel"),QDialogButtonBox::RejectRole);
   QPushButton * button = m_buttonBox->addButton(QDialogButtonBox::Cancel);
   button->setText(tr("&Cancel"));
+  m_buttonBox->addButton(m_keyboardButton, QDialogButtonBox::ActionRole);
+  /*
   m_buttonBox->addButton(m_moreButton, QDialogButtonBox::ActionRole);
-
   if (searchType == SearchOptions::Word) {
     m_moreButton->setVisible(true);
   }
   else {
     m_moreButton->setVisible(false);
   }
-  m_buttonBox->addButton(m_keyboardButton,QDialogButtonBox::ActionRole);
+  */
+  //  m_buttonBox->addButton(m_keyboardButton,QDialogButtonBox::ActionRole);
   QPushButton * helpbutton = m_buttonBox->addButton(QDialogButtonBox::Help);
   connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
   m_findButton->setFocus();
@@ -87,22 +93,16 @@ TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidg
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
   connect(m_edit,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
+  /*
   m_options = new SearchOptionsWidget(SearchOptions::Text,this);
-
-  connect(m_options,SIGNAL(force(bool)),m_edit,SLOT(setForceLTR(bool)));
 
   connect(m_options,SIGNAL(loadKeymap(const QString &)),this,SLOT(loadKeymap(const QString &)));
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->currentMap();
-  /*
-  if (map.isEmpty()) {
-    map = m_edit->getNullMap();
-  }
-  maps << m_edit->getNullMap();
-  */
   m_options->addKeymaps(map,maps);
   m_options->setOptions(m_searchType);
+  */
   m_mapEnabled = m_edit->isMappingEnabled();
   connect(m_moreButton, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
 
@@ -114,9 +114,38 @@ TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidg
   inputlayout->addWidget(m_edit,0,1);
   inputlayout->addWidget(m_text,1,1);
   leftlayout->addLayout(inputlayout);
-  //  leftlayout->addWidget(m_text);
-  leftlayout->addWidget(m_options);
-  leftlayout->addStretch();
+  m_optionsWidget = new QWidget(this);
+
+
+  m_regexSearch = new QRadioButton(tr("Regular expression"));
+  m_normalSearch = new QRadioButton(tr("Normal"));
+  m_wholeWord = new QCheckBox(tr("Whole word match"));
+  m_ignoreCase = new QCheckBox(tr("Ignore case"));
+  m_ignoreDiacritics = new QCheckBox(tr("Ignore diacritics"));
+  m_goTab = new QCheckBox(tr("Activate tab"));
+  m_newTab = new QCheckBox(tr("Open new tab"));
+
+  QGroupBox * typeGroup = new QGroupBox(tr("Search type"));
+  QHBoxLayout * typeLayout = new QHBoxLayout;
+  typeLayout->addWidget(m_normalSearch);
+  typeLayout->addWidget(m_regexSearch);
+  typeGroup->setLayout(typeLayout);
+
+  QGridLayout * optionlayout = new QGridLayout;
+  optionlayout->addWidget(typeGroup,0,0,1,2);
+  optionlayout->addWidget(m_wholeWord,1,0);
+  optionlayout->addWidget(m_ignoreCase,1,1);
+  optionlayout->addWidget(m_ignoreDiacritics,2,0);
+  optionlayout->addWidget(m_newTab,3,0);
+  optionlayout->addWidget(m_goTab,3,1);
+  m_optionsWidget->setLayout(optionlayout);
+  leftlayout->addWidget(m_optionsWidget);
+  //  hidde
+  //  m_wholeWord->setVisible(false);
+  //  m_ignoreCase->setVisible(false);
+  connect(m_regexSearch,SIGNAL(toggled(bool)),this,SLOT(searchTypeChanged(bool)));
+  //  leftlayout->addWidget(m_options);
+  //  leftlayout->addStretch();
 
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addLayout(leftlayout);
@@ -128,9 +157,9 @@ TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidg
   //  mainlayout->addStretch();
   setLayout(mainlayout);
 
+  //  m_optionsWidget->setVisible(false);
 
-
-  m_options->showMore(false);
+  //  m_options->showMore(false);
 
   m_edit->setFocus();
 
@@ -163,6 +192,7 @@ TextSearchDialog::TextSearchDialog(SearchOptions::SearchScope_t searchType,QWidg
   connect(m_keyboard,SIGNAL(closed()),this,SLOT(keyboardClosed()));
   connect(m_keyboard,SIGNAL(keyboardShortcut(const QString &)),this,SLOT(onKeyboardShortcut(const QString &)));
   m_moreButton->setVisible(false);
+  readSettings();
 }
 void TextSearchDialog::onKeyboardShortcut(const QString & key) {
   if (key == m_keyboardButton->shortcut().toString()) {
@@ -219,12 +249,14 @@ void TextSearchDialog::showKeyboard() {
   m_edit->setFocus();
 }
 void TextSearchDialog::showOptions(bool v) {
+  /*
   m_options->showMore(v);
   if (!v)
     m_edit->setFocus();
 
   /// this shrinks the dialog
   this->layout()->setSizeConstraint(QLayout::SetFixedSize);
+  */
 }
 QString TextSearchDialog::getText() const {
   QString t = m_edit->text().trimmed();
@@ -235,11 +267,6 @@ void TextSearchDialog::setPrompt(const QString & text) {
   m_prompt->setText(text);
 }
 /*
-void TextSearchDialog::setOptions(SearchOptions & opts) {
-  opts.setSearchScope(m_searchType);
-  m_options->setOptions(m_searchType);
-}
-*/
 void TextSearchDialog::getOptions(SearchOptions & opts) const {
   m_options->getOptions(opts);
   opts.setPattern(m_edit->text());
@@ -249,12 +276,11 @@ void TextSearchDialog::setOptions(SearchOptions & opts)  {
   m_options->setOptions(opts);
   m_edit->setText(opts.pattern());
 }
+*/
 void TextSearchDialog::loadKeymap(const QString & mapname) {
   m_edit->setCurrentMap(mapname);
 }
-bool TextSearchDialog::getForceLTR() const {
-  return m_options->getForceLTR();
-}
+
 void TextSearchDialog::setText(const QString & t) {
   m_edit->setText(t);
 }
@@ -378,4 +404,48 @@ QString TextSearchDialog::showText(const QString & txt) {
   }
   html += "</body></html>";
   return html;
+}
+void TextSearchDialog::readSettings() {
+  SETTINGS
+
+  settings.beginGroup("TextSearch");
+  m_wholeWord->setChecked(settings.value(SID_TEXTSEARCH_WHOLE_WORD,false).toBool());
+  m_ignoreCase->setChecked(settings.value(SID_TEXTSEARCH_IGNORE_CASE,true).toBool());
+  m_ignoreDiacritics->setChecked(settings.value(SID_TEXTSEARCH_DIACRITICS,true).toBool());
+  if (settings.value(SID_TEXTSEARCH_TYPE_REGEX,false).toBool()) {
+    m_regexSearch->setChecked(true);
+  }
+  else {
+    m_normalSearch->setChecked(true);
+  }
+
+  m_goTab->setChecked(settings.value(SID_TEXTSEARCH_GO_TAB,true).toBool());
+  m_newTab->setChecked(settings.value(SID_TEXTSEARCH_NEW_TAB,true).toBool());
+  /*
+#define SID_TEXTSEARCH_DIACRITICS              "Ignore diacritics"
+#define SID_TEXTSEARCH_TYPE_REGEX              "Regex"
+#define SID_TEXTSEARCH_NEW_TAB                 "New tab"
+#define SID_TEXTSEARCH_GO_TAB                  "Activate tab"
+#define SID_TEXTSEARCH_WHOLE_WORD              "Whole word"
+#define SID_TEXTSEARCH_IGNORE_CASE             "Ignore case"
+  */
+}
+void TextSearchDialog::searchTypeChanged(bool v) {
+  m_wholeWord->setEnabled(! m_regexSearch->isChecked());
+  //  m_ignoreCase->setChecked(settings.value(SID_TEXTSEARCH_IGNORE_CASE,true));
+  m_ignoreDiacritics->setEnabled(! m_regexSearch->isChecked());
+
+}
+TextOption TextSearchDialog::options() const {
+  TextOption o;
+
+  o.wholeWord =  m_wholeWord->isChecked();
+  o.caseSensitive =  ! m_ignoreCase->isChecked();
+  o.ignoreDiacritics = m_ignoreDiacritics->isChecked();
+  o.regex =  m_regexSearch->isChecked();
+  o.target = m_edit->text();
+  return o;
+}
+QPair<bool,bool> TextSearchDialog::tabOptions() const {
+  return qMakePair(m_newTab->isChecked(),m_goTab->isChecked());
 }

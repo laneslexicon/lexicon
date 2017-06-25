@@ -40,6 +40,7 @@
 #include "textwidthdialog.h"
 #include "contentspanel.h"
 #include "textsearchdialog.h"
+#include "ensearchwidget.h"
 LanesLexicon::LanesLexicon(QWidget *parent) :
     QMainWindow(parent)
 
@@ -2007,7 +2008,7 @@ void LanesLexicon::onTest() {
     delete d;
   }
   if (1) {
-    TextSearchDialog * d = new TextSearchDialog(SearchOptions::Text);
+    TextSearchDialog * d = new TextSearchDialog();
     d->exec();
   }
 }
@@ -3386,12 +3387,14 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   SearchOptions options;
   d->getOptions(options);
   int ix = m_tabs->currentIndex();
-
+  if (searchType == SearchOptions::Text) {
+    return;
+  }
   if (searchType == SearchOptions::Word) {
     FullSearchWidget * s = new FullSearchWidget;
     s->setSearch(t,options);
     s->setForceLTR(d->getForceLTR());
-    s->findTarget(true);
+    s->findTarget(true);  // does the actual search including progress dialog
     connect(s,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
     connect(s,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
     /// this is a count of search tabs (not search results)
@@ -3438,7 +3441,29 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   }
 }
 void LanesLexicon::searchForText() {
-  this->wordSearch("en");
+  TextSearchDialog * d = new TextSearchDialog();
+  if (d->exec()) {
+    TextOption o = d->options();
+    EnsearchWidget * w = new EnsearchWidget;
+    w->setPadding(30);                // get from settings.ini
+    w->setFields("RHOPNTV");         //
+    w->setSearch(o.target,
+                 o.regex,
+                 o.caseSensitive,
+                 o.wholeWord,
+                 o.ignoreDiacritics);
+    QPair<bool,bool> tabOpts = d->tabOptions();  // first = new,second = go
+    int n = w->search();
+    int c = this->getSearchCount();
+    int ix = this->addTab(tabOpts.first,w,QString(tr("Search %1")).arg(c+1));
+    if (tabOpts.second) {
+      m_tabs->setCurrentIndex(ix);
+    }
+    w->show();
+    statusMessage(QString(tr("Search returned %1 %2")).arg(n).arg(n == 1 ? "result" : "results"));
+
+  }
+  delete d;
 }
 void LanesLexicon::searchForWord() {
   this->wordSearch("ar");
@@ -3464,7 +3489,10 @@ void LanesLexicon::wordSearch(const QString & lang) {
   m_wordSearchDialog->hideKeyboard();
 }
 
-/// TODO these needs to search the entry looking for bareword or word
+/**
+ * Headword search
+ *
+ */
 void LanesLexicon::searchForEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   if (m_headSearchDialog == NULL) {
@@ -3755,24 +3783,7 @@ int LanesLexicon::hasPlace(const Place & p,int searchtype,bool setFocus) {
 void LanesLexicon::showSearchNode(const QString & node,bool forceNewTab) {
   QLOG_DEBUG() << Q_FUNC_INFO << node << forceNewTab;
   GraphicsEntry * entry;
-  /*
-  FullSearchWidget * w = qobject_cast<FullSearchWidget *>(sender());
-  if (w) {
-    QLOG_DEBUG() << ">>>>>>>>>>>>>>>>> fullsearch" << node;
-  }
-  else {
-    HeadSearchWidget * h = qobject_cast<HeadSearchWidget *>(sender());
-    if (h) {
-      QLOG_DEBUG() << ">>>>>>>>>>>>>>>>> headsearch" << node;
-    }
-    else {
-      GraphicsEntry * e = qobject_cast<GraphicsEntry *>(sender());
-      if (e) {
-        QLOG_DEBUG() << ">>>>>>>>>>>>>>>>>>>> link view" << node;
-      }
-    }
-  }
-  */
+
   bool v = m_allowDuplicates;
   if (forceNewTab) {
     m_allowDuplicates = true;
@@ -3805,20 +3816,6 @@ void LanesLexicon::showSearchNode(const QString & node,bool forceNewTab) {
 
   }
     m_allowDuplicates = v;
-
-  /*
-  //  int ix = this->searchTabs(node);
-
-  if (ix != -1) {
-    statusMessage(QString(tr("Entry loaded into tab %1")).arg(ix+1));
-    GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->widget(ix));
-    if (entry) {
-      entry->focusNode(node);
-    }
-    return;
-  }
-  */
-
 }
 
 int LanesLexicon::getSearchCount() {

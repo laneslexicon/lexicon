@@ -10,24 +10,29 @@
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QTextBrowser>
+#include <QGridLayout>
 #include "application.h"
 #include "imedit.h"
 #include "imlineedit.h"
 #include "keyboardwidget.h"
-#include "searchoptionswidget.h"
+#include "textsearch.h"
+//#include "searchoptionswidget.h"
 class TextSearchDialog : public QDialog {
   Q_OBJECT
 
  public:
-  TextSearchDialog(SearchOptions::SearchScope_t type,QWidget * parent = 0, Qt::WindowFlags f = 0);
+  TextSearchDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
   ~TextSearchDialog();
   QString getText() const;
   void setPrompt(const QString &);
-  void getOptions(SearchOptions &) const;
-  void setOptions(SearchOptions &);
-  bool getForceLTR() const ;
+  //  void getOptions(SearchOptions &) const;
+  //  void setOptions(SearchOptions &);
+  //  bool getForceLTR() const ;
   void setText(const QString &);
   void hideKeyboard();
+  void readSettings();
+  TextOption options() const;
+  QPair<bool,bool> tabOptions() const;
   public slots:
     virtual void showOptions(bool);
     void showKeyboard();
@@ -36,9 +41,12 @@ class TextSearchDialog : public QDialog {
     void onKeyboardShortcut(const QString &);
     void onHelp();
     void onTextChanged(const QString &);
+    void searchTypeChanged(bool);
  protected:
     QString showText(const QString &);
-    SearchOptions::SearchScope_t m_searchType;
+    //    SearchOptions::SearchScope_t m_searchType;
+ private:
+    QWidget * m_optionsWidget;
     int m_count;
     KeyboardWidget * m_keyboard;
     QLabel * m_text;
@@ -51,7 +59,14 @@ class TextSearchDialog : public QDialog {
     QPushButton * m_moreButton;
     QPushButton * m_findButton;
     QPushButton * m_keyboardButton;
-    SearchOptionsWidget  * m_options;
+    QCheckBox * m_wholeWord;
+    QCheckBox * m_ignoreCase;
+    QCheckBox * m_ignoreDiacritics;
+    QCheckBox * m_goTab;
+    QCheckBox * m_newTab;
+    QRadioButton * m_normalSearch;
+    QRadioButton * m_regexSearch;
+//    SearchOptionsWidget  * m_options;
 
  signals:
     void showHelp(const  QString &);
