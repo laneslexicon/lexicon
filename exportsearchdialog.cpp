@@ -14,16 +14,38 @@ ExportSearchDialog::ExportSearchDialog(const QStringList & columns,const QString
     m_columnKey = columnKey;
   }
   QVBoxLayout * layout = new QVBoxLayout;
-  QGroupBox * columnbox = new QGroupBox(tr("Select columns to export"));
+  QGroupBox * columnbox = new QGroupBox(tr("Select columns to export, use up/down to change the order"));
+  QHBoxLayout * columnhbox = new QHBoxLayout;
   QFormLayout * columnlayout = new QFormLayout;
+  m_columnOrder = new QListWidget;
+
   columnlayout->setHorizontalSpacing(100);
   for(int i=0;i < columns.size();i++) {
     QCheckBox * col = new QCheckBox;
     m_columns << col;
     columnlayout->addRow(columns[i],col);
-  }
-  columnbox->setLayout(columnlayout);
 
+
+  }
+  columnhbox->addLayout(columnlayout);
+
+
+  columnhbox->addWidget(m_columnOrder);
+
+  QVBoxLayout * updownlayout = new QVBoxLayout;
+  updownlayout->addStretch();
+  m_up = new QPushButton("Up");
+  m_down = new QPushButton("Down");
+  m_up->setEnabled(false);
+  m_down->setEnabled(false);
+  updownlayout->addWidget(m_up);
+  updownlayout->addWidget(m_down);
+  updownlayout->addStretch();
+  columnhbox->addLayout(updownlayout);
+  columnbox->setLayout(columnhbox);
+  connect(m_up,SIGNAL(clicked()),this,SLOT(columnUp()));
+  connect(m_down,SIGNAL(clicked()),this,SLOT(columnDown()));
+  connect(m_columnOrder,SIGNAL(itemSelectionChanged()),this,SLOT(columnSelectionChanged()));
 
   QHBoxLayout * separatorlayout  = new QHBoxLayout;
   QGroupBox * separatorbox = new QGroupBox(tr("Field separator"));
@@ -96,6 +118,12 @@ ExportSearchDialog::ExportSearchDialog(const QStringList & columns,const QString
   setLayout(layout);
 
   readSettings();
+  for(int i=0;i < m_columns.size();i++) {
+    connect(m_columns[i],SIGNAL(stateChanged(int)),this,SLOT(columnChanged(int)));
+    if (m_columns[i]->isChecked()) {
+      m_columnOrder->addItem(new QListWidgetItem(m_columnLabels[i]));
+    }
+  }
 }
 QString ExportSearchDialog::separator() const {
   if (m_tabSeparator->isChecked()) {
@@ -186,13 +214,65 @@ bool ExportSearchDialog::allRows() const {
 }
 QStringList ExportSearchDialog::columns() const {
   QStringList columns;
-  for (int i=0;i < m_columns.size();i++) {
-    if (m_columns[i]->isChecked()) {
-      columns << m_columnLabels[i];
-    }
+  for(int i=0;i < m_columnOrder->count();i++) {
+    columns << m_columnOrder->item(i)->text();
   }
   return columns;
 }
 void ExportSearchDialog::setColumnKey(const QString & str) {
   m_columnKey = str;
+}
+void ExportSearchDialog::columnUp() {
+  int currentRow = m_columnOrder->currentRow();
+  if (currentRow == 0) {
+    return;
+  }
+  QListWidgetItem * item = m_columnOrder->takeItem(currentRow);
+  m_columnOrder->insertItem(currentRow - 1, item);
+  m_columnOrder->setCurrentRow(currentRow - 1);
+}
+void ExportSearchDialog::columnDown() {
+  int currentRow = m_columnOrder->currentRow();
+  if (currentRow == (m_columnOrder->count() - 1)) {
+    return;
+  }
+  QListWidgetItem * item = m_columnOrder->takeItem(currentRow);
+  m_columnOrder->insertItem(currentRow + 1, item);
+  m_columnOrder->setCurrentRow(currentRow + 1);
+}
+void ExportSearchDialog::columnSelectionChanged() {
+  m_up->setEnabled(m_columnOrder->count() > 1);
+  m_down->setEnabled(m_columnOrder->count() > 1);
+}
+void ExportSearchDialog::columnChanged(int state) {
+  int row = -1;
+  QCheckBox * box = qobject_cast<QCheckBox *>(sender());
+  if (box) {
+    for(int i=0;i < m_columns.size();i++) {
+      if (m_columns[i] == box) {
+        row = i;
+      }
+    }
+    if (row == -1) {
+      return;
+    }
+    QString str = m_columnLabels[row];
+    if (state == Qt::Checked) {
+      m_columnOrder->addItem(new QListWidgetItem(str));
+    }
+    else {
+      QList<QListWidgetItem *> r = m_columnOrder->findItems(str,Qt::MatchFixedString);
+      for(int i=0;i < r.size();i++) {
+        delete r[i];
+      }
+    }
+  }
+  bool ok = false;
+  if (m_columnOrder->selectedItems().size() > 0) {
+    if (m_columnOrder->count() > 1) {
+      ok = true;
+    }
+  }
+  m_up->setEnabled(ok);
+  m_down->setEnabled(ok);
 }

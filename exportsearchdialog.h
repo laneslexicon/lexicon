@@ -11,6 +11,8 @@
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QLineEdit>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <QPushButton>
 #include <QFileDialog>
 #include <QDir>
@@ -43,6 +45,14 @@ class ExportSearchDialog : public QDialog {
   QLineEdit * m_charSeparator;
   QCheckBox * m_saveSettings;
   QLineEdit * m_fileName;
+  QListWidget * m_columnOrder;
   QString   m_columnKey;
+  QPushButton * m_up;
+  QPushButton * m_down;
+  private slots:
+    void columnUp();
+    void columnDown();
+    void columnSelectionChanged();
+    void columnChanged(int);
 };
 #endif
