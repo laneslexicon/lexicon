@@ -171,6 +171,19 @@ void ColumnarTableWidget::showEmpty(const QString & text) {
   this->setCellWidget(0,0,label);
   m_saveConfig = false;
 }
+QStringList ColumnarTableWidget::columnHeadings() const {
+  QStringList columns;
+
+  for(int i=0;i < this->columnCount();i++) {
+    QString s = this->horizontalHeaderItem(i)->text();
+    if (i != m_markColumn) {
+      if (! s.isEmpty()) {
+        columns << s;
+      }
+    }
+  }
+  return columns;
+}
 QString ColumnarTableWidget::exportResults(const QString & key) const {
   QStringList columns;
 

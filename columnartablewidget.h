@@ -40,6 +40,7 @@ class ColumnarTableWidget : public QTableWidget {
   virtual void writeConfiguration();
   virtual QLabel * createLabel(const QString &,const QString & style = QString()) const;
   QString exportResults(const QString & key = QString()) const;
+  QStringList columnHeadings() const;
  private slots:
     void onColumnDialog(int);
  private:
