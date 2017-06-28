@@ -14,6 +14,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <iostream>
+
 #ifndef LANE
 class SearchRunner : public QObject {
   Q_OBJECT
@@ -93,16 +94,20 @@ class TextSearch : public QObject {
   QList<QPair<QString,QString> > splitText(const QString & txt);
   QMap<int,QString> searchEntry(QString xml);//,QString headword,QString node = QString());
   bool searchWord(const QString &);
-  static QString getDiacritics(QList<QChar> & points);
-  static QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
+  void setDiacritics();   // Tries to set the list of diacritics from settings.ini
+  void setDiacritics(const QString &); // set diacritics from command string
+  QString getDiacritics(QList<QChar> & points);
+  QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
+  static QStringList fields();
   QString fixHtml(const QString & t);
   void setSearch(const QString & pattern,bool regex,bool caseSensitive,bool wholeWord,bool diacritics);
   void setSettingsPath(const QString &);
   void setXsltFileName(const QString &);
   void setDbFileName(const QString &);
   void setFields(const QString &);
+  void setExportRecord(bool v);
   QString  dbFile() const;
-  void toFile(const QString & fileName = QString()) const;
+  void toFile(const QString & fileName = QString());
   QString fromSafe(const QString & v);
   int search();
   void searchAll();
@@ -117,6 +122,7 @@ class TextSearch : public QObject {
   void setSearchType(bool);
   void setIgnoreXref(bool);
   void setCancel(bool);
+  void setSeparator(const QString &);
   SearchParams params() const;
   QPair<int,int> getPageCounts() const;
   QString summary() const;
@@ -133,12 +139,14 @@ class TextSearch : public QObject {
   int readSize() const;
  private:
   QList<SearchResult>  m_results;
-  void setOffsets();
+  QList<QChar> m_dc;
+  bool m_exportRecord;
   qint64 m_time;
   QStringList m_nodes;
   QString m_fields;
   QRegularExpression m_rx;
   QTextDocument::FindFlags m_findFlags;
+  bool m_outputRecord;
   bool m_cancel;
   bool m_verbose;
   bool m_caseSensitive;
@@ -160,5 +168,6 @@ class TextSearch : public QObject {
  signals:
   void recordsRead(int);
   void fatalError(const QString &);
+  void exportRecord(int,int);
 };
 #endif

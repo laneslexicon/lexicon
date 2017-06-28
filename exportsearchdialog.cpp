@@ -99,7 +99,7 @@ ExportSearchDialog::ExportSearchDialog(const QStringList & columns,const QString
   otherlayout->addRow(tr("Export to file"),filelayout);
 
   m_headers = new QCheckBox;
-  otherlayout->addRow(tr("Including column headers"),m_headers);
+  otherlayout->addRow(tr("Include column headings"),m_headers);
 
   m_saveSettings = new QCheckBox;
   otherlayout->addRow(tr("Save these settings"),m_saveSettings);

@@ -3452,6 +3452,7 @@ void LanesLexicon::searchForText() {
   if (d->exec()) {
     TextOption o = d->options();
     EnsearchWidget * w = new EnsearchWidget;
+    w->setDiacritics();
     w->setPadding(30);                // get from settings.ini
     w->setFields("RHOPNTV");         //
     w->setSearch(o.target,

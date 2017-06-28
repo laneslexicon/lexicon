@@ -84,3 +84,11 @@ void EnsearchWidget::cancelSearch() {
 void EnsearchWidget::focusTable() {
   m_search->focusTable();
 }
+void EnsearchWidget::setDiacritics(const QString & v) {
+  if (v.length() == 0) {
+    m_search->searcher()->setDiacritics(); // get from settings ini
+  }
+  else {
+    m_search->searcher()->setDiacritics(v); // get from commandline
+  }
+}

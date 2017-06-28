@@ -17,6 +17,7 @@ class EnsearchWidget : public QWidget {
   EnsearchWidget(int rows = 10,QWidget * parent = 0);
   QSize sizeHint() const;
   int search();
+  void setDiacritics(const QString & v = QString());
   void setSearch(const QString & pattern,bool regex,bool caseSensitive,bool wholeWord,bool diacritics);
   void setFields(const QString &);
   void setPadding(int);

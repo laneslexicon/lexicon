@@ -9,6 +9,7 @@
 #include "definedsql.h"
 #include "externs.h"
 #include "nodeview.h"
+#include "exportsearchdialog.h"
 #define SELECT_COLUMN 0
 #define ROOT_COLUMN 1
 #define HEAD_COLUMN 2
@@ -20,6 +21,11 @@ extern LaneSupport * getSupport();
 
 TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) : QWidget(parent) {
   QStringList headings;
+  /**
+   * Other than the mark/select column, the possible columns should come from TextSerch.
+   * What the columns headings are is not important as long as they can be correlated with
+   * TextSearch fields
+   */
   headings << tr("Mark") << tr("Root") << tr("Headword") << tr(" Node ") << tr("Occurs")  << tr("Vol/Page") << tr("Context");
   if (! summary) {
     headings[POSITION_COLUMN] = tr("Position");
@@ -45,6 +51,9 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
   hlayout->addWidget(m_page);
   hlayout->addWidget(m_summaryTable);
   hlayout->addStretch();
+
+  m_exportButton = new QPushButton(tr("Export"));
+  hlayout->addWidget(m_exportButton);
   layout->addLayout(hlayout);
   m_results->setRowCount(pageSize);
   setLayout(layout);
@@ -53,6 +62,9 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
   connect(m_results,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
   connect(m_results,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(onCellDoubleClicked(int,int)));
+  connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
+
+  connect(m_data,SIGNAL(exportRecord(int,int)),this,SLOT(exportRecord(int,int)));
 }
 TextSearch * TextSearchWidget::searcher() {
   return m_data;
@@ -82,6 +94,7 @@ void TextSearchWidget::setPages(int pages) {
   }
   m_page->blockSignals(false);
 }
+/*
 void TextSearchWidget::load(const TextSearch & data) {
   int rows = data.rows(m_summary);
   QList<SearchHit> d = data.getHits(0,rows,m_summary);
@@ -90,6 +103,7 @@ void TextSearchWidget::load(const TextSearch & data) {
     addRow(p,d[i].fragment,d[i].ix);
   }
 }
+*/
 void TextSearchWidget::loadPage(int page) {
   m_results->setRowCount(0);
   //  int rows = data.rows(m_summary);
@@ -106,7 +120,7 @@ void TextSearchWidget::loadPage(int page) {
     m_results->resizeRowsToContents();
   }
   m_currentPage = page;
-  // new restore the marks
+  // now restore the marks
   if (m_marks.contains(page)) {
     QSet<int> s = m_marks.value(page);
     QSetIterator<int> iter(m_marks.value(page));
@@ -318,4 +332,70 @@ void TextSearchWidget::openNode(const QString & node) {
 }
 void TextSearchWidget::focusTable() {
   m_results->setFocus();
+}
+/**
+ * TODO if exporting summary ? Export all for each or just the count?
+ *
+ */
+void TextSearchWidget::onExport() {
+  QStringList columns = m_results->columnHeadings();
+  qDebug() << Q_FUNC_INFO << m_marks;
+  ExportSearchDialog dlg(columns);
+  if (dlg.exec() != QDialog::Accepted) {
+    return;
+  }
+  if (dlg.saveSettings()) {
+    dlg.writeSettings();
+  }
+  QString exportFileName = dlg.exportFileName();
+  QFile file(exportFileName);
+  if (! file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    QString err = QString(tr("Error opening export file to %1 : %2")).arg(exportFileName).arg(file.errorString());
+    QLOG_WARN() << err;
+    QMessageBox::warning(0, tr("Export Search Results"),err);
+    return;
+  }
+  if (exportFileName.isEmpty()) {
+    return;
+  }
+  file.close();
+  QString sep = dlg.separator();
+  columns = dlg.columns();
+
+/**
+ * If the column names ever get translated, then this needs to match
+*
+*/
+  QMap<QString,QString> cnames;
+  cnames.insert(tr("Node"),"N");
+  cnames.insert(tr("Root"),"R");
+  cnames.insert(tr("Head"),"H");
+  cnames.insert(tr("Context"),"T");
+  cnames.insert(tr("Page"),"P");
+  cnames.insert(tr("Vol"),"V");
+  cnames.insert(tr("Pos"),"O");
+  QString fields;
+  QMapIterator<QString,QString> iter(cnames);
+  for(int i=0;i < columns.size();i++) {
+    iter.toFront();
+    while(iter.hasNext()) {
+      iter.next();
+      if (columns[i].contains(iter.key(),Qt::CaseInsensitive)) {
+        fields.append(iter.value());
+      }
+    }
+  }
+  qDebug() << exportFileName <<  sep << columns << fields;
+  m_exportAll = dlg.allRows();
+  m_data->setFields(fields);
+  m_data->setSeparator(sep);
+  m_data->toFile(exportFileName);
+}
+void TextSearchWidget::exportRecord(int entry,int row) {
+  qDebug() << Q_FUNC_INFO << entry << row;
+  if (m_exportAll) {
+    m_data->setExportRecord(true);
+    return;
+  }
+
 }

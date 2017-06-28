@@ -124,10 +124,6 @@ void test(QString & str) {
     }
   }
   if (1) {
-    QList<QChar> points;
-    QString d =  TextSearch::getDiacritics(points);
-    //    tests <<  "فَتح" ;
-    qDebug() << d << d.length() << points;
     TestRunner t("فَتح");
     t.add("graeme",false);
     t.add("فَتَح",false);
@@ -244,12 +240,15 @@ int main(int argc, char *argv[])
   parser.addOption(listOption);
 
 
-  QCommandLineOption fieldOption(QStringList() <<"f" << "fields",QObject::tr("Specify output information: R(oot), H(ead word, N(ode), O(ffset),P(age), T(ext), V(olume). Defaults to all.)"),"RHNOTVP");
+  QCommandLineOption fieldOption(QStringList() <<"f" << "fields",QObject::tr("Specify output information: R(oot), H(ead word, N(ode), O(ffset),P(age), T(ext), V(olume). Defaults to all.)"),"fields");
   fieldOption.setDefaultValue("RHNOTVP");
   parser.addOption(fieldOption);
 
   QCommandLineOption noxrefOption(QStringList() <<"e" << "no-xref",QObject::tr("Do not use cross-reference table"));
   parser.addOption(noxrefOption);
+
+  QCommandLineOption criticsOption(QStringList() <<"a" << "set-diacritics",QObject::tr("Comma separated list of code points (in hex)"),"critics");
+  parser.addOption(criticsOption);
 
 
   parser.process(app);
@@ -374,6 +373,12 @@ int main(int argc, char *argv[])
   if (fx.match(fields).hasMatch()) {
     std::cerr << qPrintable(QString("Unknown output field requested, ignored (use only RHNOPTV)")) << std::endl;
   }
+  if (parser.isSet(criticsOption)) {
+    searcher.setDiacritics(parser.value(criticsOption));
+  }
+  else {
+    searcher.setDiacritics();
+  }
   searcher.setVerbose(verbose);
   searcher.m_separator = parser.value(separatorOption);
   int padding = 30;
@@ -431,6 +436,12 @@ int main(int argc, char *argv[])
   }
   else {
     EnsearchWidget * w = new EnsearchWidget(rows);
+    if (parser.isSet(criticsOption)) {
+      w->setDiacritics(parser.value(criticsOption));
+    }
+    else {
+      w->setDiacritics();
+    }
     w->setPadding(padding);
     w->setFields("RHOPNTV");
     w->setNode(parser.value(nodeOption));

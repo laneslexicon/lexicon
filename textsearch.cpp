@@ -17,6 +17,7 @@
 SearchRunner::SearchRunner() {
 }
 void SearchRunner::recordsRead(int r) {
+  // TODO change this
   double d = 100 * (r/47919.0) ;
   CERR << qPrintable(QString("..%1%..").arg(d,0,'g',4));
 }
@@ -34,10 +35,11 @@ void TestRunner::add(const QString & t,bool r,bool w,bool c,bool i) {
   tests << o;
 }
 void TestRunner::run() {
-
+  TextSearch s;
+  s.setDiacritics();
   for(int i=0;i < tests.size();i++) {
     TextOption o = tests[i];
-    QRegularExpression rx = TextSearch::buildRx(pattern,o.ignoreDiacritics,o.wholeWord,o.caseSensitive);
+    QRegularExpression rx = s.buildRx(pattern,o.ignoreDiacritics,o.wholeWord,o.caseSensitive);
     qDebug() << i << rx.match(o.target).hasMatch() << o.result;
   }
 }
@@ -491,48 +493,59 @@ void testSplit(const QString & txt) {
   qDebug() << "words" << words;
 }
 */
-/*
-  Return the regex to make the diacritics optional and fill the passed array with the characters
-  so the calling function can remove them from the search pattern
-*/
-QString TextSearch::getDiacritics(QList<QChar> & points) {
-  /*
-  if (m_iniFileName.isEmpty()) {
-    CERR << qPrintable("Cannot locate settings.ini, diacritics option ignored") << ENDL;
-    return QString();
-  }
-  QSettings settings(m_iniFileName,QSettings::IniFormat);
-  */
+/**
+ * set diacritics from INI file
+ *
+ */
+void TextSearch::setDiacritics() {
 #ifdef LANE
-  QSettings settings(getLexicon()->settingsFileName(),QSettings::IniFormat);
-  settings.setIniCodec("UTF-8");
+  QString fileName = getLexicon()->settingsFileName();
 #else
-  QSettings settings(getSupport()->settingsFileName(),QSettings::IniFormat);
-  settings.setIniCodec("UTF-8");
+  QString fileName = getSupport()->settingsFileName();
 #endif
-
-
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Diacritics");
-  QStringList keys = settings.childKeys();
-  QString v;
-  QString rx("[");
-  bool ok;
-  for(int i=0;i < keys.size();i++) {
-    if (keys[i].startsWith("Char")) {
-      v = settings.value(keys[i],QString()).toString();
-      QChar c = QChar(v.toInt(&ok,16));
-      if (ok) {
-        rx.append(c);
+  if (! fileName.isEmpty() && QFileInfo::exists(fileName)) {
+    m_dc.clear();
+    QSettings settings(fileName,QSettings::IniFormat);
+    settings.setIniCodec("UTF-8");
+    settings.beginGroup("Diacritics");
+    QStringList keys = settings.childKeys();
+    QString v;
+    bool ok;
+    for(int i=0;i < keys.size();i++) {
+      if (keys[i].startsWith("Char")) {
+        v = settings.value(keys[i],QString()).toString();
+        QChar c = QChar(v.toInt(&ok,16));
+        m_dc << c;
       }
-      else {
-        //        qDebug() << "Cannot convert" << v;
-      }
-      points << c;
     }
   }
+  //  qDebug() << Q_FUNC_INFO << "diacritics count" << m_dc.size();
+}
+/**
+ * set diacritics from comma delimited list of hex code points.
+ *
+ * @param v
+ */
+void TextSearch::setDiacritics(const QString & v) {
+  QStringList w = v.split(",",QString::SkipEmptyParts);
+  for(int i=0;i < w.size();i++) {
+    bool ok = true;
+    QChar c = QChar(w[i].remove("0x").toInt(&ok,16));
+    if (ok) {
+      m_dc << c;
+    }
+  }
+}
+QString TextSearch::getDiacritics(QList<QChar> & points) {
+  if (m_dc.size() == 0) {
+    return QString();
+  }
+  QString rx("[");
+  for(int i=0;i < m_dc.size();i++) {
+    rx.append(m_dc[i]);
+    points << m_dc[i];
+  }
   rx.append("]*");
-
   return rx;
 }
 QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool wholeword,bool casesensitive) {
@@ -564,29 +577,30 @@ QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool
   //  qDebug() << Q_FUNC_INFO << rx.isValid() << rx.pattern();
   return rx;
 }
-void TextSearch::toFile(const QString & fileName) const {
+void TextSearch::toFile(const QString & fileName)  {
   bool fileOutput = false;
   QFile of;
 
   if (fileName.length() > 0) {
-  of.setFileName(fileName);
-  if (! of.open(QIODevice::WriteOnly)) {
-    CERR << "Cannot open output file for writing: ";
-    CERR << qPrintable(of.errorString()) << ENDL;
-  }
-  else {
-    fileOutput = true;
-  }
+    of.setFileName(fileName);
+    if (! of.open(QIODevice::WriteOnly)) {
+      CERR << "Cannot open output file for writing: ";
+      CERR << qPrintable(of.errorString()) << ENDL;
+    }
+    else {
+      fileOutput = true;
+    }
   }
   QTextStream out(&of);
   out.setCodec("UTF-8");
 
   int findCount = 0;
   QStringList fields = m_fields.split("",QString::SkipEmptyParts);
-
+  m_exportRecord = true;
   for(int i=0;i < m_results.size();i++) {
     QMapIterator<int,QString> iter(m_results[i].fragments);
     findCount += m_results[i].fragments.size();
+    int j=0;
     while(iter.hasNext()) {
       iter.next();
       QStringList o;
@@ -613,13 +627,19 @@ void TextSearch::toFile(const QString & fileName) const {
           o << iter.value();
         }
       }
-      if (fileOutput) {
-        out << o.join(m_separator);
-        out << "\n";
+      // convert to page/offset
+
+      emit(exportRecord(i,j));
+      if (m_exportRecord) {
+        if (fileOutput) {
+          out << o.join(m_separator);
+          out << "\n";
+        }
+        else {
+          COUT << qPrintable(o.join(m_separator)) << ENDL;
+        }
       }
-      else {
-        COUT << qPrintable(o.join(m_separator)) << ENDL;
-      }
+      j++;
     }
   }
   // QString summary =  QString("Search for: %1 : found in %2 entr%3, total count %4 (time %5ms)").arg(m_pattern).arg(entryCount).arg(entryCount > 1 ? "ies" : "y").arg(findCount).arg(m_time);
@@ -876,7 +896,8 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     QRegularExpression rx("[\u0600-\u06ff]+");
     if (rx.match(pattern).hasMatch()) { // text contains arabic
       if (diacritics) {
-        pattern = QRegularExpression::escape(pattern);
+        // TODO do we need to do this?
+        //        pattern = QRegularExpression::escape(pattern);
         m_rx = buildRx(pattern,diacritics,wholeWord,caseSensitive);
         if (m_verbose) {
           CERR << "Arabic regex search (forced by diacritics):" << ENDL;
@@ -969,12 +990,6 @@ int TextSearch::rows(bool summary) const {
     c += m_results[i].fragments.size();
   }
   return c;
-}
-void TextSearch::setOffsets() {
-  int c = 0;
-  for(int i = 0;i < m_results.size();i++) {
-    c += m_results[i].fragments.size();
-  }
 }
 QPair<int,int> TextSearch::setPages(int sz) {
   m_pageSize = sz;
@@ -1092,4 +1107,15 @@ void TextSearch::dumpPages(bool summary) {
 }
 QPair<int,int> TextSearch::getPageCounts() const {
   return qMakePair(m_summaryPages.size(),m_fullPages.size());
+}
+void TextSearch::setExportRecord(bool v) {
+  m_exportRecord = v;
+}
+void TextSearch::setSeparator(const QString & v) {
+  m_separator = v;
+}
+QStringList TextSearch::fields() {
+  QStringList f;
+  f << "root" << "head" << "node" << "vol" << "page" << "offset" << "text";
+  return f;
 }
