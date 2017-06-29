@@ -125,6 +125,8 @@ TextSearch::TextSearch() {
   m_diacritics = true;
   m_noXref = false;
   m_cancel = false;
+  m_pageSize = 10;
+  m_summaryExport = false;
   QMap<QChar,QChar> safe;
   m_safe.insert(QChar('C'),QChar(0x621));
   m_safe.insert(QChar('M'),QChar(0x622));
@@ -601,14 +603,15 @@ void TextSearch::toFile(const QString & fileName)  {
   }
   QTextStream out(&of);
   out.setCodec("UTF-8");
-
+  int page;
+  int row;
   int findCount = 0;
   QStringList fields = m_fields.split("",QString::SkipEmptyParts);
   m_exportRecord = true;
+  int j=0;
   for(int i=0;i < m_results.size();i++) {
     QMapIterator<int,QString> iter(m_results[i].fragments);
     findCount += m_results[i].fragments.size();
-    int j=0;
     while(iter.hasNext()) {
       iter.next();
       QStringList o;
@@ -636,15 +639,24 @@ void TextSearch::toFile(const QString & fileName)  {
         }
       }
       // convert to page/offset
-
-      emit(exportRecord(i,j));
+      if (m_summaryExport) {
+         page = i / m_pageSize;
+         row = i % m_pageSize;
+      }
+      else {
+        page = (j/m_pageSize);
+        row  = j % m_pageSize;
+      }
+      emit(exportRecord(page+1,row));
       if (m_exportRecord) {
         if (fileOutput) {
           out << o.join(m_separator);
           out << "\n";
         }
         else {
-          COUT << qPrintable(o.join(m_separator)) << ENDL;
+          COUT << qPrintable(o.join(m_separator));
+          //          COUT << qPrintable(QString("    %1 %2").arg(page,4).arg(row,4));
+          COUT << ENDL;
         }
       }
       j++;
@@ -1130,6 +1142,12 @@ void TextSearch::setExportRecord(bool v) {
 }
 void TextSearch::setSeparator(const QString & v) {
   m_separator = v;
+}
+void TextSearch::setListSize(int v) {
+  m_pageSize = v;
+}
+void TextSearch::setSummaryExport(bool v) {
+  m_summaryExport = v;
 }
 QStringList TextSearch::fields() {
   QStringList f;

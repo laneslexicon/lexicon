@@ -341,7 +341,7 @@ void TextSearchWidget::focusTable() {
  */
 void TextSearchWidget::onExport() {
   QStringList columns = m_results->columnHeadings();
-  qDebug() << Q_FUNC_INFO << m_marks;
+  //  qDebug() << Q_FUNC_INFO << m_marks;
   ExportSearchDialog dlg(columns);
   if (dlg.exec() != QDialog::Accepted) {
     return;
@@ -387,17 +387,37 @@ void TextSearchWidget::onExport() {
       }
     }
   }
-  qDebug() << exportFileName <<  sep << columns << fields;
+  //  qDebug() << exportFileName <<  sep << columns << fields;
   m_exportAll = dlg.allRows();
   m_data->setFields(fields);
   m_data->setSeparator(sep);
+  m_data->setSummaryExport(m_summary);
   m_data->toFile(exportFileName);
 }
-void TextSearchWidget::exportRecord(int entry,int row) {
-  qDebug() << Q_FUNC_INFO << entry << row;
+void TextSearchWidget::exportRecord(int page,int row) {
+  //  qDebug() << Q_FUNC_INFO << m_marks << page << row;
+
   if (m_exportAll) {
     m_data->setExportRecord(true);
     return;
   }
+  if (! m_summary) {
+    if (m_marks.contains(page)) {
+      m_data->setExportRecord(m_marks.value(page).contains(row));
+      return;
+    }
+    m_data->setExportRecord(false);
+    return;
+  }
+  if (m_summary) {
+    if (m_marks.contains(page)) {
+      m_data->setExportRecord(m_marks.value(page).contains(row));
+      return;
+    }
+    m_data->setExportRecord(false);
+    return;
+
+  }
+
 
 }

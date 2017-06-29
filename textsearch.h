@@ -124,6 +124,8 @@ class TextSearch : public QObject {
   void setIgnoreXref(bool);
   void setCancel(bool);
   void setSeparator(const QString &);
+  void setListSize(int);
+  void setSummaryExport(bool);
   bool ok() const;
   SearchParams params() const;
   QPair<int,int> getPageCounts() const;
@@ -154,6 +156,7 @@ class TextSearch : public QObject {
   bool m_caseSensitive;
   bool m_wholeWord;
   bool m_noXref;
+  bool m_summaryExport;
   int m_padding;
   bool m_diacritics;
   bool m_regex;

@@ -48,7 +48,7 @@ class TextSearchWidget : public QWidget {
 
   QMap<int,QSet<int>> m_marks;     // key is page number (base=1),value is rows marked
   private slots:
-    void exportRecord(int entry,int row);
+    void exportRecord(int page,int row);
     void pageChanged(const QString &);
     void rowMarked(int);
     void summaryChanged(int);
