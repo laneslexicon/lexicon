@@ -33,7 +33,12 @@ LaneSupport::~LaneSupport() {
   //  std::cerr << "Delete LaneSupport" << std::endl;
 }
 QString LaneSupport::settingsFileName() const {
+  if (m_settings) {
   return m_settings->fileName();
+  }
+  else {
+    return QString();
+  }
 }
 /**
  *
@@ -129,6 +134,9 @@ QString LaneSupport::spanArabic(const QString & ar,const QString & spanstyle) {
   QString fontFamily;
   int fontSize = 10;
   QString style;
+  if (! m_settings) {
+    return ar;
+  }
   while(! m_settings->group().isEmpty()) {
     m_settings->endGroup();
   }
@@ -170,6 +178,9 @@ QString LaneSupport::getSpanStyle(const QString & spanstyle) {
   QString fontFamily;
   int fontSize = 10;
   QString style;
+  if (! m_settings) {
+    return style;
+  }
   while(! m_settings->group().isEmpty()) {
     m_settings->endGroup();
   }
@@ -373,6 +384,9 @@ bool LaneSupport::startsWithArabic(const QString & txt) const {
 }
 QString LaneSupport::xsltFileName() const {
   QString fileName;
+  if (! m_settings) {
+    return fileName;
+  }
   while(! m_settings->group().isEmpty()) {
     m_settings->endGroup();
   }

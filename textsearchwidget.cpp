@@ -172,6 +172,8 @@ int TextSearchWidget::addRow(const Place & p, const QString & text,int pos) {
   QString str = "‪" + text;
   QRegularExpression leadingSpaces("^\\s+");
   QRegularExpression lineBreaks("\\r|\\n");
+  leadingSpaces.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
+  lineBreaks.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
   // remove the formatting characters surrounding Arabic quoted text
   str.remove(QChar(0xfdd0));
   str.remove(QChar(0xfdd1));

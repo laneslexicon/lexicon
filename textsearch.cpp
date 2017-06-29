@@ -40,6 +40,7 @@ void TestRunner::run() {
   for(int i=0;i < tests.size();i++) {
     TextOption o = tests[i];
     QRegularExpression rx = s.buildRx(pattern,o.ignoreDiacritics,o.wholeWord,o.caseSensitive);
+    rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
     qDebug() << i << rx.match(o.target).hasMatch() << o.result;
   }
 }
@@ -105,6 +106,7 @@ QDebug operator<<(QDebug debug, const SearchParams& obj)
 QString TextSearch::fixHtml(const QString & t) {
   QString html = t;
   QRegularExpression rxInsert("<!--insert{([^}]+)}-->",QRegularExpression::MultilineOption);
+  rxInsert.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
   QRegularExpressionMatchIterator iter = rxInsert.globalMatch(html);
   while(iter.hasNext()) {
     QRegularExpressionMatch m = iter.next();
@@ -181,6 +183,9 @@ TextSearch::TextSearch() {
 
 
 }
+bool TextSearch::ok() const {
+  return (QFileInfo::exists(m_xsltFile) && (QFileInfo::exists(m_dbFile)));
+}
 QString TextSearch::buckwalterCharacters() {
   QString v;
   QList<QChar> k = m_safe.keys();
@@ -206,6 +211,9 @@ void TextSearch::setDbFileName(const QString & v) {
 }
 QString TextSearch::dbFile() const {
   return m_dbFile;
+}
+QString TextSearch::xsltFile() const {
+  return m_xsltFile;
 }
 void TextSearch::setSettingsPath(const QString & p) {
   m_iniFileName = p;
@@ -550,7 +558,7 @@ QString TextSearch::getDiacritics(QList<QChar> & points) {
 }
 QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool wholeword,bool casesensitive) {
   QList<QChar> dc;
-  QString diacritics = getDiacritics(dc);//("[0x6710x64c0x6500x651]*");
+  QString diacritics = getDiacritics(dc);
   QString pattern;
   //  qDebug() << Q_FUNC_INFO << diacritics << diacritics.length();
   // remove diacritics from the search pattern
@@ -784,6 +792,9 @@ void TextSearch::searchNodes() {
             r.root = query.value("root").toString().toUtf8();
             r.head = query.value("headword").toString().toUtf8();
             r.fragments = ret;
+            Place p = Place::fromEntryRecord(query.record());
+            r.vol = p.volume();
+            r.page = p.page();
             m_findCount += ret.size();
             m_results << r;
           }
@@ -890,14 +901,14 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
   m_regex = regex;
   m_diacritics = diacritics;
   QString pattern = p;
-
+  m_pattern = pattern;
   if (! regex) {
-    m_pattern = pattern;
     QRegularExpression rx("[\u0600-\u06ff]+");
+    rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
     if (rx.match(pattern).hasMatch()) { // text contains arabic
       if (diacritics) {
         // TODO do we need to do this?
-        //        pattern = QRegularExpression::escape(pattern);
+        //pattern = QRegularExpression::escape(pattern);
         m_rx = buildRx(pattern,diacritics,wholeWord,caseSensitive);
         if (m_verbose) {
           CERR << "Arabic regex search (forced by diacritics):" << ENDL;
@@ -911,14 +922,19 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     }
   }
   else {    // doing a regex search so just set the pattern
-    //    m_pattern = pattern;
+    if (diacritics) {
+      m_rx = buildRx(pattern,diacritics,false,caseSensitive);
+    }
+    else {
     m_rx.setPattern(pattern);
+    }
   }
   //
   // test for a single word of Arabic so we can use the xref table
   // later
   //
   QRegularExpression srx("^[\u0600-\u06ff]+$");
+  srx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
   m_singleArabic = srx.match(p.trimmed()).hasMatch();
 
   if (m_regex && ! caseSensitive) {
@@ -941,6 +957,7 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     }
 
   }
+  m_rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
 }
 
 QList<SearchHit> TextSearch::getHits(int offset,int pageSize,bool summary) const {

@@ -107,6 +107,7 @@ class TextSearch : public QObject {
   void setFields(const QString &);
   void setExportRecord(bool v);
   QString  dbFile() const;
+  QString xsltFile() const;
   void toFile(const QString & fileName = QString());
   QString fromSafe(const QString & v);
   int search();
@@ -123,6 +124,7 @@ class TextSearch : public QObject {
   void setIgnoreXref(bool);
   void setCancel(bool);
   void setSeparator(const QString &);
+  bool ok() const;
   SearchParams params() const;
   QPair<int,int> getPageCounts() const;
   QString summary() const;

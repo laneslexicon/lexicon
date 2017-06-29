@@ -21,6 +21,7 @@ NodeView::NodeView(const SearchParams & p,QWidget * parent)
   /// at the entry in the array that matches the position in SearchParams
   QTextCursor c;
   QRegularExpression rx;
+  rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
   if (p.regex) {
     rx.setPattern(p.pattern);
     c = m_browser->document()->find(rx,0,p.flags);
@@ -45,7 +46,7 @@ NodeView::NodeView(const SearchParams & p,QWidget * parent)
       m_startPosition = i;
     }
   }
-  qDebug() << Q_FUNC_INFO << p.pos << m_positions << "start index" << m_startPosition;;
+  //  qDebug() << Q_FUNC_INFO << p.pos << m_positions << "start index" << m_startPosition;;
   if (m_positions.size() > 0) {
     m_findFirstButton->setEnabled(true);
     m_findNextButton->setEnabled(true);
@@ -213,6 +214,7 @@ void NodeView::findFirst() {
   QTextCursor c;// = m_browser->document()->find(m_pattern,m_positions[m_positionIndex]);
   if (m_params.regex) {
     QRegularExpression rx(m_params.pattern);
+    rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
     c = m_browser->document()->find(rx,m_positions[m_positionIndex],m_params.flags);
   }
   else {
@@ -233,6 +235,7 @@ void NodeView::findNext() {
     QTextCursor c;// = m_browser->document()->find(m_pattern,m_positions[m_positionIndex]);
     if (m_params.regex) {
       QRegularExpression rx(m_params.pattern);
+      rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
       c = m_browser->document()->find(rx,m_positions[m_positionIndex],m_params.flags);
     }
     else {
