@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QGroupBox>
 #include <QSet>
 #include <QList>
 #include <QByteArray>
@@ -41,6 +42,9 @@ class TextSearchWidget : public QWidget {
   QComboBox * m_page;
   QCheckBox * m_summaryTable;
   QPushButton * m_exportButton;
+  QPushButton * m_clearMarks;
+  QPushButton * m_markAll;
+  QCheckBox   * m_thisPage;
   bool m_resizeRows;
   bool m_exportAll;
   int m_rowHeight;
@@ -56,6 +60,8 @@ class TextSearchWidget : public QWidget {
     void itemDoubleClicked(QTableWidgetItem * item);
     void openNode(const QString &);
     void onExport();
+    void onClear();
+    void onMark();
    signals:
       void printNode(const QString &);
       void showNode(const QString &,bool);

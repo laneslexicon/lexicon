@@ -52,6 +52,7 @@ int EnsearchWidget::search() {
   // rows per table
   // fragment size
   // fields
+  // clear/mark current page only
   m_search->setPages(m_pageCounts.second);
   m_search->loadPage(1);
   QString txt = m_search->searcher()->summary();

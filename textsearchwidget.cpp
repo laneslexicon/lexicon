@@ -50,15 +50,34 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
   hlayout->addWidget(new QLabel(tr("Page")));
   hlayout->addWidget(m_page);
   hlayout->addWidget(m_summaryTable);
+
   hlayout->addStretch();
 
   m_exportButton = new QPushButton(tr("Export"));
   hlayout->addWidget(m_exportButton);
   layout->addLayout(hlayout);
+  QGroupBox * groupbox = new QGroupBox(tr("Selections"));
+  QHBoxLayout * markslayout = new QHBoxLayout;
+  m_clearMarks = new QPushButton(tr("Clear"));
+  m_markAll = new QPushButton(tr("Select all"));
+
+  connect(m_clearMarks,SIGNAL(clicked()),this,SLOT(onClear()));
+  connect(m_markAll,SIGNAL(clicked()),this,SLOT(onMark()));
+  m_thisPage = new QCheckBox(tr("Current page only"));
+  markslayout->addWidget(m_clearMarks);
+  markslayout->addWidget(m_markAll);
+  markslayout->addWidget(m_thisPage);
+  groupbox->setLayout(markslayout);
+  QHBoxLayout * selectionslayout = new QHBoxLayout;
+  selectionslayout->addWidget(groupbox);
+  selectionslayout->addStretch();
+  layout->addLayout(selectionslayout);
+
   m_results->setRowCount(pageSize);
   setLayout(layout);
   m_data = new TextSearch();
   m_data->setXsltFileName(getSupport()->xsltFileName());
+  m_data->setListSize(pageSize);
   connect(m_results,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
   connect(m_results,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(onCellDoubleClicked(int,int)));
@@ -341,7 +360,7 @@ void TextSearchWidget::focusTable() {
  */
 void TextSearchWidget::onExport() {
   QStringList columns = m_results->columnHeadings();
-  //  qDebug() << Q_FUNC_INFO << m_marks;
+
   ExportSearchDialog dlg(columns);
   if (dlg.exec() != QDialog::Accepted) {
     return;
@@ -387,6 +406,7 @@ void TextSearchWidget::onExport() {
       }
     }
   }
+  //  qDebug() << Q_FUNC_INFO << m_marks;
   //  qDebug() << exportFileName <<  sep << columns << fields;
   m_exportAll = dlg.allRows();
   m_data->setFields(fields);
@@ -395,7 +415,7 @@ void TextSearchWidget::onExport() {
   m_data->toFile(exportFileName);
 }
 void TextSearchWidget::exportRecord(int page,int row) {
-  //  qDebug() << Q_FUNC_INFO << m_marks << page << row;
+  //  qDebug() << Q_FUNC_INFO << page << row;
 
   if (m_exportAll) {
     m_data->setExportRecord(true);
@@ -420,4 +440,57 @@ void TextSearchWidget::exportRecord(int page,int row) {
   }
 
 
+}
+void TextSearchWidget::onClear() {
+  bool currentPageOnly = m_thisPage->isChecked();
+  QList<QCheckBox *> marks = m_results->findChildren<QCheckBox *>();
+
+  for(int i=0;i < marks.size();i++) {
+    marks[i]->blockSignals(true);
+  }
+
+  for(int i=0;i < marks.size();i++) {
+    marks[i]->setChecked(false);
+  }
+  if (currentPageOnly) {
+    m_marks.remove(m_currentPage);
+  }
+  else {
+    m_marks.clear();
+  }
+  for(int i=0;i < marks.size();i++) {
+    marks[i]->blockSignals(false);
+  }
+}
+void TextSearchWidget::onMark() {
+  bool currentPageOnly = m_thisPage->isChecked();
+  QList<QCheckBox *> marks = m_results->findChildren<QCheckBox *>();
+  //  qDebug() << Q_FUNC_INFO << m_currentPage << marks.size();
+  for(int i=0;i < marks.size();i++) {
+    marks[i]->blockSignals(true);
+  }
+  // mark the currently viewed page
+  for(int i=0;i < marks.size();i++) {
+    marks[i]->setChecked(true);
+  }
+  int pages = m_page->count();
+  if (currentPageOnly) {
+    QSet<int> r;
+    for(int j=0;j < m_pageSize;j++) {
+      r.insert(j);
+    }
+    m_marks.insert(m_currentPage,r);
+  }
+  else {
+    for(int i=0;i < pages;i++) {
+      QSet<int> r;
+      for(int j=0;j < m_pageSize;j++) {
+        r.insert(j);
+      }
+      m_marks.insert(i+1,r);
+    }
+  }
+  for(int i=0;i < marks.size();i++) {
+    marks[i]->blockSignals(false);
+  }
 }

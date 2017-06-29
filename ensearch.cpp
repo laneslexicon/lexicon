@@ -494,6 +494,7 @@ regular expression search for \"friendship\" or \"fellowship\".\n\
   if (! ok ) {
     rows = 10;
   }
+  searcher.setListSize(rows);
 
   if (! parser.isSet(guiOption)) {
     SearchRunner * r = new SearchRunner;
