@@ -14,6 +14,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QPushButton>
+#include <QLabel>
 class TextSearch;
 class ColumnarTableWidget;
 class Place;
@@ -22,6 +23,7 @@ class TextSearchWidget : public QWidget {
 
  public:
   TextSearchWidget(int pageSize = 50,bool summary = false,QWidget * parent = 0);
+  ~TextSearchWidget();
   //  void load(const TextSearch &);
   void loadPage(int page);
   void setPages(int);
@@ -40,6 +42,7 @@ class TextSearchWidget : public QWidget {
   int addRow(const Place & p, const QString & text,int pos);
   int m_pageSize;
   int m_currentPage;
+  QLabel    * m_pagesText;
   QComboBox * m_page;
   QCheckBox * m_summaryTable;
   QPushButton * m_exportButton;
@@ -66,5 +69,6 @@ class TextSearchWidget : public QWidget {
    signals:
       void printNode(const QString &);
       void showNode(const QString &,bool);
+      void statusMessage(const QString &);
 };
 #endif

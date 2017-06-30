@@ -3453,6 +3453,9 @@ void LanesLexicon::searchForText() {
   TextSearchDialog * d = new TextSearchDialog();
   if (d->exec()) {
     TextOption o = d->options();
+    // need to set summary
+    // fragment size
+    // fields ?
     EnsearchWidget * w = new EnsearchWidget;
     w->setDiacritics();
     w->setPadding(30);                // get from settings.ini
@@ -3484,6 +3487,8 @@ void LanesLexicon::searchForText() {
       }
       connect(w,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
       connect(w,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
+      connect(w,SIGNAL(statusMessage(const QString &)),this,SLOT(setStatus(const QString &)));
+
       w->show();
       statusMessage(QString(tr("Search returned %1 %2")).arg(n).arg(n == 1 ? "result" : "results"));
     }

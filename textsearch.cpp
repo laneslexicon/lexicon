@@ -587,15 +587,21 @@ QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool
   //  qDebug() << Q_FUNC_INFO << rx.isValid() << rx.pattern();
   return rx;
 }
-void TextSearch::toFile(const QString & fileName)  {
+QString TextSearch::exportError() const {
+  return m_fileError;
+}
+int TextSearch::toFile(const QString & fileName)  {
   bool fileOutput = false;
   QFile of;
 
+  m_fileError.clear();
   if (fileName.length() > 0) {
     of.setFileName(fileName);
-    if (! of.open(QIODevice::WriteOnly)) {
+    if (! of.open(QIODevice::WriteOnly | QIODevice::Text)) {
       CERR << "Cannot open output file for writing: ";
       CERR << qPrintable(of.errorString()) << ENDL;
+      m_fileError = of.errorString();
+      return -1;
     }
     else {
       fileOutput = true;
@@ -609,6 +615,7 @@ void TextSearch::toFile(const QString & fileName)  {
   QStringList fields = m_fields.split("",QString::SkipEmptyParts);
   m_exportRecord = true;
   int j=0;
+  int exportCount = 0;
   for(int i=0;i < m_results.size();i++) {
     QMapIterator<int,QString> iter(m_results[i].fragments);
     findCount += m_results[i].fragments.size();
@@ -652,6 +659,7 @@ void TextSearch::toFile(const QString & fileName)  {
         if (fileOutput) {
           out << o.join(m_separator);
           out << "\n";
+          exportCount++;
         }
         else {
           COUT << qPrintable(o.join(m_separator));
@@ -666,6 +674,7 @@ void TextSearch::toFile(const QString & fileName)  {
   of.close();
   COUT << ENDL;
   CERR << qPrintable(this->summary()) << ENDL;
+  return exportCount;
 }
 void TextSearch::searchAll() {
   QSqlQuery query;
@@ -1137,6 +1146,16 @@ void TextSearch::dumpPages(bool summary) {
 QPair<int,int> TextSearch::getPageCounts() const {
   return qMakePair(m_summaryPages.size(),m_fullPages.size());
 }
+int TextSearch::pages(bool summary) const {
+  if (! summary) {
+    return m_fullPages.size();
+  }
+  else {
+    return m_summaryPages.size();
+  }
+  return 0;
+}
+
 void TextSearch::setExportRecord(bool v) {
   m_exportRecord = v;
 }

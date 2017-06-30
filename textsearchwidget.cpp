@@ -41,14 +41,17 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
   QVBoxLayout * layout = new QVBoxLayout;
   layout->addWidget(m_results);
   m_page = new QComboBox(this);
+  m_page->setEditable(true);
+  m_page->setInsertPolicy(QComboBox::NoInsert);
   connect(m_page,SIGNAL(currentIndexChanged(const QString &)),this,SLOT(pageChanged(const QString &)));
 
   m_summaryTable = new QCheckBox(tr("One row per entry"));
   connect(m_summaryTable,SIGNAL(stateChanged(int)),this,SLOT(summaryChanged(int)));
-
+  m_pagesText = new QLabel;
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(new QLabel(tr("Page")));
   hlayout->addWidget(m_page);
+  hlayout->addWidget(m_pagesText);
   hlayout->addWidget(m_summaryTable);
 
   hlayout->addStretch();
@@ -85,6 +88,9 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
 
   connect(m_data,SIGNAL(exportRecord(int,int)),this,SLOT(exportRecord(int,int)));
 }
+TextSearchWidget::~TextSearchWidget() {
+  QLOG_DEBUG() << Q_FUNC_INFO;
+}
 TextSearch * TextSearchWidget::searcher() {
   return m_data;
 }
@@ -108,9 +114,9 @@ void TextSearchWidget::setPages(int pages) {
     m_page->setEnabled(false);
     m_summaryTable->setEnabled(false);
   }
-  if (pages == 1) {
-    m_page->setEnabled(false);
-  }
+  //  if (pages == 1) {
+  //    m_page->setEnabled(false);
+  //  }
   m_page->blockSignals(false);
 }
 /*
@@ -131,6 +137,9 @@ void TextSearchWidget::loadPage(int page) {
     Place p = Place::fromSearchHit(d[i]);
     addRow(p,d[i].fragment,d[i].ix);
   }
+  //
+  //  what about when the columns aren't selected
+  //
   m_results->resizeColumnToContents(SELECT_COLUMN);
   m_results->resizeColumnToContents(NODE_COLUMN);
   m_results->resizeColumnToContents(POSITION_COLUMN);
@@ -151,6 +160,13 @@ void TextSearchWidget::loadPage(int page) {
         cb->setChecked(true);
       }
     }
+  }
+  int pages = m_data->pages(m_summary);
+  if (pages > 0) {
+    m_pagesText->setText(QString(tr("of %1")).arg(pages));
+  }
+  else {
+    m_pagesText->setText("");
   }
 }
 void TextSearchWidget::pageChanged(const QString & page) {
@@ -371,9 +387,16 @@ void TextSearchWidget::onExport() {
   QString exportFileName = dlg.exportFileName();
   QFile file(exportFileName);
   if (! file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    /*
     QString err = QString(tr("Error opening export file to %1 : %2")).arg(exportFileName).arg(file.errorString());
     QLOG_WARN() << err;
     QMessageBox::warning(0, tr("Export Search Results"),err);
+    */
+    QFileInfo fi(exportFileName);
+    QString error = file.errorString();
+    QMessageBox::warning(this, tr("Export Error"),
+                         QString(tr("There was a problem exporting to:\n\n   %1\n\nError: %2")).arg(fi.absoluteFilePath()).arg(error),
+             QMessageBox::Ok);
     return;
   }
   if (exportFileName.isEmpty()) {
@@ -406,13 +429,23 @@ void TextSearchWidget::onExport() {
       }
     }
   }
-  //  qDebug() << Q_FUNC_INFO << m_marks;
   //  qDebug() << exportFileName <<  sep << columns << fields;
   m_exportAll = dlg.allRows();
   m_data->setFields(fields);
   m_data->setSeparator(sep);
   m_data->setSummaryExport(m_summary);
-  m_data->toFile(exportFileName);
+  int count = m_data->toFile(exportFileName);
+  QFileInfo fi(exportFileName);
+  if (count != -1) {
+  emit(statusMessage(QString(tr("Exported %1 %2 to %3")).arg(count).arg(count == 1 ? "record" : "records").arg(fi.absoluteFilePath())));
+  }
+  else {
+    QString error = m_data->exportError();
+    QMessageBox::warning(this, tr("Export Error"),
+                         QString(tr("There was a problem exporting to:\n\n %1\n\nError: %2")).arg(fi.absoluteFilePath()).arg(error),
+             QMessageBox::Ok);
+
+  }
 }
 /**
  * This functions is called by TextSearch export routine for each result

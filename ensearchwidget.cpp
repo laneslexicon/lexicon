@@ -23,6 +23,7 @@ EnsearchWidget::EnsearchWidget(int rows,QWidget * parent) : QWidget(parent) {
   connect(m_search->searcher(),SIGNAL(recordsRead(int)),this,SLOT(recordsRead(int)));
   connect(m_search,SIGNAL(showNode(const QString &,bool)),this,SIGNAL(showNode(const QString &,bool)));
   connect(m_search,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
+  connect(m_search,SIGNAL(statusMessage(const QString &)),this,SIGNAL(statusMessage(const QString &)));
 }
 /*
 TextSearchWidget * EnsearchWidget::searcher() {

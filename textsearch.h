@@ -108,8 +108,9 @@ class TextSearch : public QObject {
   void setExportRecord(bool v);
   QString  dbFile() const;
   QString xsltFile() const;
-  void toFile(const QString & fileName = QString());
+  int toFile(const QString & fileName = QString());
   QString fromSafe(const QString & v);
+  QString exportError() const;
   int search();
   void searchAll();
   void searchNodes();
@@ -129,10 +130,12 @@ class TextSearch : public QObject {
   bool ok() const;
   SearchParams params() const;
   QPair<int,int> getPageCounts() const;
+  int pages(bool summary = false) const;
   QString summary() const;
   QString toHtml(const QString & xml);
   QString m_pattern;
   QString m_separator;
+  QString m_fileError;
   QList<SearchHit> getHits(int start,int sz,bool summary = false) const;
   QList<SearchHit> getPage(int page,bool summary) const;
   QString buckwalterCharacters();
