@@ -38,7 +38,7 @@ TextSearch * EnsearchWidget::searcher() {
 
 int EnsearchWidget::search() {
   int max = m_search->searcher()->readSize();
-  m_pd = new QProgressDialog("Searching...", "Cancel", 0,max, this);
+  m_pd = new QProgressDialog(tr("Searching..."), tr("Cancel"), 0,max, this);
   m_pd->setWindowTitle(tr("Text Search"));
   connect(m_pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
   m_pd->setWindowModality(Qt::WindowModal);
@@ -46,6 +46,12 @@ int EnsearchWidget::search() {
   this->recordsRead(1);
   int findCount = m_search->searcher()->search();
   delete m_pd;
+
+  if (findCount == 0) {
+    m_search->showEmpty(tr("Text not found"));
+    m_pageCounts = qMakePair(0,0);
+  }
+  else {
   m_pageCounts = m_search->searcher()->setPages(m_pageSize);
   // TextSearchWidget needs to readSettings for:
   // summary/full
@@ -57,6 +63,7 @@ int EnsearchWidget::search() {
   m_search->loadPage(1);
   QString txt = m_search->searcher()->summary();
   m_summary->setText(getSupport()->scanAndSpan(txt,"searchsummary",true));
+  }
   return findCount;
 }
 void EnsearchWidget::recordsRead(int x) {

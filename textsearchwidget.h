@@ -21,7 +21,7 @@ class TextSearchWidget : public QWidget {
   Q_OBJECT
 
  public:
-  TextSearchWidget(int pageSize = 10,bool summary = false,QWidget * parent = 0);
+  TextSearchWidget(int pageSize = 50,bool summary = false,QWidget * parent = 0);
   //  void load(const TextSearch &);
   void loadPage(int page);
   void setPages(int);
@@ -29,6 +29,7 @@ class TextSearchWidget : public QWidget {
   void readSettings();
   void viewNode(int row);
   void focusTable();
+  void showEmpty(const QString & text);
 
 
  private:

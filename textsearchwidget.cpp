@@ -56,7 +56,7 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
   m_exportButton = new QPushButton(tr("Export"));
   hlayout->addWidget(m_exportButton);
   layout->addLayout(hlayout);
-  QGroupBox * groupbox = new QGroupBox(tr("Selections"));
+  QGroupBox * groupbox = new QGroupBox(tr("Selection marks"));
   QHBoxLayout * markslayout = new QHBoxLayout;
   m_clearMarks = new QPushButton(tr("Clear"));
   m_markAll = new QPushButton(tr("Select all"));
@@ -245,15 +245,15 @@ void TextSearchWidget::rowMarked(int state) {
 void TextSearchWidget::readSettings() {
   SETTINGS
 
-  settings.beginGroup("FullSearch");
-  m_contextStyle = settings.value(SID_FULLSEARCH_CONTEXT_STYLE,QString()).toString();
-  //  m_singleRow = settings.value(SID_FULLSEARCH_ONE_ROW,true).toBool();
-  QString f = settings.value(SID_FULLSEARCH_RESULTS_FONT,QString()).toString();
+  settings.beginGroup("TextSearch");
+  m_contextStyle = settings.value(SID_TEXTSEARCH_CONTEXT_STYLE,QString()).toString();
+  //  m_singleRow = settings.value(SID_TEXTSEARCH_ONE_ROW,true).toBool();
+  QString f = settings.value(SID_TEXTSEARCH_RESULTS_FONT,QString()).toString();
   if (! f.isEmpty()) {
     //    m_resultsFont.fromString(f);
   }
-  m_resizeRows = settings.value(SID_FULLSEARCH_RESIZE_ROWS,true).toBool();
-  m_rowHeight  = settings.value(SID_FULLSEARCH_ROW_HEIGHT,40).toInt();;
+  m_resizeRows = settings.value(SID_TEXTSEARCH_RESIZE_ROWS,true).toBool();
+  m_rowHeight  = settings.value(SID_TEXTSEARCH_ROW_HEIGHT,40).toInt();;
 
 }
 void TextSearchWidget::summaryChanged(int state) {
@@ -355,7 +355,7 @@ void TextSearchWidget::focusTable() {
   m_results->setFocus();
 }
 /**
- * TODO if exporting summary ? Export all for each or just the count?
+ *
  *
  */
 void TextSearchWidget::onExport() {
@@ -414,6 +414,12 @@ void TextSearchWidget::onExport() {
   m_data->setSummaryExport(m_summary);
   m_data->toFile(exportFileName);
 }
+/**
+ * This functions is called by TextSearch export routine for each result
+ * before it is output.
+ * @param page
+ * @param row
+ */
 void TextSearchWidget::exportRecord(int page,int row) {
   //  qDebug() << Q_FUNC_INFO << page << row;
 
@@ -493,4 +499,13 @@ void TextSearchWidget::onMark() {
   for(int i=0;i < marks.size();i++) {
     marks[i]->blockSignals(false);
   }
+}
+void TextSearchWidget::showEmpty(const QString & text) {
+  m_results->showEmpty(text);
+  m_exportButton->setEnabled(false);
+  m_page->setEnabled(false);
+  m_clearMarks->setEnabled(false);
+  m_markAll->setEnabled(false);
+  m_thisPage->setEnabled(false);
+  m_summaryTable->setEnabled(false);
 }

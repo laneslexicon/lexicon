@@ -161,7 +161,9 @@ bool ColumnarTableWidget::startsWithArabic(const QString & t) const {
 }
 */
 void ColumnarTableWidget::showEmpty(const QString & text) {
+  this->setRowCount(0);
   this->insertRow(0);
+  this->setHorizontalHeaderItem(0,new QTableWidgetItem());
   for(int i=1;i < this->columnCount();i++) {
     this->hideColumn(i);
   }
@@ -238,6 +240,7 @@ QString ColumnarTableWidget::exportResults(const QString & key) const {
     allRows = true;
   }
   QRegularExpression rx("[\u2000-\u202e]");
+  rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
   for(int i=0;i < rowCount;i++) {
     ok = true;
     if (! allRows ) {
