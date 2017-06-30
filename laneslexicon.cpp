@@ -3448,6 +3448,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   }
 }
 void LanesLexicon::searchForText() {
+  bool r = false;
   TextSearchDialog * d = new TextSearchDialog();
   if (d->exec()) {
     TextOption o = d->options();
@@ -3462,18 +3463,34 @@ void LanesLexicon::searchForText() {
                  o.ignoreDiacritics);
     QPair<bool,bool> tabOpts = d->tabOptions();  // first = new,second = go
     int n = w->search();
-    int c = this->getSearchCount();
-    int ix = this->addTab(tabOpts.first,w,QString(tr("Search for: %1")).arg(o.target));
-    if (tabOpts.second) {
-      m_tabs->setCurrentIndex(ix);
+    if (n == 0) {
+      QMessageBox msg;
+      msg.setWindowTitle(tr("Text Search"));
+      msg.setText(QString("<html><body><div><p>Search for:</p><p style=\"font-weight:bold;margin-left:20px\">%1</p><p>Return no results.</p>\
+      <p>Search again?</p></div></body></html>").arg(o.target));
+      msg.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+      msg.setDefaultButton(QMessageBox::No);
+      int ret = msg.exec();
+      if (ret == QMessageBox::Yes) {
+        r = true;
+      }
     }
-    connect(w,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
-    connect(w,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
-    w->show();
-    statusMessage(QString(tr("Search returned %1 %2")).arg(n).arg(n == 1 ? "result" : "results"));
-
+    else {
+      int c = this->getSearchCount();    // find the number of search tabs
+      int ix = this->addTab(tabOpts.first,w,QString(tr("Search for: %1")).arg(o.target));
+      if (tabOpts.second) {
+        m_tabs->setCurrentIndex(ix);
+      }
+      connect(w,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
+      connect(w,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
+      w->show();
+      statusMessage(QString(tr("Search returned %1 %2")).arg(n).arg(n == 1 ? "result" : "results"));
+    }
   }
   delete d;
+  if (r) {
+    m_textSearchAction->trigger();
+  }
 }
 void LanesLexicon::searchForWord() {
   this->wordSearch("ar");
