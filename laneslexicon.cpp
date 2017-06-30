@@ -2010,6 +2010,7 @@ void LanesLexicon::onTest() {
   if (1) {
     TextSearchDialog * d = new TextSearchDialog();
     d->exec();
+    delete d;
   }
 }
 /**

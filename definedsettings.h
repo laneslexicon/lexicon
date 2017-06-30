@@ -236,7 +236,11 @@ They should not be translated.
 #define SID_TEXTSEARCH_ROW_HEIGHT              "Row height"
 #define SID_TEXTSEARCH_RESIZE_ROWS             "Resize rows"
 #define SID_TEXTSEARCH_IGNORE_CASE             "Ignore case"
-
+#define SID_TEXTSEARCH_CURRENTPAGE_ONLY        "Current page only"
+#define SID_TEXTSEARCH_PAGE_SIZE               "Page size"
+#define SID_TEXTSEARCH_RESULTS_FONT            "Results Arabic font"
+#define SID_TEXTSEARCH_DIALOG_SIZE             "Size"
+#define SID_TEXTSEARCH_DIALOG_POS              "Pos"
 
 
 
