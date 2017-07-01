@@ -362,7 +362,21 @@ void TextSearchDialog::readSettings() {
   m_newTab->setChecked(settings.value(SID_TEXTSEARCH_NEW_TAB,true).toBool());
 
   resize(settings.value(SID_TEXTSEARCH_DIALOG_SIZE,QSize(580,230)).toSize());
-  move(settings.value(SID_TEXTSEARCH_DIALOG_POS,QPoint(640,300)).toPoint());
+  QPoint p = settings.value(SID_TEXTSEARCH_DIALOG_POS,QPoint()).toPoint();
+  if (p.isNull()) {
+  int width = this->frameGeometry().width();
+  int height = this->frameGeometry().height();
+
+  QDesktopWidget wid;
+
+  int screenWidth = wid.screen()->width();
+  int screenHeight = wid.screen()->height();
+
+  this->setGeometry((screenWidth/2)-(width/2),(screenHeight/2)-(height/2),width,height);
+  }
+  else {
+    move(p);
+  }
 }
 void TextSearchDialog::searchTypeChanged(bool v) {
   m_wholeWord->setEnabled(! m_regexSearch->isChecked());

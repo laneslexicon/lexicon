@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QTextBrowser>
 #include <QGridLayout>
+#include <QDesktopWidget>
 #include "application.h"
 #include "imedit.h"
 #include "imlineedit.h"
