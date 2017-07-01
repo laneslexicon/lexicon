@@ -152,7 +152,17 @@ void HeadSearchWidget::search(const QString & searchpattern,const SearchOptions 
   connect(pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
 
   pd->setWindowModality(Qt::WindowModal);
+  int width = pd->frameGeometry().width();
+  int height = pd->frameGeometry().height();
+
+  QDesktopWidget wid;
+
+  int screenWidth = wid.screen()->width();
+  int screenHeight = wid.screen()->height();
+
+  pd->setGeometry((screenWidth/2)-(width/2),(screenHeight/2)-(height/2),width,height);
   pd->show();
+
   m_cancelSearch = false;
 
   Place p;

@@ -10,6 +10,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QFile>
+#include <QDesktopWidget>
 #include <QLabel>
 #include <QSettings>
 #include <QTableWidget>

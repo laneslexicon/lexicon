@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QEventLoop>
 #include <QProgressDialog>
+#include <QDesktopWidget>
 class TextSearchWidget;
 class TextSearch;
 class EnsearchWidget : public QWidget {

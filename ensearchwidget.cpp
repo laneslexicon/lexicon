@@ -48,6 +48,16 @@ int EnsearchWidget::search() {
   m_pd->setWindowTitle(tr("Text Search"));
   connect(m_pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
   m_pd->setWindowModality(Qt::WindowModal);
+
+  int width = m_pd->frameGeometry().width();
+  int height = m_pd->frameGeometry().height();
+
+  QDesktopWidget wid;
+
+  int screenWidth = wid.screen()->width();
+  int screenHeight = wid.screen()->height();
+
+  m_pd->setGeometry((screenWidth/2)-(width/2),(screenHeight/2)-(height/2),width,height);
   m_pd->show();
   this->recordsRead(1);
   int findCount = m_search->searcher()->search();

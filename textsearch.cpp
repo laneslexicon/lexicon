@@ -669,7 +669,7 @@ int TextSearch::toFile(const QString & fileName,bool columnheadings)  {
           o << "page";
         }
         if (fields[j] == "O") {
-          o << "offset/count";
+          o << "offset";
         }
         if (fields[j] == "T") {
           o << "text";
@@ -1233,6 +1233,6 @@ void TextSearch::setSummaryExport(bool v) {
 QStringList TextSearch::fields() {
   QStringList f;
   //    R           H            N        V          P         O                T
-  f << "root" << "headword" << "node" << "vol" << "page" << "offset/count" << "text";
+  f << "root" << "headword" << "node" << "vol" << "page" << "offset" << "text";
   return f;
 }
