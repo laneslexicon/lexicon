@@ -624,7 +624,7 @@ QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool
 QString TextSearch::exportError() const {
   return m_fileError;
 }
-int TextSearch::toFile(const QString & fileName)  {
+int TextSearch::toFile(const QString & fileName,bool columnheadings)  {
   bool fileOutput = false;
   QFile of;
 
@@ -650,6 +650,34 @@ int TextSearch::toFile(const QString & fileName)  {
   m_exportRecord = true;
   int j=0;
   int exportCount = 0;
+  if (columnheadings) {
+    QStringList o;
+    for (int j=0;j < fields.size();j++) {
+        if (fields[j] == "N") {
+          o << "node";
+        }
+        if (fields[j] == "R") {
+          o << "root";
+        }
+        if (fields[j] == "H") {
+          o << "headword";
+        }
+        if (fields[j] == "V") {
+          o << "volume";
+        }
+        if (fields[j] == "P") {
+          o << "page";
+        }
+        if (fields[j] == "O") {
+          o << "offset/count";
+        }
+        if (fields[j] == "T") {
+          o << "text";
+        }
+      }
+    out << o.join(m_separator);
+    out << "\n";
+  }
   for(int i=0;i < m_results.size();i++) {
     QMapIterator<int,QString> iter(m_results[i].fragments);
     findCount += m_results[i].fragments.size();

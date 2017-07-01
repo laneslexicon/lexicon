@@ -151,6 +151,10 @@ void ExportSearchDialog::onFileSelect() {
 QSize ExportSearchDialog::sizeHint() const {
   return QSize(600,400);
 }
+bool ExportSearchDialog::columnHeadings() const {
+  return m_headers->isChecked();
+}
+
 void ExportSearchDialog::readSettings() {
 
   SETTINGS

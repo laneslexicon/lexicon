@@ -420,7 +420,7 @@ void TextSearchWidget::onExport() {
   file.close();
   QString sep = dlg.separator();
   QStringList columns = dlg.requestedFields();
-
+  bool withHeaders = dlg.columnHeadings();
 /**
  * If the column names ever get translated, then this needs to match
 *
@@ -450,7 +450,7 @@ void TextSearchWidget::onExport() {
   m_data->setFields(columns);
   m_data->setSeparator(sep);
   m_data->setSummaryExport(m_summary);
-  int count = m_data->toFile(exportFileName);
+  int count = m_data->toFile(exportFileName,withHeaders);
   QFileInfo fi(exportFileName);
   if (count != -1) {
   emit(statusMessage(QString(tr("Exported %1 %2 to %3")).arg(count).arg(count == 1 ? "record" : "records").arg(fi.absoluteFilePath())));

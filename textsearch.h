@@ -109,7 +109,7 @@ class TextSearch : public QObject {
   void setExportRecord(bool v);
   QString  dbFile() const;
   QString xsltFile() const;
-  int toFile(const QString & fileName = QString());
+  int toFile(const QString & fileName = QString(),bool columnheadings = false);
   QString fromSafe(const QString & v);
   QString exportError() const;
   int search();

@@ -25,6 +25,7 @@ class ExportSearchDialog : public QDialog {
   QString exportFileName() const;
   QStringList columns() const;
   bool allRows() const;
+  bool columnHeadings() const;
   bool saveSettings() const;
   public slots:
    void onFileSelect();
