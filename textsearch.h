@@ -105,6 +105,7 @@ class TextSearch : public QObject {
   void setXsltFileName(const QString &);
   void setDbFileName(const QString &);
   void setFields(const QString &);
+  void setFields(const QStringList &);
   void setExportRecord(bool v);
   QString  dbFile() const;
   QString xsltFile() const;
@@ -144,9 +145,11 @@ class TextSearch : public QObject {
   QPair<int,int> setPages(int pagesize);
   void dumpPages(bool);
   int readSize() const;
+  enum { text , root , head };
  private:
   QList<SearchResult>  m_results;
   QList<QChar> m_dc;
+  int m_scope;
   bool m_exportRecord;
   qint64 m_time;
   QStringList m_nodes;

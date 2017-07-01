@@ -390,9 +390,9 @@ void TextSearchWidget::focusTable() {
  *
  */
 void TextSearchWidget::onExport() {
-  QStringList columns = m_results->columnHeadings();
+  //  QStringList columns = m_results->columnHeadings();
 
-  ExportSearchDialog dlg(columns);
+  ExportSearchDialog dlg(TextSearch::fields(),"textsearch");
   if (dlg.exec() != QDialog::Accepted) {
     return;
   }
@@ -419,12 +419,12 @@ void TextSearchWidget::onExport() {
   }
   file.close();
   QString sep = dlg.separator();
-  columns = dlg.columns();
+  QStringList columns = dlg.requestedFields();
 
 /**
  * If the column names ever get translated, then this needs to match
 *
-*/
+
   QMap<QString,QString> cnames;
   cnames.insert(tr("Node"),"N");
   cnames.insert(tr("Root"),"R");
@@ -444,9 +444,10 @@ void TextSearchWidget::onExport() {
       }
     }
   }
+*/
   //  qDebug() << exportFileName <<  sep << columns << fields;
   m_exportAll = dlg.allRows();
-  m_data->setFields(fields);
+  m_data->setFields(columns);
   m_data->setSeparator(sep);
   m_data->setSummaryExport(m_summary);
   int count = m_data->toFile(exportFileName);

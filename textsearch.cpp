@@ -205,6 +205,40 @@ void TextSearch::setVerbose(bool v) {
 void TextSearch::setFields(const QString & v) {
   m_fields = v;
 }
+//    R           H            N        V          P         O                T
+//  "root" << "headword" << "node" << "vol" << "page" << "offset/count" << "text";
+void TextSearch::setFields(const QStringList & v) {
+  m_fields.clear();
+  for(int i=0;i < v.size();i++) {
+    QString f;
+    if (v[i] == "root") {
+      f = "R";
+    }
+    else if (v[i] == "headword") {
+      f = "H";
+    }
+    else if (v[i] == "headword") {
+      f = "H";
+    }
+    else if (v[i] == "node") {
+      f = "N";
+    }
+    else if (v[i] == "vol") {
+      f = "V";
+    }
+    else if (v[i] == "page") {
+      f = "P";
+    }
+    else if (v[i] == "offset/count") {
+      f = "O";
+    }
+    else if (v[i] == "text") {
+      f = "T";
+    }
+    m_fields.append(f);
+  }
+
+}
 void TextSearch::setXsltFileName(const QString & v) {
   m_xsltFile = v;
 }
@@ -1170,6 +1204,7 @@ void TextSearch::setSummaryExport(bool v) {
 }
 QStringList TextSearch::fields() {
   QStringList f;
-  f << "root" << "head" << "node" << "vol" << "page" << "offset" << "text";
+  //    R           H            N        V          P         O                T
+  f << "root" << "headword" << "node" << "vol" << "page" << "offset/count" << "text";
   return f;
 }

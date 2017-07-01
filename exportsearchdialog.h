@@ -31,6 +31,8 @@ class ExportSearchDialog : public QDialog {
   void readSettings();
   void writeSettings();
   void setColumnKey(const QString &);
+  void setSelections(const QStringList &);
+  QStringList requestedFields() const;
  protected:
    QSize sizeHint() const;
  private:

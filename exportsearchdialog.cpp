@@ -191,6 +191,8 @@ void ExportSearchDialog::writeSettings() {
   SETTINGS
 
   settings.beginGroup("Export Search");
+
+  // going to need separate key for textsearch
   QStringList columns;
   for (int i=0;i < m_columns.size();i++) {
     if (m_columns[i]->isChecked()) {
@@ -275,4 +277,23 @@ void ExportSearchDialog::columnChanged(int state) {
   }
   m_up->setEnabled(ok);
   m_down->setEnabled(ok);
+}
+QStringList ExportSearchDialog::requestedFields() const{
+  QStringList fields;
+  for(int i=0;i < m_columnOrder->count();i++) {
+    fields << m_columnOrder->item(i)->text();
+  }
+  return fields;
+}
+/**
+ * list of columns that are to be selected, provided by
+ *  textsearchwidget from settings.ini
+ *
+ * @param f
+ */
+void ExportSearchDialog::setSelections(const QStringList & f) {
+  for(int i=0;i < f.size();i++) {
+
+
+  }
 }

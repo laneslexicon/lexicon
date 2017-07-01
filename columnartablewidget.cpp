@@ -186,6 +186,13 @@ QStringList ColumnarTableWidget::columnHeadings() const {
   }
   return columns;
 }
+/**
+ * This is not used by textsearchwidget
+ *
+ * @param key
+ *
+ * @return
+ */
 QString ColumnarTableWidget::exportResults(const QString & key) const {
   QStringList columns;
 
