@@ -86,6 +86,19 @@ TextSearchWidget::TextSearchWidget(QWidget * parent) : QWidget(parent) {
   m_results->setSelectionMode(QAbstractItemView::SingleSelection);
   m_results->setMarkColumn(SELECT_COLUMN);
 
+
+  // restore the column selections by telling columnartable widget what
+  // keys to use to read the QSettings
+  // if no default column widths, it defaults to
+  m_results->setDefaultWidth(100);
+  m_results->setKey(ColumnarTableWidget::STATE,SID_TEXTSEARCH_LIST_STATE);
+  m_results->setKey(ColumnarTableWidget::COLUMN_WIDTHS,SID_TEXTSEARCH_LIST_COLUMNS);
+  SETTINGS
+
+  settings.beginGroup("TextSearch");
+  m_results->readConfiguration(settings);
+  settings.endGroup();
+
   connect(m_results,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
   connect(m_results,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(onCellDoubleClicked(int,int)));
@@ -283,8 +296,8 @@ void TextSearchWidget::readSettings() {
 
   m_data->setListSize(m_pageSize);
   m_data->setPadding(settings.value(SID_TEXTSEARCH_FRAGMENT_SIZE,30).toInt());
+  // TODO get rid
   m_data->setFields("RHOPNTV");         //
-
 
 }
 void TextSearchWidget::summaryChanged(int state) {
@@ -421,30 +434,6 @@ void TextSearchWidget::onExport() {
   QString sep = dlg.separator();
   QStringList columns = dlg.requestedFields();
   bool withHeaders = dlg.columnHeadings();
-/**
- * If the column names ever get translated, then this needs to match
-*
-
-  QMap<QString,QString> cnames;
-  cnames.insert(tr("Node"),"N");
-  cnames.insert(tr("Root"),"R");
-  cnames.insert(tr("Head"),"H");
-  cnames.insert(tr("Context"),"T");
-  cnames.insert(tr("Page"),"P");
-  cnames.insert(tr("Vol"),"V");
-  cnames.insert(tr("Pos"),"O");
-  QString fields;
-  QMapIterator<QString,QString> iter(cnames);
-  for(int i=0;i < columns.size();i++) {
-    iter.toFront();
-    while(iter.hasNext()) {
-      iter.next();
-      if (columns[i].contains(iter.key(),Qt::CaseInsensitive)) {
-        fields.append(iter.value());
-      }
-    }
-  }
-*/
   //  qDebug() << exportFileName <<  sep << columns << fields;
   m_exportAll = dlg.allRows();
   m_data->setFields(columns);

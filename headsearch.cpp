@@ -26,7 +26,8 @@ HeadSearchWidget::HeadSearchWidget(QWidget * parent) : QWidget(parent) {
   setObjectName("headsearchwidget");
 
   m_heads = new ColumnarTableWidget(QStringList() << tr("Mark") << tr("Root") << tr("Head word") << tr("Entry") << tr("Node") << tr("Vol/Page"));
-
+  // this tell it which QSettings key to save state under
+  // because it can be used by headsearch or textsearch
   m_heads->setKey(ColumnarTableWidget::STATE,SID_HEADSEARCH_STATE);
   m_heads->setDefaultWidth(100);
   m_heads->setObjectName("headsearchlist");
