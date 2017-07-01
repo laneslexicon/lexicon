@@ -19,7 +19,7 @@
 #define CONTEXT_COLUMN 6
 extern LaneSupport * getSupport();
 
-TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) : QWidget(parent) {
+TextSearchWidget::TextSearchWidget(QWidget * parent) : QWidget(parent) {
   QStringList headings;
   /**
    * Other than the mark/select column, the possible columns should come from TextSerch.
@@ -27,26 +27,18 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
    * TextSearch fields
    */
   headings << tr("Mark") << tr("Root") << tr("Headword") << tr(" Node ") << tr("Occurs")  << tr("Vol/Page") << tr("Context");
-  if (! summary) {
-    headings[POSITION_COLUMN] = tr("Position");
-  }
-  readSettings();
-  m_summary = summary;
-  m_pageSize = pageSize;
+
+  m_summary = false;
+  m_pageSize = 50;
   m_results = new ColumnarTableWidget(headings,this);
-  m_results->setFixedRowHeight(m_rowHeight);
-  m_results->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_results->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_results->setMarkColumn(SELECT_COLUMN);
   QVBoxLayout * layout = new QVBoxLayout;
   layout->addWidget(m_results);
   m_page = new QComboBox(this);
   m_page->setEditable(true);
   m_page->setInsertPolicy(QComboBox::NoInsert);
-  connect(m_page,SIGNAL(currentIndexChanged(const QString &)),this,SLOT(pageChanged(const QString &)));
 
   m_summaryTable = new QCheckBox(tr("One row per entry"));
-  connect(m_summaryTable,SIGNAL(stateChanged(int)),this,SLOT(summaryChanged(int)));
+
   m_pagesText = new QLabel;
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addWidget(new QLabel(tr("Page")));
@@ -76,17 +68,32 @@ TextSearchWidget::TextSearchWidget(int pageSize,bool summary,QWidget * parent) :
   selectionslayout->addStretch();
   layout->addLayout(selectionslayout);
 
-  m_results->setRowCount(pageSize);
+
   setLayout(layout);
   m_data = new TextSearch();
   m_data->setXsltFileName(getSupport()->xsltFileName());
-  m_data->setListSize(pageSize);
+
+
+  readSettings();
+
+  if ( m_summary) {
+    m_results->setHorizontalHeaderItem(POSITION_COLUMN,new QTableWidgetItem("Count"));
+  }
+
+  m_results->setRowCount(m_pageSize);
+  m_results->setFixedRowHeight(m_rowHeight);
+  m_results->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_results->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_results->setMarkColumn(SELECT_COLUMN);
+
   connect(m_results,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
   connect(m_results,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(onCellDoubleClicked(int,int)));
   connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
 
   connect(m_data,SIGNAL(exportRecord(int,int)),this,SLOT(exportRecord(int,int)));
+  connect(m_page,SIGNAL(currentIndexChanged(const QString &)),this,SLOT(pageChanged(const QString &)));
+  connect(m_summaryTable,SIGNAL(stateChanged(int)),this,SLOT(summaryChanged(int)));
 }
 TextSearchWidget::~TextSearchWidget() {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -263,13 +270,21 @@ void TextSearchWidget::readSettings() {
 
   settings.beginGroup("TextSearch");
   m_contextStyle = settings.value(SID_TEXTSEARCH_CONTEXT_STYLE,QString()).toString();
-  //  m_singleRow = settings.value(SID_TEXTSEARCH_ONE_ROW,true).toBool();
+  m_summary = settings.value(SID_TEXTSEARCH_SUMMARY_FORMAT,false).toBool();
+  m_summaryTable->setChecked(m_summary);
+  m_thisPage->setChecked(settings.value(SID_TEXTSEARCH_CURRENTPAGE_ONLY,false).toBool());
   QString f = settings.value(SID_TEXTSEARCH_RESULTS_FONT,QString()).toString();
   if (! f.isEmpty()) {
-    //    m_resultsFont.fromString(f);
+   //    m_resultsFont.fromString(f);
   }
   m_resizeRows = settings.value(SID_TEXTSEARCH_RESIZE_ROWS,true).toBool();
   m_rowHeight  = settings.value(SID_TEXTSEARCH_ROW_HEIGHT,40).toInt();;
+  m_pageSize = settings.value(SID_TEXTSEARCH_PAGE_SIZE,50).toInt();;
+
+  m_data->setListSize(m_pageSize);
+  m_data->setPadding(settings.value(SID_TEXTSEARCH_FRAGMENT_SIZE,30).toInt());
+  m_data->setFields("RHOPNTV");         //
+
 
 }
 void TextSearchWidget::summaryChanged(int state) {

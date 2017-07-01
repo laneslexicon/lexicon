@@ -4,7 +4,7 @@
 #include "externs.h"
 #include "nodeview.h"
 EnsearchWidget::EnsearchWidget(int rows,QWidget * parent) : QWidget(parent) {
-  m_search = new TextSearchWidget(rows,false);
+  m_search = new TextSearchWidget;
   m_pageSize = rows;
   setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
   QVBoxLayout * layout = new QVBoxLayout;
@@ -20,6 +20,11 @@ EnsearchWidget::EnsearchWidget(int rows,QWidget * parent) : QWidget(parent) {
   connect(m_quit,SIGNAL(clicked()),this,SLOT(onExit()));
 #endif
   setLayout(layout);
+
+  //  w->setDiacritics();
+  //  w->setPadding(30);                // get from settings.ini
+  //  w->setFields("RHOPNTV");         //
+
   connect(m_search->searcher(),SIGNAL(recordsRead(int)),this,SLOT(recordsRead(int)));
   connect(m_search,SIGNAL(showNode(const QString &,bool)),this,SIGNAL(showNode(const QString &,bool)));
   connect(m_search,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
@@ -55,11 +60,9 @@ int EnsearchWidget::search() {
   else {
   m_pageCounts = m_search->searcher()->setPages(m_pageSize);
   // TextSearchWidget needs to readSettings for:
-  // summary/full
-  // rows per table
   // fragment size
   // fields
-  // clear/mark current page only
+  // step count
   m_search->setPages(m_pageCounts.second);
   m_search->loadPage(1);
   QString txt = m_search->searcher()->summary();

@@ -22,7 +22,7 @@ class TextSearchWidget : public QWidget {
   Q_OBJECT
 
  public:
-  TextSearchWidget(int pageSize = 50,bool summary = false,QWidget * parent = 0);
+  TextSearchWidget(QWidget * parent = 0);
   ~TextSearchWidget();
   //  void load(const TextSearch &);
   void loadPage(int page);

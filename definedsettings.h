@@ -221,7 +221,7 @@ They should not be translated.
 #define SID_FULLSEARCH_HEAD_TEXT               "Head text"
 
 
-#define SID_TEXTSEARCH_ONE_ROW                 "One row"
+#define SID_TEXTSEARCH_SUMMARY_FORMAT          "Summary"
 #define SID_TEXTSEARCH_FRAGMENT_SIZE           "Fragment size"
 #define SID_TEXTSEARCH_VIEWER_POSITION         "Viewer position"
 #define SID_TEXTSEARCH_STEP                    "Step"

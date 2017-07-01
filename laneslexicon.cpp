@@ -3458,8 +3458,8 @@ void LanesLexicon::searchForText() {
     // fields ?
     EnsearchWidget * w = new EnsearchWidget;
     w->setDiacritics();
-    w->setPadding(30);                // get from settings.ini
-    w->setFields("RHOPNTV");         //
+    //    w->setPadding(30);                // get from settings.ini
+    //    w->setFields("RHOPNTV");         //
     w->setSearch(o.target,
                  o.regex,
                  o.caseSensitive,
