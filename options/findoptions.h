@@ -19,20 +19,20 @@ class FindOptions : public OptionsWidget {
     void onLocalDialog();
  private:
     /// full search
-    QCheckBox * m_fullDebug;
-    QSpinBox  *  m_fullFragmentSize;
-    QCheckBox * m_fullIncludeHeads;
-    QCheckBox * m_fullOneRow;
-    QSpinBox  * m_fullStep;
-    QLineEdit * m_fullHeadText;
+    QCheckBox * m_textDebug;
+    QSpinBox  *  m_textFragmentSize;
+    QCheckBox * m_textSummary;
+    QCheckBox * m_textCurrentPage;
+    QSpinBox  * m_textStep;
+    QSpinBox  * m_textPageSize;
     QLineEdit * m_contextStyle;
 
-    bool m_fullWholeWord;
-    bool m_fullDiacritics;
-    bool m_fullRegex;
-    bool m_fullNewTab;
-    bool m_fullGoTab;
-    bool m_fullForce;
+    bool m_textWholeWord;
+    bool m_textDiacritics;
+    bool m_textRegex;
+    bool m_textNewTab;
+    bool m_textGoTab;
+    bool m_textCase;
 
     /// head word search
     QCheckBox * m_headPhrase;
