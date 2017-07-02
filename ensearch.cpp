@@ -7,6 +7,7 @@
 #include <QSqlError>
 #include <QPalette>
 #include <QFont>
+#include <QtGlobal>
 #include "QsLog.h"
 #include "QsLogDest.h"
 #include "definedsettings.h"
@@ -236,6 +237,7 @@ regular expression search for \"friendship\" or \"fellowship\".\n\
   // have paged table with option of number of rows in table
   //
 
+  bool nogui = false;
 
   QCommandLineOption criticsOption(QStringList() <<"a" << "set-diacritics",QObject::tr("Comma separated list of code points (in hex)"),"critics");
   parser.addOption(criticsOption);
@@ -268,6 +270,10 @@ regular expression search for \"friendship\" or \"fellowship\".\n\
 
   QCommandLineOption testOption(QStringList() <<"m" << "test",QObject::tr("Invoke test routine (Development only)"));
   parser.addOption(testOption);
+#if QT_VERSION >= 0x050800
+  testOption.setFlags(QCommandLineOption::HiddenFromHelp);
+#endif
+
 
  QCommandLineOption nodeOption(QStringList() <<"n" << "node",QObject::tr("Node or comma delimited list of nodes to be searched"),"node");
   parser.addOption(nodeOption);
@@ -350,6 +356,9 @@ regular expression search for \"friendship\" or \"fellowship\".\n\
         searcher.setDbFileName(dbFile.absoluteFilePath());
       }
     }
+  }
+  else {
+    nogui = true;
   }
   QSqlDatabase db;
   if (parser.isSet(dbOption)) {
@@ -494,8 +503,11 @@ regular expression search for \"friendship\" or \"fellowship\".\n\
     rows = 10;
   }
   searcher.setListSize(rows);
+  if (nogui && parser.isSet(guiOption)) {
+    std::cerr << "Warning - the gui version is not available without a settings.ini file" << std::endl;
+  }
 
-  if (! parser.isSet(guiOption)) {
+  if (nogui || ! parser.isSet(guiOption)) {
     SearchRunner * r = new SearchRunner;
 
     if (verbose) {
@@ -511,10 +523,10 @@ regular expression search for \"friendship\" or \"fellowship\".\n\
     else {
       searcher.toFile();
     }
-    qDebug() << searcher.getPage(1,false);
+    //    qDebug() << searcher.getPage(1,false);
   }
   else {
-    EnsearchWidget * w = new EnsearchWidget(rows);
+    EnsearchWidget * w = new EnsearchWidget;
     if (parser.isSet(criticsOption)) {
       w->setDiacritics(parser.value(criticsOption));
     }

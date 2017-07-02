@@ -384,8 +384,11 @@ bool LaneSupport::startsWithArabic(const QString & txt) const {
 }
 QString LaneSupport::xsltFileName() const {
   QString fileName;
-  if (! m_settings) {
-    return fileName;
+  if (! m_settings) {                     // for when ensearch is run from the wrong place
+    if (QFileInfo::exists("entry.xslt")) {
+      QFileInfo fi("entry.xslt");
+      return fi.absoluteFilePath();
+    }
   }
   while(! m_settings->group().isEmpty()) {
     m_settings->endGroup();
