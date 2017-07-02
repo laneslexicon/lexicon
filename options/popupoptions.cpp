@@ -54,28 +54,24 @@ void DialogOptions::enableOption(int which,bool v) {
     break;
   }
 }
+/**
+ * in Qt 5.9 should be able to do removeRow(which)
+ *
+ *
+ * @param which
+ */
 void DialogOptions::hideOption(int which) {
-  //  m_form->takeAt(which);
   QWidget * w;
   switch(which) {
   case DialogOptions::Tab :
-    m_newTab->setVisible(false);
-    w = m_form->labelForField(m_newTab);
-    if (w) {
-      w->setVisible(false);
-    }
     break;
   case DialogOptions::Go :
-    m_goTab->setVisible(false);
     break;
   case DialogOptions::Whole :
-    m_wholeWord->setVisible(false);
     break;
   case DialogOptions::Diacritics :
-    m_diacritics->setVisible(false);
     break;
   case DialogOptions::Regex :
-    m_regex->setVisible(false);
     break;
   case DialogOptions::Force :
     w =  m_form->labelForField(m_force);
@@ -87,7 +83,6 @@ void DialogOptions::hideOption(int which) {
     m_form->removeWidget(m_force);
     break;
   case DialogOptions::IgnoreCase :
-    m_ignoreCase->setVisible(false);
     break;
     }
 }
