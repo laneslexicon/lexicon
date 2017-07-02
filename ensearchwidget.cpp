@@ -3,9 +3,8 @@
 #include "textsearch.h"
 #include "externs.h"
 #include "nodeview.h"
-EnsearchWidget::EnsearchWidget(int rows,QWidget * parent) : QWidget(parent) {
+EnsearchWidget::EnsearchWidget(QWidget * parent) : QWidget(parent) {
   m_search = new TextSearchWidget;
-  m_pageSize = rows;
   setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
   QVBoxLayout * layout = new QVBoxLayout;
   layout->addWidget(m_search);
@@ -21,20 +20,11 @@ EnsearchWidget::EnsearchWidget(int rows,QWidget * parent) : QWidget(parent) {
 #endif
   setLayout(layout);
 
-  //  w->setDiacritics();
-  //  w->setPadding(30);                // get from settings.ini
-  //  w->setFields("RHOPNTV");         //
-
   connect(m_search->searcher(),SIGNAL(recordsRead(int)),this,SLOT(recordsRead(int)));
   connect(m_search,SIGNAL(showNode(const QString &,bool)),this,SIGNAL(showNode(const QString &,bool)));
   connect(m_search,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
   connect(m_search,SIGNAL(statusMessage(const QString &)),this,SIGNAL(statusMessage(const QString &)));
 }
-/*
-TextSearchWidget * EnsearchWidget::searcher() {
-  return m_search;
-}
-*/
 QSize EnsearchWidget::sizeHint() const {
   return QSize(800,400);
 }
@@ -60,23 +50,16 @@ int EnsearchWidget::search() {
   m_pd->setGeometry((screenWidth/2)-(width/2),(screenHeight/2)-(height/2),width,height);
   m_pd->show();
   this->recordsRead(1);
-  int findCount = m_search->searcher()->search();
+  int findCount = m_search->search();
   delete m_pd;
 
   if (findCount == 0) {
     m_search->showEmpty(tr("Text not found"));
-    m_pageCounts = qMakePair(0,0);
   }
   else {
-  m_pageCounts = m_search->searcher()->setPages(m_pageSize);
-  // TextSearchWidget needs to readSettings for:
-  // fragment size
-  // fields
-  // step count
-  m_search->setPages(m_pageCounts.second);
-  m_search->loadPage(1);
-  QString txt = m_search->searcher()->summary();
-  m_summary->setText(getSupport()->scanAndSpan(txt,"searchsummary",true));
+    m_search->loadPage(1);
+    QString txt = m_search->searcher()->summary();
+    m_summary->setText(getSupport()->scanAndSpan(txt,"searchsummary",true));
   }
   return findCount;
 }

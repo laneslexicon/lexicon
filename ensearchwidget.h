@@ -15,7 +15,7 @@ class EnsearchWidget : public QWidget {
   Q_OBJECT
 
  public:
-  EnsearchWidget(int rows = 10,QWidget * parent = 0);
+  EnsearchWidget(QWidget * parent = 0);
   QSize sizeHint() const;
   int search();
   void setDiacritics(const QString & v = QString());
@@ -26,13 +26,11 @@ class EnsearchWidget : public QWidget {
   void focusTable();
   TextSearch * searcher();
  private:
-  int m_pageSize;
   TextSearchWidget * m_search;
   QLabel * m_summary;
   QPushButton * m_quit;
   QProgressDialog * m_pd;
   QEventLoop m_ep;
-  QPair<int,int> m_pageCounts;  // first is summary,second is full
   public slots:
     void recordsRead(int);
     void onExit();
