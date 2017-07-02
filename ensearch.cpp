@@ -486,10 +486,9 @@ regular expression search for \"friendship\" or \"fellowship\".\n\
   searcher.setNode(parser.value(nodeOption));
   QStringList nodes;
   QSqlQuery query;
+
   int rows = 0;
-
   str = parser.value(listOption);
-
   rows = str.toInt(&ok,10);
   if (! ok ) {
     rows = 10;
@@ -503,6 +502,7 @@ regular expression search for \"friendship\" or \"fellowship\".\n\
       QObject::connect(&searcher,SIGNAL(recordsRead(int)),r,SLOT(recordsRead(int)));
     }
     searcher.search();
+    //    searcher.setPages(rows);
     delete r;
     QFile of;
     if (parser.isSet(outputOption)) {
@@ -511,7 +511,7 @@ regular expression search for \"friendship\" or \"fellowship\".\n\
     else {
       searcher.toFile();
     }
-    searcher.setPages(rows);
+    qDebug() << searcher.getPage(1,false);
   }
   else {
     EnsearchWidget * w = new EnsearchWidget(rows);

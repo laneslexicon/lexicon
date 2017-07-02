@@ -76,6 +76,7 @@ TextSearchWidget::TextSearchWidget(QWidget * parent) : QWidget(parent) {
 
   readSettings();
 
+  m_data->setListSize(m_pageSize);
   if ( m_summary) {
     m_results->setHorizontalHeaderItem(POSITION_COLUMN,new QTableWidgetItem("Count"));
   }
@@ -113,6 +114,17 @@ TextSearchWidget::~TextSearchWidget() {
 }
 TextSearch * TextSearchWidget::searcher() {
   return m_data;
+}
+int TextSearchWidget::search() {
+  int c = m_data->search();
+  QPair<int,int> p = m_data->getPageCounts();
+  if (m_summaryTable->isChecked()) {
+    this->setPages(p.first);
+  }
+  else {
+    this->setPages(p.second);
+  }
+  return c;
 }
 /*
 void TextSearchWidget::search() {
@@ -293,12 +305,8 @@ void TextSearchWidget::readSettings() {
   m_resizeRows = settings.value(SID_TEXTSEARCH_RESIZE_ROWS,true).toBool();
   m_rowHeight  = settings.value(SID_TEXTSEARCH_ROW_HEIGHT,40).toInt();;
   m_pageSize = settings.value(SID_TEXTSEARCH_PAGE_SIZE,50).toInt();;
-
   m_data->setListSize(m_pageSize);
-  m_data->setPadding(settings.value(SID_TEXTSEARCH_FRAGMENT_SIZE,30).toInt());
-  // TODO get rid
-  m_data->setFields("RHOPNTV");         //
-
+  m_data->setPadding(settings.value(SID_TEXTSEARCH_FRAGMENT_SIZE,60).toInt());
 }
 void TextSearchWidget::summaryChanged(int state) {
   bool summary = (state == Qt::Checked);

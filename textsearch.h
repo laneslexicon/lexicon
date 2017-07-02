@@ -138,7 +138,7 @@ class TextSearch : public QObject {
   QString m_separator;
   QString m_fileError;
   QList<SearchHit> getHits(int start,int sz,bool summary = false) const;
-  QList<SearchHit> getPage(int page,bool summary) const;
+  QList<SearchHit> getPage(int page,bool summary = false) const;
   QString buckwalterCharacters();
 
   int rows(bool summary) const;

@@ -32,7 +32,7 @@ class TextSearchWidget : public QWidget {
   void viewNode(int row);
   void focusTable();
   void showEmpty(const QString & text);
-
+  int search();
 
  private:
   TextSearch * m_data;

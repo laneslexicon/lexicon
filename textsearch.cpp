@@ -937,6 +937,7 @@ int TextSearch::search() {
     this->searchNodes();
   }
  m_time = t.elapsed();
+ setPages(m_pageSize);
  return m_findCount;
 }
 QString TextSearch::summary() const {
