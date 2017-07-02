@@ -29,6 +29,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
 
   this->setControlSize(m_textStep,MEDIUM_EDIT);
   m_textStep->setSingleStep(25);
+  m_textStep->setRange(100,1000);
   this->setControlSize(m_textStep,MEDIUM_EDIT);
 
   this->setControlSize(m_textPageSize,MEDIUM_EDIT);
@@ -474,6 +475,8 @@ void FindOptions::onFullDialog() {
   d.setChecked(DialogOptions::Whole,m_textWholeWord);
   d.setChecked(DialogOptions::Diacritics,m_textDiacritics);
   d.setChecked(DialogOptions::Regex,m_textRegex);
+  d.setChecked(DialogOptions::IgnoreCase,m_textCase);
+  d.hideOption(DialogOptions::Force);
   if (d.exec() == QDialog::Accepted) {
     m_textNewTab =  d.isChecked(DialogOptions::Tab);
     m_textGoTab = d.isChecked(DialogOptions::Go);

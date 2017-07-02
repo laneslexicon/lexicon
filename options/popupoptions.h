@@ -11,11 +11,13 @@ class DialogOptions : public QDialog {
 
  public:
   DialogOptions(QWidget * parent =0);
-  enum Which { Tab , Go , Whole, Diacritics, Regex, Force, IgnoreCase };
+  enum Which { Whole, Diacritics, Regex, Force, IgnoreCase, Tab, Go };
   void setChecked(int,bool);
   bool isChecked(int);
   void enableOption(int,bool v);
+  void hideOption(int);
  private:
+  QFormLayout * m_form;
   QCheckBox * m_newTab;
   QCheckBox * m_goTab;
   QCheckBox * m_wholeWord;
