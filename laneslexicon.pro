@@ -80,7 +80,6 @@ SOURCES += main.cpp\
         headsearch.cpp \
         history.cpp \
         place.cpp \
-        fullsearch.cpp \
         menubar.cpp \
         tabwidget.cpp \
         application.cpp \
@@ -131,7 +130,6 @@ HEADERS  += laneslexicon.h \
             headsearch.h \
             history.h \
             place.h \
-            fullsearch.h \
             menubar.h \
             tabwidget.h \
             application.h \

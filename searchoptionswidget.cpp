@@ -113,8 +113,7 @@ void SearchOptionsWidget::setup(QWidget * parent) {
   gridlayout->addWidget(m_buckwalterTarget,row,1);
 
   mainlayout->addLayout(gridlayout);
-  if ( ! qobject_cast<FullSearchWidget *>(parent))
-    mainlayout->addSpacerItem(m_spacer);
+  mainlayout->addSpacerItem(m_spacer);
 
   setLayout(mainlayout);
 
@@ -422,6 +421,7 @@ void SearchOptionsWidget::setOptions(int type) {
   settings.setIniCodec("UTF-8");
   switch (type) {
   case SearchOptions::Word : {
+    /*
     settings.beginGroup("FullSearch");
     m_ignoreDiacritics->setChecked(settings.value(SID_FULLSEARCH_DIACRITICS,true).toBool());
     m_wholeWordMatch->setChecked(settings.value(SID_FULLSEARCH_WHOLE_WORD,true).toBool());
@@ -431,8 +431,8 @@ void SearchOptionsWidget::setOptions(int type) {
     m_makeActive->setChecked(settings.value(SID_FULLSEARCH_GO_TAB,true).toBool());
     m_includeHeads->setChecked(settings.value(SID_FULLSEARCH_INCLUDE_HEADS,false).toBool());
     settings.endGroup();
+    */
     break;
-    //  m_keymapsEnabled = options.keymaps();
   }
   case SearchOptions::Entry : {
     settings.beginGroup("HeadSearch");

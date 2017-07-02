@@ -15,7 +15,6 @@
 #include "laneslexicon.h"
 #include "searchoptionswidget.h"
 #include "searchdialogs.h"
-#include "fullsearch.h"
 #include "headsearch.h"
 #include "definedsettings.h"
 #include "optionsdialog.h"
@@ -498,7 +497,7 @@ bool LanesLexicon::deleteWidget(QWidget * w) {
       delete notes;
       return true;
   }
-  FullSearchWidget * search = qobject_cast<FullSearchWidget *>(w);
+  EnsearchWidget * search = qobject_cast<EnsearchWidget *>(w);
   if (search) {
     delete search;
     return true;
@@ -3398,30 +3397,6 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   if (searchType == SearchOptions::Text) {
     return;
   }
-  if (searchType == SearchOptions::Word) {
-    FullSearchWidget * s = new FullSearchWidget;
-    s->setSearch(t,options);
-    s->setForceLTR(d->getForceLTR());
-    s->findTarget(true);  // does the actual search including progress dialog
-    connect(s,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
-    connect(s,SIGNAL(printNode(const QString &)),this,SLOT(printNode(const QString &)));
-    /// this is a count of search tabs (not search results)
-    int c = this->getSearchCount();
-    ix = this->addTab(options.newTab(),s,QString(tr("Search %1")).arg(c+1));
-
-    if (options.activateTab()) {
-      m_tabs->setCurrentIndex(ix);
-    }
-    int n = s->findCount();
-    statusMessage(QString(tr("Search returned %1 %2")).arg(n).arg(n == 1 ? "result" : "results"));
-    ///
-    /// this shifts focus from ContentsWidget (how it got focus is a mystery)
-    ///
-    if (options.newTab() && ! options.activateTab()) {
-      s->setFocus(Qt::OtherFocusReason);
-    }
-    return;
-  }
   /// head word search
   if (searchType == SearchOptions::Entry) {
       HeadSearchWidget * s = new HeadSearchWidget(this);
@@ -3675,10 +3650,6 @@ void LanesLexicon::currentTabChanged(int ix) {
     this->enableForPage(true);
     return;
   }
-  FullSearchWidget * full = qobject_cast<FullSearchWidget *>(m_tabs->currentWidget());
-  if (full)  {
-    full->selectFocus();
-  }
   EnsearchWidget * ensearch = qobject_cast<EnsearchWidget *>(m_tabs->currentWidget());
   if (ensearch)  {
     ensearch->focusTable();
@@ -3858,10 +3829,6 @@ void LanesLexicon::showSearchNode(const QString & node,bool forceNewTab) {
 int LanesLexicon::getSearchCount() {
   int c = 0;
   for(int i=0;i < m_tabs->count();i++) {
-    FullSearchWidget * w = qobject_cast<FullSearchWidget *>(m_tabs->widget(i));
-    if (w) {
-      c++;
-    }
     EnsearchWidget * e = qobject_cast<EnsearchWidget *>(m_tabs->widget(i));
     if (e) {
       c++;
