@@ -127,6 +127,7 @@ TextSearch::TextSearch() {
   m_cancel = false;
   m_pageSize = 10;
   m_summaryExport = false;
+  m_progressStep = 200;
   QMap<QChar,QChar> safe;
   m_safe.insert(QChar('C'),QChar(0x621));
   m_safe.insert(QChar('M'),QChar(0x622));
@@ -187,6 +188,9 @@ TextSearch::TextSearch() {
 }
 bool TextSearch::ok() const {
   return (QFileInfo::exists(m_xsltFile) && (QFileInfo::exists(m_dbFile)));
+}
+void TextSearch::setProgressStep(int v) {
+  m_progressStep = v;
 }
 QString TextSearch::buckwalterCharacters() {
   QString v;
@@ -780,7 +784,7 @@ void TextSearch::searchAll() {
       finished = true;
     }
     */
-    if ((readCount % 1000) == 0) {
+    if ((readCount % m_progressStep) == 0) {
       emit(recordsRead(readCount));
     }
   }

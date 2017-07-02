@@ -128,6 +128,7 @@ class TextSearch : public QObject {
   void setSeparator(const QString &);
   void setListSize(int);
   void setSummaryExport(bool);
+  void setProgressStep(int);
   bool ok() const;
   SearchParams params() const;
   QPair<int,int> getPageCounts() const;
@@ -172,6 +173,7 @@ class TextSearch : public QObject {
   QString m_dbFile;      //
   int m_pageSize;
   int m_findCount;
+  int m_progressStep;
   //  QMap<int,int> m_pages;
   QMap<int,QPair<int,int> > m_summaryPages;
   QMap<int,QPair<int,int> > m_fullPages;

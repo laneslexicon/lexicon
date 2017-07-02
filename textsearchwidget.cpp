@@ -80,7 +80,7 @@ TextSearchWidget::TextSearchWidget(QWidget * parent) : QWidget(parent) {
   if ( m_summary) {
     m_results->setHorizontalHeaderItem(POSITION_COLUMN,new QTableWidgetItem("Count"));
   }
-
+  m_data->setProgressStep(m_stepSize);
   m_results->setRowCount(m_pageSize);
   m_results->setFixedRowHeight(m_rowHeight);
   m_results->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -303,10 +303,11 @@ void TextSearchWidget::readSettings() {
    //    m_resultsFont.fromString(f);
   }
   m_resizeRows = settings.value(SID_TEXTSEARCH_RESIZE_ROWS,true).toBool();
-  m_rowHeight  = settings.value(SID_TEXTSEARCH_ROW_HEIGHT,40).toInt();;
-  m_pageSize = settings.value(SID_TEXTSEARCH_PAGE_SIZE,50).toInt();;
+  m_rowHeight  = settings.value(SID_TEXTSEARCH_ROW_HEIGHT,40).toInt();
+  m_pageSize = settings.value(SID_TEXTSEARCH_PAGE_SIZE,50).toInt();
   m_data->setListSize(m_pageSize);
   m_data->setPadding(settings.value(SID_TEXTSEARCH_FRAGMENT_SIZE,60).toInt());
+  m_stepSize = settings.value(SID_TEXTSEARCH_STEP,200).toInt();
 }
 void TextSearchWidget::summaryChanged(int state) {
   bool summary = (state == Qt::Checked);

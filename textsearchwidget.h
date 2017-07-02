@@ -42,6 +42,7 @@ class TextSearchWidget : public QWidget {
   int addRow(const Place & p, const QString & text,int pos);
   int m_pageSize;
   int m_currentPage;
+  int m_stepSize;
   QLabel    * m_pagesText;
   QComboBox * m_page;
   QCheckBox * m_summaryTable;
