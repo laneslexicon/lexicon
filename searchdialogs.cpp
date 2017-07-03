@@ -85,7 +85,6 @@ ArabicSearchDialog::ArabicSearchDialog(SearchOptions::SearchScope_t searchType,Q
   connect(m_options,SIGNAL(force(bool)),m_edit,SLOT(setForceLTR(bool)));
 
   connect(m_options,SIGNAL(loadKeymap(const QString &)),this,SLOT(loadKeymap(const QString &)));
-  connect(m_options,SIGNAL(onLanguageSwitch(int)),this,SLOT(languageSwitch(int)));
 
   QStringList maps = m_edit->getMaps();
   QString map = m_edit->currentMap();
@@ -177,9 +176,6 @@ void ArabicSearchDialog::onKeyboardShortcut(const QString & key) {
   }
 }
 ArabicSearchDialog::~ArabicSearchDialog() {
-}
-void ArabicSearchDialog::setArabic(bool v) {
-  //  m_options->setArabic(v);
 }
 void ArabicSearchDialog::keyboardClosed() {
   showKeyboard();

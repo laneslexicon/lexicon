@@ -167,13 +167,12 @@ class LanesLexicon : public QMainWindow
       void onEditTheme();
       void onCreateTheme();
 
-      void searchForWord();
       void searchForText();
       void searchForPage();
       void searchForNode();
       void searchForRoot();
       void searchForEntry();
-      void wordSearch(const QString & language);
+
       void onClearHistory();
       void onShowHistory();
       void onHistorySelection();

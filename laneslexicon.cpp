@@ -533,7 +533,7 @@ void LanesLexicon::shortcut(const QString & key) {
     searchForNode();
   }
   else if (key == SID_SHORTCUT_SEARCH_WORD) {
-    searchForWord();
+    searchForText();
   }
   else if (key == SID_SHORTCUT_SEARCH_HEAD) {
     searchForEntry();
@@ -962,9 +962,7 @@ void LanesLexicon::createActions() {
   connect(m_docAction,SIGNAL(triggered()),this,SLOT(onDocs()));
   connect(m_aboutAction,SIGNAL(triggered()),this,SLOT(onAbout()));
 
-  m_searchWordAction = new QAction(tr("Arabic single &word"),this);
-  connect(m_searchWordAction,SIGNAL(triggered()),this,SLOT(searchForWord()));
-  m_textSearchAction = new QAction(tr("Tex&t (English/Arabic)"),this);
+  m_textSearchAction = new QAction(tr("Tex&t (Arabic and non-Arabic)"),this);
   connect(m_textSearchAction,SIGNAL(triggered()),this,SLOT(searchForText()));
   m_searchPageAction = new QAction(tr("&Page"),this);
   connect(m_searchPageAction,SIGNAL(triggered()),this,SLOT(searchForPage()));
@@ -1468,7 +1466,6 @@ void LanesLexicon::createMenus() {
   m_searchMenu->setObjectName("searchmenu");
   m_searchMenu->addAction(m_searchRootAction);
   m_searchMenu->addAction(m_searchEntryAction);
-  //  m_searchMenu->addAction(m_searchWordAction);
   m_searchMenu->addAction(m_textSearchAction);
   m_searchMenu->addAction(m_searchPageAction);
   m_searchMenu->addAction(m_searchNodeAction);
@@ -2221,6 +2218,10 @@ void LanesLexicon::readSettings() {
   settings.beginGroup("Printer");
   settings.setValue(SID_PRINTER_USE,true);
   settings.setValue(SID_PRINTER_OUTPUT_PDF,true);
+  settings.endGroup();
+
+  settings.beginGroup("Text Search");
+  m_searchAgainDefault = settings.value(SID_TEXTSEARCH_FAILURE_DEFAULT_ACTION,true).toBool();
   settings.endGroup();
 }
 void LanesLexicon::writeSettings() {
@@ -3428,13 +3429,8 @@ void LanesLexicon::searchForText() {
   TextSearchDialog * d = new TextSearchDialog();
   if (d->exec()) {
     TextOption o = d->options();
-    // need to set summary
-    // fragment size
-    // fields ?
     EnsearchWidget * w = new EnsearchWidget;
     w->setDiacritics();
-    //    w->setPadding(30);                // get from settings.ini
-    //    w->setFields("RHOPNTV");         //
     w->setSearch(o.target,
                  o.regex,
                  o.caseSensitive,
@@ -3481,30 +3477,6 @@ void LanesLexicon::searchForText() {
     m_textSearchAction->trigger();
   }
 }
-void LanesLexicon::searchForWord() {
-  this->wordSearch("ar");
-}
-void LanesLexicon::wordSearch(const QString & lang) {
-  if (m_wordSearchDialog == NULL) {
-    m_wordSearchDialog = new ArabicSearchDialog(SearchOptions::Word);
-
-    connect(m_wordSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
-  }
-  else {
-    m_wordSearchDialog->setText("");
-  }
-  m_wordSearchDialog->setArabic(lang == "ar");
-  //  d.setOptions(m_searchOptions);
-  if (m_wordSearchDialog->exec()) {
-    QString t = m_wordSearchDialog->getText();
-    if (! t.isEmpty()) {
-      this->search(SearchOptions::Word,m_wordSearchDialog,t);
-    }
-  }
-  m_searchButton->menu()->hide();
-  m_wordSearchDialog->hideKeyboard();
-}
-
 /**
  * Headword search
  *
