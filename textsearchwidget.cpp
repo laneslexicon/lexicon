@@ -26,7 +26,7 @@ TextSearchWidget::TextSearchWidget(QWidget * parent) : QWidget(parent) {
    * What the columns headings are is not important as long as they can be correlated with
    * TextSearch fields
    */
-  headings << tr("Mark") << tr("Root") << tr("Headword") << tr(" Node ") << tr("Occurs")  << tr("Vol/Page") << tr("Context");
+  headings << tr("Mark") << tr("Root") << tr("Headword") << tr(" Node ") << tr("Position")  << tr("Vol/Page") << tr("Context");
 
   m_summary = false;
   m_pageSize = 50;
