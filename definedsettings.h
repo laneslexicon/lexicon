@@ -241,7 +241,7 @@ They should not be translated.
 #define SID_TEXTSEARCH_RESULTS_FONT            "Results Arabic font"
 #define SID_TEXTSEARCH_DIALOG_SIZE             "Size"
 #define SID_TEXTSEARCH_DIALOG_POS              "Pos"
-#define SID_TEXTSEARCH_FAILURE_DEFAULT_ACTION  "Search again default"
+#define SID_TEXTSEARCH_FAILURE_DEFAULT_BTN     "Search again default btn"
 
 
 #define SID_ROOTSEARCH_NEW_TAB                 "Root new tab"

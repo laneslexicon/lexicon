@@ -26,7 +26,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_textStep = new QSpinBox;
   m_textPageSize = new QSpinBox;
   m_contextStyle = new QLineEdit;
-
+  m_textRepeat = new QCheckBox;
   this->setControlSize(m_textStep,MEDIUM_EDIT);
   m_textStep->setSingleStep(25);
   m_textStep->setRange(100,1000);
@@ -47,7 +47,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   fulllayout->addRow(tr("One row for each entry"),m_textSummary);
   fulllayout->addRow(tr("Mark/clear selections for current page"),m_textCurrentPage);
   fulllayout->addRow(tr("Progress interval"),m_textStep);
-
+  fulllayout->addRow(tr("Default button 'Yes' on search failure"),m_textRepeat);
   QPushButton * fullbtn = new QPushButton(tr("Set"));
   this->setControlSize(fullbtn,MEDIUM_EDIT);
   QHBoxLayout * setlayout1 = new QHBoxLayout;
@@ -162,6 +162,7 @@ void FindOptions::readSettings(bool reload) {
   m_textDiacritics = settings.value(SID_TEXTSEARCH_DIACRITICS,true).toBool();
   m_textRegex      = settings.value(SID_TEXTSEARCH_TYPE_REGEX,false).toBool();
   m_textCase = settings.value(SID_TEXTSEARCH_IGNORE_CASE,true).toBool();
+  m_textRepeat->setChecked(settings.value(SID_TEXTSEARCH_FAILURE_DEFAULT_BTN,true).toBool());
   m_textCurrentPage->setChecked(settings.value(SID_TEXTSEARCH_CURRENTPAGE_ONLY,false).toBool());
   m_textPageSize->setValue(settings.value(SID_TEXTSEARCH_PAGE_SIZE,100).toInt());
   settings.endGroup();
@@ -226,6 +227,7 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_TEXTSEARCH_TYPE_REGEX,m_textRegex);
   settings.setValue(SID_TEXTSEARCH_IGNORE_CASE,m_textCase);
   settings.setValue(SID_TEXTSEARCH_CONTEXT_STYLE,m_contextStyle->text());
+  settings.setValue(SID_TEXTSEARCH_FAILURE_DEFAULT_BTN,m_textRepeat->isChecked());
   settings.endGroup();
   settings.beginGroup("HeadSearch");
 
@@ -332,6 +334,9 @@ bool FindOptions::isModified()  {
   }
 
   if (m_textCase      != settings.value(SID_TEXTSEARCH_IGNORE_CASE,true).toBool()) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_TEXTSEARCH_FAILURE_DEFAULT_BTN,m_textRepeat)) {
     m_dirty = true;
   }
 

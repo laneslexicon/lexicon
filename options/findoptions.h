@@ -25,6 +25,7 @@ class FindOptions : public OptionsWidget {
     QCheckBox * m_textCurrentPage;
     QSpinBox  * m_textStep;
     QSpinBox  * m_textPageSize;
+    QCheckBox * m_textRepeat;  // default button when search fails
     QLineEdit * m_contextStyle;
 
     bool m_textWholeWord;

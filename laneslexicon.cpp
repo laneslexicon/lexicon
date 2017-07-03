@@ -2221,7 +2221,7 @@ void LanesLexicon::readSettings() {
   settings.endGroup();
 
   settings.beginGroup("Text Search");
-  m_searchAgainDefault = settings.value(SID_TEXTSEARCH_FAILURE_DEFAULT_ACTION,true).toBool();
+  m_searchAgainDefault = settings.value(SID_TEXTSEARCH_FAILURE_DEFAULT_BTN,true).toBool();
   settings.endGroup();
 }
 void LanesLexicon::writeSettings() {
@@ -3441,12 +3441,12 @@ void LanesLexicon::searchForText() {
     if (n == 0) {
       QMessageBox msg;
       msg.setWindowTitle(tr("Text Search"));
-      msg.setText(QString("<html><body><div><p>%1:</p><p style=\"font-weight:bold;margin-left:20px\">%2</p><p>%3.</p>\
-      <p>%4?</p></div></body></html>")
-                  .arg(tr("Search for"))
+      msg.setText(QString("<html><body><div><p>%1</p><p style=\"font-weight:bold;margin-left:20px\">%2</p><p>%3</p>\
+      <p>%4</p></div></body></html>")
+                  .arg(tr("Search for:"))
                   .arg(o.target)
-                  .arg(tr("Return no results"))
-                  .arg(tr("New search")));
+                  .arg(tr("Pattern not found."))
+                  .arg(tr("New search?")));
       msg.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
       if (m_searchAgainDefault) {
         msg.setDefaultButton(QMessageBox::Yes);
