@@ -17,6 +17,7 @@
 #include "imlineedit.h"
 #include "keyboardwidget.h"
 #include "textsearch.h"
+class SearchOptions;
 //#include "searchoptionswidget.h"
 class TextSearchDialog : public QDialog {
   Q_OBJECT
@@ -32,7 +33,12 @@ class TextSearchDialog : public QDialog {
   void setText(const QString &);
   void hideKeyboard();
   void readSettings();
+  void showHeadOption(bool v);
+  void showHighlightAll(bool v);
+  bool headPhrase() const;
   TextOption options() const;
+  SearchOptions searchOptions() const; // this returns everything including headphrase and highlight all
+  void fromOptions(SearchOptions &);   // set widgets from options
   QPair<bool,bool> tabOptions() const;
   public slots:
     virtual void showOptions(bool);
@@ -47,6 +53,7 @@ class TextSearchDialog : public QDialog {
     QString showText(const QString &);
     //    SearchOptions::SearchScope_t m_searchType;
  private:
+    QGridLayout * m_form;
     QWidget * m_optionsWidget;
     int m_count;
     KeyboardWidget * m_keyboard;
@@ -65,6 +72,8 @@ class TextSearchDialog : public QDialog {
     QCheckBox * m_ignoreDiacritics;
     QCheckBox * m_goTab;
     QCheckBox * m_newTab;
+    QCheckBox * m_headPhrase;             // for headword search
+    QCheckBox * m_highlightAll;           // for local search;
     QRadioButton * m_normalSearch;
     QRadioButton * m_regexSearch;
 //    SearchOptionsWidget  * m_options;

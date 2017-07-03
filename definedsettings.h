@@ -135,7 +135,6 @@ They should not be translated.
 
 #define SID_SHORTCUT_OPTIONS                   "Options"
 #define SID_SHORTCUT_QUIT                      "Quit"
-#define SID_SHORTCUT_SEARCH_DELETE             "Search delete"
 #define SID_SHORTCUT_SEARCH_ENTRY              "Search entry"
 #define SID_SHORTCUT_SEARCH_HEAD               "Search head"
 #define SID_SHORTCUT_SEARCH_NODE               "Search node"

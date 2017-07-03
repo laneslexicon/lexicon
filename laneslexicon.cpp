@@ -723,9 +723,6 @@ void LanesLexicon::shortcut(const QString & key) {
   else if (key == SID_SHORTCUT_KEYMAPS_HELP) {
     this->onKeymapHelp();
   }
-  else if (key == SID_SHORTCUT_SEARCH_DELETE) {
-    this->deleteSearch();
-  }
   else if (key == SID_SHORTCUT_LOCAL_SEARCH_FIND) {
     this->localSearch();
   }
@@ -2005,6 +2002,7 @@ void LanesLexicon::onTest() {
   }
   if (1) {
     TextSearchDialog * d = new TextSearchDialog();
+    d->showHighlightAll(true);
     d->exec();
     delete d;
   }
@@ -3402,7 +3400,6 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   if (searchType == SearchOptions::Entry) {
       HeadSearchWidget * s = new HeadSearchWidget(this);
       connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
-      connect(s,SIGNAL(deleteSearch()),this,SLOT(deleteSearch()));
       connect(s,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
 
       s->search(target,options);
@@ -3427,6 +3424,8 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
 void LanesLexicon::searchForText() {
   bool r = false;
   TextSearchDialog * d = new TextSearchDialog();
+  connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
+
   if (d->exec()) {
     TextOption o = d->options();
     EnsearchWidget * w = new EnsearchWidget;
@@ -3483,13 +3482,14 @@ void LanesLexicon::searchForText() {
  */
 void LanesLexicon::searchForEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
+  // TODO replace with TextSearchDialog
   if (m_headSearchDialog == NULL) {
     m_headSearchDialog  = new ArabicSearchDialog(SearchOptions::Entry);
     connect(m_headSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
 
   }
   else {
-    //    m_headSearchDialog->setText("");
+
   }
 
   if (m_headSearchDialog->exec()) {
@@ -3926,31 +3926,6 @@ QString LanesLexicon::getKeymapFileName(const QString & mapname) const {
 QMapIterator<QString,QString> LanesLexicon::getMapIterator() {
   QMapIterator<QString,QString> iter(m_maps);
   return iter;
-}
-void LanesLexicon::deleteSearch() {
-  /*
-  DELETE THIS
-  Place p;
-  int currentTab = m_tabs->currentIndex();
-  HeadSearchWidget * searchwidget = qobject_cast<HeadSearchWidget *>(m_tabs->widget(currentTab));
-  if (searchwidget) {
-    p = searchwidget->getPlace();
-    delete searchwidget;
-  }
-  else {
-    return;
-  }
-  GraphicsEntry *  entry = new GraphicsEntry(this);
-  setSignals(entry);
-  entry->installEventFilter(this);
-  entry->getView()->installEventFilter(this);
-
-  entry->getXmlForRoot(p);
-  m_tabs->insertTab(currentTab,entry,p.getShortText());
-  m_tabs->setCurrentIndex(currentTab);
-  entry->home();
-  return;
-  */
 }
 void LanesLexicon::localSearch() {
   GraphicsEntry * entry = qobject_cast<GraphicsEntry *>(m_tabs->currentWidget());

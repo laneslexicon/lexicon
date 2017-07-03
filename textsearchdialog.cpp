@@ -80,6 +80,8 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_ignoreDiacritics = new QCheckBox(tr("Ignore diacritics"));
   m_goTab = new QCheckBox(tr("Activate tab"));
   m_newTab = new QCheckBox(tr("Open new tab"));
+  m_headPhrase = new QCheckBox(tr("Search head phrase"));
+  m_highlightAll = new QCheckBox(tr("Highlight all"));
 
   QGroupBox * typeGroup = new QGroupBox(tr("Search type"));
   QHBoxLayout * typeLayout = new QHBoxLayout;
@@ -87,15 +89,20 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   typeLayout->addWidget(m_regexSearch);
   typeGroup->setLayout(typeLayout);
 
-  QGridLayout * optionlayout = new QGridLayout;
-  optionlayout->addWidget(typeGroup,0,0,1,2);
-  optionlayout->addWidget(m_wholeWord,1,0);
-  optionlayout->addWidget(m_ignoreCase,1,1);
-  optionlayout->addWidget(m_ignoreDiacritics,2,0);
-  optionlayout->addWidget(m_newTab,3,0);
-  optionlayout->addWidget(m_goTab,3,1);
-  m_optionsWidget->setLayout(optionlayout);
+  m_form = new QGridLayout;
+  m_form->addWidget(typeGroup,0,0,1,2);
+  m_form->addWidget(m_wholeWord,1,0);
+  m_form->addWidget(m_ignoreCase,1,1);
+  m_form->addWidget(m_ignoreDiacritics,2,0);
+  m_form->addWidget(m_headPhrase,3,0);
+  m_form->addWidget(m_highlightAll,4,0);
+  m_form->addWidget(m_newTab,5,0);
+  m_form->addWidget(m_goTab,5,1);
+  m_optionsWidget->setLayout(m_form);
   leftlayout->addWidget(m_optionsWidget);
+
+  m_headPhrase->setVisible(false);
+  m_highlightAll->setVisible(false);
   //  hidde
   //  m_wholeWord->setVisible(false);
   //  m_ignoreCase->setVisible(false);
@@ -237,11 +244,12 @@ void TextSearchDialog::setText(const QString & t) {
   m_edit->setText(t);
 }
 void TextSearchDialog::onHelp() {
+  QLOG_DEBUG() << Q_FUNC_INFO << this->metaObject()->className();
   emit(showHelp(this->metaObject()->className()));
 }
 void TextSearchDialog::onTextChanged(const QString & txt) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << txt;
-  bool rtl = false;
+
   int rtlCount = 0;
   int ltrCount = 0;
   for(int i=0;i < txt.length();i++) {
@@ -277,7 +285,7 @@ void TextSearchDialog::onTextChanged(const QString & txt) {
 }
 QString TextSearchDialog::showText(const QString & txt) {
 
-  bool rtl = false;
+
   int rtlCount = 0;
   int ltrCount = 0;
   int currentDir;
@@ -394,4 +402,39 @@ TextOption TextSearchDialog::options() const {
 }
 QPair<bool,bool> TextSearchDialog::tabOptions() const {
   return qMakePair(m_newTab->isChecked(),m_goTab->isChecked());
+}
+void TextSearchDialog::showHeadOption(bool v) {
+  m_headPhrase->setVisible(v);
+}
+bool TextSearchDialog::headPhrase() const {
+  return m_headPhrase->isChecked();
+}
+void TextSearchDialog::showHighlightAll(bool v) {
+    m_highlightAll->setVisible(v);
+}
+SearchOptions TextSearchDialog::searchOptions() const {
+  SearchOptions o;
+
+  o.setIgnoreDiacritics(m_ignoreDiacritics->isChecked());
+  o.setWholeWordMatch(m_wholeWord->isChecked());
+  o.setShowAll(m_highlightAll->isChecked());
+  o.setIgnoreCase(m_ignoreCase->isChecked());
+  o.setHeadPhrase(m_headPhrase->isChecked());
+  o.setPattern(m_edit->text());
+  if (m_regexSearch->isChecked()) {
+    o.setSearchType(SearchOptions::Regex);
+  }
+  else {
+    o.setSearchType(SearchOptions::Normal);
+  }
+
+  return o;
+}
+void TextSearchDialog::fromOptions(SearchOptions & o) {
+  m_ignoreDiacritics->setChecked(o.ignoreDiacritics());
+  m_wholeWord->setChecked(o.wholeWordMatch());
+  m_highlightAll->setChecked(o.showAll());
+  m_headPhrase->setChecked(o.headPhrase());
+  m_ignoreCase->setChecked(o.ignoreCase());
+  m_regexSearch->setChecked(o.regex());
 }

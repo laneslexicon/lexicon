@@ -16,6 +16,7 @@
 #include "linkcheckdialog.h"
 #include "showxmldialog.h"
 #include "textsearch.h"
+#include "textsearchdialog.h"
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
   setObjectName("toolbuttondata");
@@ -1909,13 +1910,14 @@ int GraphicsEntry::search() {
     options.setIgnoreCase(settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool());
     options.setShowAll(settings.value(SID_LOCALSEARCH_SHOW_ALL,false).toBool());
   }
-  ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Local,this);
-  d->setOptions(options);
+  TextSearchDialog * d = new TextSearchDialog;
+  connect(d,SIGNAL(showHelp(const QString &)),getApp(),SLOT(showHelp(const QString &)));
+  d->fromOptions(options);
+  d->showHighlightAll(true);
   QString t;
   if (d->exec()) {
     t = d->getText();
-    qDebug() << Q_FUNC_INFO << t << t.size();
-    d->getOptions(options);
+    options = d->searchOptions();//d->getOptions(options);
     delete d;
     if ( t.isEmpty()) {
       return -1;
@@ -1949,7 +1951,6 @@ int GraphicsEntry::search() {
   //  if (options.ignoreCase()) {
   //    rx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   //  }
-  qDebug() << Q_FUNC_INFO << "returned search pattern" << rx.pattern();
   //  m_currentSearchRx = rx;
   m_currentSearchTarget = t;
   QGraphicsItem * focusItem = m_scene->focusItem();
@@ -1977,6 +1978,7 @@ int GraphicsEntry::search() {
     }
   }
   m_findCount = count;
+
 
   if (count  == 0) {
     QMessageBox msgBox;

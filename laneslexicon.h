@@ -117,7 +117,6 @@ class LanesLexicon : public QMainWindow
       void showNoteBrowser();
       void onNotesDeleted(const QStringList &);
       void shortcut(const QString &);
-      void deleteSearch();
       void localSearch();
       void localSearchNext();
       void localSearchClear();
