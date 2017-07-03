@@ -35,7 +35,6 @@ class ArabicSearchDialog : public QDialog {
     void keyboardClosed();
     void onKeyboardShortcut(const QString &);
     void onHelp();
-    void languageSwitch(int);
  protected:
     SearchOptions::SearchScope_t m_searchType;
     int m_count;

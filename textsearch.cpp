@@ -1010,12 +1010,12 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     }
   }
   else {    // doing a regex search so just set the pattern
-    if (diacritics) {
-      m_rx = buildRx(pattern,diacritics,false,caseSensitive);
-    }
-    else {
+    //    if (diacritics) {
+    //      m_rx = buildRx(pattern,diacritics,false,caseSensitive);
+    //    }
+    //    else {
     m_rx.setPattern(pattern);
-    }
+    //    }
   }
   //
   // test for a single word of Arabic so we can use the xref table

@@ -15,6 +15,7 @@
 #include "definedsql.h"
 #include "linkcheckdialog.h"
 #include "showxmldialog.h"
+#include "textsearch.h"
 ToolButtonData::ToolButtonData(int id) : QToolButton() {
   m_id = id;
   setObjectName("toolbuttondata");
@@ -1913,6 +1914,7 @@ int GraphicsEntry::search() {
   QString t;
   if (d->exec()) {
     t = d->getText();
+    qDebug() << Q_FUNC_INFO << t << t.size();
     d->getOptions(options);
     delete d;
     if ( t.isEmpty()) {
@@ -1937,18 +1939,18 @@ int GraphicsEntry::search() {
   this->clearHighlights(false);
   m_searchItemPtr = 0;
   m_searchIndex = 0;
-  /// TODO remove these
 
   m_searchItemIndexes.clear();
-  QRegExp rx = SearchOptionsWidget::buildRx(t,m_pattern,options);
-  QLOG_DEBUG() << "Search pattern" << rx.pattern();
-  if (options.ignoreCase()) {
-    rx.setCaseSensitivity(Qt::CaseInsensitive);
-  }
-  else {
-    rx.setCaseSensitivity(Qt::CaseSensitive);
-  }
-  m_currentSearchRx = rx;
+  QLOG_DEBUG() << Q_FUNC_INFO << "calling buildRx" << m_pattern;
+  // m_pattern contains the diacritics
+  //  QRegularExpression rx = SearchOptionsWidget::buildRx(t,m_pattern,options);
+  TextSearch ts;
+  QRegularExpression rx = ts.buildRx(t,options.ignoreDiacritics(),options.isWholeWord(),! options.ignoreCase());
+  //  if (options.ignoreCase()) {
+  //    rx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+  //  }
+  qDebug() << Q_FUNC_INFO << "returned search pattern" << rx.pattern();
+  //  m_currentSearchRx = rx;
   m_currentSearchTarget = t;
   QGraphicsItem * focusItem = m_scene->focusItem();
   //  this->m_items[0]->ensureVisible();

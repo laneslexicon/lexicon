@@ -3333,9 +3333,9 @@ void LanesLexicon::searchForRoot() {
   if (m_rootSearchDialog->exec()) {
     QString t = m_rootSearchDialog->getText();
     if (! t.isEmpty()) {
-      if (! UcdScripts::isScript(t,"Arabic")) {
-        t = convertString(t);
-      }
+      //      if (! UcdScripts::isScript(t,"Arabic")) {
+      //        t = convertString(t);
+      //      }
       SearchOptions opts;
       m_rootSearchDialog->getOptions(opts);
       Place p;

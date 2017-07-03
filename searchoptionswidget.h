@@ -34,7 +34,6 @@ class SearchOptionsWidget : public QWidget {
   bool getForceLTR();
   bool isTextSearch() const;
   void setTextSearch(bool);
-  static QRegExp buildRx(const QString & target,const QString & diacritics,const SearchOptions &,const QString & metacharacters = QString("()[].?"));
  public slots:
   void searchTypeChanged();
   void keymapChanged();

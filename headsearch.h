@@ -60,7 +60,6 @@ class HeadSearchWidget : public QWidget
    bool eventFilter(QObject * target,QEvent * event);
    bool m_focusTable;
    QString buildText(const SearchOptions &);
-   QRegExp m_currentRx;
    QString m_diacritics;
    SearchOptions m_searchOptions;
    QLabel * m_searchTitle;

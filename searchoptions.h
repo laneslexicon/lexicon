@@ -54,6 +54,8 @@ class SearchOptions {
 
   bool isValid() const;
   bool isWholeWord() const;   // returns value according to whether isArabic is set
+
+  bool regex() const;
  private:
   bool m_textSearch;
   bool m_ignoreDiacritics;

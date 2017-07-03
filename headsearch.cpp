@@ -11,6 +11,7 @@
 #include "nodeinfo.h"
 #include "xsltsupport.h"
 #include "centeredcheckbox.h"
+#include "textsearch.h"
 #define SELECT_COLUMN 0
 #define ROOT_COLUMN 1
 #define HEAD_COLUMN 2
@@ -121,18 +122,33 @@ void HeadSearchWidget::search(const QString & searchpattern,const SearchOptions 
   QTableWidgetItem * item;
   int count = 0;
 
-  QRegExp rx;
-  QRegExp rxclass(m_diacritics);
+  //  QRegExp rxclass(m_diacritics);
   QString pattern = searchpattern;
   pattern.remove(QChar(0x202d));
 
-  bool replaceSearch = true;
 
   m_target = pattern;
   m_searchOptions = options;
 
-  rx = SearchOptionsWidget::buildRx(pattern,m_diacritics,options);
-  m_currentRx = rx;
+  QList<QChar> points;
+  TextSearch ts;
+  ts.setDiacritics();
+  ts.getDiacritics(points);
+  /*
+  qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+  qDebug() << Q_FUNC_INFO << "Diacritics" << options.ignoreDiacritics();
+  qDebug() << Q_FUNC_INFO << "Whole word" << options.isWholeWord();
+  qDebug() << Q_FUNC_INFO << "Ignore case" << options.ignoreCase();
+  qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+  */
+
+  QRegularExpression rx;
+  if (options.regex()) {
+    rx.setPattern(searchpattern);
+  }
+  else {
+    rx = ts.buildRx(pattern,options.ignoreDiacritics(),options.isWholeWord(),! options.ignoreCase());
+  }
 
   if (! m_query.prepare(SQL_ALL_ENTRIES)) {
       QLOG_WARN() << QString(tr("SQL prepare error %1: %2"))
@@ -181,9 +197,10 @@ void HeadSearchWidget::search(const QString & searchpattern,const SearchOptions 
     }
     /// strip diacritics if required
     if (options.getSearchType() == SearchOptions::Normal) {
-      if (replaceSearch) {
-        if (options.ignoreDiacritics())
-          searchtarget =  searchtarget.replace(rxclass,QString());
+      if (options.ignoreDiacritics()) {
+        for(int i=0;i < points.size();i++) {
+          searchtarget.remove(points[i]);
+        }
       }
     }
     if (searchtarget.indexOf(rx) != -1) {

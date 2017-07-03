@@ -32,7 +32,7 @@
 #include <QKeyEvent>
 #include <QFocusEvent>
 #include <QSettings>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QClipboard>
 #include <QToolButton>
 #include <QMap>
@@ -65,7 +65,7 @@ class EntryItem : public QGraphicsTextItem {
   void setPlace(const Place &);
   void setHighlightColor(const QString &);
   void selectAll();
-  QPair<int,int> find(const QRegExp &,int,bool highlight = true);
+  QPair<int,int> find(const QRegularExpression &,int,bool highlight = true);
   Place getPlace();
   QString getNode();
   QString getRoot();

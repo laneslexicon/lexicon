@@ -306,52 +306,6 @@ void SearchOptionsWidget::onNewTab(int checked) {
   }
 
 }
-/**
- * Ignore diacritics is done by removing all diacritics from the search pattern
- * and for every Arabic letter in the pattern append *[:diacritics:]
- *
- * @param searchtarget
- * @param diacritics
- * @param options
- * @param metacharacters
- *
- * @return
- */
-QRegExp SearchOptionsWidget::buildRx(const QString & searchtarget,const QString & diacritics,const SearchOptions & options, const QString & metacharacters) {
-  QRegExp rx;
-  QString target = searchtarget;
-  QRegExp rxclass(diacritics);
-
-  QString pattern;
-
-  if (options.getSearchType() == SearchOptions::Normal) {
-    target = QRegularExpression::escape(target);
-    if (options.ignoreDiacritics()) {
-      target = target.replace(rxclass,QString());
-      for(int i=0;i < target.size();i++) {
-        QChar sp = target.at(i);
-        pattern += QString(sp);
-        if ( sp.isLetter() ) {
-          /// if it's in the Arabic block, append to allow for optional diacritics
-          if ((sp.unicode() >= 0x600) && (sp.unicode() <= 0x6ff)) {
-            pattern += diacritics;
-          }
-        }
-      }
-    }
-    else {
-      pattern = target;
-    }
-    if (options.wholeWordMatch()) {
-      pattern = "\\b" + pattern + "\\b";
-    }
-    rx.setPattern(pattern);
-  }
-  else {
-    rx.setPattern(target);
-  }
-  return rx;
-}
 void SearchOptionsWidget::getOptions(SearchOptions & opts) const {
   QLOG_DEBUG() << Q_FUNC_INFO;
 

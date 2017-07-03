@@ -251,19 +251,6 @@ void ArabicSearchDialog::setText(const QString & t) {
 void ArabicSearchDialog::onHelp() {
   emit(showHelp(this->metaObject()->className()));
 }
-void ArabicSearchDialog::languageSwitch(int /* index */) {
-  /*
-  QLOG_DEBUG() << Q_FUNC_INFO;
-  if (m_options->isArabicSearch()) {
-    m_edit->enableMapping(m_mapEnabled);
-  }
-  else {
-    m_edit->enableMapping(false);
-  }
-  QLOG_DEBUG() << "isArabicSearch" << m_options->isArabicSearch();
-  QLOG_DEBUG() << "edit map enabled" << m_edit->isMappingEnabled();
-  */
-}
 /**
  *
  *pp

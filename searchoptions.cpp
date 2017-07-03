@@ -43,7 +43,9 @@ bool SearchOptions::isWholeWord() const {
     return m_enWholeWordMatch;
   }
 }
-
+bool SearchOptions::regex() const {
+  return m_type == SearchOptions::Regex;
+}
 void SearchOptions::setSearchType(SearchType_t x) {
   m_type = x;
 }
