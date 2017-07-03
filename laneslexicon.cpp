@@ -3445,17 +3445,25 @@ void LanesLexicon::searchForText() {
     if (n == 0) {
       QMessageBox msg;
       msg.setWindowTitle(tr("Text Search"));
-      msg.setText(QString("<html><body><div><p>Search for:</p><p style=\"font-weight:bold;margin-left:20px\">%1</p><p>Return no results.</p>\
-      <p>Search again?</p></div></body></html>").arg(o.target));
+      msg.setText(QString("<html><body><div><p>%1:</p><p style=\"font-weight:bold;margin-left:20px\">%2</p><p>%3.</p>\
+      <p>%4?</p></div></body></html>")
+                  .arg(tr("Search for"))
+                  .arg(o.target)
+                  .arg(tr("Return no results"))
+                  .arg(tr("New search")));
       msg.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
-      msg.setDefaultButton(QMessageBox::No);
+      if (m_searchAgainDefault) {
+        msg.setDefaultButton(QMessageBox::Yes);
+      }
+      else {
+        msg.setDefaultButton(QMessageBox::No);
+      }
       int ret = msg.exec();
       if (ret == QMessageBox::Yes) {
         r = true;
       }
     }
     else {
-      int c = this->getSearchCount();    // find the number of search tabs
       int ix = this->addTab(tabOpts.first,w,QString(tr("Search for: %1")).arg(o.target));
       if (tabOpts.second) {
         m_tabs->setCurrentIndex(ix);

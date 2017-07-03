@@ -347,6 +347,7 @@ class LanesLexicon : public QMainWindow
       bool m_historyNewTab;
       bool m_historyGoTab;
       bool m_rootActivateTab;
+      bool m_searchAgainDefault;     // true = Yes, false = No
       QToolBar * m_mainbar;
       QToolBar * m_navigation;
       QToolBar * m_entrybar;
