@@ -31,7 +31,7 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_text = new QLabel;
 
   m_findButton = new QPushButton(tr("&Find"));
-  m_findButton->setDefault(true);
+
   m_findButton->setEnabled(false);
   m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
   m_keyboardButton->setAutoDefault(false);
@@ -154,6 +154,7 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   readSettings();
 
   keymapChanged();
+  m_findButton->setDefault(true);
 }
 void TextSearchDialog::onKeyboardShortcut(const QString & key) {
   if (key == m_keyboardButton->shortcut().toString()) {
