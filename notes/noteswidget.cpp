@@ -98,13 +98,11 @@ bool EditableSqlModel::updateTag(int id, const QString & tag)
     return query.exec();
 }
 bool EditableSqlModel::createConnection() {
-  bool dbInitRequired = false;
   QString dbname = "notes.sqlite";
 
   QFile dbfile(dbname);
-  if (! dbfile.exists()) {
-    dbInitRequired = true;
-  }
+  //  if (! dbfile.exists()) {
+  //  }
   m_db = QSqlDatabase::addDatabase("QSQLITE","notesdb");
   m_db.setDatabaseName(dbname);
   if (! m_db.open()) {
@@ -228,12 +226,12 @@ void NotesWidget::onLexiconClicked() {
   this->hide();
 }
 bool NotesWidget::createConnection() {
-  bool dbInitRequired = false;
+  //  bool dbInitRequired = false;
   QString dbname = "notes.sqlite";
 
   QFile dbfile(dbname);
   if (! dbfile.exists()) {
-    dbInitRequired = true;
+    //    dbInitRequired = true;
   }
   m_db = QSqlDatabase::addDatabase("QSQLITE","notesdb");
   m_db.setDatabaseName(dbname);

@@ -268,7 +268,7 @@ LanesLexicon::~LanesLexicon()
 }
 void LanesLexicon::showStartupEntry() {
   Place p;
-  int ix;
+  int ix=0;
   if (! m_startupNode.isEmpty()) {
     p.setNode(m_startupNode);
     ix = this->hasPlace(p,GraphicsEntry::NodeSearch,true);
@@ -4390,7 +4390,7 @@ bool LanesLexicon::sanityCheck(int type) {
   QLOG_DEBUG() << Q_FUNC_INFO << type;
 
   QStringList errors;
-  int level = 0;        // 0 for missing stylesheet , 1 is critical and terminate
+  //  int level = 0;        // 0 for missing stylesheet , 1 is critical and terminate
   QString filename = getLexicon()->getStylesheetFilePath(Lexicon::Entry,false);
   if (! QFileInfo::exists(filename)) {
     errors << QString(tr("CSS stylesheet: %1")).arg(QDir::current().relativeFilePath(filename));
@@ -4408,12 +4408,12 @@ bool LanesLexicon::sanityCheck(int type) {
       info = QString("Lexicon database: %1").arg(currentDir);
     }
     errors << info;
-    level = 1;
+    //level = 1;
   }
   QString xslt =  getLexicon()->getXsltFileName();
   if (xslt.isEmpty() || ! QFileInfo::exists(xslt)) {
     QDir d;
-    level = 1;
+    //    level = 1;
     QString info = QString("XSLT stylesheet: %1").arg(QDir::current().relativeFilePath(xslt));
     errors << info;
   }
@@ -5197,7 +5197,7 @@ void LanesLexicon::onLoadPageSet() {
 
   LoadPageSetDialog * d = new LoadPageSetDialog;
   QList<int> pages;
-  bool clearTabs;
+  bool clearTabs=false;
   if (d->exec() == QDialog::Accepted) {
     pages = d->pages();
     clearTabs = d->closeExisting();

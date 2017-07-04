@@ -910,7 +910,7 @@ int TextSearch::readSize() const {
   bool ok = false;
   QString sql = QString(SQL_FIND_MAXIMUM).arg(table);
   QSqlQuery maxq(sql);
-  int max;
+  int max=50000;
   if (maxq.exec() && maxq.first()) {
     max = maxq.value(0).toInt(&ok);
   }
@@ -1115,8 +1115,8 @@ QPair<int,int> TextSearch::setPages(int sz) {
 
   m_fullPages.clear();
   int j=0;
-  int currentEntry=0;
-  int currentFragment=0;
+  //  int currentEntry=0;
+  //  int currentFragment=0;
   QString pp(" ");
   page=0;
   for(int i = 0;i < m_results.size();i++) {
@@ -1128,8 +1128,8 @@ QPair<int,int> TextSearch::setPages(int sz) {
         page++;
         m_fullPages.insert(page,qMakePair(i,k));
         pp = "P";
-        currentFragment = k;
-        currentEntry = i;
+	//    currentFragment = k;
+	//        currentEntry = i;
       }
       //      qDebug() << QString("%1 [%2][%3:%4] %5").arg(pp).arg(j).arg(i).arg(k).arg(j % m_pageSize);
       pp = " ";

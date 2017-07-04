@@ -201,7 +201,7 @@ void KeyDef::setGroupValues(int group, QSettings & settings,QSettings & specials
 *************************************************/
 void KeyDef::setLevelValues(int group,int level,QSettings & settings,QSettings & specials) {
   bool ok;
-  int base;
+  //int base;
   QRegExp sp("<(.+)>");
   QRegExp nx("^\\d+$");
   QRegExp hx("^0x[0-9,a-f,A-F]+");
@@ -209,7 +209,7 @@ void KeyDef::setLevelValues(int group,int level,QSettings & settings,QSettings &
   QStringList keys  = settings.allKeys();
   if (m_type == KeyDef::Char) {
     if (keys.contains("value")) {
-      base = 10;
+      //      base = 10;
       int x = -1;
       QString s = settings.value("value").toString();
       if (! s.isEmpty()) {

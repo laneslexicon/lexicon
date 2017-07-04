@@ -139,9 +139,9 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
     }
   }
   QAction *markAction = menu.addAction(tr("&Bookmark"));
-  //  QAction *searchAction = menu.addAction("Find");
-  //  connect(searchAction,SIGNAL(triggered()),this,SLOT(searchItem()));
-  QAction *selectAction;// = menu.addAction(tr("&Select"));
+
+
+  QAction *selectAction = 0;
   QAction *printAction = menu.addAction(tr("&Print"));
 
   QAction *copyAction = menu.addAction("&Copy");
@@ -149,8 +149,6 @@ void EntryItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event ) {
   copyAction->setEnabled(this->textCursor().hasSelection());
 
   if (this->textCursor().hasSelection()) {
-    //    QAction *copyAction = menu.addAction("&Copy");
-    //    connect(copyAction,SIGNAL(triggered()),this,SIGNAL(copy()));
     QAction *clearCurrentAction = menu.addAction(tr("Clear &selection"));
     connect(clearCurrentAction,SIGNAL(triggered()),this,SLOT(clearSelection()));
   }
