@@ -23,7 +23,7 @@ using XALAN_CPP_NAMESPACE::XalanCompiledStylesheet;
 #include <libxml/debugXML.h>
 #include <libxml/HTMLtree.h>
 #include <libxml/xmlIO.h>
-#include <libxml/DOCBparser.h>
+//#include <libxml/DOCBparser.h>
 #include <libxml/xinclude.h>
 #include <libxml/catalog.h>
 #include <libxslt/xslt.h>

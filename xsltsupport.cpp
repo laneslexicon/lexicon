@@ -109,6 +109,8 @@ int compileStylesheet(int type,const QString & xsl) {
 QString xsltTransform(int type,const QString & xml) {
   QString result;
   xmlDocPtr doc, res;
+  doc = NULL;
+  res = NULL;
   const char * params[16 + 1];
   memset(params,0x00,sizeof(params));
   int nbparams = 0;
@@ -119,7 +121,7 @@ QString xsltTransform(int type,const QString & xml) {
      return QString();
   }
 
-  xmlChar * buf;
+  xmlChar * buf = NULL;
   int sz;
     switch(type) {
   case ENTRY_XSLT:
