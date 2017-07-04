@@ -192,11 +192,11 @@ KeyMap * km_new() {
 
   return m;
 }
-/**
-   Search the combinations has for the given value and
-   return the entry
-*/
-/*
+//
+//   Search the combinations has for the given value and
+//   return the entry
+//
+//
 KeyEntry * km_get_combination_entry(KeyMap * map,gint v) {
   GString * key;
   key = g_string_new("");

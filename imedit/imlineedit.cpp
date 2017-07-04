@@ -124,7 +124,7 @@ void ImLineEdit::readSettings(const QString & fileName) {
 */
 void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
-  int pos = this->cursorPosition();
+  //  int pos = this->cursorPosition();
   if (!m_enabled ) {
     //    emit(charInserted(event->text().unicode()->unicode(),pos));
     return QLineEdit::keyPressEvent(event);

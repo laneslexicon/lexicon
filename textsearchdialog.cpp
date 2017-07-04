@@ -270,8 +270,6 @@ QString TextSearchDialog::showText(const QString & txt) {
 
   int rtlCount = 0;
   int ltrCount = 0;
-  int currentDir;
-  int prevDir;
   QString p;
   QString cp;
   for(int i=0;i < txt.length();i++) {
@@ -373,7 +371,7 @@ void TextSearchDialog::readSettings() {
     move(p);
   }
 }
-void TextSearchDialog::searchTypeChanged(bool v) {
+void TextSearchDialog::searchTypeChanged(bool /* v */) {
   m_wholeWord->setEnabled(! m_regexSearch->isChecked());
   m_ignoreDiacritics->setEnabled(! m_regexSearch->isChecked());
 }

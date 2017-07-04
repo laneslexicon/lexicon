@@ -97,7 +97,7 @@ void TabWidget::focusOutEvent(QFocusEvent * /* event */) {
 bool TabWidget::numberTab() const {
   return m_numberTabs;
 }
-void TabWidget::contextMenuEvent(QContextMenuEvent * event) {
+void TabWidget::contextMenuEvent(QContextMenuEvent * /* event */) {
   QMenu menu(this->tabText(this->currentIndex()));;
   QAction * closeOther = menu.addAction(tr("Close &other tabs"));
   QAction * closeThis = menu.addAction(tr("&Close this tab"));

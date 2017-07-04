@@ -311,7 +311,7 @@ void EntryItem::clearHighlights(bool keepResults) {
 void EntryItem::setWord(const QString & word) {
   m_place.setWord(word);
 }
-void EntryItem::setRoot(const QString & root,bool isroot) {
+void EntryItem::setRoot(const QString & root,bool /* isroot */) {
   m_place.setRoot(root);
   //  m_place.setIsRoot(isroot);
 }

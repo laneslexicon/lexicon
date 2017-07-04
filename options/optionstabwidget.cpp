@@ -112,7 +112,7 @@ bool OptionsTabWidget::isModified() {
 }
 void OptionsTabWidget::enableButtons() {
   bool v = false;
-  OptionsWidget * currentTab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
+  //  OptionsWidget * currentTab = qobject_cast<OptionsWidget *>(m_tabs->currentWidget());
   for(int i=0;(i < m_tabs->count()) && !v;i++) {
     OptionsWidget * tab = qobject_cast<OptionsWidget *>(m_tabs->widget(i));
     if (tab) {

@@ -36,7 +36,7 @@ bool EditableSqlModel::setData(const QModelIndex &index, const QVariant &value, 
 
   clear();
 
-  bool ok;
+  bool ok = false;
   if (index.column() == 3) {
     ok = updateNote(id, value.toString());
   }

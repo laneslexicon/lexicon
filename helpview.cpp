@@ -47,7 +47,7 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   QString html = "<p>Versions of this software built with Qt 5.7.1 or newer do not provide an inbuilt documentation viewer and will try to use your browser to view the online documenation located <a href=\"http://laneslexicon.github.io/lexicon/site/\">here.</a> This may change. ";
 
   b->setHtml(html);
-  
+
   b->setReadOnly(true);
   b->setOpenExternalLinks(true);
   m_closeButton = new QPushButton(QIcon(QPixmap(":/qrc/window-close.svg")),tr("Close"));
@@ -246,7 +246,7 @@ void HelpView::loadStarted() {
  *
  * @param ok
  */
-void HelpView::loadFinished(bool ok) {
+void HelpView::loadFinished(bool /* ok */) {
 #if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
   QLOG_DEBUG() << Q_FUNC_INFO << m_view->url() << ok;
   if (m_initialPage) {

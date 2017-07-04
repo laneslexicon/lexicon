@@ -129,7 +129,7 @@ void FontChangeWidget::readSettings() {
 }
 void FontChangeWidget::writeSettings() {
 }
-void FontChangeWidget::onFontChanged(const QString & family) {
+void FontChangeWidget::onFontChanged(const QString & /* family */) {
 }
 void FontChangeWidget::onShowAllChanged(int state) {
   QFontDatabase fdb;

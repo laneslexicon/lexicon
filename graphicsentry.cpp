@@ -654,12 +654,9 @@ void GraphicsEntry::showLinkDetails(const QString  & link) {
     info->setCloseOnLoad(m_nodeinfoClose);
     //    info->showForce(false);
     connect(info,SIGNAL(openNode(const QString &,bool)),this,SIGNAL(showNode(const QString &,bool)));
-    int ret = info->exec();
+    info->exec();
     this->setFocus();
     delete info;
-    //    if (ret == QDialog::Accepted) {
-    //      emit(gotoNode(Place::fromNode(node),true,true));
-    //    }
   }
   else {
     QLOG_WARN() << QString(tr("Requested link node not found : %1")).arg(node);
@@ -2632,8 +2629,6 @@ QString GraphicsEntry::userTitle() const {
   return m_userTitle;
 }
 void GraphicsEntry::checkLink(const QString link) {
-  bool ok;
-
   QSqlQuery query;
   if (! query.prepare(SQL_LINK_TYPE)) {
     QLOG_WARN() << QString(tr("Prepare failed for SQL_LINK_TYPE query:%1")).arg(query.lastError().text());

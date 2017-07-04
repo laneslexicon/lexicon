@@ -176,7 +176,7 @@ Return the style attribute for the matching value in settings/SpannedText
  */
 QString LaneSupport::getSpanStyle(const QString & spanstyle) {
   QString fontFamily;
-  int fontSize = 10;
+  //  int fontSize = 10;
   QString style;
   if (! m_settings) {
     return style;
@@ -207,7 +207,7 @@ QString LaneSupport::getSpanStyle(const QString & spanstyle) {
  */
 QString LaneSupport::scanAndStyle(const QString & str,const QString & spanstyle) {
   QString fontFamily;
-  int fontSize = 10;
+  //  int fontSize = 10;
   QString style;
   while(! m_settings->group().isEmpty()) {
     m_settings->endGroup();

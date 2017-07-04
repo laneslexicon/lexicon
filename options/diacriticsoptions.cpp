@@ -108,7 +108,7 @@ DiacriticsOptions::DiacriticsOptions(const QString & theme,QWidget * parent) : O
   readSettings();
   setupConnections();
 }
-void DiacriticsOptions::readSettings(bool reload) {
+void DiacriticsOptions::readSettings(bool /*reload */) {
   QString hex;
   bool ok;
 

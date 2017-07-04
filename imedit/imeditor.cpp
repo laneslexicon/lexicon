@@ -504,7 +504,7 @@ void ImEditor::onPrinters() {
   printDialog->setWindowTitle("Set and Configure Printer");
   printDialog->open(this,SLOT(onPrinterSetup()));
 }
-void ImEditor::charInserted(int unicode,int position) {
+void ImEditor::charInserted(int unicode,int /*  position */) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << unicode << QChar(unicode) << UcdScripts::getScript(unicode) << position;
   QString family = m_edit->textCursor().charFormat().fontFamily();
   QString script = UcdScripts::getScript(unicode);

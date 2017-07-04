@@ -252,8 +252,8 @@ void ImEdit::actionDeleteUnicode() {
 void ImEdit::dragEnterEvent(QDragEnterEvent * event) {
   event->acceptProposedAction();
 }
-void ImEdit::dropEvent(QDropEvent * event) {
-  emit(logMessage("ImEdit drop event"));
+void ImEdit::dropEvent(QDropEvent * /* event */) {
+  //  emit(logMessage("ImEdit drop event"));
 }
 void ImEdit::scrollContentsBy(int dx,int dy) {
   QTextEdit::scrollContentsBy(dx,dy);

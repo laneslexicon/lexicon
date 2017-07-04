@@ -481,9 +481,8 @@ InputMapper * im_new() {
 }
 int im_load_map_from_json(InputMapper * im,const char * filename,const char  * mapname) {
    QJsonValue v;
-  bool ok = true;
  QFile file;
- int ret = -1;
+
 
 //  setAttribute(Qt::WA_InputMethodEnabled,true);
   file.setFileName(filename);

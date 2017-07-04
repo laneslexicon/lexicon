@@ -319,7 +319,7 @@ void NoteDialog::onTypeChange(int ix) {
   }
 }
 */
-void NoteDialog::focusChanged(int reason) {
+void NoteDialog::focusChanged(int /* reason */) {
   ImLineEdit * e = qobject_cast<ImLineEdit *>(sender());
   if (e){
     m_attachedEdit = NoteDialog::AttachSubject;

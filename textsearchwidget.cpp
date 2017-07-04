@@ -210,7 +210,7 @@ void TextSearchWidget::pageChanged(const QString & page) {
 }
 int TextSearchWidget::addRow(const Place & p, const QString & text,int pos) {
 
-  QTableWidgetItem * item;
+  //  QTableWidgetItem * item;
   QLabel * label;
 
   int row = m_results->rowCount();

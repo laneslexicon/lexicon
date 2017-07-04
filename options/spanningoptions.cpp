@@ -49,23 +49,13 @@ SpanningOptions::SpanningOptions(const QString & theme,QWidget * parent) : Optio
   }
   vlayout->addLayout(formlayout);
 
-  /*
-  m_info = new QLabel;
-
-  QStringList html;
-  html << "<br/><p>";
-  html << tr("Please see the documentation for information about these CSS fragments.");
-  html << "</p>";
-  m_info->setText(html.join(""));
-  vlayout->addWidget(m_info);
-  */
   vlayout->addStretch();
   setLayout(vlayout);
   addButtons();
   readSettings();
   setupConnections();
 }
-void SpanningOptions::readSettings(bool reload) {
+void SpanningOptions::readSettings(bool /* reload */) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

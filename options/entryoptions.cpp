@@ -264,7 +264,7 @@ EntryOptions::EntryOptions(const QString & theme,QWidget * parent) : OptionsWidg
   //  getLexicon()->setCursorPosition(this);
 }
 
-void EntryOptions::readSettings(bool reload) {
+void EntryOptions::readSettings(bool /* reload */) {
   QString v;
     QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");

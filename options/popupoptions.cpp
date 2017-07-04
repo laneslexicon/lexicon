@@ -56,7 +56,6 @@ void DialogOptions::enableOption(int which,bool v) {
  * @param which
  */
 void DialogOptions::hideOption(int which) {
-  QWidget * w;
   switch(which) {
   case DialogOptions::Tab :
     break;

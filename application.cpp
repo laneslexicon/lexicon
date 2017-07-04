@@ -375,7 +375,7 @@ void Lexicon::scanForFonts(const QDir & dir)
    }
    QString fileName;
    int ret;
-   int foundFonts = fonts.size();
+   //   int foundFonts = fonts.size();
    int loadedFonts = 0;
    int failedFonts = 0;
    while(fonts.size() > 0) {
@@ -532,7 +532,7 @@ QString Lexicon::scanAndStyle(const QString & str,const QString & spanstyle) {
   QSettings s(f.absoluteFilePath(),QSettings::IniFormat);
   s.setIniCodec("UTF-8");
   QString fontFamily;
-  int fontSize = 10;
+  //  int fontSize = 10;
   QString style;
 
   if ( ! spanstyle.isEmpty() ) {
@@ -772,7 +772,7 @@ QStringList Lexicon::changeFontInSettings(const QString & selector,bool matching
   QRegularExpression reCssFont("{([^}]+)}");
   QRegularExpressionMatch match;
   for(int i=0;i < keys.size();i++) {
-    bool ok = false;
+    //    bool ok = false;
     if (re.match(keys[i]).hasMatch() == matching) {
       v = settings.value(keys[i]).toString();
       if (reFontString.match(v).hasMatch()) {
@@ -1030,7 +1030,7 @@ void Lexicon::adjustHeight(QWidget * w) {
     settings.endGroup();
   }
 }
-void Lexicon::setEditFont(QWidget * w,const QString & selector,const QString & t,int margin) {
+void Lexicon::setEditFont(QWidget * w,const QString & /* selector */,const QString & t,int margin) {
   QString css = getSelectorCss("ImLineEdit");
   if (css.isEmpty()) {
     return;
@@ -1122,7 +1122,6 @@ QStringList Lexicon::getFontInSettings(const QString & selector,bool invertMatch
   QRegularExpression reCssFont("{([^}]+)}");
   QRegularExpressionMatch match;
   for(int i=0;i < keys.size();i++) {
-    bool ok = false;
     if ((re.match(keys[i]).hasMatch() && ! invertMatch) ||
         (! re.match(keys[i]).hasMatch() && invertMatch))
     {

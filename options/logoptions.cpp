@@ -70,7 +70,7 @@ LogOptions::LogOptions(const QString & theme,QWidget * parent) : OptionsWidget(t
   this->setComboSize(VLARGE_EDIT);
 }
 
-void LogOptions::readSettings(bool reload) {
+void LogOptions::readSettings(bool /* reload */) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

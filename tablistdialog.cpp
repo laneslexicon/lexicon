@@ -57,7 +57,7 @@ TabListDialog::TabListDialog(QWidget * parent)
 
 }
 void TabListDialog::loadTabs() {
-  QTableWidgetItem * item;
+  //  QTableWidgetItem * item;
   QLabel * label;
   int row;
   QTabWidget * tabs = getApp()->tabwidget();

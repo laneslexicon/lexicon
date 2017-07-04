@@ -81,33 +81,12 @@ RootsOptions::RootsOptions(const QString & theme,QWidget * parent) : OptionsWidg
 
 
   vlayout->addLayout(formlayout);
-  /*
-  m_info = new QLabel;
-
-  QStringList html;
-  html << "<h4>";
-  html << tr("Notes:");
-  html << "</h4>";
-  html << "<ul>";
-  html << "<li>";
-  html << tr("Up/down arrows  can be used to move around the tree");
-  html << "</li>";
-  html << "<li>";
-  html << tr("Space will expand/collapse the current node");
-  html << "</li>";
-  html << "<li>";
-  html << tr("Return on a head word will activate the item");
-  html << "</li>";
-  html << "</ul>";
-  m_info->setText(html.join(""));
-  vlayout->addWidget(m_info);
-  */
   setLayout(vlayout);
   addButtons();
   readSettings();
   setupConnections();
 }
-void RootsOptions::readSettings(bool reload) {
+void RootsOptions::readSettings(bool /* reload */) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup(m_section);

@@ -145,7 +145,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   //  getLexicon()->setCursorPosition(this);
 }
 
-void FindOptions::readSettings(bool reload) {
+void FindOptions::readSettings(bool /* reload */) {
   QSettings settings(m_settingsFileName,QSettings::IniFormat);
   settings.setIniCodec("UTF-8");
   settings.beginGroup("TextSearch");
