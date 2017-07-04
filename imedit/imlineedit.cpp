@@ -84,47 +84,9 @@ void ImLineEdit::shortcutActivated() {
     m_activeMap.clear();
   }
 }
-/**
- * REMOVE THIS
- *
- * It no longer loads the maps, but only sets up the shortcut
- * @param settings
-
-void ImLineEdit::readSettings(const QString & fileName) {
-  QSettings settings(fileName,QSettings::IniFormat);
-  settings.setIniCodec("UTF-8");
-  settings.beginGroup("Maps");
-  qDebug() << settings.childKeys();
-  //  m_nullMap = settings.value(SID_MAPS_NULL_MAP_NAME,"Native").toString();
-  m_enabled = settings.value(SID_MAPS_ENABLED,true).toBool();
-  qDebug() << Q_FUNC_INFO << fileName << "Enabled" << m_enabled;
-  //  m_debug = settings.value(SID_MAPS_DEBUG,false).toBool();
-  QStringList groups = settings.childGroups();
-  for(int i=0;i < groups.size();i++) {
-    settings.beginGroup(groups[i]);
-    //   QString file = settings.value("file",QString()).toString();
-    //    if (! file.isEmpty()) {
-    //      loadMap(file,groups[i]);
-    //    }
-    QString scut = settings.value("shortcut",QString()).toString();
-    if (! scut.isEmpty()) {
-      QKeySequence k = QKeySequence(scut);
-      QShortcut * sc = new QShortcut(k,this);
-      sc->setProperty("keymap", groups[i]);
-      sc->setContext(Qt::WidgetShortcut);
-      connect(sc,SIGNAL(activated()),this,SLOT(shortcutActivated()));
-    }
-    bool  enabled = settings.value("enabled",false).toBool();
-    if (enabled) {
-      m_activeMap = groups[i];
-    }
-    settings.endGroup();
-  }
-}
-*/
 void ImLineEdit::keyPressEvent(QKeyEvent * event) {
   ushort pc;
-  //  int pos = this->cursorPosition();
+
   if (!m_enabled ) {
     //    emit(charInserted(event->text().unicode()->unicode(),pos));
     return QLineEdit::keyPressEvent(event);
@@ -147,7 +109,6 @@ void ImLineEdit::keyPressEvent(QKeyEvent * event) {
     return QLineEdit::keyPressEvent(event);
   }
 
-  //event->text().toUtf8().data());
   const QChar * uc = event->text().unicode();
   pc = uc->unicode();
   if (pc == 0) {

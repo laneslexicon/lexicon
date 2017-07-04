@@ -25,9 +25,9 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
     m_edit->loadMap(iter.value(),iter.key());
   }
   m_edit->setCurrentMap(mapname);
-  m_edit->enableMapping(false);
+  //  m_edit->enableMapping(false);
   m_prompt->setBuddy(m_edit);
-
+  m_mapEnabled = m_edit->isMappingEnabled();
   m_text = new QLabel;
 
   m_findButton = new QPushButton(tr("&Find"));
@@ -35,6 +35,10 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_findButton->setEnabled(false);
   m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
   m_keyboardButton->setAutoDefault(false);
+  m_keymapButton  = new QPushButton(tr(""));
+  m_keymapButton->setCheckable(true);
+
+
   /*
   m_moreButton = new QPushButton(tr("&More"));
   m_moreButton->setCheckable(true);
@@ -50,6 +54,7 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   QPushButton * button = m_buttonBox->addButton(QDialogButtonBox::Cancel);
   button->setText(tr("&Cancel"));
   m_buttonBox->addButton(m_keyboardButton, QDialogButtonBox::ActionRole);
+  m_buttonBox->addButton(m_keymapButton, QDialogButtonBox::ActionRole);
   QPushButton * helpbutton = m_buttonBox->addButton(QDialogButtonBox::Help);
   connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
   m_findButton->setFocus();
@@ -57,8 +62,10 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
+  connect(m_keymapButton, SIGNAL(clicked()),this,SLOT(keymapChanged()));
   connect(m_edit,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
-  m_mapEnabled = m_edit->isMappingEnabled();
+  //  m_mapEnabled = m_edit->isMappingEnabled();
+  m_keymapButton->setChecked(m_mapEnabled);
 
   QVBoxLayout * leftlayout = new QVBoxLayout;
 
@@ -145,6 +152,8 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
 
   m_type = SearchOptions::Text;
   readSettings();
+
+  keymapChanged();
 }
 void TextSearchDialog::onKeyboardShortcut(const QString & key) {
   if (key == m_keyboardButton->shortcut().toString()) {
@@ -340,6 +349,12 @@ QString TextSearchDialog::showText(const QString & txt) {
 void TextSearchDialog::readSettings() {
   SETTINGS
 
+    settings.beginGroup("Maps");
+
+  bool enabled = settings.value(SID_MAPS_ENABLED,false).toBool();
+
+  m_keymapButton->setChecked(enabled);
+  settings.endGroup();
   settings.beginGroup("TextSearch");
   m_wholeWord->setChecked(settings.value(SID_TEXTSEARCH_WHOLE_WORD,false).toBool());
   m_ignoreCase->setChecked(settings.value(SID_TEXTSEARCH_IGNORE_CASE,true).toBool());
@@ -459,4 +474,15 @@ void TextSearchDialog::setForLocal() {
     m_newTab->setVisible(false);
     m_goTab->setVisible(false);
     setWindowTitle(tr("Local search"));
+}
+void TextSearchDialog::keymapChanged() {
+  if (m_keymapButton->isChecked()) {
+  m_edit->enableMapping(true);
+  m_keymapButton->setText(tr("Keymap enabled"));
+  }
+  else {
+    m_edit->enableMapping(false);
+    m_keymapButton->setText(tr("Keymap disabled"));
+  }
+  m_edit->setFocus();
 }

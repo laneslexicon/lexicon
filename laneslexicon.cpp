@@ -802,6 +802,10 @@ void LanesLexicon::addShortcut(const QString & name,const QString & k,bool updat
     }
   }
   sc = new QShortcut(k,this);
+  if ((name == SID_SHORTCUT_KEYMAPS_DISABLE) ||
+      (name == SID_SHORTCUT_KEYMAPS_ENABLE)) {
+    sc->setContext(Qt::ApplicationShortcut);
+  }
   sc->setObjectName(name);
   connect(sc,SIGNAL(activated()),m_shortcutMap,SLOT(map()));
   m_shortcutMap->setMapping(sc,name);
@@ -3810,8 +3814,8 @@ void LanesLexicon::convertToEntry() {
 void LanesLexicon::enableKeymaps(bool v) {
   bool ok;
   m_keymapsEnabled = v;
-  //  QLOG_DEBUG() << Q_FUNC_INFO << v << m_maps;
-  QLOG_DEBUG() << Q_FUNC_INFO << "Current map" << m_currentMap;
+  //QLOG_DEBUG() << Q_FUNC_INFO << v << m_maps;
+  QLOG_DEBUG() << Q_FUNC_INFO << "Current map" << m_currentMap << v;
 
   QString tip;
   if (m_keymapsEnabled)

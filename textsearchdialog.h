@@ -48,6 +48,7 @@ class TextSearchDialog : public QDialog {
     void onTextChanged(const QString &);
     void searchTypeChanged(bool);
     void newTabChanged(int);
+    void keymapChanged();
  protected:
     QString showText(const QString &);
  private:
@@ -65,6 +66,7 @@ class TextSearchDialog : public QDialog {
     QDialogButtonBox * m_buttonBox;
     QPushButton * m_findButton;
     QPushButton * m_keyboardButton;
+    QPushButton * m_keymapButton;
     QCheckBox * m_wholeWord;
     QCheckBox * m_ignoreCase;
     QCheckBox * m_ignoreDiacritics;
