@@ -48,9 +48,8 @@
 #include <QPainter>
 #include <QDomDocument>
 #include "place.h"
-#include "searchoptionswidget.h"
+//#include "searchoptionswidget.h"
 #include "searchoptions.h"
-class ArabicSearchDialog;
 class NoteMaster;
 class HistoryMaster;
 class Place;
@@ -241,7 +240,7 @@ class LanesLexicon : public QMainWindow
       void printCurrentPage(const QString & node = QString());
       void restoreSavedState();
       void cleanup();
-      void search(int searchType,ArabicSearchDialog *,const QString &);
+      //      void search(int searchType,ArabicSearchDialog *,const QString &);
       //      Place showPlace(const Place &,int);
       void closeAllTabs();
       void updateStatusBar(const Place & p = Place());
@@ -315,9 +314,6 @@ class LanesLexicon : public QMainWindow
       QLabel * m_statusMessage;
       QTimer * m_messageTimer;
 
-      ArabicSearchDialog * m_rootSearchDialog;
-      ArabicSearchDialog * m_wordSearchDialog;
-      ArabicSearchDialog * m_headSearchDialog;
       NodeSearchDialog   * m_nodeSearchDialog;
       PageSearchDialog   * m_pageSearchDialog;
 

@@ -13,7 +13,6 @@
 #include "notebrowser.h"
 #include "tabwidget.h"
 #include "laneslexicon.h"
-#include "searchoptionswidget.h"
 #include "searchdialogs.h"
 #include "headsearch.h"
 #include "definedsettings.h"
@@ -58,9 +57,6 @@ LanesLexicon::LanesLexicon(QWidget *parent) :
   m_bookmarkMap = NULL;
   m_helpview = NULL;
   m_tabStyle = LanesLexicon::InsertTab;
-  m_rootSearchDialog = NULL;
-  m_wordSearchDialog = NULL;
-  m_headSearchDialog = NULL;
   m_nodeSearchDialog = NULL;
   m_pageSearchDialog = NULL;
   m_allowNavMode = false;
@@ -341,19 +337,6 @@ void LanesLexicon::cleanup() {
   if (m_helpview != NULL) {
     delete m_helpview;
     m_helpview = 0;
-  }
-  if (m_rootSearchDialog != NULL) {
-    delete m_rootSearchDialog;
-    m_rootSearchDialog = 0;
-  }
-  if (m_wordSearchDialog != NULL) {
-    delete m_wordSearchDialog;
-    m_wordSearchDialog = 0;
-  }
-
-  if (m_headSearchDialog != NULL) {
-    delete m_headSearchDialog;
-    m_headSearchDialog = 0;
   }
   if (m_nodeSearchDialog != NULL) {
     delete m_nodeSearchDialog;
@@ -3370,7 +3353,7 @@ void LanesLexicon::searchForRoot() {
 /**
  *
  *
- */
+
 void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & t) {
   QLOG_DEBUG() << Q_FUNC_INFO << searchType;
   QString target = t;
@@ -3380,33 +3363,8 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
   if (searchType == SearchOptions::Text) {
     return;
   }
-  /// head word search
-  /*
-  if (searchType == SearchOptions::Entry) {
-      HeadSearchWidget * s = new HeadSearchWidget(this);
-      connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
-      connect(s,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
-
-      s->search(target,options);
-      if (s->count() == 0) {
-        QMessageBox msgBox;
-        msgBox.setObjectName("wordnotfound");
-        msgBox.setTextFormat(Qt::RichText);
-        msgBox.setText(QString(tr("Head word not found: %1")).arg(getLexicon()->spanArabic(target,"wordnotfound")));
-        msgBox.exec();
-        delete s;
-        return;
-      }
-      ix = this->addTab(options.newTab(),s,QString(tr("Head word search for %1")).arg(target));
-      if (options.activateTab()) {
-        m_tabs->setCurrentIndex(ix);
-      }
-      if (options.newTab() && ! options.activateTab()) {
-        s->setFocus(Qt::OtherFocusReason);
-      }
-  }
-  */
 }
+*/
 void LanesLexicon::searchForText() {
   bool r = false;
   TextSearchDialog * d = new TextSearchDialog();
@@ -3885,10 +3843,11 @@ void LanesLexicon::enableKeymaps(bool v) {
         }
       }
       else {
-        SearchOptionsWidget * search = qobject_cast<SearchOptionsWidget *>(widget);
-        if (search) {
-          search->setKeymapsEnabled(v);
-        }
+        //  Replace this TextSearchDialog ?
+        //        SearchOptionsWidget * search = qobject_cast<SearchOptionsWidget *>(widget);
+        //        if (search) {
+        //          search->setKeymapsEnabled(v);
+        //        }
       }
     }
   }

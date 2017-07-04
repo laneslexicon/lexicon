@@ -14,6 +14,7 @@
 #include "imlineedit.h"
 #include "keyboardwidget.h"
 #include "searchoptionswidget.h"
+/*
 class ArabicSearchDialog : public QDialog {
   Q_OBJECT
 
@@ -22,7 +23,7 @@ class ArabicSearchDialog : public QDialog {
   ~ArabicSearchDialog();
   QString getText() const;
   void setPrompt(const QString &);
-  //  void setOptions(SearchOptions &);
+
   void getOptions(SearchOptions &) const;
   void setOptions(SearchOptions &);
   bool getForceLTR() const ;
@@ -52,7 +53,7 @@ class ArabicSearchDialog : public QDialog {
  signals:
     void showHelp(const  QString &);
 };
-
+*/
 class NodeSearchDialog : public QDialog {
   Q_OBJECT
 

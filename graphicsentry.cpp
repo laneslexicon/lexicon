@@ -9,7 +9,6 @@
 #include "definedsettings.h"
 #include "laneslexicon.h"
 #include "searchdialogs.h"
-#include "searchoptionswidget.h"
 #include "externs.h"
 #include "nodeinfo.h"
 #include "definedsql.h"

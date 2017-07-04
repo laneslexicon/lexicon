@@ -2,7 +2,6 @@
 #include "application.h"
 #include "headsearch.h"
 #include "laneslexicon.h"
-#include "searchoptionswidget.h"
 #include "definedsettings.h"
 #include "definedsql.h"
 #include "externs.h"
