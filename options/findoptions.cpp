@@ -179,14 +179,14 @@ void FindOptions::readSettings(bool reload) {
   m_headWholeWord  = settings.value(SID_HEADSEARCH_WHOLE_WORD,true).toBool();
   m_headDiacritics = settings.value(SID_HEADSEARCH_DIACRITICS,true).toBool();
   m_headRegex      = settings.value(SID_HEADSEARCH_TYPE_REGEX,true).toBool();
-  m_headForce      = settings.value(SID_HEADSEARCH_FORCE,true).toBool();
+  //  m_headForce      = settings.value(SID_HEADSEARCH_FORCE,true).toBool();
 
   settings.endGroup();
   settings.beginGroup("LocalSearch");
   m_localWholeWord  = settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool();
   m_localDiacritics = settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool();
   m_localRegex      = settings.value(SID_LOCALSEARCH_TYPE_REGEX,true).toBool();
-  m_localForce      = settings.value(SID_LOCALSEARCH_FORCE,true).toBool();
+  //  m_localForce      = settings.value(SID_LOCALSEARCH_FORCE,true).toBool();
   m_ignoreCase      = settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool();
 
 
@@ -245,7 +245,7 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_HEADSEARCH_WHOLE_WORD,m_headWholeWord );
   settings.setValue(SID_HEADSEARCH_DIACRITICS,m_headDiacritics);
   settings.setValue(SID_HEADSEARCH_TYPE_REGEX,m_headRegex);
-  settings.setValue(SID_HEADSEARCH_FORCE,m_headForce);
+  //  settings.setValue(SID_HEADSEARCH_FORCE,m_headForce);
 
 
   settings.endGroup();
@@ -254,7 +254,7 @@ void FindOptions::writeSettings(const QString & fileName) {
    settings.setValue(SID_LOCALSEARCH_WHOLE_WORD,m_localWholeWord);
    settings.setValue(SID_LOCALSEARCH_DIACRITICS,m_localDiacritics);
    settings.setValue(SID_LOCALSEARCH_TYPE_REGEX,m_localRegex);
-   settings.setValue(SID_LOCALSEARCH_FORCE,m_localForce);
+   //   settings.setValue(SID_LOCALSEARCH_FORCE,m_localForce);
    settings.setValue(SID_LOCALSEARCH_IGNORE_CASE,m_ignoreCase);
 
 
@@ -377,9 +377,9 @@ bool FindOptions::isModified()  {
     m_dirty = true;
   }
 
-  if (m_headForce      != settings.value(SID_HEADSEARCH_FORCE,true).toBool()) {
-    m_dirty = true;
-  }
+  //  if (m_headForce      != settings.value(SID_HEADSEARCH_FORCE,true).toBool()) {
+  //    m_dirty = true;
+  //  }
 
 
   settings.endGroup();
@@ -401,9 +401,9 @@ bool FindOptions::isModified()  {
     m_dirty = true;
   }
 
-  if (m_localForce      != settings.value(SID_LOCALSEARCH_FORCE,true).toBool()) {
-    m_dirty = true;
-  }
+  //  if (m_localForce      != settings.value(SID_LOCALSEARCH_FORCE,true).toBool()) {
+  //    m_dirty = true;
+  //  }
   if (m_ignoreCase      != settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool()) {
     m_dirty = true;
   }
@@ -481,7 +481,6 @@ void FindOptions::onFullDialog() {
   d.setChecked(DialogOptions::Diacritics,m_textDiacritics);
   d.setChecked(DialogOptions::Regex,m_textRegex);
   d.setChecked(DialogOptions::IgnoreCase,m_textCase);
-  d.hideOption(DialogOptions::Force);
   if (d.exec() == QDialog::Accepted) {
     m_textNewTab =  d.isChecked(DialogOptions::Tab);
     m_textGoTab = d.isChecked(DialogOptions::Go);
@@ -503,14 +502,12 @@ void FindOptions::onHeadDialog() {
   d.setChecked(DialogOptions::Whole,m_headWholeWord);
   d.setChecked(DialogOptions::Diacritics,m_headDiacritics);
   d.setChecked(DialogOptions::Regex,m_headRegex);
-  d.setChecked(DialogOptions::Force,m_headForce);
   if (d.exec() == QDialog::Accepted) {
     m_headNewTab =  d.isChecked(DialogOptions::Tab);
     m_headGoTab = d.isChecked(DialogOptions::Go);
     m_headWholeWord = d.isChecked(DialogOptions::Whole);
     m_headDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_headRegex = d.isChecked(DialogOptions::Regex);
-    m_headForce = d.isChecked(DialogOptions::Force);
     bool v = isModified();
     setButtons(v);
     emit(modified(v));
@@ -524,13 +521,11 @@ void FindOptions::onLocalDialog() {
   d.setChecked(DialogOptions::Whole,m_localWholeWord);
   d.setChecked(DialogOptions::Diacritics,m_localDiacritics);
   d.setChecked(DialogOptions::Regex,m_localRegex);
-  d.setChecked(DialogOptions::Force,m_localForce);
   d.setChecked(DialogOptions::IgnoreCase,m_ignoreCase);
   if (d.exec() == QDialog::Accepted) {
     m_localWholeWord = d.isChecked(DialogOptions::Whole);
     m_localDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_localRegex = d.isChecked(DialogOptions::Regex);
-    m_localForce = d.isChecked(DialogOptions::Force);
     m_ignoreCase = d.isChecked(DialogOptions::IgnoreCase);
     emit(modified(true));
     bool v = isModified();

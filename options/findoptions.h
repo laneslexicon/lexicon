@@ -47,10 +47,10 @@ class FindOptions : public OptionsWidget {
     bool m_headRegex;
     bool m_headNewTab;
     bool m_headGoTab;
-    bool m_headForce;
+    //    bool m_headForce;
 
     /// local search
-    bool m_localForce;
+    //    bool m_localForce;
     bool m_localWholeWord;
     bool m_localRegex;
     bool m_localDiacritics;
@@ -65,9 +65,6 @@ class FindOptions : public OptionsWidget {
     QCheckBox * m_pageGo;
     QCheckBox * m_rootNew;
     QCheckBox * m_rootGo;
-
-    //    QSize       m_viewerSize;
-    //    QPoint      m_viewerPosition;
 
 };
 #endif
