@@ -49,7 +49,7 @@
 #include <QDomDocument>
 #include "place.h"
 #include "searchoptionswidget.h"
-
+#include "searchoptions.h"
 class ArabicSearchDialog;
 class NoteMaster;
 class HistoryMaster;
@@ -91,6 +91,7 @@ class LanesLexicon : public QMainWindow
   bool sanityCheck(int type = 0);
   enum NewTabBehaviour { InsertTab, AppendTab };
   enum NavigationMode { ByRoot , ByPage };
+  static SearchOptions options(int);
   public slots:
     int hasPlace(const Place & p,int searchtype,bool setFocus = false);
     GraphicsEntry * showPlace(const Place &,bool newTab,bool activate);

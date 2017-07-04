@@ -27,21 +27,19 @@ class TextSearchDialog : public QDialog {
   ~TextSearchDialog();
   QString getText() const;
   void setPrompt(const QString &);
-  //  void getOptions(SearchOptions &) const;
-  //  void setOptions(SearchOptions &);
-  //  bool getForceLTR() const ;
   void setText(const QString &);
   void hideKeyboard();
   void readSettings();
-  void showHeadOption(bool v);
-  void showHighlightAll(bool v);
+  void setForRoot();
+  void setForHead();
+  void setForLocal();
+  void showTabOptions(bool v);
   bool headPhrase() const;
   TextOption options() const;
   SearchOptions searchOptions() const; // this returns everything including headphrase and highlight all
   void fromOptions(SearchOptions &);   // set widgets from options
   QPair<bool,bool> tabOptions() const;
   public slots:
-    virtual void showOptions(bool);
     void showKeyboard();
     void loadKeymap(const QString &);
     void keyboardClosed();
@@ -49,13 +47,14 @@ class TextSearchDialog : public QDialog {
     void onHelp();
     void onTextChanged(const QString &);
     void searchTypeChanged(bool);
+    void newTabChanged(int);
  protected:
     QString showText(const QString &);
-    //    SearchOptions::SearchScope_t m_searchType;
  private:
+    QGroupBox   * m_typeGroup;
     QGridLayout * m_form;
-    QWidget * m_optionsWidget;
     int m_count;
+    int m_type;
     KeyboardWidget * m_keyboard;
     QLabel * m_text;
     bool m_attached;
@@ -64,7 +63,6 @@ class TextSearchDialog : public QDialog {
     QGroupBox * m_group;
     ImLineEdit * m_edit;
     QDialogButtonBox * m_buttonBox;
-    QPushButton * m_moreButton;
     QPushButton * m_findButton;
     QPushButton * m_keyboardButton;
     QCheckBox * m_wholeWord;
@@ -76,7 +74,6 @@ class TextSearchDialog : public QDialog {
     QCheckBox * m_highlightAll;           // for local search;
     QRadioButton * m_normalSearch;
     QRadioButton * m_regexSearch;
-//    SearchOptionsWidget  * m_options;
 
  signals:
     void showHelp(const  QString &);

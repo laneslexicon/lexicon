@@ -1947,62 +1947,11 @@ void LanesLexicon::onLogViewer() {
   m_logview->show();
 }
 void LanesLexicon::onTest() {
-  if (0) {
-    SearchOptionsWidget * s = new SearchOptionsWidget(SearchOptions::Word);
-    s->addKeymaps("map1",QStringList() << "map0" << "map1" << "map2");
-    m_tabs->addTab(s,"Test");
-    SearchOptions options;
-    options.setNewTab(true);
-    options.setSearchType(SearchOptions::Regex);
-    s->setOptions(options);
-    //    s->setOptions(0);
-    ArabicSearchDialog * d = new ArabicSearchDialog(SearchOptions::Word);
-    connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
-    d->exec();
-  }
-  if (0) {
-  foreach (QWidget *widget, QApplication::allWidgets()) {
-    ImLineEdit * w = qobject_cast<ImLineEdit *>(widget);
-    if (w) {
-      QLOG_DEBUG() << "Found linedit";
-    }
-  }
-  }
-  if (0) {
-    Place p = m_contentsPanel->tree()->getCurrentPlace();
-    QLOG_DEBUG() << QString("Root %1, Word %2 , Node %3, Supplement %4")
-      .arg(p.getRoot())
-      .arg(p.getWord())
-      .arg(p.getNode())
-      .arg(p.getSupplement());
-  }
-  if (0) {
-    FontChangeDialog * d = new FontChangeDialog(this);
-    d->exec();
-    delete d;
-  }
-  if (0) {
-  if (m_editView == 0) {
-    m_editView = new EditView;
-    connect(m_editView,SIGNAL(reload(const QString &,const QString &)),this,SLOT(reloadEntry(const QString &,const QString &)));
-  }
-  if (0) {
-    m_editView->show();
-  }
-  addShortcut("Search node","Ctrl+S,X",true);
-  }
-  if (0) {
-    ExportSearchDialog * d = new ExportSearchDialog(QStringList() << "One" << "Two" << "Three" << "Four" << "Five" << "Six");
-    if (d->exec() == QDialog::Accepted) {
-      if (d->saveSettings()) {
-        d->writeSettings();
-      }
-    }
-    delete d;
-  }
   if (1) {
     TextSearchDialog * d = new TextSearchDialog();
-    d->showHighlightAll(true);
+    SearchOptions o = LanesLexicon::options(SearchOptions::Root);
+    d->fromOptions(o);
+    d->setForRoot();
     d->exec();
     delete d;
   }
@@ -3254,6 +3203,24 @@ void LanesLexicon::onAbout() {
 void LanesLexicon::testSlot() {
   QLOG_DEBUG() << Q_FUNC_INFO;
 }
+int LanesLexicon::addTab(bool create,QWidget * w,const QString & title) {
+  QLOG_DEBUG() << Q_FUNC_INFO << create << title;
+  int ix = m_tabs->currentIndex();
+  if (create) {
+    if (m_tabStyle == LanesLexicon::AppendTab) {
+      ix = m_tabs->addTab(w,title);
+    }
+    else {
+      ix = m_tabs->insertTab(ix+1,w,title);
+    }
+  }
+  else {
+    this->onCloseTab(ix);
+    ix = m_tabs->insertTab(ix,w,title);
+  }
+  this->onFocusContent();
+  return ix;
+}
 /**
  *
  *
@@ -3321,19 +3288,53 @@ void LanesLexicon::searchForPage() {
 void LanesLexicon::searchForRoot() {
   QLOG_DEBUG() << Q_FUNC_INFO << m_allowDuplicates;
   int ix;
+  TextSearchDialog * d = new TextSearchDialog;
+  connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
+  SearchOptions o = LanesLexicon::options(SearchOptions::Root);
+  d->fromOptions(o);
+  d->setForRoot();
+  if (d->exec()) {
+    SearchOptions opts = d->searchOptions();
+    QString target = d->getText();
+      Place p;
+      p.setRoot(target);
+      ix = this->hasPlace(p,GraphicsEntry::RootSearch,false);
+      if (ix != -1) {
+        p.setAction(Place::SwitchTab);
+        m_tabs->setCurrentIndex(ix);
+        delete d;
+        return;
+      }
+      GraphicsEntry *  entry = showPlace(Place(target),opts.newTab(),opts.activateTab());
+      if (! entry ) {
+        QMessageBox msgBox;
+        msgBox.setObjectName("rootnotfound");
+        msgBox.setTextFormat(Qt::RichText);
+        QString html = (qobject_cast<Lexicon *>(qApp))->spanArabic(target,"rootnotfound");
+        msgBox.setText(QString(tr("Root not found: %1")).arg(html));
+        msgBox.exec();
+      }
+      else {
+        if (m_linkContents) {
+          this->syncFromEntry();
+        }
+        else {
+          m_tabs->currentWidget()->setFocus();
+        }
+      }
+  }
+  delete d;
+    /*
   if (m_rootSearchDialog == NULL) {
     m_rootSearchDialog = new ArabicSearchDialog(SearchOptions::Root);
     connect(m_rootSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   }
   else {
-    //    m_rootSearchDialog->setText("");
+
   }
   if (m_rootSearchDialog->exec()) {
     QString t = m_rootSearchDialog->getText();
     if (! t.isEmpty()) {
-      //      if (! UcdScripts::isScript(t,"Arabic")) {
-      //        t = convertString(t);
-      //      }
       SearchOptions opts;
       m_rootSearchDialog->getOptions(opts);
       Place p;
@@ -3364,24 +3365,7 @@ void LanesLexicon::searchForRoot() {
     }
   }
   m_rootSearchDialog->hideKeyboard();
-}
-int LanesLexicon::addTab(bool create,QWidget * w,const QString & title) {
-  QLOG_DEBUG() << Q_FUNC_INFO << create << title;
-  int ix = m_tabs->currentIndex();
-  if (create) {
-    if (m_tabStyle == LanesLexicon::AppendTab) {
-      ix = m_tabs->addTab(w,title);
-    }
-    else {
-      ix = m_tabs->insertTab(ix+1,w,title);
-    }
-  }
-  else {
-    this->onCloseTab(ix);
-    ix = m_tabs->insertTab(ix,w,title);
-  }
-  this->onFocusContent();
-  return ix;
+    */
 }
 /**
  *
@@ -3397,6 +3381,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
     return;
   }
   /// head word search
+  /*
   if (searchType == SearchOptions::Entry) {
       HeadSearchWidget * s = new HeadSearchWidget(this);
       connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
@@ -3420,6 +3405,7 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
         s->setFocus(Qt::OtherFocusReason);
       }
   }
+  */
 }
 void LanesLexicon::searchForText() {
   bool r = false;
@@ -3482,23 +3468,38 @@ void LanesLexicon::searchForText() {
  */
 void LanesLexicon::searchForEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  // TODO replace with TextSearchDialog
-  if (m_headSearchDialog == NULL) {
-    m_headSearchDialog  = new ArabicSearchDialog(SearchOptions::Entry);
-    connect(m_headSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
+  TextSearchDialog * d = new TextSearchDialog;
+  connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
+  SearchOptions o = LanesLexicon::options(SearchOptions::Entry);
+  d->fromOptions(o);
+  d->setForHead();
+  if (d->exec()) {
+    o = d->searchOptions();
+    QString target = d->getText();
+    HeadSearchWidget * s = new HeadSearchWidget(this);
+    connect(s,SIGNAL(searchResult(const QString &)),this,SLOT(setStatus(const QString &)));
+    connect(s,SIGNAL(showNode(const QString &,bool)),this,SLOT(showSearchNode(const QString &,bool)));
 
-  }
-  else {
-
-  }
-
-  if (m_headSearchDialog->exec()) {
-    QString t = m_headSearchDialog->getText();
-    if (! t.isEmpty()) {
-      this->search(SearchOptions::Entry,m_headSearchDialog,t);
+    s->search(target,o);
+    if (s->count() == 0) {
+      QMessageBox msgBox;
+      msgBox.setObjectName("wordnotfound");
+      msgBox.setTextFormat(Qt::RichText);
+      msgBox.setText(QString(tr("Head word not found: %1")).arg(getLexicon()->spanArabic(target,"wordnotfound")));
+      msgBox.exec();
+      delete s;
+      delete d;
+      return;
+    }
+    int ix = this->addTab(o.newTab(),s,QString(tr("Head word search for %1")).arg(target));
+    if (! o.newTab() || (o.newTab() && o.activateTab())) {
+      m_tabs->setCurrentIndex(ix);
+    }
+    if (o.newTab() && ! o.activateTab()) {
+      s->setFocus(Qt::OtherFocusReason);
     }
   }
-  m_headSearchDialog->hideKeyboard();
+  delete d;
 }
 void LanesLexicon::searchForNode() {
   QLOG_DEBUG() << Q_FUNC_INFO;
@@ -5374,4 +5375,54 @@ void LanesLexicon::onAllowDuplicates() {
   else {
     statusMessage(tr("Duplicates not allowed"));
   }
+}
+SearchOptions LanesLexicon::options(int type) {
+  SETTINGS
+
+    SearchOptions options;
+  switch(type) {
+  case SearchOptions::Local : {
+    settings.beginGroup("LocalSearch");
+    if (settings.value(SID_LOCALSEARCH_TYPE_REGEX,false).toBool()) {
+      options.setSearchType(SearchOptions::Regex);
+    }
+    else {
+      options.setSearchType(SearchOptions::Normal);
+    }
+    options.setSearchScope(SearchOptions::Local);
+    options.setIgnoreDiacritics(settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool());
+    options.setWholeWordMatch(settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool());
+    options.setForceLTR(settings.value(SID_LOCALSEARCH_FORCE,false).toBool());
+    options.setIgnoreCase(settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool());
+    options.setShowAll(settings.value(SID_LOCALSEARCH_SHOW_ALL,false).toBool());
+    settings.endGroup();
+    break;
+  }
+  case SearchOptions::Entry : {
+    settings.beginGroup("HeadSearch");
+    options.setIgnoreDiacritics(settings.value(SID_HEADSEARCH_DIACRITICS,true).toBool());
+    options.setWholeWordMatch(settings.value(SID_HEADSEARCH_WHOLE_WORD,true).toBool());
+    options.setNewTab(settings.value(SID_HEADSEARCH_NEW_TAB,false).toBool());
+    options.setActivateTab(settings.value(SID_HEADSEARCH_GO_TAB,true).toBool());
+    options.setHeadPhrase(settings.value(SID_HEADSEARCH_USE_PHRASE,false).toBool());
+    if (settings.value(SID_HEADSEARCH_TYPE_REGEX,false).toBool()) {
+      options.setSearchType(SearchOptions::Regex);
+    }
+    else {
+      options.setSearchType(SearchOptions::Normal);
+    }
+    settings.endGroup();
+    break;
+  }
+  case SearchOptions::Root : {
+    settings.beginGroup("Search");
+    options.setNewTab(settings.value(SID_ROOTSEARCH_NEW_TAB,false).toBool());
+    options.setActivateTab(settings.value(SID_ROOTSEARCH_GO_TAB,true).toBool());
+    settings.endGroup();
+    break;
+  }
+  }
+  return options;
+
+
 }

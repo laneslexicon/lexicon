@@ -1895,6 +1895,7 @@ int GraphicsEntry::search() {
   }
   /// if we haven't got a cache search options get it from settings
   if (! options.isValid()) {
+    /*
     SETTINGS
       settings.beginGroup("LocalSearch");
     if (settings.value(SID_LOCALSEARCH_TYPE_REGEX,false).toBool()) {
@@ -1909,11 +1910,13 @@ int GraphicsEntry::search() {
     options.setForceLTR(settings.value(SID_LOCALSEARCH_FORCE,false).toBool());
     options.setIgnoreCase(settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool());
     options.setShowAll(settings.value(SID_LOCALSEARCH_SHOW_ALL,false).toBool());
+    */
+    options = LanesLexicon::options(SearchOptions::Local);
   }
   TextSearchDialog * d = new TextSearchDialog;
   connect(d,SIGNAL(showHelp(const QString &)),getApp(),SLOT(showHelp(const QString &)));
   d->fromOptions(options);
-  d->showHighlightAll(true);
+  d->setForLocal();
   QString t;
   if (d->exec()) {
     t = d->getText();

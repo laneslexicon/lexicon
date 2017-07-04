@@ -36,11 +36,11 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_findButton->setEnabled(false);
   m_keyboardButton  = new QPushButton(tr("Show &keyboard"));
   m_keyboardButton->setAutoDefault(false);
-
+  /*
   m_moreButton = new QPushButton(tr("&More"));
   m_moreButton->setCheckable(true);
   m_moreButton->setAutoDefault(false);
-
+  */
   //
   // the order of the buttons in the QDialogButtonBox depends
   // on the platform and the role of each button
@@ -60,17 +60,15 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   connect(m_keyboardButton, SIGNAL(clicked()),this,SLOT(showKeyboard()));
   connect(m_edit,SIGNAL(textChanged(const QString &)),this,SLOT(onTextChanged(const QString &)));
   m_mapEnabled = m_edit->isMappingEnabled();
-  connect(m_moreButton, SIGNAL(toggled(bool)), this, SLOT(showOptions(bool)));
 
   QVBoxLayout * leftlayout = new QVBoxLayout;
 
-  // QHBoxLayout * inputlayout = new QHBoxLayout;
   QGridLayout * inputlayout = new QGridLayout;
   inputlayout->addWidget(m_prompt,0,0);
   inputlayout->addWidget(m_edit,0,1);
   inputlayout->addWidget(m_text,1,1);
   leftlayout->addLayout(inputlayout);
-  m_optionsWidget = new QWidget(this);
+
 
 
   m_regexSearch = new QRadioButton(tr("Regular expression"));
@@ -83,14 +81,14 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_headPhrase = new QCheckBox(tr("Search head phrase"));
   m_highlightAll = new QCheckBox(tr("Highlight all"));
 
-  QGroupBox * typeGroup = new QGroupBox(tr("Search type"));
+  m_typeGroup = new QGroupBox(tr("Search type"));
   QHBoxLayout * typeLayout = new QHBoxLayout;
   typeLayout->addWidget(m_normalSearch);
   typeLayout->addWidget(m_regexSearch);
-  typeGroup->setLayout(typeLayout);
+  m_typeGroup->setLayout(typeLayout);
 
   m_form = new QGridLayout;
-  m_form->addWidget(typeGroup,0,0,1,2);
+  m_form->addWidget(m_typeGroup,0,0,1,2);
   m_form->addWidget(m_wholeWord,1,0);
   m_form->addWidget(m_ignoreCase,1,1);
   m_form->addWidget(m_ignoreDiacritics,2,0);
@@ -98,31 +96,24 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   m_form->addWidget(m_highlightAll,4,0);
   m_form->addWidget(m_newTab,5,0);
   m_form->addWidget(m_goTab,5,1);
-  m_optionsWidget->setLayout(m_form);
-  leftlayout->addWidget(m_optionsWidget);
+
+  leftlayout->addLayout(m_form);
 
   m_headPhrase->setVisible(false);
   m_highlightAll->setVisible(false);
-  //  hidde
-  //  m_wholeWord->setVisible(false);
-  //  m_ignoreCase->setVisible(false);
+
   connect(m_regexSearch,SIGNAL(toggled(bool)),this,SLOT(searchTypeChanged(bool)));
-  //  leftlayout->addWidget(m_options);
-  //  leftlayout->addStretch();
+  connect(m_newTab,SIGNAL(stateChanged(int)),this,SLOT(newTabChanged(int)));
+
+  leftlayout->addStretch();
 
   QHBoxLayout * hlayout = new QHBoxLayout;
   hlayout->addLayout(leftlayout);
-  //  hlayout->addStretch();
   hlayout->addWidget(m_buttonBox);
 
   QVBoxLayout * mainlayout = new QVBoxLayout;
   mainlayout->addLayout(hlayout);
-  //  mainlayout->addStretch();
   setLayout(mainlayout);
-
-  //  m_optionsWidget->setVisible(false);
-
-  //  m_options->showMore(false);
 
   m_edit->setFocus();
 
@@ -147,14 +138,13 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   settings.endGroup();
   settings.beginGroup("Maps");
   m_edit->enableMapping(settings.value(SID_MAPS_ENABLED,false).toBool());
- QPoint p = this->pos();
+   QPoint p = this->pos();
   int h = this->frameGeometry().height();
-  //  QLOG_DEBUG() << "Search dialog pos" << this->pos() << "mapped to global" <<  this->mapToGlobal(this->pos());
-  //  QLOG_DEBUG() << "search dialog frame geometry" << this->frameGeometry();
   m_keyboard->move(p.x(),p.y() + h);
   connect(m_keyboard,SIGNAL(closed()),this,SLOT(keyboardClosed()));
   connect(m_keyboard,SIGNAL(keyboardShortcut(const QString &)),this,SLOT(onKeyboardShortcut(const QString &)));
-  m_moreButton->setVisible(false);
+
+  m_type = SearchOptions::Text;
   readSettings();
 }
 void TextSearchDialog::onKeyboardShortcut(const QString & key) {
@@ -173,19 +163,19 @@ void TextSearchDialog::onKeyboardShortcut(const QString & key) {
     m_findButton->animateClick();
     return;
   }
-  if (key == m_moreButton->shortcut().toString()) {
-    m_moreButton->animateClick();
-  }
+  //  if (key == m_moreButton->shortcut().toString()) {
+  //    m_moreButton->animateClick();
+  //  }
 }
 TextSearchDialog::~TextSearchDialog() {
-  qDebug() << Q_FUNC_INFO << size() << pos();
   this->hideKeyboard();
-  SETTINGS
-
-  settings.beginGroup("TextSearch");
-  settings.setValue(SID_TEXTSEARCH_DIALOG_SIZE, size());
-  settings.setValue(SID_TEXTSEARCH_DIALOG_POS, pos());
-
+  if (m_type != SearchOptions::Root) {
+    SETTINGS
+    //TODO make this dependent on type root/head/local/text
+      settings.beginGroup("TextSearch");
+    settings.setValue(SID_TEXTSEARCH_DIALOG_SIZE, size());
+    settings.setValue(SID_TEXTSEARCH_DIALOG_POS, pos());
+  }
 }
 void TextSearchDialog::keyboardClosed() {
   showKeyboard();
@@ -194,6 +184,9 @@ void TextSearchDialog::hideKeyboard() {
   if (m_attached) {
     this->showKeyboard();
   }
+}
+void TextSearchDialog::newTabChanged(int /* state */) {
+  m_goTab->setEnabled(m_newTab->isChecked());
 }
 void TextSearchDialog::showKeyboard() {
   if (! m_attached) {
@@ -217,16 +210,6 @@ void TextSearchDialog::showKeyboard() {
     m_attached = false;
   }
   m_edit->setFocus();
-}
-void TextSearchDialog::showOptions(bool v) {
-  /*
-  m_options->showMore(v);
-  if (!v)
-    m_edit->setFocus();
-
-  /// this shrinks the dialog
-  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
-  */
 }
 QString TextSearchDialog::getText() const {
   QString t = m_edit->text().trimmed();
@@ -352,6 +335,11 @@ QString TextSearchDialog::showText(const QString & txt) {
   html += "</body></html>";
   return html;
 }
+/**
+ * This will read the settings from textsearch
+ * when used for local search these options are overriden by using the fromOption(options)
+ *
+ */
 void TextSearchDialog::readSettings() {
   SETTINGS
 
@@ -403,24 +391,24 @@ TextOption TextSearchDialog::options() const {
 QPair<bool,bool> TextSearchDialog::tabOptions() const {
   return qMakePair(m_newTab->isChecked(),m_goTab->isChecked());
 }
-void TextSearchDialog::showHeadOption(bool v) {
-  m_headPhrase->setVisible(v);
-}
 bool TextSearchDialog::headPhrase() const {
   return m_headPhrase->isChecked();
 }
-void TextSearchDialog::showHighlightAll(bool v) {
-    m_highlightAll->setVisible(v);
+void TextSearchDialog::showTabOptions(bool v) {
+  m_goTab->setVisible(v);
+  m_newTab->setVisible(v);
 }
 SearchOptions TextSearchDialog::searchOptions() const {
   SearchOptions o;
 
   o.setIgnoreDiacritics(m_ignoreDiacritics->isChecked());
   o.setWholeWordMatch(m_wholeWord->isChecked());
-  o.setShowAll(m_highlightAll->isChecked());
+  o.setShowAll(m_highlightAll->isChecked());      // local search
   o.setIgnoreCase(m_ignoreCase->isChecked());
-  o.setHeadPhrase(m_headPhrase->isChecked());
+  o.setHeadPhrase(m_headPhrase->isChecked());     // headword search
   o.setPattern(m_edit->text());
+  o.setNewTab(m_newTab->isChecked());
+  o.setActivateTab(m_goTab->isChecked());
   if (m_regexSearch->isChecked()) {
     o.setSearchType(SearchOptions::Regex);
   }
@@ -433,8 +421,45 @@ SearchOptions TextSearchDialog::searchOptions() const {
 void TextSearchDialog::fromOptions(SearchOptions & o) {
   m_ignoreDiacritics->setChecked(o.ignoreDiacritics());
   m_wholeWord->setChecked(o.wholeWordMatch());
-  m_highlightAll->setChecked(o.showAll());
-  m_headPhrase->setChecked(o.headPhrase());
+  m_highlightAll->setChecked(o.showAll());     // local search
+  m_headPhrase->setChecked(o.headPhrase());    // head search
   m_ignoreCase->setChecked(o.ignoreCase());
   m_regexSearch->setChecked(o.regex());
+  m_goTab->setChecked(o.activateTab());
+  m_newTab->setChecked(o.newTab());
+}
+void TextSearchDialog::setForRoot() {
+  m_type = SearchOptions::Root;
+    m_wholeWord->setVisible(false);
+    m_ignoreCase->setVisible(false);
+    m_ignoreDiacritics->setVisible(false);
+    m_headPhrase->setVisible(false);
+    m_highlightAll->setVisible(false);
+    m_typeGroup->setVisible(false);
+    m_newTab->setVisible(true);
+    m_goTab->setVisible(true);
+    setWindowTitle(tr("Search for root"));
+    this->layout()->setSizeConstraint(QLayout::SetFixedSize); // shrink the dialog
+}
+void TextSearchDialog::setForHead() {
+  m_type = SearchOptions::Entry;
+    m_wholeWord->setVisible(true);
+    m_ignoreCase->setVisible(true);
+    m_ignoreDiacritics->setVisible(true);
+    m_headPhrase->setVisible(true);
+    m_highlightAll->setVisible(false);
+    m_newTab->setVisible(true);
+    m_goTab->setVisible(true);
+    setWindowTitle(tr("Search for headword"));
+}
+void TextSearchDialog::setForLocal() {
+  m_type = SearchOptions::Local;
+    m_wholeWord->setVisible(true);
+    m_ignoreCase->setVisible(true);
+    m_ignoreDiacritics->setVisible(true);
+    m_headPhrase->setVisible(false);
+    m_highlightAll->setVisible(true);
+    m_newTab->setVisible(false);
+    m_goTab->setVisible(false);
+    setWindowTitle(tr("Local search"));
 }
