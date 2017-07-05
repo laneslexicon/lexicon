@@ -688,7 +688,8 @@ int TextSearch::toFile(const QString & fileName,bool columnheadings)  {
     while(iter.hasNext()) {
       iter.next();
       QStringList o;
-      for(int j=0;j < fields.size();j++) {
+      int j;
+      for(j=0;j < fields.size();j++) {
         if (fields[j] == "N") {
           o << m_results[i].node;
         }
