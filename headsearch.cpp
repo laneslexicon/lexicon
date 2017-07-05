@@ -161,7 +161,8 @@ void HeadSearchWidget::search(const QString & searchpattern,const SearchOptions 
   m_query.exec();
   QEventLoop ep;
 
-  QProgressDialog *  pd = new QProgressDialog(tr("Searching..."), tr("Cancel"), 0,48000, getApp());
+  QProgressDialog *  pd = new QProgressDialog(tr("Searching..."), tr("Cancel"), 0,48000);//, getApp());
+  pd->setWindowTitle(tr("Headword search"));
 #ifdef __APPLE__
   pd->setStyle(QStyleFactory::create("Fusion"));
 #endif
