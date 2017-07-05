@@ -34,7 +34,7 @@ TextSearch * EnsearchWidget::searcher() {
 
 int EnsearchWidget::search() {
   int max = m_search->searcher()->readSize();
-  m_pd = new QProgressDialog(tr("Searching..."), tr("Cancel"), 0,max, this);
+  m_pd = new QProgressDialog(tr("Searching..."), tr("Cancel"), 0,max);
   m_pd->setWindowTitle(tr("Text Search"));
   connect(m_pd,SIGNAL(canceled()),this,SLOT(cancelSearch()));
   m_pd->setWindowModality(Qt::WindowModal);
