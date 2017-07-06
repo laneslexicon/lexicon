@@ -1945,6 +1945,7 @@ int GraphicsEntry::search() {
   m_searchItemIndexes.clear();
   //  QLOG_DEBUG() << Q_FUNC_INFO << "calling buildRx" << m_pattern;
   TextSearch ts;
+  ts.setDiacritics();
   QRegularExpression rx = ts.buildRx(t,options.ignoreDiacritics(),options.isWholeWord(),! options.ignoreCase());
   m_currentSearchTarget = t;
   QGraphicsItem * focusItem = m_scene->focusItem();
