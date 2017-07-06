@@ -34,7 +34,7 @@ class FindOptions : public OptionsWidget {
     bool m_textNewTab;
     bool m_textGoTab;
     bool m_textCase;
-
+    bool m_textKeymap;
     /// head word search
     QCheckBox * m_headPhrase;
     QSpinBox  * m_headStep;
@@ -47,10 +47,10 @@ class FindOptions : public OptionsWidget {
     bool m_headRegex;
     bool m_headNewTab;
     bool m_headGoTab;
-    //    bool m_headForce;
+    bool m_headKeymap;
 
     /// local search
-    //    bool m_localForce;
+    bool m_localKeymap;
     bool m_localWholeWord;
     bool m_localRegex;
     bool m_localDiacritics;
@@ -65,6 +65,7 @@ class FindOptions : public OptionsWidget {
     QCheckBox * m_pageGo;
     QCheckBox * m_rootNew;
     QCheckBox * m_rootGo;
+    QCheckBox * m_rootKeymap;
 
 };
 #endif

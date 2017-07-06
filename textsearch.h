@@ -150,6 +150,7 @@ class TextSearch : public QObject {
  private:
   QList<SearchResult>  m_results;
   QList<QChar> m_dc;
+
   int m_scope;
   bool m_exportRecord;
   qint64 m_time;

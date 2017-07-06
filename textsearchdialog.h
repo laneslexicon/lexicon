@@ -52,6 +52,7 @@ class TextSearchDialog : public QDialog {
  protected:
     QString showText(const QString &);
  private:
+    QMap<int,bool>  m_showKeymap;
     QGroupBox   * m_typeGroup;
     QGridLayout * m_form;
     int m_count;

@@ -632,6 +632,9 @@ int TextSearch::toFile(const QString & fileName,bool columnheadings)  {
   bool fileOutput = false;
   QFile of;
 
+  if (m_pageSize == 0) {
+    m_pageSize = 1;
+  }
   m_fileError.clear();
   if (fileName.length() > 0) {
     of.setFileName(fileName);
@@ -652,7 +655,6 @@ int TextSearch::toFile(const QString & fileName,bool columnheadings)  {
   int findCount = 0;
   QStringList fields = m_fields.split("",QString::SkipEmptyParts);
   m_exportRecord = true;
-  int j=0;
   int exportCount = 0;
   if (columnheadings) {
     QStringList o;

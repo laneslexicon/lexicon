@@ -10,6 +10,7 @@ DialogOptions::DialogOptions(QWidget * parent) : QDialog(parent) {
   m_diacritics = new QCheckBox;
   m_regex  = new QCheckBox;
   m_ignoreCase = new QCheckBox;
+  m_showKeymap = new QCheckBox;
   // these have to be the same order as the enum 'which'
   m_form->addRow(tr("Whole word"),m_wholeWord);
   m_form->addRow(tr("Ignore diacritics"),m_diacritics);
@@ -17,7 +18,7 @@ DialogOptions::DialogOptions(QWidget * parent) : QDialog(parent) {
   m_form->addRow(tr("Ignore case"),m_ignoreCase);
   m_form->addRow(tr("Open in new tab"),m_newTab);
   m_form->addRow(tr("Go to new tab"),m_goTab);
-
+  m_form->addRow(tr("Show keymap button"),m_showKeymap);
 
   QDialogButtonBox * btns = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
   connect(btns,SIGNAL(accepted()),this,SLOT(accept()));
@@ -47,6 +48,10 @@ void DialogOptions::enableOption(int which,bool v) {
   case DialogOptions::IgnoreCase :
     m_ignoreCase->setEnabled(v);
     break;
+  case DialogOptions::Keymap :
+    m_showKeymap->setEnabled(v);
+    break;
+  default : break;
   }
 }
 /**
@@ -91,6 +96,10 @@ void DialogOptions::setChecked(int which,bool v) {
   case DialogOptions::IgnoreCase :
     m_ignoreCase->setChecked(v);
     break;
+  case DialogOptions::Keymap :
+    m_showKeymap->setChecked(v);
+    break;
+  default : break;
   }
 }
 bool DialogOptions::isChecked(int which) {
@@ -113,6 +122,10 @@ bool DialogOptions::isChecked(int which) {
   case DialogOptions::IgnoreCase :
     return m_ignoreCase->isChecked();
     break;
+  case DialogOptions::Keymap :
+    return m_showKeymap->isChecked();
+    break;
+  default : break;
   }
   return false;
 }

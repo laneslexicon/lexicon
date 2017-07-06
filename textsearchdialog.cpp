@@ -10,7 +10,7 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   setObjectName("arabicsearchdialog");
   setWindowTitle(tr("Text Search"));
 
-  //  m_count = 0;
+  m_type = SearchOptions::Word;
   m_prompt = new QLabel(tr("Find"));
   m_edit = new ImLineEdit;
   m_edit->setObjectName("arabicedit");
@@ -350,7 +350,7 @@ QString TextSearchDialog::showText(const QString & txt) {
 void TextSearchDialog::readSettings() {
   SETTINGS
 
-    settings.beginGroup("Maps");
+  settings.beginGroup("Maps");
 
   bool enabled = settings.value(SID_MAPS_ENABLED,false).toBool();
 
@@ -366,7 +366,9 @@ void TextSearchDialog::readSettings() {
   else {
     m_normalSearch->setChecked(true);
   }
+  m_showKeymap.insert(SearchOptions::Word,settings.value(SID_TEXTSEARCH_KEYMAP_BUTTON,false).toBool());
 
+  m_keymapButton->setVisible(settings.value(SID_TEXTSEARCH_KEYMAP_BUTTON,false).toBool());
   m_goTab->setChecked(settings.value(SID_TEXTSEARCH_GO_TAB,true).toBool());
   m_newTab->setChecked(settings.value(SID_TEXTSEARCH_NEW_TAB,true).toBool());
 
@@ -386,6 +388,22 @@ void TextSearchDialog::readSettings() {
   else {
     move(p);
   }
+  settings.endGroup();
+
+  settings.beginGroup("HeadSearch");
+  m_showKeymap.insert(SearchOptions::Entry,settings.value(SID_HEADSEARCH_KEYMAP_BUTTON,false).toBool());
+  settings.endGroup();
+
+  settings.beginGroup("LocalSearch");
+  m_showKeymap.insert(SearchOptions::Local,settings.value(SID_LOCALSEARCH_KEYMAP_BUTTON,false).toBool());
+  settings.endGroup();
+
+  settings.beginGroup("Search");
+  m_showKeymap.insert(SearchOptions::Root,settings.value(SID_ROOTSEARCH_KEYMAP_BUTTON,false).toBool());
+  settings.endGroup();
+
+
+
 }
 void TextSearchDialog::searchTypeChanged(bool /* v */) {
   m_wholeWord->setEnabled(! m_regexSearch->isChecked());
@@ -440,6 +458,8 @@ void TextSearchDialog::fromOptions(SearchOptions & o) {
   m_regexSearch->setChecked(o.regex());
   m_goTab->setChecked(o.activateTab());
   m_newTab->setChecked(o.newTab());
+
+
 }
 void TextSearchDialog::setForRoot() {
   m_type = SearchOptions::Root;
@@ -452,7 +472,9 @@ void TextSearchDialog::setForRoot() {
     m_newTab->setVisible(true);
     m_goTab->setVisible(true);
     setWindowTitle(tr("Search for root"));
+    m_keymapButton->setVisible(m_showKeymap.value(m_type));
     this->layout()->setSizeConstraint(QLayout::SetFixedSize); // shrink the dialog
+
 }
 void TextSearchDialog::setForHead() {
   m_type = SearchOptions::Entry;
@@ -463,6 +485,7 @@ void TextSearchDialog::setForHead() {
     m_highlightAll->setVisible(false);
     m_newTab->setVisible(true);
     m_goTab->setVisible(true);
+    m_keymapButton->setVisible(m_showKeymap.value(m_type));
     setWindowTitle(tr("Search for headword"));
 }
 void TextSearchDialog::setForLocal() {
@@ -474,6 +497,7 @@ void TextSearchDialog::setForLocal() {
     m_highlightAll->setVisible(true);
     m_newTab->setVisible(false);
     m_goTab->setVisible(false);
+    m_keymapButton->setVisible(m_showKeymap.value(m_type));
     setWindowTitle(tr("Local search"));
 }
 void TextSearchDialog::keymapChanged() {

@@ -92,7 +92,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_localShowAll    = new QCheckBox;
 
   QFormLayout * locallayout = new QFormLayout;
-  locallayout->addRow(tr("Show all results"),m_localShowAll);
+  locallayout->addRow(tr("Highlight all results"),m_localShowAll);
 
   QPushButton * localbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout3 = new QHBoxLayout;
@@ -105,7 +105,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   localbox->setLayout(locallayout);
 
   ///
-  QGroupBox * otherbox = new QGroupBox(tr("Tab options for root,page and node search"));
+  QGroupBox * tabbox = new QGroupBox(tr("Tab options for root,page and node search"));
   QGridLayout * gridlayout = new QGridLayout;
 
   m_nodeNew = new  QCheckBox;
@@ -114,7 +114,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_pageGo  = new  QCheckBox;
   m_rootNew = new  QCheckBox;
   m_rootGo  = new  QCheckBox;
-
+  m_rootKeymap = new  QCheckBox;
 
   gridlayout->addWidget(new QLabel("Root"),0,1);
   gridlayout->addWidget(new QLabel("Page"),0,2);
@@ -129,12 +129,17 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   gridlayout->addWidget(m_rootGo,2,1);
   gridlayout->addWidget(m_pageGo,2,2);
   gridlayout->addWidget(m_nodeGo,2,3);
-  otherbox->setLayout(gridlayout);
+  tabbox->setLayout(gridlayout);
 
+  QGroupBox * otherbox = new QGroupBox(tr("Other"));
+  QFormLayout * otherlayout = new QFormLayout;
+  otherlayout->addRow(tr("Root search show keymap button"),m_rootKeymap);
+  otherbox->setLayout(otherlayout);
 
   layout->addWidget(fullbox);
   layout->addWidget(headbox);
   layout->addWidget(localbox);
+  layout->addWidget(tabbox);
   layout->addWidget(otherbox);
   layout->addStretch();
 
@@ -165,6 +170,7 @@ void FindOptions::readSettings(bool /* reload */) {
   m_textRepeat->setChecked(settings.value(SID_TEXTSEARCH_FAILURE_DEFAULT_BTN,true).toBool());
   m_textCurrentPage->setChecked(settings.value(SID_TEXTSEARCH_CURRENTPAGE_ONLY,false).toBool());
   m_textPageSize->setValue(settings.value(SID_TEXTSEARCH_PAGE_SIZE,100).toInt());
+  m_textKeymap = settings.value(SID_TEXTSEARCH_KEYMAP_BUTTON,false).toBool();
   settings.endGroup();
   settings.beginGroup("HeadSearch");
   // head word search
@@ -179,17 +185,15 @@ void FindOptions::readSettings(bool /* reload */) {
   m_headWholeWord  = settings.value(SID_HEADSEARCH_WHOLE_WORD,true).toBool();
   m_headDiacritics = settings.value(SID_HEADSEARCH_DIACRITICS,true).toBool();
   m_headRegex      = settings.value(SID_HEADSEARCH_TYPE_REGEX,true).toBool();
-  //  m_headForce      = settings.value(SID_HEADSEARCH_FORCE,true).toBool();
+  m_headKeymap = settings.value(SID_HEADSEARCH_KEYMAP_BUTTON,false).toBool();
 
   settings.endGroup();
   settings.beginGroup("LocalSearch");
   m_localWholeWord  = settings.value(SID_LOCALSEARCH_WHOLE_WORD,true).toBool();
   m_localDiacritics = settings.value(SID_LOCALSEARCH_DIACRITICS,true).toBool();
   m_localRegex      = settings.value(SID_LOCALSEARCH_TYPE_REGEX,true).toBool();
-  //  m_localForce      = settings.value(SID_LOCALSEARCH_FORCE,true).toBool();
   m_ignoreCase      = settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool();
-
-
+  m_localKeymap = settings.value(SID_LOCALSEARCH_KEYMAP_BUTTON,false).toBool();
   m_localShowAll->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
 
   settings.endGroup();
@@ -201,6 +205,7 @@ void FindOptions::readSettings(bool /* reload */) {
   m_pageGo->setChecked(settings.value(SID_PAGESEARCH_GO_TAB,true).toBool());
   m_rootNew->setChecked(settings.value(SID_ROOTSEARCH_NEW_TAB,true).toBool());
   m_rootGo->setChecked(settings.value(SID_ROOTSEARCH_GO_TAB,true).toBool());
+  m_rootKeymap->setChecked(settings.value(SID_ROOTSEARCH_KEYMAP_BUTTON,false).toBool());
 
   m_dirty = false;
 }
@@ -226,6 +231,7 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_TEXTSEARCH_DIACRITICS,m_textDiacritics);
   settings.setValue(SID_TEXTSEARCH_TYPE_REGEX,m_textRegex);
   settings.setValue(SID_TEXTSEARCH_IGNORE_CASE,m_textCase);
+  settings.setValue(SID_TEXTSEARCH_KEYMAP_BUTTON,m_textKeymap);
   settings.setValue(SID_TEXTSEARCH_CONTEXT_STYLE,m_contextStyle->text());
   settings.setValue(SID_TEXTSEARCH_FAILURE_DEFAULT_BTN,m_textRepeat->isChecked());
   settings.endGroup();
@@ -245,7 +251,7 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_HEADSEARCH_WHOLE_WORD,m_headWholeWord );
   settings.setValue(SID_HEADSEARCH_DIACRITICS,m_headDiacritics);
   settings.setValue(SID_HEADSEARCH_TYPE_REGEX,m_headRegex);
-  //  settings.setValue(SID_HEADSEARCH_FORCE,m_headForce);
+  settings.setValue(SID_HEADSEARCH_KEYMAP_BUTTON,m_headKeymap);
 
 
   settings.endGroup();
@@ -254,7 +260,7 @@ void FindOptions::writeSettings(const QString & fileName) {
    settings.setValue(SID_LOCALSEARCH_WHOLE_WORD,m_localWholeWord);
    settings.setValue(SID_LOCALSEARCH_DIACRITICS,m_localDiacritics);
    settings.setValue(SID_LOCALSEARCH_TYPE_REGEX,m_localRegex);
-   //   settings.setValue(SID_LOCALSEARCH_FORCE,m_localForce);
+   settings.setValue(SID_LOCALSEARCH_KEYMAP_BUTTON,m_localKeymap);
    settings.setValue(SID_LOCALSEARCH_IGNORE_CASE,m_ignoreCase);
 
 
@@ -269,6 +275,7 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_PAGESEARCH_GO_TAB,m_pageGo->isChecked());
   settings.setValue(SID_ROOTSEARCH_NEW_TAB,m_rootNew->isChecked());
   settings.setValue(SID_ROOTSEARCH_GO_TAB,m_rootGo->isChecked());
+  settings.setValue(SID_ROOTSEARCH_KEYMAP_BUTTON,m_rootKeymap->isChecked());
 
   settings.sync();
   settings.endGroup();
@@ -336,6 +343,9 @@ bool FindOptions::isModified()  {
   if (m_textCase      != settings.value(SID_TEXTSEARCH_IGNORE_CASE,true).toBool()) {
     m_dirty = true;
   }
+  if (m_textKeymap     != settings.value(SID_TEXTSEARCH_KEYMAP_BUTTON,true).toBool()) {
+    m_dirty = true;
+  }
   if (compare(&settings,SID_TEXTSEARCH_FAILURE_DEFAULT_BTN,m_textRepeat)) {
     m_dirty = true;
   }
@@ -377,9 +387,9 @@ bool FindOptions::isModified()  {
     m_dirty = true;
   }
 
-  //  if (m_headForce      != settings.value(SID_HEADSEARCH_FORCE,true).toBool()) {
-  //    m_dirty = true;
-  //  }
+  if (m_headKeymap      != settings.value(SID_HEADSEARCH_KEYMAP_BUTTON,true).toBool()) {
+     m_dirty = true;
+  }
 
 
   settings.endGroup();
@@ -401,9 +411,10 @@ bool FindOptions::isModified()  {
     m_dirty = true;
   }
 
-  //  if (m_localForce      != settings.value(SID_LOCALSEARCH_FORCE,true).toBool()) {
-  //    m_dirty = true;
-  //  }
+  if (m_localKeymap      != settings.value(SID_LOCALSEARCH_KEYMAP_BUTTON,true).toBool()) {
+      m_dirty = true;
+  }
+
   if (m_ignoreCase      != settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool()) {
     m_dirty = true;
   }
@@ -427,6 +438,9 @@ bool FindOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_ROOTSEARCH_GO_TAB,m_rootGo)) {
+    m_dirty = true;
+  }
+  if (compare(&settings,SID_ROOTSEARCH_KEYMAP_BUTTON,m_rootKeymap)) {
     m_dirty = true;
   }
 
@@ -481,6 +495,7 @@ void FindOptions::onFullDialog() {
   d.setChecked(DialogOptions::Diacritics,m_textDiacritics);
   d.setChecked(DialogOptions::Regex,m_textRegex);
   d.setChecked(DialogOptions::IgnoreCase,m_textCase);
+  d.setChecked(DialogOptions::Keymap,m_textKeymap);
   if (d.exec() == QDialog::Accepted) {
     m_textNewTab =  d.isChecked(DialogOptions::Tab);
     m_textGoTab = d.isChecked(DialogOptions::Go);
@@ -488,6 +503,7 @@ void FindOptions::onFullDialog() {
     m_textDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_textRegex = d.isChecked(DialogOptions::Regex);
     m_textCase = d.isChecked(DialogOptions::IgnoreCase);
+    m_textKeymap = d.isChecked(DialogOptions::Keymap);
 
     bool v = isModified();
     setButtons(v);
@@ -502,12 +518,14 @@ void FindOptions::onHeadDialog() {
   d.setChecked(DialogOptions::Whole,m_headWholeWord);
   d.setChecked(DialogOptions::Diacritics,m_headDiacritics);
   d.setChecked(DialogOptions::Regex,m_headRegex);
+  d.setChecked(DialogOptions::Keymap,m_headKeymap);
   if (d.exec() == QDialog::Accepted) {
     m_headNewTab =  d.isChecked(DialogOptions::Tab);
     m_headGoTab = d.isChecked(DialogOptions::Go);
     m_headWholeWord = d.isChecked(DialogOptions::Whole);
     m_headDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_headRegex = d.isChecked(DialogOptions::Regex);
+    m_headKeymap = d.isChecked(DialogOptions::Keymap);
     bool v = isModified();
     setButtons(v);
     emit(modified(v));
@@ -522,11 +540,13 @@ void FindOptions::onLocalDialog() {
   d.setChecked(DialogOptions::Diacritics,m_localDiacritics);
   d.setChecked(DialogOptions::Regex,m_localRegex);
   d.setChecked(DialogOptions::IgnoreCase,m_ignoreCase);
+  d.setChecked(DialogOptions::Keymap,m_localKeymap);
   if (d.exec() == QDialog::Accepted) {
     m_localWholeWord = d.isChecked(DialogOptions::Whole);
     m_localDiacritics = d.isChecked(DialogOptions::Diacritics);
     m_localRegex = d.isChecked(DialogOptions::Regex);
     m_ignoreCase = d.isChecked(DialogOptions::IgnoreCase);
+    m_localKeymap = d.isChecked(DialogOptions::Keymap);
     emit(modified(true));
     bool v = isModified();
     setButtons(v);
