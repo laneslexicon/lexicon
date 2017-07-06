@@ -470,6 +470,9 @@ regular expression search for \"friendship\" or \"fellowship\".\n\
   }
   searcher.setVerbose(verbose);
   searcher.m_separator = parser.value(separatorOption);
+  if (searcher.m_separator == "\\t") {
+    searcher.m_separator = '\t';
+  }
   int padding = 30;
 
   if (parser.isSet(sizeOption)) {
