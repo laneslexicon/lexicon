@@ -52,7 +52,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   this->setControlSize(fullbtn,MEDIUM_EDIT);
   QHBoxLayout * setlayout1 = new QHBoxLayout;
   setlayout1->addWidget(fullbtn);
-  //  setlayout1->addStretch();
+  setlayout1->addStretch();
   fulllayout->addRow(tr("Search dialog options"),setlayout1);
   //  fulllayout->addRow(tr("Debug"),m_fullDebug);
 
