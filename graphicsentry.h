@@ -72,7 +72,7 @@ class GraphicsEntry : public QWidget {
     void setScale(qreal v, bool use = true);
     int getTextWidth() const { return m_textWidth; }
     QGraphicsScene * getScene() { return m_scene;}
-    int search();
+    //    int search();
     int getFindCount() const;
     //    int getCurrentFind() const;
     //    int getHighlightCount() const;
@@ -88,9 +88,11 @@ class GraphicsEntry : public QWidget {
     void shiftFocus();
     void setCurrentItem(QGraphicsItem *);
     QString userTitle() const;
+    QString localSearchPattern() const;
     void setXrefMode(int);
     void setReposition(bool);
   public slots:
+    int search();
     void setTextWidth(int, bool apply = false);
     void setUserTitle(const QString &);
     void anchorClicked(const QUrl &);
@@ -126,6 +128,7 @@ class GraphicsEntry : public QWidget {
     int m_findCount;
     int m_highlightCount;
     int m_currentFind;
+    QAction * m_localSearchAction;
     QString wrapEntry(const QSqlRecord &,const QString &);
     QSqlRecord findLinkRecord(const QString & inkid) const;
     void centerOnSearchResult(int,int);

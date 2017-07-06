@@ -91,6 +91,7 @@ class LanesLexicon : public QMainWindow
   enum NewTabBehaviour { InsertTab, AppendTab };
   enum NavigationMode { ByRoot , ByPage };
   static SearchOptions options(int);
+  static bool searchFailure(int /* search type */,const QString &);
   public slots:
     int hasPlace(const Place & p,int searchtype,bool setFocus = false);
     GraphicsEntry * showPlace(const Place &,bool newTab,bool activate);
@@ -280,7 +281,7 @@ class LanesLexicon : public QMainWindow
 
       bool copyRecursively(const QString &,const QString &,int *);
 
-      bool searchFailure(int /* search type */,int /* searchagain action */,const QString &);
+
       //    QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
       /// look through all tabs for the given node, -1 if not found, else tab index
 

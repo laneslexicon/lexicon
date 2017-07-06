@@ -40,6 +40,7 @@ class FindOptions : public OptionsWidget {
     QSpinBox  * m_headStep;
     QCheckBox * m_headVertical;
     QCheckBox * m_headFocusTable;
+    QComboBox * m_headRepeat;  // default button when search fails
     QCheckBox * m_nodeinfoClose;
     QCheckBox * m_nodeinfoForce;
     bool m_headWholeWord;
@@ -57,6 +58,7 @@ class FindOptions : public OptionsWidget {
     bool m_ignoreCase;
 
     QCheckBox * m_localShowAll;
+    QComboBox * m_localRepeat;  // default button when search fails
 
 
     QCheckBox * m_nodeNew;
@@ -66,6 +68,7 @@ class FindOptions : public OptionsWidget {
     QCheckBox * m_rootNew;
     QCheckBox * m_rootGo;
     QCheckBox * m_rootKeymap;
+    QComboBox * m_rootRepeat;
 
 };
 #endif

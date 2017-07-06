@@ -62,7 +62,8 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   // add the graphics viwe
   layout->addWidget(m_view);
 
-
+  m_localSearchAction = new QAction;
+  connect(m_localSearchAction,SIGNAL(triggered()),this,SLOT(search()));
   setLayout(layout);
 
   connect(m_scene,SIGNAL(focusItemChanged(QGraphicsItem *, QGraphicsItem *, Qt::FocusReason)),
@@ -1942,15 +1943,9 @@ int GraphicsEntry::search() {
   m_searchIndex = 0;
 
   m_searchItemIndexes.clear();
-  QLOG_DEBUG() << Q_FUNC_INFO << "calling buildRx" << m_pattern;
-  // m_pattern contains the diacritics
-  //  QRegularExpression rx = SearchOptionsWidget::buildRx(t,m_pattern,options);
+  //  QLOG_DEBUG() << Q_FUNC_INFO << "calling buildRx" << m_pattern;
   TextSearch ts;
   QRegularExpression rx = ts.buildRx(t,options.ignoreDiacritics(),options.isWholeWord(),! options.ignoreCase());
-  //  if (options.ignoreCase()) {
-  //    rx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
-  //  }
-  //  m_currentSearchRx = rx;
   m_currentSearchTarget = t;
   QGraphicsItem * focusItem = m_scene->focusItem();
   //  this->m_items[0]->ensureVisible();
@@ -1978,16 +1973,12 @@ int GraphicsEntry::search() {
   }
   m_findCount = count;
 
-
-  if (count  == 0) {
-    QMessageBox msgBox;
-    msgBox.setObjectName("wordnotfound");
-    msgBox.setTextFormat(Qt::RichText);
-    if (UcdScripts::isScript(m_currentSearchTarget,"Arabic")) {
-      t = (qobject_cast<Lexicon *>(qApp))->spanArabic(t,"wordnotfound");
+  //  QLOG_DEBUG() << Q_FUNC_INFO << "find count" << m_findCount;
+  if (m_findCount  == 0) {
+    bool reshow = getApp()->searchFailure(SearchOptions::Local,m_currentSearchTarget);//entry->localSearchPattern());
+    if (reshow) {
+      m_localSearchAction->trigger();
     }
-    msgBox.setText(QString(tr("Word not found: %1")).arg(t));
-    msgBox.exec();
     if (focusItem) {
       m_scene->setFocusItem(focusItem);
     }
@@ -2004,6 +1995,9 @@ int GraphicsEntry::search() {
     }
   }
   return count;
+}
+QString GraphicsEntry::localSearchPattern() const {
+  return m_currentSearchTarget;
 }
 /**
  * m_currentSearchIndex points to the current search EntryItem

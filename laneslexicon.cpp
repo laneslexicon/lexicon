@@ -3270,6 +3270,7 @@ void LanesLexicon::searchForPage() {
 void LanesLexicon::searchForRoot() {
   QLOG_DEBUG() << Q_FUNC_INFO << m_allowDuplicates;
   int ix;
+  bool reshow = false;
   TextSearchDialog * d = new TextSearchDialog;
   connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   SearchOptions o = LanesLexicon::options(SearchOptions::Root);
@@ -3289,12 +3290,7 @@ void LanesLexicon::searchForRoot() {
       }
       GraphicsEntry *  entry = showPlace(Place(target),opts.newTab(),opts.activateTab());
       if (! entry ) {
-        QMessageBox msgBox;
-        msgBox.setObjectName("rootnotfound");
-        msgBox.setTextFormat(Qt::RichText);
-        QString html = (qobject_cast<Lexicon *>(qApp))->spanArabic(target,"rootnotfound");
-        msgBox.setText(QString(tr("Root not found: %1")).arg(html));
-        msgBox.exec();
+        reshow = searchFailure(SearchOptions::Root,target);
       }
       else {
         if (m_linkContents) {
@@ -3306,8 +3302,42 @@ void LanesLexicon::searchForRoot() {
       }
   }
   delete d;
+  if (reshow) {
+    m_searchRootAction->trigger();
+  }
 }
-bool LanesLexicon::searchFailure(int searchType,int searchAgainAction,const QString & pattern) {
+bool LanesLexicon::searchFailure(int searchType,const QString & pattern) {
+  SETTINGS
+
+  int searchAgainAction = 0;
+  QString title;
+  switch(searchType) {
+  case SearchOptions::Root : {
+    settings.beginGroup("Search");
+    searchAgainAction = settings.value(SID_TEXTSEARCH_FAILURE_ACTION,TextSearchDialog::SearchAgainYes).toInt();
+    title = tr("Root search failed");
+    break;
+  }
+  case SearchOptions::Word : {
+    settings.beginGroup("TextSearch");
+    searchAgainAction = settings.value(SID_TEXTSEARCH_FAILURE_ACTION,TextSearchDialog::SearchAgainYes).toInt();
+    title = tr("Text search failed");
+    break;
+  }
+  case SearchOptions::Entry : {
+    settings.beginGroup("HeadSearch");
+    searchAgainAction = settings.value(SID_TEXTSEARCH_FAILURE_ACTION,TextSearchDialog::SearchAgainYes).toInt();
+    title = tr("Headword search failed");
+    break;
+  }
+  case SearchOptions::Local : {
+    settings.beginGroup("LocalSearch");
+    searchAgainAction = settings.value(SID_TEXTSEARCH_FAILURE_ACTION,TextSearchDialog::SearchAgainYes).toInt();
+    title = tr("Local search failed");
+    break;
+  }
+  default : break;
+  }
   statusMessage(QString(tr("Search for \"%1\" - pattern not found")).arg(pattern));
   switch(searchAgainAction) {
   case TextSearchDialog::SearchAgainYes :
@@ -3317,23 +3347,7 @@ bool LanesLexicon::searchFailure(int searchType,int searchAgainAction,const QStr
     msg.setObjectName("wordnotfound");
     msg.setTextFormat(Qt::RichText);
     QString str = getLexicon()->scanAndStyle(pattern,"messagebox");
-    switch(searchType) {
-    case  SearchOptions::Word : {
-      msg.setWindowTitle(tr("Text search failed"));
-      break;
-    }
-    case  SearchOptions::Entry : {
-      msg.setWindowTitle(tr("Headword search failed"));
-      break;
-    }
-   case  SearchOptions::Root : {
-      msg.setWindowTitle(tr("Root search failed"));
-      break;
-    }
-    default : {
-      msg.setWindowTitle(tr("Text Search"));
-    }
-    }
+    msg.setWindowTitle(title);
     msg.setText(QString("<html><body><div><p>%1</p><p style=\"font-weight:bold;margin-left:20px\">%2</p><p>%3</p>\
       <p>%4</p></div></body></html>")
                 .arg(tr("Search for:"))
@@ -3360,11 +3374,6 @@ bool LanesLexicon::searchFailure(int searchType,int searchAgainAction,const QStr
   return false;
 }
 void LanesLexicon::searchForText() {
-  SETTINGS
-  settings.beginGroup("TextSearch");
-  int searchAgainAction = settings.value(SID_TEXTSEARCH_FAILURE_ACTION,TextSearchDialog::SearchAgainYes).toInt();
-
-
   bool showSearchDialog = false;
   TextSearchDialog * d = new TextSearchDialog();
   connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
@@ -3381,7 +3390,7 @@ void LanesLexicon::searchForText() {
     QPair<bool,bool> tabOpts = d->tabOptions();  // first = new,second = go
     int n = w->search();
     if (n == 0) {
-      showSearchDialog = searchFailure(SearchOptions::Word,searchAgainAction,o.target);
+      showSearchDialog = searchFailure(SearchOptions::Word,o.target);
     }
     else {
       int ix = this->addTab(tabOpts.first,w,QString(tr("Search for: %1")).arg(o.target));
@@ -3408,6 +3417,7 @@ void LanesLexicon::searchForText() {
 void LanesLexicon::searchForEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   TextSearchDialog * d = new TextSearchDialog;
+  bool reshow = false;
   connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   SearchOptions o = LanesLexicon::options(SearchOptions::Entry);
   d->fromOptions(o);
@@ -3421,6 +3431,8 @@ void LanesLexicon::searchForEntry() {
 
     s->search(target,o);
     if (s->count() == 0) {
+      reshow = searchFailure(SearchOptions::Entry,target);
+      /*
       QMessageBox msgBox;
       msgBox.setObjectName("wordnotfound");
       msgBox.setTextFormat(Qt::RichText);
@@ -3429,16 +3441,22 @@ void LanesLexicon::searchForEntry() {
       delete s;
       delete d;
       return;
+      */
     }
-    int ix = this->addTab(o.newTab(),s,QString(tr("Head word search for %1")).arg(target));
-    if (! o.newTab() || (o.newTab() && o.activateTab())) {
-      m_tabs->setCurrentIndex(ix);
-    }
-    if (o.newTab() && ! o.activateTab()) {
-      s->setFocus(Qt::OtherFocusReason);
+    else {
+      int ix = this->addTab(o.newTab(),s,QString(tr("Head word search for %1")).arg(target));
+      if (! o.newTab() || (o.newTab() && o.activateTab())) {
+        m_tabs->setCurrentIndex(ix);
+      }
+      if (o.newTab() && ! o.activateTab()) {
+        s->setFocus(Qt::OtherFocusReason);
+      }
     }
   }
   delete d;
+  if (reshow) {
+    m_searchEntryAction->trigger();
+  }
 }
 void LanesLexicon::searchForNode() {
   QLOG_DEBUG() << Q_FUNC_INFO;

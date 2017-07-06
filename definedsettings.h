@@ -177,6 +177,7 @@ They should not be translated.
 #define SID_HEADSEARCH_RESIZE_ROWS             "Resize rows"
 #define SID_HEADSEARCH_NODEINFO_FORCE          "Node info force tab"
 #define SID_HEADSEARCH_KEYMAP_BUTTON           "Show keymap button"
+#define SID_HEADSEARCH_FAILURE_ACTION          "Search again action"
 
 #define SID_LOCALSEARCH_SHOW_ALL               "Show all results"
 #define SID_LOCALSEARCH_DIACRITICS             "Ignore diacritics"
@@ -186,6 +187,7 @@ They should not be translated.
 #define SID_LOCALSEARCH_FORCE                  "Force LTR"
 #define SID_LOCALSEARCH_IGNORE_CASE            "Ignore case"
 #define SID_LOCALSEARCH_KEYMAP_BUTTON           "Show keymap button"
+#define SID_LOCALSEARCH_FAILURE_ACTION          "Search again action"
 
 
 
@@ -248,6 +250,7 @@ They should not be translated.
 #define SID_ROOTSEARCH_NEW_TAB                 "Root new tab"
 #define SID_ROOTSEARCH_GO_TAB                  "Root activate tab"
 #define SID_ROOTSEARCH_KEYMAP_BUTTON           "Show keymap button"
+#define SID_ROOTSEARCH_FAILURE_ACTION          "Search again action"
 #define SID_PAGESEARCH_NEW_TAB                 "Page new tab"
 #define SID_PAGESEARCH_GO_TAB                  "Page activate tab"
 #define SID_NODESEARCH_NEW_TAB                 "Node new tab"

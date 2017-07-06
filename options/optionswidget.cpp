@@ -316,7 +316,11 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   }
   QComboBox * combo = qobject_cast<QComboBox *>(p);
   if (combo) {
-    if (key == SID_TEXTSEARCH_FAILURE_ACTION) {
+    if ((key == SID_TEXTSEARCH_FAILURE_ACTION) ||
+        (key == SID_HEADSEARCH_FAILURE_ACTION) ||
+        (key == SID_ROOTSEARCH_FAILURE_ACTION) ||
+        (key == SID_LOCALSEARCH_FAILURE_ACTION))
+        {
       int ix = combo->currentIndex();
       if (settings->value(key).toInt() != ix) {
         m_changes  << QString("%1 | %2 | %3")

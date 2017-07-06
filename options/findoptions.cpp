@@ -50,10 +50,10 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   fulllayout->addRow(tr("One row for each entry"),m_textSummary);
   fulllayout->addRow(tr("Mark/clear selections for current page"),m_textCurrentPage);
   fulllayout->addRow(tr("Progress update interval"),m_textStep);
-  QHBoxLayout * repeatlayout = new QHBoxLayout;
-  repeatlayout->addWidget(m_textRepeat);
-  repeatlayout->addStretch();
-  fulllayout->addRow(tr("Search failure action"),repeatlayout);//m_textRepeat);
+  QHBoxLayout * textrepeatlayout = new QHBoxLayout;
+  textrepeatlayout->addWidget(m_textRepeat);
+  textrepeatlayout->addStretch();
+  fulllayout->addRow(tr("Search failure action"),textrepeatlayout);//m_textRepeat);
   QPushButton * fullbtn = new QPushButton(tr("Set"));
   this->setControlSize(fullbtn,MEDIUM_EDIT);
   QHBoxLayout * setlayout1 = new QHBoxLayout;
@@ -75,12 +75,20 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   this->setControlSize(m_headStep,MEDIUM_EDIT);
   this->setControlSize(m_headStep,MEDIUM_EDIT);
   m_headStep->setSingleStep(25);
+
+  m_headRepeat = new QComboBox;
+  m_headRepeat->addItems(TextSearchDialog::failureActions());
+
   m_nodeinfoClose = new QCheckBox;
   m_nodeinfoForce = new QCheckBox;
   QFormLayout * headlayout = new QFormLayout;
   headlayout->addRow(tr("Progress udpate interval"),m_headStep);
   headlayout->addRow(tr("Close entry info after load"),m_nodeinfoClose);
   headlayout->addRow(tr("Show entry info forces new tab"),m_nodeinfoForce);
+  QHBoxLayout * headrepeatlayout = new QHBoxLayout;
+  headrepeatlayout->addWidget(m_headRepeat);
+  headrepeatlayout->addStretch();
+  headlayout->addRow(tr("Search failure action"),headrepeatlayout);//m_textRepeat);
   QPushButton * headbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout2 = new QHBoxLayout;
   setlayout2->addWidget(headbtn);
@@ -96,9 +104,15 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   QGroupBox * localbox = new QGroupBox(tr("Local search"));
 
   m_localShowAll    = new QCheckBox;
+  m_localRepeat = new QComboBox;
+  m_localRepeat->addItems(TextSearchDialog::failureActions());
 
   QFormLayout * locallayout = new QFormLayout;
   locallayout->addRow(tr("Highlight all results"),m_localShowAll);
+  QHBoxLayout * localrepeatlayout = new QHBoxLayout;
+  localrepeatlayout->addWidget(m_localRepeat);
+  localrepeatlayout->addStretch();
+  locallayout->addRow(tr("Search failure action"),localrepeatlayout);//m_textRepeat);
 
   QPushButton * localbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout3 = new QHBoxLayout;
@@ -121,6 +135,8 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_rootNew = new  QCheckBox;
   m_rootGo  = new  QCheckBox;
   m_rootKeymap = new  QCheckBox;
+  m_rootRepeat = new QComboBox;
+  m_rootRepeat->addItems(TextSearchDialog::failureActions());
 
   gridlayout->addWidget(new QLabel("Root"),0,1);
   gridlayout->addWidget(new QLabel("Page"),0,2);
@@ -137,16 +153,20 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   gridlayout->addWidget(m_nodeGo,2,3);
   tabbox->setLayout(gridlayout);
 
-  QGroupBox * otherbox = new QGroupBox(tr("Other"));
+  QGroupBox * otherbox = new QGroupBox(tr("Root search"));
   QFormLayout * otherlayout = new QFormLayout;
   otherlayout->addRow(tr("Root search show keymap button"),m_rootKeymap);
+  QHBoxLayout * rootrepeatlayout = new QHBoxLayout;
+  rootrepeatlayout->addWidget(m_rootRepeat);
+  rootrepeatlayout->addStretch();
+  otherlayout->addRow(tr("Search failure action"),rootrepeatlayout);//m_textRepeat);
   otherbox->setLayout(otherlayout);
 
   layout->addWidget(fullbox);
   layout->addWidget(headbox);
   layout->addWidget(localbox);
-  layout->addWidget(tabbox);
   layout->addWidget(otherbox);
+  layout->addWidget(tabbox);
   layout->addStretch();
 
   setLayout(layout);
@@ -185,6 +205,7 @@ void FindOptions::readSettings(bool /* reload */) {
   m_nodeinfoClose->setChecked(settings.value(SID_HEADSEARCH_NODEINFO_CLOSE,true).toBool());
   m_nodeinfoForce->setChecked(settings.value(SID_HEADSEARCH_NODEINFO_FORCE,true).toBool());
   m_headStep->setValue(settings.value(SID_HEADSEARCH_STEP,50).toInt());
+  m_headRepeat->setCurrentIndex(settings.value(SID_HEADSEARCH_FAILURE_ACTION,TextSearchDialog::SearchAgainYes).toInt());
 
   m_headNewTab     = settings.value(SID_HEADSEARCH_NEW_TAB,true).toBool();
   m_headGoTab      = settings.value(SID_HEADSEARCH_GO_TAB,true).toBool();
@@ -201,6 +222,7 @@ void FindOptions::readSettings(bool /* reload */) {
   m_ignoreCase      = settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool();
   m_localKeymap = settings.value(SID_LOCALSEARCH_KEYMAP_BUTTON,false).toBool();
   m_localShowAll->setChecked(settings.value(SID_LOCALSEARCH_SHOW_ALL,true).toBool());
+  m_localRepeat->setCurrentIndex(settings.value(SID_LOCALSEARCH_FAILURE_ACTION,TextSearchDialog::SearchAgainYes).toInt());
 
   settings.endGroup();
   settings.beginGroup("Search");
@@ -212,6 +234,7 @@ void FindOptions::readSettings(bool /* reload */) {
   m_rootNew->setChecked(settings.value(SID_ROOTSEARCH_NEW_TAB,true).toBool());
   m_rootGo->setChecked(settings.value(SID_ROOTSEARCH_GO_TAB,true).toBool());
   m_rootKeymap->setChecked(settings.value(SID_ROOTSEARCH_KEYMAP_BUTTON,false).toBool());
+  m_rootRepeat->setCurrentIndex(settings.value(SID_ROOTSEARCH_FAILURE_ACTION,TextSearchDialog::SearchAgainYes).toInt());
 
   m_dirty = false;
 }
@@ -258,6 +281,7 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_HEADSEARCH_DIACRITICS,m_headDiacritics);
   settings.setValue(SID_HEADSEARCH_TYPE_REGEX,m_headRegex);
   settings.setValue(SID_HEADSEARCH_KEYMAP_BUTTON,m_headKeymap);
+  settings.setValue(SID_HEADSEARCH_FAILURE_ACTION,m_headRepeat->currentIndex());
 
 
   settings.endGroup();
@@ -268,6 +292,7 @@ void FindOptions::writeSettings(const QString & fileName) {
    settings.setValue(SID_LOCALSEARCH_TYPE_REGEX,m_localRegex);
    settings.setValue(SID_LOCALSEARCH_KEYMAP_BUTTON,m_localKeymap);
    settings.setValue(SID_LOCALSEARCH_IGNORE_CASE,m_ignoreCase);
+   settings.setValue(SID_LOCALSEARCH_FAILURE_ACTION,m_localRepeat->currentIndex());
 
 
   settings.value(SID_LOCALSEARCH_SHOW_ALL,m_localShowAll->isChecked());
@@ -282,6 +307,7 @@ void FindOptions::writeSettings(const QString & fileName) {
   settings.setValue(SID_ROOTSEARCH_NEW_TAB,m_rootNew->isChecked());
   settings.setValue(SID_ROOTSEARCH_GO_TAB,m_rootGo->isChecked());
   settings.setValue(SID_ROOTSEARCH_KEYMAP_BUTTON,m_rootKeymap->isChecked());
+  settings.setValue(SID_ROOTSEARCH_FAILURE_ACTION,m_rootRepeat->currentIndex());
 
   settings.sync();
   settings.endGroup();
@@ -396,6 +422,9 @@ bool FindOptions::isModified()  {
   if (m_headKeymap      != settings.value(SID_HEADSEARCH_KEYMAP_BUTTON,true).toBool()) {
      m_dirty = true;
   }
+  if (compare(&settings,SID_HEADSEARCH_FAILURE_ACTION,m_headRepeat)) {
+    m_dirty = true;
+  }
 
 
   settings.endGroup();
@@ -424,6 +453,10 @@ bool FindOptions::isModified()  {
   if (m_ignoreCase      != settings.value(SID_LOCALSEARCH_IGNORE_CASE,true).toBool()) {
     m_dirty = true;
   }
+ if (compare(&settings,SID_LOCALSEARCH_FAILURE_ACTION,m_localRepeat)) {
+    m_dirty = true;
+  }
+
   settings.endGroup();
   settings.beginGroup("Search");
 
@@ -447,6 +480,9 @@ bool FindOptions::isModified()  {
     m_dirty = true;
   }
   if (compare(&settings,SID_ROOTSEARCH_KEYMAP_BUTTON,m_rootKeymap)) {
+    m_dirty = true;
+  }
+ if (compare(&settings,SID_ROOTSEARCH_FAILURE_ACTION,m_rootRepeat)) {
     m_dirty = true;
   }
 
