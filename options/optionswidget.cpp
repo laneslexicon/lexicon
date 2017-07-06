@@ -1,5 +1,6 @@
 #include "optionswidget.h"
 #ifdef LANE
+#include "definedsettings.h"
 #include "application.h"
 #include "externs.h"
 #include "QsLog.h"
@@ -315,8 +316,22 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
   }
   QComboBox * combo = qobject_cast<QComboBox *>(p);
   if (combo) {
-    QString v = combo->currentText();
-    if (settings->value(key) != v) {
+    if (key == SID_TEXTSEARCH_FAILURE_ACTION) {
+      int ix = combo->currentIndex();
+      if (settings->value(key).toInt() != ix) {
+        m_changes  << QString("%1 | %2 | %3")
+          .arg(key)
+          .arg(settings->value(key).toInt())
+          .arg(ix);
+        if (m_debug) {
+          QLOG_DEBUG() << m_changes.last();
+        }
+        return true;
+      }
+    }
+    else {
+      QString v = combo->currentText();
+      if (settings->value(key) != v) {
         m_changes  << QString("%1 | %2 | %3")
           .arg(key)
           .arg(settings->value(key).toString())
@@ -324,7 +339,8 @@ bool OptionsWidget::compare(const QSettings * settings,const QString & key, QWid
         if (m_debug) {
           QLOG_DEBUG() << m_changes.last();
         }
-      return true;
+        return true;
+      }
     }
   }
   QRadioButton * radio = qobject_cast<QRadioButton *>(p);

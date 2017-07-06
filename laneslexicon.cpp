@@ -1944,9 +1944,9 @@ void LanesLexicon::onTest() {
   }
 }
 /**
- * Read settings from INIFILE (by default : "default.ini");
- * Options can also come from the command line and they override settings
- * in the ini file
+ *
+ *
+ *
  *
  * All QActions have been created when we get here
  */
@@ -2146,17 +2146,12 @@ void LanesLexicon::readSettings() {
   settings.endGroup();
 
   QList<QPrinterInfo> printers = QPrinterInfo::availablePrinters();
-  if (printers.size() > 0) {
-      return;
+  if (printers.size() == 0) {
+    settings.beginGroup("Printer");
+    settings.setValue(SID_PRINTER_USE,true);
+    settings.setValue(SID_PRINTER_OUTPUT_PDF,true);
+    settings.endGroup();
   }
-  settings.beginGroup("Printer");
-  settings.setValue(SID_PRINTER_USE,true);
-  settings.setValue(SID_PRINTER_OUTPUT_PDF,true);
-  settings.endGroup();
-
-  settings.beginGroup("Text Search");
-  m_searchAgainDefault = settings.value(SID_TEXTSEARCH_FAILURE_DEFAULT_BTN,true).toBool();
-  settings.endGroup();
 }
 void LanesLexicon::writeSettings() {
 
@@ -3370,7 +3365,12 @@ void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & 
 }
 */
 void LanesLexicon::searchForText() {
-  bool r = false;
+  SETTINGS
+  settings.beginGroup("TextSearch");
+  int searchAgainAction = settings.value(SID_TEXTSEARCH_FAILURE_ACTION,TextSearchDialog::SearchAgainYes).toInt();
+
+
+  bool showSearchDialog = false;
   TextSearchDialog * d = new TextSearchDialog();
   connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
 
@@ -3386,24 +3386,38 @@ void LanesLexicon::searchForText() {
     QPair<bool,bool> tabOpts = d->tabOptions();  // first = new,second = go
     int n = w->search();
     if (n == 0) {
+      statusMessage(QString(tr("Search for \"%1\" - pattern not found")).arg(o.target));
+      switch(searchAgainAction) {
+      case TextSearchDialog::SearchAgainYes :
+      case TextSearchDialog::SearchAgainNo : {
       QMessageBox msg;
+
+      msg.setObjectName("wordnotfound");
+      msg.setTextFormat(Qt::RichText);
+      QString str = getLexicon()->scanAndStyle(o.target,"messagebox");
       msg.setWindowTitle(tr("Text Search"));
       msg.setText(QString("<html><body><div><p>%1</p><p style=\"font-weight:bold;margin-left:20px\">%2</p><p>%3</p>\
       <p>%4</p></div></body></html>")
-                  .arg(tr("Search for:"))
-                  .arg(o.target)
-                  .arg(tr("Pattern not found."))
-                  .arg(tr("New search?")));
-      msg.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
-      if (m_searchAgainDefault) {
-        msg.setDefaultButton(QMessageBox::Yes);
+                    .arg(tr("Search for:"))
+                    .arg(str)
+                    .arg(tr("Pattern not found."))
+                    .arg(tr("New search?")));
+
+        msg.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+        if (searchAgainAction == TextSearchDialog::SearchAgainYes) {
+          msg.setDefaultButton(QMessageBox::Yes);
+        }
+        else {
+          msg.setDefaultButton(QMessageBox::No);
+        }
+        int ret = msg.exec();
+        if (ret == QMessageBox::Yes) {
+          showSearchDialog = true;
+        }
+        break;
       }
-      else {
-        msg.setDefaultButton(QMessageBox::No);
-      }
-      int ret = msg.exec();
-      if (ret == QMessageBox::Yes) {
-        r = true;
+      case TextSearchDialog::Nothing : break;
+        default: break;
       }
     }
     else {
@@ -3420,7 +3434,7 @@ void LanesLexicon::searchForText() {
     }
   }
   delete d;
-  if (r) {
+  if (showSearchDialog) {
     m_textSearchAction->trigger();
   }
 }

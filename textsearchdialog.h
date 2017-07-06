@@ -36,10 +36,12 @@ class TextSearchDialog : public QDialog {
   void showTabOptions(bool v);
   bool headPhrase() const;
   TextOption options() const;
+  static QStringList failureActions();
   SearchOptions searchOptions() const; // this returns everything including headphrase and highlight all
   void fromOptions(SearchOptions &);   // set widgets from options
   QPair<bool,bool> tabOptions() const;
-  public slots:
+  enum NotFound_t { SearchAgainYes , SearchAgainNo, Nothing };
+    public slots:
     void showKeyboard();
     void loadKeymap(const QString &);
     void keyboardClosed();
@@ -49,6 +51,7 @@ class TextSearchDialog : public QDialog {
     void searchTypeChanged(bool);
     void newTabChanged(int);
     void keymapChanged();
+
  protected:
     QString showText(const QString &);
  private:
@@ -57,6 +60,7 @@ class TextSearchDialog : public QDialog {
     QGridLayout * m_form;
     int m_count;
     int m_type;
+
     KeyboardWidget * m_keyboard;
     QLabel * m_text;
     bool m_attached;

@@ -511,3 +511,16 @@ void TextSearchDialog::keymapChanged() {
   }
   m_edit->setFocus();
 }
+/**
+ * Have to be in the same order as the NotFound_t enum
+ *
+ *
+ * @return
+ */
+QStringList TextSearchDialog::failureActions() {
+  QStringList s;
+  s << tr("Search again dialog, default Yes");
+  s << tr("Search again dialog, default No");
+  s << tr("No dialog, status message only");
+  return s;
+}
