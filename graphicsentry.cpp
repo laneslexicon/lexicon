@@ -62,7 +62,7 @@ GraphicsEntry::GraphicsEntry(QWidget * parent ) : QWidget(parent) {
   // add the graphics viwe
   layout->addWidget(m_view);
 
-  m_localSearchAction = new QAction;
+  m_localSearchAction = new QAction(this);
   connect(m_localSearchAction,SIGNAL(triggered()),this,SLOT(search()));
   setLayout(layout);
 
@@ -1946,7 +1946,11 @@ int GraphicsEntry::search() {
   //  QLOG_DEBUG() << Q_FUNC_INFO << "calling buildRx" << m_pattern;
   TextSearch ts;
   ts.setDiacritics();
+#if QT_VERSION >= 0x050500
   QRegularExpression rx = ts.buildRx(t,options.ignoreDiacritics(),options.isWholeWord(),! options.ignoreCase());
+#else
+  QRegExp rx = ts.buildRx(t,options.ignoreDiacritics(),options.isWholeWord(),! options.ignoreCase());
+#endif
   m_currentSearchTarget = t;
   QGraphicsItem * focusItem = m_scene->focusItem();
   //  this->m_items[0]->ensureVisible();

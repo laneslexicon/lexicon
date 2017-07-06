@@ -22,9 +22,19 @@ NodeView::NodeView(const SearchParams & p,QWidget * parent)
   QTextCursor c;
   QRegularExpression rx;
   rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
+
+#if QT_VERSION < 0x050500
+  QRegExp rexp;
+  rexp.setPattern(p.pattern);
+#endif
+
   if (p.regex) {
     rx.setPattern(p.pattern);
+#if QT_VERSION < 0x050500
+    c = m_browser->document()->find(rexp,0,p.flags);
+#else
     c = m_browser->document()->find(rx,0,p.flags);
+#endif
   }
   else {
     c = m_browser->document()->find(p.pattern,0,p.flags);
@@ -34,7 +44,11 @@ NodeView::NodeView(const SearchParams & p,QWidget * parent)
     position = c.position();
     m_positions << (position - c.selectedText().size());
     if (p.regex) {
+#if QT_VERSION < 0x050500
+      c = m_browser->document()->find(rexp,position,p.flags);
+#else
       c = m_browser->document()->find(rx,position,p.flags);
+#endif      
     }
     else {
       c = m_browser->document()->find(p.pattern,position,p.flags);
@@ -213,8 +227,12 @@ void NodeView::findFirst() {
   }
   QTextCursor c;// = m_browser->document()->find(m_pattern,m_positions[m_positionIndex]);
   if (m_params.regex) {
-    QRegularExpression rx(m_params.pattern);
-    rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
+#if QT_VERSION < 0x050500
+      QRegExp rx(m_params.pattern);
+#else      
+      QRegularExpression rx(m_params.pattern);
+      rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
+#endif      
     c = m_browser->document()->find(rx,m_positions[m_positionIndex],m_params.flags);
   }
   else {
@@ -234,8 +252,12 @@ void NodeView::findNext() {
   if (m_positionIndex < m_positions.size()) {
     QTextCursor c;// = m_browser->document()->find(m_pattern,m_positions[m_positionIndex]);
     if (m_params.regex) {
+#if QT_VERSION < 0x050500
+      QRegExp rx(m_params.pattern);
+#else      
       QRegularExpression rx(m_params.pattern);
       rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
+#endif      
       c = m_browser->document()->find(rx,m_positions[m_positionIndex],m_params.flags);
     }
     else {

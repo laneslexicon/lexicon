@@ -35,6 +35,8 @@ void TestRunner::add(const QString & t,bool r,bool w,bool c,bool i) {
   tests << o;
 }
 void TestRunner::run() {
+#if QT_VERSION >= 0x050500
+  
   TextSearch s;
   s.setDiacritics();
   for(int i=0;i < tests.size();i++) {
@@ -43,6 +45,7 @@ void TestRunner::run() {
     rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
     qDebug() << i << rx.match(o.target).hasMatch() << o.result;
   }
+#endif
 }
 QDataStream &operator<<(QDataStream &s, const SearchResult& obj)
 {
@@ -344,7 +347,7 @@ QString TextSearch::transform(int type,const QString & xsl,const QString & xml) 
 
 }
 QList<QPair<QString,QString> > TextSearch::splitText(const QString & txt) {
-  QList<QPair<QString,QString>> texts;
+  QList<QPair<QString,QString> > texts;
   int rtlCount = 0;
   int ltrCount = 0;
   QString p;
@@ -596,7 +599,12 @@ QString TextSearch::getDiacritics(QList<QChar> & points) {
   rx.append("]*");
   return rx;
 }
-QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool wholeword,bool casesensitive) {
+#if QT_VERSION < 0x050500
+  QRegExp TextSearch::buildRx(QString target,bool ignorediacritics,bool wholeword,bool casesensitive) 
+#else
+QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool wholeword,bool casesensitive)
+ #endif
+  {
   QList<QChar> dc;
   QString diacritics = getDiacritics(dc);
   QString pattern;
@@ -618,10 +626,21 @@ QRegularExpression TextSearch::buildRx(QString target,bool ignorediacritics,bool
   if (wholeword) {
     pattern = "\\b" + pattern + "\\b";
   }
+#if QT_VERSION < 0x050500
+  QRegExp rx(pattern);
+  if (casesensitive) {
+    m_rx.setCaseSensitivity(Qt::CaseSensitive);
+  }
+  else {
+    m_rx.setCaseSensitivity(Qt::CaseInsensitive);
+  }
+#else
   QRegularExpression rx(pattern);
   if (! casesensitive) {
     rx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   }
+#endif
+  
   //  qDebug() << Q_FUNC_INFO << rx.isValid() << rx.pattern();
   return rx;
 }
@@ -994,9 +1013,14 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
   QString pattern = p;
   m_pattern = pattern;
   if (! regex) {
+#if QT_VERSION < 0x050500
+    QRegExp rx("[\u0600-\u06ff]+");
+    if (rx.indexIn(pattern) != -1) { // text contains arabic
+#else    
     QRegularExpression rx("[\u0600-\u06ff]+");
     rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
     if (rx.match(pattern).hasMatch()) { // text contains arabic
+#endif
       if (diacritics) {
         // TODO do we need to do this?
         //pattern = QRegularExpression::escape(pattern);
@@ -1024,6 +1048,18 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
   // test for a single word of Arabic so we can use the xref table
   // later
   //
+#if QT_VERSION < 0x050500
+  QRegExp srx("^[\u0600-\u06ff]+$");
+  m_singleArabic = (srx.indexIn(p.trimmed()) != -1);
+  if (m_regex) {
+    if (caseSensitive) {
+      m_rx.setCaseSensitivity(Qt::CaseSensitive);
+    }
+    else {
+      m_rx.setCaseSensitivity(Qt::CaseInsensitive);
+    }
+  }
+#else
   QRegularExpression srx("^[\u0600-\u06ff]+$");
   srx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
   m_singleArabic = srx.match(p.trimmed()).hasMatch();
@@ -1031,6 +1067,7 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
   if (m_regex && ! caseSensitive) {
     m_rx.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   }
+#endif
   if (! m_rx.isValid()) {
     CERR << qPrintable(m_rx.pattern()) << ENDL;
     CERR << qPrintable(QString("Invalid regular expression: %1").arg(m_rx.errorString())) << ENDL;
@@ -1042,13 +1079,16 @@ void TextSearch::setSearch(const QString & p,bool regex,bool caseSensitive,bool 
     CERR << qPrintable(QString("Ignore diacritics              :%1").arg(m_diacritics)) << ENDL;
     CERR << qPrintable(QString("Pattern                        :%1").arg(m_pattern)) << ENDL;
     CERR << qPrintable(QString("Regex pattern                  :%1").arg(m_rx.pattern())) << ENDL;
+#if QT_VERSION >= 0x050500
     CERR << qPrintable(QString("Regex case insensitive  option :%1").arg(m_rx.patternOptions() && QRegularExpression::CaseInsensitiveOption)) << ENDL;
+    m_rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
+#endif    
     if (m_singleArabic) {
       CERR << qPrintable(QString("Using cross-ref table        :%1").arg(m_singleArabic)) << ENDL;
     }
 
   }
-  m_rx.setPatternOptions(QRegularExpression::UseUnicodePropertiesOption);
+
 }
 
 QList<SearchHit> TextSearch::getHits(int offset,int pageSize,bool summary) const {

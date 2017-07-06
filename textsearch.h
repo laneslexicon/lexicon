@@ -7,6 +7,7 @@
 #include <QTextDocument>
 #include <QTextCursor>
 #include <QDir>
+#include <QRegExp>
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
@@ -97,7 +98,11 @@ class TextSearch : public QObject {
   void setDiacritics();   // Tries to set the list of diacritics from settings.ini
   void setDiacritics(const QString &); // set diacritics from command string
   QString getDiacritics(QList<QChar> & points);
+#if QT_VERSION < 0x050500
+  QRegExp buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
+#else
   QRegularExpression buildRx(QString target,bool ignorediacritics,bool wholeword,bool ignorecase);
+ #endif
   static QStringList fields();
   QString fixHtml(const QString & t);
   void setSearch(const QString & pattern,bool regex,bool caseSensitive,bool wholeWord,bool diacritics);
@@ -156,7 +161,11 @@ class TextSearch : public QObject {
   qint64 m_time;
   QStringList m_nodes;
   QString m_fields;
+#if QT_VERSION < 0x050500
+  QRegExp m_rx;
+#else
   QRegularExpression m_rx;
+#endif
   QTextDocument::FindFlags m_findFlags;
   bool m_outputRecord;
   bool m_cancel;

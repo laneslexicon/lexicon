@@ -246,8 +246,9 @@ void HelpView::loadStarted() {
  *
  * @param ok
  */
-void HelpView::loadFinished(bool /* ok */) {
 #if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+void HelpView::loadFinished(bool ok) {
+
   QLOG_DEBUG() << Q_FUNC_INFO << m_view->url() << ok;
   if (m_initialPage) {
     this->showNormal();
@@ -276,8 +277,11 @@ void HelpView::loadFinished(bool /* ok */) {
   if (! m_initialPage ) {
     emit(finished(ok));
   }
-#endif
 }
+#else
+void HelpView::loadFinished(bool /* ok */) {
+}
+#endif
 bool HelpView::isLoaded() const {
   return ! m_initialPage;
 }

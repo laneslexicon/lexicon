@@ -65,7 +65,11 @@ class EntryItem : public QGraphicsTextItem {
   void setPlace(const Place &);
   void setHighlightColor(const QString &);
   void selectAll();
+#if QT_VERSION >= 0x050500
   QPair<int,int> find(const QRegularExpression &,int,bool highlight = true);
+#else
+  QPair<int,int> find(const QRegExp &,int,bool highlight = true);
+#endif
   Place getPlace();
   QString getNode();
   QString getRoot();

@@ -140,8 +140,11 @@ void HeadSearchWidget::search(const QString & searchpattern,const SearchOptions 
   qDebug() << Q_FUNC_INFO << "Ignore case" << options.ignoreCase();
   qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
   */
-
+#if QT_VERSION >= 0x050500
   QRegularExpression rx;
+#else
+  QRegExp rx;
+#endif
   if (options.regex()) {
     rx.setPattern(searchpattern);
   }
