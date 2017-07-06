@@ -3306,64 +3306,59 @@ void LanesLexicon::searchForRoot() {
       }
   }
   delete d;
-    /*
-  if (m_rootSearchDialog == NULL) {
-    m_rootSearchDialog = new ArabicSearchDialog(SearchOptions::Root);
-    connect(m_rootSearchDialog,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
-  }
-  else {
+}
+bool LanesLexicon::searchFailure(int searchType,int searchAgainAction,const QString & pattern) {
+  statusMessage(QString(tr("Search for \"%1\" - pattern not found")).arg(pattern));
+  switch(searchAgainAction) {
+  case TextSearchDialog::SearchAgainYes :
+  case TextSearchDialog::SearchAgainNo : {
+    QMessageBox msg;
 
-  }
-  if (m_rootSearchDialog->exec()) {
-    QString t = m_rootSearchDialog->getText();
-    if (! t.isEmpty()) {
-      SearchOptions opts;
-      m_rootSearchDialog->getOptions(opts);
-      Place p;
-      p.setRoot(t);
-      ix = this->hasPlace(p,GraphicsEntry::RootSearch,false);
-      if (ix != -1) {
-        p.setAction(Place::SwitchTab);
-        m_tabs->setCurrentIndex(ix);
-        return;
-      }
-      GraphicsEntry *  entry = showPlace(Place(t),opts.newTab(),opts.activateTab());
-      if (! entry ) {
-        QMessageBox msgBox;
-        msgBox.setObjectName("rootnotfound");
-        msgBox.setTextFormat(Qt::RichText);
-        QString html = (qobject_cast<Lexicon *>(qApp))->spanArabic(t,"rootnotfound");
-        msgBox.setText(QString(tr("Root not found: %1")).arg(html));
-        msgBox.exec();
-      }
-      else {
-        if (m_linkContents) {
-          this->syncFromEntry();
-        }
-        else {
-          m_tabs->currentWidget()->setFocus();
-        }
-      }
+    msg.setObjectName("wordnotfound");
+    msg.setTextFormat(Qt::RichText);
+    QString str = getLexicon()->scanAndStyle(pattern,"messagebox");
+    switch(searchType) {
+    case  SearchOptions::Word : {
+      msg.setWindowTitle(tr("Text search failed"));
+      break;
     }
-  }
-  m_rootSearchDialog->hideKeyboard();
-    */
-}
-/**
- *
- *
+    case  SearchOptions::Entry : {
+      msg.setWindowTitle(tr("Headword search failed"));
+      break;
+    }
+   case  SearchOptions::Root : {
+      msg.setWindowTitle(tr("Root search failed"));
+      break;
+    }
+    default : {
+      msg.setWindowTitle(tr("Text Search"));
+    }
+    }
+    msg.setText(QString("<html><body><div><p>%1</p><p style=\"font-weight:bold;margin-left:20px\">%2</p><p>%3</p>\
+      <p>%4</p></div></body></html>")
+                .arg(tr("Search for:"))
+                .arg(str)
+                .arg(tr("Pattern not found."))
+                .arg(tr("New search?")));
 
-void LanesLexicon::search(int searchType,ArabicSearchDialog * d,const QString & t) {
-  QLOG_DEBUG() << Q_FUNC_INFO << searchType;
-  QString target = t;
-  SearchOptions options;
-  d->getOptions(options);
-  int ix = m_tabs->currentIndex();
-  if (searchType == SearchOptions::Text) {
-    return;
+    msg.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+    if (searchAgainAction == TextSearchDialog::SearchAgainYes) {
+      msg.setDefaultButton(QMessageBox::Yes);
+    }
+    else {
+      msg.setDefaultButton(QMessageBox::No);
+    }
+    int ret = msg.exec();
+    if (ret == QMessageBox::Yes) {
+      return true;
+    }
+    break;
   }
+  case TextSearchDialog::Nothing : break;
+  default: break;
+  }
+  return false;
 }
-*/
 void LanesLexicon::searchForText() {
   SETTINGS
   settings.beginGroup("TextSearch");
@@ -3386,39 +3381,7 @@ void LanesLexicon::searchForText() {
     QPair<bool,bool> tabOpts = d->tabOptions();  // first = new,second = go
     int n = w->search();
     if (n == 0) {
-      statusMessage(QString(tr("Search for \"%1\" - pattern not found")).arg(o.target));
-      switch(searchAgainAction) {
-      case TextSearchDialog::SearchAgainYes :
-      case TextSearchDialog::SearchAgainNo : {
-      QMessageBox msg;
-
-      msg.setObjectName("wordnotfound");
-      msg.setTextFormat(Qt::RichText);
-      QString str = getLexicon()->scanAndStyle(o.target,"messagebox");
-      msg.setWindowTitle(tr("Text Search"));
-      msg.setText(QString("<html><body><div><p>%1</p><p style=\"font-weight:bold;margin-left:20px\">%2</p><p>%3</p>\
-      <p>%4</p></div></body></html>")
-                    .arg(tr("Search for:"))
-                    .arg(str)
-                    .arg(tr("Pattern not found."))
-                    .arg(tr("New search?")));
-
-        msg.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
-        if (searchAgainAction == TextSearchDialog::SearchAgainYes) {
-          msg.setDefaultButton(QMessageBox::Yes);
-        }
-        else {
-          msg.setDefaultButton(QMessageBox::No);
-        }
-        int ret = msg.exec();
-        if (ret == QMessageBox::Yes) {
-          showSearchDialog = true;
-        }
-        break;
-      }
-      case TextSearchDialog::Nothing : break;
-        default: break;
-      }
+      showSearchDialog = searchFailure(SearchOptions::Word,searchAgainAction,o.target);
     }
     else {
       int ix = this->addTab(tabOpts.first,w,QString(tr("Search for: %1")).arg(o.target));

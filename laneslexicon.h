@@ -280,6 +280,7 @@ class LanesLexicon : public QMainWindow
 
       bool copyRecursively(const QString &,const QString &,int *);
 
+      bool searchFailure(int /* search type */,int /* searchagain action */,const QString &);
       //    QAction * createIconAction(const QString imgdir,const QString & iconfile,const QString & text);
       /// look through all tabs for the given node, -1 if not found, else tab index
 
