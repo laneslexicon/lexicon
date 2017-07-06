@@ -46,7 +46,7 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   fulllayout->addRow(tr("Context style"),m_contextStyle);
   fulllayout->addRow(tr("One row for each entry"),m_textSummary);
   fulllayout->addRow(tr("Mark/clear selections for current page"),m_textCurrentPage);
-  fulllayout->addRow(tr("Progress interval"),m_textStep);
+  fulllayout->addRow(tr("Progress update interval"),m_textStep);
   fulllayout->addRow(tr("Default button 'Yes' on search failure"),m_textRepeat);
   QPushButton * fullbtn = new QPushButton(tr("Set"));
   this->setControlSize(fullbtn,MEDIUM_EDIT);
@@ -72,9 +72,9 @@ FindOptions::FindOptions(const QString & theme,QWidget * parent) : OptionsWidget
   m_nodeinfoClose = new QCheckBox;
   m_nodeinfoForce = new QCheckBox;
   QFormLayout * headlayout = new QFormLayout;
-  headlayout->addRow(tr("Step interval"),m_headStep);
+  headlayout->addRow(tr("Progress udpate interval"),m_headStep);
   headlayout->addRow(tr("Close entry info after load"),m_nodeinfoClose);
-  headlayout->addRow(tr("Entry info force new tab"),m_nodeinfoForce);
+  headlayout->addRow(tr("Show entry info forces new tab"),m_nodeinfoForce);
   QPushButton * headbtn = new QPushButton(tr("Set"));
   QHBoxLayout * setlayout2 = new QHBoxLayout;
   setlayout2->addWidget(headbtn);
