@@ -40,7 +40,7 @@ class TextSearchDialog : public QDialog {
   SearchOptions searchOptions() const; // this returns everything including headphrase and highlight all
   void fromOptions(SearchOptions &);   // set widgets from options
   QPair<bool,bool> tabOptions() const;
-  enum NotFound_t { SearchAgainYes , SearchAgainNo, Nothing };
+  enum NotFound_t { SearchAgainYes , SearchAgainNo, SearchDialog, Nothing };
     public slots:
     void showKeyboard();
     void loadKeymap(const QString &);

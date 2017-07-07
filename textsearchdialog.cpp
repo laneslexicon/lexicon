@@ -521,6 +521,7 @@ QStringList TextSearchDialog::failureActions() {
   QStringList s;
   s << tr("Search again dialog, default Yes");
   s << tr("Search again dialog, default No");
+  s << tr("Search dialog and status message");
   s << tr("No dialog, status message only");
   return s;
 }

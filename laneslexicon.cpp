@@ -3368,6 +3368,9 @@ bool LanesLexicon::searchFailure(int searchType,const QString & pattern) {
     }
     break;
   }
+  case TextSearchDialog::SearchDialog : {
+    return true;
+  }
   case TextSearchDialog::Nothing : break;
   default: break;
   }
