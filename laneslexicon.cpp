@@ -4461,10 +4461,13 @@ void LanesLexicon::showHelp(const QString & sect,const QString & para ) {
   QString section = sect.toLower();
   QString url;
   if (m_siteMap.contains(section)) {
-    QString url = m_siteMap.value(section);
+    url = m_siteMap.value(section);
     if (! para.isEmpty()) {
       url = QString("%1#%2").arg(url).arg(para);
     }
+  }
+  else {
+    QLOG_INFO() << QString("Help system: unknown section %1").arg(sect);
   }
   if (m_helpview == NULL) {
     QLOG_DEBUG() << Q_FUNC_INFO << "initialising help system" << url;
