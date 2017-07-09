@@ -60,7 +60,7 @@ class TextSearchDialog : public QDialog {
     QGridLayout * m_form;
     int m_count;
     int m_type;
-
+    bool m_helpClose;                    // close dialog on help button
     KeyboardWidget * m_keyboard;
     QLabel * m_text;
     bool m_attached;

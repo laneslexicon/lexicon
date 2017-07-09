@@ -238,6 +238,9 @@ void TextSearchDialog::setText(const QString & t) {
 void TextSearchDialog::onHelp() {
   QLOG_DEBUG() << Q_FUNC_INFO << this->metaObject()->className();
   emit(showHelp(this->metaObject()->className()));
+  if (m_helpClose) {
+    this->close();
+  }
 }
 void TextSearchDialog::onTextChanged(const QString & txt) {
   //  QLOG_DEBUG() << Q_FUNC_INFO << txt;
@@ -357,6 +360,7 @@ void TextSearchDialog::readSettings() {
   m_keymapButton->setChecked(enabled);
   settings.endGroup();
   settings.beginGroup("TextSearch");
+  m_helpClose = settings.value(SID_TEXTSEARCH_CLOSE_HELP,true).toBool();
   m_wholeWord->setChecked(settings.value(SID_TEXTSEARCH_WHOLE_WORD,false).toBool());
   m_ignoreCase->setChecked(settings.value(SID_TEXTSEARCH_IGNORE_CASE,true).toBool());
   m_ignoreDiacritics->setChecked(settings.value(SID_TEXTSEARCH_DIACRITICS,true).toBool());
@@ -400,6 +404,7 @@ void TextSearchDialog::readSettings() {
 
   settings.beginGroup("Search");
   m_showKeymap.insert(SearchOptions::Root,settings.value(SID_ROOTSEARCH_KEYMAP_BUTTON,false).toBool());
+
   settings.endGroup();
 
 
