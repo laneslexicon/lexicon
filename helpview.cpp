@@ -79,6 +79,42 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
  *
  * @return
  */
+QUrl HelpView::sectionToUrl(const QString& section) {
+  QString prefix;
+  QString location;
+  QUrl url;
+  if (section.isEmpty()) {
+    return QUrl();
+  }
+  if (m_localSource) {
+    prefix = m_localPrefix;
+    location = m_localRoot;
+    if (section.endsWith("index.html")) {
+      QFileInfo fi(m_localRoot + QDir::separator() + section);
+      url = QUrl::fromLocalFile(fi.absoluteFilePath());
+    }
+    else {
+      QFileInfo fi(m_localRoot + QDir::separator() + "index.html");
+      url = QUrl::fromLocalFile(fi.absoluteFilePath());
+    }
+  }
+  else {
+    prefix = m_onlinePrefix;
+    location = m_onlineRoot;
+    QString s("/");
+    if (section.startsWith("/")) {
+      s.clear();
+    }
+    url = QUrl(m_onlinePrefix + m_onlineRoot + s + section);
+  }
+
+  qDebug() << "--------------------------------";
+  qDebug() << section;
+  qDebug() << url.toString();
+  qDebug() << "--------------------------------";
+
+  return url;
+}
 bool HelpView::loadHelpSystem(const QString & section) {
   QLOG_DEBUG() << Q_FUNC_INFO << section;
   /**
@@ -88,6 +124,11 @@ bool HelpView::loadHelpSystem(const QString & section) {
    * If there is a problem loading the page, it seems to default to about:blank, so
    * check for this as well.
    */
+  if (! section.isEmpty()) {
+    m_currentLocalPage.clear();
+    m_currentOnlinePage.clear();
+  }
+  QUrl url = sectionToUrl(section);
 
   if (m_localSource && ! m_currentLocalPage.isEmpty()) {
     QFileInfo cp(m_currentLocalPage.toLocalFile());
@@ -101,28 +142,30 @@ bool HelpView::loadHelpSystem(const QString & section) {
   QString location;
   QUrl startPage;
   if (! section.isEmpty()) {
-    startPage = QUrl(section);
+    startPage = sectionToUrl(section);
   }
-  if (m_localSource) {
-    prefix = m_localPrefix;
-    location = m_localRoot;
-    startPage = m_currentLocalPage;
-  }
-  else {
-    prefix = m_onlinePrefix;
-    location = m_onlineRoot;
-    startPage = m_currentOnlinePage;
-  }
-  if (startPage.isEmpty() || (startPage == QUrl("about:blank"))) {
+  if (! startPage.isValid()) {
     if (m_localSource) {
-      if (location.endsWith(QDir::separator())) {
-        location.chop(1);
-      }
-      QFileInfo fi(m_localRoot + QDir::separator() + "index.html");
-      startPage = QUrl::fromLocalFile(fi.absoluteFilePath());
+      prefix = m_localPrefix;
+      location = m_localRoot;
+      startPage = m_currentLocalPage;
     }
     else {
-      startPage = QUrl(prefix + "/" + "index.html");
+      prefix = m_onlinePrefix;
+      location = m_onlineRoot;
+      startPage = m_currentOnlinePage;
+    }
+    if (startPage.isEmpty() || (startPage == QUrl("about:blank"))) {
+      if (m_localSource) {
+	if (location.endsWith(QDir::separator())) {
+	  location.chop(1);
+	}
+	QFileInfo fi(m_localRoot + QDir::separator() + "index.html");
+	startPage = QUrl::fromLocalFile(fi.absoluteFilePath());
+      }
+      else {
+	startPage = QUrl(prefix + "/" + "index.html");
+      }
     }
   }
   m_currentUrl = startPage;
@@ -161,6 +204,7 @@ void HelpView::linkclick(const QUrl & url) {
     QDesktopServices::openUrl(url);
     return;
   }
+  // check starts with http
   if (! m_localSource) {
     if (url.host() !=  QUrl(m_onlinePrefix).host()) {
       QDesktopServices::openUrl(url);
@@ -172,6 +216,7 @@ void HelpView::linkclick(const QUrl & url) {
     str.chop(1);
   }
   QUrl f(str + QDir::separator() + "index.html");
+  QLOG_DEBUG() << Q_FUNC_INFO << "load page" << f.toString();
   m_view->load(f);
 #else
       QDesktopServices::openUrl(url);

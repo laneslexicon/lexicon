@@ -56,6 +56,8 @@ class HelpView : public QWidget {
   bool isLoaded() const;
   bool isOffline() const;
   QUrl lastWishes() const;
+  QUrl sectionToUrl(const QString& section);
+  
   bool loadHelpSystem(const QString & section = QString());
   public slots:
     void linkclick(const QUrl &);
