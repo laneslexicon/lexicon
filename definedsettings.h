@@ -246,7 +246,7 @@ They should not be translated.
 #define SID_TEXTSEARCH_DIALOG_POS              "Pos"
 #define SID_TEXTSEARCH_FAILURE_ACTION          "Search again action"
 #define SID_TEXTSEARCH_KEYMAP_BUTTON           "Show keymap button"
-
+#define SID_TEXTSEARCH_CLOSE_HELP              "Close dialog on help"
 #define SID_ROOTSEARCH_NEW_TAB                 "Root new tab"
 #define SID_ROOTSEARCH_GO_TAB                  "Root activate tab"
 #define SID_ROOTSEARCH_KEYMAP_BUTTON           "Show keymap button"
