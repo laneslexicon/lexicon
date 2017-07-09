@@ -3103,7 +3103,7 @@ void LanesLexicon::onShowHistory() {
   return;
 }
 void LanesLexicon::onDocs() {
-
+  QLOG_DEBUG() << Q_FUNC_INFO;
   SETTINGS
 
   settings.beginGroup("System");
@@ -4453,26 +4453,35 @@ bool LanesLexicon::sanityCheck(int type) {
 }
 /**
  * For the optionsdialogs, section is metaObect()->className()
- *
+ * m_sitemap has the keys from sitemap.ini (all converted to lowercase)
  * @param section - used as a key for the sitemap from which we get the URL
  */
-void LanesLexicon::showHelp(const QString & section,const QString & para ) {
-  QLOG_DEBUG() << Q_FUNC_INFO << section << para;
-  if (m_helpview == NULL) {
-    m_helpview = new HelpView();
-    connect(m_helpview,SIGNAL(finished(bool)),this,SLOT(onHelpLoaded(bool)));
-    //    connect(m_helpview,SIGNAL(helpSystemLoaded(bool)),this,SLOT(onHelpSystemLoaded(bool)));
-    m_helpview->loadHelpSystem();
-  }
-
-  if (m_siteMap.contains(section.toLower())) {
-    QString url = m_siteMap.value(section.toLower());
+void LanesLexicon::showHelp(const QString & sect,const QString & para ) {
+  QLOG_DEBUG() << Q_FUNC_INFO << sect << para;
+  QString section = sect.toLower();
+  QString url;
+  if (m_siteMap.contains(section)) {
+    QString url = m_siteMap.value(section);
     if (! para.isEmpty()) {
       url = QString("%1#%2").arg(url).arg(para);
     }
+  }
+  if (m_helpview == NULL) {
+    QLOG_DEBUG() << Q_FUNC_INFO << "initialising help system" << url;
+    m_helpview = new HelpView();
+    connect(m_helpview,SIGNAL(finished(bool)),this,SLOT(onHelpLoaded(bool)));
+    m_helpview->loadHelpSystem(url);
+    // added because when initially loading help system from the search dialogs
+    // don't understand why this should be necessary
+    m_helpview->show();
+    m_helpview->activateWindow();
+    return;
+  }
+  if (! url.isEmpty()) {
     m_helpview->showSection(url);
   }
-  m_helpview->setFocus();
+  m_helpview->show();
+  setFocus();
 }
 void LanesLexicon::onDeleteTheme() {
   DeleteThemeDialog d;

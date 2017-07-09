@@ -79,7 +79,8 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
  *
  * @return
  */
-bool HelpView::loadHelpSystem() {
+bool HelpView::loadHelpSystem(const QString & section) {
+  QLOG_DEBUG() << Q_FUNC_INFO << section;
   /**
    * check the current page points to an actual file. e.g. when the saved page url is out
    * of date after documentation changes
@@ -99,6 +100,9 @@ bool HelpView::loadHelpSystem() {
   QString prefix;
   QString location;
   QUrl startPage;
+  if (! section.isEmpty()) {
+    startPage = QUrl(section);
+  }
   if (m_localSource) {
     prefix = m_localPrefix;
     location = m_localRoot;
@@ -281,16 +285,18 @@ void HelpView::loadFinished(bool ok) {
     emit(helpSystemLoaded(ok));
   }
   if (ok) {
-    this->showNormal();
-    m_view->show();
+    QLOG_DEBUG() << Q_FUNC_INFO << "showing" << m_view->url();
 #ifdef HELP_WEBKIT
     m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 #endif
     m_forwardButton->setEnabled(m_view->page()->history()->canGoForward());
     m_backButton->setEnabled(m_view->page()->history()->canGoBack());
+    m_view->show();
+    this->show();
+    this->activateWindow();
   }
   else {
-    QLOG_INFO() << "Load failed";
+    QLOG_INFO() << "Page load failed";
   }
   if (! m_initialPage ) {
     emit(finished(ok));
@@ -363,7 +369,6 @@ void HelpView::showSection(const QString & section) {
     m_stack << m_currentUrl;
     return;
   }
-
   m_view->load(startPage);
   m_view->show();
 #endif
