@@ -7,7 +7,7 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   setObjectName("helpview");
   setWindowTitle(tr("Documentation"));
   QVBoxLayout * layout = new QVBoxLayout;
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+#ifndef HELP_NONE
   m_forwardButton = new QPushButton(QIcon(QPixmap(":/qrc/arrow-right.svg")),tr("Forward"));
   m_backButton = new QPushButton(QIcon(QPixmap(":/qrc/arrow-left.svg")),tr("Back"));
   m_closeButton = new QPushButton(QIcon(QPixmap(":/qrc/window-close.svg")),tr("Close"));
@@ -24,16 +24,24 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   layout->addLayout(btnlayout);
 
 
-
+#ifdef HELP_WEBKIT
   m_view = new QWebView(this);
+#endif
+#ifdef HELP_WEBENGINE
+  m_view = new QWebEngineView(this);
+#endif
+#ifdef HELP_NONE
+  m_view = new QWidget
+#endif
 
   layout->addWidget(m_view);
   setLayout(layout);
   m_initialPage = true;
   m_timer = 0;
   m_progress = 0;
-
+#ifdef HELP_WEBKIT
   connect(m_view,SIGNAL(linkClicked(const QUrl &)),this,SLOT(linkclick(const QUrl &)));
+#endif  
   //  connect(btns, SIGNAL(rejected()), this, SLOT(onClose()));
   connect(m_view,SIGNAL(loadProgress(int)),this,SLOT(loadProgress(int)));
   connect(m_view,SIGNAL(loadStarted()),this,SLOT(loadStarted()));
@@ -115,9 +123,11 @@ bool HelpView::loadHelpSystem() {
   }
   m_currentUrl = startPage;
   QLOG_DEBUG() << Q_FUNC_INFO << "Loading initial page" << startPage;
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+#ifndef HELP_NONE
   m_view->load(startPage);
+#ifdef HELP_WEBKIT  
   m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+#endif
   m_forwardButton->setEnabled(false);
   m_backButton->setEnabled(false);
 #else
@@ -130,9 +140,14 @@ HelpView::~HelpView() {
   QLOG_DEBUG() << Q_FUNC_INFO;
   writeSettings();
 }
+/**
+ * the url sometimes is not an actual Url, but needs to have index.html added
+ *
+ * @param url
+ */
 void HelpView::linkclick(const QUrl & url) {
   QLOG_DEBUG() << Q_FUNC_INFO << url;
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+#ifndef HELP_NONE
   /**
    *  external links opened via QDesktopServices
    *
@@ -192,7 +207,7 @@ void HelpView::readSettings() {
  */
 void HelpView::writeSettings() {
   SETTINGS
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+#ifndef HELP_NONE
   settings.beginGroup("Help");
   settings.setValue(SID_HELP_SIZE, size());
   settings.setValue(SID_HELP_POS, pos());
@@ -226,8 +241,7 @@ void HelpView::loadProgress(int x) {
   }
 }
 void HelpView::loadStarted() {
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
-
+#ifndef HELP_NONE
   if (m_initialPage) {
     this->showMinimized();
     m_progress = new QProgressDialog(tr("Loading ..."), tr("Cancel"), 0, 100);
@@ -246,9 +260,11 @@ void HelpView::loadStarted() {
  *
  * @param ok
  */
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+#ifdef HELP_NONE
+void HelpView::loadFinished(bool /* ok */) {
+}
+#else
 void HelpView::loadFinished(bool ok) {
-
   QLOG_DEBUG() << Q_FUNC_INFO << m_view->url() << ok;
   if (m_initialPage) {
     this->showNormal();
@@ -267,7 +283,9 @@ void HelpView::loadFinished(bool ok) {
   if (ok) {
     this->showNormal();
     m_view->show();
+#ifdef HELP_WEBKIT
     m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+#endif
     m_forwardButton->setEnabled(m_view->page()->history()->canGoForward());
     m_backButton->setEnabled(m_view->page()->history()->canGoBack());
   }
@@ -277,9 +295,6 @@ void HelpView::loadFinished(bool ok) {
   if (! m_initialPage ) {
     emit(finished(ok));
   }
-}
-#else
-void HelpView::loadFinished(bool /* ok */) {
 }
 #endif
 bool HelpView::isLoaded() const {
@@ -303,14 +318,14 @@ void HelpView::showEvent(QShowEvent * event) {
   QWidget::showEvent(event);
 }
 void HelpView::onPageForward() {
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+#ifndef HELP_NONE
   if (m_view->page()->history()->canGoForward()) {
     m_view->page()->history()->forward();
   }
 #endif
 }
 void HelpView::onPageBack() {
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+#ifndef HELP_NONE
   if (m_view->page()->history()->canGoBack()) {
     m_view->page()->history()->back();
   }
@@ -342,7 +357,7 @@ void HelpView::showSection(const QString & section) {
   }
   QLOG_DEBUG() << Q_FUNC_INFO << "Loading section" << section << startPage;
   /// save the requested url so if it fails
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+#ifndef HELP_NONE
   m_currentUrl = startPage;
   if ( m_initialPage ) {
     m_stack << m_currentUrl;
@@ -351,7 +366,8 @@ void HelpView::showSection(const QString & section) {
 
   m_view->load(startPage);
   m_view->show();
-#else
+#endif
+#ifdef HELP_NONE
   QLOG_DEBUG() << "section via desktopservices" << startPage;
   QDesktopServices::openUrl(startPage);
 #endif

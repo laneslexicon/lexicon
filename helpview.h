@@ -8,10 +8,16 @@
 #include <QLabel>
 #include <QSettings>
 #include <QtGlobal>
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+#ifdef HELP_WEBKIT
 #include <QtWebKitWidgets/QWebView>
 #include <QtWebKitWidgets/QWebPage>
 #include <QWebHistoryItem>
+#endif
+#ifdef HELP_WEBENGINE
+#include <QWebEngineView>
+#include <QWebEnginePage>
+#include <QWebEngineHistory>
+#include <QWebEngineHistoryItem>
 #endif
 #include <QUrl>
 #include <QFile>
@@ -38,9 +44,13 @@ class HelpView : public QWidget {
  public:
   HelpView(QWidget * parent = 0);
   ~HelpView();
-#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 1))
+#ifdef HELP_WEBKIT
   QWebView * m_view;
-#else
+#endif
+#ifdef HELP_WEBENGINE
+  QWebEngineView * m_view;
+#endif
+#ifdef HELP_NONE
   QWidget * m_view;
 #endif
   bool isLoaded() const;

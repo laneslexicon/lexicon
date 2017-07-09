@@ -5,17 +5,46 @@
 # is available on freeBSD the help system can be
 # rewritten to use it.
 #-------------------------------------------------
-QT       += core gui printsupport
-equals(QT_MAJOR_VERSION,5):lessThan(QT_MINOR_VERSION,7) { QT       += webkitwidgets }
-lessThan(QT_MAJOR_VERSION,5) { QT       += webkitwidgets }
+lessThan(QT_MAJOR_VERSION,5) {
+error("This software requires Qt 5.0 or greater")
+}
+QT       += widgets
 QT       += xml
 QT       += sql
 QT       += svg
+QT       += core gui printsupport
+#
+#  Webkit for < 5.7
+#  WebEngine > 5.7
+#  Nothing = 5.7   for FreeBSD 5.7 webengine was not ported (I think)
+#
+equals(QT_MAJOR_VERSION,5) {
+lessThan(QT_MINOR_VERSION,7) {
+QT    += webkitwidgets
+DEFINES += HELP_WEBKIT
+}
+equals(QT_MINOR_VERSION,7) {
+freebsd {
+DEFINES += HELP_NONE
+}
+! freebsd {
+DEFINES += HELP_WEBKIT
+}
+}
+greaterThan(QT_MINOR_VERSION,7) {
+QT += webenginewidgets
+DEFINES += HELP_WEBENGINE
+}
+}
+greaterThan(QT_MAJOR_VERSION,5): {
+QT += webenginewidgets
+DEFINES += HELP_WEBENGINE
+}
+
 CONFIG   += release
 CONFIG   += libxslt
 QMAKE_CXXFLAGS += -g
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = laneslexicon
 TEMPLATE = app
 ! exists ("version.cpp") {
