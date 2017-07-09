@@ -3,6 +3,38 @@
 #include "externs.h"
 #include "definedsettings.h"
 #include "QsLog.h"
+#ifdef HELP_WEBENGINE
+void HelpPage::setLocal(bool v) {
+  m_local = v;
+}
+/*
+  this is an ugly work around. The links in the documentation point to directories, not files.
+  With http urls this does not matter because it automagically looks for the index.html, 
+  but when the url is file:/// the fail loads. So we save the attempted url and in the loadFinished()
+  check for failure and then retry with the saved and fixed url
+ */
+bool HelpPage::acceptNavigationRequest(const QUrl & url, NavigationType type, bool /* isMainFrame */)  {
+  QLOG_DEBUG() << Q_FUNC_INFO << url;
+  if (type == QWebEnginePage::NavigationTypeLinkClicked) {
+    if (m_local) {
+      QString str = url.toString();
+      if (str.endsWith("index.html")) {
+	return true;
+      }
+      m_url = str;
+      if (! str.endsWith("/")) {
+	m_url += "/";
+      }
+      m_url += "index.html";
+      return false;
+      }
+    }
+  return true;
+}
+QUrl HelpPage::getLocalUrl() const {
+  return QUrl(m_url);
+}
+#endif
 HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   setObjectName("helpview");
   setWindowTitle(tr("Documentation"));
@@ -47,6 +79,11 @@ HelpView::HelpView(QWidget * parent) : QWidget(parent) {
   connect(m_view,SIGNAL(loadStarted()),this,SLOT(loadStarted()));
   connect(m_view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
   readSettings();
+#ifdef HELP_WEBENGINE
+  HelpPage *h = new HelpPage;
+  h->setLocal(m_localSource);
+  m_view->setPage(h);
+#endif
 
 
 #else
@@ -107,12 +144,12 @@ QUrl HelpView::sectionToUrl(const QString& section) {
     }
     url = QUrl(m_onlinePrefix + m_onlineRoot + s + section);
   }
-
+  /*
   qDebug() << "--------------------------------";
   qDebug() << section;
   qDebug() << url.toString();
   qDebug() << "--------------------------------";
-
+  */
   return url;
 }
 bool HelpView::loadHelpSystem(const QString & section) {
@@ -315,7 +352,7 @@ void HelpView::loadFinished(bool /* ok */) {
 #else
 void HelpView::loadFinished(bool ok) {
   QLOG_DEBUG() << Q_FUNC_INFO << m_view->url() << ok;
-  if (m_initialPage) {
+  if (ok && m_initialPage) {
     this->showNormal();
     m_view->show();
     m_initialPage = false;
@@ -330,7 +367,7 @@ void HelpView::loadFinished(bool ok) {
     emit(helpSystemLoaded(ok));
   }
   if (ok) {
-    QLOG_DEBUG() << Q_FUNC_INFO << "showing" << m_view->url();
+    //    QLOG_DEBUG() << Q_FUNC_INFO << "showing" << m_view->url();
 #ifdef HELP_WEBKIT
     m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 #endif
@@ -341,7 +378,18 @@ void HelpView::loadFinished(bool ok) {
     this->activateWindow();
   }
   else {
-    QLOG_INFO() << "Page load failed";
+#ifdef HELP_WEBENGINE
+    if (m_localSource) {
+      HelpPage * p = qobject_cast<HelpPage *>(m_view->page());
+      if (p) {
+	QUrl u = p->getLocalUrl();
+	if (u.isValid()) {
+	  m_view->load(u);
+	  return;
+	}
+      }
+    }
+#endif
   }
   if (! m_initialPage ) {
     emit(finished(ok));
@@ -365,7 +413,6 @@ void HelpView::onCancel() {
     emit(finished(false));
 }
 void HelpView::showEvent(QShowEvent * event) {
-  //  qDebug() << Q_FUNC_INFO << m_initialPage;
   QWidget::showEvent(event);
 }
 void HelpView::onPageForward() {

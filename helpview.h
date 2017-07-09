@@ -39,6 +39,19 @@ class NoHelp : QWidget {
   void load(const QString &);
 };
 */
+#ifdef HELP_WEBENGINE
+class HelpPage : public QWebEnginePage {
+  Q_OBJECT
+ public:
+  void setLocal(bool v);
+  QUrl getLocalUrl() const;
+ protected:
+  bool acceptNavigationRequest(const QUrl &, NavigationType type, bool isMainFrame);
+ private:
+  bool m_local;
+  QString m_url;
+};
+#endif
 class HelpView : public QWidget {
   Q_OBJECT
  public:
