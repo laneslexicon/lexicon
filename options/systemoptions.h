@@ -62,7 +62,7 @@ class SystemOptions : public OptionsWidget {
     QLineEdit * m_offlineLocation;
     QLineEdit * m_offlineCurrentPage;
     QCheckBox * m_localDocs;
-
+    QCheckBox * m_closeModal;
     QRadioButton * m_insertNewTab;
     QRadioButton * m_appendNewTab;
 
