@@ -24,6 +24,7 @@ EnsearchWidget::EnsearchWidget(QWidget * parent) : QWidget(parent) {
   connect(m_search,SIGNAL(showNode(const QString &,bool)),this,SIGNAL(showNode(const QString &,bool)));
   connect(m_search,SIGNAL(printNode(const QString &)),this,SIGNAL(printNode(const QString &)));
   connect(m_search,SIGNAL(statusMessage(const QString &)),this,SIGNAL(statusMessage(const QString &)));
+  connect(m_search,SIGNAL(showHelp(const QString &)),this,SIGNAL(showHelp(const QString &)));
 }
 QSize EnsearchWidget::sizeHint() const {
   return QSize(800,400);

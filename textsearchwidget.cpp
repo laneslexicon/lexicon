@@ -48,6 +48,8 @@ TextSearchWidget::TextSearchWidget(QWidget * parent) : QWidget(parent) {
 
   hlayout->addStretch();
 
+  m_helpButton = new QPushButton(tr("Help"));
+  hlayout->addWidget(m_helpButton);
   m_exportButton = new QPushButton(tr("Export"));
   hlayout->addWidget(m_exportButton);
   layout->addLayout(hlayout);
@@ -66,6 +68,8 @@ TextSearchWidget::TextSearchWidget(QWidget * parent) : QWidget(parent) {
   QHBoxLayout * selectionslayout = new QHBoxLayout;
   selectionslayout->addWidget(groupbox);
   selectionslayout->addStretch();
+  m_helpButton = new QPushButton(tr("Help"));
+  selectionslayout->addWidget(m_helpButton);
   layout->addLayout(selectionslayout);
 
 
@@ -104,6 +108,7 @@ TextSearchWidget::TextSearchWidget(QWidget * parent) : QWidget(parent) {
           this,SLOT(itemDoubleClicked(QTableWidgetItem * )));
   connect(m_results,SIGNAL(cellDoubleClicked(int,int)),this,SLOT(onCellDoubleClicked(int,int)));
   connect(m_exportButton,SIGNAL(clicked()),this,SLOT(onExport()));
+ connect(m_helpButton,SIGNAL(clicked()),this,SLOT(onHelp()));
 
   connect(m_data,SIGNAL(exportRecord(int,int)),this,SLOT(exportRecord(int,int)));
   connect(m_page,SIGNAL(currentIndexChanged(const QString &)),this,SLOT(pageChanged(const QString &)));
@@ -555,4 +560,8 @@ void TextSearchWidget::showEmpty(const QString & text) {
   m_markAll->setEnabled(false);
   m_thisPage->setEnabled(false);
   m_summaryTable->setEnabled(false);
+}
+void TextSearchWidget::onHelp() {
+   QLOG_DEBUG() << Q_FUNC_INFO << this->metaObject()->className();
+   emit(showHelp(this->metaObject()->className()));
 }

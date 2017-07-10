@@ -55,8 +55,10 @@ TextSearchDialog::TextSearchDialog(QWidget * parent,Qt::WindowFlags f) :
   button->setText(tr("&Cancel"));
   m_buttonBox->addButton(m_keyboardButton, QDialogButtonBox::ActionRole);
   m_buttonBox->addButton(m_keymapButton, QDialogButtonBox::ActionRole);
+  /*
   QPushButton * helpbutton = m_buttonBox->addButton(QDialogButtonBox::Help);
   connect(helpbutton,SIGNAL(clicked()),this,SLOT(onHelp()));
+  */
   m_findButton->setFocus();
 
   connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));

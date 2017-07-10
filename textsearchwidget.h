@@ -49,6 +49,7 @@ class TextSearchWidget : public QWidget {
   QPushButton * m_exportButton;
   QPushButton * m_clearMarks;
   QPushButton * m_markAll;
+  QPushButton * m_helpButton;
   QCheckBox   * m_thisPage;
   bool m_resizeRows;
   bool m_exportAll;
@@ -67,9 +68,11 @@ class TextSearchWidget : public QWidget {
     void onExport();
     void onClear();
     void onMark();
+    void onHelp();
    signals:
       void printNode(const QString &);
       void showNode(const QString &,bool);
       void statusMessage(const QString &);
+      void showHelp(const QString &);
 };
 #endif

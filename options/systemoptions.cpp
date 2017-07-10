@@ -179,7 +179,6 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   connect(locationbutton,SIGNAL(clicked()),this,SLOT(onOfflineLocation()));
   m_offlineCurrentPage = new QLineEdit;
   m_localDocs = new QCheckBox;
-  m_closeModal = new QCheckBox;
   QGroupBox * docgroup = new QGroupBox(tr("Documentation"));
   QFormLayout * doclayout = new QFormLayout;
   doclayout->addRow(tr("Online URL"),m_onlineUrl);
@@ -187,7 +186,6 @@ QHBoxLayout * noteslayout = new QHBoxLayout;
   doclayout->addRow(tr("Offline location"),locationlayout);
   doclayout->addRow(tr("Offline current page"),m_offlineCurrentPage);
   doclayout->addRow(tr("Local documentation"),m_localDocs);
-  doclayout->addRow(tr("On help, close modal dialog"),m_closeModal);
   doclayout->setVerticalSpacing(VERTICAL_SPACING);
   docgroup->setLayout(doclayout);
 
@@ -270,17 +268,12 @@ void SystemOptions::readSettings(bool reload) {
   m_onlineCurrentPage->setText(settings.value(SID_HELP_ONLINE_URL,QUrl()).toUrl().toString());
   m_offlineLocation->setText(settings.value(SID_HELP_LOCAL_LOCATION,"site").toString());
 
-
   QDir dd(m_offlineLocation->text());
   //  QUrl u = settings.value(SID_HELP_LOCAL_URL,QUrl()).toUrl();
   //  m_offlineCurrentPage->setText(dd.relativeFilePath(u.fileName()));
   m_offlineCurrentPage->setText(settings.value(SID_HELP_LOCAL_URL,"index.html").toString());
   //u.tom_offlineLocation->text();
   m_localDocs->setChecked(settings.value(SID_HELP_LOCAL,true).toBool());
-  settings.endGroup();
-  settings.beginGroup("TextSearch");
-  m_closeModal->setChecked(settings.value(SID_TEXTSEARCH_CLOSE_HELP,true).toBool());
-  settings.endGroup();
 
   m_dirty = false;
 }
@@ -357,16 +350,13 @@ void SystemOptions::writeSettings(const QString & fileName) {
   //  settings.setValue(SID_HELP_LOCAL_URL,QUrl::fromLocalFile(fi.absoluteFilePath()));
   settings.setValue(SID_HELP_LOCAL_URL,m_offlineCurrentPage->text());
   settings.setValue(SID_HELP_LOCAL,m_localDocs->isChecked());
-  settings.endGroup();
-  settings.beginGroup("TextSearch");
-  settings.setValue(SID_TEXTSEARCH_CLOSE_HELP,m_closeModal->isChecked());
-  settings.endGroup();
+
    settings.sync();
   m_dirty = false;
   emit(modified(false));
 }
 /**
- * 
+ *
  *
  *
  * @return
@@ -511,12 +501,7 @@ bool SystemOptions::isModified()  {
   if (compare(&settings,SID_HELP_LOCAL,m_localDocs)) {
     m_dirty = true;
   }
-  settings.endGroup();
-  settings.beginGroup("TextSearch");
-  if (compare(&settings,SID_TEXTSEARCH_CLOSE_HELP,m_closeModal)) {
-    m_dirty = true;
-  }
-  settings.endGroup();
+
 
   return m_dirty;
 }

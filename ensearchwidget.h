@@ -39,5 +39,6 @@ class EnsearchWidget : public QWidget {
     void showNode(const QString &,bool);
     void printNode(const QString &);
     void statusMessage(const QString &);
+    void showHelp(const QString &);
 };
 #endif
