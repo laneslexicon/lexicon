@@ -530,7 +530,7 @@ void FindOptions::onSetColor() {
 }
 void FindOptions::onFullDialog() {
   DialogOptions d;
-  d.setWindowTitle(tr("Search Options"));
+  d.setWindowTitle(tr("Text Search Options"));
   d.setChecked(DialogOptions::Tab,m_textNewTab);
   d.setChecked(DialogOptions::Go,m_textGoTab);
   d.setChecked(DialogOptions::Whole,m_textWholeWord);
@@ -554,7 +554,7 @@ void FindOptions::onFullDialog() {
 }
 void FindOptions::onHeadDialog() {
   DialogOptions d;
-  d.setWindowTitle(tr("Search Options"));
+  d.setWindowTitle(tr("Head Search Options"));
   d.setChecked(DialogOptions::Tab,m_headNewTab);
   d.setChecked(DialogOptions::Go,m_headGoTab);
   d.setChecked(DialogOptions::Whole,m_headWholeWord);
@@ -575,7 +575,7 @@ void FindOptions::onHeadDialog() {
 }
 void FindOptions::onLocalDialog() {
   DialogOptions d;
-  d.setWindowTitle(tr("Search Options"));
+  d.setWindowTitle(tr("Local Search Options"));
   d.enableOption(DialogOptions::Tab,false);
   d.enableOption(DialogOptions::Go,false);
   d.setChecked(DialogOptions::Whole,m_localWholeWord);
