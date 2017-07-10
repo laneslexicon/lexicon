@@ -423,7 +423,7 @@ TextOption TextSearchDialog::options() const {
   o.caseSensitive =  ! m_ignoreCase->isChecked();
   o.ignoreDiacritics = m_ignoreDiacritics->isChecked();
   o.regex =  m_regexSearch->isChecked();
-  o.target = m_edit->text();
+  o.target = this->getText();
   return o;
 }
 QPair<bool,bool> TextSearchDialog::tabOptions() const {
