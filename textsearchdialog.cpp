@@ -486,7 +486,7 @@ void TextSearchDialog::setForRoot() {
 void TextSearchDialog::setForHead() {
   m_type = SearchOptions::Entry;
     m_wholeWord->setVisible(true);
-    m_ignoreCase->setVisible(true);
+    m_ignoreCase->setVisible(false);
     m_ignoreDiacritics->setVisible(true);
     m_headPhrase->setVisible(true);
     m_highlightAll->setVisible(false);
