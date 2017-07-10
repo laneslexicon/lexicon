@@ -48,8 +48,6 @@ TextSearchWidget::TextSearchWidget(QWidget * parent) : QWidget(parent) {
 
   hlayout->addStretch();
 
-  m_helpButton = new QPushButton(tr("Help"));
-  hlayout->addWidget(m_helpButton);
   m_exportButton = new QPushButton(tr("Export"));
   hlayout->addWidget(m_exportButton);
   layout->addLayout(hlayout);
