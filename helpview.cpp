@@ -206,7 +206,7 @@ bool HelpView::loadHelpSystem(const QString & section) {
     }
   }
   m_currentUrl = startPage;
-  QLOG_DEBUG() << Q_FUNC_INFO << "Loading initial page" << startPage;
+  QLOG_DEBUG() << Q_FUNC_INFO << "Loading initial page" << startPage << startPage.isValid();
 #ifndef HELP_NONE
   m_view->load(startPage);
 #ifdef HELP_WEBKIT  
@@ -252,9 +252,18 @@ void HelpView::linkclick(const QUrl & url) {
   if (str.endsWith(QDir::separator())) {
     str.chop(1);
   }
+  if ( ! m_localSource) {
+      if (url.isValid()) {
+          m_view->load(url);
+          return;
+      }
+      else {
+          QLOG_WARN() << "Invalid url" << url.toString();
+      }
+     return;
+  }
   QUrl f(str + QDir::separator() + "index.html");
-  QLOG_DEBUG() << Q_FUNC_INFO << "load page" << f.toString();
-  m_view->load(f);
+   m_view->load(f);
 #else
       QDesktopServices::openUrl(url);
       return;
@@ -448,10 +457,11 @@ void HelpView::showSection(const QString & section) {
     }
     QFileInfo fi(m_localRoot + QDir::separator() + section);
     QLOG_DEBUG() << Q_FUNC_INFO << "Loading" << fi.absoluteFilePath();
-    startPage = QUrl(m_localPrefix + fi.absoluteFilePath());
+    startPage = QUrl::fromLocalFile(fi.absoluteFilePath());
   }
   else {
     startPage = QUrl(prefix + "/" + section);
+    QLOG_DEBUG() << "startPage set to" << startPage.toString() << startPage.isValid();
   }
   QLOG_DEBUG() << Q_FUNC_INFO << "Loading section" << section << startPage;
   /// save the requested url so if it fails
