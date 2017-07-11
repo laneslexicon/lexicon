@@ -3271,7 +3271,7 @@ void LanesLexicon::searchForRoot() {
   QLOG_DEBUG() << Q_FUNC_INFO << m_allowDuplicates;
   int ix;
   bool reshow = false;
-  TextSearchDialog * d = new TextSearchDialog;
+  TextSearchDialog * d = new TextSearchDialog(getApp());
   connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   SearchOptions o = LanesLexicon::options(SearchOptions::Root);
   d->fromOptions(o);
@@ -3378,7 +3378,7 @@ bool LanesLexicon::searchFailure(int searchType,const QString & pattern) {
 }
 void LanesLexicon::searchForText() {
   bool showSearchDialog = false;
-  TextSearchDialog * d = new TextSearchDialog();
+  TextSearchDialog * d = new TextSearchDialog(getApp());
   connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
 
   if (d->exec()) {
@@ -3420,7 +3420,7 @@ void LanesLexicon::searchForText() {
  */
 void LanesLexicon::searchForEntry() {
   QLOG_DEBUG() << Q_FUNC_INFO;
-  TextSearchDialog * d = new TextSearchDialog;
+  TextSearchDialog * d = new TextSearchDialog(getApp());
   bool reshow = false;
   connect(d,SIGNAL(showHelp(const QString &)),this,SLOT(showHelp(const QString &)));
   SearchOptions o = LanesLexicon::options(SearchOptions::Entry);
