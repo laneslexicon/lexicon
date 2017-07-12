@@ -128,13 +128,7 @@
                 <li class="toctree-l3"><a href="#overview">Overview</a></li>
                 
             
-                <li class="toctree-l3"><a href="#root">Root</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#full-lexicon-search">Full Lexicon search</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#head-word-search">Head word search</a></li>
+                <li class="toctree-l3"><a href="#text-search">Text search</a></li>
                 
             
                 <li class="toctree-l3"><a href="#saving-the-search-results">Saving the search results</a></li>
@@ -144,7 +138,11 @@
                 
                     <li><a class="toctree-l4" href="#normal-search">Normal search</a></li>
                 
-                    <li><a class="toctree-l4" href="#regular-expression-search">Regular Expression search</a></li>
+            
+                <li class="toctree-l3"><a href="#root">Root</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#head-word-search">Head word search</a></li>
                 
             
                 <li class="toctree-l3"><a href="#search-the-currently-viewed-entry">Search the currently viewed entry</a></li>
@@ -580,49 +578,48 @@
             <div class="section">
               
                 <h3 id="overview">Overview</h3>
-<p>Searching for Arabic text can be restricted to specific contexts by choosing the appropriate method, either from the <em>Search</em> menu or by using the appropriate shortcut:</p>
+<p>The Lexicon may be searched in its entirety for Arabic or non-Arabic text or a mixture of both. Additionally, when searching for Arabic text, the scope of the search can be restricted to either roots or headwords. These three search methods can be invoked either from the <em>Search</em> menu or by using the appropriate shortcut:</p>
 <ul>
+<li>
+<p>Ctrl+S,W       Search for Arabic or non-Arabic text in the entire Lexicon</p>
+</li>
 <li>
 <p>Ctrl+S,R       Search for root</p>
 </li>
 <li>
 <p>Ctrl+S,H       Search for headword</p>
 </li>
+</ul>
+<h3 id="text-search">Text search</h3>
+<p>The text search dialog can be used to enter both Arabic and non-Arabic text. Details on how to enter Arabic text are described <a href="../entering/">here</a>. (If keymaps are not used, the "Keymap disabled" button can be hidden by setting the appropriate options as described <a href="../../options/options_search/">here</a>.)</p>
+<p><img alt="Search Results Arabic" src="../../images/textsearchdialog_ar.png" /></p>
+<p>If the search pattern being entered contains both Arabic and non-Arabic text, the text will forced to display left-to-right. However, the visually correct text will be display immediately underneath, as shown here:</p>
+<p><img alt="Search Dialog Mixed" src="../../images/textsearchdialog_bidi.svg" /></p>
+<p>When searching the entire Lexicon for an Arabic word, the results are presented as shown below:</p>
+<p><img alt="Search Results" src="../../images/textsearch.png" /></p>
+<p>The results are presented in a table consisting of one or more pages. Use the page box to select which page to view. (The number of rows in a page is controlled via the <a href="../../options/options_search/#rowsperpage">search options</a>.)</p>
+<p>The results in the table will show</p>
+<ul>
 <li>
-<p>Ctrl+S,W       search for Arabic word in the body of the text</p>
+<p>one row for every occurrence of the pattern, or</p>
+</li>
+<li>
+<p>one row for each entry in which the pattern is found, with a count per entry shown</p>
 </li>
 </ul>
-<p>There is no method of searching the entire Lexicon for an English word, although you can search the currently displayed root and all its entries for either English or Arabic text.</p>
-<p>When searching for a headword or an Arabic word in the body of the text a number of options are available and are described <a href="#searchoptions">below</a>. Details on how to enter Arabic text are <a href="../entering/">here</a></p>
-<h3 id="root">Root</h3>
-<p>Searching for a root is the simplest (and fastest) search. Only exact matches are considered successful.</p>
-<p><img alt="Root search" src="../../images/rootsearch.png" /></p>
-<p>If found the root and all its children are loaded into either the current or a new tab, depending on the options selected.</p>
-<h3 id="full-lexicon-search">Full Lexicon search</h3>
-<p>When searching the entire Lexicon for an Arabic word, the results are presented as shown below:</p>
-<p><img alt="Search Results" src="../../images/searchresults.png" /></p>
-<p>The "Context" column shows the found text in its text context. To view the full entry with the search result hightlighted either double-click the row or, with the row selected, hit the spacebar or return key. From the result dialog, below, it is possible to print or open the result as a new tab. Any number of these dialogs can be open at once.</p>
+<p>depending on the "One row per entry" checkbox. Changing this does not initiate a new search, but it will remove the any row selections that have been made.</p>
+<p>The "Context" column shows the found text in context. To view the full entry either double-click the row or, with the row selected, hit the spacebar or return key. From the result dialog, shown below, it is possible to print or open the result as a new tab. Any number of these dialogs can be open at once.</p>
 <p><a name="nodeview"></a>
 <img alt="Node View" src="../../images/searchnodeinfo.png" /></p>
-<h3 id="head-word-search">Head word search</h3>
-<p>Head word search has an important option, highlighted below:</p>
-<p><img alt="Head search dialog" src="../../images/headsearchdialog.png" /></p>
-<p><em>Search entry heading</em> refers to the difference between an entry's headword and the full phrase that sometimes marks the entry in Lane's original text. (The distinction is discussed <a href="../diffs/">here</a>.)</p>
-<p>If this option is set, the search will be conducted using the head phrase as a target, otherwise the headword is used.</p>
-<p>The results are returned in a table:</p>
-<p><img alt="Head search results" src="../../images/headsearchresults.png" /></p>
-<p>To view a particular search result either double-click the row or, with the row selected, hit the spacebar or return key. From the viewing dialog, below, it is possible to open the result as a new tab. Any number of these dialogs can be open at once.</p>
-<p><img alt="Head search result view" src="../../images/headsearchresultview.png" /></p>
-<p>(If the <em>close after load</em> checkbox is ticked, the view dialog will be closed after the entry has been loaded into a tab.)</p>
+<p>To select/deselect which columns are shown, double-click on one of the column headers and make the appropriate selections in the dialog box that appears.</p>
 <h3 id="saving-the-search-results">Saving the search results</h3>
-<p>Clicking the <em>Export</em> button in the bottom right of the search results dialog will show the export options. All of the results, or a selection of them, marked by using the checkbox in column 2, can be saved to a text file.</p>
-<p><img alt="Export options" src="../../images/exportresults.png" /></p>
+<p>Clicking the <em>Export</em> button in the bottom right of the search results dialog will show the export options. All or a selection of the results can be exported. Which fields are exported can be changed using the checkboxes and the order of those fields adjusted by selecting, with the mouse, a line in the list and changing its position by using the 'up' and 'down' buttons.</p>
+<p><img alt="Export options" src="../../images/exportdialog.png" /></p>
 <p><a name="searchoptions"></a></p>
 <h3 id="search-options">Search Options</h3>
 <p>There are two types of search:'normal' and 'regular expression' with slightly differing options.</p>
 <h4 id="normal-search">Normal search</h4>
 <p>For a normal search the entered pattern is treated as literal text.</p>
-<p><img alt="SearchDialog" src="../../images/searchdialog.png" /></p>
 <h6 id="ignore-diacritics">Ignore diacritics</h6>
 <p>When checked any diacritics will be ignored. What counts as a diacritic can be set <a href="../../options/options_diacritics/">here.</a></p>
 <p>The default diacritics are:<span class="arabiclarge">
@@ -637,15 +634,26 @@
 &#x0652;&nbsp;&nbsp;&nbsp;&nbsp;
 &#x0670;
 </span></p>
+<h6 id="ignore-case">Ignore case</h6>
+<p>When checked, the search will be case-insensitive (non-Arabic text only);</p>
 <h6 id="whole-word-match">Whole word match</h6>
 <p>The match is successful only when the target is a whole word; patterns embedded within a word do not match. For example, when this option is set searching for <span class="arabic">كت</span> will not match <span class="arabic">كتبن</span> .</p>
-<h4 id="regular-expression-search">Regular Expression search</h4>
-<p>The pattern will be treated as a regular expression.</p>
-<p><img alt="Regular Expression Search Dialog" src="../../images/rx_searchdialog.png" /></p>
-<h6 id="force-ltr">Force LTR</h6>
-<p>Mixing Arabic text and regular expression syntax can be very confusing as the regex constructs e.g. \b (bare word) and \s (space) will change the text direction. With this option set, Arabic text will be displayed left-to-right. (To achieve this the Unicode code point 0x202d (LEFT-TO-RIGHT OVERRIDE) is prepended to the text. It is possible to accidentally remove this character through backspacing. If this happens, unchecking then checking the option will re-insert it.)</p>
-<h6 id="include-head-entries-in-search-results">Include head entries in search results</h6>
-<p>When set, any head word that matches the pattern are included in the search results.</p>
+<h5 id="regular-expression-search">Regular Expression search</h5>
+<p>The pattern will be treated as a regular expression. The author of the software has found during testing that the embedded regular expression engine has some problems with Arabic. To the author's knowledge there are problems with word boundaries "\b" and Arabic text. There may be more.</p>
+<h3 id="root">Root</h3>
+<p>Searching for a root is the simplest (and fastest) search. Only exact matches are considered successful.</p>
+<p><img alt="Root search" src="../../images/rootsearch.png" /></p>
+<p>If found the root and all its children are loaded into either the current or a new tab, depending on the options selected.</p>
+<h3 id="head-word-search">Head word search</h3>
+<p>Head word search has an important option, highlighted below:</p>
+<p><img alt="Head search dialog" src="../../images/headsearch.svg" /></p>
+<p><em>Search head phrase</em> refers to the difference between an entry's headword and the full phrase that sometimes marks the entry in Lane's original text. (The distinction is discussed <a href="../diffs/">here</a>.)</p>
+<p>If this option is set, the search will be conducted using the head phrase as a target, otherwise the headword is used.</p>
+<p>The results are returned in a table:</p>
+<p><img alt="Head search results" src="../../images/headsearchresults.png" /></p>
+<p>To view a particular search result either double-click the row or, with the row selected, hit the spacebar or return key. From the viewing dialog, below, it is possible to open the result as a new tab. Any number of these dialogs can be open at once.</p>
+<p><img alt="Head search result view" src="../../images/headsearchresultview.png" /></p>
+<p>(If the <em>close after load</em> checkbox is ticked, the view dialog will be closed after the entry has been loaded into a tab.)</p>
 <p><a name="searchcurrent"></a></p>
 <h3 id="search-the-currently-viewed-entry">Search the currently viewed entry</h3>
 <p>The currently viewed entry can be searched for Arabic or English text. Local searching can be done either via the context menu, the main menu or via the appropriate shortcut (default, Ctrl+L,F).</p>

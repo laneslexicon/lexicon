@@ -274,28 +274,28 @@
         
             <ul>
             
-                <li class="toctree-l3"><a href="#full-search">Full search</a></li>
+                <li class="toctree-l3"><a href="#text-search">Text search</a></li>
                 
-                    <li><a class="toctree-l4" href="#include-headword">Include headword</a></li>
-                
-                    <li><a class="toctree-l4" href="#headword-text">Headword text</a></li>
+                    <li><a class="toctree-l4" href="#rows-per-page">Rows per page</a></li>
                 
                     <li><a class="toctree-l4" href="#fragment-size">Fragment size</a></li>
                 
                     <li><a class="toctree-l4" href="#context-style">Context style</a></li>
                 
-                    <li><a class="toctree-l4" href="#one-row">One row</a></li>
+                    <li><a class="toctree-l4" href="#one-row-per-entry">One row per entry</a></li>
                 
                     <li><a class="toctree-l4" href="#progress-interval">Progress interval</a></li>
+                
+                    <li><a class="toctree-l4" href="#search-failure-action">Search failure action</a></li>
                 
                     <li><a class="toctree-l4" href="#dialog-options">Dialog options</a></li>
                 
             
                 <li class="toctree-l3"><a href="#head-word-search">Head word search</a></li>
                 
-                    <li><a class="toctree-l4" href="#use-head-phrase">Use head phrase</a></li>
+                    <li><a class="toctree-l4" href="#close-after-load">Close after load</a></li>
                 
-                    <li><a class="toctree-l4" href="#dialog-options_1">Dialog options</a></li>
+                    <li><a class="toctree-l4" href="#use-head-phrase">Use head phrase</a></li>
                 
             
                 <li class="toctree-l3"><a href="#local-search">Local search</a></li>
@@ -587,16 +587,15 @@
             <div class="section">
               
                 <p><img alt="Search" src="../../images/options_search.png" /></p>
-<h3 id="full-search">Full search</h3>
-<h5 id="include-headword">Include headword</h5>
-<p>When set, any matches against headword will be included in the results.</p>
-<h5 id="headword-text">Headword text</h5>
-<p>If the "Include headword" option is set, the text shown here will appear in the "Context" column of the search rsults.</p>
+<h3 id="text-search">Text search</h3>
+<p><a name="rowsperpage"></a></p>
+<h5 id="rows-per-page">Rows per page</h5>
+<p>Sets the maximum number of rows in a page. If this is set to a high-number, there may be a noticeable "hang" while the table is being loaded.</p>
 <h5 id="fragment-size">Fragment size</h5>
 <p>The context column shows found text in its context. This setting controls how many characters either side of the found text are to be shown in the context column.</p>
 <h5 id="context-style">Context style</h5>
 <p>This CSS fragment sets the appearance of the non-Arabic text in the context column. The Arabic text is controlled <a href="../options_spanned/#arabiccontext">here</a>.</p>
-<h5 id="one-row">One row</h5>
+<h5 id="one-row-per-entry">One row per entry</h5>
 <p>When the searched for text appears in an individual entry multiple times:</p>
 <ul>
 <li>
@@ -607,14 +606,25 @@
 </li>
 </ul>
 <h5 id="progress-interval">Progress interval</h5>
-<p>How frequently the progress bar is updating.</p>
+<p>Determines how frequently the progress bar is updated.</p>
+<p><a name="failure"></a></p>
+<h5 id="search-failure-action">Search failure action</h5>
+<p>Controls what happens when a search returns no results.</p>
+<ul>
+<li>Show a search again dialog, default button 'yes'</li>
+<li>Show a search again dialog, default button 'no'</li>
+<li>Show the text search dialog, report search failure in status area</li>
+<li>Show nothing, report search failure in status area</li>
+</ul>
 <h5 id="dialog-options">Dialog options</h5>
 <p><img alt="Dialog options" src="../../images/options_search_optsdialog.png" /></p>
-<p>Use this dialog to set the default search options.</p>
+<p>Setting these for each search type, sets the corresponding option in the search dialog.</p>
+<p>To hide the keymap button in the text search dialog, set the option here.</p>
 <h3 id="head-word-search">Head word search</h3>
+<h5 id="close-after-load">Close after load</h5>
+<p>When viewing the entry details of a successful find, the entry may be loaded into a new tab. If this options is set, the view dialog will be closed after the tab has been loaded.</p>
 <h5 id="use-head-phrase">Use head phrase</h5>
-<h5 id="dialog-options_1">Dialog options</h5>
-<p>Set the headword search options.</p>
+<p>Sets the head phrase option in the headword search dialog.</p>
 <h3 id="local-search">Local search</h3>
 <h5 id="show-all-results">Show all results</h5>
 <p>When this is set, all matches on the current page are highlighted. When not set, the first match is highlighted and subsequent matches are highighted using either the appropriate key command (as above) or shortcut.</p>
