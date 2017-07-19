@@ -18,6 +18,7 @@ QT       += core gui printsupport
 #  WebEngine > 5.7
 #  Nothing = 5.7   for FreeBSD 5.7 webengine was not ported (I think)
 #
+! linux {
 equals(QT_MAJOR_VERSION,5) {
 lessThan(QT_MINOR_VERSION,7) {
 QT    += webkitwidgets
@@ -40,7 +41,10 @@ greaterThan(QT_MAJOR_VERSION,5): {
 QT += webenginewidgets
 DEFINES += HELP_WEBENGINE
 }
-
+}
+linux {
+DEFINES += HELP_NONE
+}
 CONFIG   += release
 CONFIG   += libxslt
 QMAKE_CXXFLAGS += -g
