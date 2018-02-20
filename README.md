@@ -1,4 +1,6 @@
-This is the gui application repository for the laneslexicon application.
+ For an overview of the project see [here](http://laneslexicon.github.io).
+
+This is the gui application repository for the project.
 
 It should be used in conjuction with these repositories:
 
