@@ -1,13 +1,8 @@
- For an overview of the project see [here](http://laneslexicon.github.io).
+ For an overview of the project including links to downloads, documentation and a screenshot, see [here](http://laneslexicon.github.io).
+
+Users may which to check [here](https://github.com/laneslexicon/LexiconDatabase) for new versions of the database. The lastest version is as of 24th February 2018 (version 1.0.8).
 
 This is the gui application repository for the project.
-
-It should be used in conjuction with these repositories:
-
-+ parser
-+ xml
-+ documentation
-
 
 Windows and OSX users can download binaries from [here](https://github.com/laneslexicon/lexicon/releases).
 
