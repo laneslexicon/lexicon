@@ -13,6 +13,7 @@ QT       += xml
 QT       += sql
 QT       += svg
 QT       += core gui printsupport
+QT       += xmlpatterns
 #
 #  Webkit for < 5.7
 #  WebEngine > 5.7
@@ -76,7 +77,8 @@ LIBS += -L"$$PWD\libxslt-1.1.26.win32\lib" -llibxslt
 #
 #
 #
-DEFINES += USE_LIBXSLT
+#DEFINES += USE_LIBXSLT
+DEFINES += USE_XQUERY
 DEFINES += LANE
 }
 #

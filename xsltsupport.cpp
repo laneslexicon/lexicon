@@ -193,6 +193,82 @@ void clearParseErrors() {
   xmlParseErrors.clear();
 }
 #endif
+#ifdef USE_XQUERY
+
+MessageHandler xmesshandler;
+QUrl urlXsl;
+QStringList xmlParseErrors;
+
+void initXslt() {
+}
+// unfortunately this does not detect XSLT errors and we cannot
+// "compile" the stylesheet"
+
+// We could use setQuery(QString) to save reloading but
+// it seems pretty fast as it is
+// and we pick up stylesheet changes automatically
+//
+int compileStylesheet(int /* type */,const QString &  xsl ) {
+  urlXsl.setUrl(xsl);
+  return 0;
+}
+QString xsltTransform(int type,const QString & xml) {
+  QString result;
+  QXmlQuery xquery(QXmlQuery::XSLT20);
+  xquery.setMessageHandler(&xmesshandler);
+
+  //  QXmlQuery query(QXmlQuery::XSLT20);
+    switch(type) {
+  case ENTRY_XSLT:
+  case ENTRY_XSLT_RECOMPILE: {
+    xquery.bindVariable("entrytype", QVariant("word"));
+    break;
+  }
+  case NODE_XSLT:{
+    xquery.bindVariable("entrytype", QVariant("node"));
+    break;
+  }
+  case TEST_XSLT: {
+    xquery.bindVariable("entrytype", QVariant("word"));
+    break;
+  }
+  default : {
+    QLOG_WARN() << Q_FUNC_INFO << QObject::tr("transform of unknown type requested") << type;
+    break;
+  }
+  }
+    QString html;
+  xquery.setFocus(xml);
+  xquery.setQuery(urlXsl);
+  if (! xquery.isValid()) {
+    qDebug() << "Got XSLT error";
+    qDebug() << xmesshandler.line() << xmesshandler.column() << xmesshandler.statusMessage();
+    xmlParseErrors << QString("Line: %1 Column: %2").arg(xmesshandler.line()).arg(xmesshandler.column());
+    xmlParseErrors << xmesshandler.statusMessage();
+    return QString();
+  }
+  if (! xquery.evaluateTo(&html)) {
+    qDebug() << "Got error";
+    qDebug() << xmesshandler.statusMessage();
+  }
+  return html;
+}
+const char * getCompileError() {
+  return "";
+}
+void freeXslt() {
+}
+void parseErrorHandler(void *,const char *, ...) {
+}
+QStringList getParseErrors() {
+  return xmlParseErrors;
+}
+
+void clearParseErrors() {
+  xmlParseErrors.clear();
+}
+
+#endif
 /**
    xsl - name of xslt file
 */

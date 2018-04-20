@@ -1400,20 +1400,25 @@ QString GraphicsEntry::transform(int type,const QString & xsl,const QString & xm
   if (ok == 0) {
     QString html = xsltTransform(type,xml);
     if (! html.isEmpty()) {
-
       return fixHtml(html);
     }
     else {
       QLOG_WARN() << "Transform returned no HTML";
-      return QString();
     }
   }
 
   QStringList errors = getParseErrors();
   /// TODO fix this
-  errors.prepend("Errors when processing entry styesheet:");
   QMessageBox msgBox;
+#ifdef USE_XQUERY
+  if (errors.length() > 1) {
+    msgBox.setWindowTitle(QString("XSLT Error at  %1").arg(errors[0]));
+    msgBox.setText(errors[1]);
+  }
+#else
+  errors.prepend("Errors when processing entry styesheet:");
   msgBox.setText(errors.join("\n"));
+#endif
   msgBox.exec();
   clearParseErrors();
   return QString();
