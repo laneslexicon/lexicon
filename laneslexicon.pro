@@ -47,8 +47,9 @@ linux {
 DEFINES += HELP_NONE
 }
 CONFIG   += release
-CONFIG   += libxslt
-QMAKE_CXXFLAGS += -g
+#CONFIG   += libxslt
+CONFIG   += xquery
+!win32: QMAKE_CXXFLAGS += -g
 
 TARGET = laneslexicon
 TEMPLATE = app
