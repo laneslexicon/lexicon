@@ -201,15 +201,9 @@ QStringList xmlParseErrors;
 
 void initXslt() {
 }
-// unfortunately this does not detect XSLT errors and we cannot
-// "compile" the stylesheet"
 
-// We could use setQuery(QString) to save reloading but
-// it seems pretty fast as it is
-// and we pick up stylesheet changes automatically
-//
 int compileStylesheet(int /* type */,const QString &  xsl ) {
-  urlXsl.setUrl(xsl);
+  urlXsl = QUrl::fromLocalFile(xsl);
   return 0;
 }
 QString xsltTransform(int type,const QString & xml) {
