@@ -3,17 +3,17 @@
 #
 #-------------------------------------------------
 
-QT       += core sql xml gui widgets printsupport
+QT       += core sql xml gui widgets printsupport xmlpatterns
 CONFIG   += debug
-CONFIG   += libxslt
+#CONFIG   += libxslt
 CONFIG   += gui
-
+CONFIG   += xquery
 TARGET = ensearch
 
 TEMPLATE = app
 QMAKE_CXXFLAGS += -pthread -Wunused-parameter -g
-DEFINES += USE_LIBXSLT
 libxslt {
+  DEFINES += USE_LIBXSLT
 ! win32 {
   INCLUDEPATH += /usr/include/libxml2 /usr/local/include/libxml2 /usr/local/include
   LIBS += -L $$[QT_INSTALL_LIBS] -lxml2 -lxslt
@@ -24,6 +24,10 @@ INCLUDEPATH += "libxslt-1.1.26.win32\include"
 LIBS += -L"$$PWD\libxml2-2.7.8.win32\lib" -llibxml2
 LIBS += -L"$$PWD\libxslt-1.1.26.win32\lib" -llibxslt
 }
+}
+
+xquery {
+DEFINES += USE_XQUERY
 }
 OBJECTS_DIR = ./ensearch-obj
 MOC_DIR = ./ensearch-moc
