@@ -14,29 +14,32 @@ QT       += sql
 QT       += svg
 QT       += core gui printsupport
 QT       += xmlpatterns
+CONFIG   += release
+#CONFIG   += libxslt
+CONFIG   += xquery
 #
 #  Webkit for < 5.7
 #  WebEngine > 5.7
 #  Nothing = 5.7   for FreeBSD 5.7 webengine was not ported (I think)
 #
 ! linux {
-equals(QT_MAJOR_VERSION,5) {
-lessThan(QT_MINOR_VERSION,7) {
-QT    += webkitwidgets
-DEFINES += HELP_WEBKIT
-}
-equals(QT_MINOR_VERSION,7) {
-freebsd {
-DEFINES += HELP_NONE
-}
-! freebsd {
-DEFINES += HELP_WEBKIT
-}
-}
-greaterThan(QT_MINOR_VERSION,7) {
-QT += webenginewidgets
-DEFINES += HELP_WEBENGINE
-}
+  equals(QT_MAJOR_VERSION,5) {
+  lessThan(QT_MINOR_VERSION,7) {
+     QT    += webkitwidgets
+     DEFINES += HELP_WEBKIT
+  }
+  equals(QT_MINOR_VERSION,7) {
+    freebsd {
+      DEFINES += HELP_NONE
+    }
+    ! freebsd {
+     DEFINES += HELP_WEBKIT
+    }
+  }
+  greaterThan(QT_MINOR_VERSION,7) {
+   QT += webenginewidgets
+   DEFINES += HELP_WEBENGINE
+  }
 }
 greaterThan(QT_MAJOR_VERSION,5): {
 QT += webenginewidgets
@@ -46,9 +49,7 @@ DEFINES += HELP_WEBENGINE
 linux {
 DEFINES += HELP_NONE
 }
-CONFIG   += release
-#CONFIG   += libxslt
-CONFIG   += xquery
+
 !win32: QMAKE_CXXFLAGS += -g
 
 TARGET = laneslexicon
@@ -65,33 +66,36 @@ TEMPLATE = app
 # Library and include paths LibXslt
 #
 libxslt {
-! win32 {
+  DEFINES += USE_LIBXSLT
+  ! win32 {
   INCLUDEPATH += /usr/include/libxml2 /usr/local/include/libxml2 /usr/local/include
   LIBS += -L $$[QT_INSTALL_LIBS] -lxml2 -lxslt
-}
-win32 {
-INCLUDEPATH += "libxml2-2.7.8.win32\include"
-INCLUDEPATH += "libxslt-1.1.26.win32\include"
-LIBS += -L"$$PWD\libxml2-2.7.8.win32\lib" -llibxml2
-LIBS += -L"$$PWD\libxslt-1.1.26.win32\lib" -llibxslt
+  }
+  win32 {
+    INCLUDEPATH += "libxml2-2.7.8.win32\include"
+    INCLUDEPATH += "libxslt-1.1.26.win32\include"
+    LIBS += -L"$$PWD\libxml2-2.7.8.win32\lib" -llibxml2
+    LIBS += -L"$$PWD\libxslt-1.1.26.win32\lib" -llibxslt
+    }
 }
 #
-#
-#
-#DEFINES += USE_LIBXSLT
-DEFINES += USE_XQUERY
-DEFINES += LANE
-}
 #
 # Never completed using Xalan. LibXslt seemed a lot easier to incorporate
 #
 #
 xalan {
-INCLUDEPATH += /usr/include/xalanc/PlatformSupport
-INCLUDEPATH += /usr/include/xalanc/XalanTransformer
-LIBS += -lxalan-c -lxalanMsg -lxerces-c -lxerces-depdom
-DEFINES += USE_XALAN
+   INCLUDEPATH += /usr/include/xalanc/PlatformSupport
+   INCLUDEPATH += /usr/include/xalanc/XalanTransformer
+   LIBS += -lxalan-c -lxalanMsg -lxerces-c -lxerces-depdom
+   DEFINES += USE_XALAN
 }
+
+xquery : {
+DEFINES += USE_XQUERY
+}
+
+
+DEFINES += LANE
 INCLUDEPATH += ./qslog
 RESOURCES += laneslexicon.qrc
 #TRANSLATIONS = laneslexicon_de.ts laneslexicon_fr.ts
